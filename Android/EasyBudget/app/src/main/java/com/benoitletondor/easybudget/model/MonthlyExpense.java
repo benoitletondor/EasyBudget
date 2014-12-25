@@ -13,26 +13,54 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
+ * Object that represent a expense that occur on every month
+ *
  * @author Benoit LETONDOR
  */
 public class MonthlyExpense extends Expense
 {
-    private int startAmount;
-    private int dayOfMonth;
+    /**
+     * Amount of the monthly expense at the beginning (before any edit)
+     */
+    private int  startAmount;
+    /**
+     * Day of month of this expense (computed at runtime from the StartDate)
+     */
+    private int  dayOfMonth;
+    /**
+     * Start date of this recurring expense (Should not be updated)
+     */
     private Date startDate;
+    /**
+     * End date of this recurring expense
+     */
     private Date endDate;
+    /**
+     * List of modifications that have been made to this expense.
+     */
     private Map<Date, Integer> modifications = new HashMap<>();
 
 // ---------------------------------->
 
+    /**
+     *
+     * @param startAmount
+     * @param startDate
+     */
     public MonthlyExpense(int startAmount, Date startDate)
     {
         this(startAmount, startDate, null);
     }
 
+    /**
+     *
+     * @param startAmount
+     * @param startDate
+     * @param endDate
+     */
     public MonthlyExpense(int startAmount, Date startDate, Date endDate)
     {
-        if( startAmount == 0 )
+        if (startAmount == 0)
         {
             throw new IllegalArgumentException("startAmount should be != 0");
         }
@@ -59,6 +87,13 @@ public class MonthlyExpense extends Expense
         this.endDate = DateHelper.cleanDate(endDate);
     }
 
+    /**
+     *
+     * @param startAmount
+     * @param startDate
+     * @param endDate
+     * @param modifications
+     */
     public MonthlyExpense(int startAmount, Date startDate, Date endDate, Map<Date, Integer> modifications)
     {
         this(startAmount, startDate, endDate);
@@ -73,11 +108,22 @@ public class MonthlyExpense extends Expense
 
 // ---------------------------------->
 
+    /**
+     * Add a modification to this expense
+     *
+     * @param startingDate
+     * @param newAmount
+     */
     public void addModification(Date startingDate, int newAmount)
     {
         if( newAmount == 0 )
         {
             throw new IllegalArgumentException("amount should be != 0");
+        }
+
+        if( startingDate.before(startDate) )
+        {
+            throw new IllegalArgumentException("starting date should be > start date");
         }
 
         Date cleanedDate = DateHelper.cleanDate(startingDate);
@@ -96,6 +142,12 @@ public class MonthlyExpense extends Expense
         modifications.put(cleanedDate, new Integer(newAmount));
     }
 
+    /**
+     * Get the amount for a given date
+     *
+     * @param date
+     * @return
+     */
     public int getAmountForMonth(Date date)
     {
         Date cleanedDate = DateHelper.cleanDate(date);
@@ -117,21 +169,37 @@ public class MonthlyExpense extends Expense
         return amount;
     }
 
+    /**
+     *
+     * @return
+     */
     public Date getStartDate()
     {
         return startDate;
     }
 
+    /**
+     *
+     * @return
+     */
     public Date getEndDate()
     {
         return endDate;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getStartAmount()
     {
         return startAmount;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getDayOfMonth()
     {
         return dayOfMonth;
@@ -139,6 +207,13 @@ public class MonthlyExpense extends Expense
 
 // ---------------------------------->
 
+    /**
+     * Helper to serialize modifications to a json string
+     *
+     * @param expense
+     * @return
+     * @throws JSONException
+     */
     public static String modificationsToJson(MonthlyExpense expense) throws JSONException
     {
         JSONArray array = new JSONArray();
@@ -156,6 +231,13 @@ public class MonthlyExpense extends Expense
         return array.toString();
     }
 
+    /**
+     * Helper to deserialize modification from a json string
+     *
+     * @param jsonString
+     * @return
+     * @throws JSONException
+     */
     public static Map<Date, Integer> jsonToModifications(String jsonString) throws JSONException
     {
         JSONArray array = new JSONArray(jsonString);

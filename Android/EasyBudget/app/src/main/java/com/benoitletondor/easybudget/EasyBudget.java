@@ -9,6 +9,8 @@ import com.benoitletondor.easybudget.model.db.DB;
 import java.util.Date;
 
 /**
+ * EasyBudget application
+ *
  * @author Benoit LETONDOR
  */
 public class EasyBudget extends Application

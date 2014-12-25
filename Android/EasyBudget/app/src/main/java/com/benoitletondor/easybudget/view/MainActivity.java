@@ -21,6 +21,8 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
+ * Main activity containing Calendar and List of expenses
+ *
  * @author Benoit LETONDOR
  */
 public class MainActivity extends ActionBarActivity

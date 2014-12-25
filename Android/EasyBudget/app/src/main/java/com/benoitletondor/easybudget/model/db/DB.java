@@ -18,14 +18,12 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * Database wrapper and DAO
+ *
  * @author Benoit LETONDOR
  */
 public final class DB
 {
-    /**
-     * Saved app context
-     */
-    private Context        context;
     /**
      * The SQLLite DB
      */
@@ -37,6 +35,12 @@ public final class DB
 
 // -------------------------------------------->
 
+    /**
+     * Create and open a new DB
+     *
+     * @param context
+     * @throws SQLiteException
+     */
     public DB(Context context) throws SQLiteException
     {
         if (context == null)
@@ -44,11 +48,13 @@ public final class DB
             throw new NullPointerException("context==null");
         }
 
-        this.context = context.getApplicationContext();
-		databaseHelper = new SQLiteDBHelper(this.context);
+		databaseHelper = new SQLiteDBHelper(context.getApplicationContext());
 		database = databaseHelper.getWritableDatabase();
 	}
 
+    /**
+     * Close the DB, no call to other methods should be made after this method
+     */
     public void close()
     {
         try
@@ -73,6 +79,11 @@ public final class DB
 
 // -------------------------------------------->
 
+    /**
+     * Add a one time expense into DB
+     *
+     * @param expense
+     */
     public void addOneTimeExpense(OneTimeExpense expense)
     {
         if( expense == null )
@@ -83,6 +94,12 @@ public final class DB
         database.insert(SQLiteDBHelper.TABLE_ONE_TIME_EXPENSE, null, generateContentValuesForOneTimeExpense(expense));
     }
 
+    /**
+     * Get all one time expense for a day
+     *
+     * @param date
+     * @return
+     */
     public List<OneTimeExpense> getOneTimeExpensesForDay(Date date)
     {
         date = DateHelper.cleanDate(date);
@@ -109,6 +126,11 @@ public final class DB
         }
     }
 
+    /**
+     * Add a monthly expense
+     *
+     * @param expense
+     */
     public void addMonthlyExpense(MonthlyExpense expense)
     {
         if( expense == null )
@@ -126,6 +148,12 @@ public final class DB
         }
     }
 
+    /**
+     * Get all monthly expense for a day
+     *
+     * @param date
+     * @return
+     */
     public List<MonthlyExpense> getMonthyExpensesForDay(Date date)
     {
         date = DateHelper.cleanDate(date);
@@ -161,6 +189,12 @@ public final class DB
 
 // -------------------------------------------->
 
+    /**
+     * Deserialize a one time expense from DB
+     *
+     * @param cursor
+     * @return
+     */
     private static OneTimeExpense OneTimeExpenseFromCursor(Cursor cursor)
     {
         return new OneTimeExpense
@@ -170,6 +204,12 @@ public final class DB
         );
     }
 
+    /**
+     * Generate serialized values for a one time expense
+     *
+     * @param expense
+     * @return
+     */
     private static ContentValues generateContentValuesForOneTimeExpense(OneTimeExpense expense)
     {
         final ContentValues values = new ContentValues();
@@ -180,6 +220,13 @@ public final class DB
         return values;
     }
 
+    /**
+     * Deserialize a monthly expense from DB
+     *
+     * @param cursor
+     * @return
+     * @throws JSONException
+     */
     private static MonthlyExpense MonthlyExpenseFromCursor(Cursor cursor) throws JSONException
     {
         return new MonthlyExpense
@@ -191,6 +238,13 @@ public final class DB
         );
     }
 
+    /**
+     * Generate serialized values for a monthly expense
+     *
+     * @param expense
+     * @return
+     * @throws JSONException
+     */
     private static ContentValues generateContentValuesForMonthlyExpense(MonthlyExpense expense) throws JSONException
     {
         final ContentValues values = new ContentValues();

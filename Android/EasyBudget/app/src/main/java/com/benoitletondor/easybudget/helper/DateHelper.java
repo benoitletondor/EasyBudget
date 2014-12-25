@@ -5,10 +5,18 @@ import java.util.Date;
 import java.util.TimeZone;
 
 /**
+ * Helper to work with dates
+ *
  * @author Benoit LETONDOR
  */
 public class DateHelper
 {
+    /**
+     * Remove hour, minutes, seconds and ms data from a date.
+     *
+     * @param date
+     * @return a new cleaned date
+     */
     public static Date cleanDate(Date date)
     {
         Calendar cal = Calendar.getInstance();
@@ -23,6 +31,12 @@ public class DateHelper
         return cal.getTime();
     }
 
+    /**
+     * Return the day of month of a date
+     *
+     * @param date
+     * @return
+     */
     public static int getDayOfMonth(Date date)
     {
         Calendar cal = Calendar.getInstance();
