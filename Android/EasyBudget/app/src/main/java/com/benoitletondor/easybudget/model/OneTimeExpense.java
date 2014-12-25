@@ -8,7 +8,7 @@ import java.util.Date;
 /**
  * @author Benoit LETONDOR
  */
-public class OneTimeExpense
+public class OneTimeExpense extends Expense
 {
     private int amount;
     private Date date;

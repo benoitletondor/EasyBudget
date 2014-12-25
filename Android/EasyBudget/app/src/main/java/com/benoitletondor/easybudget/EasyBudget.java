@@ -2,6 +2,7 @@ package com.benoitletondor.easybudget;
 
 import android.app.Application;
 
+import com.benoitletondor.easybudget.model.MonthlyExpense;
 import com.benoitletondor.easybudget.model.OneTimeExpense;
 import com.benoitletondor.easybudget.model.db.DB;
 
@@ -20,5 +21,6 @@ public class EasyBudget extends Application
         DB db = new DB(getApplicationContext());
         db.clearDB();
         db.addOneTimeExpense(new OneTimeExpense(30, new Date()));
+        db.addMonthlyExpense(new MonthlyExpense(10, new Date()));
     }
 }

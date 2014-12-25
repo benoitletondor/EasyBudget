@@ -109,6 +109,23 @@ public final class DB
         }
     }
 
+    public void addMonthlyExpense(MonthlyExpense expense)
+    {
+        if( expense == null )
+        {
+            throw new NullPointerException("expense==null");
+        }
+
+        try
+        {
+            database.insert(SQLiteDBHelper.TABLE_MONTHLY_EXPENSE, null, generateContentValuesForMonthlyExpense(expense));
+        }
+        catch(Exception e)
+        {
+            throw new RuntimeException("Error while serializing Monthly expense to SQLite", e);
+        }
+    }
+
     public List<MonthlyExpense> getMonthyExpensesForDay(Date date)
     {
         date = DateHelper.cleanDate(date);

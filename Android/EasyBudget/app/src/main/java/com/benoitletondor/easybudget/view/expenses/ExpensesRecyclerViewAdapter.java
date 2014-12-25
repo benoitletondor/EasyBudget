@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.benoitletondor.easybudget.R;
+import com.benoitletondor.easybudget.model.Expense;
 import com.benoitletondor.easybudget.model.MonthlyExpense;
 import com.benoitletondor.easybudget.model.OneTimeExpense;
 import com.benoitletondor.easybudget.model.db.DB;
@@ -20,8 +21,8 @@ import java.util.List;
  */
 public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRecyclerViewAdapter.ViewHolder>
 {
-    private List<OneTimeExpense> oneTimeExpenses = new ArrayList<>();
-    private List<MonthlyExpense> monthlyExpenses = new ArrayList<>();
+    private List<Expense> expenses = new ArrayList<>();
+    private Date date;
 
     public ExpensesRecyclerViewAdapter(DB db, Date date)
     {
@@ -35,8 +36,9 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
             throw new NullPointerException("date==null");
         }
 
-        this.oneTimeExpenses =  db.getOneTimeExpensesForDay(date);
-        this.monthlyExpenses = db.getMonthyExpensesForDay(date);
+        this.date = date;
+        this.expenses.addAll(db.getOneTimeExpensesForDay(date));
+        this.expenses.addAll(db.getMonthyExpensesForDay(date));
     }
 
 // ------------------------------------------>
@@ -51,13 +53,34 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int i)
     {
-        viewHolder.textView.setText("Amount : " + oneTimeExpenses.get(i).getAmount());
+        Expense expense = expenses.get(i);
+
+        if( expense instanceof OneTimeExpense )
+        {
+            drawOneTimeExpense((OneTimeExpense) expense, viewHolder);
+        }
+        else if( expense instanceof MonthlyExpense )
+        {
+            drawMonthlyExpense((MonthlyExpense) expense, viewHolder);
+        }
     }
 
     @Override
     public int getItemCount()
     {
-        return oneTimeExpenses.size() + monthlyExpenses.size();
+        return expenses.size();
+    }
+
+// ------------------------------------------->
+
+    private void drawOneTimeExpense(OneTimeExpense expense, ViewHolder viewHolder)
+    {
+        viewHolder.textView.setText("Amount : " + expense.getAmount());
+    }
+
+    private void drawMonthlyExpense(MonthlyExpense expense, ViewHolder viewHolder)
+    {
+        viewHolder.textView.setText("Month amount : " + expense.getAmountForMonth(date));
     }
 
 // ------------------------------------------->

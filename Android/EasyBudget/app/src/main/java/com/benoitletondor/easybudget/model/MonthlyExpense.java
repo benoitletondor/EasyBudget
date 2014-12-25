@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -14,7 +15,7 @@ import java.util.Map;
 /**
  * @author Benoit LETONDOR
  */
-public class MonthlyExpense
+public class MonthlyExpense extends Expense
 {
     private int startAmount;
     private int dayOfMonth;
@@ -23,6 +24,11 @@ public class MonthlyExpense
     private Map<Date, Integer> modifications = new HashMap<>();
 
 // ---------------------------------->
+
+    public MonthlyExpense(int startAmount, Date startDate)
+    {
+        this(startAmount, startDate, null);
+    }
 
     public MonthlyExpense(int startAmount, Date startDate, Date endDate)
     {
@@ -40,6 +46,16 @@ public class MonthlyExpense
 
         this.startDate = DateHelper.cleanDate(startDate);
         this.dayOfMonth = DateHelper.getDayOfMonth(startDate);
+
+        // If the endDate is null, it's set to 1000 year from now
+        if( endDate == null )
+        {
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.YEAR, 1000);
+
+            endDate = cal.getTime();
+        }
+
         this.endDate = DateHelper.cleanDate(endDate);
     }
 
