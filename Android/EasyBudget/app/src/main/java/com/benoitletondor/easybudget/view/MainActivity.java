@@ -7,14 +7,18 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.benoitletondor.easybudget.R;
+import com.benoitletondor.easybudget.model.db.DB;
 import com.benoitletondor.easybudget.view.calendar.CalendarFragment;
 import com.benoitletondor.easybudget.view.expenses.ExpensesRecyclerViewAdapter;
 import com.melnykov.fab.FloatingActionButton;
 import com.roomorama.caldroid.CaldroidFragment;
+import com.roomorama.caldroid.CaldroidListener;
 
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * @author Benoit LETONDOR
@@ -26,6 +30,8 @@ public class MainActivity extends ActionBarActivity
     private LinearLayoutManager         expensesLayoutManager;
     private ExpensesRecyclerViewAdapter expensesViewAdapter;
 
+    private DB db;
+
 // ------------------------------------------>
 
     @Override
@@ -34,6 +40,7 @@ public class MainActivity extends ActionBarActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        db = new DB(getApplicationContext());
         initCalendarFragment();
         initRecyclerView();
     }
@@ -45,6 +52,9 @@ public class MainActivity extends ActionBarActivity
         expensesRecyclerView = null;
         expensesLayoutManager = null;
         expensesViewAdapter = null;
+
+        db.close();
+        db = null;
 
         super.onDestroy();
     }
@@ -93,6 +103,24 @@ public class MainActivity extends ActionBarActivity
         FragmentTransaction t = getSupportFragmentManager().beginTransaction();
         t.replace(R.id.calendarView, calendarFragment);
         t.commit();
+
+        final CaldroidListener listener = new CaldroidListener()
+        {
+            @Override
+            public void onSelectDate(Date date, View view)
+            {
+                expensesViewAdapter = new ExpensesRecyclerViewAdapter(db, date);
+                expensesRecyclerView.swapAdapter(expensesViewAdapter, true);
+            }
+
+            @Override
+            public void onChangeMonth(int month, int year)
+            {
+
+            }
+        };
+
+        calendarFragment.setCaldroidListener(listener);
     }
 
     private void initRecyclerView()
@@ -105,7 +133,7 @@ public class MainActivity extends ActionBarActivity
         expensesLayoutManager = new LinearLayoutManager(this);
         expensesRecyclerView.setLayoutManager(expensesLayoutManager);
 
-        expensesViewAdapter = new ExpensesRecyclerViewAdapter();
+        expensesViewAdapter = new ExpensesRecyclerViewAdapter(db, new Date());
         expensesRecyclerView.setAdapter(expensesViewAdapter);
     }
 }

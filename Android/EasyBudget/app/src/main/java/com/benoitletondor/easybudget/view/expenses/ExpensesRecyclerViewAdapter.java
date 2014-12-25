@@ -1,30 +1,62 @@
 package com.benoitletondor.easybudget.view.expenses;
 
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.benoitletondor.easybudget.R;
+import com.benoitletondor.easybudget.model.Expense;
+import com.benoitletondor.easybudget.model.OneTimeExpense;
+import com.benoitletondor.easybudget.model.db.DB;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 /**
- * Created by benoit on 25/12/14.
+ * @author Benoit LETONDOR
  */
 public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRecyclerViewAdapter.ViewHolder>
 {
+    private List<Expense> expenses = new ArrayList<>();
+
+    public ExpensesRecyclerViewAdapter(DB db, Date date)
+    {
+        if (db == null)
+        {
+            throw new NullPointerException("db==null");
+        }
+
+        if (date == null)
+        {
+            throw new NullPointerException("date==null");
+        }
+
+        List<OneTimeExpense> expenses = db.getOneTimeExpensesForDay(date);
+        this.expenses.addAll(expenses);
+    }
+
+// ------------------------------------------>
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i)
     {
-        return null;
+        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.recycleview_expense_cell, viewGroup, false);
+        return new ViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int i)
     {
-
+        viewHolder.textView.setText("Amount : "+expenses.get(i).getAmount());
     }
 
     @Override
     public int getItemCount()
     {
-        return 0;
+        return expenses.size();
     }
 
 // ------------------------------------------->
@@ -35,12 +67,13 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
     public static class ViewHolder extends RecyclerView.ViewHolder
     {
         // each data item is just a string in this case
-        public TextView mTextView;
+        public TextView textView;
 
-        public ViewHolder(TextView v)
+        public ViewHolder(View v)
         {
             super(v);
-            mTextView = v;
+
+            textView = (TextView) v.findViewById(R.id.expense_text_view);
         }
     }
 }

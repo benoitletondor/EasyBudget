@@ -12,23 +12,29 @@
         android:layout_height="wrap_content"
         android:orientation="vertical" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/expensesRecyclerView"
-        android:scrollbars="vertical"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dip"
-        android:layout_weight="1" />
+        android:layout_weight="1">
 
-    <com.melnykov.fab.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
-        android:layout_margin="16dp"
-        android:src="@drawable/ic_add"
-        fab:fab_colorNormal="@color/accent"
-        fab:fab_colorPressed="@color/primary_dark"
-        fab:fab_colorRipple="@color/primary_light"
-        tools:ignore="RtlHardcoded"/>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/expensesRecyclerView"
+            android:scrollbars="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <com.melnykov.fab.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_add"
+            fab:fab_colorNormal="@color/accent"
+            fab:fab_colorPressed="@color/primary_dark"
+            fab:fab_colorRipple="@color/primary_light"
+            tools:ignore="RtlHardcoded"/>
+
+    </FrameLayout>
 
 </LinearLayout>

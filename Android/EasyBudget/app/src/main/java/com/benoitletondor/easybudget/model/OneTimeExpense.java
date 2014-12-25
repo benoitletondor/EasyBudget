@@ -1,5 +1,6 @@
 package com.benoitletondor.easybudget.model;
 
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -20,7 +21,7 @@ public class OneTimeExpense extends Expense
             throw new NullPointerException("date==null");
         }
 
-        this.date = date;
+        this.date = cleanDate(date);
     }
 
 // ------------------------------------>

@@ -7,12 +7,15 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 
 import com.benoitletondor.easybudget.helper.Logger;
+import com.benoitletondor.easybudget.model.Expense;
 import com.benoitletondor.easybudget.model.MonthlyExpense;
 import com.benoitletondor.easybudget.model.OneTimeExpense;
 
 import org.json.JSONException;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Benoit LETONDOR
@@ -46,9 +49,46 @@ public final class DB
 		database = databaseHelper.getWritableDatabase();
 	}
 
+    public void close()
+    {
+        try
+        {
+            database.close();
+            databaseHelper = null;
+        }
+        catch (Exception e)
+        {
+            Logger.error("Error while closing SQLite DB", e);
+        }
+    }
+
 // -------------------------------------------->
 
+    public List<OneTimeExpense> getOneTimeExpensesForDay(Date date)
+    {
+        date = Expense.cleanDate(date);
 
+        Cursor cursor = null;
+        try
+        {
+            List<OneTimeExpense> expenses = new ArrayList<>();
+
+            cursor = database.query(SQLiteDBHelper.TABLE_ONE_TIME_EXPENSE, null, SQLiteDBHelper.COLUMN_ONE_TIME_DATE + " = "+date.getTime(), null, null, null, null, null);
+            while( cursor.moveToNext() )
+            {
+                expenses.add(OneTimeExpenseFromCursor(cursor));
+            }
+
+            return expenses;
+        }
+        finally
+        {
+            if( cursor != null )
+            {
+                cursor.close();
+            }
+        }
+    }
 
 // -------------------------------------------->
 
