@@ -62,7 +62,26 @@ public final class DB
         }
     }
 
+    /**
+     * Clear all DB content (<b>for test purpose</b>)
+     */
+    public void clearDB()
+    {
+        database.delete(SQLiteDBHelper.TABLE_ONE_TIME_EXPENSE, null, null);
+        database.delete(SQLiteDBHelper.TABLE_MONTHLY_EXPENSE, null, null);
+    }
+
 // -------------------------------------------->
+
+    public void addOneTimeExpense(OneTimeExpense expense)
+    {
+        if( expense == null )
+        {
+            throw new NullPointerException("expense==null");
+        }
+
+        database.insert(SQLiteDBHelper.TABLE_ONE_TIME_EXPENSE, null, generateContentValuesForOneTimeExpense(expense));
+    }
 
     public List<OneTimeExpense> getOneTimeExpensesForDay(Date date)
     {
