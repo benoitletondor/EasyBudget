@@ -1,5 +1,9 @@
 package com.benoitletondor.easybudget.model;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -28,6 +32,18 @@ public class MonthlyExpense extends Expense
 
         this.startDate = cleanDate(startDate);
         this.endDate = cleanDate(endDate);
+    }
+
+    public MonthlyExpense(int startAmount, Date startDate, Date endDate, Map<Date, Integer> modifications)
+    {
+        this(startAmount, startDate, endDate);
+
+        if( modifications == null )
+        {
+            throw new NullPointerException("modifications==null");
+        }
+
+        this.modifications = modifications;
     }
 
 // ---------------------------------->
@@ -99,5 +115,39 @@ public class MonthlyExpense extends Expense
         cal.set(Calendar.MILLISECOND, 0);
 
         return cal.getTime();
+    }
+
+// ---------------------------------->
+
+    public static String modificationsToJson(MonthlyExpense expense) throws JSONException
+    {
+        JSONArray array = new JSONArray();
+
+        for( Date modificationDate : expense.modifications.keySet() )
+        {
+            Integer amount = expense.modifications.get(modificationDate);
+
+            JSONObject modifJson = new JSONObject();
+            modifJson.put("d", modificationDate.getTime());
+            modifJson.put("a", amount);
+            array.put(modifJson);
+        }
+
+        return array.toString();
+    }
+
+    public static Map<Date, Integer> jsonToModifications(String jsonString) throws JSONException
+    {
+        JSONArray array = new JSONArray(jsonString);
+
+        Map<Date, Integer> modifications = new HashMap<>();
+
+        for(int i=0; i<array.length(); i++)
+        {
+            JSONObject modifJson = array.getJSONObject(i);
+            modifications.put(new Date(modifJson.getInt("d")), modifJson.getInt("a"));
+        }
+
+        return modifications;
     }
 }

@@ -3,7 +3,7 @@ package com.benoitletondor.easybudget.model;
 import java.util.Date;
 
 /**
- * Created by benoit on 25/12/14.
+ * @author Benoit LETONDOR
  */
 public class OneTimeExpense extends Expense
 {

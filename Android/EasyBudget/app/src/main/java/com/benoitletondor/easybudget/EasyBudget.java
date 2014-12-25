@@ -11,7 +11,5 @@ public class EasyBudget extends Application
     public void onCreate()
     {
         super.onCreate();
-
-
     }
 }
