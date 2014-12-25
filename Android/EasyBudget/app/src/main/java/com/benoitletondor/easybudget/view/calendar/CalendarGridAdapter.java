@@ -1,4 +1,4 @@
-package com.benoitletondor.easybudget.calendar;
+package com.benoitletondor.easybudget.view.calendar;
 
 import android.content.Context;
 import android.view.View;

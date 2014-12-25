@@ -1,4 +1,4 @@
-package com.benoitletondor.easybudget.calendar;
+package com.benoitletondor.easybudget.view.calendar;
 
 import com.roomorama.caldroid.CaldroidFragment;
 import com.roomorama.caldroid.CaldroidGridAdapter;

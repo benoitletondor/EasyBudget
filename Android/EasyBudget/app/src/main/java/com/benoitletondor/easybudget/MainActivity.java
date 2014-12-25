@@ -3,25 +3,29 @@ package com.benoitletondor.easybudget;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 
-import com.benoitletondor.easybudget.calendar.CalendarFragment;
+import com.benoitletondor.easybudget.view.calendar.CalendarFragment;
+import com.benoitletondor.easybudget.view.expenses.ExpensesRecyclerViewAdapter;
+import com.melnykov.fab.FloatingActionButton;
 import com.roomorama.caldroid.CaldroidFragment;
-import com.roomorama.caldroid.CaldroidListener;
 
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * @author Benoit LETONDOR
  */
 public class MainActivity extends ActionBarActivity
 {
-    private CalendarFragment calendarFragment;
+    private CalendarFragment            calendarFragment;
+    private RecyclerView                expensesRecyclerView;
+    private LinearLayoutManager         expensesLayoutManager;
+    private ExpensesRecyclerViewAdapter expensesViewAdapter;
+
+// ------------------------------------------>
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -30,18 +34,21 @@ public class MainActivity extends ActionBarActivity
         setContentView(R.layout.activity_main);
 
         initCalendarFragment();
+        initRecyclerView();
     }
 
     @Override
     protected void onDestroy()
     {
         calendarFragment = null;
+        expensesRecyclerView = null;
+        expensesLayoutManager = null;
+        expensesViewAdapter = null;
 
         super.onDestroy();
     }
 
-// --------------------------------------->
-
+// ------------------------------------------>
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -67,8 +74,6 @@ public class MainActivity extends ActionBarActivity
         return super.onOptionsItemSelected(item);
     }
 
-
-
 // ------------------------------------------>
 
     private void initCalendarFragment()
@@ -87,5 +92,19 @@ public class MainActivity extends ActionBarActivity
         FragmentTransaction t = getSupportFragmentManager().beginTransaction();
         t.replace(R.id.calendarView, calendarFragment);
         t.commit();
+    }
+
+    private void initRecyclerView()
+    {
+        expensesRecyclerView = (RecyclerView) findViewById(R.id.expensesRecyclerView);
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.attachToRecyclerView(expensesRecyclerView);
+
+        expensesLayoutManager = new LinearLayoutManager(this);
+        expensesRecyclerView.setLayoutManager(expensesLayoutManager);
+
+        expensesViewAdapter = new ExpensesRecyclerViewAdapter();
+        expensesRecyclerView.setAdapter(expensesViewAdapter);
     }
 }
