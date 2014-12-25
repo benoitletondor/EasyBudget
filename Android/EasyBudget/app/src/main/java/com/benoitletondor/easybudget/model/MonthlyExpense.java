@@ -1,10 +1,11 @@
 package com.benoitletondor.easybudget.model;
 
+import com.benoitletondor.easybudget.helper.DateHelper;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -13,8 +14,10 @@ import java.util.Map;
 /**
  * @author Benoit LETONDOR
  */
-public class MonthlyExpense extends Expense
+public class MonthlyExpense
 {
+    private int startAmount;
+    private int dayOfMonth;
     private Date startDate;
     private Date endDate;
     private Map<Date, Integer> modifications = new HashMap<>();
@@ -23,15 +26,21 @@ public class MonthlyExpense extends Expense
 
     public MonthlyExpense(int startAmount, Date startDate, Date endDate)
     {
-        super(startAmount);
+        if( startAmount == 0 )
+        {
+            throw new IllegalArgumentException("startAmount should be != 0");
+        }
+
+        this.startAmount = startAmount;
 
         if (startDate == null)
         {
             throw new NullPointerException("date==null");
         }
 
-        this.startDate = cleanDate(startDate);
-        this.endDate = cleanDate(endDate);
+        this.startDate = DateHelper.cleanDate(startDate);
+        this.dayOfMonth = DateHelper.getDayOfMonth(startDate);
+        this.endDate = DateHelper.cleanDate(endDate);
     }
 
     public MonthlyExpense(int startAmount, Date startDate, Date endDate, Map<Date, Integer> modifications)
@@ -55,7 +64,7 @@ public class MonthlyExpense extends Expense
             throw new IllegalArgumentException("amount should be != 0");
         }
 
-        Date cleanedDate = cleanDate(startingDate);
+        Date cleanedDate = DateHelper.cleanDate(startingDate);
 
         Iterator<Date> modificationDateIterator = modifications.keySet().iterator();
         while( modificationDateIterator.hasNext() )
@@ -73,8 +82,8 @@ public class MonthlyExpense extends Expense
 
     public int getAmountForMonth(Date date)
     {
-        Date cleanedDate = cleanDate(date);
-        int amount = getAmount();
+        Date cleanedDate = DateHelper.cleanDate(date);
+        int amount = startAmount;
 
         if( modifications.isEmpty() )
         {
@@ -100,6 +109,16 @@ public class MonthlyExpense extends Expense
     public Date getEndDate()
     {
         return endDate;
+    }
+
+    public int getStartAmount()
+    {
+        return startAmount;
+    }
+
+    public int getDayOfMonth()
+    {
+        return dayOfMonth;
     }
 
 // ---------------------------------->

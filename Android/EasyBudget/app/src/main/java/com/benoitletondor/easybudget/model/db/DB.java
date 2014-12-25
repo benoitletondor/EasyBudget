@@ -6,8 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 
+import com.benoitletondor.easybudget.helper.DateHelper;
 import com.benoitletondor.easybudget.helper.Logger;
-import com.benoitletondor.easybudget.model.Expense;
 import com.benoitletondor.easybudget.model.MonthlyExpense;
 import com.benoitletondor.easybudget.model.OneTimeExpense;
 
@@ -66,7 +66,7 @@ public final class DB
 
     public List<OneTimeExpense> getOneTimeExpensesForDay(Date date)
     {
-        date = Expense.cleanDate(date);
+        date = DateHelper.cleanDate(date);
 
         Cursor cursor = null;
         try
@@ -77,6 +77,39 @@ public final class DB
             while( cursor.moveToNext() )
             {
                 expenses.add(OneTimeExpenseFromCursor(cursor));
+            }
+
+            return expenses;
+        }
+        finally
+        {
+            if( cursor != null )
+            {
+                cursor.close();
+            }
+        }
+    }
+
+    public List<MonthlyExpense> getMonthyExpensesForDay(Date date)
+    {
+        date = DateHelper.cleanDate(date);
+
+        Cursor cursor = null;
+        try
+        {
+            List<MonthlyExpense> expenses = new ArrayList<>();
+
+            cursor = database.query(SQLiteDBHelper.TABLE_MONTHLY_EXPENSE, null, SQLiteDBHelper.COLUMN_MONTHLY_DAYOFMONTH + " = "+DateHelper.getDayOfMonth(date), null, null, null, null, null);
+            while( cursor.moveToNext() )
+            {
+                try
+                {
+                    expenses.add(MonthlyExpenseFromCursor(cursor));
+                }
+                catch(Exception e)
+                {
+                    throw new RuntimeException("Error while deserializing MonthlyExpense", e);
+                }
             }
 
             return expenses;
@@ -115,7 +148,7 @@ public final class DB
     {
         return new MonthlyExpense
         (
-            cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_AMOUNT)),
+            cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_START_AMOUNT)),
             new Date(cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_STARTDATE))),
             new Date(cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_ENDDATE))),
             MonthlyExpense.jsonToModifications(cursor.getString(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_MODIFICATIONS)))
@@ -128,8 +161,9 @@ public final class DB
 
         values.put(SQLiteDBHelper.COLUMN_MONTHLY_STARTDATE, expense.getStartDate().getTime());
         values.put(SQLiteDBHelper.COLUMN_MONTHLY_ENDDATE, expense.getEndDate().getTime());
-        values.put(SQLiteDBHelper.COLUMN_MONTHLY_AMOUNT, expense.getAmount());
+        values.put(SQLiteDBHelper.COLUMN_MONTHLY_START_AMOUNT, expense.getStartAmount());
         values.put(SQLiteDBHelper.COLUMN_MONTHLY_MODIFICATIONS, MonthlyExpense.modificationsToJson(expense));
+        values.put(SQLiteDBHelper.COLUMN_MONTHLY_DAYOFMONTH, expense.getDayOfMonth());
 
         return values;
     }
