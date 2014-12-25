@@ -1,4 +1,4 @@
-package com.benoitletondor.easybudget;
+package com.benoitletondor.easybudget.view;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.benoitletondor.easybudget.R;
 import com.benoitletondor.easybudget.view.calendar.CalendarFragment;
 import com.benoitletondor.easybudget.view.expenses.ExpensesRecyclerViewAdapter;
 import com.melnykov.fab.FloatingActionButton;
