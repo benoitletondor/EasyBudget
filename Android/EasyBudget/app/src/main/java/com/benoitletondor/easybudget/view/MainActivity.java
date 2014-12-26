@@ -99,8 +99,10 @@ public class MainActivity extends ActionBarActivity
         args.putInt(CaldroidFragment.YEAR, cal.get(Calendar.YEAR));
         args.putBoolean(CaldroidFragment.ENABLE_SWIPE, true);
         args.putBoolean(CaldroidFragment.SIX_WEEKS_IN_CALENDAR, false);
+        args.putInt(CalendarFragment.START_DAY_OF_WEEK, CalendarFragment.MONDAY);
 
         calendarFragment.setArguments(args);
+        calendarFragment.setSelectedDates(new Date(), new Date());
 
         FragmentTransaction t = getSupportFragmentManager().beginTransaction();
         t.replace(R.id.calendarView, calendarFragment);
@@ -113,6 +115,9 @@ public class MainActivity extends ActionBarActivity
             {
                 expensesViewAdapter = new ExpensesRecyclerViewAdapter(db, date);
                 expensesRecyclerView.swapAdapter(expensesViewAdapter, true);
+
+                calendarFragment.setSelectedDates(date, date);
+                calendarFragment.refreshView();
             }
 
             @Override
