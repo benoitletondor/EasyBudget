@@ -7,7 +7,7 @@
                 android:width="2dp"
                 android:color="@color/accent" />
 
-            <solid android:color="@color/accent_pressed" />
+            <solid android:color="@color/accent_ripple" />
         </shape>
     </item>
 

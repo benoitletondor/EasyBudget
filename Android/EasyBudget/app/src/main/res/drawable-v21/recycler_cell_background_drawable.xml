@@ -2,6 +2,6 @@
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
         android:color="@color/accent_ripple">
 
-    <item android:drawable="@color/calendar_cell_selected" />
+    <item android:drawable="@android:color/white" />
 
 </ripple>
