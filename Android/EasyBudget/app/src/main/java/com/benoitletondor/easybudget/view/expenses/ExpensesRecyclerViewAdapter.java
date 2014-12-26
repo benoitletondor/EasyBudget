@@ -75,12 +75,14 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
 
     private void drawOneTimeExpense(OneTimeExpense expense, ViewHolder viewHolder)
     {
-        viewHolder.textView.setText("Amount : " + expense.getAmount());
+        viewHolder.expenseTitleTextView.setText("Title");
+        viewHolder.expenseAmountTextView.setText(expense.getAmount()+" €");
     }
 
     private void drawMonthlyExpense(MonthlyExpense expense, ViewHolder viewHolder)
     {
-        viewHolder.textView.setText("Month amount : " + expense.getAmountForMonth(date));
+        viewHolder.expenseTitleTextView.setText("Title");
+        viewHolder.expenseAmountTextView.setText(expense.getAmountForMonth(date)+" €");
     }
 
 // ------------------------------------------->
@@ -90,14 +92,15 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
     // you provide access to all the views for a data item in a view holder
     public static class ViewHolder extends RecyclerView.ViewHolder
     {
-        // each data item is just a string in this case
-        public TextView textView;
+        public final TextView   expenseTitleTextView;
+        public final TextView   expenseAmountTextView;
 
         public ViewHolder(View v)
         {
             super(v);
 
-            textView = (TextView) v.findViewById(R.id.expense_text_view);
+            expenseTitleTextView = (TextView) v.findViewById(R.id.expense_title);
+            expenseAmountTextView = (TextView) v.findViewById(R.id.expense_amount);
         }
     }
 }

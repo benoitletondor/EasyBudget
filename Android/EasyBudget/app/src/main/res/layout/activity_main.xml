@@ -12,29 +12,59 @@
         android:layout_height="wrap_content"
         android:orientation="vertical" />
 
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dip"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:orientation="vertical">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/expensesRecyclerView"
-            android:scrollbars="vertical"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content">
 
-        <com.melnykov.fab.FloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right"
-            android:layout_margin="16dp"
-            android:src="@drawable/ic_add"
-            fab:fab_colorNormal="@color/accent"
-            fab:fab_colorPressed="@color/accent_pressed"
-            fab:fab_colorRipple="@color/accent_ripple"
-            tools:ignore="RtlHardcoded"/>
+            <TextView android:id="@+id/budgetLine"
+                      android:layout_width="match_parent"
+                      android:layout_height="25dp"
+                      android:background="@color/budget_green"
+                      android:textColor="@android:color/white"
+                      android:textSize="14dp"
+                      android:paddingTop="3dp"
+                      android:paddingLeft="15dp"
+                      android:paddingRight="15dp" />
 
-    </FrameLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:background="@drawable/elevation_shadow" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:layout_weight="1">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/expensesRecyclerView"
+                android:scrollbars="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/white" />
+
+            <com.melnykov.fab.FloatingActionButton
+                android:id="@+id/fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|right"
+                android:layout_margin="16dp"
+                android:src="@drawable/ic_add"
+                fab:fab_colorNormal="@color/accent"
+                fab:fab_colorPressed="@color/accent_pressed"
+                fab:fab_colorRipple="@color/accent_ripple"
+                tools:ignore="RtlHardcoded"/>
+
+        </FrameLayout>
+
+    </LinearLayout>
 
 </LinearLayout>

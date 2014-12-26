@@ -37,6 +37,7 @@ public class MainActivity extends ActionBarActivity
     private ExpensesRecyclerViewAdapter expensesViewAdapter;
 
     private DB db;
+    private TextView budgetLine;
 
 // ------------------------------------------>
 
@@ -46,6 +47,7 @@ public class MainActivity extends ActionBarActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        budgetLine = (TextView) findViewById(R.id.budgetLine);
         db = new DB(getApplicationContext());
         initCalendarFragment();
         initRecyclerView();
@@ -61,6 +63,8 @@ public class MainActivity extends ActionBarActivity
 
         db.close();
         db = null;
+
+        budgetLine = null;
 
         super.onDestroy();
     }
@@ -175,5 +179,7 @@ public class MainActivity extends ActionBarActivity
 
         expensesViewAdapter = new ExpensesRecyclerViewAdapter(db, new Date());
         expensesRecyclerView.setAdapter(expensesViewAdapter);
+
+        budgetLine.setText("ACCOUNT BALANCE : 1267 €");
     }
 }
