@@ -5,8 +5,7 @@
     android:layout_height="50dp"
     android:gravity="center_horizontal"
     android:background="@drawable/custom_grid_cell_drawable"
-    android:orientation="vertical"
-    android:paddingTop="5dp" >
+    android:orientation="vertical" >
 
     <TextView
         android:id="@+id/grid_cell_tv1"
@@ -15,13 +14,14 @@
         android:textSize="15dp"
         android:textStyle="bold"
         android:textColor="@color/primary_text"
+        android:layout_marginTop="5dp"
         android:layout_marginBottom="4dp"/>
 
     <TextView
         android:id="@+id/grid_cell_tv2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="13dp"
+        android:textSize="12dp"
         android:textColor="@color/secondary_text" />
 
 </LinearLayout>
