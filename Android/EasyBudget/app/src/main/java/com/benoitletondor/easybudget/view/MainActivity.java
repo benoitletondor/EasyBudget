@@ -1,13 +1,17 @@
 package com.benoitletondor.easybudget.view;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.benoitletondor.easybudget.R;
 import com.benoitletondor.easybudget.model.db.DB;
@@ -124,6 +128,37 @@ public class MainActivity extends ActionBarActivity
             public void onChangeMonth(int month, int year)
             {
 
+            }
+
+            @Override
+            public void onCaldroidViewCreated()
+            {
+                Button leftButton = calendarFragment.getLeftArrowButton();
+                Button rightButton = calendarFragment.getRightArrowButton();
+                TextView textView = calendarFragment.getMonthTitleTextView();
+
+                textView.setTextColor(MainActivity.this.getResources().getColor(R.color.primary_text));
+
+                leftButton.setText("<");
+                leftButton.setTextSize(25);
+                leftButton.setGravity(Gravity.CENTER);
+                leftButton.setTextColor(MainActivity.this.getResources().getColor(R.color.primary_light));
+                leftButton.setBackgroundResource(R.drawable.calendar_month_switcher_button_drawable);
+                
+                rightButton.setText(">");
+                rightButton.setTextSize(25);
+                rightButton.setGravity(Gravity.CENTER);
+                rightButton.setTextColor(MainActivity.this.getResources().getColor(R.color.primary_light));
+                rightButton.setBackgroundResource(R.drawable.calendar_month_switcher_button_drawable);
+
+                // Remove border on lollipop
+                if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP )
+                {
+                    leftButton.setOutlineProvider(null);
+                    rightButton.setOutlineProvider(null);
+                }
+
+                calendarFragment.refreshView();
             }
         };
 
