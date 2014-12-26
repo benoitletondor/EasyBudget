@@ -54,7 +54,7 @@ public class CalendarGridAdapter extends CaldroidGridAdapter
         else
         {
             tv1.setTextColor(context.getResources().getColor(R.color.primary_text));
-            tv1.setTextColor(context.getResources().getColor(R.color.secondary_text));
+            tv2.setTextColor(context.getResources().getColor(R.color.secondary_text));
         }
 
         // Today's cell

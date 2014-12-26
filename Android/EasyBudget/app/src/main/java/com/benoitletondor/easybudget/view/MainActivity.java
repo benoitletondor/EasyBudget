@@ -108,10 +108,6 @@ public class MainActivity extends ActionBarActivity
         calendarFragment.setArguments(args);
         calendarFragment.setSelectedDates(new Date(), new Date());
 
-        FragmentTransaction t = getSupportFragmentManager().beginTransaction();
-        t.replace(R.id.calendarView, calendarFragment);
-        t.commit();
-
         final CaldroidListener listener = new CaldroidListener()
         {
             @Override
@@ -144,7 +140,7 @@ public class MainActivity extends ActionBarActivity
                 leftButton.setGravity(Gravity.CENTER);
                 leftButton.setTextColor(MainActivity.this.getResources().getColor(R.color.primary_light));
                 leftButton.setBackgroundResource(R.drawable.calendar_month_switcher_button_drawable);
-                
+
                 rightButton.setText(">");
                 rightButton.setTextSize(25);
                 rightButton.setGravity(Gravity.CENTER);
@@ -157,12 +153,14 @@ public class MainActivity extends ActionBarActivity
                     leftButton.setOutlineProvider(null);
                     rightButton.setOutlineProvider(null);
                 }
-
-                calendarFragment.refreshView();
             }
         };
 
         calendarFragment.setCaldroidListener(listener);
+
+        FragmentTransaction t = getSupportFragmentManager().beginTransaction();
+        t.replace(R.id.calendarView, calendarFragment);
+        t.commit();
     }
 
     private void initRecyclerView()
