@@ -199,6 +199,7 @@ public final class DB
     {
         return new OneTimeExpense
         (
+            cursor.getString(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_ONE_TIME_TITLE)),
             cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_ONE_TIME_AMOUNT)),
             new Date(cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_ONE_TIME_DATE)))
         );
@@ -214,6 +215,7 @@ public final class DB
     {
         final ContentValues values = new ContentValues();
 
+        values.put(SQLiteDBHelper.COLUMN_ONE_TIME_TITLE, expense.getTitle());
         values.put(SQLiteDBHelper.COLUMN_ONE_TIME_DATE, expense.getDate().getTime());
         values.put(SQLiteDBHelper.COLUMN_ONE_TIME_AMOUNT, expense.getAmount());
 
@@ -231,6 +233,7 @@ public final class DB
     {
         return new MonthlyExpense
         (
+            cursor.getString(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_TITLE)),
             cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_START_AMOUNT)),
             new Date(cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_STARTDATE))),
             new Date(cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_ENDDATE))),
@@ -249,6 +252,7 @@ public final class DB
     {
         final ContentValues values = new ContentValues();
 
+        values.put(SQLiteDBHelper.COLUMN_MONTHLY_TITLE, expense.getTitle());
         values.put(SQLiteDBHelper.COLUMN_MONTHLY_STARTDATE, expense.getStartDate().getTime());
         values.put(SQLiteDBHelper.COLUMN_MONTHLY_ENDDATE, expense.getEndDate().getTime());
         values.put(SQLiteDBHelper.COLUMN_MONTHLY_START_AMOUNT, expense.getStartAmount());

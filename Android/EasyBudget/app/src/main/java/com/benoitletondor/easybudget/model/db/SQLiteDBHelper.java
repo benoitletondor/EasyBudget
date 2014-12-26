@@ -11,11 +11,13 @@ public final class SQLiteDBHelper extends SQLiteOpenHelper
 {
     protected static final String TABLE_ONE_TIME_EXPENSE = "onetimeexpense";
     protected static final String COLUMN_ONE_TIME_DB_ID  = "_expense_id";
+    protected static final String COLUMN_ONE_TIME_TITLE  = "title";
     protected static final String COLUMN_ONE_TIME_AMOUNT = "amount";
     protected static final String COLUMN_ONE_TIME_DATE   = "date";
 
     protected static final String TABLE_MONTHLY_EXPENSE        = "monthlyexpense";
     protected static final String COLUMN_MONTHLY_DB_ID         = "_expense_id";
+    protected static final String COLUMN_MONTHLY_TITLE         = "title";
     protected static final String COLUMN_MONTHLY_START_AMOUNT  = "amount";
     protected static final String COLUMN_MONTHLY_STARTDATE     = "startDate";
     protected static final String COLUMN_MONTHLY_DAYOFMONTH    = "dayofmonth";
@@ -40,6 +42,7 @@ public final class SQLiteDBHelper extends SQLiteOpenHelper
         database.execSQL("create table "
                 + TABLE_ONE_TIME_EXPENSE + "("
 				+ COLUMN_ONE_TIME_DB_ID + " integer primary key autoincrement, "
+                + COLUMN_ONE_TIME_TITLE + " text not null, "
                 + COLUMN_ONE_TIME_AMOUNT + " integer not null, "
 				+ COLUMN_ONE_TIME_DATE + " integer not null );");
 
@@ -48,6 +51,7 @@ public final class SQLiteDBHelper extends SQLiteOpenHelper
         database.execSQL("create table "
                 + TABLE_MONTHLY_EXPENSE + "("
                 + COLUMN_MONTHLY_DB_ID + " integer primary key autoincrement, "
+                + COLUMN_MONTHLY_TITLE + " text not null, "
                 + COLUMN_MONTHLY_START_AMOUNT + " integer not null, "
                 + COLUMN_MONTHLY_ENDDATE + " integer not null, "
                 + COLUMN_MONTHLY_DAYOFMONTH + " integer not null, "

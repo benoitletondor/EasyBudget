@@ -15,8 +15,10 @@ public class OneTimeExpense extends Expense
 
 // ------------------------------------>
 
-    public OneTimeExpense(int amount, Date date)
+    public OneTimeExpense(String title, int amount, Date date)
     {
+        super(title);
+
         if( amount == 0 )
         {
             throw new IllegalArgumentException("amount should be != 0");

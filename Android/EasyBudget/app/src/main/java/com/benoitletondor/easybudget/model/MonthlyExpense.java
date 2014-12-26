@@ -44,22 +44,26 @@ public class MonthlyExpense extends Expense
 
     /**
      *
+     * @param title
      * @param startAmount
      * @param startDate
      */
-    public MonthlyExpense(int startAmount, Date startDate)
+    public MonthlyExpense(String title, int startAmount, Date startDate)
     {
-        this(startAmount, startDate, null);
+        this(title, startAmount, startDate, null);
     }
 
     /**
      *
+     * @param title
      * @param startAmount
      * @param startDate
      * @param endDate
      */
-    public MonthlyExpense(int startAmount, Date startDate, Date endDate)
+    public MonthlyExpense(String title, int startAmount, Date startDate, Date endDate)
     {
+        super(title);
+
         if (startAmount == 0)
         {
             throw new IllegalArgumentException("startAmount should be != 0");
@@ -89,14 +93,15 @@ public class MonthlyExpense extends Expense
 
     /**
      *
+     * @param title
      * @param startAmount
      * @param startDate
      * @param endDate
      * @param modifications
      */
-    public MonthlyExpense(int startAmount, Date startDate, Date endDate, Map<Date, Integer> modifications)
+    public MonthlyExpense(String title, int startAmount, Date startDate, Date endDate, Map<Date, Integer> modifications)
     {
-        this(startAmount, startDate, endDate);
+        this(title, startAmount, startDate, endDate);
 
         if( modifications == null )
         {

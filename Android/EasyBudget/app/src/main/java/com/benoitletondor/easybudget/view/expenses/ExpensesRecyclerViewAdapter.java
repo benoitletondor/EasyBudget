@@ -55,6 +55,8 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
     {
         Expense expense = expenses.get(i);
 
+        viewHolder.expenseTitleTextView.setText(expense.getTitle());
+
         if( expense instanceof OneTimeExpense )
         {
             drawOneTimeExpense((OneTimeExpense) expense, viewHolder);
@@ -75,13 +77,11 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
 
     private void drawOneTimeExpense(OneTimeExpense expense, ViewHolder viewHolder)
     {
-        viewHolder.expenseTitleTextView.setText("Title");
         viewHolder.expenseAmountTextView.setText(expense.getAmount()+" €");
     }
 
     private void drawMonthlyExpense(MonthlyExpense expense, ViewHolder viewHolder)
     {
-        viewHolder.expenseTitleTextView.setText("Title");
         viewHolder.expenseAmountTextView.setText(expense.getAmountForMonth(date)+" €");
     }
 
@@ -92,8 +92,8 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
     // you provide access to all the views for a data item in a view holder
     public static class ViewHolder extends RecyclerView.ViewHolder
     {
-        public final TextView   expenseTitleTextView;
-        public final TextView   expenseAmountTextView;
+        public final TextView expenseTitleTextView;
+        public final TextView expenseAmountTextView;
 
         public ViewHolder(View v)
         {

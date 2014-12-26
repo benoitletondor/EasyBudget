@@ -22,7 +22,7 @@ public class EasyBudget extends Application
 
         DB db = new DB(getApplicationContext());
         db.clearDB();
-        db.addOneTimeExpense(new OneTimeExpense(30, new Date()));
-        db.addMonthlyExpense(new MonthlyExpense(10, new Date()));
+        db.addOneTimeExpense(new OneTimeExpense("One Time", 30, new Date()));
+        db.addMonthlyExpense(new MonthlyExpense("Monthly", 10, new Date()));
     }
 }
