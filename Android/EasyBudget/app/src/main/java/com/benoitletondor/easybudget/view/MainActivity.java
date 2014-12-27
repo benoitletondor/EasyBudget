@@ -64,9 +64,6 @@ public class MainActivity extends ActionBarActivity
         expensesViewAdapter = null;
 
         db.close();
-        db = null;
-
-        budgetLine = null;
 
         super.onDestroy();
     }
@@ -99,6 +96,12 @@ public class MainActivity extends ActionBarActivity
 
 // ------------------------------------------>
 
+    /**
+     * Update the balance for the given day
+     * FIXME optim, translate
+     *
+     * @param day
+     */
     private void updateBalanceDisplayForDay(Date day)
     {
         budgetLine.setText("ACCOUNT BALANCE : "+(Parameters.getInstance(this).getInt(ParameterKeys.BASE_BALANCE,0)-db.getBalanceForDay(day))+" €");
