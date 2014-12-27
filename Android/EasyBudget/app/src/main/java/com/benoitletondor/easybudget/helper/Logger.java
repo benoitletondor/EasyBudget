@@ -433,7 +433,6 @@ public final class Logger
 	/**
 	 * Verbose log with message and throwable. Uses the default tag.
 	 * 
-	 * @param tag	Tag to show.
 	 * @param msg	Message.
 	 * @param t		Throwable exception.
 	 */

@@ -96,12 +96,43 @@ public final class DB
     }
 
     /**
+     * Check if an expense is set to the given day
+     *
+     * @param day
+     * @return
+     */
+    public boolean hasExpensesForDay(Date day)
+    {
+        day = DateHelper.cleanDate(day);
+
+        Cursor cursor = null;
+        try
+        {
+            cursor = database.rawQuery("SELECT COUNT(*) FROM "+SQLiteDBHelper.TABLE_EXPENSE+" WHERE "+SQLiteDBHelper.COLUMN_EXPENSE_DATE+" = "+day.getTime(), null);
+
+            if(cursor.moveToFirst())
+            {
+                return cursor.getInt(0) > 0;
+            }
+
+            return false;
+        }
+        finally
+        {
+            if( cursor != null )
+            {
+                cursor.close();
+            }
+        }
+    }
+
+    /**
      * Get all one time expense for a day
      *
      * @param date
      * @return
      */
-    public List<Expense> getOneTimeExpensesForDay(Date date)
+    public List<Expense> getExpensesForDay(Date date)
     {
         date = DateHelper.cleanDate(date);
 
@@ -117,6 +148,37 @@ public final class DB
             }
 
             return expenses;
+        }
+        finally
+        {
+            if( cursor != null )
+            {
+                cursor.close();
+            }
+        }
+    }
+
+    /**
+     * Get a sum of all amount of expenses until the given day
+     *
+     * @param day
+     * @return
+     */
+    public int getBalanceForDay(Date day)
+    {
+        day = DateHelper.cleanDate(day);
+
+        Cursor cursor = null;
+        try
+        {
+            cursor = database.rawQuery("SELECT SUM("+SQLiteDBHelper.COLUMN_EXPENSE_AMOUNT+") FROM "+SQLiteDBHelper.TABLE_EXPENSE+" WHERE "+SQLiteDBHelper.COLUMN_EXPENSE_DATE+" <= "+day.getTime(), null);
+
+            if(cursor.moveToFirst())
+            {
+                return cursor.getInt(0);
+            }
+
+            return 0;
         }
         finally
         {

@@ -7,9 +7,14 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.benoitletondor.easybudget.R;
+import com.benoitletondor.easybudget.helper.ParameterKeys;
+import com.benoitletondor.easybudget.helper.Parameters;
+import com.benoitletondor.easybudget.model.db.DB;
 import com.roomorama.caldroid.CaldroidGridAdapter;
 
+import java.util.Date;
 import java.util.HashMap;
+import java.util.TimeZone;
 
 import hirondelle.date4j.DateTime;
 
@@ -18,11 +23,28 @@ import hirondelle.date4j.DateTime;
  */
 public class CalendarGridAdapter extends CaldroidGridAdapter
 {
+    private DB db;
+    private int baseBalance;
+
+// ----------------------------------->
 
     public CalendarGridAdapter(Context context, int month, int year, HashMap<String, Object> caldroidData, HashMap<String, Object> extraData)
     {
         super(context, month, year, caldroidData, extraData);
+
+        db = new DB(context.getApplicationContext());
+        baseBalance = Parameters.getInstance(context).getInt(ParameterKeys.BASE_BALANCE, 0);
     }
+
+    @Override
+    protected void finalize() throws Throwable
+    {
+        db.close();
+
+        super.finalize();
+    }
+
+// ----------------------------------->
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
@@ -84,7 +106,17 @@ public class CalendarGridAdapter extends CaldroidGridAdapter
         }
 
         tv1.setText("" + dateTime.getDay());
-        tv2.setText("Hi");
+
+        Date date = new Date(dateTime.getMilliseconds(TimeZone.getTimeZone("UTC")));
+        if( db.hasExpensesForDay(date) )
+        {
+            tv2.setVisibility(View.VISIBLE);
+            tv2.setText((baseBalance-db.getBalanceForDay(date))+"");
+        }
+        else
+        {
+            tv2.setVisibility(View.INVISIBLE);
+        }
 
         return cellView;
     }

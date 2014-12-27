@@ -14,6 +14,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.benoitletondor.easybudget.R;
+import com.benoitletondor.easybudget.helper.ParameterKeys;
+import com.benoitletondor.easybudget.helper.Parameters;
 import com.benoitletondor.easybudget.model.db.DB;
 import com.benoitletondor.easybudget.view.calendar.CalendarFragment;
 import com.benoitletondor.easybudget.view.expenses.ExpensesRecyclerViewAdapter;
@@ -97,6 +99,13 @@ public class MainActivity extends ActionBarActivity
 
 // ------------------------------------------>
 
+    private void updateBalanceDisplayForDay(Date day)
+    {
+        budgetLine.setText("ACCOUNT BALANCE : "+(Parameters.getInstance(this).getInt(ParameterKeys.BASE_BALANCE,0)-db.getBalanceForDay(day))+" €");
+    }
+
+// ------------------------------------------>
+
     private void initCalendarFragment()
     {
         calendarFragment = new CalendarFragment();
@@ -122,6 +131,8 @@ public class MainActivity extends ActionBarActivity
 
                 calendarFragment.setSelectedDates(date, date);
                 calendarFragment.refreshView();
+
+                updateBalanceDisplayForDay(date);
             }
 
             @Override
@@ -179,7 +190,6 @@ public class MainActivity extends ActionBarActivity
 
         expensesViewAdapter = new ExpensesRecyclerViewAdapter(db, new Date());
         expensesRecyclerView.setAdapter(expensesViewAdapter);
-
-        budgetLine.setText("ACCOUNT BALANCE : 1267 €");
+        updateBalanceDisplayForDay(new Date());
     }
 }
