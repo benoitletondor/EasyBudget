@@ -131,7 +131,7 @@ public final class DB
      * Add a monthly expense
      *
      * @param expense
-     * @return ID of the inserted monthly expense on success, exception or 0 on error
+     * @return ID of the inserted monthly expense on success, exception or -1 on error
      */
     public long addMonthlyExpense(MonthlyExpense expense)
     {
@@ -140,14 +140,7 @@ public final class DB
             throw new NullPointerException("expense==null");
         }
 
-        try
-        {
-            return database.insert(SQLiteDBHelper.TABLE_MONTHLY_EXPENSE, null, generateContentValuesForMonthlyExpense(expense));
-        }
-        catch(Exception e)
-        {
-            throw new RuntimeException("Error while serializing Monthly expense to SQLite", e);
-        }
+        return database.insert(SQLiteDBHelper.TABLE_MONTHLY_EXPENSE, null, generateContentValuesForMonthlyExpense(expense));
     }
 
 // -------------------------------------------->
@@ -194,7 +187,7 @@ public final class DB
         values.put(SQLiteDBHelper.COLUMN_EXPENSE_DATE, expense.getDate().getTime());
         values.put(SQLiteDBHelper.COLUMN_EXPENSE_AMOUNT, expense.getAmount());
 
-        if( expense.getMonthlyId() != null )
+        if( expense.isMonthly() )
         {
             values.put(SQLiteDBHelper.COLUMN_EXPENSE_MONTHLY_ID, expense.getMonthlyId());
         }
@@ -209,7 +202,7 @@ public final class DB
      * @return
      * @throws JSONException
      */
-    private static MonthlyExpense MonthlyExpenseFromCursor(Cursor cursor) throws JSONException
+    private static MonthlyExpense MonthlyExpenseFromCursor(Cursor cursor)
     {
         return new MonthlyExpense
         (
@@ -227,7 +220,7 @@ public final class DB
      * @return
      * @throws JSONException
      */
-    private static ContentValues generateContentValuesForMonthlyExpense(MonthlyExpense expense) throws JSONException
+    private static ContentValues generateContentValuesForMonthlyExpense(MonthlyExpense expense)
     {
         final ContentValues values = new ContentValues();
 

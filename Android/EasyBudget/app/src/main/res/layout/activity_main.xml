@@ -58,9 +58,9 @@
                 android:layout_gravity="bottom|right"
                 android:layout_margin="16dp"
                 android:src="@drawable/ic_add"
-                fab:fab_colorNormal="@color/accent"
-                fab:fab_colorPressed="@color/accent_ripple"
-                fab:fab_colorRipple="@color/accent"
+                fab:fab_colorNormal="@color/primary"
+                fab:fab_colorPressed="@color/primary_light"
+                fab:fab_colorRipple="@color/primary"
                 tools:ignore="RtlHardcoded"/>
 
         </FrameLayout>
