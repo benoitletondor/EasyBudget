@@ -4,7 +4,7 @@
     <item>
         <shape android:shape="rectangle" >
             <stroke
-                android:width="2dp"
+                android:width="@dimen/grid_cell_today_border_size"
                 android:color="@color/accent" />
 
             <solid android:color="@android:color/white" />

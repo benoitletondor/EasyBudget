@@ -1,27 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/custom_cell"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/custom_cell"
     android:layout_width="match_parent"
     android:layout_height="50dp"
-    android:gravity="center_horizontal"
-    android:background="@drawable/custom_grid_cell_drawable"
-    android:orientation="vertical" >
+    android:background="@drawable/custom_grid_cell_drawable" >
 
-    <TextView
-        android:id="@+id/grid_cell_tv1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="15dp"
-        android:textStyle="bold"
-        android:textColor="@color/primary_text"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="4dp"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_horizontal" >
 
-    <TextView
-        android:id="@+id/grid_cell_tv2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="12dp"
-        android:textColor="@color/secondary_text" />
+        <TextView
+            android:id="@+id/grid_cell_tv1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:textStyle="bold"
+            android:textColor="@color/primary_text"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="4dp"/>
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/grid_cell_tv2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12dp"
+            android:textColor="@color/secondary_text"
+            android:visibility="invisible" />
+
+    </LinearLayout>
+
+    <View android:id="@+id/cell_color_indicator"
+        android:layout_width="8dp"
+        android:layout_height="8dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        tools:ignore="RtlHardcoded" />
+
+</RelativeLayout>
