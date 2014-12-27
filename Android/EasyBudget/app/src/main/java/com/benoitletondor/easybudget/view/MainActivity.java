@@ -104,7 +104,22 @@ public class MainActivity extends ActionBarActivity
      */
     private void updateBalanceDisplayForDay(Date day)
     {
-        budgetLine.setText("ACCOUNT BALANCE : "+(Parameters.getInstance(this).getInt(ParameterKeys.BASE_BALANCE,0)-db.getBalanceForDay(day))+" €");
+        int balance = Parameters.getInstance(this).getInt(ParameterKeys.BASE_BALANCE,0) - db.getBalanceForDay(day);
+
+        budgetLine.setText("ACCOUNT BALANCE : "+balance+" €");
+
+        if( balance <= 0 )
+        {
+            budgetLine.setBackgroundResource(R.color.budget_red);
+        }
+        else if( balance < 100 )
+        {
+            budgetLine.setBackgroundResource(R.color.budget_orange);
+        }
+        else
+        {
+            budgetLine.setBackgroundResource(R.color.budget_green);
+        }
     }
 
 // ------------------------------------------>
