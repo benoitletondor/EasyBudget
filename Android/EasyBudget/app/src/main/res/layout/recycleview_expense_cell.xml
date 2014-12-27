@@ -12,7 +12,7 @@
         android:paddingLeft="15dp"
         android:paddingRight="15dp" >
 
-        <ImageView
+        <ImageView android:id="@+id/positive_indicator"
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:src="@drawable/ic_label_red"

@@ -27,5 +27,6 @@ public class EasyBudget extends Application
         db.addExpense(new Expense("Monthly", 10, new Date(), monthlyID));
 
         db.addExpense(new Expense("Daily", 30, new Date()));
+        db.addExpense(new Expense("Daily positive", -10, new Date()));
     }
 }

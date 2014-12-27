@@ -1,6 +1,8 @@
 package com.benoitletondor.easybudget.helper;
 
 /**
+ * List of keys to query {@link com.benoitletondor.easybudget.helper.Parameters}
+ *
  * @author Benoit LETONDOR
  */
 public class ParameterKeys
