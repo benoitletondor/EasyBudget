@@ -8,8 +8,6 @@ import android.widget.TextView;
 
 import com.benoitletondor.easybudget.R;
 import com.benoitletondor.easybudget.model.Expense;
-import com.benoitletondor.easybudget.model.MonthlyExpense;
-import com.benoitletondor.easybudget.model.OneTimeExpense;
 import com.benoitletondor.easybudget.model.db.DB;
 
 import java.util.ArrayList;
@@ -37,7 +35,6 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
         }
 
         this.date = date;
-        this.expenses.addAll(db.getMonthyExpensesForDay(date));
         this.expenses.addAll(db.getOneTimeExpensesForDay(date));
     }
 
@@ -56,33 +53,14 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
         Expense expense = expenses.get(i);
 
         viewHolder.expenseTitleTextView.setText(expense.getTitle());
-
-        if( expense instanceof OneTimeExpense )
-        {
-            drawOneTimeExpense((OneTimeExpense) expense, viewHolder);
-        }
-        else if( expense instanceof MonthlyExpense )
-        {
-            drawMonthlyExpense((MonthlyExpense) expense, viewHolder);
-        }
+        viewHolder.expenseAmountTextView.setText(expense.getAmount()+" €");
+        viewHolder.monthlyIndicator.setVisibility(expense.isMonthly() ? View.VISIBLE : View.GONE);
     }
 
     @Override
     public int getItemCount()
     {
         return expenses.size();
-    }
-
-// ------------------------------------------->
-
-    private void drawOneTimeExpense(OneTimeExpense expense, ViewHolder viewHolder)
-    {
-        viewHolder.expenseAmountTextView.setText(expense.getAmount()+" €");
-    }
-
-    private void drawMonthlyExpense(MonthlyExpense expense, ViewHolder viewHolder)
-    {
-        viewHolder.expenseAmountTextView.setText(expense.getAmountForMonth(date)+" €");
     }
 
 // ------------------------------------------->
@@ -94,6 +72,7 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
     {
         public final TextView expenseTitleTextView;
         public final TextView expenseAmountTextView;
+        public final ViewGroup monthlyIndicator;
 
         public ViewHolder(View v)
         {
@@ -101,6 +80,7 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
 
             expenseTitleTextView = (TextView) v.findViewById(R.id.expense_title);
             expenseAmountTextView = (TextView) v.findViewById(R.id.expense_amount);
+            monthlyIndicator = (ViewGroup) v.findViewById(R.id.monthly_indicator);
         }
     }
 }

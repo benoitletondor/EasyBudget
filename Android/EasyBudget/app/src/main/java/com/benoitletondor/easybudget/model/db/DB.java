@@ -8,8 +8,8 @@ import android.database.sqlite.SQLiteException;
 
 import com.benoitletondor.easybudget.helper.DateHelper;
 import com.benoitletondor.easybudget.helper.Logger;
+import com.benoitletondor.easybudget.model.Expense;
 import com.benoitletondor.easybudget.model.MonthlyExpense;
-import com.benoitletondor.easybudget.model.OneTimeExpense;
 
 import org.json.JSONException;
 
@@ -73,7 +73,7 @@ public final class DB
      */
     public void clearDB()
     {
-        database.delete(SQLiteDBHelper.TABLE_ONE_TIME_EXPENSE, null, null);
+        database.delete(SQLiteDBHelper.TABLE_EXPENSE, null, null);
         database.delete(SQLiteDBHelper.TABLE_MONTHLY_EXPENSE, null, null);
     }
 
@@ -83,15 +83,16 @@ public final class DB
      * Add a one time expense into DB
      *
      * @param expense
+     * @return
      */
-    public void addOneTimeExpense(OneTimeExpense expense)
+    public long addExpense(Expense expense)
     {
         if( expense == null )
         {
             throw new NullPointerException("expense==null");
         }
 
-        database.insert(SQLiteDBHelper.TABLE_ONE_TIME_EXPENSE, null, generateContentValuesForOneTimeExpense(expense));
+        return database.insert(SQLiteDBHelper.TABLE_EXPENSE, null, generateContentValuesForExpense(expense));
     }
 
     /**
@@ -100,19 +101,19 @@ public final class DB
      * @param date
      * @return
      */
-    public List<OneTimeExpense> getOneTimeExpensesForDay(Date date)
+    public List<Expense> getOneTimeExpensesForDay(Date date)
     {
         date = DateHelper.cleanDate(date);
 
         Cursor cursor = null;
         try
         {
-            List<OneTimeExpense> expenses = new ArrayList<>();
+            List<Expense> expenses = new ArrayList<>();
 
-            cursor = database.query(SQLiteDBHelper.TABLE_ONE_TIME_EXPENSE, null, SQLiteDBHelper.COLUMN_ONE_TIME_DATE + " = "+date.getTime(), null, null, null, null, null);
+            cursor = database.query(SQLiteDBHelper.TABLE_EXPENSE, null, SQLiteDBHelper.COLUMN_EXPENSE_DATE + " = "+date.getTime(), null, null, null, null, null);
             while( cursor.moveToNext() )
             {
-                expenses.add(OneTimeExpenseFromCursor(cursor));
+                expenses.add(ExpenseFromCursor(cursor));
             }
 
             return expenses;
@@ -130,8 +131,9 @@ public final class DB
      * Add a monthly expense
      *
      * @param expense
+     * @return ID of the inserted monthly expense on success, exception or 0 on error
      */
-    public void addMonthlyExpense(MonthlyExpense expense)
+    public long addMonthlyExpense(MonthlyExpense expense)
     {
         if( expense == null )
         {
@@ -140,7 +142,7 @@ public final class DB
 
         try
         {
-            database.insert(SQLiteDBHelper.TABLE_MONTHLY_EXPENSE, null, generateContentValuesForMonthlyExpense(expense));
+            return database.insert(SQLiteDBHelper.TABLE_MONTHLY_EXPENSE, null, generateContentValuesForMonthlyExpense(expense));
         }
         catch(Exception e)
         {
@@ -148,76 +150,54 @@ public final class DB
         }
     }
 
-    /**
-     * Get all monthly expense for a day
-     *
-     * @param date
-     * @return
-     */
-    public List<MonthlyExpense> getMonthyExpensesForDay(Date date)
-    {
-        date = DateHelper.cleanDate(date);
-
-        Cursor cursor = null;
-        try
-        {
-            List<MonthlyExpense> expenses = new ArrayList<>();
-
-            cursor = database.query(SQLiteDBHelper.TABLE_MONTHLY_EXPENSE, null, SQLiteDBHelper.COLUMN_MONTHLY_DAYOFMONTH + " = "+DateHelper.getDayOfMonth(date), null, null, null, null, null);
-            while( cursor.moveToNext() )
-            {
-                try
-                {
-                    expenses.add(MonthlyExpenseFromCursor(cursor));
-                }
-                catch(Exception e)
-                {
-                    throw new RuntimeException("Error while deserializing MonthlyExpense", e);
-                }
-            }
-
-            return expenses;
-        }
-        finally
-        {
-            if( cursor != null )
-            {
-                cursor.close();
-            }
-        }
-    }
-
 // -------------------------------------------->
 
     /**
-     * Deserialize a one time expense from DB
+     * Deserialize an expense from DB
      *
      * @param cursor
      * @return
      */
-    private static OneTimeExpense OneTimeExpenseFromCursor(Cursor cursor)
+    private static Expense ExpenseFromCursor(Cursor cursor)
     {
-        return new OneTimeExpense
+        long monthlyId = 0;
+        try
+        {
+            monthlyId = cursor.getLong(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_MONTHLY_ID));
+        }
+        catch(Exception e)
+        {
+            // Exception can be thrown on null depending on impl.
+        }
+
+        return new Expense
         (
-            cursor.getString(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_ONE_TIME_TITLE)),
-            cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_ONE_TIME_AMOUNT)),
-            new Date(cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_ONE_TIME_DATE)))
+            cursor.getLong(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_DB_ID)),
+            cursor.getString(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_TITLE)),
+            cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_AMOUNT)),
+            new Date(cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_DATE))),
+            monthlyId > 0 ? monthlyId : null
         );
     }
 
     /**
-     * Generate serialized values for a one time expense
+     * Generate serialized values for an expense
      *
      * @param expense
      * @return
      */
-    private static ContentValues generateContentValuesForOneTimeExpense(OneTimeExpense expense)
+    private static ContentValues generateContentValuesForExpense(Expense expense)
     {
         final ContentValues values = new ContentValues();
 
-        values.put(SQLiteDBHelper.COLUMN_ONE_TIME_TITLE, expense.getTitle());
-        values.put(SQLiteDBHelper.COLUMN_ONE_TIME_DATE, expense.getDate().getTime());
-        values.put(SQLiteDBHelper.COLUMN_ONE_TIME_AMOUNT, expense.getAmount());
+        values.put(SQLiteDBHelper.COLUMN_EXPENSE_TITLE, expense.getTitle());
+        values.put(SQLiteDBHelper.COLUMN_EXPENSE_DATE, expense.getDate().getTime());
+        values.put(SQLiteDBHelper.COLUMN_EXPENSE_AMOUNT, expense.getAmount());
+
+        if( expense.getMonthlyId() != null )
+        {
+            values.put(SQLiteDBHelper.COLUMN_EXPENSE_MONTHLY_ID, expense.getMonthlyId());
+        }
 
         return values;
     }
@@ -234,10 +214,9 @@ public final class DB
         return new MonthlyExpense
         (
             cursor.getString(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_TITLE)),
-            cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_START_AMOUNT)),
-            new Date(cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_STARTDATE))),
-            new Date(cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_ENDDATE))),
-            MonthlyExpense.jsonToModifications(cursor.getString(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_MODIFICATIONS)))
+            cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_AMOUNT)),
+            new Date(cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_RECURRING_DATE))),
+            cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_MODIFIED)) == 1
         );
     }
 
@@ -253,11 +232,9 @@ public final class DB
         final ContentValues values = new ContentValues();
 
         values.put(SQLiteDBHelper.COLUMN_MONTHLY_TITLE, expense.getTitle());
-        values.put(SQLiteDBHelper.COLUMN_MONTHLY_STARTDATE, expense.getStartDate().getTime());
-        values.put(SQLiteDBHelper.COLUMN_MONTHLY_ENDDATE, expense.getEndDate().getTime());
-        values.put(SQLiteDBHelper.COLUMN_MONTHLY_START_AMOUNT, expense.getStartAmount());
-        values.put(SQLiteDBHelper.COLUMN_MONTHLY_MODIFICATIONS, MonthlyExpense.modificationsToJson(expense));
-        values.put(SQLiteDBHelper.COLUMN_MONTHLY_DAYOFMONTH, expense.getDayOfMonth());
+        values.put(SQLiteDBHelper.COLUMN_MONTHLY_RECURRING_DATE, expense.getRecurringDate().getTime());
+        values.put(SQLiteDBHelper.COLUMN_MONTHLY_AMOUNT, expense.getAmount());
+        values.put(SQLiteDBHelper.COLUMN_MONTHLY_MODIFIED, expense.isModified() ? 1 : 0);
 
         return values;
     }
