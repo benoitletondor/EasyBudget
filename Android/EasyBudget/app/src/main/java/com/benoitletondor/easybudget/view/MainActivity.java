@@ -142,13 +142,13 @@ public class MainActivity extends ActionBarActivity
                 leftButton.setText("<");
                 leftButton.setTextSize(25);
                 leftButton.setGravity(Gravity.CENTER);
-                leftButton.setTextColor(MainActivity.this.getResources().getColor(R.color.primary_light));
+                leftButton.setTextColor(MainActivity.this.getResources().getColor(R.color.primary));
                 leftButton.setBackgroundResource(R.drawable.calendar_month_switcher_button_drawable);
 
                 rightButton.setText(">");
                 rightButton.setTextSize(25);
                 rightButton.setGravity(Gravity.CENTER);
-                rightButton.setTextColor(MainActivity.this.getResources().getColor(R.color.primary_light));
+                rightButton.setTextColor(MainActivity.this.getResources().getColor(R.color.primary));
                 rightButton.setBackgroundResource(R.drawable.calendar_month_switcher_button_drawable);
 
                 // Remove border on lollipop
