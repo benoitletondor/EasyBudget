@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.benoitletondor.easybudget.R;
 
@@ -28,6 +30,7 @@ public class AddExpenseActivity extends ActionBarActivity
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         setUpButtons();
+        setUpTextFields();
     }
 
 // ----------------------------------->
@@ -95,6 +98,47 @@ public class AddExpenseActivity extends ActionBarActivity
                     isRevenue = true;
                     paymentCheckboxImageview.setImageResource(R.drawable.ic_radio_button_off);
                     revenueCheckboxImageview.setImageResource(R.drawable.ic_radio_button_on);
+                }
+            }
+        });
+    }
+
+    /**
+     * Set up text field focus behavior
+     */
+    private void setUpTextFields()
+    {
+        final TextView descriptionTextView = (TextView) findViewById(R.id.description_descriptor);
+        final TextView amountTextView = (TextView) findViewById(R.id.amount_descriptor);
+
+        ((EditText) findViewById(R.id.description_edittext)).setOnFocusChangeListener(new View.OnFocusChangeListener()
+        {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus)
+            {
+                if( hasFocus )
+                {
+                    descriptionTextView.setTextColor(getResources().getColor(R.color.accent));
+                }
+                else
+                {
+                    descriptionTextView.setTextColor(getResources().getColor(R.color.secondary_text));
+                }
+            }
+        });
+
+        ((EditText) findViewById(R.id.amount_edittext)).setOnFocusChangeListener(new View.OnFocusChangeListener()
+        {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus)
+            {
+                if( hasFocus )
+                {
+                    amountTextView.setTextColor(getResources().getColor(R.color.accent));
+                }
+                else
+                {
+                    amountTextView.setTextColor(getResources().getColor(R.color.secondary_text));
                 }
             }
         });
