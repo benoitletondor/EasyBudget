@@ -78,6 +78,8 @@ public class CalendarGridAdapter extends CaldroidGridAdapter
         TextView tv2 = viewData.amountTextView;
         View cellColorIndicator = viewData.cellColorIndicator;
 
+        // Set today's date
+        tv1.setText("" + dateTime.getDay());
 
         // Customize for disabled dates and date outside min/max dates
         if ( isDisabled )
@@ -85,144 +87,151 @@ public class CalendarGridAdapter extends CaldroidGridAdapter
             if( !viewData.isDisabled )
             {
                 tv1.setTextColor(context.getResources().getColor(R.color.calendar_cell_disabled_text_color));
-                tv2.setTextColor(context.getResources().getColor(R.color.calendar_cell_disabled_text_color));
+                tv2.setVisibility(View.INVISIBLE);
+                cellColorIndicator.setVisibility(View.GONE);
                 cellView.setBackgroundResource(android.R.color.white);
 
                 viewData.isDisabled = true;
                 viewData.isToday = false;
                 viewData.isSelected = false;
+                viewData.containsExpenses = false;
+                viewData.colorIndicatorMarginForToday = false;
             }
         }
         else if( viewData.isDisabled )
         {
             tv1.setTextColor(context.getResources().getColor(R.color.primary_text));
             tv2.setTextColor(context.getResources().getColor(R.color.secondary_text));
+            tv2.setText("");
+            tv2.setVisibility(View.VISIBLE);
             cellView.setBackgroundResource(R.drawable.custom_grid_cell_drawable);
 
             viewData.isDisabled = false;
             viewData.isSelected = false;
             viewData.isToday = false;
+            viewData.containsExpenses = false;
+            viewData.colorIndicatorMarginForToday = false;
         }
 
-        // Out of month (same that disabled that's the reason we check we're not already disabled)
-        if( isOutOfMonth && !isDisabled )
+        if( !isDisabled )
         {
-            if( !viewData.isOutOfMonth )
+            if( isOutOfMonth )
             {
-                tv1.setTextColor(context.getResources().getColor(R.color.divider));
-                tv2.setTextColor(context.getResources().getColor(R.color.divider));
-
-                viewData.isOutOfMonth = true;
-            }
-        }
-        else if( !isDisabled && viewData.isOutOfMonth )
-        {
-            tv1.setTextColor(context.getResources().getColor(R.color.primary_text));
-            tv2.setTextColor(context.getResources().getColor(R.color.secondary_text));
-
-            viewData.isOutOfMonth = false;
-        }
-
-        // Today's cell
-        if( isToday )
-        {
-            // Customize for selected dates
-            if (selectedDates != null && selectedDatesMap.containsKey(dateTime))
-            {
-                if( !viewData.isToday || !viewData.isSelected )
+                if( !viewData.isOutOfMonth )
                 {
-                    cellView.setBackgroundResource(R.drawable.custom_grid_today_cell_selected_drawable);
+                    tv1.setTextColor(context.getResources().getColor(R.color.divider));
+                    tv2.setTextColor(context.getResources().getColor(R.color.divider));
+
+                    viewData.isOutOfMonth = true;
+                }
+            }
+            else if( viewData.isOutOfMonth )
+            {
+                tv1.setTextColor(context.getResources().getColor(R.color.primary_text));
+                tv2.setTextColor(context.getResources().getColor(R.color.secondary_text));
+
+                viewData.isOutOfMonth = false;
+            }
+
+            // Today's cell
+            if( isToday )
+            {
+                // Customize for selected dates
+                if (selectedDates != null && selectedDatesMap.containsKey(dateTime))
+                {
+                    if( !viewData.isToday || !viewData.isSelected )
+                    {
+                        cellView.setBackgroundResource(R.drawable.custom_grid_today_cell_selected_drawable);
+
+                        viewData.isToday = true;
+                        viewData.isSelected = true;
+                    }
+                }
+                else if( !viewData.isToday || viewData.isSelected )
+                {
+                    cellView.setBackgroundResource(R.drawable.custom_grid_today_cell_drawable);
 
                     viewData.isToday = true;
-                    viewData.isSelected = true;
+                    viewData.isSelected = false;
                 }
             }
-            else if( !viewData.isToday || viewData.isSelected )
+            else
             {
-                cellView.setBackgroundResource(R.drawable.custom_grid_today_cell_drawable);
-
-                viewData.isToday = true;
-                viewData.isSelected = false;
-            }
-        }
-        else
-        {
-            // Customize for selected dates
-            if (selectedDates != null && selectedDatesMap.containsKey(dateTime))
-            {
-                if( viewData.isToday || !viewData.isSelected )
+                // Customize for selected dates
+                if (selectedDates != null && selectedDatesMap.containsKey(dateTime))
                 {
-                    cellView.setBackgroundResource(R.drawable.custom_grid_cell_selected_drawable);
+                    if( viewData.isToday || !viewData.isSelected )
+                    {
+                        cellView.setBackgroundResource(R.drawable.custom_grid_cell_selected_drawable);
+
+                        viewData.isToday = false;
+                        viewData.isSelected = true;
+                    }
+                }
+                else if( viewData.isToday || viewData.isSelected )
+                {
+                    cellView.setBackgroundResource(R.drawable.custom_grid_cell_drawable);
 
                     viewData.isToday = false;
-                    viewData.isSelected = true;
+                    viewData.isSelected = false;
                 }
             }
-            else if( viewData.isToday || viewData.isSelected )
+
+            Date date = new Date(dateTime.getMilliseconds(TimeZone.getTimeZone("UTC")));
+            if( db.hasExpensesForDay(date) )
             {
-                cellView.setBackgroundResource(R.drawable.custom_grid_cell_drawable);
+                int balance = db.getBalanceForDay(date);
 
-                viewData.isToday = false;
-                viewData.isSelected = false;
+                if( !viewData.containsExpenses )
+                {
+                    tv2.setVisibility(View.VISIBLE);
+                    cellColorIndicator.setVisibility(View.VISIBLE);
+
+                    viewData.containsExpenses = true;
+                }
+
+                tv2.setText((baseBalance-balance)+"");
+
+                if( balance > 0 )
+                {
+                    cellColorIndicator.setBackgroundResource(R.color.budget_red);
+                }
+                else if( balance <= 0 )
+                {
+                    cellColorIndicator.setBackgroundResource(R.color.budget_green);
+                }
+
+                // Apply margin to the color indicator if it's today's cell since there's a border
+                if( isToday && !viewData.colorIndicatorMarginForToday )
+                {
+                    int marginDimen = context.getResources().getDimensionPixelOffset(R.dimen.grid_cell_today_border_size);
+
+                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(cellColorIndicator.getLayoutParams());
+                    params.setMargins(0, marginDimen, marginDimen, 0);
+                    params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                    params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                    cellColorIndicator.setLayoutParams(params);
+
+                    viewData.colorIndicatorMarginForToday = true;
+                }
+                else if( !isToday && viewData.colorIndicatorMarginForToday )
+                {
+                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(cellColorIndicator.getLayoutParams());
+                    params.setMargins(0, 0, 0, 0);
+                    params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                    params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                    cellColorIndicator.setLayoutParams(params);
+
+                    viewData.colorIndicatorMarginForToday = false;
+                }
             }
-        }
-
-        tv1.setText("" + dateTime.getDay());
-
-        Date date = new Date(dateTime.getMilliseconds(TimeZone.getTimeZone("UTC")));
-        if( db.hasExpensesForDay(date) )
-        {
-            int balance = db.getBalanceForDay(date);
-
-            if( !viewData.containsExpenses )
+            else if( viewData.containsExpenses )
             {
-                tv2.setVisibility(View.VISIBLE);
-                cellColorIndicator.setVisibility(View.VISIBLE);
+                cellColorIndicator.setVisibility(View.GONE);
+                tv2.setVisibility(View.INVISIBLE);
 
-                viewData.containsExpenses = true;
+                viewData.containsExpenses = false;
             }
-
-            tv2.setText((baseBalance-balance)+"");
-
-            if( balance > 0 )
-            {
-                cellColorIndicator.setBackgroundResource(R.color.budget_red);
-            }
-            else if( balance <= 0 )
-            {
-                cellColorIndicator.setBackgroundResource(R.color.budget_green);
-            }
-
-            // Apply margin to the color indicator if it's today's cell since there's a border
-            if( isToday && !viewData.colorIndicatorMarginForToday )
-            {
-                int marginDimen = context.getResources().getDimensionPixelOffset(R.dimen.grid_cell_today_border_size);
-
-                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(cellColorIndicator.getLayoutParams());
-                params.setMargins(0, marginDimen, marginDimen, 0);
-                params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-                cellColorIndicator.setLayoutParams(params);
-
-                viewData.colorIndicatorMarginForToday = true;
-            }
-            else if( !isToday && viewData.colorIndicatorMarginForToday )
-            {
-                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(cellColorIndicator.getLayoutParams());
-                params.setMargins(0, 0, 0, 0);
-                params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-                cellColorIndicator.setLayoutParams(params);
-
-                viewData.colorIndicatorMarginForToday = false;
-            }
-        }
-        else if( viewData.containsExpenses )
-        {
-            cellColorIndicator.setVisibility(View.GONE);
-            tv2.setVisibility(View.INVISIBLE);
-
-            viewData.containsExpenses = false;
         }
 
         cellView.setTag(viewData);
