@@ -25,7 +25,7 @@
                 android:orientation="horizontal"
                 android:layout_marginBottom="20dp">
 
-                <LinearLayout
+                <LinearLayout android:id="@+id/payment_button_view"
                     android:layout_width="0dip"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
@@ -34,7 +34,7 @@
                     android:gravity="center"
                     android:background="@drawable/recycler_cell_background_drawable">
 
-                    <ImageView
+                    <ImageView android:id="@+id/payment_checkbox_imageview"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:src="@drawable/ic_radio_button_on"
@@ -49,7 +49,7 @@
 
                 </LinearLayout>
 
-                <LinearLayout
+                <LinearLayout android:id="@+id/revenue_button_view"
                     android:layout_width="0dip"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
@@ -58,7 +58,7 @@
                     android:gravity="center"
                     android:background="@drawable/recycler_cell_background_drawable">
 
-                    <ImageView
+                    <ImageView android:id="@+id/revenue_checkbox_imageview"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:src="@drawable/ic_radio_button_off"

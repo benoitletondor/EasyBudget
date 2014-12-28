@@ -1,15 +1,22 @@
 package com.benoitletondor.easybudget.view;
 
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 
 import com.benoitletondor.easybudget.R;
 
 public class AddExpenseActivity extends ActionBarActivity
 {
+    /**
+     * Is the new expense a revenue
+     */
+    private boolean isRevenue = false;
+
+// -------------------------------------->
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -19,7 +26,11 @@ public class AddExpenseActivity extends ActionBarActivity
 
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        setUpButtons();
     }
+
+// ----------------------------------->
 
 
     @Override
@@ -33,9 +44,6 @@ public class AddExpenseActivity extends ActionBarActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
@@ -44,12 +52,51 @@ public class AddExpenseActivity extends ActionBarActivity
             finish(); //FIXME
             return true;
         }
-        else if( id == android.R.id.home )
+        else if( id == android.R.id.home ) // Back button of the actionbar
         {
             finish();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+// ----------------------------------->
+
+    /**
+     * Set-up revenue and payment buttons
+     */
+    private void setUpButtons()
+    {
+        final ImageView paymentCheckboxImageview = (ImageView) findViewById(R.id.payment_checkbox_imageview);
+        final ImageView revenueCheckboxImageview = (ImageView) findViewById(R.id.revenue_checkbox_imageview);
+
+        findViewById(R.id.payment_button_view).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if(isRevenue)
+                {
+                    isRevenue = false;
+                    paymentCheckboxImageview.setImageResource(R.drawable.ic_radio_button_on);
+                    revenueCheckboxImageview.setImageResource(R.drawable.ic_radio_button_off);
+                }
+            }
+        });
+
+        findViewById(R.id.revenue_button_view).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if( !isRevenue)
+                {
+                    isRevenue = true;
+                    paymentCheckboxImageview.setImageResource(R.drawable.ic_radio_button_off);
+                    revenueCheckboxImageview.setImageResource(R.drawable.ic_radio_button_on);
+                }
+            }
+        });
     }
 }
