@@ -1,5 +1,6 @@
 package com.benoitletondor.easybudget.view;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -85,7 +86,7 @@ public class AddExpenseActivity extends ActionBarActivity
 
     /**
      * Validate user inputs
-     * 
+     *
      * @return true if user inputs are ok, false otherwise
      */
     private boolean validateInputs()
@@ -100,19 +101,27 @@ public class AddExpenseActivity extends ActionBarActivity
         }
 
         String amount = amountEditText.getText().toString();
-        try
+        if( amount.trim().isEmpty() )
         {
-            int value = Integer.parseInt(amount);
-            if( value <= 0 )
+            amountEditText.setError("Enter an amount"); //TODO translate
+            ok = false;
+        }
+        else
+        {
+            try
             {
-                amountEditText.setError("Amount should be greater than 0"); //TODO
+                int value = Integer.parseInt(amount);
+                if( value <= 0 )
+                {
+                    amountEditText.setError("Amount should be greater than 0"); //TODO
+                    ok = false;
+                }
+            }
+            catch(Exception e)
+            {
+                amountEditText.setError("Not a valid amount"); //TODO
                 ok = false;
             }
-        }
-        catch(Exception e)
-        {
-            amountEditText.setError("Not a valid amount"); //TODO
-            ok = false;
         }
 
         return ok;
@@ -169,13 +178,15 @@ public class AddExpenseActivity extends ActionBarActivity
             @Override
             public void onFocusChange(View v, boolean hasFocus)
             {
-                if( hasFocus )
+                if (hasFocus)
                 {
                     descriptionTextView.setTextColor(getResources().getColor(R.color.accent));
+                    descriptionTextView.setTypeface(null, Typeface.BOLD);
                 }
                 else
                 {
                     descriptionTextView.setTextColor(getResources().getColor(R.color.secondary_text));
+                    descriptionTextView.setTypeface(null, Typeface.NORMAL);
                 }
             }
         });
@@ -189,10 +200,12 @@ public class AddExpenseActivity extends ActionBarActivity
                 if (hasFocus)
                 {
                     amountTextView.setTextColor(getResources().getColor(R.color.accent));
+                    amountTextView.setTypeface(null, Typeface.BOLD);
                 }
                 else
                 {
                     amountTextView.setTextColor(getResources().getColor(R.color.secondary_text));
+                    amountTextView.setTypeface(null, Typeface.NORMAL);
                 }
             }
         });
