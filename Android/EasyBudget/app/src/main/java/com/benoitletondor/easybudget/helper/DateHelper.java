@@ -20,7 +20,6 @@ public class DateHelper
     public static Date cleanDate(Date date)
     {
         Calendar cal = Calendar.getInstance();
-        cal.setTimeZone(TimeZone.getTimeZone("GMT"));
         cal.setTime(date);
 
         cal.set(Calendar.MILLISECOND, 0);

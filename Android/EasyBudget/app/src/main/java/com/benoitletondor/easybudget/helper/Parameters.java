@@ -50,6 +50,17 @@ public class Parameters
     }
 
     /**
+     * Save a long for the given key
+     *
+     * @param key
+     * @param value
+     */
+    public void putInt(String key, long value)
+    {
+        preferences.edit().putLong(key, value).apply();
+    }
+
+    /**
      * Save a string for the given key
      *
      * @param key
@@ -81,6 +92,18 @@ public class Parameters
     public int getInt(String key, int defaultValue)
     {
         return preferences.getInt(key, defaultValue);
+    }
+
+    /**
+     * Get the long value and fallback on default if not found
+     *
+     * @param key
+     * @param defaultValue
+     * @return
+     */
+    public long getLong(String key, long defaultValue)
+    {
+        return preferences.getLong(key, defaultValue);
     }
 
     /**

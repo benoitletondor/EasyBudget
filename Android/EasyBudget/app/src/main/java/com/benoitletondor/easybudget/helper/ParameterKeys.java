@@ -10,5 +10,9 @@ public class ParameterKeys
     /**
      * Initial balance of the user account (int)
      */
-    public static final String BASE_BALANCE = "basebalance";
+    public static final String BASE_BALANCE      = "basebalance";
+    /**
+     * Date of the base balance set-up (long)
+     */
+    public static final String BASE_BALANCE_DATE = "basebalancedate";
 }

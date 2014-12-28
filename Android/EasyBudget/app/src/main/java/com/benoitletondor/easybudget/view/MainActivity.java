@@ -135,9 +135,13 @@ public class MainActivity extends ActionBarActivity
         args.putBoolean(CaldroidFragment.ENABLE_SWIPE, true);
         args.putBoolean(CaldroidFragment.SIX_WEEKS_IN_CALENDAR, false);
         args.putInt(CalendarFragment.START_DAY_OF_WEEK, CalendarFragment.MONDAY);
+        args.putBoolean(CalendarFragment.ENABLE_CLICK_ON_DISABLED_DATES, false);
 
         calendarFragment.setArguments(args);
         calendarFragment.setSelectedDates(new Date(), new Date());
+
+        Date minDate = new Date(Parameters.getInstance(this).getLong(ParameterKeys.BASE_BALANCE_DATE, new Date().getTime()));
+        calendarFragment.setMinDate(minDate);
 
         final CaldroidListener listener = new CaldroidListener()
         {

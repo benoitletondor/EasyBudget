@@ -10,6 +10,7 @@
     <color name="divider">#B6B6B6</color>
 
     <color name="calendar_cell_selected">#d2e3e7</color>
+    <color name="calendar_cell_disabled_text_color">#eeeeee</color>
     <color name="budget_green">#aed581</color>
     <color name="budget_orange">#ffb74d</color>
     <color name="budget_red">#e57373</color>
