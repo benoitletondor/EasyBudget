@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRecyclerViewAdapter.ViewHolder>
 {
-    private List<Expense> expenses = new ArrayList<>();
+    private List<Expense> expenses;
     private Date date;
 
     public ExpensesRecyclerViewAdapter(DB db, Date date)
@@ -37,7 +37,17 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
         }
 
         this.date = date;
-        this.expenses.addAll(db.getExpensesForDay(date));
+        this.expenses = db.getExpensesForDay(date);
+    }
+
+    /**
+     * Return the date content is displayed for displayed
+     *
+     * @return
+     */
+    public Date getDate()
+    {
+        return date;
     }
 
 // ------------------------------------------>

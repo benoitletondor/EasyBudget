@@ -37,6 +37,9 @@ import java.util.Date;
  */
 public class MainActivity extends ActionBarActivity
 {
+    private static final String CALENDAR_SAVED_STATE = "calendar_saved_state";
+    private static final String RECYCLE_VIEW_SAVED_DATE = "recycleViewSavedDate";
+
     private CalendarFragment            calendarFragment;
     private RecyclerView                expensesRecyclerView;
     private LinearLayoutManager         expensesLayoutManager;
@@ -55,8 +58,8 @@ public class MainActivity extends ActionBarActivity
 
         budgetLine = (TextView) findViewById(R.id.budgetLine);
         db = new DB(getApplicationContext());
-        initCalendarFragment();
-        initRecyclerView();
+        initCalendarFragment(savedInstanceState);
+        initRecyclerView(savedInstanceState);
     }
 
     @Override
@@ -72,6 +75,21 @@ public class MainActivity extends ActionBarActivity
         super.onDestroy();
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState)
+    {
+        if (calendarFragment != null)
+        {
+            calendarFragment.saveStatesToKey(outState, CALENDAR_SAVED_STATE);
+        }
+
+        if( expensesRecyclerView.getAdapter() != null && (expensesRecyclerView.getAdapter() instanceof ExpensesRecyclerViewAdapter) )
+        {
+            outState.putSerializable(RECYCLE_VIEW_SAVED_DATE, ((ExpensesRecyclerViewAdapter) expensesRecyclerView.getAdapter()).getDate());
+        }
+
+        super.onSaveInstanceState(outState);
+    }
 // ------------------------------------------>
 
     @Override
@@ -128,26 +146,33 @@ public class MainActivity extends ActionBarActivity
 
 // ------------------------------------------>
 
-    private void initCalendarFragment()
+    private void initCalendarFragment(Bundle savedInstanceState)
     {
         calendarFragment = new CalendarFragment();
 
-        Bundle args = new Bundle();
-        Calendar cal = Calendar.getInstance();
-        args.putInt(CaldroidFragment.MONTH, cal.get(Calendar.MONTH) + 1);
-        args.putInt(CaldroidFragment.YEAR, cal.get(Calendar.YEAR));
-        args.putBoolean(CaldroidFragment.ENABLE_SWIPE, true);
-        args.putBoolean(CaldroidFragment.SIX_WEEKS_IN_CALENDAR, false);
-        args.putInt(CalendarFragment.START_DAY_OF_WEEK, CalendarFragment.MONDAY);
-        args.putBoolean(CalendarFragment.ENABLE_CLICK_ON_DISABLED_DATES, false);
+        if( savedInstanceState != null && savedInstanceState.containsKey(CALENDAR_SAVED_STATE) )
+        {
+            calendarFragment.restoreStatesFromKey(savedInstanceState, CALENDAR_SAVED_STATE);
+        }
+        else
+        {
+            Bundle args = new Bundle();
+            Calendar cal = Calendar.getInstance();
+            args.putInt(CaldroidFragment.MONTH, cal.get(Calendar.MONTH) + 1);
+            args.putInt(CaldroidFragment.YEAR, cal.get(Calendar.YEAR));
+            args.putBoolean(CaldroidFragment.ENABLE_SWIPE, true);
+            args.putBoolean(CaldroidFragment.SIX_WEEKS_IN_CALENDAR, false);
+            args.putInt(CalendarFragment.START_DAY_OF_WEEK, CalendarFragment.MONDAY);
+            args.putBoolean(CalendarFragment.ENABLE_CLICK_ON_DISABLED_DATES, false);
 
-        calendarFragment.setArguments(args);
-        calendarFragment.setSelectedDates(new Date(), new Date());
+            calendarFragment.setArguments(args);
+            calendarFragment.setSelectedDates(new Date(), new Date());
+
+            Date minDate = new Date(Parameters.getInstance(this).getLong(ParameterKeys.BASE_BALANCE_DATE, new Date().getTime()));
+            calendarFragment.setMinDate(minDate);
+        }
 
         WeekdayArrayAdapter.textColor = getResources().getColor(R.color.secondary_text);
-
-        Date minDate = new Date(Parameters.getInstance(this).getLong(ParameterKeys.BASE_BALANCE_DATE, new Date().getTime()));
-        calendarFragment.setMinDate(minDate);
 
         final CaldroidListener listener = new CaldroidListener()
         {
@@ -206,7 +231,7 @@ public class MainActivity extends ActionBarActivity
         t.commit();
     }
 
-    private void initRecyclerView()
+    private void initRecyclerView(Bundle savedInstanceState)
     {
         expensesRecyclerView = (RecyclerView) findViewById(R.id.expensesRecyclerView);
 
@@ -224,8 +249,18 @@ public class MainActivity extends ActionBarActivity
         expensesLayoutManager = new LinearLayoutManager(this);
         expensesRecyclerView.setLayoutManager(expensesLayoutManager);
 
-        expensesViewAdapter = new ExpensesRecyclerViewAdapter(db, new Date());
+        Date date = null;
+        if( savedInstanceState != null && savedInstanceState.containsKey(RECYCLE_VIEW_SAVED_DATE) )
+        {
+            date = (Date) savedInstanceState.getSerializable(RECYCLE_VIEW_SAVED_DATE);
+        }
+        else
+        {
+            date = new Date();
+        }
+
+        expensesViewAdapter = new ExpensesRecyclerViewAdapter(db, date);
         expensesRecyclerView.setAdapter(expensesViewAdapter);
-        updateBalanceDisplayForDay(new Date());
+        updateBalanceDisplayForDay(date);
     }
 }
