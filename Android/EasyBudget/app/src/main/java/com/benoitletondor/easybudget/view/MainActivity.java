@@ -22,6 +22,7 @@ import com.benoitletondor.easybudget.view.expenses.ExpensesRecyclerViewAdapter;
 import com.melnykov.fab.FloatingActionButton;
 import com.roomorama.caldroid.CaldroidFragment;
 import com.roomorama.caldroid.CaldroidListener;
+import com.roomorama.caldroid.WeekdayArrayAdapter;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -139,6 +140,8 @@ public class MainActivity extends ActionBarActivity
 
         calendarFragment.setArguments(args);
         calendarFragment.setSelectedDates(new Date(), new Date());
+
+        WeekdayArrayAdapter.textColor = getResources().getColor(R.color.secondary_text);
 
         Date minDate = new Date(Parameters.getInstance(this).getLong(ParameterKeys.BASE_BALANCE_DATE, new Date().getTime()));
         calendarFragment.setMinDate(minDate);
