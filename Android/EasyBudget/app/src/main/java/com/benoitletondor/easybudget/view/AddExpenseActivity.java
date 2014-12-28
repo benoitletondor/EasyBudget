@@ -1,7 +1,7 @@
 package com.benoitletondor.easybudget.view;
 
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,8 +11,22 @@ import android.widget.TextView;
 
 import com.benoitletondor.easybudget.R;
 
+/**
+ * Activity to add a new expense
+ *
+ * @author Benoit LETONDOR
+ */
 public class AddExpenseActivity extends ActionBarActivity
 {
+    /**
+     * Edit text that contains the description
+     */
+    private EditText descriptionEditText;
+    /**
+     * Edit text that contains the amount
+     */
+    private EditText amountEditText;
+
     /**
      * Is the new expense a revenue
      */
@@ -35,7 +49,6 @@ public class AddExpenseActivity extends ActionBarActivity
 
 // ----------------------------------->
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
@@ -52,7 +65,11 @@ public class AddExpenseActivity extends ActionBarActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_save)
         {
-            finish(); //FIXME
+            if( validateInputs() )
+            {
+                // TODO save
+                finish();
+            }
             return true;
         }
         else if( id == android.R.id.home ) // Back button of the actionbar
@@ -67,6 +84,41 @@ public class AddExpenseActivity extends ActionBarActivity
 // ----------------------------------->
 
     /**
+     * Validate user inputs
+     * 
+     * @return true if user inputs are ok, false otherwise
+     */
+    private boolean validateInputs()
+    {
+        boolean ok = true;
+
+        String description = descriptionEditText.getText().toString();
+        if( description.trim().isEmpty() )
+        {
+            descriptionEditText.setError("Enter a description"); //TODO translate
+            ok = false;
+        }
+
+        String amount = amountEditText.getText().toString();
+        try
+        {
+            int value = Integer.parseInt(amount);
+            if( value <= 0 )
+            {
+                amountEditText.setError("Amount should be greater than 0"); //TODO
+                ok = false;
+            }
+        }
+        catch(Exception e)
+        {
+            amountEditText.setError("Not a valid amount"); //TODO
+            ok = false;
+        }
+
+        return ok;
+    }
+
+    /**
      * Set-up revenue and payment buttons
      */
     private void setUpButtons()
@@ -79,7 +131,7 @@ public class AddExpenseActivity extends ActionBarActivity
             @Override
             public void onClick(View v)
             {
-                if(isRevenue)
+                if( isRevenue )
                 {
                     isRevenue = false;
                     paymentCheckboxImageview.setImageResource(R.drawable.ic_radio_button_on);
@@ -93,7 +145,7 @@ public class AddExpenseActivity extends ActionBarActivity
             @Override
             public void onClick(View v)
             {
-                if( !isRevenue)
+                if( !isRevenue )
                 {
                     isRevenue = true;
                     paymentCheckboxImageview.setImageResource(R.drawable.ic_radio_button_off);
@@ -111,7 +163,8 @@ public class AddExpenseActivity extends ActionBarActivity
         final TextView descriptionTextView = (TextView) findViewById(R.id.description_descriptor);
         final TextView amountTextView = (TextView) findViewById(R.id.amount_descriptor);
 
-        ((EditText) findViewById(R.id.description_edittext)).setOnFocusChangeListener(new View.OnFocusChangeListener()
+        descriptionEditText = (EditText) findViewById(R.id.description_edittext);
+        descriptionEditText.setOnFocusChangeListener(new View.OnFocusChangeListener()
         {
             @Override
             public void onFocusChange(View v, boolean hasFocus)
@@ -127,12 +180,13 @@ public class AddExpenseActivity extends ActionBarActivity
             }
         });
 
-        ((EditText) findViewById(R.id.amount_edittext)).setOnFocusChangeListener(new View.OnFocusChangeListener()
+        amountEditText = (EditText) findViewById(R.id.amount_edittext);
+        amountEditText.setOnFocusChangeListener(new View.OnFocusChangeListener()
         {
             @Override
             public void onFocusChange(View v, boolean hasFocus)
             {
-                if( hasFocus )
+                if (hasFocus)
                 {
                     amountTextView.setTextColor(getResources().getColor(R.color.accent));
                 }
