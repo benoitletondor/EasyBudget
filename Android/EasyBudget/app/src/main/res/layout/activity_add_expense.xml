@@ -152,9 +152,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textColor="@color/primary_text"
-                        android:textSize="16dp"
-                        android:background="@drawable/add_expense_edittext_drawable"
-                        android:paddingBottom="8dp"/>
+                        android:textSize="14dp"
+                        android:background="@drawable/add_expense_edittext_drawable" />
 
                 </LinearLayout>
 

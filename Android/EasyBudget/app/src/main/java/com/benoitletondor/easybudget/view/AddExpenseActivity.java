@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.benoitletondor.easybudget.R;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -265,6 +266,7 @@ public class AddExpenseActivity extends DBActivity
 
     private void updateDateButtonDisplay()
     {
-        dateButton.setText(date.toString());
+        SimpleDateFormat formatter = new SimpleDateFormat("MMM dd yyyy");
+        dateButton.setText(formatter.format(date));
     }
 }

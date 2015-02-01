@@ -15,7 +15,6 @@ import java.util.Date;
 public class DatePickerDialogFragment extends DialogFragment
 {
     private Date originalDate;
-
     private DatePickerDialog.OnDateSetListener listener;
 
 // ------------------------------------------>
