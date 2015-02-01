@@ -35,7 +35,7 @@ import java.util.Date;
  *
  * @author Benoit LETONDOR
  */
-public class MainActivity extends ActionBarActivity
+public class MainActivity extends DBActivity
 {
     private static final String CALENDAR_SAVED_STATE = "calendar_saved_state";
     private static final String RECYCLE_VIEW_SAVED_DATE = "recycleViewSavedDate";
@@ -45,7 +45,6 @@ public class MainActivity extends ActionBarActivity
     private LinearLayoutManager         expensesLayoutManager;
     private ExpensesRecyclerViewAdapter expensesViewAdapter;
 
-    private DB db;
     private TextView budgetLine;
 
 // ------------------------------------------>
@@ -57,7 +56,6 @@ public class MainActivity extends ActionBarActivity
         setContentView(R.layout.activity_main);
 
         budgetLine = (TextView) findViewById(R.id.budgetLine);
-        db = new DB(getApplicationContext());
         initCalendarFragment(savedInstanceState);
         initRecyclerView(savedInstanceState);
     }
@@ -69,8 +67,6 @@ public class MainActivity extends ActionBarActivity
         expensesRecyclerView = null;
         expensesLayoutManager = null;
         expensesViewAdapter = null;
-
-        db.close();
 
         super.onDestroy();
     }
@@ -242,7 +238,10 @@ public class MainActivity extends ActionBarActivity
             @Override
             public void onClick(View v)
             {
-                ActivityCompat.startActivity(MainActivity.this, new Intent(MainActivity.this, AddExpenseActivity.class), null);
+                Intent startIntent = new Intent(MainActivity.this, AddExpenseActivity.class);
+                startIntent.putExtra("date", calendarFragment.getSelectedDate());
+
+                ActivityCompat.startActivity(MainActivity.this, startIntent, null);
             }
         });
 

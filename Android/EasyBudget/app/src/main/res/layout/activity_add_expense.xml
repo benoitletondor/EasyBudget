@@ -148,12 +148,11 @@
                         android:textSize="14dp"
                         android:layout_marginBottom="5dp" />
 
-                    <com.benoitletondor.easybudget.helper.PaddingEditText
+                    <Button android:id="@+id/date_button"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textColor="@color/primary_text"
                         android:textSize="16dp"
-                        android:inputType="none"
                         android:background="@drawable/add_expense_edittext_drawable"
                         android:paddingBottom="8dp"/>
 
