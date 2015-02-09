@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.benoitletondor.easybudget.R;
+import com.benoitletondor.easybudget.model.Expense;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -65,6 +66,8 @@ public class AddExpenseActivity extends DBActivity
         setUpButtons();
         setUpTextFields();
         setUpDateButton();
+
+        setResult(RESULT_CANCELED);
     }
 
 // ----------------------------------->
@@ -87,7 +90,12 @@ public class AddExpenseActivity extends DBActivity
         {
             if( validateInputs() )
             {
-                // TODO save
+                int value = Integer.parseInt(amountEditText.getText().toString());
+
+                Expense expense = new Expense(descriptionEditText.getText().toString(), isRevenue? -value : value, date);
+                db.addExpense(expense);
+
+                setResult(RESULT_OK);
                 finish();
             }
             return true;
