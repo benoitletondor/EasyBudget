@@ -153,6 +153,7 @@
                         android:layout_height="30dp"
                         android:textColor="@color/primary_text"
                         android:textSize="14dp"
+                        android:paddingBottom="8dp"
                         android:background="@drawable/add_expense_edittext_drawable" />
 
                 </LinearLayout>
