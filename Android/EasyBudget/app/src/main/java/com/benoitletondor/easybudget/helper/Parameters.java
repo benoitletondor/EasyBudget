@@ -55,7 +55,7 @@ public class Parameters
      * @param key
      * @param value
      */
-    public void putInt(String key, long value)
+    public void putLong(String key, long value)
     {
         preferences.edit().putLong(key, value).apply();
     }

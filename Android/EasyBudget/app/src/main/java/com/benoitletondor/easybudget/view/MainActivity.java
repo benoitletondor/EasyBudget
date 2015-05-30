@@ -203,7 +203,7 @@ public class MainActivity extends DBActivity
                     int newBalance = Integer.valueOf(amountEditText.getText().toString());
                     int diff = newBalance - currentBalance;
 
-                    Expense expense = new Expense(getResources().getString(R.string.adjust_balance_expense_title), diff, new Date());
+                    Expense expense = new Expense(getResources().getString(R.string.adjust_balance_expense_title), -diff, new Date());
                     db.addExpense(expense);
 
                     refreshAllForDate(expensesViewAdapter.getDate());

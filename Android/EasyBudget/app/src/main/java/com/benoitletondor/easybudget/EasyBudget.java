@@ -2,6 +2,9 @@ package com.benoitletondor.easybudget;
 
 import android.app.Application;
 
+import com.benoitletondor.easybudget.helper.Logger;
+import com.benoitletondor.easybudget.helper.ParameterKeys;
+import com.benoitletondor.easybudget.helper.Parameters;
 import com.benoitletondor.easybudget.model.Expense;
 import com.benoitletondor.easybudget.model.MonthlyExpense;
 import com.benoitletondor.easybudget.model.db.DB;
@@ -20,13 +23,17 @@ public class EasyBudget extends Application
     {
         super.onCreate();
 
-        DB db = new DB(getApplicationContext());
-        db.clearDB();
+        firstLaunchActions();
+    }
 
-        long monthlyID = db.addMonthlyExpense(new MonthlyExpense("Monthly", 10, new Date()));
-        db.addExpense(new Expense("Monthly", 10, new Date(), monthlyID));
+    private void firstLaunchActions()
+    {
+        Logger.debug("First launch actions");
 
-        db.addExpense(new Expense("Daily", 30, new Date()));
-        db.addExpense(new Expense("Daily positive", -10, new Date()));
+        long initDate = Parameters.getInstance(getApplicationContext()).getLong(ParameterKeys.INIT_DATE, 0);
+        if( initDate <= 0 )
+        {
+            Parameters.getInstance(getApplicationContext()).putLong(ParameterKeys.INIT_DATE, new Date().getTime());
+        }
     }
 }
