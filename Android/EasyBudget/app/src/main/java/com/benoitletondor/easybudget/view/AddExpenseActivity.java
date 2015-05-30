@@ -2,6 +2,7 @@ package com.benoitletondor.easybudget.view;
 
 import android.app.DatePickerDialog;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBarActivity;
@@ -15,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.benoitletondor.easybudget.R;
+import com.benoitletondor.easybudget.helper.CompatHelper;
 import com.benoitletondor.easybudget.model.Expense;
 
 import java.text.SimpleDateFormat;
@@ -244,6 +246,8 @@ public class AddExpenseActivity extends DBActivity
     private void setUpDateButton()
     {
         dateButton = (Button) findViewById(R.id.date_button);
+        CompatHelper.removeButtonBorder(dateButton); // Remove border on lollipop
+
         updateDateButtonDisplay();
 
         dateButton.setOnClickListener(new View.OnClickListener()

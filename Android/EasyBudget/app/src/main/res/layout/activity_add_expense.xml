@@ -92,12 +92,12 @@
                 <com.benoitletondor.easybudget.helper.PaddingEditText
                     android:id="@+id/description_edittext"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="30dp"
                     android:textColor="@color/primary_text"
                     android:textSize="16dp"
                     android:inputType="text"
                     android:background="@drawable/add_expense_edittext_drawable"
-                    android:paddingBottom="8dp"/>
+                    android:paddingBottom="0dp"/>
 
             </LinearLayout>
 
@@ -124,12 +124,12 @@
                     <com.benoitletondor.easybudget.helper.PaddingEditText
                         android:id="@+id/amount_edittext"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="30dp"
                         android:textColor="@color/primary_text"
                         android:textSize="16dp"
                         android:inputType="number"
                         android:background="@drawable/add_expense_edittext_drawable"
-                        android:paddingBottom="8dp"/>
+                        android:paddingBottom="0dp"/>
 
                 </LinearLayout>
 
@@ -153,7 +153,7 @@
                         android:layout_height="30dp"
                         android:textColor="@color/primary_text"
                         android:textSize="14dp"
-                        android:paddingBottom="8dp"
+                        android:paddingBottom="0dp"
                         android:background="@drawable/add_expense_edittext_drawable" />
 
                 </LinearLayout>

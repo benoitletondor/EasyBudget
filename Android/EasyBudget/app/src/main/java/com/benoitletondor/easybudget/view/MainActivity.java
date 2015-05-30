@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.benoitletondor.easybudget.R;
+import com.benoitletondor.easybudget.helper.CompatHelper;
 import com.benoitletondor.easybudget.helper.ParameterKeys;
 import com.benoitletondor.easybudget.helper.Parameters;
 import com.benoitletondor.easybudget.model.db.DB;
@@ -236,11 +237,8 @@ public class MainActivity extends DBActivity
                 rightButton.setBackgroundResource(R.drawable.calendar_month_switcher_button_drawable);
 
                 // Remove border on lollipop
-                if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP )
-                {
-                    leftButton.setOutlineProvider(null);
-                    rightButton.setOutlineProvider(null);
-                }
+                CompatHelper.removeButtonBorder(leftButton);
+                CompatHelper.removeButtonBorder(rightButton);
             }
         };
 
