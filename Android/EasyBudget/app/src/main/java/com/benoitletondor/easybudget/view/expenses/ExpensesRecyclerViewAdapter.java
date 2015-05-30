@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -28,10 +29,10 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
 {
     private List<Expense> expenses;
     private Date          date;
-    private MainActivity  activity;
+    private Activity  activity;
     private DB db;
 
-    public ExpensesRecyclerViewAdapter(MainActivity activity, DB db, Date date)
+    public ExpensesRecyclerViewAdapter(Activity activity, DB db, Date date)
     {
         if (db == null)
         {
@@ -110,7 +111,10 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
                                 {
                                     if ( db.deleteExpense(expense) )
                                     {
-                                        activity.onExpenseDeleted(expense); //FIXME event?
+                                        // Send notification to inform views that this expense has been deleted
+                                        Intent intent = new Intent(MainActivity.INTENT_EXPENSE_DELETED);
+                                        intent.putExtra("expense", expense);
+                                        LocalBroadcastManager.getInstance(activity.getApplicationContext()).sendBroadcast(intent);
                                     }
                                 }
                             }
