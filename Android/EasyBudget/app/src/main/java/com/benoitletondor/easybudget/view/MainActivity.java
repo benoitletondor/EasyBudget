@@ -298,12 +298,8 @@ public class MainActivity extends DBActivity
             @Override
             public void onSelectDate(Date date, View view)
             {
-                refreshRecyclerViewForDate(date);
-
                 calendarFragment.setSelectedDates(date, date);
-                calendarFragment.refreshView();
-
-                updateBalanceDisplayForDay(date);
+                refreshAllForDate(date);
             }
 
             @Override
