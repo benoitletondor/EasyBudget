@@ -1,8 +1,10 @@
 package com.benoitletondor.easybudget.view;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentTransaction;
@@ -22,7 +24,6 @@ import com.benoitletondor.easybudget.helper.Parameters;
 import com.benoitletondor.easybudget.model.db.DB;
 import com.benoitletondor.easybudget.view.calendar.CalendarFragment;
 import com.benoitletondor.easybudget.view.expenses.ExpensesRecyclerViewAdapter;
-import com.melnykov.fab.FloatingActionButton;
 import com.roomorama.caldroid.CaldroidFragment;
 import com.roomorama.caldroid.CaldroidListener;
 import com.roomorama.caldroid.WeekdayArrayAdapter;
@@ -60,6 +61,8 @@ public class MainActivity extends DBActivity
         budgetLine = (TextView) findViewById(R.id.budgetLine);
         initCalendarFragment(savedInstanceState);
         initRecyclerView(savedInstanceState);
+
+
     }
 
     @Override
@@ -253,7 +256,7 @@ public class MainActivity extends DBActivity
         expensesRecyclerView = (RecyclerView) findViewById(R.id.expensesRecyclerView);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.attachToRecyclerView(expensesRecyclerView);
+        fab.setRippleColor(getResources().getColor(R.color.accent));
         fab.setOnClickListener(new View.OnClickListener()
         {
             @Override

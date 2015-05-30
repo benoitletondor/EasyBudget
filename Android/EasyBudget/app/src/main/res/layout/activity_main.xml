@@ -1,6 +1,5 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -51,16 +50,16 @@
                 android:layout_height="match_parent"
                 android:background="@android:color/white" />
 
-            <com.melnykov.fab.FloatingActionButton
+            <!-- borderWidth used for design support bug : https://code.google.com/p/android/issues/detail?id=175067 -->
+            <android.support.design.widget.FloatingActionButton
+                xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/fab"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|right"
-                android:layout_margin="16dp"
+                android:layout_margin="@dimen/fab_margin"
                 android:src="@drawable/ic_add"
-                fab:fab_colorNormal="@color/primary"
-                fab:fab_colorPressed="@color/primary_light"
-                fab:fab_colorRipple="@color/primary"
+                app:borderWidth="0dp"
                 tools:ignore="RtlHardcoded"/>
 
         </FrameLayout>
