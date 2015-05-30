@@ -16,12 +16,11 @@ Here's a first look at what it __may__ looks like:
 
 EasyBudget is a simple Android app build with Android Studio that will support Android 4+. 
 
-I'll try to make the app look as Material as I can using appcompat and some imagination/magic.
+I'll try to make the app adopt Material design as much as possible using appcompat and some imagination/magic.
 
 The project is made possible by some external libraries made by awesome guys that I want to thanks here:
 
 - Caldroid : a library to display a customizable Calendar [https://github.com/roomorama/Caldroid](https://github.com/roomorama/Caldroid)
-- FloatingActionButton : a library to backport FAB to Android 4 [https://github.com/makovkastar/FloatingActionButton](https://github.com/makovkastar/FloatingActionButton)
 
 ### Licence
 
