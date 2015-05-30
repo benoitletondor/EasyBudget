@@ -38,7 +38,7 @@
 
         </FrameLayout>
 
-        <FrameLayout
+        <android.support.design.widget.CoordinatorLayout
             android:layout_width="match_parent"
             android:layout_height="0dip"
             android:layout_weight="1">
@@ -60,9 +60,11 @@
                 android:layout_margin="@dimen/fab_margin"
                 android:src="@drawable/ic_add"
                 app:borderWidth="0dp"
+                app:layout_anchor="@id/expensesRecyclerView"
+                app:layout_anchorGravity="bottom|right|end"
                 tools:ignore="RtlHardcoded"/>
 
-        </FrameLayout>
+        </android.support.design.widget.CoordinatorLayout>
 
     </LinearLayout>
 

@@ -12,5 +12,7 @@
         <item>Edit expense</item>
         <item>Delete expense</item>
     </string-array>
+    <string name="expense_delete_snackbar_text">Expense deleted</string>
+    <string name="expense_delete_snackbar_cancel_action">Cancel</string>
 
 </resources>

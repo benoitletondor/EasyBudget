@@ -28,9 +28,10 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
 {
     private List<Expense> expenses;
     private Date          date;
-    private Activity      activity;
+    private MainActivity  activity;
+    private DB db;
 
-    public ExpensesRecyclerViewAdapter(Activity activity, DB db, Date date)
+    public ExpensesRecyclerViewAdapter(MainActivity activity, DB db, Date date)
     {
         if (db == null)
         {
@@ -50,6 +51,7 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
         this.activity = activity;
         this.date = date;
         this.expenses = db.getExpensesForDay(date);
+        this.db = db;
     }
 
     /**
@@ -104,9 +106,12 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
 
                                     ActivityCompat.startActivityForResult(activity, startIntent, MainActivity.ADD_EXPENSE_ACTIVITY_CODE, null);
                                 }
-                                case 1: //Delete
+                                case 1: // Delete
                                 {
-                                    // TODO delete
+                                    if ( db.deleteExpense(expense) )
+                                    {
+                                        activity.onExpenseDeleted(expense); //FIXME event?
+                                    }
                                 }
                             }
                         }

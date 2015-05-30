@@ -136,7 +136,7 @@ public final class DB
         {
             List<Expense> expenses = new ArrayList<>();
 
-            cursor = database.query(SQLiteDBHelper.TABLE_EXPENSE, null, SQLiteDBHelper.COLUMN_EXPENSE_DATE + " = "+date.getTime(), null, null, null, null, null);
+            cursor = database.query(SQLiteDBHelper.TABLE_EXPENSE, null, SQLiteDBHelper.COLUMN_EXPENSE_DATE + " = " + date.getTime(), null, null, null, null, null);
             while( cursor.moveToNext() )
             {
                 expenses.add(ExpenseFromCursor(cursor));
@@ -166,7 +166,7 @@ public final class DB
         Cursor cursor = null;
         try
         {
-            cursor = database.rawQuery("SELECT SUM("+SQLiteDBHelper.COLUMN_EXPENSE_AMOUNT+") FROM "+SQLiteDBHelper.TABLE_EXPENSE+" WHERE "+SQLiteDBHelper.COLUMN_EXPENSE_DATE+" <= "+day.getTime(), null);
+            cursor = database.rawQuery("SELECT SUM(" + SQLiteDBHelper.COLUMN_EXPENSE_AMOUNT + ") FROM " + SQLiteDBHelper.TABLE_EXPENSE + " WHERE " + SQLiteDBHelper.COLUMN_EXPENSE_DATE + " <= " + day.getTime(), null);
 
             if(cursor.moveToFirst())
             {
@@ -200,6 +200,17 @@ public final class DB
         return database.insert(SQLiteDBHelper.TABLE_MONTHLY_EXPENSE, null, generateContentValuesForMonthlyExpense(expense));
     }
 
+    /**
+     * Delete this expense
+     *
+     * @param expense
+     * @return
+     */
+    public boolean deleteExpense(Expense expense)
+    {
+        return database.delete(SQLiteDBHelper.TABLE_EXPENSE, SQLiteDBHelper.COLUMN_EXPENSE_DB_ID+"="+expense.getId(), null) > 0;
+    }
+
 // -------------------------------------------->
 
     /**
@@ -225,7 +236,7 @@ public final class DB
             cursor.getLong(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_DB_ID)),
             cursor.getString(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_TITLE)),
             cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_AMOUNT)),
-            new Date(cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_DATE))),
+            new Date(cursor.getLong(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_DATE))),
             monthlyId > 0 ? monthlyId : null
         );
     }

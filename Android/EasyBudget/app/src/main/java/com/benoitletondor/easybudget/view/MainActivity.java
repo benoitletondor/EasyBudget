@@ -3,6 +3,7 @@ package com.benoitletondor.easybudget.view;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,6 +19,7 @@ import com.benoitletondor.easybudget.R;
 import com.benoitletondor.easybudget.helper.CompatHelper;
 import com.benoitletondor.easybudget.helper.ParameterKeys;
 import com.benoitletondor.easybudget.helper.Parameters;
+import com.benoitletondor.easybudget.model.Expense;
 import com.benoitletondor.easybudget.view.calendar.CalendarFragment;
 import com.benoitletondor.easybudget.view.expenses.ExpensesRecyclerViewAdapter;
 import com.roomorama.caldroid.CaldroidFragment;
@@ -57,8 +59,6 @@ public class MainActivity extends DBActivity
         budgetLine = (TextView) findViewById(R.id.budgetLine);
         initCalendarFragment(savedInstanceState);
         initRecyclerView(savedInstanceState);
-
-
     }
 
     @Override
@@ -278,5 +278,36 @@ public class MainActivity extends DBActivity
         expensesViewAdapter = new ExpensesRecyclerViewAdapter(this, db, date);
         expensesRecyclerView.setAdapter(expensesViewAdapter);
         updateBalanceDisplayForDay(date);
+    }
+
+    public void onExpenseDeleted(final Expense expense)
+    {
+        expense.setId(null);
+
+        expensesViewAdapter = new ExpensesRecyclerViewAdapter(this, db, expensesViewAdapter.getDate());
+        expensesRecyclerView.setAdapter(expensesViewAdapter);
+
+        updateBalanceDisplayForDay(expensesViewAdapter.getDate());
+
+        calendarFragment.refreshView();
+
+        Snackbar snackbar = Snackbar.make(expensesRecyclerView, R.string.expense_delete_snackbar_text, Snackbar.LENGTH_LONG);
+        snackbar.setAction(R.string.expense_delete_snackbar_cancel_action, new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                db.addExpense(expense);
+
+                expensesViewAdapter = new ExpensesRecyclerViewAdapter(MainActivity.this, db, expensesViewAdapter.getDate());
+                expensesRecyclerView.setAdapter(expensesViewAdapter);
+
+                updateBalanceDisplayForDay(expensesViewAdapter.getDate());
+
+                calendarFragment.refreshView();
+            }
+        });
+
+        snackbar.show();
     }
 }
