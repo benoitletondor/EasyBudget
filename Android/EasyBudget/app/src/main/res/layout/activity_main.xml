@@ -50,7 +50,7 @@
                 android:layout_height="match_parent"
                 android:background="@android:color/white" />
 
-            <!-- borderWi Design support bug : https://code.google.com/p/android/issues/detail?id=175067 -->
+            <!-- borderWidth used for design support bug : https://code.google.com/p/android/issues/detail?id=175067 -->
             <android.support.design.widget.FloatingActionButton
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/fab"
