@@ -26,11 +26,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".view.ExpenseEditActivity"
-            android:label="@string/title_activity_add_expense"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_add_expense"
             android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".view.MonthlyExpenseEditActivity"
+            android:configChanges="locale|keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_add_monthly_expense"
+            android:screenOrientation="portrait" />
+
     </application>
 
 </manifest>
