@@ -8,8 +8,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.benoitletondor.easybudget.R;
-import com.benoitletondor.easybudget.helper.ParameterKeys;
-import com.benoitletondor.easybudget.helper.Parameters;
 import com.benoitletondor.easybudget.model.db.DB;
 import com.roomorama.caldroid.CaldroidGridAdapter;
 

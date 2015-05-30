@@ -5,9 +5,6 @@ import android.app.Application;
 import com.benoitletondor.easybudget.helper.Logger;
 import com.benoitletondor.easybudget.helper.ParameterKeys;
 import com.benoitletondor.easybudget.helper.Parameters;
-import com.benoitletondor.easybudget.model.Expense;
-import com.benoitletondor.easybudget.model.MonthlyExpense;
-import com.benoitletondor.easybudget.model.db.DB;
 
 import java.util.Date;
 
