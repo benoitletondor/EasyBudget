@@ -7,4 +7,10 @@
     <string name="title_activity_add_expense">Add Expense</string>
     <string name="title_activity_edit_expense">Edit Expense</string>
 
+    <string name="dialog_edit_expense_title">What do you want to do?</string>
+    <string-array name="dialog_edit_expense_choices">
+        <item>Edit expense</item>
+        <item>Delete expense</item>
+    </string-array>
+
 </resources>
