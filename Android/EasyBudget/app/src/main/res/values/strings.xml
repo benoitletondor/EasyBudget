@@ -16,10 +16,10 @@
         <item>Delete expense</item>
     </string-array>
     <string name="expense_delete_snackbar_text">Expense deleted</string>
-    <string name="expense_delete_snackbar_cancel_action">Cancel</string>
 
     <string name="adjust_balance_title">New balance</string>
     <string name="adjust_balance_message">Adjust today\'s balance</string>
     <string name="adjust_balance_expense_title">Balance</string>
+    <string name="adjust_balance_snackbar_text">Balance adjusted to %s</string>
 
 </resources>
