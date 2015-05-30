@@ -2,7 +2,6 @@ package com.benoitletondor.easybudget.helper;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.TimeZone;
 
 /**
  * Helper to work with dates

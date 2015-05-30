@@ -1,6 +1,5 @@
 package com.benoitletondor.easybudget.view.expenses;
 
-import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +11,6 @@ import com.benoitletondor.easybudget.R;
 import com.benoitletondor.easybudget.model.Expense;
 import com.benoitletondor.easybudget.model.db.DB;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 

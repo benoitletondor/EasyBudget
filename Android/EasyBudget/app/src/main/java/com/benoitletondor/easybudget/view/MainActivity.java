@@ -1,14 +1,10 @@
 package com.benoitletondor.easybudget.view;
 
 import android.content.Intent;
-import android.content.res.ColorStateList;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
@@ -22,7 +18,6 @@ import com.benoitletondor.easybudget.R;
 import com.benoitletondor.easybudget.helper.CompatHelper;
 import com.benoitletondor.easybudget.helper.ParameterKeys;
 import com.benoitletondor.easybudget.helper.Parameters;
-import com.benoitletondor.easybudget.model.db.DB;
 import com.benoitletondor.easybudget.view.calendar.CalendarFragment;
 import com.benoitletondor.easybudget.view.expenses.ExpensesRecyclerViewAdapter;
 import com.roomorama.caldroid.CaldroidFragment;
@@ -270,7 +265,7 @@ public class MainActivity extends DBActivity
         expensesLayoutManager = new LinearLayoutManager(this);
         expensesRecyclerView.setLayoutManager(expensesLayoutManager);
 
-        Date date = null;
+        Date date;
         if( savedInstanceState != null && savedInstanceState.containsKey(RECYCLE_VIEW_SAVED_DATE) )
         {
             date = (Date) savedInstanceState.getSerializable(RECYCLE_VIEW_SAVED_DATE);

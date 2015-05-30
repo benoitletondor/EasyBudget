@@ -2,10 +2,7 @@ package com.benoitletondor.easybudget.view;
 
 import android.app.DatePickerDialog;
 import android.graphics.Typeface;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
-import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +19,7 @@ import com.benoitletondor.easybudget.model.Expense;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Activity to add a new expense
@@ -278,7 +276,7 @@ public class AddExpenseActivity extends DBActivity
 
     private void updateDateButtonDisplay()
     {
-        SimpleDateFormat formatter = new SimpleDateFormat("MMM dd yyyy");
+        SimpleDateFormat formatter = new SimpleDateFormat("MMM dd yyyy", Locale.US);
         dateButton.setText(formatter.format(date));
     }
 }

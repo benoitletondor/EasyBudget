@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 
 import java.util.Calendar;
@@ -44,6 +45,7 @@ public class DatePickerDialogFragment extends DialogFragment
 // ------------------------------------------>
 
     @Override
+    @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState)
     {
         // Use the current date as the default date in the picker

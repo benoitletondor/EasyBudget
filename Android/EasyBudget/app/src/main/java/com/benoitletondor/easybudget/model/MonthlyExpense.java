@@ -2,15 +2,7 @@ package com.benoitletondor.easybudget.model;
 
 import com.benoitletondor.easybudget.helper.DateHelper;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * Object that represent a expense that occur on every month
