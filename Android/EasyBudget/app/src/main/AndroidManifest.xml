@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".view.AddExpenseActivity"
+            android:name=".view.ExpenseEditActivity"
             android:label="@string/title_activity_add_expense"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait" />

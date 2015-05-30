@@ -1,5 +1,8 @@
 package com.benoitletondor.easybudget.view.expenses;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +13,8 @@ import android.widget.TextView;
 import com.benoitletondor.easybudget.R;
 import com.benoitletondor.easybudget.model.Expense;
 import com.benoitletondor.easybudget.model.db.DB;
+import com.benoitletondor.easybudget.view.ExpenseEditActivity;
+import com.benoitletondor.easybudget.view.MainActivity;
 
 import java.util.Date;
 import java.util.List;
@@ -20,9 +25,10 @@ import java.util.List;
 public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRecyclerViewAdapter.ViewHolder>
 {
     private List<Expense> expenses;
-    private Date date;
+    private Date          date;
+    private Activity      activity;
 
-    public ExpensesRecyclerViewAdapter(DB db, Date date)
+    public ExpensesRecyclerViewAdapter(Activity activity, DB db, Date date)
     {
         if (db == null)
         {
@@ -34,6 +40,12 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
             throw new NullPointerException("date==null");
         }
 
+        if( activity == null )
+        {
+            throw new NullPointerException("activity==null");
+        }
+
+        this.activity = activity;
         this.date = date;
         this.expenses = db.getExpensesForDay(date);
     }
@@ -58,14 +70,27 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder viewHolder, int i)
+    public void onBindViewHolder(final ViewHolder viewHolder, int i)
     {
-        Expense expense = expenses.get(i);
+        final Expense expense = expenses.get(i);
 
         viewHolder.expenseTitleTextView.setText(expense.getTitle());
         viewHolder.expenseAmountTextView.setText(-expense.getAmount()+" €");
         viewHolder.monthlyIndicator.setVisibility(expense.isMonthly() ? View.VISIBLE : View.GONE);
         viewHolder.positiveIndicator.setImageResource(expense.getAmount() < 0 ? R.drawable.ic_label_green : R.drawable.ic_label_red);
+
+        viewHolder.view.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Intent startIntent = new Intent(viewHolder.view.getContext(), ExpenseEditActivity.class);
+                startIntent.putExtra("date", expense.getDate());
+                startIntent.putExtra("expense", expense);
+
+                ActivityCompat.startActivityForResult(activity, startIntent, MainActivity.ADD_EXPENSE_ACTIVITY_CODE, null);
+            }
+        });
     }
 
     @Override
@@ -85,11 +110,13 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
         public final TextView expenseAmountTextView;
         public final ViewGroup monthlyIndicator;
         public final ImageView positiveIndicator;
+        public final View view;
 
         public ViewHolder(View v)
         {
             super(v);
 
+            view = v;
             expenseTitleTextView = (TextView) v.findViewById(R.id.expense_title);
             expenseAmountTextView = (TextView) v.findViewById(R.id.expense_amount);
             monthlyIndicator = (ViewGroup) v.findViewById(R.id.monthly_indicator);

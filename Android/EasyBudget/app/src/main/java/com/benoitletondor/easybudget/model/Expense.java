@@ -2,6 +2,7 @@ package com.benoitletondor.easybudget.model;
 
 import com.benoitletondor.easybudget.helper.DateHelper;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -9,7 +10,7 @@ import java.util.Date;
  *
  * @author Benoit LETONDOR
  */
-public class Expense
+public class Expense implements Serializable
 {
     /**
      * DB id of this expense (can be null)

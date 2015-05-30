@@ -34,7 +34,7 @@ import java.util.Date;
  */
 public class MainActivity extends DBActivity
 {
-    private static final int ADD_EXPENSE_ACTIVITY_CODE = 101;
+    public static final int ADD_EXPENSE_ACTIVITY_CODE = 101;
 
     private static final String CALENDAR_SAVED_STATE = "calendar_saved_state";
     private static final String RECYCLE_VIEW_SAVED_DATE = "recycleViewSavedDate";
@@ -100,7 +100,7 @@ public class MainActivity extends DBActivity
                 calendarFragment.refreshView();
                 updateBalanceDisplayForDay(calendarFragment.getSelectedDate());
 
-                expensesViewAdapter = new ExpensesRecyclerViewAdapter(db, calendarFragment.getSelectedDate());
+                expensesViewAdapter = new ExpensesRecyclerViewAdapter(this, db, calendarFragment.getSelectedDate());
                 expensesRecyclerView.swapAdapter(expensesViewAdapter, true);
             }
         }
@@ -195,7 +195,7 @@ public class MainActivity extends DBActivity
             @Override
             public void onSelectDate(Date date, View view)
             {
-                expensesViewAdapter = new ExpensesRecyclerViewAdapter(db, date);
+                expensesViewAdapter = new ExpensesRecyclerViewAdapter(MainActivity.this, db, date);
                 expensesRecyclerView.swapAdapter(expensesViewAdapter, true);
 
                 calendarFragment.setSelectedDates(date, date);
@@ -255,7 +255,7 @@ public class MainActivity extends DBActivity
             @Override
             public void onClick(View v)
             {
-                Intent startIntent = new Intent(MainActivity.this, AddExpenseActivity.class);
+                Intent startIntent = new Intent(MainActivity.this, ExpenseEditActivity.class);
                 startIntent.putExtra("date", calendarFragment.getSelectedDate());
 
                 ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
@@ -275,7 +275,7 @@ public class MainActivity extends DBActivity
             date = new Date();
         }
 
-        expensesViewAdapter = new ExpensesRecyclerViewAdapter(db, date);
+        expensesViewAdapter = new ExpensesRecyclerViewAdapter(this, db, date);
         expensesRecyclerView.setAdapter(expensesViewAdapter);
         updateBalanceDisplayForDay(date);
     }

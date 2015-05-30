@@ -26,7 +26,7 @@ import java.util.Locale;
  *
  * @author Benoit LETONDOR
  */
-public class AddExpenseActivity extends DBActivity
+public class ExpenseEditActivity extends DBActivity
 {
     /**
      * Edit text that contains the description
@@ -39,12 +39,16 @@ public class AddExpenseActivity extends DBActivity
     /**
      * Button for date selection
      */
-    private Button dateButton;
+    private Button   dateButton;
 
+    /**
+     * Expense that is being edited (will be null if it's a new one)
+     */
+    private Expense expense;
     /**
      * The date of the expense
      */
-    private Date date;
+    private Date    date;
     /**
      * Is the new expense a revenue
      */
@@ -54,7 +58,8 @@ public class AddExpenseActivity extends DBActivity
 // -------------------------------------->
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_expense);
 
@@ -62,6 +67,14 @@ public class AddExpenseActivity extends DBActivity
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         date = (Date) getIntent().getSerializableExtra("date");
+
+        if (getIntent().hasExtra("expense"))
+        {
+            expense = (Expense) getIntent().getSerializableExtra("expense");
+            isRevenue = expense.getAmount() < 0;
+
+            setTitle(getResources().getString(R.string.title_activity_edit_expense));
+        }
 
         setUpButtons();
         setUpTextFields();
@@ -218,6 +231,11 @@ public class AddExpenseActivity extends DBActivity
             }
         });
 
+        if( expense != null )
+        {
+            descriptionEditText.setText(expense.getTitle());
+        }
+
         amountEditText = (EditText) findViewById(R.id.amount_edittext);
         amountEditText.setOnFocusChangeListener(new View.OnFocusChangeListener()
         {
@@ -236,6 +254,11 @@ public class AddExpenseActivity extends DBActivity
                 }
             }
         });
+
+        if( expense != null )
+        {
+            amountEditText.setText(String.valueOf(expense.getAmount()));
+        }
     }
 
     /**
