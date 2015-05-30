@@ -85,14 +85,22 @@ public final class DB
      * @param expense
      * @return
      */
-    public long addExpense(Expense expense)
+    public boolean addExpense(Expense expense)
     {
         if( expense == null )
         {
             throw new NullPointerException("expense==null");
         }
 
-        return database.insert(SQLiteDBHelper.TABLE_EXPENSE, null, generateContentValuesForExpense(expense));
+        long id = database.insert(SQLiteDBHelper.TABLE_EXPENSE, null, generateContentValuesForExpense(expense));
+
+        if( id > 0 )
+        {
+            expense.setId(id);
+            return true;
+        }
+
+        return false;
     }
 
     /**

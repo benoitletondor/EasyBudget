@@ -80,16 +80,16 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
         final Expense expense = expenses.get(i);
 
         viewHolder.expenseTitleTextView.setText(expense.getTitle());
-        viewHolder.expenseAmountTextView.setText(-expense.getAmount()+" €");
+        viewHolder.expenseAmountTextView.setText(-expense.getAmount() + " €");
         viewHolder.monthlyIndicator.setVisibility(expense.isMonthly() ? View.VISIBLE : View.GONE);
         viewHolder.positiveIndicator.setImageResource(expense.getAmount() < 0 ? R.drawable.ic_label_green : R.drawable.ic_label_red);
 
-        viewHolder.view.setOnClickListener(new View.OnClickListener()
+        final View.OnClickListener onClickListener = new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                if( !expense.isMonthly() )
+                if (!expense.isMonthly())
                 {
                     AlertDialog.Builder builder = new AlertDialog.Builder(activity);
                     builder.setTitle(R.string.dialog_edit_expense_title);
@@ -109,7 +109,7 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
                                 }
                                 case 1: // Delete
                                 {
-                                    if ( db.deleteExpense(expense) )
+                                    if (db.deleteExpense(expense))
                                     {
                                         // Send notification to inform views that this expense has been deleted
                                         Intent intent = new Intent(MainActivity.INTENT_EXPENSE_DELETED);
@@ -123,6 +123,18 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
                     builder.show();
                 }
 
+            }
+        };
+
+        viewHolder.view.setOnClickListener(onClickListener);
+
+        viewHolder.view.setOnLongClickListener(new View.OnLongClickListener()
+        {
+            @Override
+            public boolean onLongClick(View v)
+            {
+                onClickListener.onClick(v);
+                return true;
             }
         });
     }
