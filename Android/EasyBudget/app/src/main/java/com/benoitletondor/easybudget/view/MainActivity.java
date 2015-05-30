@@ -2,6 +2,7 @@ package com.benoitletondor.easybudget.view;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
@@ -17,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.benoitletondor.easybudget.R;
@@ -80,9 +83,7 @@ public class MainActivity extends DBActivity
                 {
                     final Expense expense = (Expense) intent.getSerializableExtra("expense");
 
-                    refreshRecyclerViewForDate(expensesViewAdapter.getDate());
-                    updateBalanceDisplayForDay(expensesViewAdapter.getDate());
-                    calendarFragment.refreshView();
+                    refreshAllForDate(expensesViewAdapter.getDate());
 
                     Snackbar snackbar = Snackbar.make(expensesRecyclerView, R.string.expense_delete_snackbar_text, Snackbar.LENGTH_LONG);
                     snackbar.setAction(R.string.expense_delete_snackbar_cancel_action, new View.OnClickListener()
@@ -92,9 +93,7 @@ public class MainActivity extends DBActivity
                         {
                             db.addExpense(expense);
 
-                            refreshRecyclerViewForDate(expensesViewAdapter.getDate());
-                            updateBalanceDisplayForDay(expensesViewAdapter.getDate());
-                            calendarFragment.refreshView();
+                            refreshAllForDate(expensesViewAdapter.getDate());
                         }
                     });
 
@@ -172,7 +171,48 @@ public class MainActivity extends DBActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if ( id == R.id.action_settings)
+        {
+            return true;
+        }
+        else if( id == R.id.action_balance )
+        {
+            final int currentBalance = -db.getBalanceForDay(new Date());
+
+            View dialogView = getLayoutInflater().inflate(R.layout.dialog_adjust_balance, null);
+            final EditText amountEditText = (EditText) dialogView.findViewById(R.id.balance_amount);
+            amountEditText.setText(String.valueOf(currentBalance));
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(R.string.adjust_balance_title);
+            builder.setMessage(R.string.adjust_balance_message);
+            builder.setView(dialogView);
+            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    dialog.dismiss();
+                }
+            });
+            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    int newBalance = Integer.valueOf(amountEditText.getText().toString());
+                    int diff = newBalance - currentBalance;
+
+                    Expense expense = new Expense(getResources().getString(R.string.adjust_balance_expense_title), diff, new Date());
+                    db.addExpense(expense);
+
+                    refreshAllForDate(expensesViewAdapter.getDate());
+                    dialog.dismiss();
+                }
+            });
+
+            builder.show();
+
             return true;
         }
 
@@ -189,7 +229,7 @@ public class MainActivity extends DBActivity
      */
     private void updateBalanceDisplayForDay(Date day)
     {
-        int balance = Parameters.getInstance(this).getInt(ParameterKeys.BASE_BALANCE,0) - db.getBalanceForDay(day);
+        int balance = - db.getBalanceForDay(day);
 
         budgetLine.setText("ACCOUNT BALANCE : " + balance + " €"); //TODO translate
 
@@ -231,7 +271,7 @@ public class MainActivity extends DBActivity
             calendarFragment.setArguments(args);
             calendarFragment.setSelectedDates(new Date(), new Date());
 
-            Date minDate = new Date(Parameters.getInstance(this).getLong(ParameterKeys.BASE_BALANCE_DATE, new Date().getTime()));
+            Date minDate = new Date(Parameters.getInstance(this).getLong(ParameterKeys.INIT_DATE, new Date().getTime()));
             calendarFragment.setMinDate(minDate);
         }
 
@@ -329,5 +369,12 @@ public class MainActivity extends DBActivity
     {
         expensesViewAdapter = new ExpensesRecyclerViewAdapter(this, db, date);
         expensesRecyclerView.setAdapter(expensesViewAdapter);
+    }
+
+    private void refreshAllForDate(Date date)
+    {
+        refreshRecyclerViewForDate(date);
+        updateBalanceDisplayForDay(date);
+        calendarFragment.refreshView();
     }
 }

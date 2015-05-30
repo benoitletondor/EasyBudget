@@ -25,7 +25,6 @@ import hirondelle.date4j.DateTime;
 public class CalendarGridAdapter extends CaldroidGridAdapter
 {
     private DB db;
-    private int baseBalance;
 
 // ----------------------------------->
 
@@ -34,7 +33,6 @@ public class CalendarGridAdapter extends CaldroidGridAdapter
         super(context, month, year, caldroidData, extraData);
 
         db = new DB(context.getApplicationContext());
-        baseBalance = Parameters.getInstance(context).getInt(ParameterKeys.BASE_BALANCE, 0);
     }
 
     @Override
@@ -179,7 +177,7 @@ public class CalendarGridAdapter extends CaldroidGridAdapter
                     viewData.containsExpenses = true;
                 }
 
-                tv2.setText((baseBalance-balance)+"");
+                tv2.setText(String.valueOf(-balance));
 
                 if( balance > 0 )
                 {
