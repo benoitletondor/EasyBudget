@@ -1,19 +1,19 @@
 package com.benoitletondor.easybudget.view;
 
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 
 import com.benoitletondor.easybudget.model.db.DB;
 
 /**
- * An ActionBarActivity that contains an open connection DB to perform queries
+ * An AppCompatActivity that contains an opened DB connection to perform queries
  *
  * @author Benoit LETONDOR
  */
-public abstract class DBActivity extends ActionBarActivity
+public abstract class DBActivity extends AppCompatActivity
 {
     /**
-     * An open DB connection that can be used
+     * An opened DB connection that is ready to be used
      */
     protected DB db;
 

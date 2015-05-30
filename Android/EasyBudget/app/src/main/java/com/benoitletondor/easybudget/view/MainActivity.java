@@ -149,7 +149,7 @@ public class MainActivity extends DBActivity
     {
         int balance = Parameters.getInstance(this).getInt(ParameterKeys.BASE_BALANCE,0) - db.getBalanceForDay(day);
 
-        budgetLine.setText("ACCOUNT BALANCE : "+balance+" €");
+        budgetLine.setText("ACCOUNT BALANCE : "+balance+" €"); //TODO translate
 
         if( balance <= 0 )
         {
