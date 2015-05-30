@@ -2,7 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.benoitletondor.easybudget.view.AddExpenseActivity">
+    tools:context="com.benoitletondor.easybudget.view.AddExpenseActivity"
+    android:background="@android:color/white" >
 
     <ScrollView
         android:layout_width="match_parent"
