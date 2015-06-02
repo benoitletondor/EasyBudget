@@ -1,4 +1,4 @@
-package com.benoitletondor.easybudget.view.calendar;
+package com.benoitletondor.easybudget.view.main.calendar;
 
 import android.content.Context;
 import android.view.LayoutInflater;

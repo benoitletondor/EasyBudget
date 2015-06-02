@@ -12,6 +12,10 @@ import java.util.Date;
 public class MonthlyExpense
 {
     /**
+     * DB id of this expense (can be null)
+     */
+    private Long id;
+    /**
      * Title of this expense when created
      */
     private String  title;
@@ -62,15 +66,17 @@ public class MonthlyExpense
 
     /**
      *
+     * @param id
      * @param title
      * @param startAmount
      * @param recurringDate
      * @param modified
      */
-    public MonthlyExpense(String title, int startAmount, Date recurringDate, boolean modified)
+    public MonthlyExpense(Long id, String title, int startAmount, Date recurringDate, boolean modified)
     {
         this(title, startAmount, recurringDate);
 
+        this.id = id;
         this.modified = modified;
     }
 
@@ -110,6 +116,24 @@ public class MonthlyExpense
     public boolean isModified()
     {
         return modified;
+    }
+
+    /**
+     *
+     * @param id
+     */
+    public void setId(Long id)
+    {
+        this.id = id;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Long getId()
+    {
+        return id;
     }
 
 }

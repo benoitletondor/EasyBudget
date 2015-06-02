@@ -27,8 +27,8 @@ import com.benoitletondor.easybudget.helper.CompatHelper;
 import com.benoitletondor.easybudget.helper.ParameterKeys;
 import com.benoitletondor.easybudget.helper.Parameters;
 import com.benoitletondor.easybudget.model.Expense;
-import com.benoitletondor.easybudget.view.calendar.CalendarFragment;
-import com.benoitletondor.easybudget.view.expenses.ExpensesRecyclerViewAdapter;
+import com.benoitletondor.easybudget.view.main.calendar.CalendarFragment;
+import com.benoitletondor.easybudget.view.main.ExpensesRecyclerViewAdapter;
 import com.roomorama.caldroid.CaldroidFragment;
 import com.roomorama.caldroid.CaldroidListener;
 import com.roomorama.caldroid.WeekdayArrayAdapter;
@@ -44,7 +44,6 @@ import java.util.Date;
 public class MainActivity extends DBActivity
 {
     public static final int ADD_EXPENSE_ACTIVITY_CODE = 101;
-    public static final int ADD_MONTHLY_EXPENSE_ACTIVITY_CODE = 102;
     public static final String INTENT_EXPENSE_DELETED = "intent.expense.deleted";
 
     private static final String CALENDAR_SAVED_STATE = "calendar_saved_state";
@@ -84,21 +83,29 @@ public class MainActivity extends DBActivity
                 {
                     final Expense expense = (Expense) intent.getSerializableExtra("expense");
 
-                    refreshAllForDate(expensesViewAdapter.getDate());
-
-                    Snackbar snackbar = Snackbar.make(expensesRecyclerView, R.string.expense_delete_snackbar_text, Snackbar.LENGTH_LONG);
-                    snackbar.setAction(R.string.cancel, new View.OnClickListener()
+                    if( db.deleteExpense(expense) )
                     {
-                        @Override
-                        public void onClick(View v)
+                        refreshAllForDate(expensesViewAdapter.getDate());
+
+                        Snackbar snackbar = Snackbar.make(expensesRecyclerView, R.string.expense_delete_snackbar_text, Snackbar.LENGTH_LONG);
+                        snackbar.setAction(R.string.cancel, new View.OnClickListener()
                         {
-                            db.addExpense(expense);
+                            @Override
+                            public void onClick(View v)
+                            {
+                                db.addExpense(expense);
 
-                            refreshAllForDate(expensesViewAdapter.getDate());
-                        }
-                    });
+                                refreshAllForDate(expensesViewAdapter.getDate());
+                            }
+                        });
 
-                    snackbar.show();
+                        snackbar.show();
+                    }
+                    else
+                    {
+                        // TODO warn user of error
+                    }
+
                 }
             }
         };
@@ -140,7 +147,7 @@ public class MainActivity extends DBActivity
     {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if( requestCode == ADD_EXPENSE_ACTIVITY_CODE || requestCode == ADD_MONTHLY_EXPENSE_ACTIVITY_CODE )
+        if( requestCode == ADD_EXPENSE_ACTIVITY_CODE )
         {
             if( resultCode == RESULT_OK )
             {
@@ -230,10 +237,10 @@ public class MainActivity extends DBActivity
         }
         else if( id == R.id.action_add_monthly_expense )
         {
-            Intent startIntent = new Intent(MainActivity.this, MonthlyExpenseEditActivity.class);
+            Intent startIntent = new Intent(MainActivity.this, MonthlyExpensesManageActivity.class);
             startIntent.putExtra("date", calendarFragment.getSelectedDate());
 
-            ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_MONTHLY_EXPENSE_ACTIVITY_CODE, null);
+            ActivityCompat.startActivity(MainActivity.this, startIntent, null);
             return true;
         }
 

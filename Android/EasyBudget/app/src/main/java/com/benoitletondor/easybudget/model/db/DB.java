@@ -83,7 +83,7 @@ public final class DB
      * Add a one time expense into DB
      *
      * @param expense
-     * @return
+     * @return true on success, false on error
      */
     public boolean addExpense(Expense expense)
     {
@@ -196,16 +196,53 @@ public final class DB
      * Add a monthly expense
      *
      * @param expense
-     * @return ID of the inserted monthly expense on success, exception or -1 on error
+     * @return true on success, false on error
      */
-    public long addMonthlyExpense(MonthlyExpense expense)
+    public boolean addMonthlyExpense(MonthlyExpense expense)
     {
         if( expense == null )
         {
             throw new NullPointerException("expense==null");
         }
 
-        return database.insert(SQLiteDBHelper.TABLE_MONTHLY_EXPENSE, null, generateContentValuesForMonthlyExpense(expense));
+        long id = database.insert(SQLiteDBHelper.TABLE_MONTHLY_EXPENSE, null, generateContentValuesForMonthlyExpense(expense));
+
+        if( id > 0 )
+        {
+            expense.setId(id);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Get all monthly expenses
+     *
+     * @return
+     */
+    public List<MonthlyExpense> getAllMonthlyExpenses()
+    {
+        Cursor cursor = null;
+        try
+        {
+            List<MonthlyExpense> expenses = new ArrayList<>();
+
+            cursor = database.query(SQLiteDBHelper.TABLE_MONTHLY_EXPENSE, null, null, null, null, null, null, null);
+            while( cursor.moveToNext() )
+            {
+                expenses.add(MonthlyExpenseFromCursor(cursor));
+            }
+
+            return expenses;
+        }
+        finally
+        {
+            if( cursor != null )
+            {
+                cursor.close();
+            }
+        }
     }
 
     /**
@@ -282,6 +319,7 @@ public final class DB
     {
         return new MonthlyExpense
         (
+            cursor.getLong(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_DB_ID)),
             cursor.getString(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_TITLE)),
             cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_AMOUNT)),
             new Date(cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_RECURRING_DATE))),

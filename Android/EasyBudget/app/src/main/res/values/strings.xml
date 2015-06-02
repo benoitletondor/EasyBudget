@@ -4,12 +4,11 @@
     <string name="app_name">EasyBudget</string>
     <string name="action_settings">Settings</string>
     <string name="action_balance">Adjust balance</string>
-    <string name="action_add_monthly_expense">Add monthly expense</string>
+    <string name="action_add_monthly_expense">Manage monthly expenses</string>
     <string name="action_save">Save</string>
     <string name="title_activity_add_expense">Add Expense</string>
     <string name="title_activity_edit_expense">Edit Expense</string>
-    <string name="title_activity_add_monthly_expense">Add Monthly Expense</string>
-    <string name="title_activity_edit_monthly_expense">Edit Monthly Expense</string>
+    <string name="title_activity_add_monthly_expense">Manage Monthly Expenses</string>
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
 

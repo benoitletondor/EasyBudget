@@ -1,4 +1,4 @@
-package com.benoitletondor.easybudget.view.expenses;
+package com.benoitletondor.easybudget.view.main;
 
 import android.app.Activity;
 import android.content.DialogInterface;
@@ -30,7 +30,6 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
     private List<Expense> expenses;
     private Date          date;
     private Activity  activity;
-    private DB db;
 
     public ExpensesRecyclerViewAdapter(Activity activity, DB db, Date date)
     {
@@ -52,7 +51,6 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
         this.activity = activity;
         this.date = date;
         this.expenses = db.getExpensesForDay(date);
-        this.db = db;
     }
 
     /**
@@ -109,13 +107,10 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
                                 }
                                 case 1: // Delete
                                 {
-                                    if (db.deleteExpense(expense))
-                                    {
-                                        // Send notification to inform views that this expense has been deleted
-                                        Intent intent = new Intent(MainActivity.INTENT_EXPENSE_DELETED);
-                                        intent.putExtra("expense", expense);
-                                        LocalBroadcastManager.getInstance(activity.getApplicationContext()).sendBroadcast(intent);
-                                    }
+                                    // Send notification to inform views that this expense has been deleted
+                                    Intent intent = new Intent(MainActivity.INTENT_EXPENSE_DELETED);
+                                    intent.putExtra("expense", expense);
+                                    LocalBroadcastManager.getInstance(activity.getApplicationContext()).sendBroadcast(intent);
                                 }
                             }
                         }
