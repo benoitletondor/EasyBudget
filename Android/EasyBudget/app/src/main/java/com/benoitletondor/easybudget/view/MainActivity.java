@@ -44,6 +44,7 @@ import java.util.Date;
 public class MainActivity extends DBActivity
 {
     public static final int ADD_EXPENSE_ACTIVITY_CODE = 101;
+    public static final int MANAGE_MONTHLY_EXPENSE_ACTIVITY_CODE = 102;
     public static final String INTENT_EXPENSE_DELETED = "intent.expense.deleted";
 
     private static final String CALENDAR_SAVED_STATE = "calendar_saved_state";
@@ -147,7 +148,7 @@ public class MainActivity extends DBActivity
     {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if( requestCode == ADD_EXPENSE_ACTIVITY_CODE )
+        if( requestCode == ADD_EXPENSE_ACTIVITY_CODE || requestCode == MANAGE_MONTHLY_EXPENSE_ACTIVITY_CODE )
         {
             if( resultCode == RESULT_OK )
             {
@@ -240,7 +241,7 @@ public class MainActivity extends DBActivity
             Intent startIntent = new Intent(MainActivity.this, MonthlyExpensesManageActivity.class);
             startIntent.putExtra("date", calendarFragment.getSelectedDate());
 
-            ActivityCompat.startActivity(MainActivity.this, startIntent, null);
+            ActivityCompat.startActivityForResult(MainActivity.this, startIntent, MANAGE_MONTHLY_EXPENSE_ACTIVITY_CODE, null);
             return true;
         }
 

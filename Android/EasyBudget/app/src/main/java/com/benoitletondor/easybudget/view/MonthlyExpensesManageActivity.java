@@ -1,7 +1,9 @@
 package com.benoitletondor.easybudget.view;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
@@ -13,6 +15,8 @@ import com.benoitletondor.easybudget.view.monthly.MonthlyRecyclerViewAdapter;
 
 public class MonthlyExpensesManageActivity extends DBActivity
 {
+    private static final int EDIT_MONTHLY_EXPENSE_ACTIVITY_CODE = 1000;
+
     private RecyclerView expensesRecyclerView;
     private MonthlyRecyclerViewAdapter expensesViewAdapter;
 
@@ -28,6 +32,8 @@ public class MonthlyExpensesManageActivity extends DBActivity
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         initRecyclerView(savedInstanceState);
+
+        setResult(RESULT_CANCELED);
     }
 
     @Override
@@ -65,6 +71,17 @@ public class MonthlyExpensesManageActivity extends DBActivity
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if( resultCode == RESULT_OK ) // If an edit or a creation happened set result to OK to pass it to MainActivity
+        {
+            setResult(RESULT_OK);
+        }
+    }
+
 // ------------------------------------------>
 
     private void initRecyclerView(Bundle savedInstanceState)
@@ -78,7 +95,9 @@ public class MonthlyExpensesManageActivity extends DBActivity
             @Override
             public void onClick(View v)
             {
-                //TODO
+                Intent startIntent = new Intent(MonthlyExpensesManageActivity.this, MonthlyExpenseEditActivity.class);
+
+                ActivityCompat.startActivityForResult(MonthlyExpensesManageActivity.this, startIntent, EDIT_MONTHLY_EXPENSE_ACTIVITY_CODE, null);
             }
         });
 
