@@ -1,6 +1,5 @@
 package com.benoitletondor.easybudget.view.monthly;
 
-import android.app.Activity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +8,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.benoitletondor.easybudget.R;
-import com.benoitletondor.easybudget.model.Expense;
 import com.benoitletondor.easybudget.model.MonthlyExpense;
 import com.benoitletondor.easybudget.model.db.DB;
 
@@ -20,24 +18,17 @@ import java.util.List;
  */
 public class MonthlyRecyclerViewAdapter extends RecyclerView.Adapter<MonthlyRecyclerViewAdapter.ViewHolder>
 {
-    private Activity             activity;
     private List<MonthlyExpense> expenses;
 
 // ------------------------------------------>
 
-    public MonthlyRecyclerViewAdapter(Activity activity, DB db)
+    public MonthlyRecyclerViewAdapter(DB db)
     {
         if (db == null)
         {
             throw new NullPointerException("db==null");
         }
 
-        if (activity == null)
-        {
-            throw new NullPointerException("activity==null");
-        }
-
-        this.activity = activity;
         this.expenses = db.getAllMonthlyExpenses();
     }
 

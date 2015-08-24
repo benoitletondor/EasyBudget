@@ -22,7 +22,7 @@ import hirondelle.date4j.DateTime;
  */
 public class CalendarGridAdapter extends CaldroidGridAdapter
 {
-    private DB db;
+    private final DB db;
 
 // ----------------------------------->
 
@@ -74,7 +74,7 @@ public class CalendarGridAdapter extends CaldroidGridAdapter
         {
             if( !viewData.isDisabled )
             {
-                tv1.setTextColor(context.getResources().getColor(R.color.calendar_cell_disabled_text_color));
+                tv1.setTextColor(context.getColor(R.color.calendar_cell_disabled_text_color));
                 tv2.setVisibility(View.INVISIBLE);
                 cellColorIndicator.setVisibility(View.GONE);
                 cellView.setBackgroundResource(android.R.color.white);
@@ -84,8 +84,8 @@ public class CalendarGridAdapter extends CaldroidGridAdapter
         }
         else if( viewData.isDisabled ) // Reset all view params
         {
-            tv1.setTextColor(context.getResources().getColor(R.color.primary_text));
-            tv2.setTextColor(context.getResources().getColor(R.color.secondary_text));
+            tv1.setTextColor(context.getColor(R.color.primary_text));
+            tv2.setTextColor(context.getColor(R.color.secondary_text));
             tv2.setText("");
             tv2.setVisibility(View.VISIBLE);
             cellView.setBackgroundResource(R.drawable.custom_grid_cell_drawable);
@@ -104,16 +104,16 @@ public class CalendarGridAdapter extends CaldroidGridAdapter
             {
                 if( !viewData.isOutOfMonth )
                 {
-                    tv1.setTextColor(context.getResources().getColor(R.color.divider));
-                    tv2.setTextColor(context.getResources().getColor(R.color.divider));
+                    tv1.setTextColor(context.getColor(R.color.divider));
+                    tv2.setTextColor(context.getColor(R.color.divider));
 
                     viewData.isOutOfMonth = true;
                 }
             }
             else if( viewData.isOutOfMonth )
             {
-                tv1.setTextColor(context.getResources().getColor(R.color.primary_text));
-                tv2.setTextColor(context.getResources().getColor(R.color.secondary_text));
+                tv1.setTextColor(context.getColor(R.color.primary_text));
+                tv2.setTextColor(context.getColor(R.color.secondary_text));
 
                 viewData.isOutOfMonth = false;
             }

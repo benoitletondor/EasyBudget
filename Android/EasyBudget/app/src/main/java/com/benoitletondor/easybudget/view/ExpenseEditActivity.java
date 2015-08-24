@@ -220,12 +220,12 @@ public class ExpenseEditActivity extends DBActivity
             {
                 if (hasFocus)
                 {
-                    descriptionTextView.setTextColor(getResources().getColor(R.color.accent));
+                    descriptionTextView.setTextColor(getColor(R.color.accent));
                     descriptionTextView.setTypeface(null, Typeface.BOLD);
                 }
                 else
                 {
-                    descriptionTextView.setTextColor(getResources().getColor(R.color.secondary_text));
+                    descriptionTextView.setTextColor(getColor(R.color.secondary_text));
                     descriptionTextView.setTypeface(null, Typeface.NORMAL);
                 }
             }
@@ -244,12 +244,12 @@ public class ExpenseEditActivity extends DBActivity
             {
                 if (hasFocus)
                 {
-                    amountTextView.setTextColor(getResources().getColor(R.color.accent));
+                    amountTextView.setTextColor(getColor(R.color.accent));
                     amountTextView.setTypeface(null, Typeface.BOLD);
                 }
                 else
                 {
-                    amountTextView.setTextColor(getResources().getColor(R.color.secondary_text));
+                    amountTextView.setTextColor(getColor(R.color.secondary_text));
                     amountTextView.setTypeface(null, Typeface.NORMAL);
                 }
             }

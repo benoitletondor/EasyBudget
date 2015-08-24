@@ -2,6 +2,8 @@ package com.benoitletondor.easybudget.helper;
 
 import android.util.Log;
 
+import com.benoitletondor.easybudget.BuildConfig;
+
 /**
  * Helper to easily log into the application.
  * 
@@ -13,11 +15,6 @@ public final class Logger
 	 * Default logger tag.
 	 */
 	public static final String DEFAULT_TAG	= "EasyBudget";
-	
-	/**
-	 * Is the logger in dev mode
-	 */
-	private static final boolean dev = true;
 	
 // ----------------------------------------->
 	
@@ -49,7 +46,7 @@ public final class Logger
 	 */
 	public static void error(String tag, boolean debug, String msg, Throwable t)
 	{
-		if( !debug || dev )
+		if( !debug || BuildConfig.DEBUG_LOG )
 		{
 			Log.e(tag, msg, t);
 		}
@@ -134,7 +131,7 @@ public final class Logger
 	 */
 	public static void warning(String tag, boolean debug, String msg, Throwable t)
 	{
-		if( !debug || dev )
+		if( !debug || BuildConfig.DEBUG_LOG )
 		{
 			Log.w(tag, msg, t);
 		}
@@ -219,7 +216,7 @@ public final class Logger
 	 */
 	public static void debug(String tag, boolean debug, String msg, Throwable t)
 	{
-		if( !debug || dev )
+		if( !debug || BuildConfig.DEBUG_LOG )
 		{
 			Log.d(tag, msg, t);
 		}	
@@ -304,7 +301,7 @@ public final class Logger
 	 */
 	public static void info(String tag, boolean debug, String msg, Throwable t)
 	{
-		if( !debug || dev )
+		if( !debug || BuildConfig.DEBUG_LOG )
 		{
 			Log.i(tag, msg, t);
 		}
@@ -389,7 +386,7 @@ public final class Logger
 	 */
 	public static void verbose(String tag, boolean debug, String msg, Throwable t)
 	{
-		if( !debug || dev )
+		if( !debug || BuildConfig.DEBUG_LOG )
 		{
 			Log.v(tag, msg, t);
 		}
