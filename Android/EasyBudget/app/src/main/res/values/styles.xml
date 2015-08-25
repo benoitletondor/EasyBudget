@@ -1,7 +1,7 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="BaseAppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
@@ -15,6 +15,10 @@
         <item name="styleCaldroidNormalCell">@style/CaldroidDefaultNormalCell</item>
         <item name="styleCaldroidSquareCell">@style/CaldroidDefaultSquareCell</item>
         <item name="styleCaldroidWeekdayView">@style/CaldroidDefaultWeekday</item>
+    </style>
+
+    <style name="AppTheme" parent="BaseAppTheme">
+        <!-- Nothing here, exists to be extended for Material animations -->
     </style>
 
     <!-- FAB style -->

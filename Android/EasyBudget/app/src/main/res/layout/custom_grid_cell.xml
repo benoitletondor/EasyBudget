@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:id="@+id/custom_cell"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/custom_cell"
     android:layout_width="match_parent"
-    android:layout_height="50dp"
+    android:layout_height="40dp"
     android:background="@drawable/custom_grid_cell_drawable" >
 
     <LinearLayout
@@ -16,17 +16,17 @@
             android:id="@+id/grid_cell_tv1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="15dp"
+            android:textSize="13dp"
             android:textStyle="bold"
             android:textColor="@color/primary_text"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="4dp"/>
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="2dp"/>
 
         <TextView
             android:id="@+id/grid_cell_tv2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="12dp"
+            android:textSize="10dp"
             android:textColor="@color/secondary_text"
             android:visibility="invisible" />
 

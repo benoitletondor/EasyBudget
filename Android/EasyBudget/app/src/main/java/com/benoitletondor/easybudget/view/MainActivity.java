@@ -1,10 +1,12 @@
 package com.benoitletondor.easybudget.view;
 
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -19,6 +21,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.Button;
@@ -187,6 +190,7 @@ public class MainActivity extends DBActivity
             View dialogView = getLayoutInflater().inflate(R.layout.dialog_adjust_balance, null);
             final EditText amountEditText = (EditText) dialogView.findViewById(R.id.balance_amount);
             amountEditText.setText(String.valueOf(currentBalance));
+            amountEditText.setSelection(amountEditText.getText().length()); // Put focus at the end of the text
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(R.string.adjust_balance_title);
@@ -215,8 +219,8 @@ public class MainActivity extends DBActivity
                     refreshAllForDate(expensesViewAdapter.getDate());
                     dialog.dismiss();
 
-                    //Show snackbar TODO money formatting
-                    Snackbar snackbar = Snackbar.make(expensesRecyclerView, String.format(getResources().getString(R.string.adjust_balance_snackbar_text), newBalance+"€"), Snackbar.LENGTH_LONG);
+                    //Show snackb ear TODO money formatting
+                    Snackbar snackbar = Snackbar.make(expensesRecyclerView, String.format(getResources().getString(R.string.adjust_balance_snackbar_text), newBalance + "€"), Snackbar.LENGTH_LONG);
                     snackbar.setAction(R.string.cancel, new View.OnClickListener()
                     {
                         @Override
@@ -232,7 +236,20 @@ public class MainActivity extends DBActivity
                 }
             });
 
-            builder.show();
+            final Dialog dialog = builder.show();
+
+            // Directly show keyboard when the dialog pops
+            amountEditText.setOnFocusChangeListener(new View.OnFocusChangeListener()
+            {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus)
+                {
+                    if (hasFocus && getResources().getConfiguration().keyboard == Configuration.KEYBOARD_NOKEYS ) // Check if the device doesn't have a physical keyboard
+                    {
+                        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                    }
+                }
+            });
 
             return true;
         }
