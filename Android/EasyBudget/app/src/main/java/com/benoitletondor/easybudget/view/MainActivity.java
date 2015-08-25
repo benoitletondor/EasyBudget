@@ -19,6 +19,8 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -31,6 +33,7 @@ import com.benoitletondor.easybudget.model.Expense;
 import com.benoitletondor.easybudget.view.main.calendar.CalendarFragment;
 import com.benoitletondor.easybudget.view.main.ExpensesRecyclerViewAdapter;
 import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.roomorama.caldroid.CaldroidFragment;
 import com.roomorama.caldroid.CaldroidListener;
 import com.roomorama.caldroid.WeekdayArrayAdapter;
@@ -56,7 +59,6 @@ public class MainActivity extends DBActivity
 
     private CalendarFragment            calendarFragment;
     private RecyclerView                expensesRecyclerView;
-    private LinearLayoutManager         expensesLayoutManager;
     private ExpensesRecyclerViewAdapter expensesViewAdapter;
 
     private TextView budgetLine;
@@ -119,11 +121,6 @@ public class MainActivity extends DBActivity
     @Override
     protected void onDestroy()
     {
-        calendarFragment = null;
-        expensesRecyclerView = null;
-        expensesLayoutManager = null;
-        expensesViewAdapter = null;
-
         LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(receiver);
 
         super.onDestroy();
@@ -351,10 +348,69 @@ public class MainActivity extends DBActivity
 
     private void initRecyclerView(Bundle savedInstanceState)
     {
-        expensesRecyclerView = (RecyclerView) findViewById(R.id.expensesRecyclerView);
+        /*
+         * FAB
+         */
+        final FloatingActionsMenu menu = (FloatingActionsMenu) findViewById(R.id.fab_choices);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener()
+        final View background = MainActivity.this.findViewById(R.id.fab_choices_background);
+        final float backgroundAlpha = 0.8f;
+        final long backgroundAnimationDuration = 200;
+        background.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                menu.collapse();
+            }
+        });
+
+        menu.setOnFloatingActionsMenuUpdateListener(new FloatingActionsMenu.OnFloatingActionsMenuUpdateListener()
+        {
+            @Override
+            public void onMenuExpanded()
+            {
+                background.setVisibility(View.VISIBLE);
+
+                AlphaAnimation animation1 = new AlphaAnimation(0.0f, backgroundAlpha);
+                animation1.setDuration(backgroundAnimationDuration);
+                animation1.setFillAfter(true);
+                background.startAnimation(animation1);
+            }
+
+            @Override
+            public void onMenuCollapsed()
+            {
+                AlphaAnimation animation1 = new AlphaAnimation(backgroundAlpha, 0.0f);
+                animation1.setDuration(backgroundAnimationDuration);
+                animation1.setFillAfter(true);
+                animation1.setAnimationListener(new Animation.AnimationListener()
+                {
+                    @Override
+                    public void onAnimationStart(Animation animation)
+                    {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation)
+                    {
+                        background.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation)
+                    {
+
+                    }
+                });
+
+                background.startAnimation(animation1);
+            }
+        });
+
+        FloatingActionButton fabNewExpense = (FloatingActionButton) findViewById(R.id.fab_new_expense);
+        fabNewExpense.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -363,11 +419,31 @@ public class MainActivity extends DBActivity
                 startIntent.putExtra("date", calendarFragment.getSelectedDate());
 
                 ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
+
+                menu.collapse();
             }
         });
 
-        expensesLayoutManager = new LinearLayoutManager(this);
-        expensesRecyclerView.setLayoutManager(expensesLayoutManager);
+        FloatingActionButton fabNewMonthlyExpense = (FloatingActionButton) findViewById(R.id.fab_new_monthly_expense);
+        fabNewMonthlyExpense.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Intent startIntent = new Intent(MainActivity.this, MonthlyExpenseEditActivity.class);
+                startIntent.putExtra("date", calendarFragment.getSelectedDate());
+
+                ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
+
+                menu.collapse();
+            }
+        });
+
+        /*
+         * Expense Recycler view
+         */
+        expensesRecyclerView = (RecyclerView) findViewById(R.id.expensesRecyclerView);
+        expensesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         Date date;
         if( savedInstanceState != null && savedInstanceState.containsKey(RECYCLE_VIEW_SAVED_DATE) )

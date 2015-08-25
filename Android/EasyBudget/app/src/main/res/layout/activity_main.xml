@@ -1,72 +1,98 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".view.MainActivity">
 
     <LinearLayout
-        android:id="@+id/calendarView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:layout_weight="1"
+        android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <FrameLayout
+        <LinearLayout
+            android:id="@+id/calendarView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
 
-            <TextView android:id="@+id/budgetLine"
-                      android:layout_width="match_parent"
-                      android:layout_height="25dp"
-                      android:background="@color/budget_green"
-                      android:textColor="@android:color/white"
-                      android:textSize="14dp"
-                      android:paddingTop="3dp"
-                      android:paddingLeft="15dp"
-                      android:paddingRight="15dp" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="7dp"
-                android:background="@drawable/elevation_shadow" />
-
-        </FrameLayout>
-
-        <android.support.design.widget.CoordinatorLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dip"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView android:id="@+id/budgetLine"
+                          android:layout_width="match_parent"
+                          android:layout_height="25dp"
+                          android:background="@color/budget_green"
+                          android:textColor="@android:color/white"
+                          android:textSize="14dp"
+                          android:paddingTop="3dp"
+                          android:paddingLeft="15dp"
+                          android:paddingRight="15dp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="7dp"
+                    android:background="@drawable/elevation_shadow" />
+
+            </FrameLayout>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/expensesRecyclerView"
                 android:scrollbars="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="0dip"
+                android:layout_weight="1"
                 android:background="@android:color/white" />
 
-            <com.getbase.floatingactionbutton.AddFloatingActionButton
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/fab"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|right"
-                android:layout_marginBottom="16dp"
-                fab:fab_plusIconColor="@android:color/white"
-                fab:fab_colorNormal="@color/accent"
-                fab:fab_colorPressed="@color/accent_ripple"
-                app:layout_anchor="@id/expensesRecyclerView"
-                app:layout_anchorGravity="bottom|right|end"
-                tools:ignore="RtlHardcoded" />
-
-        </android.support.design.widget.CoordinatorLayout>
+        </LinearLayout>
 
     </LinearLayout>
 
-</LinearLayout>
+    <View android:id="@+id/fab_choices_background"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white" />
+
+    <com.getbase.floatingactionbutton.FloatingActionsMenu
+        android:id="@+id/fab_choices"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        fab:fab_addButtonPlusIconColor="@android:color/white"
+        fab:fab_addButtonColorNormal="@color/accent"
+        fab:fab_addButtonColorPressed="@color/accent_ripple"
+        fab:fab_labelStyle="@style/fab_labels_style"
+        tools:ignore="RtlHardcoded">
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_new_monthly_expense"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_colorNormal="@android:color/white"
+            fab:fab_title="@string/title_activity_monthly_expense_add"
+            fab:fab_colorPressed="@color/accent_ripple"
+            fab:fab_size="mini" />
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_new_expense"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_colorNormal="@android:color/white"
+            fab:fab_title="@string/title_activity_add_expense"
+            fab:fab_colorPressed="@color/accent_ripple"
+            fab:fab_size="mini" />
+
+    </com.getbase.floatingactionbutton.FloatingActionsMenu>
+
+</RelativeLayout>
