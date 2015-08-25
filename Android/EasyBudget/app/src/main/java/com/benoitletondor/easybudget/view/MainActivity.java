@@ -372,12 +372,31 @@ public class MainActivity extends DBActivity
             @Override
             public void onMenuExpanded()
             {
-                background.setVisibility(View.VISIBLE);
-                background.setClickable(true);
-
                 AlphaAnimation fadeInAnimation = new AlphaAnimation(0.0f, backgroundAlpha);
                 fadeInAnimation.setDuration(backgroundAnimationDuration);
                 fadeInAnimation.setFillAfter(true);
+                fadeInAnimation.setAnimationListener(new Animation.AnimationListener()
+                {
+                    @Override
+                    public void onAnimationStart(Animation animation)
+                    {
+                        background.setVisibility(View.VISIBLE);
+                        background.setClickable(true);
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation)
+                    {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation)
+                    {
+
+                    }
+                });
+
                 background.startAnimation(fadeInAnimation);
             }
 
