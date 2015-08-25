@@ -28,10 +28,6 @@ public final class DB
      * The SQLLite DB
      */
     private SQLiteDatabase database;
-    /**
-     * The DB Helper
-     */
-    private SQLiteDBHelper databaseHelper;
 
 // -------------------------------------------->
 
@@ -48,7 +44,7 @@ public final class DB
             throw new NullPointerException("context==null");
         }
 
-		databaseHelper = new SQLiteDBHelper(context.getApplicationContext());
+        SQLiteDBHelper databaseHelper = new SQLiteDBHelper(context.getApplicationContext());
 		database = databaseHelper.getWritableDatabase();
 	}
 
@@ -60,7 +56,6 @@ public final class DB
         try
         {
             database.close();
-            databaseHelper = null;
         }
         catch (Exception e)
         {

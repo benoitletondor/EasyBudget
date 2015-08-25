@@ -89,7 +89,7 @@ public class MonthlyExpensesManageActivity extends DBActivity
         expensesRecyclerView = (RecyclerView) findViewById(R.id.monthlyExpensesRecyclerView);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.monthlyFab);
-        fab.setRippleColor(getColor(R.color.accent));
+        fab.setRippleColor(getResources().getColor(R.color.accent));
         fab.setOnClickListener(new View.OnClickListener()
         {
             @Override
