@@ -1,10 +1,13 @@
 package com.benoitletondor.easybudget.helper;
 
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.widget.Button;
 
 /**
  * Helper to manage compat with 5+
+ *
+ * @author Benoit LETONDOR
  */
 public class CompatHelper
 {
@@ -13,7 +16,7 @@ public class CompatHelper
      *
      * @param button
      */
-    public static void removeButtonBorder(Button button)
+    public static void removeButtonBorder(@NonNull Button button)
     {
         if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP )
         {

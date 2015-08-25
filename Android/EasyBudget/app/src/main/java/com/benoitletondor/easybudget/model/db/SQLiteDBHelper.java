@@ -3,6 +3,7 @@ package com.benoitletondor.easybudget.model.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.annotation.NonNull;
 
 /**
  * @author Benoit LETONDOR
@@ -30,7 +31,7 @@ public final class SQLiteDBHelper extends SQLiteOpenHelper
 
 // -------------------------------------------->
 
-    public SQLiteDBHelper(Context context)
+    public SQLiteDBHelper(@NonNull Context context)
     {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }

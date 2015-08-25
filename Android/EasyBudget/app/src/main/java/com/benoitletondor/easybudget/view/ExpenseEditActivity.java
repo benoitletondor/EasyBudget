@@ -3,6 +3,7 @@ package com.benoitletondor.easybudget.view;
 import android.app.DatePickerDialog;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -220,12 +221,12 @@ public class ExpenseEditActivity extends DBActivity
             {
                 if (hasFocus)
                 {
-                    descriptionTextView.setTextColor(getColor(R.color.accent));
+                    descriptionTextView.setTextColor(ContextCompat.getColor(ExpenseEditActivity.this, R.color.accent));
                     descriptionTextView.setTypeface(null, Typeface.BOLD);
                 }
                 else
                 {
-                    descriptionTextView.setTextColor(getColor(R.color.secondary_text));
+                    descriptionTextView.setTextColor(ContextCompat.getColor(ExpenseEditActivity.this, R.color.secondary_text));
                     descriptionTextView.setTypeface(null, Typeface.NORMAL);
                 }
             }
@@ -244,12 +245,12 @@ public class ExpenseEditActivity extends DBActivity
             {
                 if (hasFocus)
                 {
-                    amountTextView.setTextColor(getColor(R.color.accent));
+                    amountTextView.setTextColor(ContextCompat.getColor(ExpenseEditActivity.this, R.color.accent));
                     amountTextView.setTypeface(null, Typeface.BOLD);
                 }
                 else
                 {
-                    amountTextView.setTextColor(getColor(R.color.secondary_text));
+                    amountTextView.setTextColor(ContextCompat.getColor(ExpenseEditActivity.this, R.color.secondary_text));
                     amountTextView.setTypeface(null, Typeface.NORMAL);
                 }
             }

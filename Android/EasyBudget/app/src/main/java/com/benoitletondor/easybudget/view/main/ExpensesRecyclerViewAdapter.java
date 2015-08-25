@@ -3,6 +3,7 @@ package com.benoitletondor.easybudget.view.main;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
@@ -31,23 +32,8 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
     private Date          date;
     private Activity  activity;
 
-    public ExpensesRecyclerViewAdapter(Activity activity, DB db, Date date)
+    public ExpensesRecyclerViewAdapter(@NonNull Activity activity, @NonNull DB db, @NonNull Date date)
     {
-        if (db == null)
-        {
-            throw new NullPointerException("db==null");
-        }
-
-        if (date == null)
-        {
-            throw new NullPointerException("date==null");
-        }
-
-        if( activity == null )
-        {
-            throw new NullPointerException("activity==null");
-        }
-
         this.activity = activity;
         this.date = date;
         this.expenses = db.getExpensesForDay(date);

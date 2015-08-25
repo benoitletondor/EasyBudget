@@ -8,7 +8,6 @@
     <string name="action_save">Save</string>
     <string name="title_activity_add_expense">Add Expense</string>
     <string name="title_activity_edit_expense">Edit Expense</string>
-    <string name="title_activity_add_monthly_expense">Manage Monthly Expenses</string>
     <string name="title_activity_monthly_expense_add">Add Monthly Expense</string>
     <string name="title_activity_monthly_expense_edit">Edit Monthly Expense</string>
     <string name="cancel">Cancel</string>

@@ -1,5 +1,7 @@
 package com.benoitletondor.easybudget.model;
 
+import android.support.annotation.NonNull;
+
 import com.benoitletondor.easybudget.helper.DateHelper;
 
 import java.io.Serializable;
@@ -41,7 +43,7 @@ public class MonthlyExpense implements Serializable
      * @param startAmount
      * @param recurringDate
      */
-    public MonthlyExpense(String title, int startAmount, Date recurringDate)
+    public MonthlyExpense(@NonNull String title, int startAmount, @NonNull Date recurringDate)
     {
         if (startAmount == 0)
         {
@@ -49,19 +51,7 @@ public class MonthlyExpense implements Serializable
         }
 
         this.amount = startAmount;
-
-        if( title == null )
-        {
-            throw new IllegalArgumentException("title is empty or null");
-        }
-
         this.title = title;
-
-        if (recurringDate == null)
-        {
-            throw new NullPointerException("recurringDate==null");
-        }
-
         this.recurringDate = DateHelper.cleanDate(recurringDate);
     }
 
@@ -73,7 +63,7 @@ public class MonthlyExpense implements Serializable
      * @param recurringDate
      * @param modified
      */
-    public MonthlyExpense(Long id, String title, int startAmount, Date recurringDate, boolean modified)
+    public MonthlyExpense(Long id, @NonNull String title, int startAmount, @NonNull Date recurringDate, boolean modified)
     {
         this(title, startAmount, recurringDate);
 
@@ -87,6 +77,7 @@ public class MonthlyExpense implements Serializable
      *
      * @return
      */
+    @NonNull
     public String getTitle()
     {
         return title;
@@ -96,6 +87,7 @@ public class MonthlyExpense implements Serializable
      *
      * @return
      */
+    @NonNull
     public Date getRecurringDate()
     {
         return recurringDate;

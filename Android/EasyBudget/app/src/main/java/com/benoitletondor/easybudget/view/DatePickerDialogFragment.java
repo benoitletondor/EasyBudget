@@ -26,18 +26,8 @@ public class DatePickerDialogFragment extends DialogFragment
     }
 
     @SuppressLint("ValidFragment")
-    public DatePickerDialogFragment(Date originalDate, DatePickerDialog.OnDateSetListener listener)
+    public DatePickerDialogFragment(@NonNull Date originalDate, @NonNull DatePickerDialog.OnDateSetListener listener)
     {
-        if( originalDate == null )
-        {
-            throw new NullPointerException("originalDate==null");
-        }
-
-        if( listener == null )
-        {
-            throw new NullPointerException("listener==null");
-        }
-
         this.originalDate = originalDate;
         this.listener = listener;
     }

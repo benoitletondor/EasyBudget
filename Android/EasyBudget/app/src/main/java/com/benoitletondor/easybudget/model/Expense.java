@@ -1,5 +1,7 @@
 package com.benoitletondor.easybudget.model;
 
+import android.support.annotation.NonNull;
+
 import com.benoitletondor.easybudget.helper.DateHelper;
 
 import java.io.Serializable;
@@ -41,7 +43,7 @@ public class Expense implements Serializable
      * @param amount
      * @param date
      */
-    public Expense(String title, int amount, Date date)
+    public Expense(@NonNull String title, int amount, @NonNull Date date)
     {
         this(null, title, amount, date, null);
     }
@@ -53,7 +55,7 @@ public class Expense implements Serializable
      * @param date
      * @param monthlyId
      */
-    public Expense(String title, int amount, Date date, Long monthlyId)
+    public Expense(@NonNull String title, int amount, @NonNull Date date, Long monthlyId)
     {
         this(null, title, amount, date, monthlyId);
     }
@@ -66,11 +68,11 @@ public class Expense implements Serializable
      * @param date
      * @param monthlyId
      */
-    public Expense(Long id, String title, int amount, Date date, Long monthlyId)
+    public Expense(Long id, @NonNull String title, int amount, @NonNull Date date, Long monthlyId)
     {
         this.id = id;
 
-        if (title == null || title.isEmpty())
+        if ( title.isEmpty() )
         {
             throw new IllegalArgumentException("title is empty or null");
         }
@@ -83,12 +85,6 @@ public class Expense implements Serializable
         }
 
         this.amount = amount;
-
-        if( date == null )
-        {
-            throw new NullPointerException("date==null");
-        }
-
         this.date = DateHelper.cleanDate(date);
         this.monthlyId = monthlyId;
     }
@@ -120,15 +116,13 @@ public class Expense implements Serializable
         return monthlyId != null;
     }
 
-    /**
-     *
-     * @return
-     */
+    @NonNull
     public String getTitle()
     {
         return title;
     }
 
+    @NonNull
     public Date getDate()
     {
         return date;

@@ -1,5 +1,7 @@
 package com.benoitletondor.easybudget.helper;
 
+import android.support.annotation.NonNull;
+
 import java.util.Calendar;
 import java.util.Date;
 
@@ -16,7 +18,7 @@ public class DateHelper
      * @param date
      * @return a new cleaned date
      */
-    public static Date cleanDate(Date date)
+    public static Date cleanDate(@NonNull Date date)
     {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
@@ -35,7 +37,7 @@ public class DateHelper
      * @param date
      * @return
      */
-    public static int getDayOfMonth(Date date)
+    public static int getDayOfMonth(@NonNull Date date)
     {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
