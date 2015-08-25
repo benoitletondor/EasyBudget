@@ -2,6 +2,7 @@ package com.benoitletondor.easybudget.helper;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 
 /**
  * Singleton to manage parameters into the app (wrapper of SharedPreferences).
@@ -26,13 +27,8 @@ public class Parameters
      *
      * @param context
      */
-    private Parameters(Context context)
+    private Parameters(@NonNull Context context)
     {
-        if (context == null)
-        {
-            throw new NullPointerException("context==null");
-        }
-
         preferences = context.getApplicationContext().getSharedPreferences(SHARED_PREFERENCES_FILE_NAME, Context.MODE_PRIVATE);
     }
 
@@ -44,7 +40,7 @@ public class Parameters
      * @param key
      * @param value
      */
-    public void putInt(String key, int value)
+    public void putInt(@NonNull String key, int value)
     {
         preferences.edit().putInt(key, value).apply();
     }
@@ -55,7 +51,7 @@ public class Parameters
      * @param key
      * @param value
      */
-    public void putLong(String key, long value)
+    public void putLong(@NonNull String key, long value)
     {
         preferences.edit().putLong(key, value).apply();
     }
@@ -66,7 +62,7 @@ public class Parameters
      * @param key
      * @param value
      */
-    public void putString(String key, String value)
+    public void putString(@NonNull String key, @NonNull String value)
     {
         preferences.edit().putString(key, value).apply();
     }
@@ -89,7 +85,7 @@ public class Parameters
      * @param defaultValue
      * @return
      */
-    public int getInt(String key, int defaultValue)
+    public int getInt(@NonNull String key, int defaultValue)
     {
         return preferences.getInt(key, defaultValue);
     }
@@ -101,7 +97,7 @@ public class Parameters
      * @param defaultValue
      * @return
      */
-    public long getLong(String key, long defaultValue)
+    public long getLong(@NonNull String key, long defaultValue)
     {
         return preferences.getLong(key, defaultValue);
     }
@@ -113,7 +109,7 @@ public class Parameters
      * @param defaultValue
      * @return
      */
-    public Boolean getBoolean(String key, boolean defaultValue)
+    public boolean getBoolean(@NonNull String key, boolean defaultValue)
     {
         return preferences.getBoolean(key, defaultValue);
     }

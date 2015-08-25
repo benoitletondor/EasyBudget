@@ -1,6 +1,7 @@
 package com.benoitletondor.easybudget.view.main.calendar;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +28,7 @@ public class CalendarGridAdapter extends CaldroidGridAdapter
 
 // ----------------------------------->
 
-    public CalendarGridAdapter(Context context, int month, int year, HashMap<String, Object> caldroidData, HashMap<String, Object> extraData)
+    public CalendarGridAdapter(@NonNull Context context, int month, int year, HashMap<String, Object> caldroidData, HashMap<String, Object> extraData)
     {
         super(context, month, year, caldroidData, extraData);
 

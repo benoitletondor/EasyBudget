@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
@@ -249,7 +250,7 @@ public class MainActivity extends DBActivity
      *
      * @param day
      */
-    private void updateBalanceDisplayForDay(Date day)
+    private void updateBalanceDisplayForDay(@NonNull Date day)
     {
         int balance = - db.getBalanceForDay(day);
 
@@ -382,13 +383,13 @@ public class MainActivity extends DBActivity
         updateBalanceDisplayForDay(date);
     }
 
-    private void refreshRecyclerViewForDate(Date date)
+    private void refreshRecyclerViewForDate(@NonNull Date date)
     {
         expensesViewAdapter = new ExpensesRecyclerViewAdapter(this, db, date);
         expensesRecyclerView.setAdapter(expensesViewAdapter);
     }
 
-    private void refreshAllForDate(Date date)
+    private void refreshAllForDate(@NonNull Date date)
     {
         refreshRecyclerViewForDate(date);
         updateBalanceDisplayForDay(date);

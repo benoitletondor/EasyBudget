@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.support.annotation.NonNull;
 
 import com.benoitletondor.easybudget.helper.DateHelper;
 import com.benoitletondor.easybudget.helper.Logger;
@@ -37,13 +38,8 @@ public final class DB
      * @param context
      * @throws SQLiteException
      */
-    public DB(Context context) throws SQLiteException
+    public DB(@NonNull Context context) throws SQLiteException
     {
-        if (context == null)
-        {
-            throw new NullPointerException("context==null");
-        }
-
         SQLiteDBHelper databaseHelper = new SQLiteDBHelper(context.getApplicationContext());
 		database = databaseHelper.getWritableDatabase();
 	}
@@ -80,13 +76,8 @@ public final class DB
      * @param expense
      * @return true on success, false on error
      */
-    public boolean addExpense(Expense expense)
+    public boolean addExpense(@NonNull Expense expense)
     {
-        if( expense == null )
-        {
-            throw new NullPointerException("expense==null");
-        }
-
         long id = database.insert(SQLiteDBHelper.TABLE_EXPENSE, null, generateContentValuesForExpense(expense));
 
         if( id > 0 )
@@ -104,7 +95,7 @@ public final class DB
      * @param day
      * @return
      */
-    public boolean hasExpensesForDay(Date day)
+    public boolean hasExpensesForDay(@NonNull Date day)
     {
         day = DateHelper.cleanDate(day);
 
@@ -130,7 +121,8 @@ public final class DB
      * @param date
      * @return
      */
-    public List<Expense> getExpensesForDay(Date date)
+    @NonNull
+    public List<Expense> getExpensesForDay(@NonNull Date date)
     {
         date = DateHelper.cleanDate(date);
 
@@ -162,7 +154,7 @@ public final class DB
      * @param day
      * @return
      */
-    public int getBalanceForDay(Date day)
+    public int getBalanceForDay(@NonNull Date day)
     {
         day = DateHelper.cleanDate(day);
 
@@ -193,13 +185,8 @@ public final class DB
      * @param expense
      * @return true on success, false on error
      */
-    public boolean addMonthlyExpense(MonthlyExpense expense)
+    public boolean addMonthlyExpense(@NonNull MonthlyExpense expense)
     {
-        if( expense == null )
-        {
-            throw new NullPointerException("expense==null");
-        }
-
         long id = database.insert(SQLiteDBHelper.TABLE_MONTHLY_EXPENSE, null, generateContentValuesForMonthlyExpense(expense));
 
         if( id > 0 )
@@ -216,6 +203,7 @@ public final class DB
      *
      * @return
      */
+    @NonNull
     public List<MonthlyExpense> getAllMonthlyExpenses()
     {
         Cursor cursor = null;
@@ -246,7 +234,7 @@ public final class DB
      * @param expense
      * @return
      */
-    public boolean deleteExpense(Expense expense)
+    public boolean deleteExpense(@NonNull Expense expense)
     {
         return database.delete(SQLiteDBHelper.TABLE_EXPENSE, SQLiteDBHelper.COLUMN_EXPENSE_DB_ID+"="+expense.getId(), null) > 0;
     }
@@ -259,7 +247,8 @@ public final class DB
      * @param cursor
      * @return
      */
-    private static Expense ExpenseFromCursor(Cursor cursor)
+    @NonNull
+    private static Expense ExpenseFromCursor(@NonNull Cursor cursor)
     {
         long monthlyId = 0;
         try
@@ -287,7 +276,8 @@ public final class DB
      * @param expense
      * @return
      */
-    private static ContentValues generateContentValuesForExpense(Expense expense)
+    @NonNull
+    private static ContentValues generateContentValuesForExpense(@NonNull Expense expense)
     {
         final ContentValues values = new ContentValues();
 
@@ -310,7 +300,8 @@ public final class DB
      * @return
      * @throws JSONException
      */
-    private static MonthlyExpense MonthlyExpenseFromCursor(Cursor cursor)
+    @NonNull
+    private static MonthlyExpense MonthlyExpenseFromCursor(@NonNull Cursor cursor)
     {
         return new MonthlyExpense
         (
@@ -329,7 +320,8 @@ public final class DB
      * @return
      * @throws JSONException
      */
-    private static ContentValues generateContentValuesForMonthlyExpense(MonthlyExpense expense)
+    @NonNull
+    private static ContentValues generateContentValuesForMonthlyExpense(@NonNull MonthlyExpense expense)
     {
         final ContentValues values = new ContentValues();
 
