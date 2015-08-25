@@ -237,14 +237,6 @@ public class MainActivity extends DBActivity
 
             return true;
         }
-        else if( id == R.id.action_add_monthly_expense )
-        {
-            Intent startIntent = new Intent(MainActivity.this, MonthlyExpensesManageActivity.class);
-            startIntent.putExtra("date", calendarFragment.getSelectedDate());
-
-            ActivityCompat.startActivityForResult(MainActivity.this, startIntent, MANAGE_MONTHLY_EXPENSE_ACTIVITY_CODE, null);
-            return true;
-        }
 
         return super.onOptionsItemSelected(item);
     }

@@ -29,11 +29,6 @@
             android:label="@string/title_activity_add_expense"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".view.MonthlyExpensesManageActivity"
-            android:configChanges="locale|keyboardHidden|orientation|screenSize"
-            android:label="@string/title_activity_add_monthly_expense"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".view.MonthlyExpenseEditActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_monthly_expense_add"
