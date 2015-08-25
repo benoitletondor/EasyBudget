@@ -23,6 +23,7 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.benoitletondor.easybudget.R;
@@ -356,6 +357,7 @@ public class MainActivity extends DBActivity
         final View background = MainActivity.this.findViewById(R.id.fab_choices_background);
         final float backgroundAlpha = 0.8f;
         final long backgroundAnimationDuration = 200;
+
         background.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -371,20 +373,21 @@ public class MainActivity extends DBActivity
             public void onMenuExpanded()
             {
                 background.setVisibility(View.VISIBLE);
+                background.setClickable(true);
 
-                AlphaAnimation animation1 = new AlphaAnimation(0.0f, backgroundAlpha);
-                animation1.setDuration(backgroundAnimationDuration);
-                animation1.setFillAfter(true);
-                background.startAnimation(animation1);
+                AlphaAnimation fadeInAnimation = new AlphaAnimation(0.0f, backgroundAlpha);
+                fadeInAnimation.setDuration(backgroundAnimationDuration);
+                fadeInAnimation.setFillAfter(true);
+                background.startAnimation(fadeInAnimation);
             }
 
             @Override
             public void onMenuCollapsed()
             {
-                AlphaAnimation animation1 = new AlphaAnimation(backgroundAlpha, 0.0f);
-                animation1.setDuration(backgroundAnimationDuration);
-                animation1.setFillAfter(true);
-                animation1.setAnimationListener(new Animation.AnimationListener()
+                AlphaAnimation fadeOutAnimation = new AlphaAnimation(backgroundAlpha, 0.0f);
+                fadeOutAnimation.setDuration(backgroundAnimationDuration);
+                fadeOutAnimation.setFillAfter(true);
+                fadeOutAnimation.setAnimationListener(new Animation.AnimationListener()
                 {
                     @Override
                     public void onAnimationStart(Animation animation)
@@ -396,6 +399,7 @@ public class MainActivity extends DBActivity
                     public void onAnimationEnd(Animation animation)
                     {
                         background.setVisibility(View.GONE);
+                        background.setClickable(false);
                     }
 
                     @Override
@@ -405,7 +409,7 @@ public class MainActivity extends DBActivity
                     }
                 });
 
-                background.startAnimation(animation1);
+                background.startAnimation(fadeOutAnimation);
             }
         });
 
