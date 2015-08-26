@@ -25,5 +25,8 @@
     <string name="adjust_balance_expense_title">Balance</string>
     <string name="adjust_balance_snackbar_text">Balance adjusted to %s</string>
 
-
+    <string name="monthly_expense_add_loading_title">Loading</string>
+    <string name="monthly_expense_add_loading_message">Creating monthly expense...</string>
+    <string name="monthly_expense_add_error_title">Oops</string>
+    <string name="monthly_expense_add_error_message">An error occured.</string>
 </resources>

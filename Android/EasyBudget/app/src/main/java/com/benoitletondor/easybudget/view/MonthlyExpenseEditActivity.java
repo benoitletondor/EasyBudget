@@ -1,9 +1,13 @@
 package com.benoitletondor.easybudget.view;
 
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,6 +19,7 @@ import android.widget.TextView;
 
 import com.benoitletondor.easybudget.R;
 import com.benoitletondor.easybudget.helper.CompatHelper;
+import com.benoitletondor.easybudget.model.Expense;
 import com.benoitletondor.easybudget.model.MonthlyExpense;
 
 import java.text.SimpleDateFormat;
@@ -107,17 +112,8 @@ public class MonthlyExpenseEditActivity extends DBActivity
                 int value = Integer.parseInt(amountEditText.getText().toString());
 
                 MonthlyExpense expense = new MonthlyExpense(descriptionEditText.getText().toString(), isRevenue? -value : value, dateStart);
-                boolean inserted = db.addMonthlyExpense(expense);
 
-                if( inserted )
-                {
-                    // TODO insert recurring expenses
-
-                    setResult(RESULT_OK);
-                    finish();
-                }
-
-                // TODO handle error
+                new SaveMonthlyExpenseTask().execute(expense);
             }
 
             return true;
@@ -310,5 +306,94 @@ public class MonthlyExpenseEditActivity extends DBActivity
     {
         SimpleDateFormat formatter = new SimpleDateFormat("MMM dd yyyy", Locale.US);
         dateButton.setText(formatter.format(dateStart));
+    }
+
+// ------------------------------------------->
+
+    /**
+     * An asynctask to save monthly expense to DB
+     */
+    private class SaveMonthlyExpenseTask extends AsyncTask<MonthlyExpense, Integer, Boolean>
+    {
+        /**
+         * Dialog used to display loading to the user
+         */
+        private ProgressDialog dialog;
+
+        @Override
+        protected Boolean doInBackground(MonthlyExpense... expenses)
+        {
+            for (MonthlyExpense expense : expenses)
+            {
+                boolean inserted = db.addMonthlyExpense(expense);
+                if( !inserted )
+                {
+                    return false;
+                }
+
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(dateStart);
+
+                // Add up to 30 years of expenses
+                for (int i = 0; i < 12 * 30; i++)
+                {
+                    boolean expenseInserted = db.addExpense(new Expense(expense.getTitle(), expense.getAmount(), cal.getTime(), expense.getId()));
+                    if (!expenseInserted)
+                    {
+                        return false;
+                    }
+
+                    cal.add(Calendar.MONTH, 1);
+
+                    if (dateEnd != null && cal.getTime().after(dateEnd)) // If we have an end date, stop to that one
+                    {
+                        break;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        @Override
+        protected void onPreExecute()
+        {
+            // Show a ProgressDialog
+            dialog = new ProgressDialog(MonthlyExpenseEditActivity.this);
+            dialog.setIndeterminate(true);
+            dialog.setTitle(R.string.monthly_expense_add_loading_title);
+            dialog.setMessage(getResources().getString(R.string.monthly_expense_add_loading_message));
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.setCancelable(false);
+            dialog.show();
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result)
+        {
+            // Dismiss the dialog
+            dialog.dismiss();
+
+            if (result)
+            {
+                setResult(RESULT_OK);
+                finish();
+            }
+            else
+            {
+                new AlertDialog.Builder(MonthlyExpenseEditActivity.this)
+                    .setTitle(R.string.monthly_expense_add_error_title)
+                    .setMessage(getResources().getString(R.string.monthly_expense_add_error_message))
+                    .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            dialog.dismiss();
+                        }
+                    })
+                    .show();
+            }
+        }
     }
 }

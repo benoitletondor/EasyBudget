@@ -25,11 +25,11 @@ public class EasyBudget extends Application
 
     private void firstLaunchActions()
     {
-        Logger.debug("First launch actions");
-
         long initDate = Parameters.getInstance(getApplicationContext()).getLong(ParameterKeys.INIT_DATE, 0);
         if( initDate <= 0 )
         {
+            Logger.debug("First launch actions");
+
             Parameters.getInstance(getApplicationContext()).putLong(ParameterKeys.INIT_DATE, new Date().getTime());
         }
     }
