@@ -20,7 +20,8 @@ I'll try to make the app adopt Material design as much as possible using appcomp
 
 The project is made possible by some external libraries made by awesome guys that I want to thanks here:
 
-- Caldroid : a library to display a customizable Calendar [https://github.com/roomorama/Caldroid](https://github.com/roomorama/Caldroid)
+- Caldroid: a library to display a customizable Calendar [https://github.com/roomorama/Caldroid](https://github.com/roomorama/Caldroid)
+- FloatingActionButton: library to display a FAB with actions [https://github.com/futuresimple/android-floating-action-button](https://github.com/futuresimple/android-floating-action-button)
 
 ### Licence
 
