@@ -10,6 +10,7 @@
     <string name="title_activity_edit_expense">Edit Expense</string>
     <string name="title_activity_monthly_expense_add">Add Monthly Expense</string>
     <string name="title_activity_monthly_expense_edit">Edit Monthly Expense</string>
+    <string name="title_activity_settings">Settings</string>
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
 
@@ -39,4 +40,8 @@
     <string name="monthly_expense_delete_loading_message">Deleting monthly expense...</string>
     <string name="monthly_expense_delete_error_title">Oops</string>
     <string name="monthly_expense_delete_error_message">An error occurred.</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

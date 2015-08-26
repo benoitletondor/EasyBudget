@@ -200,6 +200,9 @@ public class MainActivity extends DBActivity
         //noinspection SimplifiableIfStatement
         if ( id == R.id.action_settings)
         {
+            Intent startIntent = new Intent(this, SettingsActivity.class);
+            ActivityCompat.startActivity(MainActivity.this, startIntent, null);
+
             return true;
         }
         else if( id == R.id.action_balance )

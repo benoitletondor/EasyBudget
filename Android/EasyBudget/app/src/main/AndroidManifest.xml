@@ -7,11 +7,10 @@
     <application
         android:name=".EasyBudget"
         android:allowBackup="true"
+        android:fullBackupContent="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        android:fullBackupContent="true" >
-
+        android:theme="@style/AppTheme" >
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="4f073b46e47c18a4636da5e93128e7c7d9f1600c" />
@@ -36,9 +35,14 @@
             android:name=".view.MonthlyExpenseEditActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_monthly_expense_add"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".view.SettingsActivity"
+            android:configChanges="locale|keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_settings"
             android:screenOrientation="portrait">
         </activity>
-
     </application>
 
 </manifest>
