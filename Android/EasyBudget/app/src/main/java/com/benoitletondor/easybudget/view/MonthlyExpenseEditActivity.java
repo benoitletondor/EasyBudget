@@ -328,6 +328,7 @@ public class MonthlyExpenseEditActivity extends DBActivity
                 boolean inserted = db.addMonthlyExpense(expense);
                 if( !inserted )
                 {
+                    // TODO log error
                     return false;
                 }
 
@@ -340,6 +341,7 @@ public class MonthlyExpenseEditActivity extends DBActivity
                     boolean expenseInserted = db.addExpense(new Expense(expense.getTitle(), expense.getAmount(), cal.getTime(), expense.getId()));
                     if (!expenseInserted)
                     {
+                        // TODO log error
                         return false;
                     }
 

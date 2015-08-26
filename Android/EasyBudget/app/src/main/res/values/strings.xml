@@ -18,6 +18,11 @@
         <item>Edit expense</item>
         <item>Delete expense</item>
     </string-array>
+    <string-array name="dialog_edit_monthly_expense_choices">
+        <item>Delete series from this one</item>
+        <item>Delete series before this one</item>
+        <item>Delete series</item>
+    </string-array>
     <string name="expense_delete_snackbar_text">Expense deleted</string>
 
     <string name="adjust_balance_title">New balance</string>
@@ -28,5 +33,10 @@
     <string name="monthly_expense_add_loading_title">Loading</string>
     <string name="monthly_expense_add_loading_message">Creating monthly expense...</string>
     <string name="monthly_expense_add_error_title">Oops</string>
-    <string name="monthly_expense_add_error_message">An error occured.</string>
+    <string name="monthly_expense_add_error_message">An error occurred.</string>
+    <string name="monthly_expense_delete_success_message">Monthly expense deleted with success</string>
+    <string name="monthly_expense_delete_loading_title">Deleting</string>
+    <string name="monthly_expense_delete_loading_message">Deleting monthly expense...</string>
+    <string name="monthly_expense_delete_error_title">Oops</string>
+    <string name="monthly_expense_delete_error_message">An error occurred.</string>
 </resources>

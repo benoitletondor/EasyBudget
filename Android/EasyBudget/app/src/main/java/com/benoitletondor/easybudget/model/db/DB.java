@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
 import com.benoitletondor.easybudget.helper.DateHelper;
 import com.benoitletondor.easybudget.helper.Logger;
@@ -62,6 +64,7 @@ public final class DB
     /**
      * Clear all DB content (<b>for test purpose</b>)
      */
+    @VisibleForTesting
     public void clearDB()
     {
         database.delete(SQLiteDBHelper.TABLE_EXPENSE, null, null);
@@ -214,7 +217,7 @@ public final class DB
             cursor = database.query(SQLiteDBHelper.TABLE_MONTHLY_EXPENSE, null, null, null, null, null, null, null);
             while( cursor.moveToNext() )
             {
-                expenses.add(MonthlyExpenseFromCursor(cursor));
+                expenses.add(monthlyExpenseFromCursor(cursor));
             }
 
             return expenses;
@@ -229,14 +232,90 @@ public final class DB
     }
 
     /**
+     * Delete this monthly expense
+     *
+     * @param monthlyExpense
+     * @return true on success, false on error
+     */
+    public boolean deleteMonthlyExpense(@NonNull MonthlyExpense monthlyExpense)
+    {
+        return database.delete(SQLiteDBHelper.TABLE_MONTHLY_EXPENSE, SQLiteDBHelper.COLUMN_MONTHLY_DB_ID+"="+monthlyExpense.getId(), null) > 0;
+    }
+
+    /**
      * Delete this expense
      *
      * @param expense
-     * @return
+     * @return true on success, false on error
      */
     public boolean deleteExpense(@NonNull Expense expense)
     {
         return database.delete(SQLiteDBHelper.TABLE_EXPENSE, SQLiteDBHelper.COLUMN_EXPENSE_DB_ID+"="+expense.getId(), null) > 0;
+    }
+
+    /**
+     * Delete all expense for this monthly expense
+     *
+     * @param monthlyExpense
+     * @return true on success, false on error
+     */
+    public boolean deleteAllExpenseForMonthlyExpense(@NonNull MonthlyExpense monthlyExpense)
+    {
+        return database.delete(SQLiteDBHelper.TABLE_EXPENSE, SQLiteDBHelper.COLUMN_EXPENSE_MONTHLY_ID+"="+monthlyExpense.getId(), null) > 0;
+    }
+
+    /**
+     * Delete all expense for this monthly expense from the given date (included)
+     *
+     * @param monthlyExpense
+     * @param fromDate
+     * @return true on success, false on error
+     */
+    public boolean deleteAllExpenseForMonthlyExpenseFromDate(@NonNull MonthlyExpense monthlyExpense, @NonNull Date fromDate)
+    {
+        return database.delete(SQLiteDBHelper.TABLE_EXPENSE, SQLiteDBHelper.COLUMN_EXPENSE_MONTHLY_ID+"="+monthlyExpense.getId()+" AND "+SQLiteDBHelper.COLUMN_EXPENSE_DATE+">="+fromDate.getTime(), null) > 0;
+    }
+
+    /**
+     * Delete all expense for this monthly expense before the given date (excluded)
+     *
+     * @param monthlyExpense
+     * @param toDate
+     * @return true on success, false on error
+     */
+    public boolean deleteAllExpenseForMonthlyExpenseBeforeDate(@NonNull MonthlyExpense monthlyExpense, @NonNull Date toDate)
+    {
+        return database.delete(SQLiteDBHelper.TABLE_EXPENSE, SQLiteDBHelper.COLUMN_EXPENSE_MONTHLY_ID+"="+monthlyExpense.getId()+" AND "+SQLiteDBHelper.COLUMN_EXPENSE_DATE+"<"+toDate.getTime(), null) > 0;
+    }
+
+    /**
+     * Find the monthly expense for the given ID
+     *
+     * @param id
+     * @return monthly expense if found, null otherwise
+     */
+    @Nullable
+    public MonthlyExpense findMonthlyExpenseForId(long id)
+    {
+        Cursor cursor = null;
+        try
+        {
+            cursor = database.query(SQLiteDBHelper.TABLE_MONTHLY_EXPENSE, null, SQLiteDBHelper.COLUMN_MONTHLY_DB_ID + " = " + id, null, null, null, null, "1");
+
+            if(cursor.moveToFirst())
+            {
+                return monthlyExpenseFromCursor(cursor);
+            }
+
+            return null;
+        }
+        finally
+        {
+            if( cursor != null )
+            {
+                cursor.close();
+            }
+        }
     }
 
 // -------------------------------------------->
@@ -301,7 +380,7 @@ public final class DB
      * @throws JSONException
      */
     @NonNull
-    private static MonthlyExpense MonthlyExpenseFromCursor(@NonNull Cursor cursor)
+    private static MonthlyExpense monthlyExpenseFromCursor(@NonNull Cursor cursor)
     {
         return new MonthlyExpense
         (

@@ -1,12 +1,14 @@
 package com.benoitletondor.easybudget.view;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -34,6 +36,8 @@ import com.benoitletondor.easybudget.helper.CompatHelper;
 import com.benoitletondor.easybudget.helper.ParameterKeys;
 import com.benoitletondor.easybudget.helper.Parameters;
 import com.benoitletondor.easybudget.model.Expense;
+import com.benoitletondor.easybudget.model.MonthlyExpense;
+import com.benoitletondor.easybudget.model.MonthlyExpenseDeleteType;
 import com.benoitletondor.easybudget.view.main.calendar.CalendarFragment;
 import com.benoitletondor.easybudget.view.main.ExpensesRecyclerViewAdapter;
 import com.getbase.floatingactionbutton.FloatingActionButton;
@@ -55,6 +59,7 @@ public class MainActivity extends DBActivity
     public static final int ADD_EXPENSE_ACTIVITY_CODE = 101;
     public static final int MANAGE_MONTHLY_EXPENSE_ACTIVITY_CODE = 102;
     public static final String INTENT_EXPENSE_DELETED = "intent.expense.deleted";
+    public static final String INTENT_MONTHLY_EXPENSE_DELETED = "intent.expense.monthly.deleted";
 
     private static final String CALENDAR_SAVED_STATE = "calendar_saved_state";
     private static final String RECYCLE_VIEW_SAVED_DATE = "recycleViewSavedDate";
@@ -82,6 +87,7 @@ public class MainActivity extends DBActivity
         // Register receiver
         IntentFilter filter = new IntentFilter();
         filter.addAction(INTENT_EXPENSE_DELETED);
+        filter.addAction(INTENT_MONTHLY_EXPENSE_DELETED);
 
         receiver = new BroadcastReceiver()
         {
@@ -115,6 +121,19 @@ public class MainActivity extends DBActivity
                         // TODO warn user of error
                     }
 
+                }
+                else if( INTENT_MONTHLY_EXPENSE_DELETED.equals(intent.getAction()) )
+                {
+                    final Expense expense = (Expense) intent.getSerializableExtra("expense");
+                    final MonthlyExpenseDeleteType deleteType = MonthlyExpenseDeleteType.fromValue(intent.getIntExtra("deleteType", MonthlyExpenseDeleteType.ALL.getValue()));
+
+                    if( deleteType == null )
+                    {
+                        // TODO handle error
+                        return;
+                    }
+
+                    new DeleteMonthlyExpenseTask(expense, deleteType).execute();
                 }
             }
         };
@@ -510,5 +529,136 @@ public class MainActivity extends DBActivity
         refreshRecyclerViewForDate(date);
         updateBalanceDisplayForDay(date);
         calendarFragment.refreshView();
+    }
+
+// ---------------------------------------->
+
+    /**
+     * An asynctask to delete a monthly expense from DB
+     */
+    private class DeleteMonthlyExpenseTask extends AsyncTask<Void, Integer, Boolean>
+    {
+        /**
+         * Dialog used to display loading to the user
+         */
+        private ProgressDialog dialog;
+
+        /**
+         * The expense deleted by the user
+         */
+        private Expense                  expense;
+        /**
+         * Type of delete
+         */
+        private MonthlyExpenseDeleteType deleteType;
+
+        // ------------------------------------------->
+
+        DeleteMonthlyExpenseTask(@NonNull Expense expense, @NonNull MonthlyExpenseDeleteType deleteType)
+        {
+            this.expense = expense;
+            this.deleteType = deleteType;
+        }
+
+        // ------------------------------------------->
+
+        @Override
+        protected Boolean doInBackground(Void... nothing)
+        {
+            MonthlyExpense monthlyExpense = db.findMonthlyExpenseForId(expense.getMonthlyId());
+            if( monthlyExpense == null )
+            {
+                // TODO log error
+                return false;
+            }
+
+            switch (deleteType)
+            {
+                case ALL:
+                {
+                    boolean expensesDeleted = db.deleteAllExpenseForMonthlyExpense(monthlyExpense);
+                    if( !expensesDeleted )
+                    {
+                        //TODO log error
+                        return false;
+                    }
+
+                    boolean monthlyExpenseDeleted = db.deleteMonthlyExpense(monthlyExpense);
+                    if( !monthlyExpenseDeleted )
+                    {
+                        //TODO log error
+                        return false;
+                    }
+
+                    break;
+                }
+                case FROM:
+                {
+                    boolean expensesDeleted = db.deleteAllExpenseForMonthlyExpenseFromDate(monthlyExpense, expense.getDate());
+                    if( !expensesDeleted )
+                    {
+                        //TODO log error
+                        return false;
+                    }
+
+                    break;
+                }
+                case TO:
+                {
+                    boolean expensesDeleted = db.deleteAllExpenseForMonthlyExpenseBeforeDate(monthlyExpense, expense.getDate());
+                    if( !expensesDeleted )
+                    {
+                        //TODO log error
+                        return false;
+                    }
+
+                    break;
+                }
+            }
+
+            return true;
+        }
+
+        @Override
+        protected void onPreExecute()
+        {
+            // Show a ProgressDialog
+            dialog = new ProgressDialog(MainActivity.this);
+            dialog.setIndeterminate(true);
+            dialog.setTitle(R.string.monthly_expense_delete_loading_title);
+            dialog.setMessage(getResources().getString(R.string.monthly_expense_delete_loading_message));
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.setCancelable(false);
+            dialog.show();
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result)
+        {
+            // Dismiss the dialog
+            dialog.dismiss();
+
+            if (result)
+            {
+                // Refresh and show confirm snackbar
+                refreshAllForDate(expensesViewAdapter.getDate());
+                Snackbar.make(expensesRecyclerView, R.string.monthly_expense_delete_success_message, Snackbar.LENGTH_LONG).show();
+            }
+            else
+            {
+                new AlertDialog.Builder(MainActivity.this)
+                    .setTitle(R.string.monthly_expense_delete_error_title)
+                    .setMessage(getResources().getString(R.string.monthly_expense_delete_error_message))
+                    .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            dialog.dismiss();
+                        }
+                    })
+                    .show();
+            }
+        }
     }
 }
