@@ -471,7 +471,7 @@ public class MainActivity extends DBActivity
             public void onClick(View v)
             {
                 Intent startIntent = new Intent(MainActivity.this, MonthlyExpenseEditActivity.class);
-                startIntent.putExtra("date", calendarFragment.getSelectedDate());
+                startIntent.putExtra("dateStart", calendarFragment.getSelectedDate());
 
                 ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
 
