@@ -41,7 +41,8 @@
     <string name="monthly_expense_delete_error_title">Oops</string>
     <string name="monthly_expense_delete_error_message">An error occurred.</string>
 
-<!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
+    <string name="setting_category_bug_report_title">Bug report</string>
+    <string name="setting_category_bug_report_send_button_title">Get install identifier</string>
+    <string name="setting_category_bug_report_send_button_key">send_bug_report</string>
+    <string name="setting_category_bug_report_send_text">Here's my EasyBudget identifier: </string>
 </resources>
