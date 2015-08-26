@@ -40,22 +40,22 @@ public final class SQLiteDBHelper extends SQLiteOpenHelper
     public void onCreate(SQLiteDatabase database)
     {
         database.execSQL("create table "
-                + TABLE_EXPENSE + "("
-				+ COLUMN_EXPENSE_DB_ID + " integer primary key autoincrement, "
-                + COLUMN_EXPENSE_TITLE + " text not null, "
-                + COLUMN_EXPENSE_AMOUNT + " integer not null, "
-				+ COLUMN_EXPENSE_DATE + " integer not null, "
-                + COLUMN_EXPENSE_MONTHLY_ID + " integer null );");
+            + TABLE_EXPENSE + "("
+            + COLUMN_EXPENSE_DB_ID + " integer primary key autoincrement, "
+            + COLUMN_EXPENSE_TITLE + " text not null, "
+            + COLUMN_EXPENSE_AMOUNT + " integer not null, "
+            + COLUMN_EXPENSE_DATE + " integer not null, "
+            + COLUMN_EXPENSE_MONTHLY_ID + " integer null );");
 
         database.execSQL("CREATE INDEX D_i on "+ TABLE_EXPENSE +"("+ COLUMN_EXPENSE_DATE +");");
 
         database.execSQL("create table "
-                + TABLE_MONTHLY_EXPENSE + "("
-                + COLUMN_MONTHLY_DB_ID + " integer primary key autoincrement, "
-                + COLUMN_MONTHLY_TITLE + " text not null, "
-                + COLUMN_MONTHLY_AMOUNT + " integer not null, "
-                + COLUMN_MONTHLY_MODIFIED + " integer not null, "
-                + COLUMN_MONTHLY_RECURRING_DATE + " integer not null);");
+            + TABLE_MONTHLY_EXPENSE + "("
+            + COLUMN_MONTHLY_DB_ID + " integer primary key autoincrement, "
+            + COLUMN_MONTHLY_TITLE + " text not null, "
+            + COLUMN_MONTHLY_AMOUNT + " integer not null, "
+            + COLUMN_MONTHLY_MODIFIED + " integer not null, "
+            + COLUMN_MONTHLY_RECURRING_DATE + " integer not null);");
     }
 
 	@Override
