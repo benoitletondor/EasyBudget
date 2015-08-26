@@ -15,7 +15,7 @@ public enum MonthlyExpenseDeleteType
     FROM(0),
 
     /**
-     * Delete all before a daute
+     * Delete all before a date
      */
     TO(1),
 
