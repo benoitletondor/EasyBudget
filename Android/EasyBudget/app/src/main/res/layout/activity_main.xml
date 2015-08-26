@@ -1,8 +1,10 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:fab="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/coordinatorLayout"
     tools:context=".view.MainActivity">
 
     <LinearLayout
@@ -56,10 +58,10 @@
     </LinearLayout>
 
     <View android:id="@+id/fab_choices_background"
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/white"/>
+          android:visibility="gone"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:background="@android:color/white"/>
 
     <com.getbase.floatingactionbutton.FloatingActionsMenu
         android:id="@+id/fab_choices"
@@ -67,12 +69,12 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:layout_marginRight="10dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
+        android:layout_gravity="right|bottom"
         fab:fab_addButtonPlusIconColor="@android:color/white"
         fab:fab_addButtonColorNormal="@color/accent"
         fab:fab_addButtonColorPressed="@color/accent_ripple"
         fab:fab_labelStyle="@style/fab_labels_style"
+        app:layout_behavior="com.benoitletondor.easybudget.view.main.FloatingActionButtonBehavior"
         tools:ignore="RtlHardcoded">
 
         <com.getbase.floatingactionbutton.FloatingActionButton
@@ -97,4 +99,4 @@
 
     </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
-</RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>
