@@ -1,4 +1,19 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.19.2'
+    }
+}
+
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+}
 
 android {
     compileSdkVersion 23
@@ -14,9 +29,11 @@ android {
     buildTypes {
         debug {
             buildConfigField "boolean", "DEBUG_LOG", "true"
+            buildConfigField "boolean", "CRASHLYTICS_ACTIVATED", "false"
         }
         release {
             buildConfigField "boolean", "DEBUG_LOG", "false"
+            buildConfigField "boolean", "CRASHLYTICS_ACTIVATED", "true"
 
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -34,4 +51,7 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:23.0.0'
     compile 'com.roomorama:caldroid:2.1.0'
     compile 'com.getbase:floatingactionbutton:1.10.0'
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.1@aar') {
+        transitive = true;
+    }
 }

@@ -11,4 +11,8 @@ public class ParameterKeys
      * Date of the base balance set-up (long)
      */
     public static final String INIT_DATE = "init_date";
+    /**
+     * Local identifier of the device (generated on first launch) (string)
+     */
+    public static final String LOCAL_ID  = "local_id";
 }

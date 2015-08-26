@@ -12,6 +12,10 @@
         android:theme="@style/AppTheme"
         android:fullBackupContent="true" >
 
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="4f073b46e47c18a4636da5e93128e7c7d9f1600c" />
+
         <activity
             android:name=".view.MainActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
@@ -34,6 +38,7 @@
             android:label="@string/title_activity_monthly_expense_add"
             android:screenOrientation="portrait">
         </activity>
+
     </application>
 
 </manifest>

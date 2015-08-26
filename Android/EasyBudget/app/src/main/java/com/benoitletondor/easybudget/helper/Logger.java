@@ -3,6 +3,7 @@ package com.benoitletondor.easybudget.helper;
 import android.util.Log;
 
 import com.benoitletondor.easybudget.BuildConfig;
+import com.crashlytics.android.Crashlytics;
 
 /**
  * Helper to easily log into the application.
@@ -49,6 +50,11 @@ public final class Logger
 		if( !debug || BuildConfig.DEBUG_LOG )
 		{
 			Log.e(tag, msg, t);
+		}
+
+		if( BuildConfig.CRASHLYTICS_ACTIVATED )
+		{
+			Crashlytics.logException(t);
 		}
 	}
 	
