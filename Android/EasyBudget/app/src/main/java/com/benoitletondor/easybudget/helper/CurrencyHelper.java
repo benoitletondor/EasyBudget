@@ -16,8 +16,7 @@ import java.util.Currency;
 public class CurrencyHelper
 {
     /**
-     * Helper to display an amount using the user currency<br />
-     * http://speakman.net.nz/blog/2013/10/21/android-currency-localisation-hell/
+     * Helper to display an amount using the user currency
      *
      * @param context
      * @param amount

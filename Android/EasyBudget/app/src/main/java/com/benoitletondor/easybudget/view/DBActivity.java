@@ -5,7 +5,7 @@ import android.os.Bundle;
 import com.benoitletondor.easybudget.model.db.DB;
 
 /**
- * An AppCompatActivity that contains an opened DB connection to perform queries
+ * A {@link BatchActivity} that contains an opened DB connection to perform queries
  *
  * @author Benoit LETONDOR
  */

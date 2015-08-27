@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import com.batch.android.Batch;
 
 /**
- * An activity that contains Batch SDK runtime
+ * An {@link AppCompatActivity} that contains Batch SDK runtime
  *
  * @author Benoit LETONDOR
  */
