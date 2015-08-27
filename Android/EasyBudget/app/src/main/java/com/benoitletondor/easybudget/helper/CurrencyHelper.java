@@ -26,14 +26,18 @@ public class CurrencyHelper
     public static String getFormattedCurrencyString(@NonNull Context context, int amount)
     {
         // This formats currency values as the user expects to read them (default locale).
-        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();
+        DecimalFormat currencyFormat = (DecimalFormat) NumberFormat.getCurrencyInstance();
+
+        // No fraction digits
+        currencyFormat.setMaximumFractionDigits(0);
+        currencyFormat.setMinimumFractionDigits(0);
 
         String symbol = getUserCurrency(context).getSymbol();
 
         // We then tell our formatter to use this symbol.
-        DecimalFormatSymbols decimalFormatSymbols = ((DecimalFormat) currencyFormat).getDecimalFormatSymbols();
+        DecimalFormatSymbols decimalFormatSymbols = currencyFormat.getDecimalFormatSymbols();
         decimalFormatSymbols.setCurrencySymbol(symbol);
-        ((DecimalFormat) currencyFormat).setDecimalFormatSymbols(decimalFormatSymbols);
+        currencyFormat.setDecimalFormatSymbols(decimalFormatSymbols);
 
         return currencyFormat.format(amount);
     }

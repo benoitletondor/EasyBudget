@@ -33,6 +33,7 @@ import android.widget.TextView;
 
 import com.benoitletondor.easybudget.R;
 import com.benoitletondor.easybudget.helper.CompatHelper;
+import com.benoitletondor.easybudget.helper.CurrencyHelper;
 import com.benoitletondor.easybudget.helper.ParameterKeys;
 import com.benoitletondor.easybudget.helper.Parameters;
 import com.benoitletondor.easybudget.model.Expense;
@@ -48,6 +49,7 @@ import com.roomorama.caldroid.WeekdayArrayAdapter;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Main activity containing Calendar and List of expenses
@@ -241,8 +243,8 @@ public class MainActivity extends DBActivity
                     refreshAllForDate(expensesViewAdapter.getDate());
                     dialog.dismiss();
 
-                    //Show snackb ear TODO money formatting
-                    Snackbar snackbar = Snackbar.make(expensesRecyclerView, String.format(getResources().getString(R.string.adjust_balance_snackbar_text), newBalance + "€"), Snackbar.LENGTH_LONG);
+                    //Show snackbar
+                    Snackbar snackbar = Snackbar.make(expensesRecyclerView, String.format(getResources().getString(R.string.adjust_balance_snackbar_text), CurrencyHelper.getFormattedCurrencyString(MainActivity.this, newBalance)), Snackbar.LENGTH_LONG);
                     snackbar.setAction(R.string.cancel, new View.OnClickListener()
                     {
                         @Override
@@ -291,13 +293,13 @@ public class MainActivity extends DBActivity
     {
         int balance = - db.getBalanceForDay(day);
 
-        budgetLine.setText("ACCOUNT BALANCE : " + balance + " €"); //TODO translate
+        budgetLine.setText(String.format(Locale.US, getResources().getString(R.string.account_balance_format), CurrencyHelper.getFormattedCurrencyString(this, balance)));
 
         if( balance <= 0 )
         {
             budgetLine.setBackgroundResource(R.color.budget_red);
         }
-        else if( balance < 100 )
+        else if( balance < 100 ) //TODO configurable ?
         {
             budgetLine.setBackgroundResource(R.color.budget_orange);
         }
@@ -507,14 +509,14 @@ public class MainActivity extends DBActivity
         expensesRecyclerView = (RecyclerView) findViewById(R.id.expensesRecyclerView);
         expensesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        Date date;
+        Date date = new Date();
         if( savedInstanceState != null && savedInstanceState.containsKey(RECYCLE_VIEW_SAVED_DATE) )
         {
-            date = (Date) savedInstanceState.getSerializable(RECYCLE_VIEW_SAVED_DATE);
-        }
-        else
-        {
-            date = new Date();
+            Date savedDate = (Date) savedInstanceState.getSerializable(RECYCLE_VIEW_SAVED_DATE);
+            if( savedDate != null )
+            {
+                date = savedDate;
+            }
         }
 
         refreshRecyclerViewForDate(date);

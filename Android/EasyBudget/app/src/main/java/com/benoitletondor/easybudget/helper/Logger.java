@@ -52,7 +52,7 @@ public final class Logger
 			Log.e(tag, msg, t);
 		}
 
-		if( BuildConfig.CRASHLYTICS_ACTIVATED )
+		if( BuildConfig.CRASHLYTICS_ACTIVATED && t != null )
 		{
 			Crashlytics.logException(t);
 		}
