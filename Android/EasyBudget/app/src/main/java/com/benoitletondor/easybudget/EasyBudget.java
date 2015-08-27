@@ -9,6 +9,10 @@ import com.benoitletondor.easybudget.helper.ParameterKeys;
 import com.benoitletondor.easybudget.helper.Parameters;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.Tracker;
+import com.google.android.gms.analytics.Logger.LogLevel;
+
 import io.fabric.sdk.android.Fabric;
 import java.util.Date;
 import java.util.UUID;
@@ -20,6 +24,8 @@ import java.util.UUID;
  */
 public class EasyBudget extends Application
 {
+    private Tracker analyticsTracker;
+
     @Override
     public void onCreate()
     {
@@ -39,6 +45,15 @@ public class EasyBudget extends Application
         // Batch
         Batch.setConfig(new Config(BuildConfig.BATCH_API_KEY));
         Batch.Push.setGCMSenderId("540863873711");
+
+        // Analytics
+        GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
+        analytics.setDryRun(!BuildConfig.ANALYTICS_ACTIVATED);
+        if( BuildConfig.DEBUG_LOG )
+        {
+            analytics.getLogger().setLogLevel(LogLevel.VERBOSE);
+        }
+        analyticsTracker = GoogleAnalytics.getInstance(this).newTracker(R.xml.analytics);
     }
 
     /**

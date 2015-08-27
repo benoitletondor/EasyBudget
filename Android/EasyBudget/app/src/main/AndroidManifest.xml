@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Push -->
     <permission android:name="com.benoitletondor.easybudget.permission.C2D_MESSAGE" android:protectionLevel="signature"/>
     <uses-permission android:name="com.benoitletondor.easybudget.permission.C2D_MESSAGE"/>
 
@@ -18,6 +19,8 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+
+        <!-- Fabric.io -->
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="4f073b46e47c18a4636da5e93128e7c7d9f1600c" />
@@ -51,6 +54,7 @@
             android:screenOrientation="portrait">
         </activity>
 
+        <!-- Batch SDK -->
         <service android:name="com.batch.android.BatchPushService" />
         <receiver android:name="com.batch.android.BatchPushReceiver" android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
@@ -58,6 +62,16 @@
                 <category android:name="com.benoitletondor.easybudget" />
             </intent-filter>
         </receiver>
+
+        <!-- Analytics referrer campaign -->
+        <service android:name="com.google.android.gms.analytics.CampaignTrackingService" />
+        <receiver android:name="com.google.android.gms.analytics.CampaignTrackingReceiver"
+                  android:exported="true">
+            <intent-filter>
+                <action android:name="com.android.vending.INSTALL_REFERRER" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

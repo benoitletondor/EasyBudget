@@ -38,11 +38,13 @@ android {
             buildConfigField "boolean", "DEBUG_LOG", "true"
             buildConfigField "boolean", "CRASHLYTICS_ACTIVATED", "false"
             buildConfigField "String", "BATCH_API_KEY", batch_devkey
+            buildConfigField "boolean", "ANALYTICS_ACTIVATED", "true"
         }
         release {
             buildConfigField "boolean", "DEBUG_LOG", "false"
             buildConfigField "boolean", "CRASHLYTICS_ACTIVATED", "true"
             buildConfigField "String", "BATCH_API_KEY", batch_livekey
+            buildConfigField "boolean", "ANALYTICS_ACTIVATED", "true"
 
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -57,6 +59,7 @@ dependencies {
     compile 'com.android.support:design:23.0.0'
     compile 'com.android.support:recyclerview-v7:23.0.0'
     compile 'com.google.android.gms:play-services-gcm:7.8.0'
+    compile 'com.google.android.gms:play-services-analytics:7.8.0'
     compile 'com.roomorama:caldroid:2.1.0'
     compile 'com.getbase:floatingactionbutton:1.10.0'
     compile('com.crashlytics.sdk.android:crashlytics:2.5.1@aar') { transitive = true; }
