@@ -3,6 +3,7 @@
     package="com.benoitletondor.easybudget" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <!-- Push -->
     <permission android:name="com.benoitletondor.easybudget.permission.C2D_MESSAGE" android:protectionLevel="signature"/>
@@ -63,12 +64,22 @@
             </intent-filter>
         </receiver>
 
-        <!-- Analytics referrer campaign -->
+        <!-- Analytics -->
         <service android:name="com.google.android.gms.analytics.CampaignTrackingService" />
         <receiver android:name="com.google.android.gms.analytics.CampaignTrackingReceiver"
-                  android:exported="true">
+              android:exported="true">
             <intent-filter>
                 <action android:name="com.android.vending.INSTALL_REFERRER" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name="com.google.android.gms.analytics.AnalyticsService"
+             android:enabled="true"
+             android:exported="false"/>
+        <receiver android:name="com.google.android.gms.analytics.AnalyticsReceiver"
+                  android:enabled="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.analytics.ANALYTICS_DISPATCH" />
             </intent-filter>
         </receiver>
 
