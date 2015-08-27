@@ -30,18 +30,4 @@ public class DateHelper
 
         return cal.getTime();
     }
-
-    /**
-     * Return the day of month of a date
-     *
-     * @param date
-     * @return
-     */
-    public static int getDayOfMonth(@NonNull Date date)
-    {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-
-        return cal.get(Calendar.DAY_OF_MONTH);
-    }
 }

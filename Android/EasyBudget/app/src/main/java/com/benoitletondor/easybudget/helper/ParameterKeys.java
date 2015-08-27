@@ -15,4 +15,8 @@ public class ParameterKeys
      * Local identifier of the device (generated on first launch) (string)
      */
     public static final String LOCAL_ID  = "local_id";
+    /**
+     * The chosen ISO code of the currency (string)
+     */
+    public static final String CURRENCY_ISO  = "currency_iso";
 }

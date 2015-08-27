@@ -9,8 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.benoitletondor.easybudget.R;
+import com.benoitletondor.easybudget.helper.CurrencyHelper;
 import com.benoitletondor.easybudget.helper.ParameterKeys;
 import com.benoitletondor.easybudget.helper.Parameters;
+
+import java.util.Currency;
+import java.util.Locale;
 
 /**
  * Fragment to display preferences
@@ -39,7 +43,7 @@ public class PreferencesFragment extends PreferenceFragment
 
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT, getResources().getString(R.string.setting_category_bug_report_send_text)+localId);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, getResources().getString(R.string.setting_category_bug_report_send_text) + localId);
                 sendIntent.setType("text/plain");
                 startActivity(sendIntent);
 
@@ -47,6 +51,21 @@ public class PreferencesFragment extends PreferenceFragment
             }
         });
 
+        /*
+         * Currency change button
+         */
+        Preference currencyPreference = findPreference(getResources().getString(R.string.setting_category_currency_change_button_key));
+        currencyPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+        {
+            @Override
+            public boolean onPreferenceClick(Preference preference)
+            {
+
+
+                return false;
+            }
+        });
+        currencyPreference.setTitle(String.format(Locale.US, getResources().getString(R.string.setting_category_currency_change_button_title), CurrencyHelper.getUserCurrency(getActivity()).getSymbol()));
     }
 
 

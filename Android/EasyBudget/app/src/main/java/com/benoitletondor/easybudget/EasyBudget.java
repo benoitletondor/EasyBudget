@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.batch.android.Batch;
 import com.batch.android.Config;
+import com.benoitletondor.easybudget.helper.CurrencyHelper;
 import com.benoitletondor.easybudget.helper.Logger;
 import com.benoitletondor.easybudget.helper.ParameterKeys;
 import com.benoitletondor.easybudget.helper.Parameters;
@@ -14,7 +15,10 @@ import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.analytics.Logger.LogLevel;
 
 import io.fabric.sdk.android.Fabric;
+
+import java.util.Currency;
 import java.util.Date;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -70,6 +74,8 @@ public class EasyBudget extends Application
             Logger.debug("Registering first launch date");
 
             Parameters.getInstance(getApplicationContext()).putLong(ParameterKeys.INIT_DATE, new Date().getTime());
+
+            CurrencyHelper.setUserCurrency(this, Currency.getInstance(Locale.US)); //FIXME remove that
         }
 
         /*
