@@ -38,7 +38,7 @@ android {
             buildConfigField "boolean", "DEBUG_LOG", "true"
             buildConfigField "boolean", "CRASHLYTICS_ACTIVATED", "false"
             buildConfigField "String", "BATCH_API_KEY", batch_devkey
-            buildConfigField "boolean", "ANALYTICS_ACTIVATED", "true"
+            buildConfigField "boolean", "ANALYTICS_ACTIVATED", "false"
         }
         release {
             buildConfigField "boolean", "DEBUG_LOG", "false"
