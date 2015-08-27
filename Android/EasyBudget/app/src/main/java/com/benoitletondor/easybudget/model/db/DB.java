@@ -30,7 +30,7 @@ public final class DB
     /**
      * The SQLLite DB
      */
-    private SQLiteDatabase database;
+    private final SQLiteDatabase database;
 
 // -------------------------------------------->
 

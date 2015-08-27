@@ -28,7 +28,6 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.benoitletondor.easybudget.R;
@@ -551,11 +550,11 @@ public class MainActivity extends DBActivity
         /**
          * The expense deleted by the user
          */
-        private Expense                  expense;
+        private final Expense                  expense;
         /**
          * Type of delete
          */
-        private MonthlyExpenseDeleteType deleteType;
+        private final MonthlyExpenseDeleteType deleteType;
 
         // ------------------------------------------->
 

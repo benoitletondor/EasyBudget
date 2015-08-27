@@ -22,7 +22,7 @@ public class Parameters
     /**
      * Instance of shared preferences
      */
-    private SharedPreferences preferences;
+    private final SharedPreferences preferences;
 
     /**
      *

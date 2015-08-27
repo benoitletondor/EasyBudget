@@ -17,7 +17,6 @@ import android.widget.TextView;
 import com.benoitletondor.easybudget.R;
 import com.benoitletondor.easybudget.helper.CurrencyHelper;
 import com.benoitletondor.easybudget.model.Expense;
-import com.benoitletondor.easybudget.model.MonthlyExpense;
 import com.benoitletondor.easybudget.model.MonthlyExpenseDeleteType;
 import com.benoitletondor.easybudget.model.db.DB;
 import com.benoitletondor.easybudget.view.ExpenseEditActivity;
@@ -31,9 +30,9 @@ import java.util.List;
  */
 public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRecyclerViewAdapter.ViewHolder>
 {
-    private List<Expense> expenses;
-    private Date          date;
-    private Activity  activity;
+    private final List<Expense> expenses;
+    private final Date date;
+    private final Activity activity;
 
     public ExpensesRecyclerViewAdapter(@NonNull Activity activity, @NonNull DB db, @NonNull Date date)
     {

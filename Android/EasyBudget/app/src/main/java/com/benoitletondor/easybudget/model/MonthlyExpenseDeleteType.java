@@ -29,7 +29,7 @@ public enum MonthlyExpenseDeleteType
     /**
      * Integer value (for serialization)
      */
-    private int value;
+    private final int value;
 
     /**
      * Constructor private

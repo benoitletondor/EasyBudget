@@ -4,16 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.benoitletondor.easybudget.R;
 import com.benoitletondor.easybudget.helper.CurrencyHelper;
 import com.benoitletondor.easybudget.helper.ParameterKeys;
 import com.benoitletondor.easybudget.helper.Parameters;
 
-import java.util.Currency;
 import java.util.Locale;
 
 /**
