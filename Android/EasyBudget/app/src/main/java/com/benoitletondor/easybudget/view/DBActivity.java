@@ -1,15 +1,16 @@
 package com.benoitletondor.easybudget.view;
 
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import com.benoitletondor.easybudget.model.db.DB;
 
 /**
- * A {@link BatchActivity} that contains an opened DB connection to perform queries
+ * A {@link AppCompatActivity} that contains an opened DB connection to perform queries
  *
  * @author Benoit LETONDOR
  */
-public abstract class DBActivity extends BatchActivity
+public abstract class DBActivity extends AppCompatActivity
 {
     /**
      * An opened DB connection that is ready to be used

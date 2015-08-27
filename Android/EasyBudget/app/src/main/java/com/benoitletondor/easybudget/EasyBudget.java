@@ -1,6 +1,8 @@
 package com.benoitletondor.easybudget;
 
+import android.app.Activity;
 import android.app.Application;
+import android.os.Bundle;
 
 import com.batch.android.Batch;
 import com.batch.android.Config;
@@ -47,8 +49,7 @@ public class EasyBudget extends Application
         }
 
         // Batch
-        Batch.setConfig(new Config(BuildConfig.BATCH_API_KEY));
-        Batch.Push.setGCMSenderId("540863873711");
+        setUpBatchSDK();
 
         // Analytics
         GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
@@ -59,6 +60,8 @@ public class EasyBudget extends Application
         }
         analyticsTracker = GoogleAnalytics.getInstance(this).newTracker(R.xml.analytics);
     }
+
+
 
     /**
      * Init app const and parameters
@@ -91,7 +94,58 @@ public class EasyBudget extends Application
         }
         else
         {
-            Logger.debug("Local id : "+localId);
+            Logger.debug("Local id : " + localId);
         }
+    }
+
+    private void setUpBatchSDK()
+    {
+        Batch.setConfig(new Config(BuildConfig.BATCH_API_KEY));
+        Batch.Push.setGCMSenderId("540863873711");
+
+        registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks()
+        {
+            @Override
+            public void onActivityCreated(Activity activity, Bundle savedInstanceState)
+            {
+
+            }
+
+            @Override
+            public void onActivityStarted(Activity activity)
+            {
+                Batch.onStart(activity);
+            }
+
+            @Override
+            public void onActivityResumed(Activity activity)
+            {
+
+            }
+
+            @Override
+            public void onActivityPaused(Activity activity)
+            {
+
+            }
+
+            @Override
+            public void onActivityStopped(Activity activity)
+            {
+                Batch.onStop(activity);
+            }
+
+            @Override
+            public void onActivitySaveInstanceState(Activity activity, Bundle outState)
+            {
+
+            }
+
+            @Override
+            public void onActivityDestroyed(Activity activity)
+            {
+                Batch.onDestroy(activity);
+            }
+        });
     }
 }
