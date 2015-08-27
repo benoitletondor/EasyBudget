@@ -1,8 +1,6 @@
 package com.benoitletondor.easybudget.view;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
 
 import com.benoitletondor.easybudget.R;
@@ -12,7 +10,7 @@ import com.benoitletondor.easybudget.R;
  *
  * @author Benoit LETONDOR
  */
-public class SettingsActivity extends AppCompatActivity
+public class SettingsActivity extends BatchActivity
 {
 
     @Override

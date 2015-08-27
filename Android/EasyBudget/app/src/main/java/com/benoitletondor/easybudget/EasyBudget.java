@@ -2,6 +2,8 @@ package com.benoitletondor.easybudget;
 
 import android.app.Application;
 
+import com.batch.android.Batch;
+import com.batch.android.Config;
 import com.benoitletondor.easybudget.helper.Logger;
 import com.benoitletondor.easybudget.helper.ParameterKeys;
 import com.benoitletondor.easybudget.helper.Parameters;
@@ -33,6 +35,10 @@ public class EasyBudget extends Application
 
             Crashlytics.setUserIdentifier(Parameters.getInstance(getApplicationContext()).getString(ParameterKeys.LOCAL_ID));
         }
+
+        // Batch
+        Batch.setConfig(new Config(BuildConfig.BATCH_API_KEY));
+        Batch.Push.setGCMSenderId("540863873711");
     }
 
     /**

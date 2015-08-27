@@ -1,8 +1,6 @@
 package com.benoitletondor.easybudget.view;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 
 import com.benoitletondor.easybudget.model.db.DB;
 
@@ -11,7 +9,7 @@ import com.benoitletondor.easybudget.model.db.DB;
  *
  * @author Benoit LETONDOR
  */
-public abstract class DBActivity extends AppCompatActivity
+public abstract class DBActivity extends BatchActivity
 {
     /**
      * An opened DB connection that is ready to be used

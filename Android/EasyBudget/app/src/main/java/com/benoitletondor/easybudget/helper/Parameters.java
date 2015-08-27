@@ -3,6 +3,7 @@ package com.benoitletondor.easybudget.helper;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /**
  * Singleton to manage parameters into the app (wrapper of SharedPreferences).
@@ -120,6 +121,7 @@ public class Parameters
      * @param key
      * @return
      */
+    @Nullable
     public String getString(String key)
     {
         return preferences.getString(key, null);
