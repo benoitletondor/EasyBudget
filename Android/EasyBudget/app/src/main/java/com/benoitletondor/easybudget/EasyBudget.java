@@ -58,7 +58,8 @@ public class EasyBudget extends Application
         {
             analytics.getLogger().setLogLevel(LogLevel.VERBOSE);
         }
-        analyticsTracker = GoogleAnalytics.getInstance(this).newTracker(R.xml.analytics);
+
+        analyticsTracker = analytics.newTracker(R.xml.analytics);
     }
 
 
@@ -98,6 +99,9 @@ public class EasyBudget extends Application
         }
     }
 
+    /**
+     * Set-up Batch SDK config + lifecycle
+     */
     private void setUpBatchSDK()
     {
         Batch.setConfig(new Config(BuildConfig.BATCH_API_KEY));
