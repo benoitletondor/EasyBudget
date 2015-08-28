@@ -106,6 +106,7 @@ public class EasyBudget extends Application
     {
         Batch.setConfig(new Config(BuildConfig.BATCH_API_KEY));
         Batch.Push.setGCMSenderId("540863873711");
+        Batch.Push.setManualDisplay(true);
 
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks()
         {

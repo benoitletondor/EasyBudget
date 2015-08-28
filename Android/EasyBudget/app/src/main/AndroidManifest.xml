@@ -64,6 +64,16 @@
             </intent-filter>
         </receiver>
 
+        <!-- Custom Push receiver -->
+        <service android:name=".push.PushService" />
+
+        <receiver android:name=".push.PushReceiver" android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <category android:name="com.benoitletondor.easybudget" />
+            </intent-filter>
+        </receiver>
+
         <!-- Analytics -->
         <service android:name="com.google.android.gms.analytics.CampaignTrackingService" />
         <receiver android:name="com.google.android.gms.analytics.CampaignTrackingReceiver"

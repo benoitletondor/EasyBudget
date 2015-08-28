@@ -54,7 +54,7 @@ public final class Logger
 
 		if( BuildConfig.CRASHLYTICS_ACTIVATED && t != null )
 		{
-			Crashlytics.logException(t);
+			Crashlytics.logException(new Throwable(msg, t));
 		}
 	}
 	
