@@ -2,7 +2,6 @@ package com.benoitletondor.easybudget;
 
 import android.app.Activity;
 import android.app.Application;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 

@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import com.benoitletondor.easybudget.model.db.DB;
 
 /**
- * A {@link AppCompatActivity} that contains an opened DB connection to perform queries
+ * An {@link AppCompatActivity} that contains an opened DB connection to perform queries
  *
  * @author Benoit LETONDOR
  */
