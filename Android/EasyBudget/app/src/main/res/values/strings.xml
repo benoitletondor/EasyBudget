@@ -12,6 +12,7 @@
     <string name="title_activity_settings">Settings</string>
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
+    <string name="amount">Amount ( %s )</string>
 
     <string name="dialog_edit_expense_title">What do you want to do?</string>
     <string-array name="dialog_edit_expense_choices">

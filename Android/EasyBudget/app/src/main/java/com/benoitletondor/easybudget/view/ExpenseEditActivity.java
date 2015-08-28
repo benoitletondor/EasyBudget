@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.benoitletondor.easybudget.R;
 import com.benoitletondor.easybudget.helper.CompatHelper;
+import com.benoitletondor.easybudget.helper.CurrencyHelper;
 import com.benoitletondor.easybudget.model.Expense;
 
 import java.text.SimpleDateFormat;
@@ -212,6 +213,7 @@ public class ExpenseEditActivity extends DBActivity
     {
         final TextView descriptionTextView = (TextView) findViewById(R.id.description_descriptor);
         final TextView amountTextView = (TextView) findViewById(R.id.amount_descriptor);
+        amountTextView.setText(String.format(Locale.US, getResources().getString(R.string.amount), CurrencyHelper.getUserCurrency(this).getSymbol()));
 
         descriptionEditText = (EditText) findViewById(R.id.description_edittext);
         descriptionEditText.setOnFocusChangeListener(new View.OnFocusChangeListener()

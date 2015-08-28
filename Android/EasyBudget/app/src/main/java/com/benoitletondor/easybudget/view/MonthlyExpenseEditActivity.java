@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.benoitletondor.easybudget.R;
 import com.benoitletondor.easybudget.helper.CompatHelper;
+import com.benoitletondor.easybudget.helper.CurrencyHelper;
 import com.benoitletondor.easybudget.model.Expense;
 import com.benoitletondor.easybudget.model.MonthlyExpense;
 
@@ -216,6 +217,7 @@ public class MonthlyExpenseEditActivity extends DBActivity
     {
         final TextView descriptionTextView = (TextView) findViewById(R.id.description_descriptor);
         final TextView amountTextView = (TextView) findViewById(R.id.amount_descriptor);
+        amountTextView.setText(String.format(Locale.US, getResources().getString(R.string.amount), CurrencyHelper.getUserCurrency(this).getSymbol()));
 
         descriptionEditText = (EditText) findViewById(R.id.description_edittext);
         descriptionEditText.setOnFocusChangeListener(new View.OnFocusChangeListener()
@@ -335,8 +337,8 @@ public class MonthlyExpenseEditActivity extends DBActivity
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(dateStart);
 
-                // Add up to 30 years of expenses
-                for (int i = 0; i < 12 * 30; i++)
+                // Add up to 10 years of expenses
+                for (int i = 0; i < 12 * 10; i++)
                 {
                     boolean expenseInserted = db.addExpense(new Expense(expense.getTitle(), expense.getAmount(), cal.getTime(), expense.getId()));
                     if (!expenseInserted)
