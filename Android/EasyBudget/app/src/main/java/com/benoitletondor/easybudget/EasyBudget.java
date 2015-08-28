@@ -79,8 +79,7 @@ public class EasyBudget extends Application
             Logger.debug("Registering first launch date");
 
             Parameters.getInstance(getApplicationContext()).putLong(ParameterKeys.INIT_DATE, new Date().getTime());
-
-            CurrencyHelper.setUserCurrency(this, Currency.getInstance(Locale.US)); //FIXME remove that
+            CurrencyHelper.setUserCurrency(this, Currency.getInstance(Locale.getDefault())); // Set a default currency before onboarding
         }
 
         /*

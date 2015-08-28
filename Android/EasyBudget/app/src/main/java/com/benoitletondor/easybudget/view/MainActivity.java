@@ -59,6 +59,7 @@ public class MainActivity extends DBActivity
 {
     public static final int ADD_EXPENSE_ACTIVITY_CODE = 101;
     public static final int MANAGE_MONTHLY_EXPENSE_ACTIVITY_CODE = 102;
+    public static final int WELCOME_ACTIVITY_CODE = 103;
     public static final String INTENT_EXPENSE_DELETED = "intent.expense.deleted";
     public static final String INTENT_MONTHLY_EXPENSE_DELETED = "intent.expense.monthly.deleted";
 
@@ -78,6 +79,13 @@ public class MainActivity extends DBActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        // Launch welcome screen if needed
+        if( Parameters.getInstance(this).getInt(ParameterKeys.ONBOARDING_STEP, -1) != WelcomeActivity.STEP_COMPLETED )
+        {
+            Intent startIntent = new Intent(this, WelcomeActivity.class);
+            ActivityCompat.startActivityForResult(this, startIntent, WELCOME_ACTIVITY_CODE, null);
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
