@@ -2,7 +2,9 @@ package com.benoitletondor.easybudget;
 
 import android.app.Activity;
 import android.app.Application;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 
 import com.batch.android.Batch;
 import com.batch.android.Config;
@@ -107,6 +109,8 @@ public class EasyBudget extends Application
         Batch.setConfig(new Config(BuildConfig.BATCH_API_KEY));
         Batch.Push.setGCMSenderId("540863873711");
         Batch.Push.setManualDisplay(true);
+        Batch.Push.setSmallIconResourceId(R.drawable.ic_push);
+        Batch.Push.setNotificationsColor(ContextCompat.getColor(this, R.color.accent));
 
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks()
         {
