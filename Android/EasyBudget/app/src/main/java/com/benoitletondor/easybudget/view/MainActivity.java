@@ -109,7 +109,7 @@ public class MainActivity extends DBActivity
                             @Override
                             public void onClick(View v)
                             {
-                                db.addExpense(expense);
+                                db.persistExpense(expense);
 
                                 refreshAllForDate(expensesViewAdapter.getDate());
                             }
@@ -237,7 +237,7 @@ public class MainActivity extends DBActivity
                     int diff = newBalance - currentBalance;
 
                     final Expense expense = new Expense(getResources().getString(R.string.adjust_balance_expense_title), -diff, new Date());
-                    db.addExpense(expense);
+                    db.persistExpense(expense);
 
                     refreshAllForDate(expensesViewAdapter.getDate());
                     dialog.dismiss();

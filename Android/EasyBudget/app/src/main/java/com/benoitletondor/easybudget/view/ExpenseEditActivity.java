@@ -74,6 +74,7 @@ public class ExpenseEditActivity extends DBActivity
         {
             expense = (Expense) getIntent().getSerializableExtra("expense");
             isRevenue = expense.getAmount() < 0;
+            date = expense.getDate();
 
             setTitle(R.string.title_activity_edit_expense);
         }
@@ -107,8 +108,20 @@ public class ExpenseEditActivity extends DBActivity
             {
                 int value = Integer.parseInt(amountEditText.getText().toString());
 
-                Expense expense = new Expense(descriptionEditText.getText().toString(), isRevenue? -value : value, date);
-                db.addExpense(expense);
+                Expense expenseToSave;
+                if( expense == null )
+                {
+                    expenseToSave = new Expense(descriptionEditText.getText().toString(), isRevenue? -value : value, date);
+                }
+                else
+                {
+                    expenseToSave = expense;
+                    expenseToSave.setTitle(descriptionEditText.getText().toString());
+                    expenseToSave.setAmount(isRevenue ? -value : value);
+                    expenseToSave.setDate(date);
+                }
+
+                db.persistExpense(expenseToSave);
 
                 setResult(RESULT_OK);
                 finish();
@@ -204,6 +217,13 @@ public class ExpenseEditActivity extends DBActivity
                 }
             }
         });
+
+        // If we are editing an expense that is revenue, init to revenue
+        if( isRevenue )
+        {
+            paymentCheckboxImageview.setImageResource(R.drawable.ic_radio_button_off);
+            revenueCheckboxImageview.setImageResource(R.drawable.ic_radio_button_on);
+        }
     }
 
     /**
@@ -260,7 +280,7 @@ public class ExpenseEditActivity extends DBActivity
 
         if( expense != null )
         {
-            amountEditText.setText(String.valueOf(expense.getAmount()));
+            amountEditText.setText(String.valueOf(Math.abs(expense.getAmount())));
         }
     }
 

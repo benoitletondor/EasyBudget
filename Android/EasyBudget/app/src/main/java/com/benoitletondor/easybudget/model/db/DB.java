@@ -74,19 +74,27 @@ public final class DB
 // -------------------------------------------->
 
     /**
-     * Add a one time expense into DB
+     * Add or update a one time expense into DB
      *
      * @param expense
      * @return true on success, false on error
      */
-    public boolean addExpense(@NonNull Expense expense)
+    public boolean persistExpense(@NonNull Expense expense)
     {
-        long id = database.insert(SQLiteDBHelper.TABLE_EXPENSE, null, generateContentValuesForExpense(expense));
-
-        if( id > 0 )
+        if( expense.getId() != null )
         {
-            expense.setId(id);
-            return true;
+            int rowsAffected = database.update(SQLiteDBHelper.TABLE_EXPENSE, generateContentValuesForExpense(expense), SQLiteDBHelper.COLUMN_EXPENSE_DB_ID+"="+expense.getId(), null);
+            return rowsAffected == 1;
+        }
+        else
+        {
+            long id = database.insert(SQLiteDBHelper.TABLE_EXPENSE, null, generateContentValuesForExpense(expense));
+
+            if( id > 0 )
+            {
+                expense.setId(id);
+                return true;
+            }
         }
 
         return false;

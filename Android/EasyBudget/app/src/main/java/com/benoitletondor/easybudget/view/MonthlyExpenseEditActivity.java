@@ -340,7 +340,7 @@ public class MonthlyExpenseEditActivity extends DBActivity
                 // Add up to 10 years of expenses
                 for (int i = 0; i < 12 * 10; i++)
                 {
-                    boolean expenseInserted = db.addExpense(new Expense(expense.getTitle(), expense.getAmount(), cal.getTime(), expense.getId()));
+                    boolean expenseInserted = db.persistExpense(new Expense(expense.getTitle(), expense.getAmount(), cal.getTime(), expense.getId()));
                     if (!expenseInserted)
                     {
                         // TODO log error

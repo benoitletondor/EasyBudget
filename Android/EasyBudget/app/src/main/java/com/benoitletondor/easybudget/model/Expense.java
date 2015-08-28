@@ -122,14 +122,29 @@ public class Expense implements Serializable
         return title;
     }
 
+    public void setTitle(@NonNull String title)
+    {
+        this.title = title;
+    }
+
     @NonNull
     public Date getDate()
     {
         return date;
     }
 
+    public void setDate(@NonNull Date date)
+    {
+        this.date = DateHelper.cleanDate(date);
+    }
+
     public int getAmount()
     {
         return amount;
+    }
+
+    public void setAmount(int amount)
+    {
+        this.amount = amount;
     }
 }
