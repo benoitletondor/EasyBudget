@@ -7,7 +7,7 @@
     <color name="accent_ripple">@color/primary_dark</color>
     <color name="primary_text">#212121</color>
     <color name="secondary_text">#727272</color>
-    <color name="divider">#B6B6B6</color>
+    <color name="divider">#dadada</color>
     <color name="fab_add_expense">#F44336</color>
     <color name="fab_add_expense_pressed">#EF5350</color>
     <color name="fab_add_monthly_expense">#2196F3</color>
