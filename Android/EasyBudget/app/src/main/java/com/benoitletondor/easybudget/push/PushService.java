@@ -15,9 +15,13 @@ import com.benoitletondor.easybudget.helper.Logger;
 public class PushService extends IntentService
 {
     /**
-     * Key to retrieve the new version for an update push
+     * Key to retrieve the max version for a push
      */
-    private final static String UPDATE_INTENT_VERSION_KEY = "newVersion";
+    private final static String INTENT_MAX_VERSION_KEY = "maxVersion";
+    /**
+     * Key to retrieve the max version for a push
+     */
+    private final static String INTENT_MIN_VERSION_KEY = "minVersion";
 
 // ----------------------------------->
 
@@ -33,11 +37,11 @@ public class PushService extends IntentService
     {
         try
         {
-            if ( Batch.Push.shouldDisplayPush(this, intent) ) // Check that the push is valid
+            if (Batch.Push.shouldDisplayPush(this, intent)) // Check that the push is valid
             {
-                if( isUpdatePush(intent) && !shouldDisplayUpdatePush(intent) )
+                if( !shouldDisplayPush(intent) )
                 {
-                    Logger.debug("Not displaying update push cause app is already updated");
+                    Logger.debug("Not displaying push cause app version is not matching");
                     return;
                 }
 
@@ -52,33 +56,33 @@ public class PushService extends IntentService
     }
 
     /**
-     * Check if the given intent is an update push
-     *
-     * @param intent
-     * @return true if intent contains the key, false otherwise
-     */
-    private boolean isUpdatePush(Intent intent)
-    {
-        return intent.hasExtra(UPDATE_INTENT_VERSION_KEY);
-    }
-
-    /**
-     * Check if the version received in push is > to the current version
+     * Check if the push should be displayed according to version constrains
      *
      * @param intent
      * @return true if should display the push, false otherwise
      */
-    private boolean shouldDisplayUpdatePush(Intent intent)
+    private boolean shouldDisplayPush(Intent intent)
     {
         try
         {
-            int newVersion = Integer.parseInt(intent.getStringExtra(UPDATE_INTENT_VERSION_KEY));
+            int maxVersion = BuildConfig.VERSION_CODE;
+            int minVersion = 1;
 
-            return newVersion > BuildConfig.VERSION_CODE;
+            if( intent.hasExtra(INTENT_MAX_VERSION_KEY) )
+            {
+                maxVersion = Integer.parseInt(intent.getStringExtra(INTENT_MAX_VERSION_KEY));
+            }
+
+            if( intent.hasExtra(INTENT_MIN_VERSION_KEY) )
+            {
+                minVersion = Integer.parseInt(intent.getStringExtra(INTENT_MIN_VERSION_KEY));
+            }
+
+            return BuildConfig.VERSION_CODE <= maxVersion && BuildConfig.VERSION_CODE >= minVersion;
         }
         catch(Exception e)
         {
-            Logger.error("Error while getting new version value from push", e);
+            Logger.error("Error while checking app version for push", e);
             return false;
         }
     }
