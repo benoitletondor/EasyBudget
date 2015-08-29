@@ -5,6 +5,7 @@
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
+        <item name="android:windowBackground">@android:color/white</item>
 
         <!-- Caldroid bug: https://github.com/roomorama/Caldroid/issues/266 -->
         <item name="styleCaldroidViewLayout">@style/CaldroidDefaultCalendarViewLayout</item>
@@ -22,6 +23,7 @@
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
+        <item name="android:windowBackground">@android:color/white</item>
     </style>
 
     <!-- FAB style -->
