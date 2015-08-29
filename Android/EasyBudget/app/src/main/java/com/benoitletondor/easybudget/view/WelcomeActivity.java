@@ -1,7 +1,12 @@
 package com.benoitletondor.easybudget.view;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -25,18 +30,22 @@ public class WelcomeActivity extends AppCompatActivity
     /**
      * Intent broadcasted by pager fragments to go next
      */
-    public final String PAGER_NEXT_INTENT     = "welcome.pager.next";
+    public final static String PAGER_NEXT_INTENT     = "welcome.pager.next";
     /**
      * Intent broadcasted by pager fragments to go previous
      */
-    public final String PAGER_PREVIOUS_INTENT = "welcome.pager.previous";
+    public final static String PAGER_PREVIOUS_INTENT = "welcome.pager.previous";
 
 // ------------------------------------------>
 
     /**
      * The view pager
      */
-    private ViewPager pager;
+    private ViewPager         pager;
+    /**
+     * Broadcast receiver for intent sent by fragments
+     */
+    private BroadcastReceiver receiver;
 
 // ------------------------------------------>
 
@@ -69,11 +78,45 @@ public class WelcomeActivity extends AppCompatActivity
                 return 2;
             }
         });
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(PAGER_NEXT_INTENT);
+        filter.addAction(PAGER_PREVIOUS_INTENT);
+
+        receiver = new BroadcastReceiver()
+        {
+            @Override
+            public void onReceive(Context context, Intent intent)
+            {
+                if( PAGER_NEXT_INTENT.equals(intent.getAction()) )
+                {
+                    if( pager.getCurrentItem() < pager.getAdapter().getCount() )
+                    {
+                        pager.setCurrentItem(pager.getCurrentItem()+1, true);
+                    }
+                }
+            }
+        };
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter);
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+
+        super.onDestroy();
     }
 
     @Override
     public void onBackPressed()
     {
-        // Prevent back to exit
+        if( pager.getCurrentItem() > 0 )
+        {
+            pager.setCurrentItem(pager.getCurrentItem()-1, true);
+        }
+
+        // Prevent back to leave activiy
     }
 }
