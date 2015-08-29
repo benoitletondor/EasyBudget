@@ -14,13 +14,37 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_launcher"
+            android:layout_gravity="center_horizontal" />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
+            android:layout_marginTop="10dp"
             android:textSize="40dp"
             android:textColor="@android:color/white"
             android:text="Welcome to EasyBudget beta"
+            android:gravity="center_horizontal" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="60dp"
+            android:textSize="15dp"
+            android:textColor="@android:color/white"
+            android:text="The concept is quite simple: you just enter your expenses (one time and montly recurring ones) and the app takes care of letting you know exactly how much money you have and you'll have at a given day.\nSimple as that."
+            android:gravity="center_horizontal" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:textSize="30dp"
+            android:textColor="@android:color/white"
+            android:text="Ready?"
             android:gravity="center_horizontal" />
 
     </LinearLayout>

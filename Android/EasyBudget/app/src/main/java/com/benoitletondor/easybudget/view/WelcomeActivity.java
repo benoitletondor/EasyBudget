@@ -117,6 +117,6 @@ public class WelcomeActivity extends AppCompatActivity
             pager.setCurrentItem(pager.getCurrentItem()-1, true);
         }
 
-        // Prevent back to leave activiy
+        // Prevent back to leave activity
     }
 }

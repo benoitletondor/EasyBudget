@@ -43,12 +43,4 @@ public class Onboarding1Fragment extends Fragment
 
         return v;
     }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-
-
-    }
 }
