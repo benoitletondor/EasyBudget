@@ -66,7 +66,6 @@ public class CalendarGridAdapter extends CaldroidGridAdapter
 
         TextView tv1 = viewData.dayTextView;
         TextView tv2 = viewData.amountTextView;
-        View cellColorIndicator = viewData.cellColorIndicator;
 
         // Set today's date
         tv1.setText("" + dateTime.getDay());
@@ -78,7 +77,6 @@ public class CalendarGridAdapter extends CaldroidGridAdapter
             {
                 tv1.setTextColor(ContextCompat.getColor(context, R.color.calendar_cell_disabled_text_color));
                 tv2.setVisibility(View.INVISIBLE);
-                cellColorIndicator.setVisibility(View.GONE);
                 cellView.setBackgroundResource(android.R.color.white);
 
                 viewData.isDisabled = true;
@@ -172,7 +170,6 @@ public class CalendarGridAdapter extends CaldroidGridAdapter
                 if( !viewData.containsExpenses )
                 {
                     tv2.setVisibility(View.VISIBLE);
-                    cellColorIndicator.setVisibility(View.VISIBLE);
 
                     viewData.containsExpenses = true;
                 }
@@ -181,40 +178,15 @@ public class CalendarGridAdapter extends CaldroidGridAdapter
 
                 if( balance > 0 )
                 {
-                    cellColorIndicator.setBackgroundResource(R.color.budget_red);
+                    tv1.setTextColor(ContextCompat.getColor(context, isOutOfMonth ? R.color.budget_red_out : R.color.budget_red));
                 }
-                else if( balance <= 0 )
+                else
                 {
-                    cellColorIndicator.setBackgroundResource(R.color.budget_green);
-                }
-
-                // Apply margin to the color indicator if it's today's cell since there's a border
-                if( isToday && !viewData.colorIndicatorMarginForToday )
-                {
-                    int marginDimen = context.getResources().getDimensionPixelOffset(R.dimen.grid_cell_today_border_size);
-
-                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(cellColorIndicator.getLayoutParams());
-                    params.setMargins(0, marginDimen, marginDimen, 0);
-                    params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                    params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-                    cellColorIndicator.setLayoutParams(params);
-
-                    viewData.colorIndicatorMarginForToday = true;
-                }
-                else if( !isToday && viewData.colorIndicatorMarginForToday )
-                {
-                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(cellColorIndicator.getLayoutParams());
-                    params.setMargins(0, 0, 0, 0);
-                    params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                    params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-                    cellColorIndicator.setLayoutParams(params);
-
-                    viewData.colorIndicatorMarginForToday = false;
+                    tv1.setTextColor(ContextCompat.getColor(context, isOutOfMonth ? R.color.budget_green_out : R.color.budget_green));
                 }
             }
             else if( viewData.containsExpenses )
             {
-                cellColorIndicator.setVisibility(View.GONE);
                 tv2.setVisibility(View.INVISIBLE);
 
                 viewData.containsExpenses = false;
@@ -238,7 +210,6 @@ public class CalendarGridAdapter extends CaldroidGridAdapter
 
         viewData.dayTextView = (TextView) v.findViewById(R.id.grid_cell_tv1);
         viewData.amountTextView = (TextView) v.findViewById(R.id.grid_cell_tv2);
-        viewData.cellColorIndicator = v.findViewById(R.id.cell_color_indicator);
 
         v.setTag(viewData);
 
@@ -260,10 +231,6 @@ public class CalendarGridAdapter extends CaldroidGridAdapter
          * TextView that contains the amount of money for the day
          */
         public TextView amountTextView;
-        /**
-         * View that display the color indicator of amount of money for the day
-         */
-        public View     cellColorIndicator;
 
         /**
          * Is this cell a disabled date

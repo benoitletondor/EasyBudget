@@ -1,42 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/custom_cell"
     android:layout_width="40dp"
     android:layout_height="40dp"
-    android:background="@drawable/custom_grid_cell_drawable" >
+    android:background="@drawable/custom_grid_cell_drawable"
+    android:orientation="vertical"
+    android:gravity="center_horizontal" >
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center_horizontal" >
+    <TextView
+        android:id="@+id/grid_cell_tv1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="13dp"
+        android:textStyle="bold"
+        android:textColor="@color/primary_text"
+        android:layout_marginTop="4dp"/>
 
-        <TextView
-            android:id="@+id/grid_cell_tv1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="13dp"
-            android:textStyle="bold"
-            android:textColor="@color/primary_text"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="2dp"/>
+    <TextView
+        android:id="@+id/grid_cell_tv2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="10dp"
+        android:textColor="@color/secondary_text"
+        android:visibility="invisible" />
 
-        <TextView
-            android:id="@+id/grid_cell_tv2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="10dp"
-            android:textColor="@color/secondary_text"
-            android:visibility="invisible" />
-
-    </LinearLayout>
-
-    <View android:id="@+id/cell_color_indicator"
-        android:layout_width="8dp"
-        android:layout_height="8dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        tools:ignore="RtlHardcoded" />
-
-</RelativeLayout>
+</LinearLayout>
