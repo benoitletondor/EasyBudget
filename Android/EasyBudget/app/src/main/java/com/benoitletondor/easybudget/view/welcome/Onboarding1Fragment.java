@@ -2,7 +2,6 @@ package com.benoitletondor.easybudget.view.welcome;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +15,7 @@ import com.benoitletondor.easybudget.view.WelcomeActivity;
  *
  * @author Benoit LETONDOR
  */
-public class Onboarding1Fragment extends Fragment
+public class Onboarding1Fragment extends OnboardingFragment
 {
     /**
      * Required empty public constructor
@@ -36,11 +35,17 @@ public class Onboarding1Fragment extends Fragment
             @Override
             public void onClick(View v)
             {
-                Intent intent = new Intent(WelcomeActivity.PAGER_NEXT_INTENT);
-                LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
+                next(v);
             }
         });
 
         return v;
+    }
+
+
+    @Override
+    public int getStatusBarColor()
+    {
+        return R.color.onboarding_1_statusbar;
     }
 }

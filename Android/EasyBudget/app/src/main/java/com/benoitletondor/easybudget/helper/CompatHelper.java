@@ -1,7 +1,12 @@
 package com.benoitletondor.easybudget.helper;
 
+import android.app.Activity;
 import android.os.Build;
+import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 
 /**
@@ -21,6 +26,20 @@ public class CompatHelper
         if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP )
         {
             button.setOutlineProvider(null);
+        }
+    }
+    public static void setStatusBarColor(@NonNull Activity activity, @ColorRes int colorRes)
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        {
+            Window window = activity.getWindow();
+
+            if( (window.getAttributes().flags & WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS) == 0 )
+            {
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            }
+
+            window.setStatusBarColor(ContextCompat.getColor(activity, colorRes));
         }
     }
 }
