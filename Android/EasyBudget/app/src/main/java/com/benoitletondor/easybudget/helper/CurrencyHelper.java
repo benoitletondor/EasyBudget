@@ -4,8 +4,6 @@ import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -100,19 +98,13 @@ public class CurrencyHelper
      */
     public static String getFormattedCurrencyString(@NonNull Context context, int amount)
     {
-        // This formats currency values as the user expects to read them (default locale).
-        DecimalFormat currencyFormat = (DecimalFormat) NumberFormat.getCurrencyInstance();
+        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();
 
         // No fraction digits
         currencyFormat.setMaximumFractionDigits(0);
         currencyFormat.setMinimumFractionDigits(0);
 
-        String symbol = getUserCurrency(context).getSymbol();
-
-        // We then tell our formatter to use this symbol.
-        DecimalFormatSymbols decimalFormatSymbols = currencyFormat.getDecimalFormatSymbols();
-        decimalFormatSymbols.setCurrencySymbol(symbol);
-        currencyFormat.setDecimalFormatSymbols(decimalFormatSymbols);
+        currencyFormat.setCurrency(getUserCurrency(context));
 
         return currencyFormat.format(amount);
     }
