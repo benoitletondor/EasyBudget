@@ -194,6 +194,11 @@ public class CalendarGridAdapter extends CaldroidGridAdapter
                     tv1.setTextColor(ContextCompat.getColor(context, R.color.primary_text));
                     tv2.setTextColor(ContextCompat.getColor(context, R.color.secondary_text));
                 }
+                else
+                {
+                    tv1.setTextColor(ContextCompat.getColor(context, R.color.divider));
+                    tv2.setTextColor(ContextCompat.getColor(context, R.color.divider));
+                }
 
                 viewData.containsExpenses = false;
             }
