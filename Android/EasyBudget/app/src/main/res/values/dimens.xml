@@ -4,4 +4,5 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <dimen name="grid_cell_today_border_size">2dp</dimen>
+    <dimen name="select_currency_dialog_padding_top">20dp</dimen>
 </resources>

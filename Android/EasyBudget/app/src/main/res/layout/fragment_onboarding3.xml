@@ -62,7 +62,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
             android:textSize="20dp"
-            android:text="Next steps for you are:"
+            android:text="Next steps are:"
             android:textColor="@android:color/white"
             android:gravity="center_horizontal" />
 
@@ -70,7 +70,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:textSize="15dp"
+            android:textSize="17dp"
             android:text="-Set the current balance of your account\n-Add monthly reccuring expenses and incomes (salary, rent, bills...)\n-Think about adding one time expenses during the day"
             android:textColor="@android:color/white" />
 

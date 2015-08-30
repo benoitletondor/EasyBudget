@@ -1,9 +1,12 @@
 package com.benoitletondor.easybudget.view.selectcurrency;
 
 
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -25,7 +28,7 @@ import java.util.Currency;
  *
  * @author Benoit LETONDOR
  */
-public class SelectCurrencyFragment extends Fragment
+public class SelectCurrencyFragment extends DialogFragment
 {
     /**
      * Action of the intent broadcasted when selected currency has changed
@@ -47,9 +50,47 @@ public class SelectCurrencyFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
+        if( getShowsDialog() )
+        {
+            return null;
+        }
+
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_select_currency, container, false);
 
+        setupRecyclerView(v);
+
+        return v;
+    }
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState)
+    {
+        // Inflate the layout for this fragment
+        View v = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_select_currency, null, false);
+        setupRecyclerView(v);
+
+        // Put some padding between title and content
+        v.setPadding(0, getActivity().getResources().getDimensionPixelSize(R.dimen.select_currency_dialog_padding_top), 0, 0);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+        builder.setView(v);
+        builder.setTitle(R.string.setting_category_currency_change_dialog_title);
+
+        return builder.create();
+    }
+
+// ------------------------------------->
+
+    /**
+     * Setup the recycler view
+     *
+     * @param v inflated view
+     */
+    private void setupRecyclerView(View v)
+    {
         RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.select_currency_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(v.getContext()));
 
@@ -58,9 +99,5 @@ public class SelectCurrencyFragment extends Fragment
 
         // Scroll to currently selected currency
         recyclerView.scrollToPosition(adapter.getSelectedCurrencyPosition(v.getContext()));
-
-        return v;
     }
-
-
 }
