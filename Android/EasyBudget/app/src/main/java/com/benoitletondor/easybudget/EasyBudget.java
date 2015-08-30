@@ -41,6 +41,9 @@ public class EasyBudget extends Application
         // Init actions
         init();
 
+        // Check if an update occured and perform action if needed
+        checkUpdateAction();
+
         // Crashlytics
         if( BuildConfig.CRASHLYTICS_ACTIVATED )
         {
@@ -62,8 +65,6 @@ public class EasyBudget extends Application
 
         analyticsTracker = analytics.newTracker(R.xml.analytics);
     }
-
-
 
     /**
      * Init app const and parameters
@@ -154,5 +155,32 @@ public class EasyBudget extends Application
                 Batch.onDestroy(activity);
             }
         });
+    }
+
+    /**
+     * Check if a an update occured and call {@link #onUpdate(int, int)} if so
+     */
+    private void checkUpdateAction()
+    {
+        int savedVersion = Parameters.getInstance(getApplicationContext()).getInt(ParameterKeys.APP_VERSION, 1);
+        if( savedVersion != BuildConfig.VERSION_CODE )
+        {
+            onUpdate(savedVersion, BuildConfig.VERSION_CODE);
+        }
+
+        Parameters.getInstance(getApplicationContext()).putInt(ParameterKeys.APP_VERSION, BuildConfig.VERSION_CODE);
+    }
+
+    /**
+     * Called when an update occured
+     *
+     * @param previousVersion
+     * @param newVersion
+     */
+    private void onUpdate(int previousVersion, int newVersion)
+    {
+        Logger.debug("Update detected, from "+previousVersion+" to "+newVersion);
+
+        // Add action if needed
     }
 }

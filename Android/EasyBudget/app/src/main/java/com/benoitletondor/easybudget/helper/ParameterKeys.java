@@ -8,6 +8,10 @@ package com.benoitletondor.easybudget.helper;
 public class ParameterKeys
 {
     /**
+     * App version stored to detect updates (int)
+     */
+    public static final String APP_VERSION = "appversion";
+    /**
      * Date of the base balance set-up (long)
      */
     public static final String INIT_DATE       = "init_date";
