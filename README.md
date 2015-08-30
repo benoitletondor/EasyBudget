@@ -8,9 +8,9 @@ I got the idea of this app by trying to find one really easy to use budget manag
 
 I want a simpler app to manage budget on Android. Only 1 account, no export-import features, no stats/graph, simple interface, quick and efficient.
 
-Here's a first look at what it __may__ looks like:
+Here's a first look at what the current version looks like:
 
-![EasyBudget home screen](http://i.imgur.com/HxBoOxm.png)
+![EasyBudget home screen](http://i.imgur.com/iebPxFL.png?1)
 
 ### Technical details
 
