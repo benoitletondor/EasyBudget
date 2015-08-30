@@ -40,9 +40,16 @@
         android:paddingBottom="30dp"
         android:orientation="vertical">
 
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_check_white_48dp"
+            android:layout_gravity="center_horizontal" />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:textSize="30dp"
             android:textColor="@android:color/white"
             android:text="All set!"
@@ -53,7 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
             android:textSize="20dp"
-            android:text="Other onboarding screen will come in future versions, but for now you're done!"
+            android:text="Other onboarding screens will come in future versions."
             android:textColor="@android:color/white"
             android:gravity="center_horizontal" />
 
@@ -71,7 +78,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:textSize="17dp"
-            android:text="-Set the current balance of your account\n-Add monthly reccuring expenses and incomes (salary, rent, bills...)\n-Think about adding one time expenses during the day"
+            android:text="- Set the current balance of your account\n- Add monthly reccuring expenses and incomes (salary, rent, bills...)\n- Think about adding one time expenses during the day"
             android:textColor="@android:color/white" />
 
     </LinearLayout>

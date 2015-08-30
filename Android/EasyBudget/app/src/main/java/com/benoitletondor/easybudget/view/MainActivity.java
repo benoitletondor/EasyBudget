@@ -40,6 +40,7 @@ import com.benoitletondor.easybudget.model.MonthlyExpense;
 import com.benoitletondor.easybudget.model.MonthlyExpenseDeleteType;
 import com.benoitletondor.easybudget.view.main.calendar.CalendarFragment;
 import com.benoitletondor.easybudget.view.main.ExpensesRecyclerViewAdapter;
+import com.benoitletondor.easybudget.view.selectcurrency.SelectCurrencyFragment;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.roomorama.caldroid.CaldroidFragment;
@@ -59,7 +60,6 @@ public class MainActivity extends DBActivity
 {
     public static final int ADD_EXPENSE_ACTIVITY_CODE = 101;
     public static final int MANAGE_MONTHLY_EXPENSE_ACTIVITY_CODE = 102;
-    public static final int WELCOME_ACTIVITY_CODE = 103;
     public static final String INTENT_EXPENSE_DELETED = "intent.expense.deleted";
     public static final String INTENT_MONTHLY_EXPENSE_DELETED = "intent.expense.monthly.deleted";
 
@@ -83,7 +83,7 @@ public class MainActivity extends DBActivity
         if( Parameters.getInstance(this).getInt(ParameterKeys.ONBOARDING_STEP, -1) != WelcomeActivity.STEP_COMPLETED )
         {
             Intent startIntent = new Intent(this, WelcomeActivity.class);
-            ActivityCompat.startActivityForResult(this, startIntent, WELCOME_ACTIVITY_CODE, null);
+            ActivityCompat.startActivity(this, startIntent, null);
         }
 
         super.onCreate(savedInstanceState);
@@ -97,6 +97,7 @@ public class MainActivity extends DBActivity
         IntentFilter filter = new IntentFilter();
         filter.addAction(INTENT_EXPENSE_DELETED);
         filter.addAction(INTENT_MONTHLY_EXPENSE_DELETED);
+        filter.addAction(SelectCurrencyFragment.CURRENCY_SELECTED_INTENT);
 
         receiver = new BroadcastReceiver()
         {
@@ -143,6 +144,10 @@ public class MainActivity extends DBActivity
                     }
 
                     new DeleteMonthlyExpenseTask(expense, deleteType).execute();
+                }
+                else if( SelectCurrencyFragment.CURRENCY_SELECTED_INTENT.equals(intent.getAction()) )
+                {
+                    refreshAllForDate(expensesViewAdapter.getDate());
                 }
             }
         };
