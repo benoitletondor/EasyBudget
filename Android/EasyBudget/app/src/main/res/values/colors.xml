@@ -16,8 +16,10 @@
     <color name="calendar_cell_selected">@color/primary_light</color>
     <color name="calendar_cell_disabled_text_color">#eeeeee</color>
     <color name="budget_green">#4CAF50</color>
+    <color name="budget_green_out">#7ed281</color>
     <color name="budget_orange">#FF9800</color>
     <color name="budget_red">#F44336</color>
+    <color name="budget_red_out">#f17970</color>
 
     <color name="onboarding_1_background">#00897B</color>
     <color name="onboarding_1_statusbar">#00695C</color>

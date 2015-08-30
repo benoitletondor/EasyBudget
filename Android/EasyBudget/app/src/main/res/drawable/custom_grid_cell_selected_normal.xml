@@ -2,11 +2,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item>
-        <shape android:shape="rectangle" >
-            <stroke
-                android:width="2dp"
-                android:color="@color/accent" />
-
+        <shape android:shape="oval" >
             <solid android:color="@color/calendar_cell_selected" />
         </shape>
     </item>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/custom_grid_cell_border_pressed" android:state_pressed="true"/> <!-- pressed -->
-    <item android:drawable="@drawable/custom_grid_cell_border" /> <!-- normal -->
+    <item android:drawable="@drawable/custom_grid_cell_today_pressed" android:state_focused="true"/> <!-- focused -->
+    <item android:drawable="@drawable/custom_grid_cell_today_pressed" android:state_pressed="true"/> <!-- pressed -->
+    <item android:drawable="@drawable/custom_grid_cell_today_normal" /> <!-- normal -->
 </selector>
