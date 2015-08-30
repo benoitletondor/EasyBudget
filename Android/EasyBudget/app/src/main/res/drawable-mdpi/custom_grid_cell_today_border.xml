@@ -3,7 +3,11 @@
 
     <item>
         <shape android:shape="oval" >
-            <solid android:color="@color/calendar_cell_selected" />
+            <stroke
+                android:width="@dimen/grid_cell_today_border_size"
+                android:color="@color/accent" />
+
+            <solid android:color="@android:color/white" />
         </shape>
     </item>
 

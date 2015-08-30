@@ -341,6 +341,7 @@ public class MainActivity extends DBActivity
             args.putBoolean(CaldroidFragment.SIX_WEEKS_IN_CALENDAR, false);
             args.putInt(CalendarFragment.START_DAY_OF_WEEK, CalendarFragment.MONDAY);
             args.putBoolean(CalendarFragment.ENABLE_CLICK_ON_DISABLED_DATES, false);
+            args.putInt(CaldroidFragment.THEME_RESOURCE, R.style.caldroid_style);
 
             calendarFragment.setArguments(args);
             calendarFragment.setSelectedDates(new Date(), new Date());

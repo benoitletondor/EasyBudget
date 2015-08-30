@@ -3,6 +3,10 @@
 
     <item>
         <shape android:shape="oval" >
+            <stroke
+                android:width="2dp"
+                android:color="@color/accent" />
+
             <solid android:color="@color/calendar_cell_selected" />
         </shape>
     </item>
