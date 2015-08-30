@@ -3,15 +3,17 @@
     package="com.benoitletondor.easybudget" >
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <!-- Push -->
-    <permission android:name="com.benoitletondor.easybudget.permission.C2D_MESSAGE" android:protectionLevel="signature"/>
-    <uses-permission android:name="com.benoitletondor.easybudget.permission.C2D_MESSAGE"/>
+    <permission
+        android:name="com.benoitletondor.easybudget.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
 
+    <uses-permission android:name="com.benoitletondor.easybudget.permission.C2D_MESSAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
     <application
         android:name=".EasyBudget"
@@ -52,14 +54,25 @@
             android:name=".view.SettingsActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_settings"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".view.WelcomeActivity"
+            android:theme="@style/AppThemeNoActionBar"
+            android:configChanges="locale|keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_welcome"
+            android:screenOrientation="portrait" >
         </activity>
 
         <!-- Batch SDK -->
         <service android:name="com.batch.android.BatchPushService" />
-        <receiver android:name="com.batch.android.BatchPushReceiver" android:permission="com.google.android.c2dm.permission.SEND">
+
+        <receiver
+            android:name="com.batch.android.BatchPushReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+
                 <category android:name="com.benoitletondor.easybudget" />
             </intent-filter>
         </receiver>
@@ -67,32 +80,39 @@
         <!-- Custom Push receiver -->
         <service android:name=".push.PushService" />
 
-        <receiver android:name=".push.PushReceiver" android:permission="com.google.android.c2dm.permission.SEND">
+        <receiver
+            android:name=".push.PushReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+
                 <category android:name="com.benoitletondor.easybudget" />
             </intent-filter>
         </receiver>
 
         <!-- Analytics -->
         <service android:name="com.google.android.gms.analytics.CampaignTrackingService" />
-        <receiver android:name="com.google.android.gms.analytics.CampaignTrackingReceiver"
-              android:exported="true">
+
+        <receiver
+            android:name="com.google.android.gms.analytics.CampaignTrackingReceiver"
+            android:exported="true" >
             <intent-filter>
                 <action android:name="com.android.vending.INSTALL_REFERRER" />
             </intent-filter>
         </receiver>
 
-        <service android:name="com.google.android.gms.analytics.AnalyticsService"
-             android:enabled="true"
-             android:exported="false"/>
-        <receiver android:name="com.google.android.gms.analytics.AnalyticsReceiver"
-                  android:enabled="true">
+        <service
+            android:name="com.google.android.gms.analytics.AnalyticsService"
+            android:enabled="true"
+            android:exported="false" />
+
+        <receiver
+            android:name="com.google.android.gms.analytics.AnalyticsReceiver"
+            android:enabled="true" >
             <intent-filter>
                 <action android:name="com.google.android.gms.analytics.ANALYTICS_DISPATCH" />
             </intent-filter>
         </receiver>
-
     </application>
 
 </manifest>

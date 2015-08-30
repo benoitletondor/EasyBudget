@@ -10,6 +10,7 @@
     <string name="title_activity_monthly_expense_add">Add Monthly Expense</string>
     <string name="title_activity_monthly_expense_edit">Edit Monthly Expense</string>
     <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_welcome">EasyBudget</string>
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
     <string name="amount">Amount ( %s )</string>

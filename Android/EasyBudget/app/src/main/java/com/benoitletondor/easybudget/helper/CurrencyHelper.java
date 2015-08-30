@@ -1,12 +1,20 @@
 package com.benoitletondor.easybudget.helper;
 
 import android.content.Context;
+import android.os.Build;
 import android.support.annotation.NonNull;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Currency;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 /**
  * Helper to work with currencies and display
@@ -15,6 +23,74 @@ import java.util.Currency;
  */
 public class CurrencyHelper
 {
+    /**
+     * Return a list of available currencies (using compat code)
+     *
+     * @return a list of available currencies
+     */
+    public static List<Currency> getAvailableCurrencies()
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+        {
+            return new ArrayList<>(Currency.getAvailableCurrencies());
+        }
+        else
+        {
+            Set<Currency> currencySet = new HashSet<>();
+
+            Locale[] locales = Locale.getAvailableLocales();
+            for(Locale locale : locales)
+            {
+                try
+                {
+                    Currency currency = Currency.getInstance(locale);
+                    currencySet.add(currency);
+                }
+                catch(Exception e)
+                {
+                    // Locale not found
+                }
+            }
+
+            List<Currency> currencies = new ArrayList<>(currencySet);
+            Collections.sort(currencies, new Comparator<Currency>()
+            {
+                @Override
+                public int compare(Currency lhs, Currency rhs)
+                {
+                    return lhs.getCurrencyCode().compareTo(rhs.getCurrencyCode());
+                }
+            });
+
+            return currencies;
+        }
+    }
+
+    /**
+     * Get the currency display name (using compat)
+     *
+     * @param currency
+     * @return
+     */
+    public static String getCurrencyDisplayName(Currency currency)
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+        {
+            return currency.getSymbol()+ " - "+ currency.getDisplayName();
+        }
+        else
+        {
+            if( !currency.getSymbol().equals(currency.getCurrencyCode()) )
+            {
+                return currency.getSymbol()+ " - "+ currency.getCurrencyCode();
+            }
+            else
+            {
+                return currency.getSymbol();
+            }
+        }
+    }
+
     /**
      * Helper to display an amount using the user currency
      *

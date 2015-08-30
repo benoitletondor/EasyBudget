@@ -1,12 +1,13 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="BaseAppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <!-- App theme -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
+        <item name="android:windowBackground">@android:color/white</item>
 
-        <!-- Caldroid bug : https://github.com/roomorama/Caldroid/issues/266 -->
+        <!-- Caldroid bug: https://github.com/roomorama/Caldroid/issues/266 -->
         <item name="styleCaldroidViewLayout">@style/CaldroidDefaultCalendarViewLayout</item>
         <item name="styleCaldroidLeftArrow">@style/CaldroidDefaultLeftButton</item>
         <item name="styleCaldroidRightArrow">@style/CaldroidDefaultRightButton</item>
@@ -17,8 +18,12 @@
         <item name="styleCaldroidWeekdayView">@style/CaldroidDefaultWeekday</item>
     </style>
 
-    <style name="AppTheme" parent="BaseAppTheme">
-        <!-- Nothing here, exists to be extended for Material animations -->
+    <!-- App theme without ActionBar -->
+    <style name="AppThemeNoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="android:windowBackground">@android:color/white</item>
     </style>
 
     <!-- FAB style -->

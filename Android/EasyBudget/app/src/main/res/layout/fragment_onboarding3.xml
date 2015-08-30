@@ -1,0 +1,79 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/onboarding_3_background"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context=".view.welcome.Onboarding3Fragment">
+
+    <Button android:id="@+id/onboarding_screen3_next_button"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:gravity="center"
+        android:textSize="20dp"
+        android:paddingLeft="30dp"
+        android:paddingRight="30dp"
+        android:text="Done"
+        android:layout_marginBottom="15dp"
+        android:textColor="@android:color/white"
+        android:background="@drawable/welcome_screen_next_button_1_drawable"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"/>
+
+    <TextView android:id="@+id/onboarding_screen3_thankyou"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20dp"
+        android:text="Thank you for trying EasyBudget, any feedback welcome :)"
+        android:textColor="@android:color/white"
+        android:gravity="center_horizontal"
+        android:layout_above="@id/onboarding_screen3_next_button"
+        android:layout_marginBottom="20dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/onboarding_screen3_thankyou"
+        android:paddingBottom="30dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="30dp"
+            android:textColor="@android:color/white"
+            android:text="All set!"
+            android:gravity="center_horizontal" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:textSize="20dp"
+            android:text="Other onboarding screen will come in future versions, but for now you're done!"
+            android:textColor="@android:color/white"
+            android:gravity="center_horizontal" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:textSize="20dp"
+            android:text="Next steps for you are:"
+            android:textColor="@android:color/white"
+            android:gravity="center_horizontal" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:textSize="15dp"
+            android:text="-Set the current balance of your account\n-Add monthly reccuring expenses and incomes (salary, rent, bills...)\n-Think about adding one time expenses during the day"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
+
+</RelativeLayout>
