@@ -16,8 +16,11 @@ import android.view.ViewAnimationUtils;
 
 import com.benoitletondor.easybudget.R;
 import com.benoitletondor.easybudget.helper.CompatHelper;
+import com.benoitletondor.easybudget.helper.ParameterKeys;
+import com.benoitletondor.easybudget.helper.Parameters;
 import com.benoitletondor.easybudget.view.welcome.Onboarding1Fragment;
 import com.benoitletondor.easybudget.view.welcome.Onboarding2Fragment;
+import com.benoitletondor.easybudget.view.welcome.Onboarding3Fragment;
 import com.benoitletondor.easybudget.view.welcome.OnboardingFragment;
 
 /**
@@ -33,8 +36,8 @@ public class WelcomeActivity extends AppCompatActivity
     public final static int STEP_COMPLETED = Integer.MAX_VALUE;
 
     public final static String ANIMATE_TRANSITION_KEY = "animate";
-    public final static String CENTER_X_KEY = "centerX";
-    public final static String CENTER_Y_KEY = "centerY";
+    public final static String CENTER_X_KEY           = "centerX";
+    public final static String CENTER_Y_KEY           = "centerY";
 
     /**
      * Intent broadcasted by pager fragments to go next
@@ -44,6 +47,10 @@ public class WelcomeActivity extends AppCompatActivity
      * Intent broadcasted by pager fragments to go previous
      */
     public final static String PAGER_PREVIOUS_INTENT = "welcome.pager.previous";
+    /**
+     * Intent broadcasted by pager fragments when welcome onboarding is done
+     */
+    public final static String PAGER_DONE_INTENT     = "welcome.pager.done";
 
 // ------------------------------------------>
 
@@ -61,6 +68,12 @@ public class WelcomeActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        // Reinit step to 0 if already completed
+        if( getStep() == STEP_COMPLETED )
+        {
+            setStep(0);
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
 
@@ -76,6 +89,8 @@ public class WelcomeActivity extends AppCompatActivity
                         return new Onboarding1Fragment();
                     case 1:
                         return new Onboarding2Fragment();
+                    case 2:
+                        return new Onboarding3Fragment();
                 }
 
                 return null;
@@ -84,7 +99,7 @@ public class WelcomeActivity extends AppCompatActivity
             @Override
             public int getCount()
             {
-                return 2;
+                return 3;
             }
         });
         pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener()
@@ -100,6 +115,8 @@ public class WelcomeActivity extends AppCompatActivity
             {
                 OnboardingFragment fragment = (OnboardingFragment) ((FragmentStatePagerAdapter) pager.getAdapter()).getItem(position);
                 CompatHelper.setStatusBarColor(WelcomeActivity.this, fragment.getStatusBarColor());
+
+                setStep(position);
             }
 
             @Override
@@ -113,6 +130,7 @@ public class WelcomeActivity extends AppCompatActivity
         IntentFilter filter = new IntentFilter();
         filter.addAction(PAGER_NEXT_INTENT);
         filter.addAction(PAGER_PREVIOUS_INTENT);
+        filter.addAction(PAGER_DONE_INTENT);
 
         receiver = new BroadcastReceiver()
         {
@@ -146,13 +164,23 @@ public class WelcomeActivity extends AppCompatActivity
                 {
                     pager.setCurrentItem(pager.getCurrentItem()-1, true);
                 }
+                else if( PAGER_DONE_INTENT.equals(intent.getAction()) )
+                {
+                    setStep(STEP_COMPLETED);
+                    finish();
+                }
             }
         };
 
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter);
 
-        // Init first status Bar color
-        OnboardingFragment fragment = (OnboardingFragment) ((FragmentStatePagerAdapter) pager.getAdapter()).getItem(0);
+        int initialStep = getStep();
+
+        // Init pager at the current step
+        pager.setCurrentItem(initialStep, true);
+
+        // Set status bar color
+        OnboardingFragment fragment = (OnboardingFragment) ((FragmentStatePagerAdapter) pager.getAdapter()).getItem(initialStep);
         CompatHelper.setStatusBarColor(this, fragment.getStatusBarColor());
     }
 
@@ -173,5 +201,27 @@ public class WelcomeActivity extends AppCompatActivity
         }
 
         // Prevent back to leave activity
+    }
+
+// ------------------------------------>
+
+    /**
+     * Get the current saved onboarding step
+     *
+     * @return
+     */
+    private int getStep()
+    {
+        return Parameters.getInstance(this).getInt(ParameterKeys.ONBOARDING_STEP, 0);
+    }
+
+    /**
+     * Save the given step as onboarding step
+     *
+     * @param step
+     */
+    private void setStep(int step)
+    {
+        Parameters.getInstance(this).putInt(ParameterKeys.ONBOARDING_STEP, step);
     }
 }

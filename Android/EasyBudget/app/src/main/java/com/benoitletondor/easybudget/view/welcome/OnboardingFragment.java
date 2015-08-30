@@ -40,6 +40,15 @@ public abstract class OnboardingFragment extends Fragment
     }
 
     /**
+     * Finish the onboarding flow
+     */
+    protected void done()
+    {
+        Intent intent = new Intent(WelcomeActivity.PAGER_DONE_INTENT);
+        LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
+    }
+
+    /**
      * Get the status bar color that should be used for this fragment
      *
      * @return the wanted color of the status bar

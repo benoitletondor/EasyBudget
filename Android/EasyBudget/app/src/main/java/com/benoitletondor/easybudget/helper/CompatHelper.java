@@ -17,7 +17,7 @@ import android.widget.Button;
 public class CompatHelper
 {
     /**
-     * Remove border of the button for android 5+
+     * Remove border of the button for Android 5+
      *
      * @param button
      */
@@ -28,6 +28,13 @@ public class CompatHelper
             button.setOutlineProvider(null);
         }
     }
+
+    /**
+     * Set the status bar color for Android 5+
+     *
+     * @param activity
+     * @param colorRes
+     */
     public static void setStatusBarColor(@NonNull Activity activity, @ColorRes int colorRes)
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)

@@ -21,6 +21,12 @@
 
     <color name="onboarding_1_background">#00897B</color>
     <color name="onboarding_1_statusbar">#00695C</color>
+    <color name="onboarding_1_nextbutton_normal">@color/fab_add_monthly_expense</color>
+    <color name="onboarding_1_nextbutton_pressed">@color/fab_add_monthly_expense_pressed</color>
     <color name="onboarding_2_background">#2196F3</color>
     <color name="onboarding_2_statusbar">#1976D2</color>
+    <color name="onboarding_2_nextbutton_normal">#00897B</color>
+    <color name="onboarding_2_nextbutton_pressed">#B2DFDB</color>
+    <color name="onboarding_3_background">#00897B</color>
+    <color name="onboarding_3_statusbar">#00695C</color>
 </resources>

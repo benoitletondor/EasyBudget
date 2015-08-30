@@ -2,7 +2,7 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
        android:shape="rectangle">
 
-    <solid android:color="@color/fab_add_monthly_expense_pressed"/>
+    <solid android:color="@color/onboarding_2_nextbutton_normal"/>
     <corners android:radius="1dp"/>
 
 </shape>

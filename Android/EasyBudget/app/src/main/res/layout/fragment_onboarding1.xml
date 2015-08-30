@@ -51,14 +51,16 @@
 
 
     <Button android:id="@+id/onboarding_screen1_next_button"
-        android:layout_width="100dp"
+        android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:text="Next"
         android:gravity="center"
         android:textSize="20dp"
+        android:paddingLeft="30dp"
+        android:paddingRight="30dp"
         android:layout_marginBottom="15dp"
         android:textColor="@android:color/white"
-        android:background="@drawable/welcome_screen_next_button_drawable"
+        android:background="@drawable/welcome_screen_next_button_1_drawable"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"/>
 
