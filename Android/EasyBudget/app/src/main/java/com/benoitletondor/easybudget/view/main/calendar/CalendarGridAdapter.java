@@ -189,6 +189,12 @@ public class CalendarGridAdapter extends CaldroidGridAdapter
             {
                 tv2.setVisibility(View.INVISIBLE);
 
+                if( !isOutOfMonth )
+                {
+                    tv1.setTextColor(ContextCompat.getColor(context, R.color.primary_text));
+                    tv2.setTextColor(ContextCompat.getColor(context, R.color.secondary_text));
+                }
+
                 viewData.containsExpenses = false;
             }
         }
