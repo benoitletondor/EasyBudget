@@ -10,6 +10,6 @@
 
     </item>
 
-    <item android:drawable="@drawable/custom_grid_cell_selected_border" />
+    <item android:drawable="@drawable/custom_grid_cell_selected_normal" />
 
 </ripple>
