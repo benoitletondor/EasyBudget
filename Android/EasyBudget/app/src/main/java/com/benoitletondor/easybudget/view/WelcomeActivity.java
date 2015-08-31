@@ -177,7 +177,8 @@ public class WelcomeActivity extends AppCompatActivity
         int initialStep = getStep();
 
         // Init pager at the current step
-        pager.setCurrentItem(initialStep, true);
+        pager.setCurrentItem(1, false); // Load step 1 for animation...
+        pager.setCurrentItem(initialStep, false);
 
         // Set status bar color
         OnboardingFragment fragment = (OnboardingFragment) ((FragmentStatePagerAdapter) pager.getAdapter()).getItem(initialStep);

@@ -35,7 +35,7 @@
             android:layout_marginTop="60dp"
             android:textSize="15dp"
             android:textColor="@android:color/white"
-            android:text="The concept is quite simple: you just enter your expenses (one time and montly recurring ones) and the app takes care of letting you know exactly how much money you have and you'll have at a given day.\nSimple as that."
+            android:text="The concept is quite simple: you just enter your expenses (one time and monthly recurring ones) and the app takes care of letting you know exactly how much money you have and you'll have at a given day.\nSimple as that."
             android:gravity="center_horizontal" />
 
         <TextView

@@ -55,7 +55,7 @@ public class PreferencesFragment extends PreferenceFragment
 
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT, getResources().getString(R.string.setting_category_bug_report_send_text) + localId);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, getResources().getString(R.string.setting_category_bug_report_send_text) +" "+localId);
                 sendIntent.setType("text/plain");
                 startActivity(sendIntent);
 
