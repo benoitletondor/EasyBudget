@@ -32,7 +32,7 @@ android {
     buildTypes {
         debug {
             buildConfigField "boolean", "DEBUG_LOG", "true"
-            buildConfigField "boolean", "CRASHLYTICS_ACTIVATED", "true"
+            buildConfigField "boolean", "CRASHLYTICS_ACTIVATED", "false"
             buildConfigField "String", "BATCH_API_KEY", batch_devkey
             buildConfigField "boolean", "ANALYTICS_ACTIVATED", "false"
         }
