@@ -8,20 +8,20 @@ I got the idea of this app by trying to find one really easy to use budget manag
 
 I want a simpler app to manage budget on Android. Only 1 account, no export-import features, no stats/graph, simple interface, quick and efficient.
 
-Here's a first look at what it __may__ looks like:
+Here's a first look at what the current version looks like:
 
-![EasyBudget home screen](http://i.imgur.com/HxBoOxm.png)
+![EasyBudget home screen](http://i.imgur.com/iebPxFL.png?1)
 
 ### Technical details
 
 EasyBudget is a simple Android app build with Android Studio that will support Android 4+. 
 
-I'll try to make the app look as Material as I can using appcompat and some imagination/magic.
+I'll try to make the app adopt Material design as much as possible using appcompat and some imagination/magic.
 
 The project is made possible by some external libraries made by awesome guys that I want to thanks here:
 
-- Caldroid : a library to display a customizable Calendar [https://github.com/roomorama/Caldroid](https://github.com/roomorama/Caldroid)
-- FloatingActionButton : a library to backport FAB to Android 4 [https://github.com/makovkastar/FloatingActionButton](https://github.com/makovkastar/FloatingActionButton)
+- Caldroid: a library to display a customizable Calendar [https://github.com/roomorama/Caldroid](https://github.com/roomorama/Caldroid)
+- FloatingActionButton: library to display a FAB with actions [https://github.com/futuresimple/android-floating-action-button](https://github.com/futuresimple/android-floating-action-button)
 
 ### Licence
 

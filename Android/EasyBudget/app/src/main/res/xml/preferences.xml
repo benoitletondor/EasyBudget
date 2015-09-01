@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/setting_category_general_title">
+
+        <Preference android:key="@string/setting_category_currency_change_button_key" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/setting_category_bug_report_title">
+
+        <Preference android:title="@string/setting_category_bug_report_send_button_title"
+            android:key="@string/setting_category_bug_report_send_button_key" />
+
+    </PreferenceCategory>
+
+
+</PreferenceScreen>

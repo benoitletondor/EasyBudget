@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.benoitletondor.easybudgetapp" >
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Push -->
+    <permission
+        android:name="com.benoitletondor.easybudgetapp.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="com.benoitletondor.easybudgetapp.permission.C2D_MESSAGE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
+    <application
+        android:name="com.benoitletondor.easybudgetapp.EasyBudget"
+        android:allowBackup="true"
+        android:fullBackupContent="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+
+        <!-- Fabric.io -->
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="4f073b46e47c18a4636da5e93128e7c7d9f1600c" />
+
+        <activity
+            android:name="com.benoitletondor.easybudgetapp.view.MainActivity"
+            android:configChanges="locale|keyboardHidden|orientation|screenSize"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="easybudget" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.benoitletondor.easybudgetapp.view.ExpenseEditActivity"
+            android:configChanges="locale|keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_add_expense"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.benoitletondor.easybudgetapp.view.MonthlyExpenseEditActivity"
+            android:configChanges="locale|keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_monthly_expense_add"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.benoitletondor.easybudgetapp.view.SettingsActivity"
+            android:configChanges="locale|keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_settings"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.benoitletondor.easybudgetapp.view.WelcomeActivity"
+            android:theme="@style/AppThemeNoActionBar"
+            android:configChanges="locale|keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_welcome"
+            android:screenOrientation="portrait" >
+        </activity>
+
+        <!-- Batch SDK -->
+        <service android:name="com.batch.android.BatchPushService" />
+
+        <receiver
+            android:name="com.batch.android.BatchPushReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+
+                <category android:name="com.benoitletondor.easybudgetapp" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Custom Push receiver -->
+        <service android:name="com.benoitletondor.easybudgetapp.push.PushService" />
+
+        <receiver
+            android:name="com.benoitletondor.easybudgetapp.push.PushReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+
+                <category android:name="com.benoitletondor.easybudgetapp" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Analytics -->
+        <service android:name="com.google.android.gms.analytics.CampaignTrackingService" />
+
+        <receiver
+            android:name="com.google.android.gms.analytics.CampaignTrackingReceiver"
+            android:exported="true"
+            tools:ignore="ExportedReceiver">
+            <intent-filter>
+                <action android:name="com.android.vending.INSTALL_REFERRER" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name="com.google.android.gms.analytics.AnalyticsService"
+            android:enabled="true"
+            android:exported="false" />
+
+        <receiver
+            android:name="com.google.android.gms.analytics.AnalyticsReceiver"
+            android:enabled="true"
+            tools:ignore="ExportedReceiver">
+            <intent-filter>
+                <action android:name="com.google.android.gms.analytics.ANALYTICS_DISPATCH" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>

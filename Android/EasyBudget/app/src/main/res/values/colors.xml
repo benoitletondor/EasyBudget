@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#00897B</color>
+    <color name="primary_dark">#00695C</color>
+    <color name="primary_light">#B2DFDB</color>
+    <color name="accent">@color/primary</color>
+    <color name="accent_ripple">@color/primary_dark</color>
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#727272</color>
+    <color name="divider">#dadada</color>
+    <color name="fab_add_expense">#F44336</color>
+    <color name="fab_add_expense_pressed">#EF5350</color>
+    <color name="fab_add_monthly_expense">#2196F3</color>
+    <color name="fab_add_monthly_expense_pressed">#42A5F5</color>
+
+    <color name="calendar_cell_selected">@color/primary_light</color>
+    <color name="calendar_cell_disabled_text_color">#eeeeee</color>
+    <color name="budget_green">#4CAF50</color>
+    <color name="budget_green_out">#7ed281</color>
+    <color name="budget_orange">#FF9800</color>
+    <color name="budget_red">#F44336</color>
+    <color name="budget_red_out">#f17970</color>
+
+    <color name="onboarding_1_background">#00897B</color>
+    <color name="onboarding_1_statusbar">#00695C</color>
+    <color name="onboarding_1_nextbutton_normal">@color/fab_add_monthly_expense</color>
+    <color name="onboarding_1_nextbutton_pressed">@color/fab_add_monthly_expense_pressed</color>
+    <color name="onboarding_2_background">#2196F3</color>
+    <color name="onboarding_2_statusbar">#1976D2</color>
+    <color name="onboarding_2_nextbutton_normal">#00897B</color>
+    <color name="onboarding_2_nextbutton_pressed">#B2DFDB</color>
+    <color name="onboarding_3_background">#00897B</color>
+    <color name="onboarding_3_statusbar">#00695C</color>
+</resources>

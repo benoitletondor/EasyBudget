@@ -1,0 +1,63 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.19.2'
+    }
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+
+apply from: 'batch.gradle'
+
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+    maven { url "http://maven.batch.com/release" }
+}
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23"
+
+    defaultConfig {
+        applicationId "com.benoitletondor.easybudgetapp"
+        minSdkVersion 16
+        targetSdkVersion 23
+        versionCode 1
+        versionName "0.1b1"
+    }
+    buildTypes {
+        debug {
+            buildConfigField "boolean", "DEBUG_LOG", "true"
+            buildConfigField "boolean", "CRASHLYTICS_ACTIVATED", "false"
+            buildConfigField "String", "BATCH_API_KEY", batch_devkey
+            buildConfigField "boolean", "ANALYTICS_ACTIVATED", "false"
+        }
+        release {
+            buildConfigField "boolean", "DEBUG_LOG", "false"
+            buildConfigField "boolean", "CRASHLYTICS_ACTIVATED", "true"
+            buildConfigField "String", "BATCH_API_KEY", batch_livekey
+            buildConfigField "boolean", "ANALYTICS_ACTIVATED", "true"
+
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:23.0.0'
+    compile 'com.android.support:support-v4:23.0.0'
+    compile 'com.android.support:design:23.0.0'
+    compile 'com.android.support:recyclerview-v7:23.0.0'
+    compile 'com.google.android.gms:play-services-gcm:7.8.0'
+    compile 'com.google.android.gms:play-services-analytics:7.8.0'
+    compile 'com.roomorama:caldroid:2.1.0'
+    compile 'com.getbase:floatingactionbutton:1.10.0'
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.1@aar') { transitive = true; }
+    compile 'com.batch.android:batch-sdk:1.3.2'
+}
