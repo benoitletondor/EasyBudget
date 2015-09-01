@@ -14,12 +14,8 @@ apply plugin: 'io.fabric'
 apply from: 'batch.gradle'
 
 repositories {
-    maven {
-        url 'https://maven.fabric.io/public'
-    }
-    maven {
-        url "http://maven.batch.com/release"
-    }
+    maven { url 'https://maven.fabric.io/public' }
+    maven { url "http://maven.batch.com/release" }
 }
 
 android {
@@ -27,11 +23,11 @@ android {
     buildToolsVersion "23"
 
     defaultConfig {
-        applicationId "com.benoitletondor.easybudget"
+        applicationId "com.benoitletondor.easybudgetapp"
         minSdkVersion 16
         targetSdkVersion 23
         versionCode 1
-        versionName "0.1"
+        versionName "0.1b1"
     }
     buildTypes {
         debug {

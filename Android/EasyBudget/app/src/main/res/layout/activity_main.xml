@@ -74,7 +74,7 @@
         fab:fab_addButtonColorNormal="@color/accent"
         fab:fab_addButtonColorPressed="@color/accent_ripple"
         fab:fab_labelStyle="@style/fab_labels_style"
-        app:layout_behavior="com.benoitletondor.easybudget.view.main.FloatingActionButtonBehavior"
+        app:layout_behavior="com.benoitletondor.easybudgetapp.view.main.FloatingActionButtonBehavior"
         tools:ignore="RtlHardcoded">
 
         <com.getbase.floatingactionbutton.FloatingActionButton

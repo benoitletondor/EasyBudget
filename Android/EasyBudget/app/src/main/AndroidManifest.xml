@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.benoitletondor.easybudget" >
+    package="com.benoitletondor.easybudgetapp" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <!-- Push -->
     <permission
-        android:name="com.benoitletondor.easybudget.permission.C2D_MESSAGE"
+        android:name="com.benoitletondor.easybudgetapp.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
 
-    <uses-permission android:name="com.benoitletondor.easybudget.permission.C2D_MESSAGE" />
+    <uses-permission android:name="com.benoitletondor.easybudgetapp.permission.C2D_MESSAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
     <application
-        android:name=".EasyBudget"
+        android:name="com.benoitletondor.easybudgetapp.EasyBudget"
         android:allowBackup="true"
         android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
@@ -30,7 +30,7 @@
             android:value="4f073b46e47c18a4636da5e93128e7c7d9f1600c" />
 
         <activity
-            android:name=".view.MainActivity"
+            android:name="com.benoitletondor.easybudgetapp.view.MainActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
@@ -48,24 +48,24 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".view.ExpenseEditActivity"
+            android:name="com.benoitletondor.easybudgetapp.view.ExpenseEditActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_add_expense"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".view.MonthlyExpenseEditActivity"
+            android:name="com.benoitletondor.easybudgetapp.view.MonthlyExpenseEditActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_monthly_expense_add"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".view.SettingsActivity"
+            android:name="com.benoitletondor.easybudgetapp.view.SettingsActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_settings"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".view.WelcomeActivity"
+            android:name="com.benoitletondor.easybudgetapp.view.WelcomeActivity"
             android:theme="@style/AppThemeNoActionBar"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_welcome"
@@ -81,20 +81,20 @@
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
 
-                <category android:name="com.benoitletondor.easybudget" />
+                <category android:name="com.benoitletondor.easybudgetapp" />
             </intent-filter>
         </receiver>
 
         <!-- Custom Push receiver -->
-        <service android:name=".push.PushService" />
+        <service android:name="com.benoitletondor.easybudgetapp.push.PushService" />
 
         <receiver
-            android:name=".push.PushReceiver"
+            android:name="com.benoitletondor.easybudgetapp.push.PushReceiver"
             android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
 
-                <category android:name="com.benoitletondor.easybudget" />
+                <category android:name="com.benoitletondor.easybudgetapp" />
             </intent-filter>
         </receiver>
 
