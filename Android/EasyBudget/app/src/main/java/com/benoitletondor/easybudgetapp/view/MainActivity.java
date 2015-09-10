@@ -122,6 +122,7 @@ public class MainActivity extends DBActivity
                             @Override
                             public void onClick(View v)
                             {
+                                expense.setId(null); // Reset ID to re-insert the expense (avoid update)
                                 db.persistExpense(expense);
 
                                 refreshAllForDate(expensesViewAdapter.getDate());
