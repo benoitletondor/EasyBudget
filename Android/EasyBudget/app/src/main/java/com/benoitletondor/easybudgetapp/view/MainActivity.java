@@ -253,7 +253,7 @@ public class MainActivity extends DBActivity
                     // Ajust balance
                     int newBalance = Integer.valueOf(amountEditText.getText().toString());
 
-                    if( newBalance != currentBalance )
+                    if( newBalance == currentBalance )
                     {
                         // Nothing to do, balance hasn't change
                         return;
