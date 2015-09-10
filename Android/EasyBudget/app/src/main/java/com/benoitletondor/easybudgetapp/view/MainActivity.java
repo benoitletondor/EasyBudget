@@ -327,9 +327,12 @@ public class MainActivity extends DBActivity
     {
         calendarFragment = new CalendarFragment();
 
-        if( savedInstanceState != null && savedInstanceState.containsKey(CALENDAR_SAVED_STATE) )
+        if( savedInstanceState != null && savedInstanceState.containsKey(CALENDAR_SAVED_STATE) && savedInstanceState.containsKey(RECYCLE_VIEW_SAVED_DATE) )
         {
             calendarFragment.restoreStatesFromKey(savedInstanceState, CALENDAR_SAVED_STATE);
+
+            Date selectedDate = (Date) savedInstanceState.getSerializable(RECYCLE_VIEW_SAVED_DATE);
+            calendarFragment.setSelectedDates(selectedDate, selectedDate);
         }
         else
         {
