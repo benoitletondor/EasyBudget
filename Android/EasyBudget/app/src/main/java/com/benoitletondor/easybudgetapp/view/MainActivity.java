@@ -247,6 +247,13 @@ public class MainActivity extends DBActivity
                 {
                     // Ajust balance
                     int newBalance = Integer.valueOf(amountEditText.getText().toString());
+
+                    if( newBalance != currentBalance )
+                    {
+                        // Nothing to do, balance hasn't change
+                        return;
+                    }
+
                     int diff = newBalance - currentBalance;
 
                     final Expense expense = new Expense(getResources().getString(R.string.adjust_balance_expense_title), -diff, new Date());
