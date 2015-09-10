@@ -11,6 +11,7 @@ import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
@@ -71,6 +72,7 @@ public class MainActivity extends DBActivity
     private CalendarFragment            calendarFragment;
     private RecyclerView                expensesRecyclerView;
     private ExpensesRecyclerViewAdapter expensesViewAdapter;
+    private CoordinatorLayout           coordinatorLayout;
 
     private TextView budgetLine;
 
@@ -88,6 +90,8 @@ public class MainActivity extends DBActivity
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
 
         budgetLine = (TextView) findViewById(R.id.budgetLine);
         initCalendarFragment(savedInstanceState);
@@ -112,12 +116,13 @@ public class MainActivity extends DBActivity
                     {
                         refreshAllForDate(expensesViewAdapter.getDate());
 
-                        Snackbar snackbar = Snackbar.make(expensesRecyclerView, R.string.expense_delete_snackbar_text, Snackbar.LENGTH_LONG);
+                        Snackbar snackbar = Snackbar.make(coordinatorLayout, R.string.expense_delete_snackbar_text, Snackbar.LENGTH_LONG);
                         snackbar.setAction(R.string.cancel, new View.OnClickListener()
                         {
                             @Override
                             public void onClick(View v)
                             {
+                                expense.setId(null); // Reset ID to re-insert the expense (avoid update)
                                 db.persistExpense(expense);
 
                                 refreshAllForDate(expensesViewAdapter.getDate());
@@ -247,6 +252,13 @@ public class MainActivity extends DBActivity
                 {
                     // Ajust balance
                     int newBalance = Integer.valueOf(amountEditText.getText().toString());
+
+                    if( newBalance == currentBalance )
+                    {
+                        // Nothing to do, balance hasn't change
+                        return;
+                    }
+
                     int diff = newBalance - currentBalance;
 
                     final Expense expense = new Expense(getResources().getString(R.string.adjust_balance_expense_title), -diff, new Date());
@@ -256,7 +268,7 @@ public class MainActivity extends DBActivity
                     dialog.dismiss();
 
                     //Show snackbar
-                    Snackbar snackbar = Snackbar.make(expensesRecyclerView, String.format(getResources().getString(R.string.adjust_balance_snackbar_text), CurrencyHelper.getFormattedCurrencyString(MainActivity.this, newBalance)), Snackbar.LENGTH_LONG);
+                    Snackbar snackbar = Snackbar.make(coordinatorLayout, String.format(getResources().getString(R.string.adjust_balance_snackbar_text), CurrencyHelper.getFormattedCurrencyString(MainActivity.this, newBalance)), Snackbar.LENGTH_LONG);
                     snackbar.setAction(R.string.cancel, new View.OnClickListener()
                     {
                         @Override
@@ -327,9 +339,12 @@ public class MainActivity extends DBActivity
     {
         calendarFragment = new CalendarFragment();
 
-        if( savedInstanceState != null && savedInstanceState.containsKey(CALENDAR_SAVED_STATE) )
+        if( savedInstanceState != null && savedInstanceState.containsKey(CALENDAR_SAVED_STATE) && savedInstanceState.containsKey(RECYCLE_VIEW_SAVED_DATE) )
         {
             calendarFragment.restoreStatesFromKey(savedInstanceState, CALENDAR_SAVED_STATE);
+
+            Date selectedDate = (Date) savedInstanceState.getSerializable(RECYCLE_VIEW_SAVED_DATE);
+            calendarFragment.setSelectedDates(selectedDate, selectedDate);
         }
         else
         {
@@ -660,7 +675,7 @@ public class MainActivity extends DBActivity
             {
                 // Refresh and show confirm snackbar
                 refreshAllForDate(expensesViewAdapter.getDate());
-                Snackbar.make(expensesRecyclerView, R.string.monthly_expense_delete_success_message, Snackbar.LENGTH_LONG).show();
+                Snackbar.make(coordinatorLayout, R.string.monthly_expense_delete_success_message, Snackbar.LENGTH_LONG).show();
             }
             else
             {

@@ -22,7 +22,8 @@
         android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+        tools:ignore="UnusedAttribute">
 
         <!-- Fabric.io -->
         <meta-data
@@ -33,7 +34,8 @@
             android:name="com.benoitletondor.easybudgetapp.view.MainActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/app_name"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
