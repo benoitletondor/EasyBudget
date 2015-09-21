@@ -6,12 +6,6 @@
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
         <item name="android:windowBackground">@android:color/white</item>
-
-        <!-- Caldroid bug: https://github.com/roomorama/Caldroid/issues/266 -->
-        <item name="styleCaldroidLeftArrow">@style/CaldroidDefaultLeftButton</item>
-        <item name="styleCaldroidRightArrow">@style/CaldroidDefaultRightButton</item>
-        <item name="styleCaldroidMonthName">@style/CaldroidDefaultMonthName</item>
-        <item name="styleCaldroidWeekdayView">@style/CaldroidDefaultWeekday</item>
     </style>
 
     <!-- App theme without ActionBar -->
@@ -30,14 +24,8 @@
 
     <!-- Caldroid -->
     <style name="caldroid_style" parent="CaldroidDefault">
-        <item name="styleCaldroidViewLayout">@style/CaldroidDefaultCalendarViewLayout</item>
-        <item name="styleCaldroidLeftArrow">@style/CaldroidDefaultLeftButton</item>
-        <item name="styleCaldroidRightArrow">@style/CaldroidDefaultRightButton</item>
-        <item name="styleCaldroidMonthName">@style/CaldroidDefaultMonthName</item>
         <item name="styleCaldroidGridView">@style/caldroid_gridview</item>
-        <item name="styleCaldroidNormalCell">@style/CaldroidDefaultNormalCell</item>
-        <item name="styleCaldroidSquareCell">@style/CaldroidDefaultSquareCell</item>
-        <item name="styleCaldroidWeekdayView">@style/CaldroidDefaultWeekday</item>
+        <item name="styleCaldroidWeekdayView">@style/caldroid_weekdayview</item>
     </style>
 
     <style name="caldroid_gridview" parent="CaldroidDefaultGridView">
@@ -45,5 +33,9 @@
         <item name="android:horizontalSpacing">0dip</item>
         <item name="android:verticalSpacing">0dip</item>
         <item name="android:listSelector">@android:color/transparent</item>
+    </style>
+
+    <style name="caldroid_weekdayview" parent="CaldroidDefaultWeekday">
+        <item name="android:textColor">@color/secondary_text</item>
     </style>
 </resources>

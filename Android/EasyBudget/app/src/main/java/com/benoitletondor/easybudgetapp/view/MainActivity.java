@@ -365,8 +365,6 @@ public class MainActivity extends DBActivity
             calendarFragment.setMinDate(minDate);
         }
 
-        WeekdayArrayAdapter.textColor = ContextCompat.getColor(this, R.color.secondary_text);
-
         final CaldroidListener listener = new CaldroidListener()
         {
             @Override
