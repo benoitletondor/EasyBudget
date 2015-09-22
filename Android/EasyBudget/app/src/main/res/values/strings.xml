@@ -18,6 +18,8 @@
     <string name="type">Type</string>
     <string name="payment">Payment</string>
     <string name="income">Income</string>
+    <string name="date">Date</string>
+    <string name="first_occurence">First occurence</string>
 
     <string name="dialog_edit_expense_title">What do you want to do?</string>
     <string-array name="dialog_edit_expense_choices">

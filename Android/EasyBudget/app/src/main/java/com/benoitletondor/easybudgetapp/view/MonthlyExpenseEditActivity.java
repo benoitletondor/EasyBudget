@@ -1,20 +1,23 @@
 package com.benoitletondor.easybudgetapp.view;
 
+import android.animation.Animator;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.view.Menu;
+import android.support.v7.widget.SwitchCompat;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.benoitletondor.easybudgetapp.R;
@@ -31,17 +34,25 @@ import java.util.Locale;
 public class MonthlyExpenseEditActivity extends DBActivity
 {
     /**
+     * Save floating action button
+     */
+    private FloatingActionButton fab;
+    /**
      * Edit text that contains the description
      */
-    private EditText       descriptionEditText;
+    private EditText             descriptionEditText;
     /**
      * Edit text that contains the amount
      */
-    private EditText       amountEditText;
+    private EditText             amountEditText;
     /**
      * Button for date selection
      */
-    private Button         dateButton;
+    private Button               dateButton;
+    /**
+     * Textview that displays the type of expense
+     */
+    private TextView             expenseType;
 
     /**
      * Expense that is being edited (will be null if it's a new one)
@@ -69,6 +80,8 @@ public class MonthlyExpenseEditActivity extends DBActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_monthly_expense_edit);
 
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -87,14 +100,42 @@ public class MonthlyExpenseEditActivity extends DBActivity
         setUpDateButton();
 
         setResult(RESULT_CANCELED);
-    }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_monthly_expense_edit, menu);
-        return true;
+        if ( UIHelper.willAnimateActivityEnter(this) )
+        {
+            UIHelper.animateActivityEnter(this, new Animator.AnimatorListener()
+            {
+                @Override
+                public void onAnimationStart(Animator animation)
+                {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation)
+                {
+                    UIHelper.setFocus(descriptionEditText);
+                    UIHelper.animateFABAppear(fab);
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation)
+                {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation)
+                {
+
+                }
+            });
+        }
+        else
+        {
+            UIHelper.setFocus(descriptionEditText);
+            UIHelper.animateFABAppear(fab);
+        }
     }
 
     @Override
@@ -106,20 +147,7 @@ public class MonthlyExpenseEditActivity extends DBActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_save)
-        {
-            if( validateInputs() )
-            {
-                int value = Integer.parseInt(amountEditText.getText().toString());
-
-                MonthlyExpense expense = new MonthlyExpense(descriptionEditText.getText().toString(), isRevenue? -value : value, dateStart);
-
-                new SaveMonthlyExpenseTask().execute(expense);
-            }
-
-            return true;
-        }
-        else if( id == android.R.id.home ) // Back button of the actionbar
+        if( id == android.R.id.home ) // Back button of the actionbar
         {
             finish();
             return true;
@@ -178,36 +206,59 @@ public class MonthlyExpenseEditActivity extends DBActivity
      */
     private void setUpButtons()
     {
-        final ImageView paymentCheckboxImageview = (ImageView) findViewById(R.id.payment_checkbox_imageview);
-        final ImageView revenueCheckboxImageview = (ImageView) findViewById(R.id.revenue_checkbox_imageview);
+        expenseType = (TextView) findViewById(R.id.expense_type_tv);
 
-        findViewById(R.id.payment_button_view).setOnClickListener(new View.OnClickListener()
+        SwitchCompat expenseTypeSwitch = (SwitchCompat) findViewById(R.id.expense_type_switch);
+        expenseTypeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+            {
+                isRevenue = isChecked;
+                setExpenseTypeTextViewLayout();
+            }
+        });
+
+        // Init value to checked if already a revenue (can be true if we are editing an expense)
+        if( isRevenue )
+        {
+            expenseTypeSwitch.setChecked(true);
+            setExpenseTypeTextViewLayout();
+        }
+
+        fab = (FloatingActionButton) findViewById(R.id.save_expense_fab);
+        fab.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-            if( isRevenue )
-            {
-                isRevenue = false;
-                paymentCheckboxImageview.setImageResource(R.drawable.ic_radio_button_on);
-                revenueCheckboxImageview.setImageResource(R.drawable.ic_radio_button_off);
-            }
-            }
-        });
+                if( validateInputs() )
+                {
+                    int value = Integer.parseInt(amountEditText.getText().toString());
 
-        findViewById(R.id.revenue_button_view).setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-            if( !isRevenue )
-            {
-                isRevenue = true;
-                paymentCheckboxImageview.setImageResource(R.drawable.ic_radio_button_off);
-                revenueCheckboxImageview.setImageResource(R.drawable.ic_radio_button_on);
-            }
+                    MonthlyExpense expense = new MonthlyExpense(descriptionEditText.getText().toString(), isRevenue? -value : value, dateStart);
+
+                    new SaveMonthlyExpenseTask().execute(expense);
+                }
             }
         });
+    }
+
+    /**
+     * Set revenue text view layout
+     */
+    private void setExpenseTypeTextViewLayout()
+    {
+        if( isRevenue )
+        {
+            expenseType.setText(R.string.income);
+            expenseType.setTextColor(ContextCompat.getColor(this, R.color.budget_green));
+        }
+        else
+        {
+            expenseType.setText(R.string.payment);
+            expenseType.setTextColor(ContextCompat.getColor(this, R.color.budget_red));
+        }
     }
 
     /**
@@ -215,56 +266,21 @@ public class MonthlyExpenseEditActivity extends DBActivity
      */
     private void setUpTextFields()
     {
-        final TextView descriptionTextView = (TextView) findViewById(R.id.description_descriptor);
-        final TextView amountTextView = (TextView) findViewById(R.id.amount_descriptor);
-        amountTextView.setText(String.format(Locale.US, getResources().getString(R.string.amount), CurrencyHelper.getUserCurrency(this).getSymbol()));
+        ((TextInputLayout) findViewById(R.id.amount_inputlayout)).setHint(String.format(Locale.US, getResources().getString(R.string.amount), CurrencyHelper.getUserCurrency(this).getSymbol()));
 
         descriptionEditText = (EditText) findViewById(R.id.description_edittext);
-        descriptionEditText.setOnFocusChangeListener(new View.OnFocusChangeListener()
-        {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus)
-            {
-            if (hasFocus)
-            {
-                descriptionTextView.setTextColor(ContextCompat.getColor(MonthlyExpenseEditActivity.this, R.color.accent));
-                descriptionTextView.setTypeface(null, Typeface.BOLD);
-            }
-            else
-            {
-                descriptionTextView.setTextColor(ContextCompat.getColor(MonthlyExpenseEditActivity.this, R.color.secondary_text));
-                descriptionTextView.setTypeface(null, Typeface.NORMAL);
-            }
-            }
-        });
 
         if( expense != null )
         {
             descriptionEditText.setText(expense.getTitle());
+            descriptionEditText.setSelection(descriptionEditText.getText().length()); // Put focus at the end of the text
         }
 
         amountEditText = (EditText) findViewById(R.id.amount_edittext);
-        amountEditText.setOnFocusChangeListener(new View.OnFocusChangeListener()
-        {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus)
-            {
-            if (hasFocus)
-            {
-                amountTextView.setTextColor(ContextCompat.getColor(MonthlyExpenseEditActivity.this, R.color.accent));
-                amountTextView.setTypeface(null, Typeface.BOLD);
-            }
-            else
-            {
-                amountTextView.setTextColor(ContextCompat.getColor(MonthlyExpenseEditActivity.this, R.color.secondary_text));
-                amountTextView.setTypeface(null, Typeface.NORMAL);
-            }
-            }
-        });
 
         if( expense != null )
         {
-            amountEditText.setText(String.valueOf(expense.getAmount()));
+            amountEditText.setText(String.valueOf(Math.abs(expense.getAmount())));
         }
     }
 

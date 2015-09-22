@@ -536,7 +536,15 @@ public class MainActivity extends DBActivity
                 Intent startIntent = new Intent(MainActivity.this, MonthlyExpenseEditActivity.class);
                 startIntent.putExtra("dateStart", calendarFragment.getSelectedDate());
 
+                startIntent.putExtra(ANIMATE_TRANSITION_KEY, true);
+                startIntent.putExtra(CENTER_X_KEY, (int) menu.getX() + (int) ((float) menu.getWidth() / 1.2f));
+                startIntent.putExtra(CENTER_Y_KEY, (int) menu.getY() + (int) ((float) menu.getHeight() / 1.2f));
+
                 ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
+                if( UIHelper.isCompatibleWithActivityEnterAnimation() )
+                {
+                    overridePendingTransition(0, 0);
+                }
 
                 menu.collapse();
             }
@@ -552,7 +560,7 @@ public class MainActivity extends DBActivity
         if( savedInstanceState != null && savedInstanceState.containsKey(RECYCLE_VIEW_SAVED_DATE) )
         {
             Date savedDate = (Date) savedInstanceState.getSerializable(RECYCLE_VIEW_SAVED_DATE);
-            if( savedDate != null )
+            if ( savedDate != null )
             {
                 date = savedDate;
             }

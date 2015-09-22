@@ -59,21 +59,19 @@
             android:name=".view.MonthlyExpenseEditActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_monthly_expense_add"
-            android:screenOrientation="portrait" >
-        </activity>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeNoActionBar" />
         <activity
             android:name=".view.SettingsActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_settings"
-            android:screenOrientation="portrait" >
-        </activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".view.WelcomeActivity"
             android:theme="@style/AppThemeNoActionBar"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_welcome"
-            android:screenOrientation="portrait" >
-        </activity>
+            android:screenOrientation="portrait" />
 
         <!-- Batch SDK -->
         <service android:name="com.batch.android.BatchPushService" />
