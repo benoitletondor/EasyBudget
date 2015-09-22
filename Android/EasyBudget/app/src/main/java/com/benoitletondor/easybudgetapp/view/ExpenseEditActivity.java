@@ -15,7 +15,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.benoitletondor.easybudgetapp.R;
-import com.benoitletondor.easybudgetapp.helper.CompatHelper;
+import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import com.benoitletondor.easybudgetapp.model.Expense;
 
@@ -89,6 +89,8 @@ public class ExpenseEditActivity extends DBActivity
         setUpDateButton();
 
         setResult(RESULT_CANCELED);
+
+        UIHelper.animateActivityEnterThenFocus(this, descriptionEditText);
     }
 
 // ----------------------------------->
@@ -254,7 +256,7 @@ public class ExpenseEditActivity extends DBActivity
     private void setUpDateButton()
     {
         dateButton = (Button) findViewById(R.id.date_button);
-        CompatHelper.removeButtonBorder(dateButton); // Remove border on lollipop
+        UIHelper.removeButtonBorder(dateButton); // Remove border on lollipop
 
         updateDateButtonDisplay();
 

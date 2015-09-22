@@ -32,7 +32,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.benoitletondor.easybudgetapp.R;
-import com.benoitletondor.easybudgetapp.helper.CompatHelper;
+import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
 import com.benoitletondor.easybudgetapp.helper.Parameters;
@@ -46,7 +46,6 @@ import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.roomorama.caldroid.CaldroidFragment;
 import com.roomorama.caldroid.CaldroidListener;
-import com.roomorama.caldroid.WeekdayArrayAdapter;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -63,6 +62,10 @@ public class MainActivity extends DBActivity
     public static final int MANAGE_MONTHLY_EXPENSE_ACTIVITY_CODE = 102;
     public static final String INTENT_EXPENSE_DELETED = "intent.expense.deleted";
     public static final String INTENT_MONTHLY_EXPENSE_DELETED = "intent.expense.monthly.deleted";
+
+    public final static String ANIMATE_TRANSITION_KEY = "animate";
+    public final static String CENTER_X_KEY           = "centerX";
+    public final static String CENTER_Y_KEY           = "centerY";
 
     private static final String CALENDAR_SAVED_STATE = "calendar_saved_state";
     private static final String RECYCLE_VIEW_SAVED_DATE = "recycleViewSavedDate";
@@ -404,8 +407,8 @@ public class MainActivity extends DBActivity
                 rightButton.setBackgroundResource(R.drawable.calendar_month_switcher_button_drawable);
 
                 // Remove border on lollipop
-                CompatHelper.removeButtonBorder(leftButton);
-                CompatHelper.removeButtonBorder(rightButton);
+                UIHelper.removeButtonBorder(leftButton);
+                UIHelper.removeButtonBorder(rightButton);
             }
         };
 
@@ -510,7 +513,15 @@ public class MainActivity extends DBActivity
                 Intent startIntent = new Intent(MainActivity.this, ExpenseEditActivity.class);
                 startIntent.putExtra("date", calendarFragment.getSelectedDate());
 
+                startIntent.putExtra(ANIMATE_TRANSITION_KEY, true);
+                startIntent.putExtra(CENTER_X_KEY, (int) menu.getX() + (int) ((float) menu.getWidth() / 1.2f));
+                startIntent.putExtra(CENTER_Y_KEY, (int) menu.getY() + (int) ((float) menu.getHeight() / 1.2f));
+
                 ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
+                if( UIHelper.willAnimateActivityEnter() )
+                {
+                    overridePendingTransition(0, 0);
+                }
 
                 menu.collapse();
             }

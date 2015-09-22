@@ -18,7 +18,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.benoitletondor.easybudgetapp.R;
-import com.benoitletondor.easybudgetapp.helper.CompatHelper;
+import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import com.benoitletondor.easybudgetapp.model.Expense;
 import com.benoitletondor.easybudgetapp.model.MonthlyExpense;
@@ -274,7 +274,7 @@ public class MonthlyExpenseEditActivity extends DBActivity
     private void setUpDateButton()
     {
         dateButton = (Button) findViewById(R.id.date_button);
-        CompatHelper.removeButtonBorder(dateButton); // Remove border on lollipop
+        UIHelper.removeButtonBorder(dateButton); // Remove border on lollipop
 
         updateDateButtonDisplay();
 
