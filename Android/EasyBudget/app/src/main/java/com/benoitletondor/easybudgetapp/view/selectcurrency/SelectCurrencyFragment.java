@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.util.Pair;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -98,21 +99,20 @@ public class SelectCurrencyFragment extends DialogFragment
         recyclerView.setLayoutManager(new LinearLayoutManager(v.getContext()));
 
         // Load available currencies asynchronously
-        new AsyncTask<Void, Void, List<Currency>>()
+        new AsyncTask<Void, Void, Pair<SelectCurrencyRecyclerViewAdapter, Integer>>()
         {
             @Override
-            protected List<Currency> doInBackground(Void... voids)
+            protected Pair<SelectCurrencyRecyclerViewAdapter, Integer> doInBackground(Void... voids)
             {
-                return CurrencyHelper.getAvailableCurrencies();
+                SelectCurrencyRecyclerViewAdapter adapter = new SelectCurrencyRecyclerViewAdapter(CurrencyHelper.getAvailableCurrencies());
+                return Pair.create(adapter, adapter.getSelectedCurrencyPosition(getContext()));
             }
 
             @Override
-            protected void onPostExecute(List<Currency> currencies)
+            protected void onPostExecute(Pair<SelectCurrencyRecyclerViewAdapter, Integer> data)
             {
-                SelectCurrencyRecyclerViewAdapter adapter = new SelectCurrencyRecyclerViewAdapter(currencies);
-                recyclerView.setAdapter(adapter);
-
-                recyclerView.scrollToPosition(adapter.getSelectedCurrencyPosition(v.getContext()));
+                recyclerView.setAdapter(data.first);
+                recyclerView.scrollToPosition(data.second);
             }
         }.execute();
     }
