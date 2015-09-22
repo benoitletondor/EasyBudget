@@ -77,11 +77,12 @@ public final class DB
      * Add or update a one time expense into DB
      *
      * @param expense
+     * @param forcePersist if true, it will be an insert even if an id already exists
      * @return true on success, false on error
      */
-    public boolean persistExpense(@NonNull Expense expense)
+    public boolean persistExpense(@NonNull Expense expense, boolean forcePersist)
     {
-        if( expense.getId() != null )
+        if( expense.getId() != null && !forcePersist )
         {
             int rowsAffected = database.update(SQLiteDBHelper.TABLE_EXPENSE, generateContentValuesForExpense(expense), SQLiteDBHelper.COLUMN_EXPENSE_DB_ID+"="+expense.getId(), null);
             return rowsAffected == 1;
@@ -98,6 +99,17 @@ public final class DB
         }
 
         return false;
+    }
+
+    /**
+     * Add or update a one time expense into DB
+     *
+     * @param expense
+     * @return true on success, false on error
+     */
+    public boolean persistExpense(@NonNull Expense expense)
+    {
+        return persistExpense(expense, false);
     }
 
     /**
@@ -367,6 +379,11 @@ public final class DB
     private static ContentValues generateContentValuesForExpense(@NonNull Expense expense)
     {
         final ContentValues values = new ContentValues();
+
+        if( expense.getId() != null )
+        {
+            values.put(SQLiteDBHelper.COLUMN_EXPENSE_DB_ID, expense.getId());
+        }
 
         values.put(SQLiteDBHelper.COLUMN_EXPENSE_TITLE, expense.getTitle());
         values.put(SQLiteDBHelper.COLUMN_EXPENSE_DATE, expense.getDate().getTime());

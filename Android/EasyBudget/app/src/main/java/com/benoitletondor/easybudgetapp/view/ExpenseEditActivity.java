@@ -1,20 +1,23 @@
 package com.benoitletondor.easybudgetapp.view;
 
+import android.animation.Animator;
 import android.app.DatePickerDialog;
-import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
-import android.view.Menu;
+import android.support.v7.widget.SwitchCompat;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.benoitletondor.easybudgetapp.R;
-import com.benoitletondor.easybudgetapp.helper.CompatHelper;
+import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import com.benoitletondor.easybudgetapp.model.Expense;
 
@@ -31,31 +34,37 @@ import java.util.Locale;
 public class ExpenseEditActivity extends DBActivity
 {
     /**
+     * Save floating action button
+     */
+    private FloatingActionButton fab;
+    /**
      * Edit text that contains the description
      */
-    private EditText descriptionEditText;
+    private EditText             descriptionEditText;
     /**
      * Edit text that contains the amount
      */
-    private EditText amountEditText;
+    private EditText             amountEditText;
     /**
      * Button for date selection
      */
-    private Button   dateButton;
-
+    private Button               dateButton;
+    /**
+     * Textview that displays the type of expense
+     */
+    private TextView             expenseType;
     /**
      * Expense that is being edited (will be null if it's a new one)
      */
-    private Expense expense;
+    private Expense              expense;
     /**
      * The date of the expense
      */
-    private Date    date;
+    private Date                 date;
     /**
      * Is the new expense a revenue
      */
     private boolean isRevenue = false;
-
 
 // -------------------------------------->
 
@@ -64,6 +73,8 @@ public class ExpenseEditActivity extends DBActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_expense_edit);
+
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
 
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -84,51 +95,52 @@ public class ExpenseEditActivity extends DBActivity
         setUpDateButton();
 
         setResult(RESULT_CANCELED);
+
+        if ( UIHelper.willAnimateActivityEnter(this) )
+        {
+            UIHelper.animateActivityEnter(this, new Animator.AnimatorListener()
+            {
+                @Override
+                public void onAnimationStart(Animator animation)
+                {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation)
+                {
+                    UIHelper.setFocus(descriptionEditText);
+                    UIHelper.animateFABAppear(fab);
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation)
+                {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation)
+                {
+
+                }
+            });
+        }
+        else
+        {
+            UIHelper.setFocus(descriptionEditText);
+            UIHelper.animateFABAppear(fab);
+        }
     }
 
 // ----------------------------------->
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_expense_edit, menu);
-        return true;
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_save)
-        {
-            if( validateInputs() )
-            {
-                int value = Integer.parseInt(amountEditText.getText().toString());
-
-                Expense expenseToSave;
-                if( expense == null )
-                {
-                    expenseToSave = new Expense(descriptionEditText.getText().toString(), isRevenue? -value : value, date);
-                }
-                else
-                {
-                    expenseToSave = expense;
-                    expenseToSave.setTitle(descriptionEditText.getText().toString());
-                    expenseToSave.setAmount(isRevenue ? -value : value);
-                    expenseToSave.setDate(date);
-                }
-
-                db.persistExpense(expenseToSave);
-
-                setResult(RESULT_OK);
-                finish();
-            }
-            return true;
-        }
-        else if( id == android.R.id.home ) // Back button of the actionbar
+        if( id == android.R.id.home ) // Back button of the actionbar
         {
             finish();
             return true;
@@ -187,42 +199,72 @@ public class ExpenseEditActivity extends DBActivity
      */
     private void setUpButtons()
     {
-        final ImageView paymentCheckboxImageview = (ImageView) findViewById(R.id.payment_checkbox_imageview);
-        final ImageView revenueCheckboxImageview = (ImageView) findViewById(R.id.revenue_checkbox_imageview);
+        expenseType = (TextView) findViewById(R.id.expense_type_tv);
 
-        findViewById(R.id.payment_button_view).setOnClickListener(new View.OnClickListener()
+        SwitchCompat expenseTypeSwitch = (SwitchCompat) findViewById(R.id.expense_type_switch);
+        expenseTypeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
         {
             @Override
-            public void onClick(View v)
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
             {
-                if( isRevenue )
-                {
-                    isRevenue = false;
-                    paymentCheckboxImageview.setImageResource(R.drawable.ic_radio_button_on);
-                    revenueCheckboxImageview.setImageResource(R.drawable.ic_radio_button_off);
-                }
+                isRevenue = isChecked;
+                setExpenseTypeTextViewLayout();
             }
         });
 
-        findViewById(R.id.revenue_button_view).setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                if( !isRevenue )
-                {
-                    isRevenue = true;
-                    paymentCheckboxImageview.setImageResource(R.drawable.ic_radio_button_off);
-                    revenueCheckboxImageview.setImageResource(R.drawable.ic_radio_button_on);
-                }
-            }
-        });
-
-        // If we are editing an expense that is revenue, init to revenue
+        // Init value to checked if already a revenue (can be true if we are editing an expense)
         if( isRevenue )
         {
-            paymentCheckboxImageview.setImageResource(R.drawable.ic_radio_button_off);
-            revenueCheckboxImageview.setImageResource(R.drawable.ic_radio_button_on);
+            expenseTypeSwitch.setChecked(true);
+            setExpenseTypeTextViewLayout();
+        }
+
+        fab = (FloatingActionButton) findViewById(R.id.save_expense_fab);
+        fab.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if (validateInputs())
+                {
+                    int value = Integer.parseInt(amountEditText.getText().toString());
+
+                    Expense expenseToSave;
+                    if (expense == null)
+                    {
+                        expenseToSave = new Expense(descriptionEditText.getText().toString(), isRevenue ? -value : value, date);
+                    }
+                    else
+                    {
+                        expenseToSave = expense;
+                        expenseToSave.setTitle(descriptionEditText.getText().toString());
+                        expenseToSave.setAmount(isRevenue ? -value : value);
+                        expenseToSave.setDate(date);
+                    }
+
+                    db.persistExpense(expenseToSave);
+
+                    setResult(RESULT_OK);
+                    finish();
+                }
+            }
+        });
+    }
+
+    /**
+     * Set revenue text view layout
+     */
+    private void setExpenseTypeTextViewLayout()
+    {
+        if( isRevenue )
+        {
+            expenseType.setText(R.string.income);
+            expenseType.setTextColor(ContextCompat.getColor(this, R.color.budget_green));
+        }
+        else
+        {
+            expenseType.setText(R.string.payment);
+            expenseType.setTextColor(ContextCompat.getColor(this, R.color.budget_red));
         }
     }
 
@@ -231,52 +273,17 @@ public class ExpenseEditActivity extends DBActivity
      */
     private void setUpTextFields()
     {
-        final TextView descriptionTextView = (TextView) findViewById(R.id.description_descriptor);
-        final TextView amountTextView = (TextView) findViewById(R.id.amount_descriptor);
-        amountTextView.setText(String.format(Locale.US, getResources().getString(R.string.amount), CurrencyHelper.getUserCurrency(this).getSymbol()));
+        ((TextInputLayout) findViewById(R.id.amount_inputlayout)).setHint(String.format(Locale.US, getResources().getString(R.string.amount), CurrencyHelper.getUserCurrency(this).getSymbol()));
 
         descriptionEditText = (EditText) findViewById(R.id.description_edittext);
-        descriptionEditText.setOnFocusChangeListener(new View.OnFocusChangeListener()
-        {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus)
-            {
-                if (hasFocus)
-                {
-                    descriptionTextView.setTextColor(ContextCompat.getColor(ExpenseEditActivity.this, R.color.accent));
-                    descriptionTextView.setTypeface(null, Typeface.BOLD);
-                }
-                else
-                {
-                    descriptionTextView.setTextColor(ContextCompat.getColor(ExpenseEditActivity.this, R.color.secondary_text));
-                    descriptionTextView.setTypeface(null, Typeface.NORMAL);
-                }
-            }
-        });
 
         if( expense != null )
         {
             descriptionEditText.setText(expense.getTitle());
+            descriptionEditText.setSelection(descriptionEditText.getText().length()); // Put focus at the end of the text
         }
 
         amountEditText = (EditText) findViewById(R.id.amount_edittext);
-        amountEditText.setOnFocusChangeListener(new View.OnFocusChangeListener()
-        {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus)
-            {
-                if (hasFocus)
-                {
-                    amountTextView.setTextColor(ContextCompat.getColor(ExpenseEditActivity.this, R.color.accent));
-                    amountTextView.setTypeface(null, Typeface.BOLD);
-                }
-                else
-                {
-                    amountTextView.setTextColor(ContextCompat.getColor(ExpenseEditActivity.this, R.color.secondary_text));
-                    amountTextView.setTypeface(null, Typeface.NORMAL);
-                }
-            }
-        });
 
         if( expense != null )
         {
@@ -290,7 +297,7 @@ public class ExpenseEditActivity extends DBActivity
     private void setUpDateButton()
     {
         dateButton = (Button) findViewById(R.id.date_button);
-        CompatHelper.removeButtonBorder(dateButton); // Remove border on lollipop
+        UIHelper.removeButtonBorder(dateButton); // Remove border on lollipop
 
         updateDateButtonDisplay();
 
