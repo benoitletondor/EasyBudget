@@ -3,6 +3,7 @@ package com.benoitletondor.easybudgetapp.view.selectcurrency;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -14,8 +15,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.benoitletondor.easybudgetapp.R;
+import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 
 import java.util.Currency;
+import java.util.List;
 
 /**
  * Fragment that contains UI for user to chose its currency.<br />
@@ -89,15 +92,28 @@ public class SelectCurrencyFragment extends DialogFragment
      *
      * @param v inflated view
      */
-    private void setupRecyclerView(View v)
+    private void setupRecyclerView(final View v)
     {
-        RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.select_currency_recycler_view);
+        final RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.select_currency_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(v.getContext()));
 
-        SelectCurrencyRecyclerViewAdapter adapter = new SelectCurrencyRecyclerViewAdapter();
-        recyclerView.setAdapter(adapter);
+        // Load available currencies asynchronously
+        new AsyncTask<Void, Void, List<Currency>>()
+        {
+            @Override
+            protected List<Currency> doInBackground(Void... voids)
+            {
+                return CurrencyHelper.getAvailableCurrencies();
+            }
 
-        // Scroll to currently selected currency
-        recyclerView.scrollToPosition(adapter.getSelectedCurrencyPosition(v.getContext()));
+            @Override
+            protected void onPostExecute(List<Currency> currencies)
+            {
+                SelectCurrencyRecyclerViewAdapter adapter = new SelectCurrencyRecyclerViewAdapter(currencies);
+                recyclerView.setAdapter(adapter);
+
+                recyclerView.scrollToPosition(adapter.getSelectedCurrencyPosition(v.getContext()));
+            }
+        }.execute();
     }
 }

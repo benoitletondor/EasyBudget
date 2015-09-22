@@ -17,6 +17,8 @@ import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import java.util.Currency;
 import java.util.List;
 
+import io.fabric.sdk.android.services.concurrency.AsyncTask;
+
 /**
  * View adapter for the Recycler view of the {@link SelectCurrencyFragment}
  *
@@ -27,7 +29,18 @@ public class SelectCurrencyRecyclerViewAdapter extends RecyclerView.Adapter<Sele
     /**
      * List of available currencies
      */
-    private final List<Currency> currencies = CurrencyHelper.getAvailableCurrencies();
+    private final List<Currency> currencies;
+
+// ---------------------------------------->
+
+    /**
+     *
+     * @param currencies
+     */
+    public SelectCurrencyRecyclerViewAdapter(@NonNull List<Currency> currencies)
+    {
+        this.currencies = currencies;
+    }
 
 // ---------------------------------------->
 
