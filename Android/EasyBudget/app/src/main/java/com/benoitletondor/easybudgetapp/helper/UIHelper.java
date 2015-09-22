@@ -8,14 +8,18 @@ import android.os.Build;
 import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewCompat;
+import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.AccelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.view.MainActivity;
 
 /**
@@ -64,22 +68,32 @@ public class UIHelper
      *
      * @return
      */
-    public static boolean willAnimateActivityEnter()
+    public static boolean isCompatibleWithActivityEnterAnimation()
     {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
     }
 
     /**
-     * Animate activity enter if compatible and then focus the given edit text
+     * Check if the os version is compatible with activity enter animations (Android 5+) && the
+     * activity contains the animation key
+     *
+     * @return
+     */
+    public static boolean willAnimateActivityEnter(Activity activity)
+    {
+        return isCompatibleWithActivityEnterAnimation() && activity.getIntent().getBooleanExtra(MainActivity.ANIMATE_TRANSITION_KEY, false);
+    }
+
+    /**
+     * Animate activity enter if compatible
      *
      * @param activity
-     * @param focusText
+     * @param listener
      */
-    public static void animateActivityEnterThenFocus(@NonNull final Activity activity, @NonNull final EditText focusText)
+    public static void animateActivityEnter(@NonNull final Activity activity, @NonNull final Animator.AnimatorListener listener)
     {
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP || !activity.getIntent().getBooleanExtra(MainActivity.ANIMATE_TRANSITION_KEY, false))
+        if( !willAnimateActivityEnter(activity) )
         {
-            setFocus(focusText);
             return;
         }
 
@@ -101,32 +115,7 @@ public class UIHelper
 
                     // create the animator for this view (the start radius is zero)
                     Animator anim = ViewAnimationUtils.createCircularReveal(activity.getWindow().getDecorView(), cx, cy, 0, finalRadius);
-                    anim.addListener(new Animator.AnimatorListener()
-                    {
-                        @Override
-                        public void onAnimationStart(Animator animation)
-                        {
-
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animator animation)
-                        {
-                            UIHelper.setFocus(focusText);
-                        }
-
-                        @Override
-                        public void onAnimationCancel(Animator animation)
-                        {
-
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animator animation)
-                        {
-
-                        }
-                    });
+                    anim.addListener(listener);
                     anim.start();
 
                     activity.getWindow().getDecorView().getViewTreeObserver().removeOnGlobalLayoutListener(this);
@@ -146,5 +135,21 @@ public class UIHelper
 
         InputMethodManager imm = (InputMethodManager) editText.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
+    }
+
+    /**
+     * Animate the FAB appearence (the FAB should be configured with scale & alpha to 0)
+     *
+     * @param fab
+     */
+    public static void animateFABAppear(@NonNull final View fab)
+    {
+        ViewCompat.animate(fab)
+            .scaleX(1.0f)
+            .scaleY(1.0f)
+            .alpha(1.0f)
+            .setInterpolator(new AccelerateInterpolator())
+            .withLayer()
+            .start();
     }
 }

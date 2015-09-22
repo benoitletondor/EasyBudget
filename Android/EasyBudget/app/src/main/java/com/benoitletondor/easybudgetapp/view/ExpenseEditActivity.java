@@ -1,13 +1,17 @@
 package com.benoitletondor.easybudgetapp.view;
 
+import android.animation.Animator;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
@@ -32,29 +36,33 @@ import java.util.Locale;
 public class ExpenseEditActivity extends DBActivity
 {
     /**
+     * Save floating action button
+     */
+    private FloatingActionButton fab;
+    /**
      * Edit text that contains the description
      */
-    private EditText descriptionEditText;
+    private EditText             descriptionEditText;
     /**
      * Edit text that contains the amount
      */
-    private EditText amountEditText;
+    private EditText             amountEditText;
     /**
      * Button for date selection
      */
-    private Button   dateButton;
+    private Button               dateButton;
     /**
      * Textview that displays the type of expense
      */
-    private TextView expenseType;
+    private TextView             expenseType;
     /**
      * Expense that is being edited (will be null if it's a new one)
      */
-    private Expense  expense;
+    private Expense              expense;
     /**
      * The date of the expense
      */
-    private Date     date;
+    private Date                 date;
     /**
      * Is the new expense a revenue
      */
@@ -90,7 +98,41 @@ public class ExpenseEditActivity extends DBActivity
 
         setResult(RESULT_CANCELED);
 
-        UIHelper.animateActivityEnterThenFocus(this, descriptionEditText);
+        if ( UIHelper.willAnimateActivityEnter(this) )
+        {
+            UIHelper.animateActivityEnter(this, new Animator.AnimatorListener()
+            {
+                @Override
+                public void onAnimationStart(Animator animation)
+                {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation)
+                {
+                    UIHelper.setFocus(descriptionEditText);
+                    UIHelper.animateFABAppear(fab);
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation)
+                {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation)
+                {
+
+                }
+            });
+        }
+        else
+        {
+            UIHelper.setFocus(descriptionEditText);
+            UIHelper.animateFABAppear(fab);
+        }
     }
 
 // ----------------------------------->
@@ -179,7 +221,8 @@ public class ExpenseEditActivity extends DBActivity
             setExpenseTypeTextViewLayout();
         }
 
-        findViewById(R.id.save_expense_fab).setOnClickListener(new View.OnClickListener()
+        fab = (FloatingActionButton) findViewById(R.id.save_expense_fab);
+        fab.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)

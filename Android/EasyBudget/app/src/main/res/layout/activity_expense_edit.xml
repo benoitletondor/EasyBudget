@@ -64,11 +64,11 @@
                         android:theme="@style/TextLabelDark" >
 
                         <EditText android:id="@+id/amount_edittext"
-                                  android:layout_width="match_parent"
-                                  android:layout_height="wrap_content"
-                                  android:textColor="@android:color/white"
-                                  android:textSize="16dp"
-                                  android:inputType="number"/>
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@android:color/white"
+                            android:textSize="16dp"
+                            android:inputType="number"/>
 
                     </android.support.design.widget.TextInputLayout>
 
@@ -85,6 +85,9 @@
                 android:layout_marginBottom="-5dp"
                 android:layout_marginRight="28dp"
                 android:src="@drawable/ic_save"
+                android:scaleX="0"
+                android:scaleY="0"
+                android:alpha="0"
                 app:backgroundTint="@color/fab_add_monthly_expense"/>
 
             <LinearLayout

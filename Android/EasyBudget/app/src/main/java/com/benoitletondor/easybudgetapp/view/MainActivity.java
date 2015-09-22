@@ -518,7 +518,7 @@ public class MainActivity extends DBActivity
                 startIntent.putExtra(CENTER_Y_KEY, (int) menu.getY() + (int) ((float) menu.getHeight() / 1.2f));
 
                 ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
-                if( UIHelper.willAnimateActivityEnter() )
+                if( UIHelper.isCompatibleWithActivityEnterAnimation() )
                 {
                     overridePendingTransition(0, 0);
                 }
