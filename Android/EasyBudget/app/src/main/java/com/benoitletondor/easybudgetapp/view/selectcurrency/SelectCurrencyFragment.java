@@ -3,9 +3,11 @@ package com.benoitletondor.easybudgetapp.view.selectcurrency;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.util.Pair;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,8 +16,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.benoitletondor.easybudgetapp.R;
+import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 
 import java.util.Currency;
+import java.util.List;
 
 /**
  * Fragment that contains UI for user to chose its currency.<br />
@@ -89,15 +93,27 @@ public class SelectCurrencyFragment extends DialogFragment
      *
      * @param v inflated view
      */
-    private void setupRecyclerView(View v)
+    private void setupRecyclerView(final View v)
     {
-        RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.select_currency_recycler_view);
+        final RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.select_currency_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(v.getContext()));
 
-        SelectCurrencyRecyclerViewAdapter adapter = new SelectCurrencyRecyclerViewAdapter();
-        recyclerView.setAdapter(adapter);
+        // Load available currencies asynchronously
+        new AsyncTask<Void, Void, Pair<SelectCurrencyRecyclerViewAdapter, Integer>>()
+        {
+            @Override
+            protected Pair<SelectCurrencyRecyclerViewAdapter, Integer> doInBackground(Void... voids)
+            {
+                SelectCurrencyRecyclerViewAdapter adapter = new SelectCurrencyRecyclerViewAdapter(CurrencyHelper.getAvailableCurrencies());
+                return Pair.create(adapter, adapter.getSelectedCurrencyPosition(getContext()));
+            }
 
-        // Scroll to currently selected currency
-        recyclerView.scrollToPosition(adapter.getSelectedCurrencyPosition(v.getContext()));
+            @Override
+            protected void onPostExecute(Pair<SelectCurrencyRecyclerViewAdapter, Integer> data)
+            {
+                recyclerView.setAdapter(data.first);
+                recyclerView.scrollToPosition(data.second);
+            }
+        }.execute();
     }
 }

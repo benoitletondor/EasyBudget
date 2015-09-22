@@ -15,7 +15,7 @@ import android.os.Bundle;
 import android.view.ViewAnimationUtils;
 
 import com.benoitletondor.easybudgetapp.R;
-import com.benoitletondor.easybudgetapp.helper.CompatHelper;
+import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
 import com.benoitletondor.easybudgetapp.helper.Parameters;
 import com.benoitletondor.easybudgetapp.view.welcome.Onboarding1Fragment;
@@ -114,7 +114,7 @@ public class WelcomeActivity extends AppCompatActivity
             public void onPageSelected(int position)
             {
                 OnboardingFragment fragment = (OnboardingFragment) ((FragmentStatePagerAdapter) pager.getAdapter()).getItem(position);
-                CompatHelper.setStatusBarColor(WelcomeActivity.this, fragment.getStatusBarColor());
+                UIHelper.setStatusBarColor(WelcomeActivity.this, fragment.getStatusBarColor());
 
                 setStep(position);
             }
@@ -177,12 +177,11 @@ public class WelcomeActivity extends AppCompatActivity
         int initialStep = getStep();
 
         // Init pager at the current step
-        pager.setCurrentItem(1, false); // Load step 1 for animation...
         pager.setCurrentItem(initialStep, false);
 
         // Set status bar color
         OnboardingFragment fragment = (OnboardingFragment) ((FragmentStatePagerAdapter) pager.getAdapter()).getItem(initialStep);
-        CompatHelper.setStatusBarColor(this, fragment.getStatusBarColor());
+        UIHelper.setStatusBarColor(this, fragment.getStatusBarColor());
     }
 
     @Override

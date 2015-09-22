@@ -16,6 +16,20 @@
         <item name="android:windowBackground">@android:color/white</item>
     </style>
 
+    <!-- Floating Label text -->
+    <style name="TextLabelDark" parent="AppTheme">
+        <item name="android:textColorHint">@android:color/white</item>
+        <item name="colorAccent">@android:color/white</item>
+        <item name="colorControlNormal">@android:color/white</item>
+        <item name="colorControlActivated">@android:color/white</item>
+    </style>
+
+    <!-- Expense switch -->
+    <style name="ExpenseSwitchTheme">
+        <item name="colorControlActivated">@color/budget_green</item>
+        <item name="colorSwitchThumbNormal">@color/budget_red</item>
+    </style>
+
     <!-- FAB style -->
     <style name="fab_labels_style">
         <item name="android:background">@drawable/fab_action_label_background</item>
