@@ -23,17 +23,29 @@ import com.benoitletondor.easybudgetapp.view.ExpenseEditActivity;
 import com.benoitletondor.easybudgetapp.view.MainActivity;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 /**
+ * Recycler view adapter to display expenses for a given date
+ *
  * @author Benoit LETONDOR
  */
 public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRecyclerViewAdapter.ViewHolder>
 {
-    private final List<Expense> expenses;
-    private final Date date;
-    private final Activity activity;
+    private List<Expense> expenses;
+    private Date date;
+    private Activity activity;
 
+// ------------------------------------------->
+
+    /**
+     * Instanciate an adapter for the given date
+     *
+     * @param activity
+     * @param db
+     * @param date
+     */
     public ExpensesRecyclerViewAdapter(@NonNull Activity activity, @NonNull DB db, @NonNull Date date)
     {
         this.activity = activity;
@@ -49,6 +61,57 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
     public Date getDate()
     {
         return date;
+    }
+
+    /**
+     * Set a new date to display
+     *
+     * @param date
+     * @param db
+     */
+    public void setDate(@NonNull Date date, @NonNull DB db)
+    {
+        this.date = date;
+        this.expenses = db.getExpensesForDay(date);
+        notifyDataSetChanged();
+    }
+
+    /**
+     * Remove given expense
+     *
+     * @param expense
+     * @return position of the deleted expense (-1 if not found)
+     */
+    public int removeExpense(Expense expense)
+    {
+        Iterator<Expense> expenseIterator = expenses.iterator();
+        int position = 0;
+        while( expenseIterator.hasNext() )
+        {
+            Expense shownExpense = expenseIterator.next();
+            if( shownExpense.getId().equals(expense.getId()) )
+            {
+                expenseIterator.remove();
+                notifyItemRemoved(position);
+                return position;
+            }
+
+            position++;
+        }
+
+        return -1;
+    }
+
+    /**
+     * Add an expense at the given position
+     *
+     * @param expense
+     * @param position
+     */
+    public void addExpense(Expense expense, int position)
+    {
+        expenses.add(position, expense);
+        notifyItemRangeInserted(position, 1);
     }
 
 // ------------------------------------------>

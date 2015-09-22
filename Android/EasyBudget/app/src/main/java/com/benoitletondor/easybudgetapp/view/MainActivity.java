@@ -70,7 +70,6 @@ public class MainActivity extends DBActivity
     private BroadcastReceiver receiver;
 
     private CalendarFragment            calendarFragment;
-    private RecyclerView                expensesRecyclerView;
     private ExpensesRecyclerViewAdapter expensesViewAdapter;
     private CoordinatorLayout           coordinatorLayout;
 
@@ -114,7 +113,9 @@ public class MainActivity extends DBActivity
 
                     if( db.deleteExpense(expense) )
                     {
-                        refreshAllForDate(expensesViewAdapter.getDate());
+                        final int position = expensesViewAdapter.removeExpense(expense);
+                        updateBalanceDisplayForDay(expensesViewAdapter.getDate());
+                        calendarFragment.refreshView();
 
                         Snackbar snackbar = Snackbar.make(coordinatorLayout, R.string.expense_delete_snackbar_text, Snackbar.LENGTH_LONG);
                         snackbar.setAction(R.string.cancel, new View.OnClickListener()
@@ -122,10 +123,11 @@ public class MainActivity extends DBActivity
                             @Override
                             public void onClick(View v)
                             {
-                                expense.setId(null); // Reset ID to re-insert the expense (avoid update)
-                                db.persistExpense(expense);
+                                db.persistExpense(expense, true);
 
-                                refreshAllForDate(expensesViewAdapter.getDate());
+                                expensesViewAdapter.addExpense(expense, position);
+                                updateBalanceDisplayForDay(expensesViewAdapter.getDate());
+                                calendarFragment.refreshView();
                             }
                         });
 
@@ -176,9 +178,9 @@ public class MainActivity extends DBActivity
             calendarFragment.saveStatesToKey(outState, CALENDAR_SAVED_STATE);
         }
 
-        if( expensesRecyclerView.getAdapter() != null && (expensesRecyclerView.getAdapter() instanceof ExpensesRecyclerViewAdapter) )
+        if( expensesViewAdapter != null  )
         {
-            outState.putSerializable(RECYCLE_VIEW_SAVED_DATE, ((ExpensesRecyclerViewAdapter) expensesRecyclerView.getAdapter()).getDate());
+            outState.putSerializable(RECYCLE_VIEW_SAVED_DATE, expensesViewAdapter.getDate());
         }
 
         super.onSaveInstanceState(outState);
@@ -532,7 +534,7 @@ public class MainActivity extends DBActivity
         /*
          * Expense Recycler view
          */
-        expensesRecyclerView = (RecyclerView) findViewById(R.id.expensesRecyclerView);
+        RecyclerView expensesRecyclerView = (RecyclerView) findViewById(R.id.expensesRecyclerView);
         expensesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         Date date = new Date();
@@ -545,14 +547,15 @@ public class MainActivity extends DBActivity
             }
         }
 
-        refreshRecyclerViewForDate(date);
+        expensesViewAdapter = new ExpensesRecyclerViewAdapter(this, db, date);
+        expensesRecyclerView.setAdapter(expensesViewAdapter);
+
         updateBalanceDisplayForDay(date);
     }
 
     private void refreshRecyclerViewForDate(@NonNull Date date)
     {
-        expensesViewAdapter = new ExpensesRecyclerViewAdapter(this, db, date);
-        expensesRecyclerView.setAdapter(expensesViewAdapter);
+        expensesViewAdapter.setDate(date, db);
     }
 
     private void refreshAllForDate(@NonNull Date date)
