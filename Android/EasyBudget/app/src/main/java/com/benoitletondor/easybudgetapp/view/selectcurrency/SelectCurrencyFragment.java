@@ -112,7 +112,11 @@ public class SelectCurrencyFragment extends DialogFragment
             protected void onPostExecute(Pair<SelectCurrencyRecyclerViewAdapter, Integer> data)
             {
                 recyclerView.setAdapter(data.first);
-                recyclerView.scrollToPosition(data.second);
+
+                if( data.second > 1 )
+                {
+                    recyclerView.scrollToPosition(data.second-1);
+                }
             }
         }.execute();
     }
