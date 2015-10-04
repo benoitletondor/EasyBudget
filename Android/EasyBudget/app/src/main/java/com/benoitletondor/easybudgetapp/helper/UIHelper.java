@@ -116,6 +116,7 @@ public class UIHelper
                     // create the animator for this view (the start radius is zero)
                     Animator anim = ViewAnimationUtils.createCircularReveal(activity.getWindow().getDecorView(), cx, cy, 0, finalRadius);
                     anim.addListener(listener);
+                    anim.setDuration(1000);
                     anim.start();
 
                     activity.getWindow().getDecorView().getViewTreeObserver().removeOnGlobalLayoutListener(this);
