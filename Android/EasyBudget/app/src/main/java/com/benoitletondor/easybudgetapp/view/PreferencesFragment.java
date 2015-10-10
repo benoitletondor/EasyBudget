@@ -64,6 +64,21 @@ public class PreferencesFragment extends PreferenceFragment
         });
 
         /*
+         * Show welcome screen button
+         */
+        findPreference(getResources().getString(R.string.setting_category_show_welcome_screen_button_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+        {
+            @Override
+            public boolean onPreferenceClick(Preference preference)
+            {
+                LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(new Intent(MainActivity.INTENT_SHOW_WELCOME_SCREEN));
+
+                getActivity().finish();
+                return false;
+            }
+        });
+
+        /*
          * Currency change button
          */
         final Preference currencyPreference = findPreference(getResources().getString(R.string.setting_category_currency_change_button_key));
@@ -108,7 +123,7 @@ public class PreferencesFragment extends PreferenceFragment
      */
     private void setCurrencyPreferenceTitle(Preference currencyPreference)
     {
-        currencyPreference.setTitle(String.format(Locale.US, getResources().getString(R.string.setting_category_currency_change_button_title), CurrencyHelper.getUserCurrency(getActivity()).getSymbol()));
+        currencyPreference.setTitle(getResources().getString(R.string.setting_category_currency_change_button_title, CurrencyHelper.getUserCurrency(getActivity()).getSymbol()));
     }
 
     @Override

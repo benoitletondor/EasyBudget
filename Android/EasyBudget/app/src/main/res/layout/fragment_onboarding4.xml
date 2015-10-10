@@ -2,14 +2,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/onboarding_1_background"
+    android:background="@color/onboarding_4_background"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context=".view.welcome.Onboarding1Fragment">
+    tools:context=".view.welcome.Onboarding3Fragment">
 
-    <ScrollView android:id="@+id/onboarding_screen1_top_layout"
+    <ScrollView android:id="@+id/onboarding_screen4_top_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="85dp">
@@ -22,53 +22,61 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@mipmap/ic_launcher"
+                android:src="@drawable/ic_check_white_48dp"
                 android:layout_gravity="center_horizontal" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:textSize="40dp"
-                android:textColor="@android:color/white"
-                android:text="Welcome to EasyBudget beta"
-                android:gravity="center_horizontal" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="60dp"
-                android:textSize="15dp"
-                android:textColor="@android:color/white"
-                android:text="The concept is quite simple: you just enter your expenses (one time and monthly recurring ones) and the app takes care of letting you know exactly how much money you have and you'll have at a given day.\nSimple as that."
-                android:gravity="center_horizontal" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="40dp"
                 android:textSize="30dp"
                 android:textColor="@android:color/white"
-                android:text="Ready?"
+                android:text="All set!"
                 android:gravity="center_horizontal" />
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:textSize="20dp"
+                android:text="Next steps are:"
+                android:textColor="@android:color/white"
+                android:gravity="center_horizontal" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:textSize="17dp"
+                android:text="- Add monthly reccuring expenses and incomes (salary, rent, bills...)\n- Think about adding one time expenses during the day"
+                android:textColor="@android:color/white" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20dp"
+                android:text="Thank you for trying EasyBudget, any feedback welcome :)"
+                android:textColor="@android:color/white"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="50dp" />
 
         </LinearLayout>
 
     </ScrollView>
 
-
-    <Button android:id="@+id/onboarding_screen1_next_button"
+    <Button android:id="@+id/onboarding_screen4_next_button"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
-        android:text="Next"
         android:gravity="center"
         android:textSize="20dp"
         android:paddingLeft="30dp"
         android:paddingRight="30dp"
+        android:text="Done"
         android:layout_marginBottom="15dp"
         android:textColor="@android:color/white"
         android:background="@drawable/welcome_screen_next_button_1_drawable"
-        android:layout_below="@id/onboarding_screen1_top_layout"
+        android:layout_below="@id/onboarding_screen4_top_layout"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="-55dp"/>
 

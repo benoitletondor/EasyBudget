@@ -23,7 +23,7 @@ import hirondelle.date4j.DateTime;
  */
 public class CalendarGridAdapter extends CaldroidGridAdapter
 {
-    private final DB db;
+    private final DB       db;
 
 // ----------------------------------->
 
@@ -45,15 +45,9 @@ public class CalendarGridAdapter extends CaldroidGridAdapter
 // ----------------------------------->
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent)
+    public View getView(int position, View convertView, final ViewGroup parent)
     {
-        View cellView = convertView;
-
-        // For reuse
-        if (convertView == null)
-        {
-            cellView = createView(parent);
-        }
+        final View cellView = convertView == null ? createView(parent) : convertView;
 
         ViewData viewData = (ViewData) cellView.getTag();
 
@@ -161,7 +155,7 @@ public class CalendarGridAdapter extends CaldroidGridAdapter
                 }
             }
 
-            Date date = new Date(dateTime.getMilliseconds(TimeZone.getTimeZone("UTC")));
+            final Date date = new Date(dateTime.getMilliseconds(TimeZone.getTimeZone("UTC")));
             if( db.hasExpensesForDay(date) )
             {
                 int balance = db.getBalanceForDay(date);

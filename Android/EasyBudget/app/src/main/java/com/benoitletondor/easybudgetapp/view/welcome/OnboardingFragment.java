@@ -3,10 +3,13 @@ package com.benoitletondor.easybudgetapp.view.welcome;
 import android.content.Intent;
 import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 
+import com.benoitletondor.easybudgetapp.model.db.DB;
 import com.benoitletondor.easybudgetapp.view.WelcomeActivity;
 
 /**
@@ -16,6 +19,23 @@ import com.benoitletondor.easybudgetapp.view.WelcomeActivity;
  */
 public abstract class OnboardingFragment extends Fragment
 {
+    /**
+     * Get a DB connexion if available
+     *
+     * @return a db connexion if available, which will always be the case if we are in the Welcome Activity
+     */
+    @Nullable
+    protected DB getDB()
+    {
+        FragmentActivity activity = getActivity();
+        if( activity instanceof WelcomeActivity )
+        {
+            return ((WelcomeActivity) activity).getDB();
+        }
+
+        return null;
+    }
+
     /**
      * Go to the next onboarding step without animation
      */

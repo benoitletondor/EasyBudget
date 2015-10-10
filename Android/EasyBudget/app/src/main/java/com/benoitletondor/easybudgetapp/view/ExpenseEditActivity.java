@@ -273,7 +273,7 @@ public class ExpenseEditActivity extends DBActivity
      */
     private void setUpTextFields()
     {
-        ((TextInputLayout) findViewById(R.id.amount_inputlayout)).setHint(String.format(Locale.US, getResources().getString(R.string.amount), CurrencyHelper.getUserCurrency(this).getSymbol()));
+        ((TextInputLayout) findViewById(R.id.amount_inputlayout)).setHint(getResources().getString(R.string.amount, CurrencyHelper.getUserCurrency(this).getSymbol()));
 
         descriptionEditText = (EditText) findViewById(R.id.description_edittext);
 

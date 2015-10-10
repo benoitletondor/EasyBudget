@@ -49,7 +49,6 @@ import com.roomorama.caldroid.CaldroidListener;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 /**
  * Main activity containing Calendar and List of expenses
@@ -60,8 +59,10 @@ public class MainActivity extends DBActivity
 {
     public static final int ADD_EXPENSE_ACTIVITY_CODE = 101;
     public static final int MANAGE_MONTHLY_EXPENSE_ACTIVITY_CODE = 102;
+    public static final int WELCOME_SCREEN_ACTIVITY_CODE = 103;
     public static final String INTENT_EXPENSE_DELETED = "intent.expense.deleted";
     public static final String INTENT_MONTHLY_EXPENSE_DELETED = "intent.expense.monthly.deleted";
+    public static final String INTENT_SHOW_WELCOME_SCREEN = "intent.welcomscreen.show";
 
     public final static String ANIMATE_TRANSITION_KEY = "animate";
     public final static String CENTER_X_KEY           = "centerX";
@@ -87,7 +88,7 @@ public class MainActivity extends DBActivity
         if( Parameters.getInstance(this).getInt(ParameterKeys.ONBOARDING_STEP, -1) != WelcomeActivity.STEP_COMPLETED )
         {
             Intent startIntent = new Intent(this, WelcomeActivity.class);
-            ActivityCompat.startActivity(this, startIntent, null);
+            ActivityCompat.startActivityForResult(this, startIntent, WELCOME_SCREEN_ACTIVITY_CODE, null);
         }
 
         super.onCreate(savedInstanceState);
@@ -104,6 +105,7 @@ public class MainActivity extends DBActivity
         filter.addAction(INTENT_EXPENSE_DELETED);
         filter.addAction(INTENT_MONTHLY_EXPENSE_DELETED);
         filter.addAction(SelectCurrencyFragment.CURRENCY_SELECTED_INTENT);
+        filter.addAction(INTENT_SHOW_WELCOME_SCREEN);
 
         receiver = new BroadcastReceiver()
         {
@@ -159,6 +161,11 @@ public class MainActivity extends DBActivity
                 {
                     refreshAllForDate(expensesViewAdapter.getDate());
                 }
+                else if( INTENT_SHOW_WELCOME_SCREEN.equals(intent.getAction()) )
+                {
+                    Intent startIntent = new Intent(MainActivity.this, WelcomeActivity.class);
+                    ActivityCompat.startActivityForResult(MainActivity.this, startIntent, WELCOME_SCREEN_ACTIVITY_CODE, null);
+                }
             }
         };
 
@@ -199,6 +206,17 @@ public class MainActivity extends DBActivity
             if( resultCode == RESULT_OK )
             {
                 refreshAllForDate(calendarFragment.getSelectedDate());
+            }
+        }
+        else if( requestCode == WELCOME_SCREEN_ACTIVITY_CODE )
+        {
+            if( resultCode == RESULT_OK )
+            {
+                refreshAllForDate(calendarFragment.getSelectedDate());
+            }
+            else if( resultCode == RESULT_CANCELED )
+            {
+                finish(); // Finish activity if welcome screen is finish via back button
             }
         }
     }
@@ -273,7 +291,7 @@ public class MainActivity extends DBActivity
                     dialog.dismiss();
 
                     //Show snackbar
-                    Snackbar snackbar = Snackbar.make(coordinatorLayout, String.format(getResources().getString(R.string.adjust_balance_snackbar_text), CurrencyHelper.getFormattedCurrencyString(MainActivity.this, newBalance)), Snackbar.LENGTH_LONG);
+                    Snackbar snackbar = Snackbar.make(coordinatorLayout, getResources().getString(R.string.adjust_balance_snackbar_text, CurrencyHelper.getFormattedCurrencyString(MainActivity.this, newBalance)), Snackbar.LENGTH_LONG);
                     snackbar.setAction(R.string.cancel, new View.OnClickListener()
                     {
                         @Override
@@ -322,7 +340,7 @@ public class MainActivity extends DBActivity
     {
         int balance = - db.getBalanceForDay(day);
 
-        budgetLine.setText(String.format(Locale.US, getResources().getString(R.string.account_balance_format), CurrencyHelper.getFormattedCurrencyString(this, balance)));
+        budgetLine.setText(getResources().getString(R.string.account_balance_format, CurrencyHelper.getFormattedCurrencyString(this, balance)));
 
         if( balance <= 0 )
         {
@@ -377,6 +395,27 @@ public class MainActivity extends DBActivity
             {
                 calendarFragment.setSelectedDates(date, date);
                 refreshAllForDate(date);
+            }
+
+            @Override
+            public void onLongClickDate(Date date, View view) // Add expense on long press
+            {
+                Intent startIntent = new Intent(MainActivity.this, ExpenseEditActivity.class);
+                startIntent.putExtra("date", date);
+
+                // Get the absolute location on window for Y value
+                int viewLocation[] = new int[2];
+                view.getLocationInWindow(viewLocation);
+
+                startIntent.putExtra(ANIMATE_TRANSITION_KEY, true);
+                startIntent.putExtra(CENTER_X_KEY, (int) view.getX() + view.getWidth() / 2);
+                startIntent.putExtra(CENTER_Y_KEY, viewLocation[1] + view.getHeight() / 2);
+
+                ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
+                if (UIHelper.isCompatibleWithActivityEnterAnimation())
+                {
+                    MainActivity.this.overridePendingTransition(0, 0);
+                }
             }
 
             @Override
