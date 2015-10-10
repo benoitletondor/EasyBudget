@@ -9,6 +9,62 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context=".view.welcome.Onboarding3Fragment">
 
+    <ScrollView android:id="@+id/onboarding_screen4_top_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="85dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_check_white_48dp"
+                android:layout_gravity="center_horizontal" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textSize="30dp"
+                android:textColor="@android:color/white"
+                android:text="All set!"
+                android:gravity="center_horizontal" />
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:textSize="20dp"
+                android:text="Next steps are:"
+                android:textColor="@android:color/white"
+                android:gravity="center_horizontal" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:textSize="17dp"
+                android:text="- Add monthly reccuring expenses and incomes (salary, rent, bills...)\n- Think about adding one time expenses during the day"
+                android:textColor="@android:color/white" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20dp"
+                android:text="Thank you for trying EasyBudget, any feedback welcome :)"
+                android:textColor="@android:color/white"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="50dp" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
     <Button android:id="@+id/onboarding_screen4_next_button"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
@@ -20,67 +76,8 @@
         android:layout_marginBottom="15dp"
         android:textColor="@android:color/white"
         android:background="@drawable/welcome_screen_next_button_1_drawable"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"/>
-
-    <TextView android:id="@+id/onboarding_screen4_thankyou"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="20dp"
-        android:text="Thank you for trying EasyBudget, any feedback welcome :)"
-        android:textColor="@android:color/white"
-        android:gravity="center_horizontal"
-        android:layout_above="@id/onboarding_screen4_next_button"
-        android:layout_marginBottom="20dp" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/onboarding_screen4_thankyou"
-        android:paddingBottom="30dp"
-        android:orientation="vertical">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_check_white_48dp"
-            android:layout_gravity="center_horizontal" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:textSize="30dp"
-            android:textColor="@android:color/white"
-            android:text="All set!"
-            android:gravity="center_horizontal" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:textSize="20dp"
-            android:text="Other onboarding screens will come in future versions."
-            android:textColor="@android:color/white"
-            android:gravity="center_horizontal" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:textSize="20dp"
-            android:text="Next steps are:"
-            android:textColor="@android:color/white"
-            android:gravity="center_horizontal" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:textSize="17dp"
-            android:text="- Set the current balance of your account\n- Add monthly reccuring expenses and incomes (salary, rent, bills...)\n- Think about adding one time expenses during the day"
-            android:textColor="@android:color/white" />
-
-    </LinearLayout>
+        android:layout_below="@id/onboarding_screen4_top_layout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="-55dp"/>
 
 </RelativeLayout>
