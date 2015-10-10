@@ -1,10 +1,7 @@
 package com.benoitletondor.easybudgetapp.view.main.calendar;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,11 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.benoitletondor.easybudgetapp.R;
-import com.benoitletondor.easybudgetapp.helper.Logger;
-import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.model.db.DB;
-import com.benoitletondor.easybudgetapp.view.ExpenseEditActivity;
-import com.benoitletondor.easybudgetapp.view.MainActivity;
 import com.roomorama.caldroid.CaldroidGridAdapter;
 
 import java.util.Date;
@@ -202,41 +195,6 @@ public class CalendarGridAdapter extends CaldroidGridAdapter
 
                 viewData.containsExpenses = false;
             }
-
-            // Add long press listener that opens add expense view
-            cellView.setOnLongClickListener(new View.OnLongClickListener()
-            {
-                @Override
-                public boolean onLongClick(View v)
-                {
-                    if( !(v.getContext() instanceof Activity) )
-                    {
-                        return false;
-                    }
-
-                    Activity activity = (Activity) v.getContext();
-
-                    Intent startIntent = new Intent(activity, ExpenseEditActivity.class);
-                    startIntent.putExtra("date", date);
-
-                    // Get the absolute location on window for Y value
-                    int viewLocation[] = new int[2];
-                    v.getLocationInWindow(viewLocation);
-
-                    startIntent.putExtra(MainActivity.ANIMATE_TRANSITION_KEY, true);
-                    startIntent.putExtra(MainActivity.CENTER_X_KEY, (int) v.getX() + v.getWidth() / 2);
-                    startIntent.putExtra(MainActivity.CENTER_Y_KEY, viewLocation[1] + v.getHeight() / 2);
-
-                    ActivityCompat.startActivityForResult(activity, startIntent, MainActivity.ADD_EXPENSE_ACTIVITY_CODE, null);
-                    if (UIHelper.isCompatibleWithActivityEnterAnimation())
-                    {
-                        activity.overridePendingTransition(0, 0);
-                    }
-
-                    return true;
-                }
-            });
-
         }
 
         cellView.setTag(viewData);

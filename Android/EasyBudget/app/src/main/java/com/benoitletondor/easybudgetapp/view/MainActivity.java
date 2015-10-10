@@ -49,7 +49,6 @@ import com.roomorama.caldroid.CaldroidListener;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 /**
  * Main activity containing Calendar and List of expenses
@@ -378,6 +377,27 @@ public class MainActivity extends DBActivity
             {
                 calendarFragment.setSelectedDates(date, date);
                 refreshAllForDate(date);
+            }
+
+            @Override
+            public void onLongClickDate(Date date, View view) // Add expense on long press
+            {
+                Intent startIntent = new Intent(MainActivity.this, ExpenseEditActivity.class);
+                startIntent.putExtra("date", date);
+
+                // Get the absolute location on window for Y value
+                int viewLocation[] = new int[2];
+                view.getLocationInWindow(viewLocation);
+
+                startIntent.putExtra(ANIMATE_TRANSITION_KEY, true);
+                startIntent.putExtra(CENTER_X_KEY, (int) view.getX() + view.getWidth() / 2);
+                startIntent.putExtra(CENTER_Y_KEY, viewLocation[1] + view.getHeight() / 2);
+
+                ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
+                if (UIHelper.isCompatibleWithActivityEnterAnimation())
+                {
+                    MainActivity.this.overridePendingTransition(0, 0);
+                }
             }
 
             @Override
