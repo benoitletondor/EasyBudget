@@ -201,11 +201,22 @@ public class MainActivity extends DBActivity
     {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if( requestCode == ADD_EXPENSE_ACTIVITY_CODE || requestCode == MANAGE_MONTHLY_EXPENSE_ACTIVITY_CODE || requestCode == WELCOME_SCREEN_ACTIVITY_CODE )
+        if( requestCode == ADD_EXPENSE_ACTIVITY_CODE || requestCode == MANAGE_MONTHLY_EXPENSE_ACTIVITY_CODE )
         {
             if( resultCode == RESULT_OK )
             {
                 refreshAllForDate(calendarFragment.getSelectedDate());
+            }
+        }
+        else if( requestCode == WELCOME_SCREEN_ACTIVITY_CODE )
+        {
+            if( resultCode == RESULT_OK )
+            {
+                refreshAllForDate(calendarFragment.getSelectedDate());
+            }
+            else if( resultCode == RESULT_CANCELED )
+            {
+                finish(); // Finish activity if welcome screen is finish via back button
             }
         }
     }

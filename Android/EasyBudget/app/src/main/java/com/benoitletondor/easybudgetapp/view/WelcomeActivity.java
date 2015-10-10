@@ -205,9 +205,11 @@ public class WelcomeActivity extends DBActivity
         if( pager.getCurrentItem() > 0 )
         {
             pager.setCurrentItem(pager.getCurrentItem()-1, true);
+            return;
         }
 
-        // Prevent back to leave activity
+        setResult(Activity.RESULT_CANCELED);
+        finish();
     }
 
     /**
