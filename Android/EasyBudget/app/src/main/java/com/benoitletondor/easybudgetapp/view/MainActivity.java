@@ -60,6 +60,7 @@ public class MainActivity extends DBActivity
 {
     public static final int ADD_EXPENSE_ACTIVITY_CODE = 101;
     public static final int MANAGE_MONTHLY_EXPENSE_ACTIVITY_CODE = 102;
+    public static final int WELCOME_SCREEN_ACTIVITY_CODE = 103;
     public static final String INTENT_EXPENSE_DELETED = "intent.expense.deleted";
     public static final String INTENT_MONTHLY_EXPENSE_DELETED = "intent.expense.monthly.deleted";
 
@@ -87,7 +88,7 @@ public class MainActivity extends DBActivity
         if( Parameters.getInstance(this).getInt(ParameterKeys.ONBOARDING_STEP, -1) != WelcomeActivity.STEP_COMPLETED )
         {
             Intent startIntent = new Intent(this, WelcomeActivity.class);
-            ActivityCompat.startActivity(this, startIntent, null);
+            ActivityCompat.startActivityForResult(this, startIntent, WELCOME_SCREEN_ACTIVITY_CODE, null);
         }
 
         super.onCreate(savedInstanceState);
@@ -194,7 +195,7 @@ public class MainActivity extends DBActivity
     {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if( requestCode == ADD_EXPENSE_ACTIVITY_CODE || requestCode == MANAGE_MONTHLY_EXPENSE_ACTIVITY_CODE )
+        if( requestCode == ADD_EXPENSE_ACTIVITY_CODE || requestCode == MANAGE_MONTHLY_EXPENSE_ACTIVITY_CODE || requestCode == WELCOME_SCREEN_ACTIVITY_CODE )
         {
             if( resultCode == RESULT_OK )
             {
@@ -273,7 +274,7 @@ public class MainActivity extends DBActivity
                     dialog.dismiss();
 
                     //Show snackbar
-                    Snackbar snackbar = Snackbar.make(coordinatorLayout, String.format(getResources().getString(R.string.adjust_balance_snackbar_text), CurrencyHelper.getFormattedCurrencyString(MainActivity.this, newBalance)), Snackbar.LENGTH_LONG);
+                    Snackbar snackbar = Snackbar.make(coordinatorLayout, getResources().getString(R.string.adjust_balance_snackbar_text, CurrencyHelper.getFormattedCurrencyString(MainActivity.this, newBalance)), Snackbar.LENGTH_LONG);
                     snackbar.setAction(R.string.cancel, new View.OnClickListener()
                     {
                         @Override
@@ -322,7 +323,7 @@ public class MainActivity extends DBActivity
     {
         int balance = - db.getBalanceForDay(day);
 
-        budgetLine.setText(String.format(Locale.US, getResources().getString(R.string.account_balance_format), CurrencyHelper.getFormattedCurrencyString(this, balance)));
+        budgetLine.setText(getResources().getString(R.string.account_balance_format, CurrencyHelper.getFormattedCurrencyString(this, balance)));
 
         if( balance <= 0 )
         {

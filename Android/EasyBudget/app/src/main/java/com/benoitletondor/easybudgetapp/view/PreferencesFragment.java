@@ -108,7 +108,7 @@ public class PreferencesFragment extends PreferenceFragment
      */
     private void setCurrencyPreferenceTitle(Preference currencyPreference)
     {
-        currencyPreference.setTitle(String.format(Locale.US, getResources().getString(R.string.setting_category_currency_change_button_title), CurrencyHelper.getUserCurrency(getActivity()).getSymbol()));
+        currencyPreference.setTitle(getResources().getString(R.string.setting_category_currency_change_button_title, CurrencyHelper.getUserCurrency(getActivity()).getSymbol()));
     }
 
     @Override

@@ -1,11 +1,13 @@
 package com.benoitletondor.easybudgetapp.view;
 
 import android.animation.Animator;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
@@ -18,9 +20,11 @@ import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
 import com.benoitletondor.easybudgetapp.helper.Parameters;
+import com.benoitletondor.easybudgetapp.model.db.DB;
 import com.benoitletondor.easybudgetapp.view.welcome.Onboarding1Fragment;
 import com.benoitletondor.easybudgetapp.view.welcome.Onboarding2Fragment;
 import com.benoitletondor.easybudgetapp.view.welcome.Onboarding3Fragment;
+import com.benoitletondor.easybudgetapp.view.welcome.Onboarding4Fragment;
 import com.benoitletondor.easybudgetapp.view.welcome.OnboardingFragment;
 
 /**
@@ -28,7 +32,7 @@ import com.benoitletondor.easybudgetapp.view.welcome.OnboardingFragment;
  *
  * @author Benoit LETONDOR
  */
-public class WelcomeActivity extends AppCompatActivity
+public class WelcomeActivity extends DBActivity
 {
     /**
      * Value used for the {@link com.benoitletondor.easybudgetapp.helper.ParameterKeys#ONBOARDING_STEP} when completed
@@ -91,6 +95,8 @@ public class WelcomeActivity extends AppCompatActivity
                         return new Onboarding2Fragment();
                     case 2:
                         return new Onboarding3Fragment();
+                    case 3:
+                        return new Onboarding4Fragment();
                 }
 
                 return null;
@@ -99,7 +105,7 @@ public class WelcomeActivity extends AppCompatActivity
             @Override
             public int getCount()
             {
-                return 3;
+                return 4;
             }
         });
         pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener()
@@ -167,6 +173,7 @@ public class WelcomeActivity extends AppCompatActivity
                 else if( PAGER_DONE_INTENT.equals(intent.getAction()) )
                 {
                     setStep(STEP_COMPLETED);
+                    WelcomeActivity.this.setResult(Activity.RESULT_OK);
                     finish();
                 }
             }
@@ -201,6 +208,17 @@ public class WelcomeActivity extends AppCompatActivity
         }
 
         // Prevent back to leave activity
+    }
+
+    /**
+     * Method that a child (fragment) can call to get the DB connexion
+     *
+     * @return the db connexion
+     */
+    @NonNull
+    public DB getDB()
+    {
+        return db;
     }
 
 // ------------------------------------>

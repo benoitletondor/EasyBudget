@@ -7,7 +7,69 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context=".view.welcome.Onboarding3Fragment">
+    tools:context=".view.welcome.Onboarding3Fragment"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
+    <ScrollView android:id="@+id/onboarding_screen_3_top_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="85dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="30dp"
+                android:textColor="@android:color/white"
+                android:text="Let's get to know each other"
+                android:gravity="center_horizontal" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:textSize="18dp"
+                android:text="Enter an initial amount of money: what you currently have on your account.\n(You can leave it and change it later)"
+                android:textColor="@android:color/white"
+                android:gravity="center_horizontal" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:orientation="horizontal"
+                android:maxWidth="300dp"
+                android:layout_marginLeft="60dp"
+                android:layout_marginRight="60dp">
+
+                <EditText android:id="@+id/onboarding_screen3_initial_amount_et"
+                          android:layout_width="0dip"
+                          android:layout_weight="1.0"
+                          android:layout_height="wrap_content"
+                          android:background="@android:color/white"
+                          android:maxLines="1"
+                          android:textSize="30dp"
+                          android:padding="5dp"
+                          android:inputType="number"/>
+
+                <TextView android:id="@+id/onboarding_screen3_initial_amount_money_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="10dp"
+                    android:textSize="30dp"
+                    android:textColor="@android:color/white"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
 
     <Button android:id="@+id/onboarding_screen3_next_button"
         android:layout_width="wrap_content"
@@ -16,71 +78,12 @@
         android:textSize="20dp"
         android:paddingLeft="30dp"
         android:paddingRight="30dp"
-        android:text="Done"
         android:layout_marginBottom="15dp"
         android:textColor="@android:color/white"
-        android:background="@drawable/welcome_screen_next_button_1_drawable"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"/>
-
-    <TextView android:id="@+id/onboarding_screen3_thankyou"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="20dp"
-        android:text="Thank you for trying EasyBudget, any feedback welcome :)"
-        android:textColor="@android:color/white"
-        android:gravity="center_horizontal"
-        android:layout_above="@id/onboarding_screen3_next_button"
-        android:layout_marginBottom="20dp" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/onboarding_screen3_thankyou"
-        android:paddingBottom="30dp"
-        android:orientation="vertical">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_check_white_48dp"
-            android:layout_gravity="center_horizontal" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:textSize="30dp"
-            android:textColor="@android:color/white"
-            android:text="All set!"
-            android:gravity="center_horizontal" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:textSize="20dp"
-            android:text="Other onboarding screens will come in future versions."
-            android:textColor="@android:color/white"
-            android:gravity="center_horizontal" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:textSize="20dp"
-            android:text="Next steps are:"
-            android:textColor="@android:color/white"
-            android:gravity="center_horizontal" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:textSize="17dp"
-            android:text="- Set the current balance of your account\n- Add monthly reccuring expenses and incomes (salary, rent, bills...)\n- Think about adding one time expenses during the day"
-            android:textColor="@android:color/white" />
-
-    </LinearLayout>
+        android:background="@drawable/welcome_screen_next_button_2_drawable"
+        android:layout_below="@id/onboarding_screen_3_top_layout"
+        android:layout_centerHorizontal="true"
+        android:textAllCaps="false"
+        android:layout_marginTop="-55dp"/>
 
 </RelativeLayout>

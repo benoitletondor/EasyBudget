@@ -20,7 +20,7 @@ import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragme
 import java.util.Currency;
 
 /**
- * Onboarding step 1 fragment
+ * Onboarding step 2 fragment
  *
  * @author Benoit LETONDOR
  */
@@ -55,7 +55,7 @@ public class Onboarding2Fragment extends OnboardingFragment
             @Override
             public void onClick(View v)
             {
-                next(v);
+                next();
             }
         });
 
