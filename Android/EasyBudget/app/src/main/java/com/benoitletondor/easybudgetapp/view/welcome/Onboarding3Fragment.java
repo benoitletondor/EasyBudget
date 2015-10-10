@@ -1,6 +1,7 @@
 package com.benoitletondor.easybudgetapp.view.welcome;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.text.Editable;
@@ -8,12 +9,14 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
+import com.benoitletondor.easybudgetapp.helper.Logger;
 import com.benoitletondor.easybudgetapp.model.Expense;
 import com.benoitletondor.easybudgetapp.model.db.DB;
 
@@ -93,16 +96,24 @@ public class Onboarding3Fragment extends OnboardingFragment
                     int currentBalance = db.getBalanceForDay(new Date());
                     int newBalance = Integer.valueOf(amountEditText.getText().toString());
 
-                    if (newBalance == currentBalance)
+                    if (newBalance != currentBalance)
                     {
-                        // Nothing to do, balance hasn't change
-                        return;
+                        int diff = newBalance - currentBalance;
+
+                        final Expense expense = new Expense(getResources().getString(R.string.adjust_balance_expense_title), -diff, new Date());
+                        db.persistExpense(expense);
                     }
+                }
 
-                    int diff = newBalance - currentBalance;
-
-                    final Expense expense = new Expense(getResources().getString(R.string.adjust_balance_expense_title), -diff, new Date());
-                    db.persistExpense(expense);
+                // Hide keyboard
+                try
+                {
+                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(amountEditText.getWindowToken(), 0);
+                }
+                catch(Exception e)
+                {
+                    Logger.error("Error while hiding keyboard", e);
                 }
 
                 next(v);
