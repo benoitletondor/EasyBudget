@@ -62,6 +62,7 @@ public class MainActivity extends DBActivity
     public static final int WELCOME_SCREEN_ACTIVITY_CODE = 103;
     public static final String INTENT_EXPENSE_DELETED = "intent.expense.deleted";
     public static final String INTENT_MONTHLY_EXPENSE_DELETED = "intent.expense.monthly.deleted";
+    public static final String INTENT_SHOW_WELCOME_SCREEN = "intent.welcomscreen.show";
 
     public final static String ANIMATE_TRANSITION_KEY = "animate";
     public final static String CENTER_X_KEY           = "centerX";
@@ -104,6 +105,7 @@ public class MainActivity extends DBActivity
         filter.addAction(INTENT_EXPENSE_DELETED);
         filter.addAction(INTENT_MONTHLY_EXPENSE_DELETED);
         filter.addAction(SelectCurrencyFragment.CURRENCY_SELECTED_INTENT);
+        filter.addAction(INTENT_SHOW_WELCOME_SCREEN);
 
         receiver = new BroadcastReceiver()
         {
@@ -158,6 +160,11 @@ public class MainActivity extends DBActivity
                 else if( SelectCurrencyFragment.CURRENCY_SELECTED_INTENT.equals(intent.getAction()) )
                 {
                     refreshAllForDate(expensesViewAdapter.getDate());
+                }
+                else if( INTENT_SHOW_WELCOME_SCREEN.equals(intent.getAction()) )
+                {
+                    Intent startIntent = new Intent(MainActivity.this, WelcomeActivity.class);
+                    ActivityCompat.startActivityForResult(MainActivity.this, startIntent, WELCOME_SCREEN_ACTIVITY_CODE, null);
                 }
             }
         };

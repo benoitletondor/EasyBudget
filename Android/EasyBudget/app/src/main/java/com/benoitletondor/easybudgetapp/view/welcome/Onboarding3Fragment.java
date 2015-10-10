@@ -55,7 +55,7 @@ public class Onboarding3Fragment extends OnboardingFragment
         int amount = 0;
         if( db != null )
         {
-            amount = db.getBalanceForDay(new Date());
+            amount = -db.getBalanceForDay(new Date());
         }
 
         moneyTextView = (TextView) v.findViewById(R.id.onboarding_screen3_initial_amount_money_tv);
@@ -93,8 +93,8 @@ public class Onboarding3Fragment extends OnboardingFragment
                 DB db = getDB();
                 if (db != null)
                 {
-                    int currentBalance = db.getBalanceForDay(new Date());
-                    int newBalance = Integer.valueOf(amountEditText.getText().toString());
+                    int currentBalance = -db.getBalanceForDay(new Date());
+                    int newBalance = getAmountValue();
 
                     if (newBalance != currentBalance)
                     {
@@ -152,12 +152,17 @@ public class Onboarding3Fragment extends OnboardingFragment
         }
     }
 
+    private int getAmountValue()
+    {
+        String valueString = amountEditText.getText().toString();
+        return ("".equals(valueString) || "-".equals(valueString)) ? 0 : Integer.parseInt(valueString);
+    }
+
     private void setButtonText()
     {
         if( nextButton != null )
         {
-            String valueString = amountEditText.getText().toString();
-            int value = "".equals(valueString) ? 0 : Integer.valueOf(valueString);
+            int value = getAmountValue();
 
             nextButton.setText(getActivity().getString(R.string.onboarding_start_with_amount, CurrencyHelper.getFormattedCurrencyString(getActivity(), value)));
         }
