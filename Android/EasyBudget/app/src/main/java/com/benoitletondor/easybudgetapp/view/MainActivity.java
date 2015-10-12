@@ -11,6 +11,7 @@ import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -78,6 +79,8 @@ public class MainActivity extends DBActivity
     private CoordinatorLayout           coordinatorLayout;
 
     private TextView budgetLine;
+    @Nullable
+    private Date lastStopDate;
 
 // ------------------------------------------>
 
@@ -170,6 +173,37 @@ public class MainActivity extends DBActivity
         };
 
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver, filter);
+    }
+
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+
+        // If the last stop happened yesterday (or another day), set and refresh to the current date
+        if( lastStopDate != null )
+        {
+            Calendar cal = Calendar.getInstance();
+            int currentDay = cal.get(Calendar.DAY_OF_YEAR);
+
+            cal.setTime(lastStopDate);
+            int lastStopDay = cal.get(Calendar.DAY_OF_YEAR);
+
+            if( currentDay != lastStopDay )
+            {
+                refreshAllForDate(new Date());
+            }
+
+            lastStopDate = null;
+        }
+    }
+
+    @Override
+    protected void onStop()
+    {
+        lastStopDate = new Date();
+
+        super.onStop();
     }
 
     @Override
@@ -368,6 +402,7 @@ public class MainActivity extends DBActivity
 
             Date selectedDate = (Date) savedInstanceState.getSerializable(RECYCLE_VIEW_SAVED_DATE);
             calendarFragment.setSelectedDates(selectedDate, selectedDate);
+            lastStopDate = selectedDate; // Set last stop date that will be check on next onStart call
         }
         else
         {
@@ -620,6 +655,7 @@ public class MainActivity extends DBActivity
     {
         refreshRecyclerViewForDate(date);
         updateBalanceDisplayForDay(date);
+        calendarFragment.setSelectedDates(date, date);
         calendarFragment.refreshView();
     }
 
