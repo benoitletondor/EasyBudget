@@ -58,7 +58,7 @@
     <string name="monthly_expense_restore_error_title">Oops</string>
     <string name="monthly_expense_restore_error_message">An error occurred.</string>
     <string name="monthly_expense_delete_first_error_title">Oops</string>
-    <string name="monthly_expense_delete_first_error_message">This are no occurrence before this one.</string>
+    <string name="monthly_expense_delete_first_error_message">There are no occurrences before this one.</string>
 
     <string name="setting_category_bug_report_title">Debug</string>
     <string name="setting_category_bug_report_send_button_title">Get install identifier</string>
