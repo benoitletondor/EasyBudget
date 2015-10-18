@@ -11,6 +11,7 @@ import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -32,6 +33,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.benoitletondor.easybudgetapp.R;
+import com.benoitletondor.easybudgetapp.helper.Logger;
 import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
@@ -47,8 +49,10 @@ import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.roomorama.caldroid.CaldroidFragment;
 import com.roomorama.caldroid.CaldroidListener;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Main activity containing Calendar and List of expenses
@@ -78,6 +82,8 @@ public class MainActivity extends DBActivity
     private CoordinatorLayout           coordinatorLayout;
 
     private TextView budgetLine;
+    @Nullable
+    private Date lastStopDate;
 
 // ------------------------------------------>
 
@@ -148,14 +154,44 @@ public class MainActivity extends DBActivity
                 {
                     final Expense expense = (Expense) intent.getSerializableExtra("expense");
                     final MonthlyExpenseDeleteType deleteType = MonthlyExpenseDeleteType.fromValue(intent.getIntExtra("deleteType", MonthlyExpenseDeleteType.ALL.getValue()));
+                    final MonthlyExpense monthlyExpense = db.findMonthlyExpenseForId(expense.getMonthlyId());
 
                     if( deleteType == null )
                     {
-                        // TODO handle error
+                        showGenericMonthlyDeleteErrorDialog();
+                        Logger.error("INTENT_MONTHLY_EXPENSE_DELETED came with null delete type");
+
                         return;
                     }
 
-                    new DeleteMonthlyExpenseTask(expense, deleteType).execute();
+                    if( monthlyExpense == null )
+                    {
+                        showGenericMonthlyDeleteErrorDialog();
+                        Logger.error("INTENT_MONTHLY_EXPENSE_DELETED: Unable to retrieve monthly expense");
+
+                        return;
+                    }
+
+                    // Check that if the user wants to delete series before this one, there are actually series to delete
+                    if( deleteType == MonthlyExpenseDeleteType.TO && !db.hasExpensesForMonthlyExpenseBeforeDate(monthlyExpense, expense.getDate()) )
+                    {
+                        new AlertDialog.Builder(MainActivity.this)
+                            .setTitle(R.string.monthly_expense_delete_first_error_title)
+                            .setMessage(getResources().getString(R.string.monthly_expense_delete_first_error_message))
+                            .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .show();
+
+                        return;
+                    }
+
+                    new DeleteMonthlyExpenseTask(monthlyExpense, expense, deleteType).execute();
                 }
                 else if( SelectCurrencyFragment.CURRENCY_SELECTED_INTENT.equals(intent.getAction()) )
                 {
@@ -170,6 +206,37 @@ public class MainActivity extends DBActivity
         };
 
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver, filter);
+    }
+
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+
+        // If the last stop happened yesterday (or another day), set and refresh to the current date
+        if( lastStopDate != null )
+        {
+            Calendar cal = Calendar.getInstance();
+            int currentDay = cal.get(Calendar.DAY_OF_YEAR);
+
+            cal.setTime(lastStopDate);
+            int lastStopDay = cal.get(Calendar.DAY_OF_YEAR);
+
+            if( currentDay != lastStopDay )
+            {
+                refreshAllForDate(new Date());
+            }
+
+            lastStopDate = null;
+        }
+    }
+
+    @Override
+    protected void onStop()
+    {
+        lastStopDate = new Date();
+
+        super.onStop();
     }
 
     @Override
@@ -362,12 +429,13 @@ public class MainActivity extends DBActivity
     {
         calendarFragment = new CalendarFragment();
 
-        if( savedInstanceState != null && savedInstanceState.containsKey(CALENDAR_SAVED_STATE) && savedInstanceState.containsKey(RECYCLE_VIEW_SAVED_DATE) )
+        if( savedInstanceState != null && savedInstanceState.containsKey(CALENDAR_SAVED_STATE) && savedInstanceState.containsKey(RECYCLE_VIEW_SAVED_DATE))
         {
             calendarFragment.restoreStatesFromKey(savedInstanceState, CALENDAR_SAVED_STATE);
 
             Date selectedDate = (Date) savedInstanceState.getSerializable(RECYCLE_VIEW_SAVED_DATE);
             calendarFragment.setSelectedDates(selectedDate, selectedDate);
+            lastStopDate = selectedDate; // Set last stop date that will be check on next onStart call
         }
         else
         {
@@ -620,7 +688,27 @@ public class MainActivity extends DBActivity
     {
         refreshRecyclerViewForDate(date);
         updateBalanceDisplayForDay(date);
+        calendarFragment.setSelectedDates(date, date);
         calendarFragment.refreshView();
+    }
+
+    /**
+     * Show a generic alert dialog telling the user an error occured while deleting monthly expense
+     */
+    private void showGenericMonthlyDeleteErrorDialog()
+    {
+        new AlertDialog.Builder(MainActivity.this)
+            .setTitle(R.string.monthly_expense_delete_error_title)
+            .setMessage(getResources().getString(R.string.monthly_expense_delete_error_message))
+            .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    dialog.dismiss();
+                }
+            })
+                .show();
     }
 
 // ---------------------------------------->
@@ -640,14 +728,30 @@ public class MainActivity extends DBActivity
          */
         private final Expense                  expense;
         /**
+         * The monthly expense associated with the expense deleted by the user
+         */
+        private final MonthlyExpense monthlyExpense;
+        /**
          * Type of delete
          */
         private final MonthlyExpenseDeleteType deleteType;
 
+        /**
+         * Expenses to restore if delete is successful and user cancels it
+         */
+        @Nullable
+        private List<Expense> expensesToRestore;
+        /**
+         * Monthly expense to restore if delete is successful and user cancels it
+         */
+        @Nullable
+        private MonthlyExpense monthlyExpenseToRestore;
+
         // ------------------------------------------->
 
-        DeleteMonthlyExpenseTask(@NonNull Expense expense, @NonNull MonthlyExpenseDeleteType deleteType)
+        DeleteMonthlyExpenseTask(@NonNull MonthlyExpense monthlyExpense, @NonNull Expense expense, @NonNull MonthlyExpenseDeleteType deleteType)
         {
+            this.monthlyExpense = monthlyExpense;
             this.expense = expense;
             this.deleteType = deleteType;
         }
@@ -657,17 +761,13 @@ public class MainActivity extends DBActivity
         @Override
         protected Boolean doInBackground(Void... nothing)
         {
-            MonthlyExpense monthlyExpense = db.findMonthlyExpenseForId(expense.getMonthlyId());
-            if( monthlyExpense == null )
-            {
-                // TODO log error
-                return false;
-            }
-
             switch (deleteType)
             {
                 case ALL:
                 {
+                    monthlyExpenseToRestore = monthlyExpense;
+                    expensesToRestore = db.getAllExpenseForMonthlyExpense(monthlyExpense);
+
                     boolean expensesDeleted = db.deleteAllExpenseForMonthlyExpense(monthlyExpense);
                     if( !expensesDeleted )
                     {
@@ -686,6 +786,8 @@ public class MainActivity extends DBActivity
                 }
                 case FROM:
                 {
+                    expensesToRestore = db.getAllExpensesForMonthlyExpenseFromDate(monthlyExpense, expense.getDate());
+
                     boolean expensesDeleted = db.deleteAllExpenseForMonthlyExpenseFromDate(monthlyExpense, expense.getDate());
                     if( !expensesDeleted )
                     {
@@ -697,8 +799,24 @@ public class MainActivity extends DBActivity
                 }
                 case TO:
                 {
+                    expensesToRestore = db.getAllExpensesForMonthlyExpenseBeforeDate(monthlyExpense, expense.getDate());
+
                     boolean expensesDeleted = db.deleteAllExpenseForMonthlyExpenseBeforeDate(monthlyExpense, expense.getDate());
                     if( !expensesDeleted )
+                    {
+                        //TODO log error
+                        return false;
+                    }
+
+                    break;
+                }
+                case ONE:
+                {
+                    expensesToRestore = new ArrayList<>(1);
+                    expensesToRestore.add(expense);
+
+                    boolean expenseDeleted = db.deleteExpense(expense);
+                    if( !expenseDeleted )
                     {
                         //TODO log error
                         return false;
@@ -734,13 +852,117 @@ public class MainActivity extends DBActivity
             {
                 // Refresh and show confirm snackbar
                 refreshAllForDate(expensesViewAdapter.getDate());
-                Snackbar.make(coordinatorLayout, R.string.monthly_expense_delete_success_message, Snackbar.LENGTH_LONG).show();
+                Snackbar snackbar = Snackbar.make(coordinatorLayout, R.string.monthly_expense_delete_success_message, Snackbar.LENGTH_LONG);
+
+                if( expensesToRestore != null ) // just in case..
+                {
+                    snackbar.setAction(R.string.cancel, new View.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(View v)
+                        {
+                            new CancelDeleteMonthlyExpenseTask(expensesToRestore, monthlyExpenseToRestore).execute();
+                        }
+                    });
+                }
+
+                snackbar.show();
+            }
+            else
+            {
+                showGenericMonthlyDeleteErrorDialog();
+            }
+        }
+
+
+    }
+
+    /**
+     * An asynctask to restore deleted monthly expense from DB
+     */
+    private class CancelDeleteMonthlyExpenseTask extends AsyncTask<Void, Void, Boolean>
+    {
+        /**
+         * Dialog used to display loading to the user
+         */
+        private ProgressDialog dialog;
+
+        /**
+         * List of expenses to restore
+         */
+        private final List<Expense> expensesToRestore;
+        /**
+         * Monthly expense to restore (will be null if delete type != ALL)
+         */
+        private final MonthlyExpense monthlyExpenseToRestore;
+
+        // ------------------------------------------->
+
+        /**
+         *
+         * @param expensesToRestore The deleted expenses to restore
+         * @param monthlyExpenseToRestore the deleted monthly expense to restore
+         */
+        private CancelDeleteMonthlyExpenseTask(@NonNull List<Expense> expensesToRestore, @Nullable MonthlyExpense monthlyExpenseToRestore)
+        {
+            this.expensesToRestore = expensesToRestore;
+            this.monthlyExpenseToRestore = monthlyExpenseToRestore;
+        }
+
+        // ------------------------------------------->
+
+        @Override
+        protected void onPreExecute()
+        {
+            // Show a ProgressDialog
+            dialog = new ProgressDialog(MainActivity.this);
+            dialog.setIndeterminate(true);
+            dialog.setTitle(R.string.monthly_expense_restoring_loading_title);
+            dialog.setMessage(getResources().getString(R.string.monthly_expense_restoring_loading_message));
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.setCancelable(false);
+            dialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params)
+        {
+            if( monthlyExpenseToRestore != null )
+            {
+                if( !db.addMonthlyExpense(monthlyExpenseToRestore) )
+                {
+                    return false;
+                }
+            }
+
+            for(Expense expense: expensesToRestore)
+            {
+                if( !db.persistExpense(expense, true) )
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result)
+        {
+            // Dismiss the dialog
+            dialog.dismiss();
+
+            if (result)
+            {
+                // Refresh and show confirm snackbar
+                refreshAllForDate(expensesViewAdapter.getDate());
+                Snackbar.make(coordinatorLayout, R.string.monthly_expense_restored_success_message, Snackbar.LENGTH_LONG).show();
             }
             else
             {
                 new AlertDialog.Builder(MainActivity.this)
-                    .setTitle(R.string.monthly_expense_delete_error_title)
-                    .setMessage(getResources().getString(R.string.monthly_expense_delete_error_message))
+                    .setTitle(R.string.monthly_expense_restore_error_title)
+                    .setMessage(getResources().getString(R.string.monthly_expense_restore_error_message))
                     .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener()
                     {
                         @Override

@@ -141,7 +141,7 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
                 if (expense.isMonthly())
                 {
                     AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                    builder.setTitle(R.string.dialog_edit_expense_title);
+                    builder.setTitle(R.string.dialog_edit_monthly_expense_title);
                     builder.setItems(R.array.dialog_edit_monthly_expense_choices, new DialogInterface.OnClickListener()
                     {
                         public void onClick(DialogInterface dialog, int which)
@@ -174,6 +174,24 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
                                     Intent intent = new Intent(MainActivity.INTENT_MONTHLY_EXPENSE_DELETED);
                                     intent.putExtra("expense", expense);
                                     intent.putExtra("deleteType", MonthlyExpenseDeleteType.ALL.getValue());
+                                    LocalBroadcastManager.getInstance(activity.getApplicationContext()).sendBroadcast(intent);
+
+                                    break;
+                                }
+                                case 3: // Edit this one
+                                {
+                                    Intent startIntent = new Intent(viewHolder.view.getContext(), ExpenseEditActivity.class);
+                                    startIntent.putExtra("date", expense.getDate());
+                                    startIntent.putExtra("expense", expense);
+
+                                    ActivityCompat.startActivityForResult(activity, startIntent, MainActivity.ADD_EXPENSE_ACTIVITY_CODE, null);
+                                }
+                                case 4: // Delete this one
+                                {
+                                    // Send notification to inform views that this expense has been deleted
+                                    Intent intent = new Intent(MainActivity.INTENT_MONTHLY_EXPENSE_DELETED);
+                                    intent.putExtra("expense", expense);
+                                    intent.putExtra("deleteType", MonthlyExpenseDeleteType.ONE.getValue());
                                     LocalBroadcastManager.getInstance(activity.getApplicationContext()).sendBroadcast(intent);
 
                                     break;

@@ -26,10 +26,13 @@
         <item>Edit expense</item>
         <item>Delete expense</item>
     </string-array>
+    <string name="dialog_edit_monthly_expense_title">Edit monthly expense</string>
     <string-array name="dialog_edit_monthly_expense_choices">
-        <item>Delete series from this one</item>
-        <item>Delete series before this one</item>
-        <item>Delete series</item>
+        <item>Delete occurrences from this one</item>
+        <item>Delete occurrences before this one</item>
+        <item>Delete all occurrences</item>
+        <item>Edit this occurrence</item>
+        <item>Delete this occurrence only</item>
     </string-array>
     <string name="expense_delete_snackbar_text">Expense deleted</string>
 
@@ -49,6 +52,13 @@
     <string name="monthly_expense_delete_loading_message">Deleting monthly expense…</string>
     <string name="monthly_expense_delete_error_title">Oops</string>
     <string name="monthly_expense_delete_error_message">An error occurred.</string>
+    <string name="monthly_expense_restoring_loading_title">Restoring</string>
+    <string name="monthly_expense_restoring_loading_message">Restoring deleted expense…</string>
+    <string name="monthly_expense_restored_success_message">Monthly expense restored with success</string>
+    <string name="monthly_expense_restore_error_title">Oops</string>
+    <string name="monthly_expense_restore_error_message">An error occurred.</string>
+    <string name="monthly_expense_delete_first_error_title">Oops</string>
+    <string name="monthly_expense_delete_first_error_message">This are no occurrence before this one.</string>
 
     <string name="setting_category_bug_report_title">Debug</string>
     <string name="setting_category_bug_report_send_button_title">Get install identifier</string>
