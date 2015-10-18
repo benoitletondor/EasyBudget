@@ -49,6 +49,11 @@
     <string name="monthly_expense_delete_loading_message">Deleting monthly expense…</string>
     <string name="monthly_expense_delete_error_title">Oops</string>
     <string name="monthly_expense_delete_error_message">An error occurred.</string>
+    <string name="monthly_expense_restoring_loading_title">Restoring</string>
+    <string name="monthly_expense_restoring_loading_message">Restoring deleted expense…</string>
+    <string name="monthly_expense_restored_success_message">Monthly expense restored with success</string>
+    <string name="monthly_expense_restore_error_title">Oops</string>
+    <string name="monthly_expense_restore_error_message">An error occurred.</string>
 
     <string name="setting_category_bug_report_title">Debug</string>
     <string name="setting_category_bug_report_send_button_title">Get install identifier</string>

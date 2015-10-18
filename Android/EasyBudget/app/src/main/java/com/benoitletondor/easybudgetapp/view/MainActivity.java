@@ -50,6 +50,7 @@ import com.roomorama.caldroid.CaldroidListener;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Main activity containing Calendar and List of expenses
@@ -680,6 +681,17 @@ public class MainActivity extends DBActivity
          */
         private final MonthlyExpenseDeleteType deleteType;
 
+        /**
+         * Expenses to restore if delete is successful and user cancels it
+         */
+        @Nullable
+        private List<Expense> expensesToRestore;
+        /**
+         * Monthly expense to restore if delete is successful and user cancels it
+         */
+        @Nullable
+        private MonthlyExpense monthlyExpenseToRestore;
+
         // ------------------------------------------->
 
         DeleteMonthlyExpenseTask(@NonNull Expense expense, @NonNull MonthlyExpenseDeleteType deleteType)
@@ -704,6 +716,9 @@ public class MainActivity extends DBActivity
             {
                 case ALL:
                 {
+                    monthlyExpenseToRestore = monthlyExpense;
+                    expensesToRestore = db.getAllExpenseForMonthlyExpense(monthlyExpense);
+
                     boolean expensesDeleted = db.deleteAllExpenseForMonthlyExpense(monthlyExpense);
                     if( !expensesDeleted )
                     {
@@ -722,6 +737,8 @@ public class MainActivity extends DBActivity
                 }
                 case FROM:
                 {
+                    expensesToRestore = db.getAllExpensesForMonthlyExpenseFromDate(monthlyExpense, expense.getDate());
+
                     boolean expensesDeleted = db.deleteAllExpenseForMonthlyExpenseFromDate(monthlyExpense, expense.getDate());
                     if( !expensesDeleted )
                     {
@@ -733,6 +750,8 @@ public class MainActivity extends DBActivity
                 }
                 case TO:
                 {
+                    expensesToRestore = db.getAllExpensesForMonthlyExpenseBeforeDate(monthlyExpense, expense.getDate());
+
                     boolean expensesDeleted = db.deleteAllExpenseForMonthlyExpenseBeforeDate(monthlyExpense, expense.getDate());
                     if( !expensesDeleted )
                     {
@@ -770,13 +789,126 @@ public class MainActivity extends DBActivity
             {
                 // Refresh and show confirm snackbar
                 refreshAllForDate(expensesViewAdapter.getDate());
-                Snackbar.make(coordinatorLayout, R.string.monthly_expense_delete_success_message, Snackbar.LENGTH_LONG).show();
+                Snackbar snackbar = Snackbar.make(coordinatorLayout, R.string.monthly_expense_delete_success_message, Snackbar.LENGTH_LONG);
+
+                if( expensesToRestore != null ) // just in case..
+                {
+                    snackbar.setAction(R.string.cancel, new View.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(View v)
+                        {
+                            new CancelDeleteMonthlyExpenseTask(expensesToRestore, monthlyExpenseToRestore).execute();
+                        }
+                    });
+                }
+
+                snackbar.show();
             }
             else
             {
                 new AlertDialog.Builder(MainActivity.this)
                     .setTitle(R.string.monthly_expense_delete_error_title)
                     .setMessage(getResources().getString(R.string.monthly_expense_delete_error_message))
+                    .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            dialog.dismiss();
+                        }
+                    })
+                    .show();
+            }
+        }
+    }
+
+    /**
+     * An asynctask to restore deleted monthly expense from DB
+     */
+    private class CancelDeleteMonthlyExpenseTask extends AsyncTask<Void, Void, Boolean>
+    {
+        /**
+         * Dialog used to display loading to the user
+         */
+        private ProgressDialog dialog;
+
+        /**
+         * List of expenses to restore
+         */
+        private final List<Expense> expensesToRestore;
+        /**
+         * Monthly expense to restore (will be null if delete type != ALL)
+         */
+        private final MonthlyExpense monthlyExpenseToRestore;
+
+        // ------------------------------------------->
+
+        /**
+         *
+         * @param expensesToRestore The deleted expenses to restore
+         * @param monthlyExpenseToRestore the deleted monthly expense to restore
+         */
+        private CancelDeleteMonthlyExpenseTask(@NonNull List<Expense> expensesToRestore, @Nullable MonthlyExpense monthlyExpenseToRestore)
+        {
+            this.expensesToRestore = expensesToRestore;
+            this.monthlyExpenseToRestore = monthlyExpenseToRestore;
+        }
+
+        // ------------------------------------------->
+
+        @Override
+        protected void onPreExecute()
+        {
+            // Show a ProgressDialog
+            dialog = new ProgressDialog(MainActivity.this);
+            dialog.setIndeterminate(true);
+            dialog.setTitle(R.string.monthly_expense_restoring_loading_title);
+            dialog.setMessage(getResources().getString(R.string.monthly_expense_restoring_loading_message));
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.setCancelable(false);
+            dialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params)
+        {
+            if( monthlyExpenseToRestore != null )
+            {
+                if( !db.addMonthlyExpense(monthlyExpenseToRestore) )
+                {
+                    return false;
+                }
+            }
+
+            for(Expense expense: expensesToRestore)
+            {
+                if( !db.persistExpense(expense, true) )
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result)
+        {
+            // Dismiss the dialog
+            dialog.dismiss();
+
+            if (result)
+            {
+                // Refresh and show confirm snackbar
+                refreshAllForDate(expensesViewAdapter.getDate());
+                Snackbar.make(coordinatorLayout, R.string.monthly_expense_restored_success_message, Snackbar.LENGTH_LONG).show();
+            }
+            else
+            {
+                new AlertDialog.Builder(MainActivity.this)
+                    .setTitle(R.string.monthly_expense_restore_error_title)
+                    .setMessage(getResources().getString(R.string.monthly_expense_restore_error_message))
                     .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener()
                     {
                         @Override
