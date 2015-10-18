@@ -22,7 +22,12 @@ public enum MonthlyExpenseDeleteType
     /**
      * Delete all
      */
-    ALL(2);
+    ALL(2),
+
+    /**
+     * Delete this expense occurrence only
+     */
+    ONE(3);
 
 // ------------------------------------->
 

@@ -48,6 +48,7 @@ import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.roomorama.caldroid.CaldroidFragment;
 import com.roomorama.caldroid.CaldroidListener;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -754,6 +755,20 @@ public class MainActivity extends DBActivity
 
                     boolean expensesDeleted = db.deleteAllExpenseForMonthlyExpenseBeforeDate(monthlyExpense, expense.getDate());
                     if( !expensesDeleted )
+                    {
+                        //TODO log error
+                        return false;
+                    }
+
+                    break;
+                }
+                case ONE:
+                {
+                    expensesToRestore = new ArrayList<>(1);
+                    expensesToRestore.add(expense);
+
+                    boolean expenseDeleted = db.deleteExpense(expense);
+                    if( !expenseDeleted )
                     {
                         //TODO log error
                         return false;

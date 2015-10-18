@@ -29,7 +29,9 @@
     <string-array name="dialog_edit_monthly_expense_choices">
         <item>Delete series from this one</item>
         <item>Delete series before this one</item>
-        <item>Delete series</item>
+        <item>Delete all series</item>
+        <item>Edit this occurrence</item>
+        <item>Delete this occurrence only</item>
     </string-array>
     <string name="expense_delete_snackbar_text">Expense deleted</string>
 

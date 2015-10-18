@@ -31,7 +31,7 @@ public class MonthlyExpense implements Serializable
      */
     private int     amount;
     /**
-     * Is this expense modified
+     * Is this expense modified (Not implemented yet)
      */
     private boolean modified = false;
 
