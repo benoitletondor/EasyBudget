@@ -33,6 +33,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.benoitletondor.easybudgetapp.R;
+import com.benoitletondor.easybudgetapp.helper.Logger;
 import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
@@ -153,14 +154,44 @@ public class MainActivity extends DBActivity
                 {
                     final Expense expense = (Expense) intent.getSerializableExtra("expense");
                     final MonthlyExpenseDeleteType deleteType = MonthlyExpenseDeleteType.fromValue(intent.getIntExtra("deleteType", MonthlyExpenseDeleteType.ALL.getValue()));
+                    final MonthlyExpense monthlyExpense = db.findMonthlyExpenseForId(expense.getMonthlyId());
 
                     if( deleteType == null )
                     {
-                        // TODO handle error
+                        showGenericMonthlyDeleteErrorDialog();
+                        Logger.error("INTENT_MONTHLY_EXPENSE_DELETED came with null delete type");
+
                         return;
                     }
 
-                    new DeleteMonthlyExpenseTask(expense, deleteType).execute();
+                    if( monthlyExpense == null )
+                    {
+                        showGenericMonthlyDeleteErrorDialog();
+                        Logger.error("INTENT_MONTHLY_EXPENSE_DELETED: Unable to retrieve monthly expense");
+
+                        return;
+                    }
+
+                    // Check that if the user wants to delete series before this one, there are actually series to delete
+                    if( deleteType == MonthlyExpenseDeleteType.TO && !db.hasExpensesForMonthlyExpenseBeforeDate(monthlyExpense, expense.getDate()) )
+                    {
+                        new AlertDialog.Builder(MainActivity.this)
+                            .setTitle(R.string.monthly_expense_delete_first_error_title)
+                            .setMessage(getResources().getString(R.string.monthly_expense_delete_first_error_message))
+                            .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .show();
+
+                        return;
+                    }
+
+                    new DeleteMonthlyExpenseTask(monthlyExpense, expense, deleteType).execute();
                 }
                 else if( SelectCurrencyFragment.CURRENCY_SELECTED_INTENT.equals(intent.getAction()) )
                 {
@@ -398,7 +429,7 @@ public class MainActivity extends DBActivity
     {
         calendarFragment = new CalendarFragment();
 
-        if( savedInstanceState != null && savedInstanceState.containsKey(CALENDAR_SAVED_STATE) && savedInstanceState.containsKey(RECYCLE_VIEW_SAVED_DATE) )
+        if( savedInstanceState != null && savedInstanceState.containsKey(CALENDAR_SAVED_STATE) && savedInstanceState.containsKey(RECYCLE_VIEW_SAVED_DATE))
         {
             calendarFragment.restoreStatesFromKey(savedInstanceState, CALENDAR_SAVED_STATE);
 
@@ -661,6 +692,25 @@ public class MainActivity extends DBActivity
         calendarFragment.refreshView();
     }
 
+    /**
+     * Show a generic alert dialog telling the user an error occured while deleting monthly expense
+     */
+    private void showGenericMonthlyDeleteErrorDialog()
+    {
+        new AlertDialog.Builder(MainActivity.this)
+            .setTitle(R.string.monthly_expense_delete_error_title)
+            .setMessage(getResources().getString(R.string.monthly_expense_delete_error_message))
+            .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    dialog.dismiss();
+                }
+            })
+                .show();
+    }
+
 // ---------------------------------------->
 
     /**
@@ -677,6 +727,10 @@ public class MainActivity extends DBActivity
          * The expense deleted by the user
          */
         private final Expense                  expense;
+        /**
+         * The monthly expense associated with the expense deleted by the user
+         */
+        private final MonthlyExpense monthlyExpense;
         /**
          * Type of delete
          */
@@ -695,8 +749,9 @@ public class MainActivity extends DBActivity
 
         // ------------------------------------------->
 
-        DeleteMonthlyExpenseTask(@NonNull Expense expense, @NonNull MonthlyExpenseDeleteType deleteType)
+        DeleteMonthlyExpenseTask(@NonNull MonthlyExpense monthlyExpense, @NonNull Expense expense, @NonNull MonthlyExpenseDeleteType deleteType)
         {
+            this.monthlyExpense = monthlyExpense;
             this.expense = expense;
             this.deleteType = deleteType;
         }
@@ -706,13 +761,6 @@ public class MainActivity extends DBActivity
         @Override
         protected Boolean doInBackground(Void... nothing)
         {
-            MonthlyExpense monthlyExpense = db.findMonthlyExpenseForId(expense.getMonthlyId());
-            if( monthlyExpense == null )
-            {
-                // TODO log error
-                return false;
-            }
-
             switch (deleteType)
             {
                 case ALL:
@@ -822,20 +870,11 @@ public class MainActivity extends DBActivity
             }
             else
             {
-                new AlertDialog.Builder(MainActivity.this)
-                    .setTitle(R.string.monthly_expense_delete_error_title)
-                    .setMessage(getResources().getString(R.string.monthly_expense_delete_error_message))
-                    .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener()
-                    {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which)
-                        {
-                            dialog.dismiss();
-                        }
-                    })
-                    .show();
+                showGenericMonthlyDeleteErrorDialog();
             }
         }
+
+
     }
 
     /**

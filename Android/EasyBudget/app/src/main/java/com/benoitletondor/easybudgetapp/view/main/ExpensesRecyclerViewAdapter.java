@@ -141,7 +141,7 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
                 if (expense.isMonthly())
                 {
                     AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                    builder.setTitle(R.string.dialog_edit_expense_title);
+                    builder.setTitle(R.string.dialog_edit_monthly_expense_title);
                     builder.setItems(R.array.dialog_edit_monthly_expense_choices, new DialogInterface.OnClickListener()
                     {
                         public void onClick(DialogInterface dialog, int which)

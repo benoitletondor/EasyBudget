@@ -372,6 +372,33 @@ public final class DB
     }
 
     /**
+     * Check if there are expenses before this date for the given monthly expense
+     *
+     * @param monthlyExpense
+     * @param toDate
+     * @return
+     */
+    public boolean hasExpensesForMonthlyExpenseBeforeDate(@NonNull MonthlyExpense monthlyExpense, @NonNull Date toDate)
+    {
+        toDate = DateHelper.cleanDate(toDate);
+
+        Cursor cursor = null;
+        try
+        {
+            cursor = database.rawQuery("SELECT COUNT(*) FROM "+SQLiteDBHelper.TABLE_EXPENSE+" WHERE "+SQLiteDBHelper.COLUMN_EXPENSE_MONTHLY_ID+"="+monthlyExpense.getId()+" AND "+SQLiteDBHelper.COLUMN_EXPENSE_DATE+"<"+toDate.getTime()+" LIMIT 1", null);
+
+            return cursor.moveToFirst() && cursor.getInt(0) > 0;
+        }
+        finally
+        {
+            if( cursor != null )
+            {
+                cursor.close();
+            }
+        }
+    }
+
+    /**
      * Retrieve all expenses associated with this monthly expense happening before the given date
      *
      * @param monthlyExpense
