@@ -185,6 +185,8 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
                                     startIntent.putExtra("expense", expense);
 
                                     ActivityCompat.startActivityForResult(activity, startIntent, MainActivity.ADD_EXPENSE_ACTIVITY_CODE, null);
+
+                                    break;
                                 }
                                 case 4: // Delete this one
                                 {
