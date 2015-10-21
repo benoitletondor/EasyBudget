@@ -147,4 +147,9 @@ public class Expense implements Serializable
     {
         this.amount = amount;
     }
+
+    public boolean isRevenue()
+    {
+        return amount < 0;
+    }
 }

@@ -3,30 +3,43 @@
 
     <string name="app_name">EasyBudget</string>
     <string name="action_settings">Settings</string>
-    <string name="action_balance">Adjust balance</string>
+    <string name="action_balance">Adjust current balance</string>
     <string name="action_save">Save</string>
+    <string name="fab_add_expense">Add expense/income</string>
+    <string name="fab_add_monthly_expense">Add montly expense/income</string>
     <string name="title_activity_add_expense">Add expense</string>
+    <string name="title_activity_add_income">Add income</string>
     <string name="title_activity_edit_expense">Edit expense</string>
+    <string name="title_activity_edit_income">Edit income</string>
     <string name="title_activity_monthly_expense_add">Add monthly expense</string>
+    <string name="title_activity_monthly_income_add">Add monthly income</string>
     <string name="title_activity_monthly_expense_edit">Edit monthly expense</string>
+    <string name="title_activity_monthly_income_edit">Edit monthly income</string>
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_welcome">EasyBudget</string>
     <string name="cancel">Cancel</string>
+    <string name="undo">UNDO</string>
     <string name="ok">OK</string>
     <string name="amount">Amount ( %s )</string>
     <string name="description">Description</string>
     <string name="type">Type</string>
-    <string name="payment">Payment</string>
+    <string name="payment">Expense</string>
     <string name="income">Income</string>
     <string name="date">Date</string>
-    <string name="first_occurence">First occurence</string>
+    <string name="first_occurence">First occurrence</string>
 
     <string name="dialog_edit_expense_title">What do you want to do?</string>
+    <string name="dialog_edit_income_title">What do you want to do?</string>
     <string-array name="dialog_edit_expense_choices">
         <item>Edit expense</item>
         <item>Delete expense</item>
     </string-array>
+    <string-array name="dialog_edit_income_choices">
+        <item>Edit income</item>
+        <item>Delete income</item>
+    </string-array>
     <string name="dialog_edit_monthly_expense_title">Edit monthly expense</string>
+    <string name="dialog_edit_monthly_income_title">Edit monthly income</string>
     <string-array name="dialog_edit_monthly_expense_choices">
         <item>Delete occurrences from this one</item>
         <item>Delete occurrences before this one</item>
@@ -34,10 +47,18 @@
         <item>Edit this occurrence</item>
         <item>Delete this occurrence only</item>
     </string-array>
+    <string-array name="dialog_edit_monthly_income_choices">
+        <item>Delete occurrences from this one</item>
+        <item>Delete occurrences before this one</item>
+        <item>Delete all occurrences</item>
+        <item>Edit this occurrence</item>
+        <item>Delete this occurrence only</item>
+    </string-array>
     <string name="expense_delete_snackbar_text">Expense deleted</string>
+    <string name="income_delete_snackbar_text">Income deleted</string>
 
-    <string name="adjust_balance_title">New balance</string>
-    <string name="adjust_balance_message">Adjust today\'s balance</string>
+    <string name="adjust_balance_title">Adjust current balance</string>
+    <string name="adjust_balance_message">Adjust how much you currently have on your account</string>
     <string name="adjust_balance_expense_title">Balance</string>
     <string name="adjust_balance_snackbar_text">Balance adjusted to %s</string>
     <string name="account_balance_format">ACCOUNT BALANCE: %s</string>
@@ -45,6 +66,7 @@
 
     <string name="monthly_expense_add_loading_title">Loading</string>
     <string name="monthly_expense_add_loading_message">Creating monthly expense…</string>
+    <string name="monthly_income_add_loading_message">Creating monthly income…</string>
     <string name="monthly_expense_add_error_title">Oops</string>
     <string name="monthly_expense_add_error_message">An error occurred.</string>
     <string name="monthly_expense_delete_success_message">Monthly expense deleted with success</string>

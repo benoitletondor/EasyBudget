@@ -253,11 +253,15 @@ public class MonthlyExpenseEditActivity extends DBActivity
         {
             expenseType.setText(R.string.income);
             expenseType.setTextColor(ContextCompat.getColor(this, R.color.budget_green));
+
+            setTitle(R.string.title_activity_monthly_income_add);
         }
         else
         {
             expenseType.setText(R.string.payment);
             expenseType.setTextColor(ContextCompat.getColor(this, R.color.budget_red));
+
+            setTitle(R.string.title_activity_monthly_expense_add);
         }
     }
 
@@ -382,7 +386,7 @@ public class MonthlyExpenseEditActivity extends DBActivity
             dialog = new ProgressDialog(MonthlyExpenseEditActivity.this);
             dialog.setIndeterminate(true);
             dialog.setTitle(R.string.monthly_expense_add_loading_title);
-            dialog.setMessage(getResources().getString(R.string.monthly_expense_add_loading_message));
+            dialog.setMessage(getResources().getString(isRevenue ? R.string.monthly_income_add_loading_message : R.string.monthly_expense_add_loading_message));
             dialog.setCanceledOnTouchOutside(false);
             dialog.setCancelable(false);
             dialog.show();

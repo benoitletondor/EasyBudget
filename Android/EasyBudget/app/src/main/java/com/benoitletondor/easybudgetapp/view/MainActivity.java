@@ -61,6 +61,11 @@ import java.util.List;
  */
 public class MainActivity extends DBActivity
 {
+    /**
+     * Snackbar with actions must be shown 5s
+     */
+    private static final int ACTION_SNACKBAR_LENGTH = 5000;
+
     public static final int ADD_EXPENSE_ACTIVITY_CODE = 101;
     public static final int MANAGE_MONTHLY_EXPENSE_ACTIVITY_CODE = 102;
     public static final int WELCOME_SCREEN_ACTIVITY_CODE = 103;
@@ -128,8 +133,8 @@ public class MainActivity extends DBActivity
                         updateBalanceDisplayForDay(expensesViewAdapter.getDate());
                         calendarFragment.refreshView();
 
-                        Snackbar snackbar = Snackbar.make(coordinatorLayout, R.string.expense_delete_snackbar_text, Snackbar.LENGTH_LONG);
-                        snackbar.setAction(R.string.cancel, new View.OnClickListener()
+                        Snackbar snackbar = Snackbar.make(coordinatorLayout, expense.isRevenue() ? R.string.income_delete_snackbar_text : R.string.expense_delete_snackbar_text, Snackbar.LENGTH_LONG);
+                        snackbar.setAction(R.string.undo, new View.OnClickListener()
                         {
                             @Override
                             public void onClick(View v)
@@ -141,7 +146,9 @@ public class MainActivity extends DBActivity
                                 calendarFragment.refreshView();
                             }
                         });
-
+                        snackbar.setActionTextColor(ContextCompat.getColor(MainActivity.this, R.color.snackbar_action_undo));
+                        //noinspection ResourceType
+                        snackbar.setDuration(ACTION_SNACKBAR_LENGTH);
                         snackbar.show();
                     }
                     else
@@ -359,7 +366,7 @@ public class MainActivity extends DBActivity
 
                     //Show snackbar
                     Snackbar snackbar = Snackbar.make(coordinatorLayout, getResources().getString(R.string.adjust_balance_snackbar_text, CurrencyHelper.getFormattedCurrencyString(MainActivity.this, newBalance)), Snackbar.LENGTH_LONG);
-                    snackbar.setAction(R.string.cancel, new View.OnClickListener()
+                    snackbar.setAction(R.string.undo, new View.OnClickListener()
                     {
                         @Override
                         public void onClick(View v)
@@ -369,7 +376,9 @@ public class MainActivity extends DBActivity
                             refreshAllForDate(expensesViewAdapter.getDate());
                         }
                     });
-
+                    snackbar.setActionTextColor(ContextCompat.getColor(MainActivity.this, R.color.snackbar_action_undo));
+                    //noinspection ResourceType
+                    snackbar.setDuration(ACTION_SNACKBAR_LENGTH);
                     snackbar.show();
                 }
             });
@@ -856,7 +865,7 @@ public class MainActivity extends DBActivity
 
                 if( expensesToRestore != null ) // just in case..
                 {
-                    snackbar.setAction(R.string.cancel, new View.OnClickListener()
+                    snackbar.setAction(R.string.undo, new View.OnClickListener()
                     {
                         @Override
                         public void onClick(View v)
@@ -866,6 +875,10 @@ public class MainActivity extends DBActivity
                     });
                 }
 
+                snackbar.setActionTextColor(ContextCompat.getColor(MainActivity.this, R.color.snackbar_action_undo));
+
+                //noinspection ResourceType
+                snackbar.setDuration(ACTION_SNACKBAR_LENGTH);
                 snackbar.show();
             }
             else

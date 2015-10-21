@@ -131,7 +131,7 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
         viewHolder.expenseTitleTextView.setText(expense.getTitle());
         viewHolder.expenseAmountTextView.setText(CurrencyHelper.getFormattedCurrencyString(viewHolder.view.getContext(), -expense.getAmount()));
         viewHolder.monthlyIndicator.setVisibility(expense.isMonthly() ? View.VISIBLE : View.GONE);
-        viewHolder.positiveIndicator.setImageResource(expense.getAmount() < 0 ? R.drawable.ic_label_green : R.drawable.ic_label_red);
+        viewHolder.positiveIndicator.setImageResource(expense.isRevenue() ? R.drawable.ic_label_green : R.drawable.ic_label_red);
 
         final View.OnClickListener onClickListener = new View.OnClickListener()
         {
@@ -141,8 +141,8 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
                 if (expense.isMonthly())
                 {
                     AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                    builder.setTitle(R.string.dialog_edit_monthly_expense_title);
-                    builder.setItems(R.array.dialog_edit_monthly_expense_choices, new DialogInterface.OnClickListener()
+                    builder.setTitle(expense.isRevenue() ? R.string.dialog_edit_monthly_income_title : R.string.dialog_edit_monthly_expense_title);
+                    builder.setItems(expense.isRevenue() ? R.array.dialog_edit_monthly_income_choices : R.array.dialog_edit_monthly_expense_choices, new DialogInterface.OnClickListener()
                     {
                         public void onClick(DialogInterface dialog, int which)
                         {
@@ -206,8 +206,8 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
                 else
                 {
                     AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                    builder.setTitle(R.string.dialog_edit_expense_title);
-                    builder.setItems(R.array.dialog_edit_expense_choices, new DialogInterface.OnClickListener()
+                    builder.setTitle(expense.isRevenue() ? R.string.dialog_edit_income_title : R.string.dialog_edit_expense_title);
+                    builder.setItems(expense.isRevenue() ? R.array.dialog_edit_income_choices : R.array.dialog_edit_expense_choices, new DialogInterface.OnClickListener()
                     {
                         public void onClick(DialogInterface dialog, int which)
                         {
