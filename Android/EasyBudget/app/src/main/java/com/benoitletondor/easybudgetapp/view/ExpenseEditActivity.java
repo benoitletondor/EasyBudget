@@ -81,13 +81,13 @@ public class ExpenseEditActivity extends DBActivity
 
         date = (Date) getIntent().getSerializableExtra("date");
 
-        if (getIntent().hasExtra("expense"))
+        if ( isEdit() )
         {
             expense = (Expense) getIntent().getSerializableExtra("expense");
-            isRevenue = expense.getAmount() < 0;
+            isRevenue = expense.isRevenue();
             date = expense.getDate();
 
-            setTitle(R.string.title_activity_edit_expense);
+            setTitle(isRevenue ? R.string.title_activity_edit_income : R.string.title_activity_edit_expense);
         }
 
         setUpButtons();
@@ -150,6 +150,16 @@ public class ExpenseEditActivity extends DBActivity
     }
 
 // ----------------------------------->
+
+    /**
+     * Is the current action an edit (vs a creation of a new one)
+     *
+     * @return
+     */
+    private boolean isEdit()
+    {
+        return getIntent().hasExtra("expense");
+    }
 
     /**
      * Validate user inputs
@@ -260,11 +270,15 @@ public class ExpenseEditActivity extends DBActivity
         {
             expenseType.setText(R.string.income);
             expenseType.setTextColor(ContextCompat.getColor(this, R.color.budget_green));
+
+            setTitle(isEdit() ? R.string.title_activity_edit_income : R.string.title_activity_add_income);
         }
         else
         {
             expenseType.setText(R.string.payment);
             expenseType.setTextColor(ContextCompat.getColor(this, R.color.budget_red));
+
+            setTitle(isEdit() ? R.string.title_activity_edit_expense : R.string.title_activity_add_expense);
         }
     }
 

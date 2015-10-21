@@ -21,6 +21,8 @@
     <color name="budget_red">#F44336</color>
     <color name="budget_red_out">#f17970</color>
 
+    <color name="snackbar_action_undo">#4caf50</color>
+
     <color name="onboarding_1_background">#00897B</color>
     <color name="onboarding_1_statusbar">#00695C</color>
     <color name="onboarding_1_nextbutton_normal">@color/fab_add_monthly_expense</color>

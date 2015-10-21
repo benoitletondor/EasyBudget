@@ -87,7 +87,7 @@
                 android:layout_height="wrap_content"
                 fab:fab_colorNormal="@color/fab_add_monthly_expense"
                 fab:fab_colorPressed="@color/fab_add_monthly_expense_pressed"
-                fab:fab_title="@string/title_activity_monthly_expense_add"
+                fab:fab_title="@string/fab_add_monthly_expense"
                 fab:fab_icon="@drawable/ic_autorenew_white"
                 fab:fab_size="mini" />
 
@@ -98,7 +98,7 @@
                 fab:fab_colorNormal="@color/fab_add_expense"
                 fab:fab_colorPressed="@color/fab_add_expense_pressed"
                 fab:fab_plusIconColor="@android:color/white"
-                fab:fab_title="@string/title_activity_add_expense"
+                fab:fab_title="@string/fab_add_expense"
                 fab:fab_size="mini" />
 
         </com.getbase.floatingactionbutton.FloatingActionsMenu>
