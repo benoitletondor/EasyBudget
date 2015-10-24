@@ -6,7 +6,7 @@
     <string name="action_balance">Adjust current balance</string>
     <string name="action_save">Save</string>
     <string name="fab_add_expense">Add expense/income</string>
-    <string name="fab_add_monthly_expense">Add montly expense/income</string>
+    <string name="fab_add_monthly_expense">Add monthly expense/income</string>
     <string name="title_activity_add_expense">Add expense</string>
     <string name="title_activity_add_income">Add income</string>
     <string name="title_activity_edit_expense">Edit expense</string>
