@@ -53,7 +53,7 @@
             android:layout_gravity="right|bottom"
             fab:fab_addButtonPlusIconColor="@android:color/white"
             fab:fab_addButtonColorNormal="@color/primary"
-            fab:fab_addButtonColorPressed="@color/primary_light"
+            fab:fab_addButtonColorPressed="@color/primary_dark"
             fab:fab_labelStyle="@style/fab_labels_style"
             app:layout_behavior="com.benoitletondor.easybudgetapp.view.main.FloatingActionButtonBehavior"
             tools:ignore="RtlHardcoded">
