@@ -61,7 +61,8 @@
     <string name="adjust_balance_message">Adjust how much you currently have on your account</string>
     <string name="adjust_balance_expense_title">Balance</string>
     <string name="adjust_balance_snackbar_text">Balance adjusted to %s</string>
-    <string name="account_balance_format">ACCOUNT BALANCE: %s</string>
+    <string name="account_balance_format">Balance for %1$s: %2$s</string>
+    <string name="account_balance_date_format">MMM dd</string>
     <string name="onboarding_start_with_amount">Start with %s</string>
 
     <string name="monthly_expense_add_loading_title">Loading</string>

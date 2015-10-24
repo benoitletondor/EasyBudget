@@ -32,13 +32,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/primary_text"
-                android:layout_marginBottom="1dp" />
+                android:layout_marginBottom="1dp"
+                android:maxLines="2"
+                android:minLines="1"
+                android:ellipsize="end"/>
 
             <TextView android:id="@+id/expense_amount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
-                android:layout_marginTop="1dp" />
+                android:layout_marginTop="1dp"
+                android:maxLines="1"
+                android:minLines="1"
+                android:ellipsize="end"/>
 
         </LinearLayout>
 

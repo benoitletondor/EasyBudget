@@ -52,6 +52,7 @@ import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.roomorama.caldroid.CaldroidFragment;
 import com.roomorama.caldroid.CaldroidListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -421,7 +422,8 @@ public class MainActivity extends DBActivity
         {
             int balance = - db.getBalanceForDay(day);
 
-            budgetLine.setText(getResources().getString(R.string.account_balance_format, CurrencyHelper.getFormattedCurrencyString(this, balance)));
+            SimpleDateFormat format = new SimpleDateFormat(getResources().getString(R.string.account_balance_date_format));
+            budgetLine.setText(getResources().getString(R.string.account_balance_format, format.format(day), CurrencyHelper.getFormattedCurrencyString(this, balance)));
 
             if( balance <= 0 )
             {
