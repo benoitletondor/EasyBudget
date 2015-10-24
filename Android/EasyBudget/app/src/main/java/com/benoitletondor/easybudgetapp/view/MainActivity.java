@@ -25,11 +25,14 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.benoitletondor.easybudgetapp.R;
@@ -86,6 +89,7 @@ public class MainActivity extends DBActivity
     private ExpensesRecyclerViewAdapter expensesViewAdapter;
     private CoordinatorLayout           coordinatorLayout;
 
+    @Nullable
     private TextView budgetLine;
     @Nullable
     private Date lastStopDate;
@@ -107,7 +111,6 @@ public class MainActivity extends DBActivity
 
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
 
-        budgetLine = (TextView) findViewById(R.id.budgetLine);
         initCalendarFragment(savedInstanceState);
         initRecyclerView(savedInstanceState);
 
@@ -408,27 +411,30 @@ public class MainActivity extends DBActivity
 
     /**
      * Update the balance for the given day
-     * FIXME optim, translate
+     * FIXME optim
      *
      * @param day
      */
     private void updateBalanceDisplayForDay(@NonNull Date day)
     {
-        int balance = - db.getBalanceForDay(day);
+        if( budgetLine != null )
+        {
+            int balance = - db.getBalanceForDay(day);
 
-        budgetLine.setText(getResources().getString(R.string.account_balance_format, CurrencyHelper.getFormattedCurrencyString(this, balance)));
+            budgetLine.setText(getResources().getString(R.string.account_balance_format, CurrencyHelper.getFormattedCurrencyString(this, balance)));
 
-        if( balance <= 0 )
-        {
-            budgetLine.setBackgroundResource(R.color.budget_red);
-        }
-        else if( balance < 100 ) //TODO configurable ?
-        {
-            budgetLine.setBackgroundResource(R.color.budget_orange);
-        }
-        else
-        {
-            budgetLine.setBackgroundResource(R.color.budget_green);
+            if( balance <= 0 )
+            {
+                budgetLine.setBackgroundResource(R.color.budget_red);
+            }
+            else if( balance < 100 ) //TODO configurable ?
+            {
+                budgetLine.setBackgroundResource(R.color.budget_orange);
+            }
+            else
+            {
+                budgetLine.setBackgroundResource(R.color.budget_green);
+            }
         }
     }
 
@@ -507,20 +513,47 @@ public class MainActivity extends DBActivity
                 Button leftButton = calendarFragment.getLeftArrowButton();
                 Button rightButton = calendarFragment.getRightArrowButton();
                 TextView textView = calendarFragment.getMonthTitleTextView();
+                GridView weekDayGreedView = calendarFragment.getWeekdayGridView();
+                LinearLayout topLayout = (LinearLayout) MainActivity.this.findViewById(com.caldroid.R.id.calendar_title_view);
+                LinearLayout calendarLayout = (LinearLayout) topLayout.getParent();
 
-                textView.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.primary_text));
+                LinearLayout.LayoutParams  params = (LinearLayout.LayoutParams)textView.getLayoutParams();
+                params.gravity = Gravity.TOP;
+                params.setMargins(0, 0, 0, MainActivity.this.getResources().getDimensionPixelSize(R.dimen.calendar_month_text_padding_bottom));
+                textView.setLayoutParams(params);
+
+                topLayout.setPadding(0, MainActivity.this.getResources().getDimensionPixelSize(R.dimen.calendar_month_padding_top), 0, MainActivity.this.getResources().getDimensionPixelSize(R.dimen.calendar_month_padding_bottom));
+
+                LinearLayout.LayoutParams leftButtonParams = (LinearLayout.LayoutParams) leftButton.getLayoutParams();
+                leftButtonParams.setMargins(MainActivity.this.getResources().getDimensionPixelSize(R.dimen.calendar_month_buttons_margin), 0, 0, 0);
+                leftButton.setLayoutParams(leftButtonParams);
+
+                LinearLayout.LayoutParams rightButtonParams = (LinearLayout.LayoutParams) rightButton.getLayoutParams();
+                rightButtonParams.setMargins(0, 0, MainActivity.this.getResources().getDimensionPixelSize(R.dimen.calendar_month_buttons_margin), 0);
+                rightButton.setLayoutParams(rightButtonParams);
+
+                textView.setTextColor(ContextCompat.getColor(MainActivity.this, android.R.color.white));
+                topLayout.setBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.primary_dark));
 
                 leftButton.setText("<");
                 leftButton.setTextSize(25);
                 leftButton.setGravity(Gravity.CENTER);
-                leftButton.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.primary));
+                leftButton.setTextColor(ContextCompat.getColor(MainActivity.this, android.R.color.white));
                 leftButton.setBackgroundResource(R.drawable.calendar_month_switcher_button_drawable);
 
                 rightButton.setText(">");
                 rightButton.setTextSize(25);
                 rightButton.setGravity(Gravity.CENTER);
-                rightButton.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.primary));
+                rightButton.setTextColor(ContextCompat.getColor(MainActivity.this, android.R.color.white));
                 rightButton.setBackgroundResource(R.drawable.calendar_month_switcher_button_drawable);
+
+                weekDayGreedView.setPadding(0, MainActivity.this.getResources().getDimensionPixelSize(R.dimen.calendar_weekdays_padding_top), 0, MainActivity.this.getResources().getDimensionPixelSize(R.dimen.calendar_weekdays_padding_bottom));
+
+                View currentAmountLayout = MainActivity.this.getLayoutInflater().inflate(R.layout.current_amount_layout, calendarLayout, false);
+                calendarLayout.addView(currentAmountLayout, 1);
+
+                budgetLine = (TextView) currentAmountLayout.findViewById(R.id.budgetLine);
+                updateBalanceDisplayForDay(calendarFragment.getSelectedDate());
 
                 // Remove border on lollipop
                 UIHelper.removeButtonBorder(leftButton);
@@ -684,8 +717,6 @@ public class MainActivity extends DBActivity
 
         expensesViewAdapter = new ExpensesRecyclerViewAdapter(this, db, date);
         expensesRecyclerView.setAdapter(expensesViewAdapter);
-
-        updateBalanceDisplayForDay(date);
     }
 
     private void refreshRecyclerViewForDate(@NonNull Date date)
@@ -717,7 +748,7 @@ public class MainActivity extends DBActivity
                     dialog.dismiss();
                 }
             })
-                .show();
+            .show();
     }
 
 // ---------------------------------------->

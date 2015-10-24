@@ -6,54 +6,31 @@
     android:layout_height="match_parent"
     tools:context=".view.MainActivity">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <FrameLayout
             android:id="@+id/calendarView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true" />
+            android:layout_height="wrap_content"/>
 
-        <LinearLayout
+        <View
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/calendarView"
-            android:orientation="vertical">
+            android:layout_height="7dp"
+            android:background="@drawable/elevation_shadow"
+            android:layout_marginTop="-7dp" />
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/expensesRecyclerView"
+            android:scrollbars="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:layout_weight="1"
+            android:background="@android:color/white" />
 
-                <TextView android:id="@+id/budgetLine"
-                    android:layout_width="match_parent"
-                    android:layout_height="25dp"
-                    android:background="@color/budget_green"
-                    android:textColor="@android:color/white"
-                    android:textSize="14dp"
-                    android:paddingTop="3dp"
-                    android:paddingLeft="15dp"
-                    android:paddingRight="15dp" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="7dp"
-                    android:background="@drawable/elevation_shadow" />
-
-            </FrameLayout>
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/expensesRecyclerView"
-                android:scrollbars="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="0dip"
-                android:layout_weight="1"
-                android:background="@android:color/white" />
-
-        </LinearLayout>
-
-    </RelativeLayout>
+    </LinearLayout>
 
 
     <View android:id="@+id/fab_choices_background"
@@ -75,8 +52,8 @@
             android:layout_marginRight="10dp"
             android:layout_gravity="right|bottom"
             fab:fab_addButtonPlusIconColor="@android:color/white"
-            fab:fab_addButtonColorNormal="@color/accent"
-            fab:fab_addButtonColorPressed="@color/accent_ripple"
+            fab:fab_addButtonColorNormal="@color/primary"
+            fab:fab_addButtonColorPressed="@color/primary_light"
             fab:fab_labelStyle="@style/fab_labels_style"
             app:layout_behavior="com.benoitletondor.easybudgetapp.view.main.FloatingActionButtonBehavior"
             tools:ignore="RtlHardcoded">
@@ -85,8 +62,8 @@
                 android:id="@+id/fab_new_monthly_expense"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                fab:fab_colorNormal="@color/fab_add_monthly_expense"
-                fab:fab_colorPressed="@color/fab_add_monthly_expense_pressed"
+                fab:fab_colorNormal="@color/fab_add_expense"
+                fab:fab_colorPressed="@color/fab_add_expense_pressed"
                 fab:fab_title="@string/fab_add_monthly_expense"
                 fab:fab_icon="@drawable/ic_autorenew_white"
                 fab:fab_size="mini" />
@@ -95,8 +72,8 @@
                 android:id="@+id/fab_new_expense"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                fab:fab_colorNormal="@color/fab_add_expense"
-                fab:fab_colorPressed="@color/fab_add_expense_pressed"
+                fab:fab_colorNormal="@color/fab_add_monthly_expense"
+                fab:fab_colorPressed="@color/fab_add_monthly_expense_pressed"
                 fab:fab_plusIconColor="@android:color/white"
                 fab:fab_title="@string/fab_add_expense"
                 fab:fab_size="mini" />
