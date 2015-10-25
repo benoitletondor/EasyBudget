@@ -139,7 +139,7 @@ public final class DB
         Boolean hasExpensesCached = DBCache.getInstance(context).hasExpensesForDay(day);
         if( hasExpensesCached != null )
         {
-            return hasExpensesCached.booleanValue();
+            return hasExpensesCached;
         }
 
         Cursor cursor = null;
@@ -207,6 +207,13 @@ public final class DB
     public int getBalanceForDay(@NonNull Date day)
     {
         day = DateHelper.cleanDate(day);
+
+        // Check cache
+        Integer cachedBalance = DBCache.getInstance(context).getBalanceForDay(day);
+        if( cachedBalance != null )
+        {
+            return cachedBalance;
+        }
 
         Cursor cursor = null;
         try

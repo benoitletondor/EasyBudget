@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.SimpleArrayMap;
-import android.util.Log;
 
 import com.benoitletondor.easybudgetapp.helper.DateHelper;
 import com.benoitletondor.easybudgetapp.helper.Logger;
@@ -32,7 +31,11 @@ public class DBCache
      */
     private final SimpleArrayMap<Date, List<Expense>> expenses = new SimpleArrayMap<>();
     /**
-     *
+     * Map that contains balances saved per day
+     */
+    private final SimpleArrayMap<Date, Integer> balances = new SimpleArrayMap<>();
+    /**
+     * Single thread executor to load data from DB
      */
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -67,6 +70,13 @@ public class DBCache
      */
     public void refreshForDay(@NonNull DB db, @NonNull Date date)
     {
+        Logger.debug("DBCache: Refreshing for day: "+date);
+
+        synchronized (balances)
+        {
+            balances.clear();
+        }
+
         synchronized (expenses)
         {
             expenses.put(date, db.getExpensesForDay(date));
@@ -86,7 +96,13 @@ public class DBCache
     {
         synchronized (expenses)
         {
-            return expenses.get(date);
+            if( expenses.containsKey(date) )
+            {
+                return expenses.get(date);
+            }
+
+            executor.execute(new LoadMonthRunnable(context, date));
+            return null;
         }
     }
 
@@ -104,10 +120,32 @@ public class DBCache
             List<Expense> expensesForDay = expenses.get(date);
             if( expensesForDay == null )
             {
+                executor.execute(new LoadMonthRunnable(context, date));
                 return null;
             }
 
             return !expensesForDay.isEmpty();
+        }
+    }
+
+    /**
+     * Get balance for the given day if cached
+     *
+     * @param day cleaned date for the day
+     * @return balance if cached, null otherwise
+     */
+    @Nullable
+    public Integer getBalanceForDay(@NonNull Date day)
+    {
+        synchronized (balances)
+        {
+            if( balances.containsKey(day) )
+            {
+                return balances.get(day);
+            }
+
+            executor.execute(new LoadMonthRunnable(context, day));
+            return null;
         }
     }
 
@@ -145,7 +183,6 @@ public class DBCache
             {
                 if (expenses.containsKey(cal.getTime()))
                 {
-                    Logger.debug("DBCache: Already contains month, skipping: " + month);
                     return;
                 }
             }
@@ -160,10 +197,16 @@ public class DBCache
             {
                 Date date = cal.getTime();
                 List<Expense> expensesForDay = db.getExpensesForDay(date);
+                int balanceForDay = db.getBalanceForDay(date);
 
                 synchronized (expenses)
                 {
                     expenses.put(date, expensesForDay);
+                }
+
+                synchronized (balances)
+                {
+                    balances.put(date, balanceForDay);
                 }
 
                 cal.add(Calendar.DAY_OF_MONTH, 1);
