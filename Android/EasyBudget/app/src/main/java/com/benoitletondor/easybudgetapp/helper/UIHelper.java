@@ -19,7 +19,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.view.MainActivity;
 
 /**

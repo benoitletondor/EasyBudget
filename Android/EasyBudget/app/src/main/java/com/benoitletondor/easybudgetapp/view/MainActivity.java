@@ -57,6 +57,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Main activity containing Calendar and List of expenses
@@ -90,7 +91,6 @@ public class MainActivity extends DBActivity
     private ExpensesRecyclerViewAdapter expensesViewAdapter;
     private CoordinatorLayout           coordinatorLayout;
 
-    @Nullable
     private TextView budgetLine;
     @Nullable
     private Date lastStopDate;
@@ -110,6 +110,7 @@ public class MainActivity extends DBActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        budgetLine = (TextView) findViewById(R.id.budgetLine);
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
 
         initCalendarFragment(savedInstanceState);
@@ -418,25 +419,22 @@ public class MainActivity extends DBActivity
      */
     private void updateBalanceDisplayForDay(@NonNull Date day)
     {
-        if( budgetLine != null )
+        int balance = - db.getBalanceForDay(day);
+
+        SimpleDateFormat format = new SimpleDateFormat(getResources().getString(R.string.account_balance_date_format), Locale.getDefault());
+        budgetLine.setText(getResources().getString(R.string.account_balance_format, format.format(day), CurrencyHelper.getFormattedCurrencyString(this, balance)));
+
+        if( balance <= 0 )
         {
-            int balance = - db.getBalanceForDay(day);
-
-            SimpleDateFormat format = new SimpleDateFormat(getResources().getString(R.string.account_balance_date_format));
-            budgetLine.setText(getResources().getString(R.string.account_balance_format, format.format(day), CurrencyHelper.getFormattedCurrencyString(this, balance)));
-
-            if( balance <= 0 )
-            {
-                budgetLine.setBackgroundResource(R.color.budget_red);
-            }
-            else if( balance < 100 ) //TODO configurable ?
-            {
-                budgetLine.setBackgroundResource(R.color.budget_orange);
-            }
-            else
-            {
-                budgetLine.setBackgroundResource(R.color.budget_green);
-            }
+            budgetLine.setBackgroundResource(R.color.budget_red);
+        }
+        else if( balance < 100 ) //TODO configurable ?
+        {
+            budgetLine.setBackgroundResource(R.color.budget_orange);
+        }
+        else
+        {
+            budgetLine.setBackgroundResource(R.color.budget_green);
         }
     }
 
@@ -517,7 +515,6 @@ public class MainActivity extends DBActivity
                 TextView textView = calendarFragment.getMonthTitleTextView();
                 GridView weekDayGreedView = calendarFragment.getWeekdayGridView();
                 LinearLayout topLayout = (LinearLayout) MainActivity.this.findViewById(com.caldroid.R.id.calendar_title_view);
-                LinearLayout calendarLayout = (LinearLayout) topLayout.getParent();
 
                 LinearLayout.LayoutParams  params = (LinearLayout.LayoutParams)textView.getLayoutParams();
                 params.gravity = Gravity.TOP;
@@ -550,12 +547,6 @@ public class MainActivity extends DBActivity
                 rightButton.setBackgroundResource(R.drawable.calendar_month_switcher_button_drawable);
 
                 weekDayGreedView.setPadding(0, MainActivity.this.getResources().getDimensionPixelSize(R.dimen.calendar_weekdays_padding_top), 0, MainActivity.this.getResources().getDimensionPixelSize(R.dimen.calendar_weekdays_padding_bottom));
-
-                View currentAmountLayout = MainActivity.this.getLayoutInflater().inflate(R.layout.current_amount_layout, calendarLayout, false);
-                calendarLayout.addView(currentAmountLayout, 1);
-
-                budgetLine = (TextView) currentAmountLayout.findViewById(R.id.budgetLine);
-                updateBalanceDisplayForDay(calendarFragment.getSelectedDate());
 
                 // Remove border on lollipop
                 UIHelper.removeButtonBorder(leftButton);
@@ -719,6 +710,8 @@ public class MainActivity extends DBActivity
 
         expensesViewAdapter = new ExpensesRecyclerViewAdapter(this, db, date);
         expensesRecyclerView.setAdapter(expensesViewAdapter);
+
+        updateBalanceDisplayForDay(date);
     }
 
     private void refreshRecyclerViewForDate(@NonNull Date date)

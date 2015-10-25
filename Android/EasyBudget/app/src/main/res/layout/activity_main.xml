@@ -22,6 +22,16 @@
             android:background="@drawable/elevation_shadow"
             android:layout_marginTop="-7dp" />
 
+        <TextView android:id="@+id/budgetLine"
+            android:layout_width="match_parent"
+            android:layout_height="28dp"
+            android:background="@color/budget_green"
+            android:textColor="@android:color/white"
+            android:textSize="14dp"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:gravity="center"/>
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/expensesRecyclerView"
             android:scrollbars="vertical"
