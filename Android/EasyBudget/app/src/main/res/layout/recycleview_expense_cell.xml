@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="60dp"
+    android:layout_height="70dp"
     android:background="@drawable/recycler_cell_background_drawable"
     android:clickable="true" >
 
@@ -13,8 +13,9 @@
         android:paddingRight="15dp" >
 
         <ImageView android:id="@+id/positive_indicator"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="5dp"
             android:src="@drawable/ic_label_red"
             android:layout_gravity="center_vertical" />
 
@@ -23,7 +24,7 @@
             android:layout_weight="1"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:layout_marginLeft="15dp"
+            android:layout_marginLeft="20dp"
             android:layout_marginRight="15dp"
             android:gravity="center_vertical" >
 
@@ -31,13 +32,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/primary_text"
-                android:layout_marginBottom="1dp" />
+                android:layout_marginBottom="1dp"
+                android:maxLines="2"
+                android:minLines="1"
+                android:ellipsize="end"/>
 
             <TextView android:id="@+id/expense_amount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/secondary_text"
-                android:layout_marginTop="1dp" />
+                android:textStyle="bold"
+                android:layout_marginTop="1dp"
+                android:maxLines="1"
+                android:minLines="1"
+                android:ellipsize="end"/>
 
         </LinearLayout>
 
@@ -69,6 +76,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dip"
+        android:layout_marginLeft="70dp"
         android:background="@color/divider"
         android:layout_alignParentBottom="true" />
 

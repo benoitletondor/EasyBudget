@@ -5,9 +5,9 @@
         <shape android:shape="oval" >
             <stroke
                 android:width="@dimen/grid_cell_today_border_size"
-                android:color="@color/accent" />
+                android:color="@color/primary_dark" />
 
-            <solid android:color="@color/accent_ripple" />
+            <solid android:color="@color/primary_light" />
         </shape>
     </item>
 

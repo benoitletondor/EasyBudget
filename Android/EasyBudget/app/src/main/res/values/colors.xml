@@ -3,15 +3,18 @@
     <color name="primary">#00897B</color>
     <color name="primary_dark">#00695C</color>
     <color name="primary_light">#B2DFDB</color>
+    <color name="secondary">#2196F3</color>
+    <color name="secondary_dark">#1976D2</color>
+    <color name="secondary_light">#69a9e9</color>
     <color name="accent">@color/primary</color>
-    <color name="accent_ripple">@color/primary_dark</color>
+    <color name="accent_ripple">@color/primary_light</color>
     <color name="primary_text">#212121</color>
     <color name="secondary_text">#727272</color>
-    <color name="divider">#dadada</color>
+    <color name="divider">#eeeeee</color>
     <color name="fab_add_expense">#F44336</color>
     <color name="fab_add_expense_pressed">#EF5350</color>
-    <color name="fab_add_monthly_expense">#2196F3</color>
-    <color name="fab_add_monthly_expense_pressed">#42A5F5</color>
+    <color name="fab_add_monthly_expense">@color/secondary</color>
+    <color name="fab_add_monthly_expense_pressed">@color/secondary_light</color>
 
     <color name="calendar_cell_selected">@color/primary_light</color>
     <color name="calendar_cell_disabled_text_color">#eeeeee</color>
@@ -23,16 +26,16 @@
 
     <color name="snackbar_action_undo">#4caf50</color>
 
-    <color name="onboarding_1_background">#00897B</color>
-    <color name="onboarding_1_statusbar">#00695C</color>
-    <color name="onboarding_1_nextbutton_normal">@color/fab_add_monthly_expense</color>
-    <color name="onboarding_1_nextbutton_pressed">@color/fab_add_monthly_expense_pressed</color>
-    <color name="onboarding_2_background">#2196F3</color>
-    <color name="onboarding_2_statusbar">#1976D2</color>
-    <color name="onboarding_2_nextbutton_normal">#00897B</color>
-    <color name="onboarding_2_nextbutton_pressed">#B2DFDB</color>
-    <color name="onboarding_3_background">#2196F3</color>
-    <color name="onboarding_3_statusbar">#1976D2</color>
-    <color name="onboarding_4_background">#00897B</color>
-    <color name="onboarding_4_statusbar">#00695C</color>
+    <color name="onboarding_1_background">@color/primary</color>
+    <color name="onboarding_1_statusbar">@color/primary_dark</color>
+    <color name="onboarding_1_nextbutton_normal">@color/secondary</color>
+    <color name="onboarding_1_nextbutton_pressed">@color/secondary_light</color>
+    <color name="onboarding_2_background">@color/secondary</color>
+    <color name="onboarding_2_statusbar">@color/secondary_dark</color>
+    <color name="onboarding_2_nextbutton_normal">@color/primary</color>
+    <color name="onboarding_2_nextbutton_pressed">@color/primary_light</color>
+    <color name="onboarding_3_background">@color/secondary</color>
+    <color name="onboarding_3_statusbar">@color/secondary_dark</color>
+    <color name="onboarding_4_background">@color/primary</color>
+    <color name="onboarding_4_statusbar">@color/primary_dark</color>
 </resources>
