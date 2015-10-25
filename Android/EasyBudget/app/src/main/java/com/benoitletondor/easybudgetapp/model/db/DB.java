@@ -31,6 +31,10 @@ public final class DB
      * The SQLLite DB
      */
     private final SQLiteDatabase database;
+    /**
+     * Saved context
+     */
+    private final Context context;
 
 // -------------------------------------------->
 
@@ -42,7 +46,8 @@ public final class DB
      */
     public DB(@NonNull Context context) throws SQLiteException
     {
-        SQLiteDBHelper databaseHelper = new SQLiteDBHelper(context.getApplicationContext());
+        this.context = context.getApplicationContext();
+        SQLiteDBHelper databaseHelper = new SQLiteDBHelper(this.context);
 		database = databaseHelper.getWritableDatabase();
 	}
 
@@ -82,23 +87,31 @@ public final class DB
      */
     public boolean persistExpense(@NonNull Expense expense, boolean forcePersist)
     {
-        if( expense.getId() != null && !forcePersist )
+        try
         {
-            int rowsAffected = database.update(SQLiteDBHelper.TABLE_EXPENSE, generateContentValuesForExpense(expense), SQLiteDBHelper.COLUMN_EXPENSE_DB_ID+"="+expense.getId(), null);
-            return rowsAffected == 1;
-        }
-        else
-        {
-            long id = database.insert(SQLiteDBHelper.TABLE_EXPENSE, null, generateContentValuesForExpense(expense));
-
-            if( id > 0 )
+            if( expense.getId() != null && !forcePersist )
             {
-                expense.setId(id);
-                return true;
+                int rowsAffected = database.update(SQLiteDBHelper.TABLE_EXPENSE, generateContentValuesForExpense(expense), SQLiteDBHelper.COLUMN_EXPENSE_DB_ID+"="+expense.getId(), null);
+                return rowsAffected == 1;
             }
-        }
+            else
+            {
+                long id = database.insert(SQLiteDBHelper.TABLE_EXPENSE, null, generateContentValuesForExpense(expense));
 
-        return false;
+                if( id > 0 )
+                {
+                    expense.setId(id);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        finally
+        {
+            // Refresh cache for day
+            DBCache.getInstance(context).refreshForDay(this, expense.getDate());
+        }
     }
 
     /**
@@ -122,10 +135,17 @@ public final class DB
     {
         day = DateHelper.cleanDate(day);
 
+        // Check cache
+        Boolean hasExpensesCached = DBCache.getInstance(context).hasExpensesForDay(day);
+        if( hasExpensesCached != null )
+        {
+            return hasExpensesCached.booleanValue();
+        }
+
         Cursor cursor = null;
         try
         {
-            cursor = database.rawQuery("SELECT COUNT(*) FROM "+SQLiteDBHelper.TABLE_EXPENSE+" WHERE "+SQLiteDBHelper.COLUMN_EXPENSE_DATE+" = "+day.getTime(), null);
+            cursor = database.rawQuery("SELECT COUNT(*) FROM " + SQLiteDBHelper.TABLE_EXPENSE + " WHERE " + SQLiteDBHelper.COLUMN_EXPENSE_DATE + " = " + day.getTime(), null);
 
             return cursor.moveToFirst() && cursor.getInt(0) > 0;
         }
@@ -148,6 +168,13 @@ public final class DB
     public List<Expense> getExpensesForDay(@NonNull Date date)
     {
         date = DateHelper.cleanDate(date);
+
+        // Check cache
+        List<Expense> cachedExpenses = DBCache.getInstance(context).getExpensesForDay(date);
+        if( cachedExpenses != null )
+        {
+            return cachedExpenses;
+        }
 
         Cursor cursor = null;
         try
@@ -270,7 +297,15 @@ public final class DB
      */
     public boolean deleteExpense(@NonNull Expense expense)
     {
-        return database.delete(SQLiteDBHelper.TABLE_EXPENSE, SQLiteDBHelper.COLUMN_EXPENSE_DB_ID+"="+expense.getId(), null) > 0;
+        try
+        {
+            return database.delete(SQLiteDBHelper.TABLE_EXPENSE, SQLiteDBHelper.COLUMN_EXPENSE_DB_ID+"="+expense.getId(), null) > 0;
+        }
+        finally
+        {
+            // Refresh cache for day
+            DBCache.getInstance(context).refreshForDay(this, expense.getDate());
+        }
     }
 
     /**
