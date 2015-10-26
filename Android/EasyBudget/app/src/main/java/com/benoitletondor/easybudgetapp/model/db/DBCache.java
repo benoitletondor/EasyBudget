@@ -60,6 +60,7 @@ public class DBCache
         Logger.debug("DBCache: Request to cache month: "+date);
 
         executor.execute(new LoadMonthRunnable(context, date));
+        executor.execute(new LoadBalanceMonthRunnable(context, date));
     }
 
     /**
@@ -74,12 +75,12 @@ public class DBCache
 
         synchronized (balances)
         {
-            balances.clear();
+            balances.clear(); // TODO be smarter than delete all!
         }
 
         synchronized (expenses)
         {
-            expenses.put(date, db.getExpensesForDay(date));
+            expenses.put(date, db.getExpensesForDay(date, false));
         }
     }
 
@@ -144,7 +145,7 @@ public class DBCache
                 return balances.get(day);
             }
 
-            executor.execute(new LoadMonthRunnable(context, day));
+            executor.execute(new LoadBalanceMonthRunnable(context, day));
             return null;
         }
     }
@@ -163,56 +164,135 @@ public class DBCache
         /**
          * Link to the DB
          */
-        private DB db;
+        private Context context;
 
         private LoadMonthRunnable(@NonNull Context context, @NonNull Date month)
         {
             this.month = month;
-            db = new DB(context);
+            this.context = context;
         }
 
         @Override
         public void run()
         {
-            // Init a calendar to the given date, setting the day of month to 1
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(DateHelper.cleanDate(month));
-            cal.set(Calendar.DAY_OF_MONTH, 1);
-
-            synchronized (expenses)
+            DB db = null;
+            try
             {
-                if (expenses.containsKey(cal.getTime()))
-                {
-                    return;
-                }
-            }
-
-            // Save the month we wanna load cache for
-            int month = cal.get(Calendar.MONTH);
-
-            Logger.debug("DBCache: Caching data for month: "+month);
-
-            // Iterate over day of month (while are still on that month)
-            while( cal.get(Calendar.MONTH) == month )
-            {
-                Date date = cal.getTime();
-                List<Expense> expensesForDay = db.getExpensesForDay(date);
-                int balanceForDay = db.getBalanceForDay(date);
+                // Init a calendar to the given date, setting the day of month to 1
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(DateHelper.cleanDate(month));
+                cal.set(Calendar.DAY_OF_MONTH, 1);
 
                 synchronized (expenses)
                 {
-                    expenses.put(date, expensesForDay);
+                    if (expenses.containsKey(cal.getTime()))
+                    {
+                        return;
+                    }
                 }
+
+                db = new DB(context.getApplicationContext());
+
+                // Save the month we wanna load cache for
+                int month = cal.get(Calendar.MONTH);
+
+                Logger.debug("DBCache: Caching data for month: "+month);
+
+                // Iterate over day of month (while are still on that month)
+                while( cal.get(Calendar.MONTH) == month )
+                {
+                    Date date = cal.getTime();
+                    List<Expense> expensesForDay = db.getExpensesForDay(date);
+
+                    synchronized (expenses)
+                    {
+                        expenses.put(date, expensesForDay);
+                    }
+
+                    cal.add(Calendar.DAY_OF_MONTH, 1);
+                }
+
+                Logger.debug("DBCache: Data cached for month: "+month);
+            }
+            finally
+            {
+                if( db != null )
+                {
+                    db.close();
+                }
+            }
+        }
+    }
+
+    /**
+     * Runnable that loads balance data for a month in cache
+     */
+    private class LoadBalanceMonthRunnable implements Runnable
+    {
+        /**
+         * Date containing the month to load
+         */
+        private Date month;
+        /**
+         * Link to the DB
+         */
+        private Context context;
+
+        private LoadBalanceMonthRunnable(@NonNull Context context, @NonNull Date month)
+        {
+            this.month = month;
+            this.context = context;
+        }
+
+        @Override
+        public void run()
+        {
+            DB db = null;
+            try
+            {
+                // Init a calendar to the given date, setting the day of month to 1
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(DateHelper.cleanDate(month));
+                cal.set(Calendar.DAY_OF_MONTH, 1);
 
                 synchronized (balances)
                 {
-                    balances.put(date, balanceForDay);
+                    if (balances.containsKey(cal.getTime()))
+                    {
+                        return;
+                    }
                 }
 
-                cal.add(Calendar.DAY_OF_MONTH, 1);
-            }
+                db = new DB(context.getApplicationContext());
 
-            Logger.debug("DBCache: Data cached for month: "+month);
+                // Save the month we wanna load cache for
+                int month = cal.get(Calendar.MONTH);
+
+                Logger.debug("DBCache: Caching balance data for month: "+month);
+
+                // Iterate over day of month (while are still on that month)
+                while( cal.get(Calendar.MONTH) == month )
+                {
+                    Date date = cal.getTime();
+                    int balanceForDay = db.getBalanceForDay(date);
+
+                    synchronized (balances)
+                    {
+                        balances.put(date, balanceForDay);
+                    }
+
+                    cal.add(Calendar.DAY_OF_MONTH, 1);
+                }
+
+                Logger.debug("DBCache: Data balance cached for month: "+month);
+            }
+            finally
+            {
+                if( db != null )
+                {
+                    db.close();
+                }
+            }
         }
     }
 

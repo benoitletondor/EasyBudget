@@ -87,31 +87,32 @@ public final class DB
      */
     public boolean persistExpense(@NonNull Expense expense, boolean forcePersist)
     {
-        try
+        if( expense.getId() != null && !forcePersist )
         {
-            if( expense.getId() != null && !forcePersist )
+            int rowsAffected = database.update(SQLiteDBHelper.TABLE_EXPENSE, generateContentValuesForExpense(expense), SQLiteDBHelper.COLUMN_EXPENSE_DB_ID+"="+expense.getId(), null);
+            if( rowsAffected > 0 )
             {
-                int rowsAffected = database.update(SQLiteDBHelper.TABLE_EXPENSE, generateContentValuesForExpense(expense), SQLiteDBHelper.COLUMN_EXPENSE_DB_ID+"="+expense.getId(), null);
-                return rowsAffected == 1;
-            }
-            else
-            {
-                long id = database.insert(SQLiteDBHelper.TABLE_EXPENSE, null, generateContentValuesForExpense(expense));
-
-                if( id > 0 )
-                {
-                    expense.setId(id);
-                    return true;
-                }
+                // Refresh cache for day
+                DBCache.getInstance(context).refreshForDay(this, expense.getDate());
             }
 
-            return false;
+            return rowsAffected == 1;
         }
-        finally
+        else
         {
-            // Refresh cache for day
-            DBCache.getInstance(context).refreshForDay(this, expense.getDate());
+            long id = database.insert(SQLiteDBHelper.TABLE_EXPENSE, null, generateContentValuesForExpense(expense));
+
+            if( id > 0 )
+            {
+                // Refresh cache for day
+                DBCache.getInstance(context).refreshForDay(this, expense.getDate());
+
+                expense.setId(id);
+                return true;
+            }
         }
+
+        return false;
     }
 
     /**
@@ -162,18 +163,22 @@ public final class DB
      * Get all one time expense for a day
      *
      * @param date
+     * @param fromCache should we use cache or not
      * @return
      */
     @NonNull
-    public List<Expense> getExpensesForDay(@NonNull Date date)
+    protected List<Expense> getExpensesForDay(@NonNull Date date, boolean fromCache)
     {
         date = DateHelper.cleanDate(date);
 
         // Check cache
-        List<Expense> cachedExpenses = DBCache.getInstance(context).getExpensesForDay(date);
-        if( cachedExpenses != null )
+        if( fromCache )
         {
-            return cachedExpenses;
+            List<Expense> cachedExpenses = DBCache.getInstance(context).getExpensesForDay(date);
+            if( cachedExpenses != null )
+            {
+                return cachedExpenses;
+            }
         }
 
         Cursor cursor = null;
@@ -196,6 +201,18 @@ public final class DB
                 cursor.close();
             }
         }
+    }
+
+    /**
+     * Get all one time expense for a day
+     *
+     * @param date
+     * @return
+     */
+    @NonNull
+    public List<Expense> getExpensesForDay(@NonNull Date date)
+    {
+        return getExpensesForDay(date, true);
     }
 
     /**
@@ -304,15 +321,15 @@ public final class DB
      */
     public boolean deleteExpense(@NonNull Expense expense)
     {
-        try
-        {
-            return database.delete(SQLiteDBHelper.TABLE_EXPENSE, SQLiteDBHelper.COLUMN_EXPENSE_DB_ID+"="+expense.getId(), null) > 0;
-        }
-        finally
+        boolean delete = database.delete(SQLiteDBHelper.TABLE_EXPENSE, SQLiteDBHelper.COLUMN_EXPENSE_DB_ID+"="+expense.getId(), null) > 0;
+
+        if( delete )
         {
             // Refresh cache for day
             DBCache.getInstance(context).refreshForDay(this, expense.getDate());
         }
+
+        return delete;
     }
 
     /**
