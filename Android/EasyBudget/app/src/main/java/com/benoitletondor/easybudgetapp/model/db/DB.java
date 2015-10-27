@@ -31,6 +31,10 @@ public final class DB
      * The SQLLite DB
      */
     private final SQLiteDatabase database;
+    /**
+     * Saved context
+     */
+    private final Context context;
 
 // -------------------------------------------->
 
@@ -42,7 +46,8 @@ public final class DB
      */
     public DB(@NonNull Context context) throws SQLiteException
     {
-        SQLiteDBHelper databaseHelper = new SQLiteDBHelper(context.getApplicationContext());
+        this.context = context.getApplicationContext();
+        SQLiteDBHelper databaseHelper = new SQLiteDBHelper(this.context);
 		database = databaseHelper.getWritableDatabase();
 	}
 
@@ -85,6 +90,12 @@ public final class DB
         if( expense.getId() != null && !forcePersist )
         {
             int rowsAffected = database.update(SQLiteDBHelper.TABLE_EXPENSE, generateContentValuesForExpense(expense), SQLiteDBHelper.COLUMN_EXPENSE_DB_ID+"="+expense.getId(), null);
+            if( rowsAffected > 0 )
+            {
+                // Refresh cache for day
+                DBCache.getInstance(context).refreshForDay(this, expense.getDate());
+            }
+
             return rowsAffected == 1;
         }
         else
@@ -93,6 +104,9 @@ public final class DB
 
             if( id > 0 )
             {
+                // Refresh cache for day
+                DBCache.getInstance(context).refreshForDay(this, expense.getDate());
+
                 expense.setId(id);
                 return true;
             }
@@ -122,10 +136,17 @@ public final class DB
     {
         day = DateHelper.cleanDate(day);
 
+        // Check cache
+        Boolean hasExpensesCached = DBCache.getInstance(context).hasExpensesForDay(day);
+        if( hasExpensesCached != null )
+        {
+            return hasExpensesCached;
+        }
+
         Cursor cursor = null;
         try
         {
-            cursor = database.rawQuery("SELECT COUNT(*) FROM "+SQLiteDBHelper.TABLE_EXPENSE+" WHERE "+SQLiteDBHelper.COLUMN_EXPENSE_DATE+" = "+day.getTime(), null);
+            cursor = database.rawQuery("SELECT COUNT(*) FROM " + SQLiteDBHelper.TABLE_EXPENSE + " WHERE " + SQLiteDBHelper.COLUMN_EXPENSE_DATE + " = " + day.getTime(), null);
 
             return cursor.moveToFirst() && cursor.getInt(0) > 0;
         }
@@ -142,12 +163,23 @@ public final class DB
      * Get all one time expense for a day
      *
      * @param date
+     * @param fromCache should we use cache or not
      * @return
      */
     @NonNull
-    public List<Expense> getExpensesForDay(@NonNull Date date)
+    protected List<Expense> getExpensesForDay(@NonNull Date date, boolean fromCache)
     {
         date = DateHelper.cleanDate(date);
+
+        // Check cache
+        if( fromCache )
+        {
+            List<Expense> cachedExpenses = DBCache.getInstance(context).getExpensesForDay(date);
+            if( cachedExpenses != null )
+            {
+                return cachedExpenses;
+            }
+        }
 
         Cursor cursor = null;
         try
@@ -172,14 +204,37 @@ public final class DB
     }
 
     /**
+     * Get all one time expense for a day
+     *
+     * @param date
+     * @return
+     */
+    @NonNull
+    public List<Expense> getExpensesForDay(@NonNull Date date)
+    {
+        return getExpensesForDay(date, true);
+    }
+
+    /**
      * Get a sum of all amount of expenses until the given day
      *
      * @param day
+     * @param fromCache should we use DBCache
      * @return
      */
-    public int getBalanceForDay(@NonNull Date day)
+    protected int getBalanceForDay(@NonNull Date day, boolean fromCache)
     {
         day = DateHelper.cleanDate(day);
+
+        // Check cache
+        if( fromCache )
+        {
+            Integer cachedBalance = DBCache.getInstance(context).getBalanceForDay(day);
+            if( cachedBalance != null )
+            {
+                return cachedBalance;
+            }
+        }
 
         Cursor cursor = null;
         try
@@ -200,6 +255,17 @@ public final class DB
                 cursor.close();
             }
         }
+    }
+
+    /**
+     * Get a sum of all amount of expenses until the given day
+     *
+     * @param day
+     * @return
+     */
+    public int getBalanceForDay(@NonNull Date day)
+    {
+        return getBalanceForDay(day, true);
     }
 
     /**
@@ -270,7 +336,15 @@ public final class DB
      */
     public boolean deleteExpense(@NonNull Expense expense)
     {
-        return database.delete(SQLiteDBHelper.TABLE_EXPENSE, SQLiteDBHelper.COLUMN_EXPENSE_DB_ID+"="+expense.getId(), null) > 0;
+        boolean delete = database.delete(SQLiteDBHelper.TABLE_EXPENSE, SQLiteDBHelper.COLUMN_EXPENSE_DB_ID+"="+expense.getId(), null) > 0;
+
+        if( delete )
+        {
+            // Refresh cache for day
+            DBCache.getInstance(context).refreshForDay(this, expense.getDate());
+        }
+
+        return delete;
     }
 
     /**
@@ -281,7 +355,14 @@ public final class DB
      */
     public boolean deleteAllExpenseForMonthlyExpense(@NonNull MonthlyExpense monthlyExpense)
     {
-        return database.delete(SQLiteDBHelper.TABLE_EXPENSE, SQLiteDBHelper.COLUMN_EXPENSE_MONTHLY_ID+"="+monthlyExpense.getId(), null) > 0;
+        boolean deleted = database.delete(SQLiteDBHelper.TABLE_EXPENSE, SQLiteDBHelper.COLUMN_EXPENSE_MONTHLY_ID+"="+monthlyExpense.getId(), null) > 0;
+
+        if( deleted )
+        {
+            DBCache.getInstance(context).wipeAll();
+        }
+
+        return deleted;
     }
 
     /**
@@ -323,7 +404,14 @@ public final class DB
      */
     public boolean deleteAllExpenseForMonthlyExpenseFromDate(@NonNull MonthlyExpense monthlyExpense, @NonNull Date fromDate)
     {
-        return database.delete(SQLiteDBHelper.TABLE_EXPENSE, SQLiteDBHelper.COLUMN_EXPENSE_MONTHLY_ID+"="+monthlyExpense.getId()+" AND "+SQLiteDBHelper.COLUMN_EXPENSE_DATE+">="+fromDate.getTime(), null) > 0;
+        boolean deleted = database.delete(SQLiteDBHelper.TABLE_EXPENSE, SQLiteDBHelper.COLUMN_EXPENSE_MONTHLY_ID+"="+monthlyExpense.getId()+" AND "+SQLiteDBHelper.COLUMN_EXPENSE_DATE+">="+fromDate.getTime(), null) > 0;
+
+        if( deleted )
+        {
+            DBCache.getInstance(context).wipeAll();
+        }
+
+        return  deleted;
     }
 
     /**
@@ -368,7 +456,14 @@ public final class DB
      */
     public boolean deleteAllExpenseForMonthlyExpenseBeforeDate(@NonNull MonthlyExpense monthlyExpense, @NonNull Date toDate)
     {
-        return database.delete(SQLiteDBHelper.TABLE_EXPENSE, SQLiteDBHelper.COLUMN_EXPENSE_MONTHLY_ID+"="+monthlyExpense.getId()+" AND "+SQLiteDBHelper.COLUMN_EXPENSE_DATE+"<"+toDate.getTime(), null) > 0;
+        boolean deleted = database.delete(SQLiteDBHelper.TABLE_EXPENSE, SQLiteDBHelper.COLUMN_EXPENSE_MONTHLY_ID+"="+monthlyExpense.getId()+" AND "+SQLiteDBHelper.COLUMN_EXPENSE_DATE+"<"+toDate.getTime(), null) > 0;
+
+        if( deleted )
+        {
+            DBCache.getInstance(context).wipeAll();
+        }
+
+        return deleted;
     }
 
     /**

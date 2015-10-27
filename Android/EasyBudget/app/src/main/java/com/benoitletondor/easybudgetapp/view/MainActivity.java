@@ -44,6 +44,7 @@ import com.benoitletondor.easybudgetapp.helper.Parameters;
 import com.benoitletondor.easybudgetapp.model.Expense;
 import com.benoitletondor.easybudgetapp.model.MonthlyExpense;
 import com.benoitletondor.easybudgetapp.model.MonthlyExpenseDeleteType;
+import com.benoitletondor.easybudgetapp.model.db.DBCache;
 import com.benoitletondor.easybudgetapp.view.main.calendar.CalendarFragment;
 import com.benoitletondor.easybudgetapp.view.main.ExpensesRecyclerViewAdapter;
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment;
@@ -146,8 +147,12 @@ public class MainActivity extends DBActivity
                             {
                                 db.persistExpense(expense, true);
 
-                                expensesViewAdapter.addExpense(expense, position);
-                                updateBalanceDisplayForDay(expensesViewAdapter.getDate());
+                                if( calendarFragment.getSelectedDate().equals(expense.getDate()) )
+                                {
+                                    expensesViewAdapter.addExpense(expense, position);
+                                }
+
+                                updateBalanceDisplayForDay(calendarFragment.getSelectedDate());
                                 calendarFragment.refreshView();
                             }
                         });
@@ -504,7 +509,11 @@ public class MainActivity extends DBActivity
             @Override
             public void onChangeMonth(int month, int year)
             {
+                Calendar cal = Calendar.getInstance();
+                cal.set(Calendar.MONTH, month);
+                cal.set(Calendar.YEAR, year);
 
+                DBCache.getInstance(MainActivity.this).loadMonth(cal.getTime());
             }
 
             @Override
