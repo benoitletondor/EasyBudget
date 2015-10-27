@@ -219,17 +219,21 @@ public final class DB
      * Get a sum of all amount of expenses until the given day
      *
      * @param day
+     * @param fromCache should we use DBCache
      * @return
      */
-    public int getBalanceForDay(@NonNull Date day)
+    protected int getBalanceForDay(@NonNull Date day, boolean fromCache)
     {
         day = DateHelper.cleanDate(day);
 
         // Check cache
-        Integer cachedBalance = DBCache.getInstance(context).getBalanceForDay(day);
-        if( cachedBalance != null )
+        if( fromCache )
         {
-            return cachedBalance;
+            Integer cachedBalance = DBCache.getInstance(context).getBalanceForDay(day);
+            if( cachedBalance != null )
+            {
+                return cachedBalance;
+            }
         }
 
         Cursor cursor = null;
@@ -251,6 +255,17 @@ public final class DB
                 cursor.close();
             }
         }
+    }
+
+    /**
+     * Get a sum of all amount of expenses until the given day
+     *
+     * @param day
+     * @return
+     */
+    public int getBalanceForDay(@NonNull Date day)
+    {
+        return getBalanceForDay(day, true);
     }
 
     /**
@@ -340,7 +355,14 @@ public final class DB
      */
     public boolean deleteAllExpenseForMonthlyExpense(@NonNull MonthlyExpense monthlyExpense)
     {
-        return database.delete(SQLiteDBHelper.TABLE_EXPENSE, SQLiteDBHelper.COLUMN_EXPENSE_MONTHLY_ID+"="+monthlyExpense.getId(), null) > 0;
+        boolean deleted = database.delete(SQLiteDBHelper.TABLE_EXPENSE, SQLiteDBHelper.COLUMN_EXPENSE_MONTHLY_ID+"="+monthlyExpense.getId(), null) > 0;
+
+        if( deleted )
+        {
+            DBCache.getInstance(context).wipeAll();
+        }
+
+        return deleted;
     }
 
     /**
@@ -382,7 +404,14 @@ public final class DB
      */
     public boolean deleteAllExpenseForMonthlyExpenseFromDate(@NonNull MonthlyExpense monthlyExpense, @NonNull Date fromDate)
     {
-        return database.delete(SQLiteDBHelper.TABLE_EXPENSE, SQLiteDBHelper.COLUMN_EXPENSE_MONTHLY_ID+"="+monthlyExpense.getId()+" AND "+SQLiteDBHelper.COLUMN_EXPENSE_DATE+">="+fromDate.getTime(), null) > 0;
+        boolean deleted = database.delete(SQLiteDBHelper.TABLE_EXPENSE, SQLiteDBHelper.COLUMN_EXPENSE_MONTHLY_ID+"="+monthlyExpense.getId()+" AND "+SQLiteDBHelper.COLUMN_EXPENSE_DATE+">="+fromDate.getTime(), null) > 0;
+
+        if( deleted )
+        {
+            DBCache.getInstance(context).wipeAll();
+        }
+
+        return  deleted;
     }
 
     /**
@@ -427,7 +456,14 @@ public final class DB
      */
     public boolean deleteAllExpenseForMonthlyExpenseBeforeDate(@NonNull MonthlyExpense monthlyExpense, @NonNull Date toDate)
     {
-        return database.delete(SQLiteDBHelper.TABLE_EXPENSE, SQLiteDBHelper.COLUMN_EXPENSE_MONTHLY_ID+"="+monthlyExpense.getId()+" AND "+SQLiteDBHelper.COLUMN_EXPENSE_DATE+"<"+toDate.getTime(), null) > 0;
+        boolean deleted = database.delete(SQLiteDBHelper.TABLE_EXPENSE, SQLiteDBHelper.COLUMN_EXPENSE_MONTHLY_ID+"="+monthlyExpense.getId()+" AND "+SQLiteDBHelper.COLUMN_EXPENSE_DATE+"<"+toDate.getTime(), null) > 0;
+
+        if( deleted )
+        {
+            DBCache.getInstance(context).wipeAll();
+        }
+
+        return deleted;
     }
 
     /**

@@ -147,8 +147,12 @@ public class MainActivity extends DBActivity
                             {
                                 db.persistExpense(expense, true);
 
-                                expensesViewAdapter.addExpense(expense, position);
-                                updateBalanceDisplayForDay(expensesViewAdapter.getDate());
+                                if( calendarFragment.getSelectedDate().equals(expense.getDate()) )
+                                {
+                                    expensesViewAdapter.addExpense(expense, position);
+                                }
+
+                                updateBalanceDisplayForDay(calendarFragment.getSelectedDate());
                                 calendarFragment.refreshView();
                             }
                         });

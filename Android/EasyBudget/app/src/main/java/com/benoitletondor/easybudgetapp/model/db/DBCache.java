@@ -84,6 +84,24 @@ public class DBCache
         }
     }
 
+    /**
+     * Instantly wipe all cached data
+     */
+    public void wipeAll()
+    {
+        Logger.debug("DBCache: Refreshing all");
+
+        synchronized (balances)
+        {
+            balances.clear();
+        }
+
+        synchronized (expenses)
+        {
+            expenses.clear();
+        }
+    }
+
 // ------------------------------------->
 
     /**
@@ -202,7 +220,7 @@ public class DBCache
                 while( cal.get(Calendar.MONTH) == month )
                 {
                     Date date = cal.getTime();
-                    List<Expense> expensesForDay = db.getExpensesForDay(date);
+                    List<Expense> expensesForDay = db.getExpensesForDay(date, false);
 
                     synchronized (expenses)
                     {
@@ -274,7 +292,7 @@ public class DBCache
                 while( cal.get(Calendar.MONTH) == month )
                 {
                     Date date = cal.getTime();
-                    int balanceForDay = db.getBalanceForDay(date);
+                    int balanceForDay = db.getBalanceForDay(date, false);
 
                     synchronized (balances)
                     {
