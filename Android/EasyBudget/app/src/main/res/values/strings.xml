@@ -38,21 +38,21 @@
         <item>Edit income</item>
         <item>Delete income</item>
     </string-array>
-    <string name="dialog_edit_monthly_expense_title">Edit monthly expense</string>
-    <string name="dialog_edit_monthly_income_title">Edit monthly income</string>
+    <string name="dialog_edit_monthly_expense_title">Monthly expense: What do you want to do?</string>
+    <string name="dialog_edit_monthly_income_title">Monthly income: What do you want to do?</string>
     <string-array name="dialog_edit_monthly_expense_choices">
-        <item>Delete occurrences from this one</item>
-        <item>Delete occurrences before this one</item>
-        <item>Delete all occurrences</item>
-        <item>Edit this occurrence</item>
-        <item>Delete this occurrence only</item>
+        <item>Edit this instance</item>
+        <item>Delete this instance only</item>
+        <item>Delete all following</item>
+        <item>Delete all before</item>
+        <item>Delete all</item>
     </string-array>
     <string-array name="dialog_edit_monthly_income_choices">
-        <item>Delete occurrences from this one</item>
-        <item>Delete occurrences before this one</item>
-        <item>Delete all occurrences</item>
-        <item>Edit this occurrence</item>
-        <item>Delete this occurrence only</item>
+        <item>Edit this instance</item>
+        <item>Delete this instance only</item>
+        <item>Delete all following</item>
+        <item>Delete all before</item>
+        <item>Delete all</item>
     </string-array>
     <string name="expense_delete_snackbar_text">Expense deleted</string>
     <string name="income_delete_snackbar_text">Income deleted</string>

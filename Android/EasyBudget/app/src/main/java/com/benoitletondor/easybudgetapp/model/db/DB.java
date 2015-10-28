@@ -396,7 +396,7 @@ public final class DB
     }
 
     /**
-     * Delete all expense for this monthly expense from the given date (included)
+     * Delete all expense for this monthly expense from the given date (not included)
      *
      * @param monthlyExpense
      * @param fromDate
@@ -404,7 +404,7 @@ public final class DB
      */
     public boolean deleteAllExpenseForMonthlyExpenseFromDate(@NonNull MonthlyExpense monthlyExpense, @NonNull Date fromDate)
     {
-        boolean deleted = database.delete(SQLiteDBHelper.TABLE_EXPENSE, SQLiteDBHelper.COLUMN_EXPENSE_MONTHLY_ID+"="+monthlyExpense.getId()+" AND "+SQLiteDBHelper.COLUMN_EXPENSE_DATE+">="+fromDate.getTime(), null) > 0;
+        boolean deleted = database.delete(SQLiteDBHelper.TABLE_EXPENSE, SQLiteDBHelper.COLUMN_EXPENSE_MONTHLY_ID+"="+monthlyExpense.getId()+" AND "+SQLiteDBHelper.COLUMN_EXPENSE_DATE+">"+fromDate.getTime(), null) > 0;
 
         if( deleted )
         {
@@ -415,7 +415,7 @@ public final class DB
     }
 
     /**
-     * Retrieve all expenses associated with this monthly expense happening after the given date (included)
+     * Retrieve all expenses associated with this monthly expense happening after the given date (not included)
      *
      * @param monthlyExpense
      * @param fromDate
@@ -430,7 +430,7 @@ public final class DB
         {
             List<Expense> expenses = new ArrayList<>();
 
-            cursor = database.query(SQLiteDBHelper.TABLE_EXPENSE, null, SQLiteDBHelper.COLUMN_EXPENSE_MONTHLY_ID+"="+monthlyExpense.getId()+" AND "+SQLiteDBHelper.COLUMN_EXPENSE_DATE+">="+fromDate.getTime(), null, null, null, null, null);
+            cursor = database.query(SQLiteDBHelper.TABLE_EXPENSE, null, SQLiteDBHelper.COLUMN_EXPENSE_MONTHLY_ID+"="+monthlyExpense.getId()+" AND "+SQLiteDBHelper.COLUMN_EXPENSE_DATE+">"+fromDate.getTime(), null, null, null, null, null);
             while( cursor.moveToNext() )
             {
                 expenses.add(ExpenseFromCursor(cursor));

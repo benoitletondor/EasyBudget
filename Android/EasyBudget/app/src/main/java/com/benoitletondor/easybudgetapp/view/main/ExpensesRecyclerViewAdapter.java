@@ -150,37 +150,7 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
                         {
                             switch (which)
                             {
-                                case 0: // Delete from
-                                {
-                                    // Send notification to inform views that this expense has been deleted
-                                    Intent intent = new Intent(MainActivity.INTENT_MONTHLY_EXPENSE_DELETED);
-                                    intent.putExtra("expense", expense);
-                                    intent.putExtra("deleteType", MonthlyExpenseDeleteType.FROM.getValue());
-                                    LocalBroadcastManager.getInstance(activity.getApplicationContext()).sendBroadcast(intent);
-
-                                    break;
-                                }
-                                case 1: // Delete up to
-                                {
-                                    // Send notification to inform views that this expense has been deleted
-                                    Intent intent = new Intent(MainActivity.INTENT_MONTHLY_EXPENSE_DELETED);
-                                    intent.putExtra("expense", expense);
-                                    intent.putExtra("deleteType", MonthlyExpenseDeleteType.TO.getValue());
-                                    LocalBroadcastManager.getInstance(activity.getApplicationContext()).sendBroadcast(intent);
-
-                                    break;
-                                }
-                                case 2: // Delete all
-                                {
-                                    // Send notification to inform views that this expense has been deleted
-                                    Intent intent = new Intent(MainActivity.INTENT_MONTHLY_EXPENSE_DELETED);
-                                    intent.putExtra("expense", expense);
-                                    intent.putExtra("deleteType", MonthlyExpenseDeleteType.ALL.getValue());
-                                    LocalBroadcastManager.getInstance(activity.getApplicationContext()).sendBroadcast(intent);
-
-                                    break;
-                                }
-                                case 3: // Edit this one
+                                case 0: // Edit this one
                                 {
                                     Intent startIntent = new Intent(viewHolder.view.getContext(), ExpenseEditActivity.class);
                                     startIntent.putExtra("date", expense.getDate());
@@ -190,12 +160,42 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
 
                                     break;
                                 }
-                                case 4: // Delete this one
+                                case 1: // Delete this one
                                 {
                                     // Send notification to inform views that this expense has been deleted
                                     Intent intent = new Intent(MainActivity.INTENT_MONTHLY_EXPENSE_DELETED);
                                     intent.putExtra("expense", expense);
                                     intent.putExtra("deleteType", MonthlyExpenseDeleteType.ONE.getValue());
+                                    LocalBroadcastManager.getInstance(activity.getApplicationContext()).sendBroadcast(intent);
+
+                                    break;
+                                }
+                                case 2: // Delete from
+                                {
+                                    // Send notification to inform views that this expense has been deleted
+                                    Intent intent = new Intent(MainActivity.INTENT_MONTHLY_EXPENSE_DELETED);
+                                    intent.putExtra("expense", expense);
+                                    intent.putExtra("deleteType", MonthlyExpenseDeleteType.FROM.getValue());
+                                    LocalBroadcastManager.getInstance(activity.getApplicationContext()).sendBroadcast(intent);
+
+                                    break;
+                                }
+                                case 3: // Delete up to
+                                {
+                                    // Send notification to inform views that this expense has been deleted
+                                    Intent intent = new Intent(MainActivity.INTENT_MONTHLY_EXPENSE_DELETED);
+                                    intent.putExtra("expense", expense);
+                                    intent.putExtra("deleteType", MonthlyExpenseDeleteType.TO.getValue());
+                                    LocalBroadcastManager.getInstance(activity.getApplicationContext()).sendBroadcast(intent);
+
+                                    break;
+                                }
+                                case 4: // Delete all
+                                {
+                                    // Send notification to inform views that this expense has been deleted
+                                    Intent intent = new Intent(MainActivity.INTENT_MONTHLY_EXPENSE_DELETED);
+                                    intent.putExtra("expense", expense);
+                                    intent.putExtra("deleteType", MonthlyExpenseDeleteType.ALL.getValue());
                                     LocalBroadcastManager.getInstance(activity.getApplicationContext()).sendBroadcast(intent);
 
                                     break;
