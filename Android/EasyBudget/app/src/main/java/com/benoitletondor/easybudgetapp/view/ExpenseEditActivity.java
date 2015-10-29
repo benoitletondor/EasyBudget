@@ -110,7 +110,7 @@ public class ExpenseEditActivity extends DBActivity
                 public void onAnimationEnd(Animator animation)
                 {
                     UIHelper.setFocus(descriptionEditText);
-                    UIHelper.animateFABAppear(fab);
+                    UIHelper.showFAB(fab);
                 }
 
                 @Override
@@ -129,7 +129,7 @@ public class ExpenseEditActivity extends DBActivity
         else
         {
             UIHelper.setFocus(descriptionEditText);
-            UIHelper.animateFABAppear(fab);
+            UIHelper.showFAB(fab);
         }
     }
 

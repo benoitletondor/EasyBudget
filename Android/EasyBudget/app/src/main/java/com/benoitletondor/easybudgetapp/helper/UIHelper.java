@@ -137,18 +137,49 @@ public class UIHelper
     }
 
     /**
-     * Animate the FAB appearence (the FAB should be configured with scale & alpha to 0)
+     * Show the FAB, animating the appearance if activated (the FAB should be configured with scale & alpha to 0)
      *
      * @param fab
      */
-    public static void animateFABAppear(@NonNull final View fab)
+    public static void showFAB(@NonNull final View fab)
     {
-        ViewCompat.animate(fab)
-            .scaleX(1.0f)
-            .scaleY(1.0f)
-            .alpha(1.0f)
-            .setInterpolator(new AccelerateInterpolator())
-            .withLayer()
-            .start();
+        if( UIHelper.areAnimationsEnabled(fab.getContext()) )
+        {
+            ViewCompat.animate(fab)
+                .scaleX(1.0f)
+                .scaleY(1.0f)
+                .alpha(1.0f)
+                .setInterpolator(new AccelerateInterpolator())
+                .withLayer()
+                .start();
+        }
+        else
+        {
+            fab.setScaleX(1.0f);
+            fab.setScaleY(1.0f);
+            fab.setAlpha(1.0f);
+        }
+    }
+
+    /**
+     * Are animations enabled (can be disabled by user in settings)
+     *
+     * @param context
+     * @return
+     */
+    public static boolean areAnimationsEnabled(@NonNull Context context)
+    {
+        return Parameters.getInstance(context).getBoolean(ParameterKeys.ANIMATIONS_ENABLED, true);
+    }
+
+    /**
+     * Set animation enabled value
+     *
+     * @param context
+     * @param enabled
+     */
+    public static void setAnimationsEnabled(@NonNull Context context, boolean enabled)
+    {
+        Parameters.getInstance(context).putBoolean(ParameterKeys.ANIMATIONS_ENABLED, enabled);
     }
 }

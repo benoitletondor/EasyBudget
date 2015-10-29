@@ -27,4 +27,8 @@ public class ParameterKeys
      * The current onboarding step (int)
      */
     public static final String ONBOARDING_STEP = "onboarding_step";
+    /**
+     * Are animations enabled (boolean)
+     */
+    public static final String ANIMATIONS_ENABLED = "animation_enabled";
 }

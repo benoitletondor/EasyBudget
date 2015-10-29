@@ -524,7 +524,6 @@ public class MainActivity extends DBActivity
             @Override
             public void onSelectDate(Date date, View view)
             {
-                calendarFragment.setSelectedDates(date, date);
                 refreshAllForDate(date);
             }
 
@@ -534,18 +533,25 @@ public class MainActivity extends DBActivity
                 Intent startIntent = new Intent(MainActivity.this, ExpenseEditActivity.class);
                 startIntent.putExtra("date", date);
 
-                // Get the absolute location on window for Y value
-                int viewLocation[] = new int[2];
-                view.getLocationInWindow(viewLocation);
-
-                startIntent.putExtra(ANIMATE_TRANSITION_KEY, true);
-                startIntent.putExtra(CENTER_X_KEY, (int) view.getX() + view.getWidth() / 2);
-                startIntent.putExtra(CENTER_Y_KEY, viewLocation[1] + view.getHeight() / 2);
-
-                ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
-                if (UIHelper.isCompatibleWithActivityEnterAnimation())
+                if( UIHelper.areAnimationsEnabled(MainActivity.this) )
                 {
-                    MainActivity.this.overridePendingTransition(0, 0);
+                    // Get the absolute location on window for Y value
+                    int viewLocation[] = new int[2];
+                    view.getLocationInWindow(viewLocation);
+
+                    startIntent.putExtra(ANIMATE_TRANSITION_KEY, true);
+                    startIntent.putExtra(CENTER_X_KEY, (int) view.getX() + view.getWidth() / 2);
+                    startIntent.putExtra(CENTER_Y_KEY, viewLocation[1] + view.getHeight() / 2);
+
+                    ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
+                    if (UIHelper.isCompatibleWithActivityEnterAnimation())
+                    {
+                        MainActivity.this.overridePendingTransition(0, 0);
+                    }
+                }
+                else
+                {
+                    ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
                 }
             }
 
@@ -707,14 +713,21 @@ public class MainActivity extends DBActivity
                 Intent startIntent = new Intent(MainActivity.this, ExpenseEditActivity.class);
                 startIntent.putExtra("date", calendarFragment.getSelectedDate());
 
-                startIntent.putExtra(ANIMATE_TRANSITION_KEY, true);
-                startIntent.putExtra(CENTER_X_KEY, (int) menu.getX() + (int) ((float) menu.getWidth() / 1.2f));
-                startIntent.putExtra(CENTER_Y_KEY, (int) menu.getY() + (int) ((float) menu.getHeight() / 1.2f));
-
-                ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
-                if( UIHelper.isCompatibleWithActivityEnterAnimation() )
+                if( UIHelper.areAnimationsEnabled(MainActivity.this) )
                 {
-                    overridePendingTransition(0, 0);
+                    startIntent.putExtra(ANIMATE_TRANSITION_KEY, true);
+                    startIntent.putExtra(CENTER_X_KEY, (int) menu.getX() + (int) ((float) menu.getWidth() / 1.2f));
+                    startIntent.putExtra(CENTER_Y_KEY, (int) menu.getY() + (int) ((float) menu.getHeight() / 1.2f));
+
+                    ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
+                    if( UIHelper.isCompatibleWithActivityEnterAnimation() )
+                    {
+                        overridePendingTransition(0, 0);
+                    }
+                }
+                else
+                {
+                    ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
                 }
 
                 menu.collapse();
@@ -730,14 +743,21 @@ public class MainActivity extends DBActivity
                 Intent startIntent = new Intent(MainActivity.this, MonthlyExpenseEditActivity.class);
                 startIntent.putExtra("dateStart", calendarFragment.getSelectedDate());
 
-                startIntent.putExtra(ANIMATE_TRANSITION_KEY, true);
-                startIntent.putExtra(CENTER_X_KEY, (int) menu.getX() + (int) ((float) menu.getWidth() / 1.2f));
-                startIntent.putExtra(CENTER_Y_KEY, (int) menu.getY() + (int) ((float) menu.getHeight() / 1.2f));
-
-                ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
-                if( UIHelper.isCompatibleWithActivityEnterAnimation() )
+                if( UIHelper.areAnimationsEnabled(MainActivity.this) )
                 {
-                    overridePendingTransition(0, 0);
+                    startIntent.putExtra(ANIMATE_TRANSITION_KEY, true);
+                    startIntent.putExtra(CENTER_X_KEY, (int) menu.getX() + (int) ((float) menu.getWidth() / 1.2f));
+                    startIntent.putExtra(CENTER_Y_KEY, (int) menu.getY() + (int) ((float) menu.getHeight() / 1.2f));
+
+                    ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
+                    if( UIHelper.isCompatibleWithActivityEnterAnimation() )
+                    {
+                        overridePendingTransition(0, 0);
+                    }
+                }
+                else
+                {
+                    ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
                 }
 
                 menu.collapse();

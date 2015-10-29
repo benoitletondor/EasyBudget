@@ -4,18 +4,22 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.Preference;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.widget.Toast;
 
+import com.benoitletondor.easybudgetapp.BuildConfig;
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
 import com.benoitletondor.easybudgetapp.helper.Parameters;
+import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment;
-
-import java.util.Locale;
 
 /**
  * Fragment to display preferences
@@ -54,29 +58,39 @@ public class PreferencesFragment extends PreferenceFragment
                 String localId = Parameters.getInstance(getActivity()).getString(ParameterKeys.LOCAL_ID);
 
                 Intent sendIntent = new Intent();
-                sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT, getResources().getString(R.string.setting_category_bug_report_send_text) +" "+localId);
-                sendIntent.setType("text/plain");
-                startActivity(sendIntent);
+                sendIntent.setAction(Intent.ACTION_SENDTO);
+                sendIntent.setData(Uri.parse("mailto:")); // only email apps should handle this
+                sendIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{getResources().getString(R.string.bug_report_email)});
+                sendIntent.putExtra(Intent.EXTRA_TEXT, getResources().getString(R.string.setting_category_bug_report_send_text, localId));
+                sendIntent.putExtra(Intent.EXTRA_SUBJECT, getResources().getString(R.string.setting_category_bug_report_send_subject));
+
+                if (sendIntent.resolveActivity(getActivity().getPackageManager()) != null)
+                {
+                    startActivity(sendIntent);
+                }
+                else
+                {
+                    Toast.makeText(getActivity(), getResources().getString(R.string.setting_category_bug_report_send_error), Toast.LENGTH_SHORT).show();
+                }
 
                 return false;
             }
         });
 
         /*
-         * Show welcome screen button
+         * Enable animations pref
          */
-        findPreference(getResources().getString(R.string.setting_category_show_welcome_screen_button_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+        final CheckBoxPreference animationsPref = (CheckBoxPreference) findPreference(getResources().getString(R.string.setting_category_disable_animation_key));
+        animationsPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
         {
             @Override
             public boolean onPreferenceClick(Preference preference)
             {
-                LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(new Intent(MainActivity.INTENT_SHOW_WELCOME_SCREEN));
-
-                getActivity().finish();
-                return false;
+                UIHelper.setAnimationsEnabled(getActivity(), animationsPref.isChecked());
+                return true;
             }
         });
+        animationsPref.setChecked(UIHelper.areAnimationsEnabled(getActivity()));
 
         /*
          * Currency change button
@@ -94,6 +108,33 @@ public class PreferencesFragment extends PreferenceFragment
             }
         });
         setCurrencyPreferenceTitle(currencyPreference);
+
+        /*
+         * Hide dev preferences if needed
+         */
+        PreferenceCategory devCategory = (PreferenceCategory) findPreference(getResources().getString(R.string.setting_category_dev_key));
+        if( !BuildConfig.DEV_PREFERENCES )
+        {
+            getPreferenceScreen().removePreference(devCategory);
+        }
+        else
+        {
+            /*
+             * Show welcome screen button
+             */
+            findPreference(getResources().getString(R.string.setting_category_show_welcome_screen_button_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+            {
+                @Override
+                public boolean onPreferenceClick(Preference preference)
+                {
+                    LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(new Intent(MainActivity.INTENT_SHOW_WELCOME_SCREEN));
+
+                    getActivity().finish();
+                    return false;
+                }
+            });
+        }
+
 
         /*
          * Broadcast receiver
