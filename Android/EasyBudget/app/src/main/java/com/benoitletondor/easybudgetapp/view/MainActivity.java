@@ -35,6 +35,7 @@ import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.benoitletondor.easybudgetapp.EasyBudget;
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.Logger;
 import com.benoitletondor.easybudgetapp.helper.UIHelper;
@@ -476,7 +477,7 @@ public class MainActivity extends DBActivity
         {
             budgetLine.setBackgroundResource(R.color.budget_red);
         }
-        else if( balance < 100 ) //TODO configurable ?
+        else if( balance < Parameters.getInstance(getApplicationContext()).getInt(ParameterKeys.LOW_MONEY_WARNING_AMOUNT, EasyBudget.DEFAULT_LOW_MONEY_WARNING_AMOUNT) )
         {
             budgetLine.setBackgroundResource(R.color.budget_orange);
         }

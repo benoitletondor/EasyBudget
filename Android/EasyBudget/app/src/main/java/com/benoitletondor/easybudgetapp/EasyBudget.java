@@ -31,6 +31,13 @@ import java.util.UUID;
  */
 public class EasyBudget extends Application
 {
+    /**
+     * Default amount use for low money warning (can be changed in settings)
+     */
+    public static final int DEFAULT_LOW_MONEY_WARNING_AMOUNT = 100;
+
+// ------------------------------------------>
+
     private Tracker analyticsTracker;
 
     @Override

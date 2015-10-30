@@ -64,6 +64,10 @@
     <string name="account_balance_format">Balance for %1$s: %2$s</string>
     <string name="account_balance_date_format">MMM dd</string>
     <string name="onboarding_start_with_amount">Start with %s</string>
+    <string name="adjust_limit_warning_title">Change low money warning threshold</string>
+    <string name="adjust_limit_warning_message">Set the threshold value (must be > 0)</string>
+    <string name="adjust_limit_warning_error_title">Oops</string>
+    <string name="adjust_limit_warning_error_message">The value you entered is invalid. It must be a positive number, superior to 0</string>
 
     <string name="monthly_expense_add_loading_title">Loading</string>
     <string name="monthly_expense_add_loading_message">Creating monthly expense…</string>
@@ -94,12 +98,15 @@
     <string name="setting_category_general_title">General</string>
     <string name="setting_category_currency_change_button_title">Change currency (%s)</string>
     <string name="setting_category_currency_change_dialog_title">Select your currency</string>
+    <string name="setting_category_limit_set_button_title">Set low money warning threshold (%s)</string>
+    <string name="setting_category_limit_set_button_message">Change the threshold used to warn you that you have not much money left on your account</string>
     <string name="setting_category_dev_title">Dev</string>
     <string name="setting_category_show_welcome_screen_button_title">Show welcome screen</string>
 
     <!-- Keys, not for translations. TODO find a way to move that away -->
     <string name="setting_category_bug_report_send_button_key" translatable="false">send_bug_report</string>
     <string name="setting_category_show_welcome_screen_button_key" translatable="false">show_welcome_screen</string>
+    <string name="setting_category_limit_set_button_key" translatable="false">limit_set</string>
     <string name="setting_category_currency_change_button_key" translatable="false">change_currency</string>
     <string name="setting_category_disable_animation_key" translatable="false">disable_animation</string>
     <string name="setting_category_dev_key" translatable="false">dev_category</string>
