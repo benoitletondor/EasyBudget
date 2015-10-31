@@ -547,7 +547,7 @@ public class MainActivity extends DBActivity
                     ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
                     if (UIHelper.isCompatibleWithActivityEnterAnimation())
                     {
-                        MainActivity.this.overridePendingTransition(0, 0);
+                        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                     }
                 }
                 else
@@ -723,7 +723,7 @@ public class MainActivity extends DBActivity
                     ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
                     if( UIHelper.isCompatibleWithActivityEnterAnimation() )
                     {
-                        overridePendingTransition(0, 0);
+                        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                     }
                 }
                 else
@@ -753,7 +753,7 @@ public class MainActivity extends DBActivity
                     ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
                     if( UIHelper.isCompatibleWithActivityEnterAnimation() )
                     {
-                        overridePendingTransition(0, 0);
+                        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                     }
                 }
                 else

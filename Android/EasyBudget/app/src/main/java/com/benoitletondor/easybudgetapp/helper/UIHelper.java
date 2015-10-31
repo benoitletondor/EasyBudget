@@ -1,6 +1,7 @@
 package com.benoitletondor.easybudgetapp.helper;
 
 import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -96,7 +97,10 @@ public class UIHelper
             return;
         }
 
-        final ViewTreeObserver viewTreeObserver = activity.getWindow().getDecorView().getViewTreeObserver();
+        final View rootView = activity.getWindow().getDecorView().findViewById(android.R.id.content);
+        rootView.setAlpha(0.0f);
+
+        final ViewTreeObserver viewTreeObserver = rootView.getViewTreeObserver();
         if ( viewTreeObserver.isAlive() )
         {
             viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
@@ -105,19 +109,27 @@ public class UIHelper
                 @Override
                 public void onGlobalLayout()
                 {
+                    rootView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+
                     // get the center for the clipping circle
-                    int cx = activity.getIntent().getIntExtra(MainActivity.CENTER_X_KEY, activity.getWindow().getDecorView().getWidth() / 2);
-                    int cy = activity.getIntent().getIntExtra(MainActivity.CENTER_Y_KEY, activity.getWindow().getDecorView().getHeight() / 2);
+                    int cx = activity.getIntent().getIntExtra(MainActivity.CENTER_X_KEY, rootView.getWidth() / 2);
+                    int cy = activity.getIntent().getIntExtra(MainActivity.CENTER_Y_KEY, rootView.getHeight() / 2);
 
                     // get the final radius for the clipping circle
-                    int finalRadius = Math.max(activity.getWindow().getDecorView().getWidth(), activity.getWindow().getDecorView().getHeight());
+                    int finalRadius = Math.max(rootView.getWidth(), rootView.getHeight());
 
                     // create the animator for this view (the start radius is zero)
-                    Animator anim = ViewAnimationUtils.createCircularReveal(activity.getWindow().getDecorView(), cx, cy, 0, finalRadius);
+                    Animator anim = ViewAnimationUtils.createCircularReveal(rootView, cx, cy, 0, finalRadius);
                     anim.addListener(listener);
+                    anim.addListener(new AnimatorListenerAdapter()
+                    {
+                        @Override
+                        public void onAnimationStart(Animator animation)
+                        {
+                            rootView.setAlpha(1.0f);
+                        }
+                    });
                     anim.start();
-
-                    activity.getWindow().getDecorView().getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 }
             });
         }

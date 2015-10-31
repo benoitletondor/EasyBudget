@@ -1,6 +1,7 @@
 package com.benoitletondor.easybudgetapp.view;
 
 import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -103,31 +104,13 @@ public class MonthlyExpenseEditActivity extends DBActivity
 
         if ( UIHelper.willAnimateActivityEnter(this) )
         {
-            UIHelper.animateActivityEnter(this, new Animator.AnimatorListener()
+            UIHelper.animateActivityEnter(this, new AnimatorListenerAdapter()
             {
-                @Override
-                public void onAnimationStart(Animator animation)
-                {
-
-                }
-
                 @Override
                 public void onAnimationEnd(Animator animation)
                 {
                     UIHelper.setFocus(descriptionEditText);
                     UIHelper.showFAB(fab);
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animation)
-                {
-
-                }
-
-                @Override
-                public void onAnimationRepeat(Animator animation)
-                {
-
                 }
             });
         }
