@@ -543,17 +543,9 @@ public class MainActivity extends DBActivity
                     startIntent.putExtra(ANIMATE_TRANSITION_KEY, true);
                     startIntent.putExtra(CENTER_X_KEY, (int) view.getX() + view.getWidth() / 2);
                     startIntent.putExtra(CENTER_Y_KEY, viewLocation[1] + view.getHeight() / 2);
+                }
 
-                    ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
-                    if (UIHelper.isCompatibleWithActivityEnterAnimation())
-                    {
-                        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                    }
-                }
-                else
-                {
-                    ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
-                }
+                ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
             }
 
             @Override
@@ -719,17 +711,9 @@ public class MainActivity extends DBActivity
                     startIntent.putExtra(ANIMATE_TRANSITION_KEY, true);
                     startIntent.putExtra(CENTER_X_KEY, (int) menu.getX() + (int) ((float) menu.getWidth() / 1.2f));
                     startIntent.putExtra(CENTER_Y_KEY, (int) menu.getY() + (int) ((float) menu.getHeight() / 1.2f));
+                }
 
-                    ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
-                    if( UIHelper.isCompatibleWithActivityEnterAnimation() )
-                    {
-                        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                    }
-                }
-                else
-                {
-                    ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
-                }
+                ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
 
                 menu.collapse();
             }
@@ -749,17 +733,9 @@ public class MainActivity extends DBActivity
                     startIntent.putExtra(ANIMATE_TRANSITION_KEY, true);
                     startIntent.putExtra(CENTER_X_KEY, (int) menu.getX() + (int) ((float) menu.getWidth() / 1.2f));
                     startIntent.putExtra(CENTER_Y_KEY, (int) menu.getY() + (int) ((float) menu.getHeight() / 1.2f));
+                }
 
-                    ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
-                    if( UIHelper.isCompatibleWithActivityEnterAnimation() )
-                    {
-                        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                    }
-                }
-                else
-                {
-                    ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
-                }
+                ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
 
                 menu.collapse();
             }
