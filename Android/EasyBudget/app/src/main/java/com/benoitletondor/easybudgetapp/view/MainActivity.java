@@ -35,6 +35,7 @@ import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.benoitletondor.easybudgetapp.EasyBudget;
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.Logger;
 import com.benoitletondor.easybudgetapp.helper.UIHelper;
@@ -92,6 +93,9 @@ public class MainActivity extends DBActivity
     private ExpensesRecyclerViewAdapter expensesViewAdapter;
     private CoordinatorLayout           coordinatorLayout;
 
+    private RecyclerView                recyclerView;
+    private View                        recyclerViewPlaceholder;
+
     private TextView budgetLine;
     @Nullable
     private Date lastStopDate;
@@ -113,6 +117,7 @@ public class MainActivity extends DBActivity
 
         budgetLine = (TextView) findViewById(R.id.budgetLine);
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
+        recyclerViewPlaceholder = findViewById(R.id.emptyExpensesRecyclerViewPlaceholder);
 
         initCalendarFragment(savedInstanceState);
         initRecyclerView(savedInstanceState);
@@ -476,7 +481,7 @@ public class MainActivity extends DBActivity
         {
             budgetLine.setBackgroundResource(R.color.budget_red);
         }
-        else if( balance < 100 ) //TODO configurable ?
+        else if( balance < Parameters.getInstance(getApplicationContext()).getInt(ParameterKeys.LOW_MONEY_WARNING_AMOUNT, EasyBudget.DEFAULT_LOW_MONEY_WARNING_AMOUNT) )
         {
             budgetLine.setBackgroundResource(R.color.budget_orange);
         }
@@ -524,7 +529,6 @@ public class MainActivity extends DBActivity
             @Override
             public void onSelectDate(Date date, View view)
             {
-                calendarFragment.setSelectedDates(date, date);
                 refreshAllForDate(date);
             }
 
@@ -534,19 +538,18 @@ public class MainActivity extends DBActivity
                 Intent startIntent = new Intent(MainActivity.this, ExpenseEditActivity.class);
                 startIntent.putExtra("date", date);
 
-                // Get the absolute location on window for Y value
-                int viewLocation[] = new int[2];
-                view.getLocationInWindow(viewLocation);
+                if( UIHelper.areAnimationsEnabled(MainActivity.this) )
+                {
+                    // Get the absolute location on window for Y value
+                    int viewLocation[] = new int[2];
+                    view.getLocationInWindow(viewLocation);
 
-                startIntent.putExtra(ANIMATE_TRANSITION_KEY, true);
-                startIntent.putExtra(CENTER_X_KEY, (int) view.getX() + view.getWidth() / 2);
-                startIntent.putExtra(CENTER_Y_KEY, viewLocation[1] + view.getHeight() / 2);
+                    startIntent.putExtra(ANIMATE_TRANSITION_KEY, true);
+                    startIntent.putExtra(CENTER_X_KEY, (int) view.getX() + view.getWidth() / 2);
+                    startIntent.putExtra(CENTER_Y_KEY, viewLocation[1] + view.getHeight() / 2);
+                }
 
                 ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
-                if (UIHelper.isCompatibleWithActivityEnterAnimation())
-                {
-                    MainActivity.this.overridePendingTransition(0, 0);
-                }
             }
 
             @Override
@@ -707,15 +710,14 @@ public class MainActivity extends DBActivity
                 Intent startIntent = new Intent(MainActivity.this, ExpenseEditActivity.class);
                 startIntent.putExtra("date", calendarFragment.getSelectedDate());
 
-                startIntent.putExtra(ANIMATE_TRANSITION_KEY, true);
-                startIntent.putExtra(CENTER_X_KEY, (int) menu.getX() + (int) ((float) menu.getWidth() / 1.2f));
-                startIntent.putExtra(CENTER_Y_KEY, (int) menu.getY() + (int) ((float) menu.getHeight() / 1.2f));
+                if( UIHelper.areAnimationsEnabled(MainActivity.this) )
+                {
+                    startIntent.putExtra(ANIMATE_TRANSITION_KEY, true);
+                    startIntent.putExtra(CENTER_X_KEY, (int) menu.getX() + (int) ((float) menu.getWidth() / 1.2f));
+                    startIntent.putExtra(CENTER_Y_KEY, (int) menu.getY() + (int) ((float) menu.getHeight() / 1.2f));
+                }
 
                 ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
-                if( UIHelper.isCompatibleWithActivityEnterAnimation() )
-                {
-                    overridePendingTransition(0, 0);
-                }
 
                 menu.collapse();
             }
@@ -730,15 +732,14 @@ public class MainActivity extends DBActivity
                 Intent startIntent = new Intent(MainActivity.this, MonthlyExpenseEditActivity.class);
                 startIntent.putExtra("dateStart", calendarFragment.getSelectedDate());
 
-                startIntent.putExtra(ANIMATE_TRANSITION_KEY, true);
-                startIntent.putExtra(CENTER_X_KEY, (int) menu.getX() + (int) ((float) menu.getWidth() / 1.2f));
-                startIntent.putExtra(CENTER_Y_KEY, (int) menu.getY() + (int) ((float) menu.getHeight() / 1.2f));
+                if( UIHelper.areAnimationsEnabled(MainActivity.this) )
+                {
+                    startIntent.putExtra(ANIMATE_TRANSITION_KEY, true);
+                    startIntent.putExtra(CENTER_X_KEY, (int) menu.getX() + (int) ((float) menu.getWidth() / 1.2f));
+                    startIntent.putExtra(CENTER_Y_KEY, (int) menu.getY() + (int) ((float) menu.getHeight() / 1.2f));
+                }
 
                 ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
-                if( UIHelper.isCompatibleWithActivityEnterAnimation() )
-                {
-                    overridePendingTransition(0, 0);
-                }
 
                 menu.collapse();
             }
@@ -747,8 +748,8 @@ public class MainActivity extends DBActivity
         /*
          * Expense Recycler view
          */
-        RecyclerView expensesRecyclerView = (RecyclerView) findViewById(R.id.expensesRecyclerView);
-        expensesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView = (RecyclerView) findViewById(R.id.expensesRecyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         Date date = new Date();
         if( savedInstanceState != null && savedInstanceState.containsKey(RECYCLE_VIEW_SAVED_DATE) )
@@ -761,14 +762,26 @@ public class MainActivity extends DBActivity
         }
 
         expensesViewAdapter = new ExpensesRecyclerViewAdapter(this, db, date);
-        expensesRecyclerView.setAdapter(expensesViewAdapter);
+        recyclerView.setAdapter(expensesViewAdapter);
 
+        refreshRecyclerViewForDate(date);
         updateBalanceDisplayForDay(date);
     }
 
     private void refreshRecyclerViewForDate(@NonNull Date date)
     {
-        expensesViewAdapter.setDate(date, db);
+        if( db.hasExpensesForDay(date) )
+        {
+            expensesViewAdapter.setDate(date, db);
+
+            recyclerView.setVisibility(View.VISIBLE);
+            recyclerViewPlaceholder.setVisibility(View.GONE);
+        }
+        else
+        {
+            recyclerView.setVisibility(View.GONE);
+            recyclerViewPlaceholder.setVisibility(View.VISIBLE);
+        }
     }
 
     private void refreshAllForDate(@NonNull Date date)

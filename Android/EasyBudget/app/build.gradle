@@ -26,8 +26,8 @@ android {
         applicationId "com.benoitletondor.easybudgetapp"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 11
-        versionName "1.0b2"
+        versionCode 12
+        versionName "1.0b3"
     }
     buildTypes {
         debug {
@@ -35,12 +35,14 @@ android {
             buildConfigField "boolean", "CRASHLYTICS_ACTIVATED", "false"
             buildConfigField "String", "BATCH_API_KEY", batch_devkey
             buildConfigField "boolean", "ANALYTICS_ACTIVATED", "false"
+            buildConfigField "boolean", "DEV_PREFERENCES", "true"
         }
         release {
             buildConfigField "boolean", "DEBUG_LOG", "false"
             buildConfigField "boolean", "CRASHLYTICS_ACTIVATED", "true"
             buildConfigField "String", "BATCH_API_KEY", batch_livekey
             buildConfigField "boolean", "ANALYTICS_ACTIVATED", "true"
+            buildConfigField "boolean", "DEV_PREFERENCES", "true"
 
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'

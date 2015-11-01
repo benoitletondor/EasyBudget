@@ -24,7 +24,15 @@ public class ParameterKeys
      */
     public static final String CURRENCY_ISO    = "currency_iso";
     /**
+     * Warning limit for low money on account (int)
+     */
+    public static final String LOW_MONEY_WARNING_AMOUNT = "low_money_warning_amount";
+    /**
      * The current onboarding step (int)
      */
     public static final String ONBOARDING_STEP = "onboarding_step";
+    /**
+     * Are animations enabled (boolean)
+     */
+    public static final String ANIMATIONS_ENABLED = "animation_enabled";
 }

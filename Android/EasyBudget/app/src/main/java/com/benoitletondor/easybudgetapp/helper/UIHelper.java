@@ -1,6 +1,7 @@
 package com.benoitletondor.easybudgetapp.helper;
 
 import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -96,7 +97,23 @@ public class UIHelper
             return;
         }
 
-        final ViewTreeObserver viewTreeObserver = activity.getWindow().getDecorView().getViewTreeObserver();
+        final View rootView;
+
+        if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ) // Animating the decor view doesn't work anymore on M, take the content view
+        {
+            rootView = activity.getWindow().getDecorView().findViewById(android.R.id.content);
+            rootView.setAlpha(0.0f);
+
+            activity.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        }
+        else
+        {
+            rootView = activity.getWindow().getDecorView();
+
+            activity.overridePendingTransition(0, 0);
+        }
+
+        final ViewTreeObserver viewTreeObserver = rootView.getViewTreeObserver();
         if ( viewTreeObserver.isAlive() )
         {
             viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
@@ -105,19 +122,27 @@ public class UIHelper
                 @Override
                 public void onGlobalLayout()
                 {
+                    rootView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+
                     // get the center for the clipping circle
-                    int cx = activity.getIntent().getIntExtra(MainActivity.CENTER_X_KEY, activity.getWindow().getDecorView().getWidth() / 2);
-                    int cy = activity.getIntent().getIntExtra(MainActivity.CENTER_Y_KEY, activity.getWindow().getDecorView().getHeight() / 2);
+                    int cx = activity.getIntent().getIntExtra(MainActivity.CENTER_X_KEY, rootView.getWidth() / 2);
+                    int cy = activity.getIntent().getIntExtra(MainActivity.CENTER_Y_KEY, rootView.getHeight() / 2);
 
                     // get the final radius for the clipping circle
-                    int finalRadius = Math.max(activity.getWindow().getDecorView().getWidth(), activity.getWindow().getDecorView().getHeight());
+                    int finalRadius = Math.max(rootView.getWidth(), rootView.getHeight());
 
                     // create the animator for this view (the start radius is zero)
-                    Animator anim = ViewAnimationUtils.createCircularReveal(activity.getWindow().getDecorView(), cx, cy, 0, finalRadius);
+                    Animator anim = ViewAnimationUtils.createCircularReveal(rootView, cx, cy, 0, finalRadius);
                     anim.addListener(listener);
+                    anim.addListener(new AnimatorListenerAdapter()
+                    {
+                        @Override
+                        public void onAnimationStart(Animator animation)
+                        {
+                            rootView.setAlpha(1.0f);
+                        }
+                    });
                     anim.start();
-
-                    activity.getWindow().getDecorView().getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 }
             });
         }
@@ -137,18 +162,49 @@ public class UIHelper
     }
 
     /**
-     * Animate the FAB appearence (the FAB should be configured with scale & alpha to 0)
+     * Show the FAB, animating the appearance if activated (the FAB should be configured with scale & alpha to 0)
      *
      * @param fab
      */
-    public static void animateFABAppear(@NonNull final View fab)
+    public static void showFAB(@NonNull final View fab)
     {
-        ViewCompat.animate(fab)
-            .scaleX(1.0f)
-            .scaleY(1.0f)
-            .alpha(1.0f)
-            .setInterpolator(new AccelerateInterpolator())
-            .withLayer()
-            .start();
+        if( UIHelper.areAnimationsEnabled(fab.getContext()) )
+        {
+            ViewCompat.animate(fab)
+                .scaleX(1.0f)
+                .scaleY(1.0f)
+                .alpha(1.0f)
+                .setInterpolator(new AccelerateInterpolator())
+                .withLayer()
+                .start();
+        }
+        else
+        {
+            fab.setScaleX(1.0f);
+            fab.setScaleY(1.0f);
+            fab.setAlpha(1.0f);
+        }
+    }
+
+    /**
+     * Are animations enabled (can be disabled by user in settings)
+     *
+     * @param context
+     * @return
+     */
+    public static boolean areAnimationsEnabled(@NonNull Context context)
+    {
+        return Parameters.getInstance(context).getBoolean(ParameterKeys.ANIMATIONS_ENABLED, true);
+    }
+
+    /**
+     * Set animation enabled value
+     *
+     * @param context
+     * @param enabled
+     */
+    public static void setAnimationsEnabled(@NonNull Context context, boolean enabled)
+    {
+        Parameters.getInstance(context).putBoolean(ParameterKeys.ANIMATIONS_ENABLED, enabled);
     }
 }

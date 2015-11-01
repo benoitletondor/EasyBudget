@@ -27,6 +27,7 @@
     <string name="income">Income</string>
     <string name="date">Date</string>
     <string name="first_occurence">First occurrence</string>
+    <string name="no_expense_for_today">No income or expense yet</string>
 
     <string name="dialog_edit_expense_title">What do you want to do?</string>
     <string name="dialog_edit_income_title">What do you want to do?</string>
@@ -38,21 +39,21 @@
         <item>Edit income</item>
         <item>Delete income</item>
     </string-array>
-    <string name="dialog_edit_monthly_expense_title">Edit monthly expense</string>
-    <string name="dialog_edit_monthly_income_title">Edit monthly income</string>
+    <string name="dialog_edit_monthly_expense_title">Monthly expense: What do you want to do?</string>
+    <string name="dialog_edit_monthly_income_title">Monthly income: What do you want to do?</string>
     <string-array name="dialog_edit_monthly_expense_choices">
-        <item>Delete occurrences from this one</item>
-        <item>Delete occurrences before this one</item>
-        <item>Delete all occurrences</item>
-        <item>Edit this occurrence</item>
-        <item>Delete this occurrence only</item>
+        <item>Edit this instance</item>
+        <item>Delete this instance only</item>
+        <item>Delete all following</item>
+        <item>Delete all before</item>
+        <item>Delete all</item>
     </string-array>
     <string-array name="dialog_edit_monthly_income_choices">
-        <item>Delete occurrences from this one</item>
-        <item>Delete occurrences before this one</item>
-        <item>Delete all occurrences</item>
-        <item>Edit this occurrence</item>
-        <item>Delete this occurrence only</item>
+        <item>Edit this instance</item>
+        <item>Delete this instance only</item>
+        <item>Delete all following</item>
+        <item>Delete all before</item>
+        <item>Delete all</item>
     </string-array>
     <string name="expense_delete_snackbar_text">Expense deleted</string>
     <string name="income_delete_snackbar_text">Income deleted</string>
@@ -64,6 +65,10 @@
     <string name="account_balance_format">Balance for %1$s: %2$s</string>
     <string name="account_balance_date_format">MMM dd</string>
     <string name="onboarding_start_with_amount">Start with %s</string>
+    <string name="adjust_limit_warning_title">Change low money warning threshold</string>
+    <string name="adjust_limit_warning_message">Set the threshold value (must be > 0)</string>
+    <string name="adjust_limit_warning_error_title">Oops</string>
+    <string name="adjust_limit_warning_error_message">The value you entered is invalid. It must be a positive number, superior to 0</string>
 
     <string name="monthly_expense_add_loading_title">Loading</string>
     <string name="monthly_expense_add_loading_message">Creating monthly expense…</string>
@@ -83,16 +88,30 @@
     <string name="monthly_expense_delete_first_error_title">Oops</string>
     <string name="monthly_expense_delete_first_error_message">There are no occurrences before this one.</string>
 
-    <string name="setting_category_bug_report_title">Debug</string>
-    <string name="setting_category_bug_report_send_button_title">Get install identifier</string>
-    <string name="setting_category_show_welcome_screen_button_title">Show welcome screen</string>
-    <string name="setting_category_bug_report_send_text">EasyBudget identifier:</string>
+    <string name="setting_category_social_title">Social</string>
+    <string name="setting_category_rate_button_title">Like the app?</string>
+    <string name="setting_category_rate_button_message">Give it a nice review on the PlayStore!</string>
+    <string name="setting_category_bug_report_send_button_title">Report a bug</string>
+    <string name="setting_category_disable_animation_title">Animations</string>
+    <string name="setting_category_disable_animation_message">You can disable animations if you experience any bug or glitch</string>
+    <string name="bug_report_email">easybudget@benoitletondor.com</string>
+    <string name="setting_category_bug_report_send_subject">EasyBudget - Bug report</string>
+    <string name="setting_category_bug_report_send_text">\n\n---\n*Please do not remove this part*\nEasyBudget id: %s</string>
+    <string name="setting_category_bug_report_send_error">Unable to find an app to send bug report email</string>
     <string name="setting_category_general_title">General</string>
     <string name="setting_category_currency_change_button_title">Change currency (%s)</string>
     <string name="setting_category_currency_change_dialog_title">Select your currency</string>
+    <string name="setting_category_limit_set_button_title">Set low money warning threshold (%s)</string>
+    <string name="setting_category_limit_set_button_message">Change the threshold used to warn you that you have not much money left on your account</string>
+    <string name="setting_category_dev_title">Dev</string>
+    <string name="setting_category_show_welcome_screen_button_title">Show welcome screen</string>
 
     <!-- Keys, not for translations. TODO find a way to move that away -->
     <string name="setting_category_bug_report_send_button_key" translatable="false">send_bug_report</string>
     <string name="setting_category_show_welcome_screen_button_key" translatable="false">show_welcome_screen</string>
+    <string name="setting_category_limit_set_button_key" translatable="false">limit_set</string>
     <string name="setting_category_currency_change_button_key" translatable="false">change_currency</string>
+    <string name="setting_category_disable_animation_key" translatable="false">disable_animation</string>
+    <string name="setting_category_dev_key" translatable="false">dev_category</string>
+    <string name="setting_category_rate_button_key" translatable="false">rate</string>
 </resources>

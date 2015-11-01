@@ -10,12 +10,14 @@
     <color name="accent_ripple">@color/primary_light</color>
     <color name="primary_text">#212121</color>
     <color name="secondary_text">#727272</color>
+    <color name="placeholder_text">#b5b5b5</color>
     <color name="divider">#eeeeee</color>
     <color name="fab_add_expense">#F44336</color>
     <color name="fab_add_expense_pressed">#EF5350</color>
     <color name="fab_add_monthly_expense">@color/secondary</color>
     <color name="fab_add_monthly_expense_pressed">@color/secondary_light</color>
 
+    <color name="placeholder_background">#f0f0f0</color>
     <color name="calendar_cell_selected">@color/primary_light</color>
     <color name="calendar_cell_disabled_text_color">#eeeeee</color>
     <color name="budget_green">#4CAF50</color>
