@@ -1,6 +1,7 @@
 package com.benoitletondor.easybudgetapp.view;
 
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -54,6 +55,29 @@ public class PreferencesFragment extends PreferenceFragment
 
         // Load the preferences from the XML resource
         addPreferencesFromResource(R.xml.preferences);
+
+        /*
+         * Rating button
+         */
+        findPreference(getResources().getString(R.string.setting_category_rate_button_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+        {
+            @Override
+            public boolean onPreferenceClick(Preference preference)
+            {
+                final String appPackageName = getActivity().getPackageName();
+
+                try
+                {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+                }
+                catch (ActivityNotFoundException e)
+                {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+                }
+
+                return false;
+            }
+        });
 
         /*
          * Bind bug report button

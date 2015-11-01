@@ -88,7 +88,9 @@
     <string name="monthly_expense_delete_first_error_title">Oops</string>
     <string name="monthly_expense_delete_first_error_message">There are no occurrences before this one.</string>
 
-    <string name="setting_category_bug_report_title">Debug</string>
+    <string name="setting_category_social_title">Social</string>
+    <string name="setting_category_rate_button_title">Like the app?</string>
+    <string name="setting_category_rate_button_message">Give it a nice review on the PlayStore!</string>
     <string name="setting_category_bug_report_send_button_title">Report a bug</string>
     <string name="setting_category_disable_animation_title">Animations</string>
     <string name="setting_category_disable_animation_message">You can disable animations if you experience any bug or glitch</string>
@@ -111,4 +113,5 @@
     <string name="setting_category_currency_change_button_key" translatable="false">change_currency</string>
     <string name="setting_category_disable_animation_key" translatable="false">disable_animation</string>
     <string name="setting_category_dev_key" translatable="false">dev_category</string>
+    <string name="setting_category_rate_button_key" translatable="false">rate</string>
 </resources>
