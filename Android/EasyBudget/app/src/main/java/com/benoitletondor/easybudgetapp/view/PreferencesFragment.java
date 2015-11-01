@@ -86,21 +86,6 @@ public class PreferencesFragment extends PreferenceFragment
         });
 
         /*
-         * Enable animations pref
-         */
-        final CheckBoxPreference animationsPref = (CheckBoxPreference) findPreference(getResources().getString(R.string.setting_category_disable_animation_key));
-        animationsPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
-        {
-            @Override
-            public boolean onPreferenceClick(Preference preference)
-            {
-                UIHelper.setAnimationsEnabled(getActivity(), animationsPref.isChecked());
-                return true;
-            }
-        });
-        animationsPref.setChecked(UIHelper.areAnimationsEnabled(getActivity()));
-
-        /*
          * Currency change button
          */
         final Preference currencyPreference = findPreference(getResources().getString(R.string.setting_category_currency_change_button_key));
@@ -221,6 +206,21 @@ public class PreferencesFragment extends PreferenceFragment
                     return false;
                 }
             });
+
+            /*
+             * Enable animations pref
+             */
+            final CheckBoxPreference animationsPref = (CheckBoxPreference) findPreference(getResources().getString(R.string.setting_category_disable_animation_key));
+            animationsPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+            {
+                @Override
+                public boolean onPreferenceClick(Preference preference)
+                {
+                    UIHelper.setAnimationsEnabled(getActivity(), animationsPref.isChecked());
+                    return true;
+                }
+            });
+            animationsPref.setChecked(UIHelper.areAnimationsEnabled(getActivity()));
         }
 
 

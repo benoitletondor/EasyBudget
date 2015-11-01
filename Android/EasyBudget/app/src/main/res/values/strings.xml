@@ -27,6 +27,7 @@
     <string name="income">Income</string>
     <string name="date">Date</string>
     <string name="first_occurence">First occurrence</string>
+    <string name="no_expense_for_today">No income or expense yet</string>
 
     <string name="dialog_edit_expense_title">What do you want to do?</string>
     <string name="dialog_edit_income_title">What do you want to do?</string>

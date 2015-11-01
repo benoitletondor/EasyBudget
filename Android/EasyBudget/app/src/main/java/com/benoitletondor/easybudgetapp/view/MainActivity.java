@@ -93,6 +93,9 @@ public class MainActivity extends DBActivity
     private ExpensesRecyclerViewAdapter expensesViewAdapter;
     private CoordinatorLayout           coordinatorLayout;
 
+    private RecyclerView                recyclerView;
+    private View                        recyclerViewPlaceholder;
+
     private TextView budgetLine;
     @Nullable
     private Date lastStopDate;
@@ -114,6 +117,7 @@ public class MainActivity extends DBActivity
 
         budgetLine = (TextView) findViewById(R.id.budgetLine);
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
+        recyclerViewPlaceholder = findViewById(R.id.emptyExpensesRecyclerViewPlaceholder);
 
         initCalendarFragment(savedInstanceState);
         initRecyclerView(savedInstanceState);
@@ -744,8 +748,8 @@ public class MainActivity extends DBActivity
         /*
          * Expense Recycler view
          */
-        RecyclerView expensesRecyclerView = (RecyclerView) findViewById(R.id.expensesRecyclerView);
-        expensesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView = (RecyclerView) findViewById(R.id.expensesRecyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         Date date = new Date();
         if( savedInstanceState != null && savedInstanceState.containsKey(RECYCLE_VIEW_SAVED_DATE) )
@@ -758,14 +762,26 @@ public class MainActivity extends DBActivity
         }
 
         expensesViewAdapter = new ExpensesRecyclerViewAdapter(this, db, date);
-        expensesRecyclerView.setAdapter(expensesViewAdapter);
+        recyclerView.setAdapter(expensesViewAdapter);
 
+        refreshRecyclerViewForDate(date);
         updateBalanceDisplayForDay(date);
     }
 
     private void refreshRecyclerViewForDate(@NonNull Date date)
     {
-        expensesViewAdapter.setDate(date, db);
+        if( db.hasExpensesForDay(date) )
+        {
+            expensesViewAdapter.setDate(date, db);
+
+            recyclerView.setVisibility(View.VISIBLE);
+            recyclerViewPlaceholder.setVisibility(View.GONE);
+        }
+        else
+        {
+            recyclerView.setVisibility(View.GONE);
+            recyclerViewPlaceholder.setVisibility(View.VISIBLE);
+        }
     }
 
     private void refreshAllForDate(@NonNull Date date)

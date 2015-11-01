@@ -14,11 +14,6 @@
     <PreferenceCategory
         android:title="@string/setting_category_bug_report_title">
 
-        <CheckBoxPreference android:title="@string/setting_category_disable_animation_title"
-            android:summaryOn="@string/setting_category_disable_animation_message"
-            android:summaryOff="@string/setting_category_disable_animation_message"
-            android:key="@string/setting_category_disable_animation_key" />
-
         <Preference android:title="@string/setting_category_bug_report_send_button_title"
             android:key="@string/setting_category_bug_report_send_button_key" />
 
@@ -29,7 +24,13 @@
         android:key="@string/setting_category_dev_key">
 
         <Preference android:title="@string/setting_category_show_welcome_screen_button_title"
-                    android:key="@string/setting_category_show_welcome_screen_button_key" />
+            android:key="@string/setting_category_show_welcome_screen_button_key" />
+
+        <CheckBoxPreference android:title="@string/setting_category_disable_animation_title"
+            android:summaryOn="@string/setting_category_disable_animation_message"
+            android:summaryOff="@string/setting_category_disable_animation_message"
+            android:key="@string/setting_category_disable_animation_key"
+            android:enabled="false"/>
 
     </PreferenceCategory>
 

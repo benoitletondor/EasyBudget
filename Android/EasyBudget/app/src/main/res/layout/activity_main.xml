@@ -32,6 +32,32 @@
             android:paddingRight="15dp"
             android:gravity="center"/>
 
+        <LinearLayout android:id="@+id/emptyExpensesRecyclerViewPlaceholder"
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:background="@color/placeholder_background"
+            android:gravity="center_horizontal"
+            android:visibility="gone"
+            android:paddingTop="15dp">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_shopping_cart"
+                android:alpha="0.3"
+                android:layout_marginBottom="5dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/secondary_text"
+                android:textSize="14dp"
+                android:text="@string/no_expense_for_today" />
+
+        </LinearLayout>
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/expensesRecyclerView"
             android:scrollbars="vertical"
