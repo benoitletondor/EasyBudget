@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:textSize="30dp"
             android:textColor="@android:color/white"
-            android:text="Let's get to know each other"
+            android:text="@string/onboarding_screen_2_title"
             android:gravity="center_horizontal" />
 
         <TextView
@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
             android:textSize="20dp"
-            android:text="First thing: select your currency\n(you can change it later in settings)"
+            android:text="@string/onboarding_screen_2_message"
             android:textColor="@android:color/white"
             android:gravity="center_horizontal" />
 

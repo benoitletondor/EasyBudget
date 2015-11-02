@@ -64,17 +64,7 @@ public class PreferencesFragment extends PreferenceFragment
             @Override
             public boolean onPreferenceClick(Preference preference)
             {
-                final String appPackageName = getActivity().getPackageName();
-
-                try
-                {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
-                }
-                catch (ActivityNotFoundException e)
-                {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
-                }
-
+                new RatingPopup(getActivity()).show();
                 return false;
             }
         });
@@ -104,6 +94,24 @@ public class PreferencesFragment extends PreferenceFragment
                 {
                     Toast.makeText(getActivity(), getResources().getString(R.string.setting_category_bug_report_send_error), Toast.LENGTH_SHORT).show();
                 }
+
+                return false;
+            }
+        });
+
+        /*
+         * App version
+         */
+        final Preference appVersionPreference = findPreference(getResources().getString(R.string.setting_category_app_version_key));
+        appVersionPreference.setTitle(getResources().getString(R.string.setting_category_app_version_title, BuildConfig.VERSION_NAME));
+        appVersionPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+        {
+            @Override
+            public boolean onPreferenceClick(Preference preference)
+            {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse("https://twitter.com/BenoitLetondor"));
+                getActivity().startActivity(i);
 
                 return false;
             }

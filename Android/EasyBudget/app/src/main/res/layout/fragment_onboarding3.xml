@@ -26,7 +26,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="30dp"
                 android:textColor="@android:color/white"
-                android:text="Let's get to know each other"
+                android:text="@string/onboarding_screen_3_title"
                 android:gravity="center_horizontal" />
 
             <TextView
@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"
                 android:textSize="18dp"
-                android:text="Enter an initial amount of money: what you currently have on your account.\n(You can leave it and change it later)"
+                android:text="@string/onboarding_screen_3_message"
                 android:textColor="@android:color/white"
                 android:gravity="center_horizontal" />
 
