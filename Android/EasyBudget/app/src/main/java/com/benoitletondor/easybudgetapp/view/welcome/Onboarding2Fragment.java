@@ -101,6 +101,6 @@ public class Onboarding2Fragment extends OnboardingFragment
      */
     private void setNextButtonText()
     {
-        nextButton.setText("Go with "+selectedCurrency.getSymbol());
+        nextButton.setText(getResources().getString(R.string.onboarding_screen_2_cta, selectedCurrency.getSymbol()));
     }
 }

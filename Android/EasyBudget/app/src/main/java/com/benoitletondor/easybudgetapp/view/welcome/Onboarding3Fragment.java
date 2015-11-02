@@ -164,7 +164,7 @@ public class Onboarding3Fragment extends OnboardingFragment
         {
             int value = getAmountValue();
 
-            nextButton.setText(getActivity().getString(R.string.onboarding_start_with_amount, CurrencyHelper.getFormattedCurrencyString(getActivity(), value)));
+            nextButton.setText(getActivity().getString(R.string.onboarding_screen_3_cta, CurrencyHelper.getFormattedCurrencyString(getActivity(), value)));
         }
     }
 }

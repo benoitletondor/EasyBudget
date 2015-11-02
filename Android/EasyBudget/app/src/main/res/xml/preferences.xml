@@ -3,7 +3,8 @@
     <PreferenceCategory
         android:title="@string/setting_category_general_title">
 
-        <Preference android:key="@string/setting_category_currency_change_button_key" />
+        <Preference android:key="@string/setting_category_currency_change_button_key"
+            android:summary="@string/setting_category_currency_change_button_message"/>
 
         <Preference android:key="@string/setting_category_limit_set_button_key"
             android:title="@string/setting_category_limit_set_button_title"
@@ -12,7 +13,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="@string/setting_category_social_title">
+        android:title="@string/setting_category_app_title">
 
         <Preference android:title="@string/setting_category_rate_button_title"
             android:summary="@string/setting_category_rate_button_message"
@@ -20,6 +21,9 @@
 
         <Preference android:title="@string/setting_category_bug_report_send_button_title"
             android:key="@string/setting_category_bug_report_send_button_key" />
+
+        <Preference android:key="@string/setting_category_app_version_key"
+            android:summary="@string/setting_category_app_version_message"/>
 
     </PreferenceCategory>
 
