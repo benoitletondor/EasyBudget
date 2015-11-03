@@ -107,9 +107,11 @@
     <string name="setting_category_app_version_message">Made with love by @BenoitLetondor</string>
     <string name="setting_category_dev_title">Dev</string>
     <string name="setting_category_show_welcome_screen_button_title">Show welcome screen</string>
+    <string name="setting_category_share_app_title">Tell your friends</string>
+    <string name="setting_category_share_app_message">EasyBudget is free, so why not sharing it with your friends!</string>
 
     <string name="rating_popup_question_title">What do you think of EasyBudget?</string>
-    <string name="rating_popup_question_message">This app might not be perfect as I develop it in my free time, but I would really appreciate your feedback.</string>
+    <string name="rating_popup_question_message">I develop this app in my free time and provide it for free, it might not be perfect but I would really appreciate your feedback.</string>
     <string name="rating_popup_question_cta_negative">I don\'t like it</string>
     <string name="rating_popup_question_cta_positive">I like it</string>
     <string name="rating_popup_negative_title">:(</string>
@@ -144,6 +146,13 @@
     <string name="onboarding_screen_4_message3">1. Add monthly recurring expenses and incomes (salary, rent, bills…)\n2. Don\'t forget to add your daily expenses and incomes during the day</string>
     <string name="onboarding_screen_4_cta">Let\'s go!</string>
 
+    <string name="app_invite_title">Tell your friends!</string>
+    <string name="app_invite_message">You should try EasyBudget: An incredibly easy to use app to manage your budget!</string> <!-- 100 chars or less -->
+    <string name="app_invite_referral" translatable="false">easybudget://referral?type=appinvite&amp;referrer=%s</string>
+    <string name="app_invite_welcome_title">Welcome to EasyBudget</string>
+    <string name="app_invite_welcome_message">It looks like a friend recommended you to try the app. You should keep that friend close, he gives great advices ;)</string>
+    <string name="app_invite_welcome_cta">Go!</string>
+
     <!-- Keys, not for translations. -->
     <string name="setting_category_bug_report_send_button_key" translatable="false">send_bug_report</string>
     <string name="setting_category_show_welcome_screen_button_key" translatable="false">show_welcome_screen</string>
@@ -153,4 +162,5 @@
     <string name="setting_category_dev_key" translatable="false">dev_category</string>
     <string name="setting_category_rate_button_key" translatable="false">rate</string>
     <string name="setting_category_app_version_key" translatable="false">app_version</string>
+    <string name="setting_category_share_app_key" translatable="false">share_app</string>
 </resources>
