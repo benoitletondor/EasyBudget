@@ -59,6 +59,7 @@ dependencies {
     compile 'com.android.support:percent:23.1.0'
     compile 'com.google.android.gms:play-services-gcm:8.1.0'
     compile 'com.google.android.gms:play-services-analytics:8.1.0'
+    compile 'com.google.android.gms:play-services-appinvite:8.1.0'
     compile 'com.roomorama:caldroid:2.2.1'
     compile 'com.getbase:floatingactionbutton:1.10.0'
     compile('com.crashlytics.sdk.android:crashlytics:2.5.2@aar') { transitive = true; }

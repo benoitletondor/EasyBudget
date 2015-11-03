@@ -14,6 +14,7 @@ import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
@@ -25,10 +26,12 @@ import com.benoitletondor.easybudgetapp.BuildConfig;
 import com.benoitletondor.easybudgetapp.EasyBudget;
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
+import com.benoitletondor.easybudgetapp.helper.Logger;
 import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
 import com.benoitletondor.easybudgetapp.helper.Parameters;
 import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment;
+import com.google.android.gms.appinvite.AppInviteInvitation;
 
 /**
  * Fragment to display preferences
@@ -93,6 +96,32 @@ public class PreferencesFragment extends PreferenceFragment
                 else
                 {
                     Toast.makeText(getActivity(), getResources().getString(R.string.setting_category_bug_report_send_error), Toast.LENGTH_SHORT).show();
+                }
+
+                return false;
+            }
+        });
+
+        /*
+         * Share app
+         */
+        findPreference(getResources().getString(R.string.setting_category_share_app_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+        {
+            @Override
+            public boolean onPreferenceClick(Preference preference)
+            {
+                try
+                {
+                    Intent intent = new AppInviteInvitation.IntentBuilder(getResources().getString(R.string.app_invite_title))
+                            .setMessage(getResources().getString(R.string.app_invite_message))
+                            .setDeepLink(Uri.parse(MainActivity.buildAppInvitesReferrerDeeplink(getActivity())))
+                            .build();
+
+                    ActivityCompat.startActivityForResult(getActivity(), intent, SettingsActivity.APP_INVITE_REQUEST, null);
+                }
+                catch (Exception e)
+                {
+                    Logger.error("An error occured during app invites activity start", e);
                 }
 
                 return false;

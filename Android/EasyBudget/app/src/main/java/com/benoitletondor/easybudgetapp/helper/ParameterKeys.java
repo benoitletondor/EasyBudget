@@ -35,4 +35,20 @@ public class ParameterKeys
      * Are animations enabled (boolean)
      */
     public static final String ANIMATIONS_ENABLED = "animation_enabled";
+    /**
+     * Number of invitations sent by the user (int)
+     */
+    public static final String NUMBER_OF_INVITATIONS = "number_of_invitations";
+    /**
+     * ID of the invitation the user came with (String)
+     */
+    public static final String INVITATION_ID = "invitation_id";
+    /**
+     * Source of the installation (String)
+     */
+    public static final String INSTALLATION_SOURCE = "installation_source";
+    /**
+     * Referrer of the installation (String)
+     */
+    public static final String INSTALLATION_REFERRER = "installation_referrer";
 }

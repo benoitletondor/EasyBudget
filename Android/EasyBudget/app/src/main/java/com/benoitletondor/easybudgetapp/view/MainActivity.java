@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -51,6 +52,8 @@ import com.benoitletondor.easybudgetapp.view.main.ExpensesRecyclerViewAdapter;
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
+import com.google.android.gms.appinvite.AppInvite;
+import com.google.android.gms.appinvite.AppInviteReferral;
 import com.roomorama.caldroid.CaldroidFragment;
 import com.roomorama.caldroid.CaldroidListener;
 
@@ -115,6 +118,12 @@ public class MainActivity extends DBActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // App invites
+        if( savedInstanceState == null && AppInviteReferral.hasReferral(getIntent()) )
+        {
+            updateInvitationStatus(getIntent());
+        }
+
         budgetLine = (TextView) findViewById(R.id.budgetLine);
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
         recyclerViewPlaceholder = findViewById(R.id.emptyExpensesRecyclerViewPlaceholder);
@@ -128,6 +137,7 @@ public class MainActivity extends DBActivity
         filter.addAction(INTENT_MONTHLY_EXPENSE_DELETED);
         filter.addAction(SelectCurrencyFragment.CURRENCY_SELECTED_INTENT);
         filter.addAction(INTENT_SHOW_WELCOME_SCREEN);
+        filter.addAction(Intent.ACTION_VIEW);
 
         receiver = new BroadcastReceiver()
         {
@@ -224,6 +234,13 @@ public class MainActivity extends DBActivity
                     Intent startIntent = new Intent(MainActivity.this, WelcomeActivity.class);
                     ActivityCompat.startActivityForResult(MainActivity.this, startIntent, WELCOME_SCREEN_ACTIVITY_CODE, null);
                 }
+                else if( Intent.ACTION_VIEW.equals(intent.getAction()) ) // App invites referrer
+                {
+                    if( AppInviteReferral.hasReferral(intent) )
+                    {
+                        updateInvitationStatus(intent);
+                    }
+                }
             }
         };
 
@@ -308,6 +325,69 @@ public class MainActivity extends DBActivity
                 finish(); // Finish activity if welcome screen is finish via back button
             }
         }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent)
+    {
+        super.onNewIntent(intent);
+
+        // App invites
+        if (AppInviteReferral.hasReferral(intent))
+        {
+            updateInvitationStatus(intent);
+        }
+    }
+
+    /**
+     * Update invitation & conversion status
+     *
+     * @param intent
+     */
+    private void updateInvitationStatus(Intent intent)
+    {
+        try
+        {
+            String invitationId = AppInviteReferral.getInvitationId(intent);
+            if( invitationId != null && !invitationId.isEmpty() )
+            {
+                Logger.debug("Installation from invitation: "+invitationId);
+
+                Parameters.getInstance(getApplicationContext()).putString(ParameterKeys.INVITATION_ID, invitationId);
+                ((EasyBudget) getApplication()).trackInvitationId(invitationId);
+            }
+
+            Uri data = intent.getData();
+            String source = data.getQueryParameter("type");
+            String referrer = data.getQueryParameter("referrer");
+
+            Logger.debug("Found conversion from source: " + source + " and referrer: " + referrer);
+
+            if( source != null )
+            {
+                Parameters.getInstance(getApplicationContext()).putString(ParameterKeys.INSTALLATION_SOURCE, source);
+            }
+
+            if( referrer != null )
+            {
+                Parameters.getInstance(getApplicationContext()).putString(ParameterKeys.INSTALLATION_REFERRER, referrer);
+            }
+        }
+        catch (Exception e)
+        {
+            Logger.error("Error while getting invitation id from intent", e);
+        }
+    }
+
+    /**
+     * Build the deeplink used for app invites invitations
+     *
+     * @param context
+     * @return
+     */
+    public static String buildAppInvitesReferrerDeeplink(@NonNull Context context)
+    {
+        return context.getResources().getString(R.string.app_invite_referral, Parameters.getInstance(context).getString(ParameterKeys.LOCAL_ID));
     }
 
 // ------------------------------------------>

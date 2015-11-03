@@ -19,6 +19,10 @@
             android:summary="@string/setting_category_rate_button_message"
             android:key="@string/setting_category_rate_button_key" />
 
+        <Preference android:title="@string/setting_category_share_app_title"
+                    android:summary="@string/setting_category_share_app_message"
+                    android:key="@string/setting_category_share_app_key" />
+
         <Preference android:title="@string/setting_category_bug_report_send_button_title"
             android:key="@string/setting_category_bug_report_send_button_key" />
 

@@ -14,6 +14,7 @@ import com.benoitletondor.easybudgetapp.helper.Parameters;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.analytics.Logger.LogLevel;
 
@@ -71,6 +72,34 @@ public class EasyBudget extends Application
         }
 
         analyticsTracker = analytics.newTracker(R.xml.analytics);
+    }
+
+    /**
+     * Track that user comes from the given invitation id
+     *
+     * @param invitationId
+     */
+    public void trackInvitationId(String invitationId)
+    {
+        analyticsTracker.send(new HitBuilders.ScreenViewBuilder()
+            .setCustomDimension(1, "referral-appinvites")
+            .build());
+    }
+
+    /**
+     * Track the number of invites sent by the user
+     *
+     * @param invitationsSent
+     */
+    public void trackNumberOfInvitsSent(int invitationsSent)
+    {
+        int invitSent = Parameters.getInstance(getApplicationContext()).getInt(ParameterKeys.NUMBER_OF_INVITATIONS, 0);
+        invitSent += invitationsSent;
+        Parameters.getInstance(getApplicationContext()).putInt(ParameterKeys.NUMBER_OF_INVITATIONS, invitSent);
+
+        analyticsTracker.send(new HitBuilders.ScreenViewBuilder()
+            .setCustomMetric(1, (float) invitSent)
+            .build());
     }
 
     /**
