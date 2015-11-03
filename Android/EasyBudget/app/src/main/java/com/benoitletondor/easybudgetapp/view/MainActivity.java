@@ -353,6 +353,23 @@ public class MainActivity extends DBActivity
             {
                 Logger.debug("Installation from invitation: "+invitationId);
 
+                String existingId = Parameters.getInstance(getApplicationContext()).getString(ParameterKeys.INVITATION_ID);
+                if( existingId == null )
+                {
+                    new AlertDialog.Builder(this)
+                        .setTitle(R.string.app_invite_welcome_title)
+                        .setMessage(R.string.app_invite_welcome_message)
+                        .setPositiveButton(R.string.app_invite_welcome_cta, new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+
+                            }
+                        })
+                        .show();
+                }
+
                 Parameters.getInstance(getApplicationContext()).putString(ParameterKeys.INVITATION_ID, invitationId);
                 ((EasyBudget) getApplication()).trackInvitationId(invitationId);
             }

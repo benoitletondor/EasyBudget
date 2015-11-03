@@ -149,6 +149,9 @@
     <string name="app_invite_title">Tell your friends!</string>
     <string name="app_invite_message">You should try EasyBudget: An incredibly easy to use app to manage your budget!</string> <!-- 100 chars or less -->
     <string name="app_invite_referral" translatable="false">easybudget://referral?type=appinvite&amp;referrer=%s</string>
+    <string name="app_invite_welcome_title">Welcome to EasyBudget</string>
+    <string name="app_invite_welcome_message">It looks like a friend recommended you to try the app. You should keep that friend close, he gives great advices ;)</string>
+    <string name="app_invite_welcome_cta">Go!</string>
 
     <!-- Keys, not for translations. -->
     <string name="setting_category_bug_report_send_button_key" translatable="false">send_bug_report</string>
