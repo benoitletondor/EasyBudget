@@ -1,32 +1,38 @@
 # EasyBudget
 
-EasyBudget is a work in progress project for a **simple** budget management Android application.
+EasyBudget is a **simple** budget management Android application.
 
-I got the idea of this app by trying to find one really easy to use budget management app on my phone, the conclusion was simple: there is no app easy enough for me.
+![EasyBudget](http://i.imgur.com/hiQrR38.png)
 
 ### Project idea
 
+I got the idea of this app by trying to find one really easy to use budget management app on my phone, the conclusion was simple: I cannot find an app on the PlayStore that fits my needs.
+
 I want a simpler app to manage budget on Android. Only 1 account, no export-import features, no stats/graph, simple interface, quick and efficient.
 
-Here's a first look at what the current version looks like:
+I simply decided to create my own app in my free time, with the hope that I'm not the only one looking for an easiest way to manage my budget.
 
-![EasyBudget home screen](http://i.imgur.com/iebPxFL.png?1)
+### Available on PlayStore
+
+EasyBudget is currently in beta, if you have access to the beta channel, you can download it on the PlayStore: [https://play.google.com/store/apps/details?id=com.benoitletondor.easybudgetapp](https://play.google.com/store/apps/details?id=com.benoitletondor.easybudgetapp)
 
 ### Technical details
 
-EasyBudget is a simple Android app build with Android Studio that will support Android 4+. 
+EasyBudget is a simple Android app build with Android Studio that supports Android 4+. 
 
-I'll try to make the app adopt Material design as much as possible using appcompat and some imagination/magic.
+The app adopt material design as much as possible using appcompat and some imagination/magic.
 
 The project is made possible by some external libraries made by awesome guys that I want to thanks here:
 
 - Caldroid: a library to display a customizable Calendar [https://github.com/roomorama/Caldroid](https://github.com/roomorama/Caldroid)
 - FloatingActionButton: library to display a FAB with actions [https://github.com/futuresimple/android-floating-action-button](https://github.com/futuresimple/android-floating-action-button)
 
-### Licence
+### Contact
 
-    Copyright (C) 2015 Benoit LETONDOR
+You can contact me regarding EasyBudget using this email: [easybudget@benoitletondor.com](mailto:easybudget@benoitletondor.com)
 
-    This program is under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+### Copyright
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+    Copyright (C) 2015 Benoit LETONDOR. The name "EasyBudget", the app idea and assets (images, names, wordings etc...) are all under copyright.
+
+    Sources are availables under the Apache 2 licence (See LICENSE for details) and contributions will be warmely welcomed! Feel free to contribute :)
