@@ -23,19 +23,25 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
 import com.benoitletondor.easybudgetapp.R;
+import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
+import com.benoitletondor.easybudgetapp.helper.Parameters;
 
 /**
  * Rating popup that ask user for feedback and redirect them to the PlayStore
- * TODO tracking, store user choices
+ * TODO send data to GA
  *
  * @author Benoit LETONDOR
  */
 public class RatingPopup
 {
+    /**
+     * Stored activity (beware of leaks !)
+     */
     @NonNull
     private Context activity;
 
@@ -46,11 +52,20 @@ public class RatingPopup
 
 // ------------------------------------------>
 
+    /**
+     * Show the rating popup to the user
+     */
     public void show()
     {
+        setRatingPopupStep(activity, RatingPopupStep.STEP_SHOWN);
         buildStep1().show();
     }
 
+    /**
+     * Build the first step of rating asking the user what he thinks of the app
+     *
+     * @return A ready to be shown {@link AlertDialog}
+     */
     private AlertDialog buildStep1()
     {
         return new AlertDialog.Builder(activity)
@@ -61,6 +76,7 @@ public class RatingPopup
                 @Override
                 public void onClick(DialogInterface dialog, int which)
                 {
+                    setRatingPopupStep(activity, RatingPopupStep.STEP_DISLIKE);
                     buildNegativeStep().show();
                 }
             })
@@ -69,12 +85,18 @@ public class RatingPopup
                 @Override
                 public void onClick(DialogInterface dialog, int which)
                 {
+                    setRatingPopupStep(activity, RatingPopupStep.STEP_LIKE);
                     buildPositiveStep().show();
                 }
             })
             .create();
     }
 
+    /**
+     * Build the step to shown when the user said he doesn't like the app
+     *
+     * @return A ready to be shown {@link AlertDialog}
+     */
     private AlertDialog buildNegativeStep()
     {
         return new AlertDialog.Builder(activity)
@@ -85,7 +107,7 @@ public class RatingPopup
                 @Override
                 public void onClick(DialogInterface dialog, int which)
                 {
-                    // Nothing to do
+                    setRatingPopupStep(activity, RatingPopupStep.STEP_DISLIKE_NO_FEEDBACK);
                 }
             })
             .setPositiveButton(R.string.rating_popup_negative_cta_positive, new DialogInterface.OnClickListener()
@@ -93,6 +115,8 @@ public class RatingPopup
                 @Override
                 public void onClick(DialogInterface dialog, int which)
                 {
+                    setRatingPopupStep(activity, RatingPopupStep.STEP_DISLIKE_FEEDBACK);
+
                     Intent sendIntent = new Intent();
                     sendIntent.setAction(Intent.ACTION_SENDTO);
                     sendIntent.setData(Uri.parse("mailto:")); // only email apps should handle this
@@ -113,6 +137,11 @@ public class RatingPopup
             .create();
     }
 
+    /**
+     * Build the step to shown when the user said he likes the app
+     *
+     * @return A ready to be shown {@link AlertDialog}
+     */
     private AlertDialog buildPositiveStep()
     {
         return new AlertDialog.Builder(activity)
@@ -123,7 +152,7 @@ public class RatingPopup
                 @Override
                 public void onClick(DialogInterface dialog, int which)
                 {
-                    // Nothing to do
+                    setRatingPopupStep(activity, RatingPopupStep.STEP_LIKE_NOT_RATED);
                 }
             })
             .setPositiveButton(R.string.rating_popup_positive_cta_positive, new DialogInterface.OnClickListener()
@@ -131,6 +160,8 @@ public class RatingPopup
                 @Override
                 public void onClick(DialogInterface dialog, int which)
                 {
+                    setRatingPopupStep(activity, RatingPopupStep.STEP_LIKE_RATED);
+
                     final String appPackageName = activity.getPackageName();
 
                     try
@@ -148,5 +179,102 @@ public class RatingPopup
                 }
             })
             .create();
+    }
+
+// -------------------------------------------->
+
+    /**
+     * Get the current user rating step
+     *
+     * @param context
+     * @return
+     */
+    public static RatingPopupStep getUserStep(@NonNull Context context)
+    {
+        return RatingPopupStep.fromValue(Parameters.getInstance(context).getInt(ParameterKeys.RATING_STEP, RatingPopupStep.STEP_NOT_SHOWN.value));
+    }
+
+    /**
+     * Set the current user rating step
+     *
+     * @param context
+     * @param step
+     */
+    public static void setRatingPopupStep(@NonNull Context context, @NonNull RatingPopupStep step)
+    {
+        Parameters.getInstance(context).putInt(ParameterKeys.RATING_STEP, step.value);
+    }
+
+    /**
+     * An enum that define the user step in the rating process
+     */
+    public enum RatingPopupStep
+    {
+        /**
+         * Rating popup not shown
+         */
+        STEP_NOT_SHOWN(0),
+
+        /**
+         * Rating popup shown
+         */
+        STEP_SHOWN(1),
+
+        /**
+         * User clicked "I like the app"
+         */
+        STEP_LIKE(2),
+
+        /**
+         * User clicked "I don't want to rate the app"
+         */
+        STEP_LIKE_NOT_RATED(3),
+
+        /**
+         * User clicked "I want to rate the app"
+         */
+        STEP_LIKE_RATED(4),
+
+        /**
+         * User clicked "I don't like the app"
+         */
+        STEP_DISLIKE(5),
+
+        /**
+         * User clicked "I don't wanna give my feedback"
+         */
+        STEP_DISLIKE_NO_FEEDBACK(6),
+
+        /**
+         * User clicked "I want to give my feedback"
+         */
+        STEP_DISLIKE_FEEDBACK(7);
+
+        public int value;
+
+        RatingPopupStep(int value)
+        {
+            this.value = value;
+        }
+
+        /**
+         * Retrive the enum for the given value
+         *
+         * @param value value to find
+         * @return the enum if found, null otherwise
+         */
+        @Nullable
+        public static RatingPopupStep fromValue(int value)
+        {
+            for(RatingPopupStep step : values())
+            {
+                if( step.value == value )
+                {
+                    return step;
+                }
+            }
+
+            return null;
+        }
     }
 }

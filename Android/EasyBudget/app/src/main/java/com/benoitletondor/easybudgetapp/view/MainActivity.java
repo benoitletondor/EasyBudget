@@ -194,7 +194,18 @@ public class MainActivity extends DBActivity
                     }
                     else
                     {
-                        // TODO warn user of error
+                        new AlertDialog.Builder(MainActivity.this)
+                            .setTitle(R.string.expense_delete_error_title)
+                            .setMessage(R.string.expense_delete_error_message)
+                            .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .show();
                     }
 
                 }
@@ -579,7 +590,7 @@ public class MainActivity extends DBActivity
 
     /**
      * Update the balance for the given day
-     * FIXME optim
+     * TODO optim
      *
      * @param day
      */
@@ -912,7 +923,7 @@ public class MainActivity extends DBActivity
     {
         new AlertDialog.Builder(MainActivity.this)
             .setTitle(R.string.monthly_expense_delete_error_title)
-            .setMessage(getResources().getString(R.string.monthly_expense_delete_error_message))
+            .setMessage(R.string.monthly_expense_delete_error_message)
             .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener()
             {
                 @Override
@@ -984,14 +995,14 @@ public class MainActivity extends DBActivity
                     boolean expensesDeleted = db.deleteAllExpenseForMonthlyExpense(monthlyExpense);
                     if( !expensesDeleted )
                     {
-                        //TODO log error
+                        Logger.error(false, "Error while deleting expenses for monthly expense (mode ALL). deleteAllExpenseForMonthlyExpense returned false");
                         return false;
                     }
 
                     boolean monthlyExpenseDeleted = db.deleteMonthlyExpense(monthlyExpense);
                     if( !monthlyExpenseDeleted )
                     {
-                        //TODO log error
+                        Logger.error(false, "Error while deleting monthly expense (mode ALL). deleteMonthlyExpense returned false");
                         return false;
                     }
 
@@ -1004,7 +1015,7 @@ public class MainActivity extends DBActivity
                     boolean expensesDeleted = db.deleteAllExpenseForMonthlyExpenseFromDate(monthlyExpense, expense.getDate());
                     if( !expensesDeleted )
                     {
-                        //TODO log error
+                        Logger.error(false, "Error while deleting expenses for monthly expense (mode FROM). deleteAllExpenseForMonthlyExpenseFromDate returned false");
                         return false;
                     }
 
@@ -1017,7 +1028,7 @@ public class MainActivity extends DBActivity
                     boolean expensesDeleted = db.deleteAllExpenseForMonthlyExpenseBeforeDate(monthlyExpense, expense.getDate());
                     if( !expensesDeleted )
                     {
-                        //TODO log error
+                        Logger.error(false, "Error while deleting expenses for monthly expense (mode TO). deleteAllExpenseForMonthlyExpenseBeforeDate returned false");
                         return false;
                     }
 
@@ -1031,7 +1042,7 @@ public class MainActivity extends DBActivity
                     boolean expenseDeleted = db.deleteExpense(expense);
                     if( !expenseDeleted )
                     {
-                        //TODO log error
+                        Logger.error("Error while deleting expense for monthly expense (mode ONE). deleteExpense returned false");
                         return false;
                     }
 

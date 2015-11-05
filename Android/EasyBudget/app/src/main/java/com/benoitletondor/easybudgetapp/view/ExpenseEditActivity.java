@@ -172,14 +172,14 @@ public class ExpenseEditActivity extends DBActivity
         String description = descriptionEditText.getText().toString();
         if( description.trim().isEmpty() )
         {
-            descriptionEditText.setError("Enter a description"); //TODO translate
+            descriptionEditText.setError(getResources().getString(R.string.no_description_error));
             ok = false;
         }
 
         String amount = amountEditText.getText().toString();
         if( amount.trim().isEmpty() )
         {
-            amountEditText.setError("Enter an amount"); //TODO translate
+            amountEditText.setError(getResources().getString(R.string.no_amount_error));
             ok = false;
         }
         else
@@ -189,13 +189,13 @@ public class ExpenseEditActivity extends DBActivity
                 int value = Integer.parseInt(amount);
                 if( value <= 0 )
                 {
-                    amountEditText.setError("Amount should be greater than 0"); //TODO
+                    amountEditText.setError(getResources().getString(R.string.negative_amount_error));
                     ok = false;
                 }
             }
             catch(Exception e)
             {
-                amountEditText.setError("Not a valid amount"); //TODO
+                amountEditText.setError(getResources().getString(R.string.invalid_amount));
                 ok = false;
             }
         }

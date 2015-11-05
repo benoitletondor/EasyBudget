@@ -38,6 +38,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.benoitletondor.easybudgetapp.R;
+import com.benoitletondor.easybudgetapp.helper.Logger;
 import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import com.benoitletondor.easybudgetapp.model.Expense;
@@ -169,14 +170,14 @@ public class MonthlyExpenseEditActivity extends DBActivity
         String description = descriptionEditText.getText().toString();
         if( description.trim().isEmpty() )
         {
-            descriptionEditText.setError("Enter a description"); //TODO translate
+            descriptionEditText.setError(getResources().getString(R.string.no_description_error));
             ok = false;
         }
 
         String amount = amountEditText.getText().toString();
         if( amount.trim().isEmpty() )
         {
-            amountEditText.setError("Enter an amount"); //TODO translate
+            amountEditText.setError(getResources().getString(R.string.no_amount_error));
             ok = false;
         }
         else
@@ -186,13 +187,13 @@ public class MonthlyExpenseEditActivity extends DBActivity
                 int value = Integer.parseInt(amount);
                 if( value <= 0 )
                 {
-                    amountEditText.setError("Amount should be greater than 0"); //TODO
+                    amountEditText.setError(getResources().getString(R.string.negative_amount_error));
                     ok = false;
                 }
             }
             catch(Exception e)
             {
-                amountEditText.setError("Not a valid amount"); //TODO
+                amountEditText.setError(getResources().getString(R.string.invalid_amount));
                 ok = false;
             }
         }
@@ -349,7 +350,7 @@ public class MonthlyExpenseEditActivity extends DBActivity
                 boolean inserted = db.addMonthlyExpense(expense);
                 if( !inserted )
                 {
-                    // TODO log error
+                    Logger.error(false, "Error while inserting monthly expense into DB: addMonthlyExpense returned false");
                     return false;
                 }
 
@@ -362,7 +363,7 @@ public class MonthlyExpenseEditActivity extends DBActivity
                     boolean expenseInserted = db.persistExpense(new Expense(expense.getTitle(), expense.getAmount(), cal.getTime(), expense.getId()));
                     if (!expenseInserted)
                     {
-                        // TODO log error
+                        Logger.error(false, "Error while inserting expense for monthly expense into DB: persistExpense returned false");
                         return false;
                     }
 

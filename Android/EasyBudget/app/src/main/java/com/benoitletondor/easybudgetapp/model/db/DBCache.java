@@ -91,7 +91,7 @@ public class DBCache
 
         synchronized (balances)
         {
-            balances.clear(); // TODO be smarter than delete all!
+            balances.clear(); // TODO be smarter than delete all ?
         }
 
         synchronized (expenses)

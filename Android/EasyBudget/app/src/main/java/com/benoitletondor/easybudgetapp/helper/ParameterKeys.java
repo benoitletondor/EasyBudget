@@ -67,4 +67,8 @@ public class ParameterKeys
      * Referrer of the installation (String)
      */
     public static final String INSTALLATION_REFERRER = "installation_referrer";
+    /**
+     * Store the user step in the rating process (int)
+     */
+    public static final String RATING_STEP = "rating_step";
 }

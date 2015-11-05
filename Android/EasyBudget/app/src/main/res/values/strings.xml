@@ -44,6 +44,11 @@
     <string name="first_occurence">First occurrence</string>
     <string name="no_expense_for_today">No income or expense yet.</string>
 
+    <string name="no_description_error">Enter a description</string>
+    <string name="no_amount_error">Enter an amount</string>
+    <string name="negative_amount_error">Amount should be greater than O</string>
+    <string name="invalid_amount">Not a valid amount</string>
+
     <string name="dialog_edit_expense_title">What do you want to do?</string>
     <string name="dialog_edit_income_title">What do you want to do?</string>
     <string-array name="dialog_edit_expense_choices">
@@ -101,6 +106,8 @@
     <string name="monthly_expense_restore_error_message">An error occurred.</string>
     <string name="monthly_expense_delete_first_error_title">Oops</string>
     <string name="monthly_expense_delete_first_error_message">There are no occurrences before this one.</string>
+    <string name="expense_delete_error_title">Oops</string>
+    <string name="expense_delete_error_message">An error occurred.</string>
 
     <string name="setting_category_app_title">App</string>
     <string name="setting_category_rate_button_title">Like the app?</string>
