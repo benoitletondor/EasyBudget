@@ -82,7 +82,7 @@
     <string name="adjust_balance_message">Adjust how much you currently have on your account</string>
     <string name="adjust_balance_expense_title">Balance</string>
     <string name="adjust_balance_snackbar_text">Balance adjusted to %s</string>
-    <string name="account_balance_format">Balance for %1$s: %2$s</string>
+    <string name="account_balance_format">Balance on %s:</string>
     <string name="account_balance_date_format">MMM dd</string>
     <string name="adjust_limit_warning_title">Change warning threshold for low balance</string>
     <string name="adjust_limit_warning_message">Set the threshold value (must be > 0)</string>

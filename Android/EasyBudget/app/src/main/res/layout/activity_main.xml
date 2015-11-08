@@ -38,15 +38,32 @@
             android:background="@drawable/elevation_shadow"
             android:layout_marginTop="-7dp" />
 
-        <TextView android:id="@+id/budgetLine"
+        <LinearLayout android:id="@+id/budgetLineContainer"
             android:layout_width="match_parent"
             android:layout_height="28dp"
-            android:background="@color/budget_green"
-            android:textColor="@android:color/white"
-            android:textSize="14dp"
+            android:orientation="horizontal"
             android:paddingLeft="15dp"
             android:paddingRight="15dp"
-            android:gravity="center"/>
+            android:background="@color/budget_green"
+            android:gravity="center">
+
+            <TextView android:id="@+id/budgetLine"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="14dp"/>
+
+            <TextView android:id="@+id/budgetLineAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="14dp"
+                android:textStyle="bold"
+                android:layout_marginLeft="2dp"/>
+
+        </LinearLayout>
+
+
 
         <LinearLayout android:id="@+id/emptyExpensesRecyclerViewPlaceholder"
             android:layout_width="match_parent"

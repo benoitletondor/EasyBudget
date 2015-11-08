@@ -116,6 +116,8 @@ public class MainActivity extends DBActivity
     private View                        recyclerViewPlaceholder;
 
     private TextView budgetLine;
+    private TextView budgetLineAmount;
+    private View budgetLineContainer;
     @Nullable
     private Date lastStopDate;
 
@@ -141,6 +143,8 @@ public class MainActivity extends DBActivity
         }
 
         budgetLine = (TextView) findViewById(R.id.budgetLine);
+        budgetLineAmount = (TextView) findViewById(R.id.budgetLineAmount);
+        budgetLineContainer = findViewById(R.id.budgetLineContainer);
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
         recyclerViewPlaceholder = findViewById(R.id.emptyExpensesRecyclerViewPlaceholder);
 
@@ -599,19 +603,20 @@ public class MainActivity extends DBActivity
         int balance = - db.getBalanceForDay(day);
 
         SimpleDateFormat format = new SimpleDateFormat(getResources().getString(R.string.account_balance_date_format), Locale.getDefault());
-        budgetLine.setText(getResources().getString(R.string.account_balance_format, format.format(day), CurrencyHelper.getFormattedCurrencyString(this, balance)));
+        budgetLine.setText(getResources().getString(R.string.account_balance_format, format.format(day)));
+        budgetLineAmount.setText(CurrencyHelper.getFormattedCurrencyString(this, balance));
 
         if( balance <= 0 )
         {
-            budgetLine.setBackgroundResource(R.color.budget_red);
+            budgetLineContainer.setBackgroundResource(R.color.budget_red);
         }
         else if( balance < Parameters.getInstance(getApplicationContext()).getInt(ParameterKeys.LOW_MONEY_WARNING_AMOUNT, EasyBudget.DEFAULT_LOW_MONEY_WARNING_AMOUNT) )
         {
-            budgetLine.setBackgroundResource(R.color.budget_orange);
+            budgetLineContainer.setBackgroundResource(R.color.budget_orange);
         }
         else
         {
-            budgetLine.setBackgroundResource(R.color.budget_green);
+            budgetLineContainer.setBackgroundResource(R.color.budget_green);
         }
     }
 
