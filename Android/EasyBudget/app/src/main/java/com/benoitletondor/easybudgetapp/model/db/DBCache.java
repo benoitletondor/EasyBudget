@@ -196,7 +196,7 @@ public class DBCache
          */
         private Date month;
         /**
-         * Link to the DB
+         * Saved context to get DB
          */
         private Context context;
 
@@ -268,7 +268,7 @@ public class DBCache
          */
         private Date month;
         /**
-         * Link to the DB
+         * Saved context to get DB
          */
         private Context context;
 
