@@ -93,7 +93,7 @@
     <string name="monthly_income_add_loading_message">Création du revenu mensuel…</string>
     <string name="monthly_expense_add_error_title">Oups</string>
     <string name="monthly_expense_add_error_message">Une erreur est survenue.</string>
-    <string name="monthly_expense_delete_success_message">Dépense mensuelle supprimée avec succès</string>
+    <string name="monthly_expense_delete_success_message">Dépense mensuelle supprimée avec succès.</string>
     <string name="monthly_expense_delete_loading_title">Suppresion</string>
     <string name="monthly_expense_delete_loading_message">Suppression de la dépense mensuelle…</string>
     <string name="monthly_expense_delete_error_title">Oups</string>
@@ -140,7 +140,7 @@
     <string name="rating_popup_negative_cta_negative">Non merci</string>
     <string name="rating_popup_negative_cta_positive">Bien sur!</string>
     <string name="rating_popup_positive_title">:)</string>
-    <string name="rating_popup_positive_message">Je suis content que l\'app vous plaise. Ça vous dirait de lui donner une bonne note sur le PlayStore ?</string>
+    <string name="rating_popup_positive_message">Je suis content que l\'app vous plaise. Ça vous dirais de lui donner une bonne note sur le PlayStore ?</string>
     <string name="rating_popup_positive_cta_negative">Non merci</string>
     <string name="rating_popup_positive_cta_positive">Bien sur!</string>
     <string name="rating_feedback_send_error">Impossible de trouver une application pour envoyer les commentaires par email.</string>
