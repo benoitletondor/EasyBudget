@@ -1,7 +1,23 @@
-<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Copyright 2015 Benoit LETONDOR
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+
 <resources>
 
-    <string name="app_name">EasyBudget</string>
+    <string name="app_name" translatable="false">EasyBudget</string>
+
     <string name="action_settings">Settings</string>
     <string name="action_balance">Adjust current balance</string>
     <string name="action_save">Save</string>
@@ -26,8 +42,13 @@
     <string name="payment">Expense</string>
     <string name="income">Income</string>
     <string name="date">Date</string>
-    <string name="first_occurence">First occurrence</string>
+    <string name="first_occurence">First instance</string>
     <string name="no_expense_for_today">No income or expense yet.</string>
+
+    <string name="no_description_error">Enter a description</string>
+    <string name="no_amount_error">Enter an amount</string>
+    <string name="negative_amount_error">Amount should be greater than O</string>
+    <string name="invalid_amount">Not a valid amount</string>
 
     <string name="dialog_edit_expense_title">What do you want to do?</string>
     <string name="dialog_edit_income_title">What do you want to do?</string>
@@ -62,7 +83,7 @@
     <string name="adjust_balance_message">Adjust how much you currently have on your account</string>
     <string name="adjust_balance_expense_title">Balance</string>
     <string name="adjust_balance_snackbar_text">Balance adjusted to %s</string>
-    <string name="account_balance_format">Balance for %1$s: %2$s</string>
+    <string name="account_balance_format">Balance on %s:</string>
     <string name="account_balance_date_format">MMM dd</string>
     <string name="adjust_limit_warning_title">Change warning threshold for low balance</string>
     <string name="adjust_limit_warning_message">Set the threshold value (must be > 0)</string>
@@ -85,33 +106,35 @@
     <string name="monthly_expense_restore_error_title">Oops</string>
     <string name="monthly_expense_restore_error_message">An error occurred.</string>
     <string name="monthly_expense_delete_first_error_title">Oops</string>
-    <string name="monthly_expense_delete_first_error_message">There are no occurrences before this one.</string>
+    <string name="monthly_expense_delete_first_error_message">There are no instances before this one.</string>
+    <string name="expense_delete_error_title">Oops</string>
+    <string name="expense_delete_error_message">An error occurred.</string>
 
     <string name="setting_category_app_title">App</string>
     <string name="setting_category_rate_button_title">Like the app?</string>
-    <string name="setting_category_rate_button_message">Let me know what you think.</string>
+    <string name="setting_category_rate_button_message">Let me know what you think</string>
     <string name="setting_category_bug_report_send_button_title">Report a bug</string>
     <string name="setting_category_disable_animation_title">Animations</string>
-    <string name="setting_category_disable_animation_message">You can disable animations if you experience any bug or glitch.</string>
+    <string name="setting_category_disable_animation_message">You can disable animations if you experience any bug or glitch</string>
     <string name="bug_report_email">easybudget@benoitletondor.com</string>
     <string name="setting_category_bug_report_send_subject">EasyBudget - Bug report</string>
     <string name="setting_category_bug_report_send_text">\n\n---\n*Please do not remove this part*\nEasyBudget id: %s</string>
     <string name="setting_category_bug_report_send_error">Unable to find an app to send bug report email</string>
     <string name="setting_category_general_title">General</string>
     <string name="setting_category_currency_change_button_title">Change currency (%s)</string>
-    <string name="setting_category_currency_change_button_message">Select the currency you want to use.</string>
+    <string name="setting_category_currency_change_button_message">Select the currency you want to use</string>
     <string name="setting_category_currency_change_dialog_title">Select your currency</string>
     <string name="setting_category_limit_set_button_title">Set low balance warning threshold (%s)</string>
-    <string name="setting_category_limit_set_button_message">Change the threshold at which you want to be warned about a low balance.</string>
+    <string name="setting_category_limit_set_button_message">Change the threshold at which you want to be warned about a low balance</string>
     <string name="setting_category_app_version_title">EasyBudget %s</string>
-    <string name="setting_category_app_version_message">Made with love by @BenoitLetondor</string>
+    <string name="setting_category_app_version_message">Made by @BenoitLetondor</string>
     <string name="setting_category_dev_title">Dev</string>
     <string name="setting_category_show_welcome_screen_button_title">Show welcome screen</string>
     <string name="setting_category_share_app_title">Tell your friends</string>
     <string name="setting_category_share_app_message">EasyBudget is free, so why not sharing it with your friends!</string>
 
     <string name="rating_popup_question_title">What do you think of EasyBudget?</string>
-    <string name="rating_popup_question_message">I develop this app in my free time and provide it for free, it might not be perfect but I would really appreciate your feedback.</string>
+    <string name="rating_popup_question_message">I develop this app in my free time and provide it for free. There still might be things to improve and I would really appreciate your feedback.</string>
     <string name="rating_popup_question_cta_negative">I don\'t like it</string>
     <string name="rating_popup_question_cta_positive">I like it</string>
     <string name="rating_popup_negative_title">:(</string>
@@ -144,13 +167,14 @@
     <string name="onboarding_screen_4_message">(That was easy, huh?)</string>
     <string name="onboarding_screen_4_message2">What do you have to do next?</string>
     <string name="onboarding_screen_4_message3">1. Add monthly recurring expenses and incomes (salary, rent, bills…)\n2. Don\'t forget to add your daily expenses and incomes during the day</string>
+    <string name="onboarding_screen_4_message4">Thank you for using EasyBudget, and welcome :)</string>
     <string name="onboarding_screen_4_cta">Let\'s go!</string>
 
     <string name="app_invite_title">Tell your friends!</string>
     <string name="app_invite_message">You should try EasyBudget: An incredibly easy to use app to manage your budget!</string> <!-- 100 chars or less -->
     <string name="app_invite_referral" translatable="false">easybudget://referral?type=appinvite&amp;referrer=%s</string>
     <string name="app_invite_welcome_title">Welcome to EasyBudget</string>
-    <string name="app_invite_welcome_message">It looks like a friend recommended you to try the app. You should keep that friend close, he gives great advices ;)</string>
+    <string name="app_invite_welcome_message">It looks like a friend recommended this app to you. Welcome on board and don\'t forget to thank your friend for that great advice ;)</string>
     <string name="app_invite_welcome_cta">Go!</string>
 
     <!-- Keys, not for translations. -->

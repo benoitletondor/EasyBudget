@@ -1,3 +1,19 @@
+/*
+ *   Copyright 2015 Benoit LETONDOR
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
 package com.benoitletondor.easybudgetapp.view;
 
 import android.app.Dialog;
@@ -100,6 +116,8 @@ public class MainActivity extends DBActivity
     private View                        recyclerViewPlaceholder;
 
     private TextView budgetLine;
+    private TextView budgetLineAmount;
+    private View budgetLineContainer;
     @Nullable
     private Date lastStopDate;
 
@@ -125,6 +143,8 @@ public class MainActivity extends DBActivity
         }
 
         budgetLine = (TextView) findViewById(R.id.budgetLine);
+        budgetLineAmount = (TextView) findViewById(R.id.budgetLineAmount);
+        budgetLineContainer = findViewById(R.id.budgetLineContainer);
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
         recyclerViewPlaceholder = findViewById(R.id.emptyExpensesRecyclerViewPlaceholder);
 
@@ -178,7 +198,18 @@ public class MainActivity extends DBActivity
                     }
                     else
                     {
-                        // TODO warn user of error
+                        new AlertDialog.Builder(MainActivity.this)
+                            .setTitle(R.string.expense_delete_error_title)
+                            .setMessage(R.string.expense_delete_error_message)
+                            .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .show();
                     }
 
                 }
@@ -563,7 +594,7 @@ public class MainActivity extends DBActivity
 
     /**
      * Update the balance for the given day
-     * FIXME optim
+     * TODO optim
      *
      * @param day
      */
@@ -572,19 +603,20 @@ public class MainActivity extends DBActivity
         int balance = - db.getBalanceForDay(day);
 
         SimpleDateFormat format = new SimpleDateFormat(getResources().getString(R.string.account_balance_date_format), Locale.getDefault());
-        budgetLine.setText(getResources().getString(R.string.account_balance_format, format.format(day), CurrencyHelper.getFormattedCurrencyString(this, balance)));
+        budgetLine.setText(getResources().getString(R.string.account_balance_format, format.format(day)));
+        budgetLineAmount.setText(CurrencyHelper.getFormattedCurrencyString(this, balance));
 
         if( balance <= 0 )
         {
-            budgetLine.setBackgroundResource(R.color.budget_red);
+            budgetLineContainer.setBackgroundResource(R.color.budget_red);
         }
         else if( balance < Parameters.getInstance(getApplicationContext()).getInt(ParameterKeys.LOW_MONEY_WARNING_AMOUNT, EasyBudget.DEFAULT_LOW_MONEY_WARNING_AMOUNT) )
         {
-            budgetLine.setBackgroundResource(R.color.budget_orange);
+            budgetLineContainer.setBackgroundResource(R.color.budget_orange);
         }
         else
         {
-            budgetLine.setBackgroundResource(R.color.budget_green);
+            budgetLineContainer.setBackgroundResource(R.color.budget_green);
         }
     }
 
@@ -896,7 +928,7 @@ public class MainActivity extends DBActivity
     {
         new AlertDialog.Builder(MainActivity.this)
             .setTitle(R.string.monthly_expense_delete_error_title)
-            .setMessage(getResources().getString(R.string.monthly_expense_delete_error_message))
+            .setMessage(R.string.monthly_expense_delete_error_message)
             .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener()
             {
                 @Override
@@ -968,14 +1000,14 @@ public class MainActivity extends DBActivity
                     boolean expensesDeleted = db.deleteAllExpenseForMonthlyExpense(monthlyExpense);
                     if( !expensesDeleted )
                     {
-                        //TODO log error
+                        Logger.error(false, "Error while deleting expenses for monthly expense (mode ALL). deleteAllExpenseForMonthlyExpense returned false");
                         return false;
                     }
 
                     boolean monthlyExpenseDeleted = db.deleteMonthlyExpense(monthlyExpense);
                     if( !monthlyExpenseDeleted )
                     {
-                        //TODO log error
+                        Logger.error(false, "Error while deleting monthly expense (mode ALL). deleteMonthlyExpense returned false");
                         return false;
                     }
 
@@ -988,7 +1020,7 @@ public class MainActivity extends DBActivity
                     boolean expensesDeleted = db.deleteAllExpenseForMonthlyExpenseFromDate(monthlyExpense, expense.getDate());
                     if( !expensesDeleted )
                     {
-                        //TODO log error
+                        Logger.error(false, "Error while deleting expenses for monthly expense (mode FROM). deleteAllExpenseForMonthlyExpenseFromDate returned false");
                         return false;
                     }
 
@@ -1001,7 +1033,7 @@ public class MainActivity extends DBActivity
                     boolean expensesDeleted = db.deleteAllExpenseForMonthlyExpenseBeforeDate(monthlyExpense, expense.getDate());
                     if( !expensesDeleted )
                     {
-                        //TODO log error
+                        Logger.error(false, "Error while deleting expenses for monthly expense (mode TO). deleteAllExpenseForMonthlyExpenseBeforeDate returned false");
                         return false;
                     }
 
@@ -1015,7 +1047,7 @@ public class MainActivity extends DBActivity
                     boolean expenseDeleted = db.deleteExpense(expense);
                     if( !expenseDeleted )
                     {
-                        //TODO log error
+                        Logger.error("Error while deleting expense for monthly expense (mode ONE). deleteExpense returned false");
                         return false;
                     }
 
