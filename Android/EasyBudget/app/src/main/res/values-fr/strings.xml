@@ -61,15 +61,15 @@
     <string name="dialog_edit_monthly_expense_title">Dépense mensuelle : Que voulez-vous faire ?</string>
     <string name="dialog_edit_monthly_income_title">Revenu mensuel : Que voulez-vous faire ?</string>
     <string-array name="dialog_edit_monthly_expense_choices">
-        <item>Modifier cette ocurrence</item>
-        <item>Supprimer cette ocurrence uniquement</item>
+        <item>Modifier cette occurrence</item>
+        <item>Supprimer cette occurrence uniquement</item>
         <item>Supprimer toutes les suivantes</item>
         <item>Supprimer toutes les précédentes</item>
         <item>Supprimer tout</item>
     </string-array>
     <string-array name="dialog_edit_monthly_income_choices">
-        <item>Modifier cette ocurrence</item>
-        <item>Supprimer cette ocurrence uniquement</item>
+        <item>Modifier cette occurrence</item>
+        <item>Supprimer cette occurrence uniquement</item>
         <item>Supprimer toutes les suivantes</item>
         <item>Supprimer toutes les précédentes</item>
         <item>Supprimer tout</item>
@@ -111,9 +111,7 @@
     <string name="setting_category_app_title">App</string>
     <string name="setting_category_rate_button_title">Vous aimez cette appli ?</string>
     <string name="setting_category_rate_button_message">Dîtes moi ce que vous en pensez</string>
-    <string name="setting_category_bug_report_send_button_title">Rapporter un bug</string>
-    <string name="setting_category_disable_animation_title">Animations</string>
-    <string name="setting_category_disable_animation_message">Vous pouvez désactiver les animations si vous rencontrer des bugs</string>
+    <string name="setting_category_bug_report_send_button_title">Signaler un bug</string>
     <string name="bug_report_email">easybudget@benoitletondor.com</string>
     <string name="setting_category_bug_report_send_subject">EasyBudget - Rapport de bug</string>
     <string name="setting_category_bug_report_send_text">\n\n---\n*Ne pas supprimer cette partie*\nEasyBudget id: %s</string>
@@ -126,8 +124,6 @@
     <string name="setting_category_limit_set_button_message">Ajustez le seuil à partir duquel l\'app vous alertera du niveau bas de votre solde</string>
     <string name="setting_category_app_version_title">EasyBudget %s</string>
     <string name="setting_category_app_version_message">Créé par @BenoitLetondor</string>
-    <string name="setting_category_dev_title">Dev</string>
-    <string name="setting_category_show_welcome_screen_button_title">Afficher l\'écran d\'accueil</string>
     <string name="setting_category_share_app_title">Partagez avec vos amis</string>
     <string name="setting_category_share_app_message">EasyBudget est gratuit alors aucune raison de ne pas partager l\'app avec vos amis !</string>
 

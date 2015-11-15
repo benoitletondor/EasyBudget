@@ -114,8 +114,6 @@
     <string name="setting_category_rate_button_title">Like the app?</string>
     <string name="setting_category_rate_button_message">Let me know what you think</string>
     <string name="setting_category_bug_report_send_button_title">Report a bug</string>
-    <string name="setting_category_disable_animation_title">Animations</string>
-    <string name="setting_category_disable_animation_message">You can disable animations if you experience any bug or glitch</string>
     <string name="bug_report_email">easybudget@benoitletondor.com</string>
     <string name="setting_category_bug_report_send_subject">EasyBudget - Bug report</string>
     <string name="setting_category_bug_report_send_text">\n\n---\n*Please do not remove this part*\nEasyBudget id: %s</string>
@@ -128,10 +126,12 @@
     <string name="setting_category_limit_set_button_message">Change the threshold at which you want to be warned about a low balance</string>
     <string name="setting_category_app_version_title">EasyBudget %s</string>
     <string name="setting_category_app_version_message">Made by @BenoitLetondor</string>
-    <string name="setting_category_dev_title">Dev</string>
-    <string name="setting_category_show_welcome_screen_button_title">Show welcome screen</string>
     <string name="setting_category_share_app_title">Tell your friends</string>
     <string name="setting_category_share_app_message">EasyBudget is free, so why not sharing it with your friends!</string>
+    <string name="setting_category_dev_title" translatable="false">Dev</string>
+    <string name="setting_category_show_welcome_screen_button_title" translatable="false">Show welcome screen</string>
+    <string name="setting_category_disable_animation_title" translatable="false">Animations</string>
+    <string name="setting_category_disable_animation_message" translatable="false">You can disable animations if you experience any bug or glitch</string>
 
     <string name="rating_popup_question_title">What do you think of EasyBudget?</string>
     <string name="rating_popup_question_message">I develop this app in my free time and provide it for free. There still might be things to improve and I would really appreciate your feedback.</string>
