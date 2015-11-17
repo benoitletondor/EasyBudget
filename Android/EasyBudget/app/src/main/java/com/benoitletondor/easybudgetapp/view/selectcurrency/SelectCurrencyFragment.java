@@ -35,7 +35,6 @@ import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 
 import java.util.Currency;
-import java.util.List;
 
 /**
  * Fragment that contains UI for user to chose its currency.<br />
@@ -120,7 +119,7 @@ public class SelectCurrencyFragment extends DialogFragment
             @Override
             protected Pair<SelectCurrencyRecyclerViewAdapter, Integer> doInBackground(Void... voids)
             {
-                SelectCurrencyRecyclerViewAdapter adapter = new SelectCurrencyRecyclerViewAdapter(CurrencyHelper.getAvailableCurrencies());
+                SelectCurrencyRecyclerViewAdapter adapter = new SelectCurrencyRecyclerViewAdapter(CurrencyHelper.getMainAvailableCurrencies(), CurrencyHelper.getOtherAvailableCurrencies());
                 return Pair.create(adapter, adapter.getSelectedCurrencyPosition(getContext()));
             }
 
