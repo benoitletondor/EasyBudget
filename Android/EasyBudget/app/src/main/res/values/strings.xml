@@ -20,7 +20,6 @@
 
     <string name="action_settings">Settings</string>
     <string name="action_balance">Adjust current balance</string>
-    <string name="action_save">Save</string>
     <string name="fab_add_expense">Add expense/income</string>
     <string name="fab_add_monthly_expense">Add monthly expense/income</string>
     <string name="title_activity_add_expense">Add expense</string>
@@ -47,7 +46,7 @@
 
     <string name="no_description_error">Enter a description</string>
     <string name="no_amount_error">Enter an amount</string>
-    <string name="negative_amount_error">Amount should be greater than O</string>
+    <string name="negative_amount_error">Amount should be greater than 0</string>
     <string name="invalid_amount">Not a valid amount</string>
 
     <string name="dialog_edit_expense_title">What do you want to do?</string>
@@ -100,8 +99,8 @@
     <string name="monthly_expense_delete_loading_message">Deleting monthly expense…</string>
     <string name="monthly_expense_delete_error_title">Oops</string>
     <string name="monthly_expense_delete_error_message">An error occurred.</string>
-    <string name="monthly_expense_restoring_loading_title">Restoring</string>
-    <string name="monthly_expense_restoring_loading_message">Restoring deleted expense…</string>
+    <string name="monthly_expense_restoring_loading_title">Canceling</string>
+    <string name="monthly_expense_restoring_loading_message">Restoring deleted monthly expense…</string>
     <string name="monthly_expense_restored_success_message">Monthly expense restored with success</string>
     <string name="monthly_expense_restore_error_title">Oops</string>
     <string name="monthly_expense_restore_error_message">An error occurred.</string>
@@ -114,10 +113,8 @@
     <string name="setting_category_rate_button_title">Like the app?</string>
     <string name="setting_category_rate_button_message">Let me know what you think</string>
     <string name="setting_category_bug_report_send_button_title">Report a bug</string>
-    <string name="setting_category_disable_animation_title">Animations</string>
-    <string name="setting_category_disable_animation_message">You can disable animations if you experience any bug or glitch</string>
-    <string name="bug_report_email">easybudget@benoitletondor.com</string>
-    <string name="setting_category_bug_report_send_subject">EasyBudget - Bug report</string>
+    <string name="bug_report_email" translatable="false">easybudget@benoitletondor.com</string>
+    <string name="setting_category_bug_report_send_subject" translatable="false">EasyBudget - Bug report</string>
     <string name="setting_category_bug_report_send_text">\n\n---\n*Please do not remove this part*\nEasyBudget id: %s</string>
     <string name="setting_category_bug_report_send_error">Unable to find an app to send bug report email</string>
     <string name="setting_category_general_title">General</string>
@@ -126,12 +123,14 @@
     <string name="setting_category_currency_change_dialog_title">Select your currency</string>
     <string name="setting_category_limit_set_button_title">Set low balance warning threshold (%s)</string>
     <string name="setting_category_limit_set_button_message">Change the threshold at which you want to be warned about a low balance</string>
-    <string name="setting_category_app_version_title">EasyBudget %s</string>
+    <string name="setting_category_app_version_title" translatable="false">EasyBudget %s</string>
     <string name="setting_category_app_version_message">Made by @BenoitLetondor</string>
-    <string name="setting_category_dev_title">Dev</string>
-    <string name="setting_category_show_welcome_screen_button_title">Show welcome screen</string>
     <string name="setting_category_share_app_title">Tell your friends</string>
     <string name="setting_category_share_app_message">EasyBudget is free, so why not sharing it with your friends!</string>
+    <string name="setting_category_dev_title" translatable="false">Dev</string>
+    <string name="setting_category_show_welcome_screen_button_title" translatable="false">Show welcome screen</string>
+    <string name="setting_category_disable_animation_title" translatable="false">Animations</string>
+    <string name="setting_category_disable_animation_message" translatable="false">You can disable animations if you experience any bug or glitch</string>
 
     <string name="rating_popup_question_title">What do you think of EasyBudget?</string>
     <string name="rating_popup_question_message">I develop this app in my free time and provide it for free. There still might be things to improve and I would really appreciate your feedback.</string>
@@ -145,9 +144,9 @@
     <string name="rating_popup_positive_message">I\'m glad you enjoy using EasyBudget. Would you mind giving it a positive review on the PlayStore?</string>
     <string name="rating_popup_positive_cta_negative">No thanks</string>
     <string name="rating_popup_positive_cta_positive">Sure</string>
-    <string name="rating_feedback_send_error">Unable to find an app to send feedback email</string>
-    <string name="rating_feedback_email">easybudget@benoitletondor.com</string>
-    <string name="rating_feedback_send_subject">EasyBudget - Feedback</string>
+    <string name="rating_feedback_send_error">Unable to find an app to send feedback email.</string>
+    <string name="rating_feedback_email" translatable="false">easybudget@benoitletondor.com</string>
+    <string name="rating_feedback_send_subject" translatable="false">EasyBudget - Feedback</string>
     <string name="rating_feedback_send_text"></string>
 
     <string name="onboarding_screen_1_title">Welcome to EasyBudget</string>

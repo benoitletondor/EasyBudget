@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Currency;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -38,15 +39,67 @@ import java.util.Set;
 public class CurrencyHelper
 {
     /**
-     * Return a list of available currencies (using compat code)
-     *
-     * @return a list of available currencies
+     * List of main currencies ISO 4217 code
      */
-    public static List<Currency> getAvailableCurrencies()
+    private static final String[] MAIN_CURRENCIES = {"USD", "EUR", "GBP", "IRN", "AUD", "CAD", "SGD", "CHF", "MYR", "JPY", "CNY", "NZD"};
+
+// ----------------------------------------->
+
+    /**
+     * Return a list of available main currencies based on {@link #MAIN_CURRENCIES} codes
+     *
+     * @return a list of currencies
+     */
+    @NonNull
+    public static List<Currency> getMainAvailableCurrencies()
     {
+        List<Currency> mainCurrencies = new ArrayList<>(MAIN_CURRENCIES.length);
+
+        for(String currencyCode : MAIN_CURRENCIES)
+        {
+            try
+            {
+                Currency currency = Currency.getInstance(currencyCode);
+                if( currency != null )
+                {
+                    mainCurrencies.add(currency);
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.debug("Unable to find currency with code: "+currencyCode);
+            }
+        }
+
+        return mainCurrencies;
+    }
+
+    /**
+     * Return a list of available currencies (using compat code) minus main ones
+     *
+     * @return a list of other available currencies
+     */
+    public static List<Currency> getOtherAvailableCurrencies()
+    {
+        List<Currency> mainCurrencies = getMainAvailableCurrencies();
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
         {
-            return new ArrayList<>(Currency.getAvailableCurrencies());
+            List<Currency> currencies = new ArrayList<>(Currency.getAvailableCurrencies());
+
+            // Exclude main currencies
+            Iterator<Currency> currencyIterator = currencies.iterator();
+            while (currencyIterator.hasNext())
+            {
+                Currency currency = currencyIterator.next();
+
+                if( mainCurrencies.contains(currency) )
+                {
+                    currencyIterator.remove();
+                }
+            }
+
+            return currencies;
         }
         else
         {
@@ -58,9 +111,15 @@ public class CurrencyHelper
                 try
                 {
                     Currency currency = Currency.getInstance(locale);
+
+                    if( mainCurrencies.contains(currency) )
+                    {
+                        continue; // Exclude main currencies
+                    }
+
                     currencySet.add(currency);
                 }
-                catch(Exception e)
+                catch(Exception ignored)
                 {
                     // Locale not found
                 }
