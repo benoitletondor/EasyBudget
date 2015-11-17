@@ -73,9 +73,7 @@
                 android:layout_marginTop="10dp"
                 android:textSize="18dp"
                 android:text="@string/onboarding_screen_4_message3"
-                android:textColor="@android:color/white"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"/>
+                android:textColor="@android:color/white"/>
 
             <TextView
                 android:layout_width="match_parent"
