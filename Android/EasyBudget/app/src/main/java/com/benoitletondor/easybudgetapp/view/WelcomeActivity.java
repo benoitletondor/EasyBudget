@@ -43,6 +43,8 @@ import com.benoitletondor.easybudgetapp.view.welcome.Onboarding3Fragment;
 import com.benoitletondor.easybudgetapp.view.welcome.Onboarding4Fragment;
 import com.benoitletondor.easybudgetapp.view.welcome.OnboardingFragment;
 
+import me.relex.circleindicator.CircleIndicator;
+
 /**
  * Welcome screen activity
  *
@@ -148,6 +150,9 @@ public class WelcomeActivity extends DBActivity
             }
         });
         pager.setOffscreenPageLimit(pager.getAdapter().getCount()); // preload all fragments for transitions smoothness
+
+        // Circle indicator
+        ((CircleIndicator) findViewById(R.id.welcome_view_pager_indicator)).setViewPager(pager);
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(PAGER_NEXT_INTENT);
