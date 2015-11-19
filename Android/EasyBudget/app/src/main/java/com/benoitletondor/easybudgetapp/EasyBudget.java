@@ -18,11 +18,15 @@ package com.benoitletondor.easybudgetapp;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 
 import com.batch.android.Batch;
+import com.batch.android.BatchUnlockListener;
 import com.batch.android.Config;
+import com.batch.android.Offer;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import com.benoitletondor.easybudgetapp.helper.Logger;
 import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
@@ -36,9 +40,11 @@ import com.google.android.gms.analytics.Logger.LogLevel;
 
 import io.fabric.sdk.android.Fabric;
 
+import java.util.Calendar;
 import java.util.Currency;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -98,8 +104,8 @@ public class EasyBudget extends Application
     public void trackInvitationId(String invitationId)
     {
         analyticsTracker.send(new HitBuilders.ScreenViewBuilder()
-            .setCustomDimension(1, "referral-appinvites")
-            .build());
+                .setCustomDimension(1, "referral-appinvites")
+                .build());
     }
 
     /**
@@ -114,8 +120,8 @@ public class EasyBudget extends Application
         Parameters.getInstance(getApplicationContext()).putInt(ParameterKeys.NUMBER_OF_INVITATIONS, invitSent);
 
         analyticsTracker.send(new HitBuilders.ScreenViewBuilder()
-            .setCustomMetric(1, (float) invitSent)
-            .build());
+                .setCustomMetric(1, (float) invitSent)
+                .build());
     }
 
     /**
@@ -150,6 +156,64 @@ public class EasyBudget extends Application
         {
             Logger.debug("Local id : " + localId);
         }
+
+        // Activity counter for app foreground & background
+        registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks()
+        {
+            private int activityCounter = 0;
+
+            @Override
+            public void onActivityCreated(Activity activity, Bundle savedInstanceState)
+            {
+
+            }
+
+            @Override
+            public void onActivityStarted(Activity activity)
+            {
+                if (activityCounter == 0)
+                {
+                    onAppForeground();
+                }
+
+                activityCounter++;
+            }
+
+            @Override
+            public void onActivityResumed(Activity activity)
+            {
+
+            }
+
+            @Override
+            public void onActivityPaused(Activity activity)
+            {
+
+            }
+
+            @Override
+            public void onActivityStopped(Activity activity)
+            {
+                if (activityCounter == 1)
+                {
+                    onAppBackground();
+                }
+
+                activityCounter--;
+            }
+
+            @Override
+            public void onActivitySaveInstanceState(Activity activity, Bundle outState)
+            {
+
+            }
+
+            @Override
+            public void onActivityDestroyed(Activity activity)
+            {
+
+            }
+        });
     }
 
     /**
@@ -172,8 +236,38 @@ public class EasyBudget extends Application
             }
 
             @Override
-            public void onActivityStarted(Activity activity)
+            public void onActivityStarted(final Activity activity)
             {
+                Batch.Unlock.setUnlockListener(new BatchUnlockListener()
+                {
+                    @Override
+                    public void onRedeemAutomaticOffer(Offer offer)
+                    {
+                        Parameters.getInstance(getApplicationContext()).getBoolean(ParameterKeys.BATCH_OFFER_REDEEMED, true);
+
+                        Map<String, String> additionalParameters = offer.getOfferAdditionalParameters();
+
+                        String rewardMessage = additionalParameters.get("reward_message");
+                        String rewardTitle = additionalParameters.get("reward_title");
+
+                        if (rewardTitle != null && rewardMessage != null)
+                        {
+                            new AlertDialog.Builder(activity)
+                                    .setTitle(rewardTitle)
+                                    .setMessage(rewardMessage)
+                                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                                    {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which)
+                                        {
+                                            dialog.dismiss();
+                                        }
+                                    })
+                                    .show();
+                        }
+                    }
+                });
+
                 Batch.onStart(activity);
             }
 
@@ -231,8 +325,68 @@ public class EasyBudget extends Application
      */
     private void onUpdate(int previousVersion, int newVersion)
     {
-        Logger.debug("Update detected, from "+previousVersion+" to "+newVersion);
+        Logger.debug("Update detected, from " + previousVersion + " to " + newVersion);
 
         // Add action if needed
+    }
+
+// -------------------------------------->
+
+    /**
+     * Called when the app goes foreground
+     */
+    private void onAppForeground()
+    {
+        Logger.debug("onAppForeground");
+
+        /*
+         * Increment the number of open
+         */
+        Parameters.getInstance(getApplicationContext()).putInt(ParameterKeys.NUMBER_OF_OPEN, Parameters.getInstance(getApplicationContext()).getInt(ParameterKeys.NUMBER_OF_OPEN, 0) + 1);
+
+        /*
+         * Check if last open is from another day
+         */
+        boolean shouldIncrementDailyOpen = false;
+
+        long lastOpen = Parameters.getInstance(getApplicationContext()).getLong(ParameterKeys.LAST_OPEN_DATE, 0);
+        if( lastOpen > 0 )
+        {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(new Date(lastOpen));
+
+            int lastDay = cal.get(Calendar.DAY_OF_YEAR);
+
+            cal.setTime(new Date());
+            int currentDay = cal.get(Calendar.DAY_OF_YEAR);
+
+            if( lastDay != currentDay )
+            {
+                shouldIncrementDailyOpen = true;
+            }
+        }
+        else
+        {
+            shouldIncrementDailyOpen = true;
+        }
+
+        // Increment daily open
+        if( shouldIncrementDailyOpen )
+        {
+            Parameters.getInstance(getApplicationContext()).putInt(ParameterKeys.NUMBER_OF_DAILY_OPEN, Parameters.getInstance(getApplicationContext()).getInt(ParameterKeys.NUMBER_OF_DAILY_OPEN, 0) + 1);
+        }
+
+        /*
+         * Save last open date
+         */
+        Parameters.getInstance(getApplicationContext()).putLong(ParameterKeys.LAST_OPEN_DATE, new Date().getTime());
+    }
+
+    /**
+     * Called when the app goes background
+     */
+    private void onAppBackground()
+    {
+        Logger.debug("onAppBackground");
     }
 }
