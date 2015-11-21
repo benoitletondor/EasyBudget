@@ -28,7 +28,7 @@
     <ScrollView android:id="@+id/onboarding_screen4_top_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="85dp">
+        android:layout_marginBottom="95dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -65,7 +65,8 @@
                 android:layout_marginTop="50dp"
                 android:textSize="20dp"
                 android:text="@string/onboarding_screen_4_message2"
-                android:textColor="@android:color/white" />
+                android:textColor="@android:color/white"
+                android:gravity="center_horizontal" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -101,7 +102,7 @@
         android:background="@drawable/welcome_screen_next_button_1_drawable"
         android:layout_below="@id/onboarding_screen4_top_layout"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="-55dp"
+        android:layout_marginTop="-65dp"
         android:textAllCaps="false"/>
 
 </RelativeLayout>

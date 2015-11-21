@@ -71,4 +71,20 @@ public class ParameterKeys
      * Store the user step in the rating process (int)
      */
     public static final String RATING_STEP = "rating_step";
+    /**
+     * Has the user redeemed a Batch offer (bool)
+     */
+    public static final String BATCH_OFFER_REDEEMED = "batch_offer_redeemed";
+    /**
+     * Number of time the app has been opened (int)
+     */
+    public static final String NUMBER_OF_OPEN = "number_of_open";
+    /**
+     * Timestamp of the last open (long)
+     */
+    public static final String LAST_OPEN_DATE = "last_open_date";
+    /**
+     * Number of time different day has been open (int)
+     */
+    public static final String NUMBER_OF_DAILY_OPEN = "number_of_daily_open";
 }

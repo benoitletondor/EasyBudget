@@ -59,7 +59,7 @@
                 android:textColor="@android:color/white"
                 android:textSize="14dp"
                 android:textStyle="bold"
-                android:layout_marginLeft="2dp"/>
+                android:layout_marginLeft="3dp"/>
 
         </LinearLayout>
 

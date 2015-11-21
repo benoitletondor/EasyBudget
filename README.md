@@ -26,6 +26,7 @@ The project is made possible by some external libraries made by awesome guys tha
 
 - Caldroid: a library to display a customizable Calendar [https://github.com/roomorama/Caldroid](https://github.com/roomorama/Caldroid)
 - FloatingActionButton: library to display a FAB with actions [https://github.com/futuresimple/android-floating-action-button](https://github.com/futuresimple/android-floating-action-button)
+- CircleIndicator: library to display a circle indicator on the onboarding view pager [https://github.com/ongakuer/CircleIndicator](https://github.com/ongakuer/CircleIndicator)
 
 ### Contact
 
