@@ -1,0 +1,166 @@
+<!--
+   Copyright 2015 Benoit LETONDOR
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+
+<resources>
+
+    <string name="action_settings">Einstellungen</string>
+    <string name="action_balance">Kontostand anpassen</string>
+    <string name="fab_add_expense">Neue Ausgabe/Einnahme</string>
+    <string name="fab_add_monthly_expense">Neue monatl. Ausgabe/Einnahme</string>
+    <string name="title_activity_add_expense">Ausgabe hinzufügen</string>
+    <string name="title_activity_add_income">Einnahme hinzufügen</string>
+    <string name="title_activity_edit_expense">Ausgabe bearbeiten</string>
+    <string name="title_activity_edit_income">Einnahme bearbeiten</string>
+    <string name="title_activity_monthly_expense_add">Monatliche Ausgabe hinzufügen</string>
+    <string name="title_activity_monthly_income_add">Monatliche Einnahme hinzufügen</string>
+    <string name="title_activity_monthly_expense_edit">Monatliche Ausgabe bearbeiten</string>
+    <string name="title_activity_monthly_income_edit">Monatliche Einnahme bearbeiten</string>
+    <string name="title_activity_settings">Einstellungen</string>
+    <string name="title_activity_welcome">EasyBudget</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="undo">RÜCKGÄNGIG</string>
+    <string name="ok">OK</string>
+    <string name="amount">Betrag ( %s )</string>
+    <string name="description">Beschreibung</string>
+    <string name="type">Art</string>
+    <string name="payment">Ausgabe</string>
+    <string name="income">Einnahme</string>
+    <string name="date">Datum</string>
+    <string name="first_occurence">Erstes Ereignis</string>
+    <string name="no_expense_for_today">Noch keine Einnahmen/Ausgaben.</string>
+
+    <string name="no_description_error">Eine Beschreibung eingeben</string>
+    <string name="no_amount_error">Einen Betrag eingeben</string>
+    <string name="negative_amount_error">Der Betrag muss größer sein als 0</string>
+    <string name="invalid_amount">Ungültiger Betrag</string>
+
+    <string name="dialog_edit_expense_title">Was möchten Sie tun?</string>
+    <string name="dialog_edit_income_title">Was möchten Sie tun?</string>
+    <string-array name="dialog_edit_expense_choices">
+        <item>Ausgabe bearbeiten</item>
+        <item>Ausgabe löschen</item>
+    </string-array>
+    <string-array name="dialog_edit_income_choices">
+        <item>Einnahme bearbeiten</item>
+        <item>Einnahme löschen</item>
+    </string-array>
+    <string name="dialog_edit_monthly_expense_title">Monatliche Ausgabe: Was möchten Sie tun?</string>
+    <string name="dialog_edit_monthly_income_title">Monatliche Einnahme: Was möchten Sie tun?</string>
+    <string-array name="dialog_edit_monthly_expense_choices">
+        <item>Dieses Ereignis bearbeiten</item>
+        <item>Nur dieses Ereignis löschen</item>
+        <item>Alle Nachfolgenden löschen</item>
+        <item>Alle Vorherigen löschen</item>
+        <item>Alle löschen</item>
+    </string-array>
+    <string-array name="dialog_edit_monthly_income_choices">
+        <item>Dieses Ereignis bearbeiten</item>
+        <item>Nur dieses Ereignis löschen</item>
+        <item>Alle Nachfolgenden löschen</item>
+        <item>Alle Vorherigen löschen</item>
+        <item>Alle löschen</item>
+    </string-array>
+    <string name="expense_delete_snackbar_text">Ausgabe gelöscht</string>
+    <string name="income_delete_snackbar_text">Einnahme gelöscht</string>
+
+    <string name="adjust_balance_title">Kontostand anpassen</string>
+    <string name="adjust_balance_message">Anpassen wie viel Sie gerade auf dem Konto haben</string>
+    <string name="adjust_balance_expense_title">Kontostand</string>
+    <string name="adjust_balance_snackbar_text">Kontostand auf %s angepasst</string>
+    <string name="account_balance_format">Kontostand am %s:</string>
+    <string name="account_balance_date_format">dd MMM</string>
+    <string name="adjust_limit_warning_title">Warnschwelle für niedrigen Kontostand ändern</string>
+    <string name="adjust_limit_warning_message">Warnschwellenbetrag einstellen (muss > 0 sein)</string>
+    <string name="adjust_limit_warning_error_title">Oops</string>
+    <string name="adjust_limit_warning_error_message">Der Betrag, den Sie eingegeben haben, ist ungültig. Es muss eine positive Zahl größer als 0 sein.</string>
+
+    <string name="monthly_expense_add_loading_title">Lädt</string>
+    <string name="monthly_expense_add_loading_message">Monatliche Ausgabe wird erstellt…</string>
+    <string name="monthly_income_add_loading_message">Monatliche Einnahme wird erstellt…</string>
+    <string name="monthly_expense_add_error_title">Oops</string>
+    <string name="monthly_expense_add_error_message">Ein Fehler ist aufgetreten.</string>
+    <string name="monthly_expense_delete_success_message">Monatliche Ausgabe erfolgreich gelöscht.</string>
+    <string name="monthly_expense_delete_loading_title">Löschvorgang</string>
+    <string name="monthly_expense_delete_loading_message">Monatliche Ausgabe wird gelöscht…</string>
+    <string name="monthly_expense_delete_error_title">Oops</string>
+    <string name="monthly_expense_delete_error_message">Ein Fehler ist aufgetreten.</string>
+    <string name="monthly_expense_restoring_loading_title">Abbruch</string>
+    <string name="monthly_expense_restoring_loading_message">Monatliche Ausgabe wird wiederhergestellt…</string>
+    <string name="monthly_expense_restored_success_message">Monatliche Ausgabe wurde wiederhergestellt.</string>
+    <string name="monthly_expense_restore_error_title">Oops</string>
+    <string name="monthly_expense_restore_error_message">Ein Fehler ist aufgetreten.</string>
+    <string name="monthly_expense_delete_first_error_title">Oops</string>
+    <string name="monthly_expense_delete_first_error_message">Es gibt keine Ereignisse vor diesem.</string>
+    <string name="expense_delete_error_title">Oops</string>
+    <string name="expense_delete_error_message">Ein Fehler ist aufgetreten.</string>
+
+    <string name="setting_category_app_title">App</string>
+    <string name="setting_category_rate_button_title">Ihnen gefällt diese App?</string>
+    <string name="setting_category_rate_button_message">Sagen Sie mir was Sie denken</string>
+    <string name="setting_category_bug_report_send_button_title">Einen Fehler melden</string>
+    <string name="setting_category_bug_report_send_text">\n\n---\n*Diesen Teil nicht löschen*\nEasyBudget id: %s</string>
+    <string name="setting_category_bug_report_send_error">Unmöglich eine App für das Versenden des Fehlerberichts zu finden</string>
+    <string name="setting_category_general_title">Allgemein</string>
+    <string name="setting_category_currency_change_button_title">Währung ändern (%s)</string>
+    <string name="setting_category_currency_change_button_message">Wählen Sie die Währung, die Sie verwenden möchten</string>
+    <string name="setting_category_currency_change_dialog_title">Währung auswählen</string>
+    <string name="setting_category_limit_set_button_title">Warnschwelle für niedrigen Kontostand einstellen (%s)</string>
+    <string name="setting_category_limit_set_button_message">Ändern Sie die Warnschwelle ab der Sie über einen niedrigen Kontostand gewarnt werden möchten</string>
+    <string name="setting_category_app_version_message">Gemacht von @BenoitLetondor</string>
+    <string name="setting_category_share_app_title">Mit Freunden teilen</string>
+    <string name="setting_category_share_app_message">EasyBudget ist gratis, warum sie also nicht mit Ihren Freunden teilen!</string>
+
+    <string name="rating_popup_question_title">Was denken Sie über EasyBudget?</string>
+    <string name="rating_popup_question_message">Ich entwickle diese App in meiner Freizeit und biete sie gratis an. Es gibt sicher noch Dinge zu verbessern und Ihre Meinung ist mir wichtig.</string>
+    <string name="rating_popup_question_cta_negative">Mag ich nicht</string>
+    <string name="rating_popup_question_cta_positive">Mag ich</string>
+    <string name="rating_popup_negative_title">:(</string>
+    <string name="rating_popup_negative_message">Schade das zu hören. Macht es Ihnen etwas aus mir Ihr Feedback zu senden?</string>
+    <string name="rating_popup_negative_cta_negative">Nein danke</string>
+    <string name="rating_popup_negative_cta_positive">Ja klar!</string>
+    <string name="rating_popup_positive_title">:)</string>
+    <string name="rating_popup_positive_message">Ich bin froh Ihnen gefällt EasyBudget. Würde es Ihnen etwas ausmachen mir eine positive Bewertung im PlayStore zu geben?</string>
+    <string name="rating_popup_positive_cta_negative">Nein danke</string>
+    <string name="rating_popup_positive_cta_positive">Ja klar!</string>
+    <string name="rating_feedback_send_error">Unmöglich eine App für das Versenden des Feedbacks zu finden.</string>
+    <string name="rating_feedback_send_text"></string>
+
+    <string name="onboarding_screen_1_title">Willkommen zu EasyBudget</string>
+    <string name="onboarding_screen_1_message">Das Konzept ist simpel. Sie tragen Ihre wiederkehrenden und täglichen Einnahmen und Ausgaben ein und die App sagt Ihnen, wie viel Sie an einem bestimmten Zeitpunkt haben, hatten und haben werden.\n\nSo einfach ist das!</string>
+    <string name="onboarding_screen_1_message2">Bereit?</string>
+    <string name="onboarding_screen_1_cta">Ja!</string>
+
+    <string name="onboarding_screen_2_title">Lernen wir uns kennen!</string>
+    <string name="onboarding_screen_2_message">Schritt 1: Welche Währung verwenden Sie?\n(Sie können das später in den Einstellungen ändern)</string>
+    <string name="onboarding_screen_2_cta">%s verwenden</string>
+
+    <string name="onboarding_screen_3_title">Lernen wir uns kennen!</string>
+    <string name="onboarding_screen_3_message">Schritt 2: Wie viel haben Sie aktuell auf Ihrem Konto?\n(Sie können das später ändern)</string>
+    <string name="onboarding_screen_3_cta">Mit %s beginnen</string>
+
+    <string name="onboarding_screen_4_title">Fertig!</string>
+    <string name="onboarding_screen_4_message">(Das war einfach, oder?)</string>
+    <string name="onboarding_screen_4_message2">Was Sie als nächstes tun müssen?</string>
+    <string name="onboarding_screen_4_message3">1. Fügen Sie monatlich wiederkehrende Ausgaben und Einnahmen (Gehalt, Miete, Rechnungen,…) hinzu\n2. Denken Sie daran Ihre täglichen Ausgaben und Einnahmen im Laufe des Tages einzutragen</string>
+    <string name="onboarding_screen_4_message4">Danke für das Verwenden von EasyBudget und willkommen :)</string>
+    <string name="onboarding_screen_4_cta">Los geht’s!</string>
+
+    <string name="app_invite_title">Mit Freunden teilen</string>
+    <string name="app_invite_message">Du solltest EasyBudget ausprobieren: Eine super einfache App, um deine Finanzen zu verwalten!</string> <!-- 100 chars or less -->
+    <string name="app_invite_welcome_title">Willkommen bei EasyBudget</string>
+    <string name="app_invite_welcome_message">Es sieht aus, als hätte Ihnen ein Freund diese App empfohlen. Willkommen an Bord und vergessen Sie nicht Ihrem Freund für diesen super Tipp zu danken ;)</string>
+    <string name="app_invite_welcome_cta">Los geht’s!</string>
+</resources>

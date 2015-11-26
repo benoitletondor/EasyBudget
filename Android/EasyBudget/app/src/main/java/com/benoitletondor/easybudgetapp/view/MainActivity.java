@@ -603,7 +603,7 @@ public class MainActivity extends DBActivity
         int balance = - db.getBalanceForDay(day);
 
         SimpleDateFormat format = new SimpleDateFormat(getResources().getString(R.string.account_balance_date_format), Locale.getDefault());
-        budgetLine.setText(getResources().getString(R.string.account_balance_format, format.format(day)));
+        budgetLine.setText(getResources().getString(R.string.account_balance_format, format.format(day)).replace(".", "")); // Remove . at the end of the month (ex: nov. -> nov)
         budgetLineAmount.setText(CurrencyHelper.getFormattedCurrencyString(this, balance));
 
         if( balance <= 0 )
