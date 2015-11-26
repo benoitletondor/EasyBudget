@@ -342,7 +342,7 @@ public class ExpenseEditActivity extends DBActivity
 
     private void updateDateButtonDisplay()
     {
-        SimpleDateFormat formatter = new SimpleDateFormat("MMM dd yyyy", Locale.US);
+        SimpleDateFormat formatter = new SimpleDateFormat(getResources().getString(R.string.add_expense_date_format), Locale.US);
         dateButton.setText(formatter.format(date));
     }
 }

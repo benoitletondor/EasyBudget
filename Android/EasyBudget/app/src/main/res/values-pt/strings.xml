@@ -82,6 +82,7 @@
     <string name="adjust_balance_snackbar_text">Saldo ajustado para %s</string>
     <string name="account_balance_format">Saldo em %s:</string>
     <string name="account_balance_date_format">dd MMM</string>
+    <string name="add_expense_date_format">dd MMM yyyy</string>
     <string name="adjust_limit_warning_title">Modificar o limite de alerta de saldo baixo</string>
     <string name="adjust_limit_warning_message">Definir o valor do limite de alerta (deve ser >0)</string>
     <string name="adjust_limit_warning_error_title">Ops</string>

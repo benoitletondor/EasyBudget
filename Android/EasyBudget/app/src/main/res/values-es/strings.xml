@@ -82,6 +82,7 @@
     <string name="adjust_balance_snackbar_text">Saldo ajustado a %s</string>
     <string name="account_balance_format">Saldo el %s:</string>
     <string name="account_balance_date_format">dd MMM</string>
+    <string name="add_expense_date_format">dd MMM yyyy</string>
     <string name="adjust_limit_warning_title">Establece el mínimo para la alerta de sueldo bajo</string>
     <string name="adjust_limit_warning_message">Establece el mínimo de la alerta (deber ser > 0)</string>
     <string name="adjust_limit_warning_error_title">¡Ups!</string>

@@ -84,6 +84,7 @@
     <string name="adjust_balance_snackbar_text">Balance adjusted to %s</string>
     <string name="account_balance_format">Balance on %s:</string>
     <string name="account_balance_date_format">MMM dd</string>
+    <string name="add_expense_date_format">MMM dd yyyy</string>
     <string name="adjust_limit_warning_title">Change warning threshold for low balance</string>
     <string name="adjust_limit_warning_message">Set the threshold value (must be > 0)</string>
     <string name="adjust_limit_warning_error_title">Oops</string>

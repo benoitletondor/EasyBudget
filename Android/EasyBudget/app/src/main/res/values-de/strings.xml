@@ -82,6 +82,7 @@
     <string name="adjust_balance_snackbar_text">Kontostand auf %s angepasst</string>
     <string name="account_balance_format">Kontostand am %s:</string>
     <string name="account_balance_date_format">dd MMM</string>
+    <string name="add_expense_date_format">dd MMM yyyy</string>
     <string name="adjust_limit_warning_title">Warnschwelle für niedrigen Kontostand ändern</string>
     <string name="adjust_limit_warning_message">Warnschwellenbetrag einstellen (muss > 0 sein)</string>
     <string name="adjust_limit_warning_error_title">Oops</string>
