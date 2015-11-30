@@ -90,6 +90,7 @@
     <string name="adjust_limit_warning_error_title">Oops</string>
     <string name="adjust_limit_warning_error_message">The value you entered is invalid. It must be a positive number, superior to 0</string>
 
+    <string name="monthly">MONTHLY</string>
     <string name="monthly_expense_add_loading_title">Loading</string>
     <string name="monthly_expense_add_loading_message">Creating monthly expense…</string>
     <string name="monthly_income_add_loading_message">Creating monthly income…</string>

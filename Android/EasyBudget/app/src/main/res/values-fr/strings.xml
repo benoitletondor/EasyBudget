@@ -88,6 +88,7 @@
     <string name="adjust_limit_warning_error_title">Oups</string>
     <string name="adjust_limit_warning_error_message">La valeur que vous avez entrée est invalide : ça doit être un nombre entier, supérieur à 0</string>
 
+    <string name="monthly">MENSUEL</string>
     <string name="monthly_expense_add_loading_title">Chargement</string>
     <string name="monthly_expense_add_loading_message">Création de la dépense mensuelle…</string>
     <string name="monthly_income_add_loading_message">Création du revenu mensuel…</string>

@@ -60,15 +60,15 @@
     <string name="dialog_edit_monthly_expense_title">Gasto mensual: ¿qué quieres hacer?</string>
     <string name="dialog_edit_monthly_income_title">Ingreso mensual: ¿qué quieres hacer?</string>
     <string-array name="dialog_edit_monthly_expense_choices">
-        <item>Modificar esta transacción</item>
-        <item>Eliminar únicamente esta transacción</item>
+        <item>Modificar esta entrada</item>
+        <item>Eliminar únicamente esta entrada</item>
         <item>Eliminar todas las siguientes</item>
         <item>Eliminar todas las anteriores</item>
         <item>Eliminarlas todas</item>
     </string-array>
     <string-array name="dialog_edit_monthly_income_choices">
-        <item>Modificar esta transacción</item>
-        <item>Eliminar únicamente esta transacción</item>
+        <item>Modificar esta entrada</item>
+        <item>Eliminar únicamente esta entrada</item>
         <item>Eliminar todas las siguientes</item>
         <item>Eliminar todas las anteriores</item>
         <item>Eliminarlas todas</item>
@@ -88,6 +88,7 @@
     <string name="adjust_limit_warning_error_title">¡Ups!</string>
     <string name="adjust_limit_warning_error_message">El valor que pusiste no es válido. Tiene que ser un número positivo, superior a 0.</string>
 
+    <string name="monthly">MENSUAL</string>
     <string name="monthly_expense_add_loading_title">Cargando</string>
     <string name="monthly_expense_add_loading_message">Creando un gasto mensual…</string>
     <string name="monthly_income_add_loading_message">Creando un ingreso mensual…</string>
@@ -129,11 +130,11 @@
     <string name="rating_popup_question_cta_negative">No me gusta</string>
     <string name="rating_popup_question_cta_positive">Me gusta</string>
     <string name="rating_popup_negative_title">:(</string>
-    <string name="rating_popup_negative_message">Siento que no te haya gustado… ¿Me ayudarías con tus comentarios?</string>
+    <string name="rating_popup_negative_message">Siento que no te haya gustado…\n¿Me ayudarías con tus comentarios?</string>
     <string name="rating_popup_negative_cta_negative">No, gracias</string>
     <string name="rating_popup_negative_cta_positive">¡Claro!</string>
     <string name="rating_popup_positive_title">:)</string>
-    <string name="rating_popup_positive_message">¡Qué bueno que te gustó! ¿Me ayudarías con una buena reseña en la PlayStore?</string>
+    <string name="rating_popup_positive_message">¡Qué bueno que te gustó!\n¿Me ayudarías con una buena reseña en la PlayStore?</string>
     <string name="rating_popup_positive_cta_negative">No, gracias</string>
     <string name="rating_popup_positive_cta_positive">¡Claro!</string>
     <string name="rating_feedback_send_error">No tienes ninguna app para enviar tu comentarios por mail.</string>

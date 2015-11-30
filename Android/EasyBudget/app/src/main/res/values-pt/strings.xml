@@ -88,6 +88,7 @@
     <string name="adjust_limit_warning_error_title">Ops</string>
     <string name="adjust_limit_warning_error_message">O valor inserido é inválido. Ele deve ser um número inteiro, maior do que 0.</string>
 
+    <string name="monthly">MENSAL</string>
     <string name="monthly_expense_add_loading_title">Carregando</string>
     <string name="monthly_expense_add_loading_message">Criando uma despesa mensal…</string>
     <string name="monthly_income_add_loading_message">Criando uma receita mensal…</string>

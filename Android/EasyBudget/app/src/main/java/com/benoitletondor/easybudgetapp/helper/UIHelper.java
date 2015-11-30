@@ -113,21 +113,10 @@ public class UIHelper
             return;
         }
 
-        final View rootView;
+        final View rootView = activity.getWindow().getDecorView().findViewById(android.R.id.content);
+        rootView.setAlpha(0.0f);
 
-        if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ) // Animating the decor view doesn't work anymore on M, take the content view
-        {
-            rootView = activity.getWindow().getDecorView().findViewById(android.R.id.content);
-            rootView.setAlpha(0.0f);
-
-            activity.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-        }
-        else
-        {
-            rootView = activity.getWindow().getDecorView();
-
-            activity.overridePendingTransition(0, 0);
-        }
+        activity.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 
         final ViewTreeObserver viewTreeObserver = rootView.getViewTreeObserver();
         if ( viewTreeObserver.isAlive() )
