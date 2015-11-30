@@ -80,7 +80,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/secondary_text"
                 android:textSize="9dp"
-                android:text="MONTHLY"
+                android:text="@string/monthly"
                 android:layout_marginTop="1dp"/>
 
         </LinearLayout>

@@ -88,6 +88,7 @@
     <string name="adjust_limit_warning_error_title">OPS!</string>
     <string name="adjust_limit_warning_error_message">Il valore che hai inserito non è valido. Inserisci un numero positivo, superiore a 0</string>
 
+    <string name="monthly">MENSILE</string>
     <string name="monthly_expense_add_loading_title">Carico</string>
     <string name="monthly_expense_add_loading_message">Creazione dell’uscita mensile…</string>
     <string name="monthly_income_add_loading_message">Creazione dell’entrata mensile…</string>
