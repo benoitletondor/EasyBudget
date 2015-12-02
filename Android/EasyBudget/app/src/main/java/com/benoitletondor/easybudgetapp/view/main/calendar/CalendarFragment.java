@@ -41,6 +41,11 @@ public class CalendarFragment extends CaldroidFragment
     {
         this.selectedDate = fromDate;
         super.setSelectedDates(fromDate, toDate);
+        try
+        {
+            super.moveToDate(fromDate);
+        }
+        catch (Exception ignored){} // Exception that occurs if we call this code before the calendar being initialized
     }
 
     public Date getSelectedDate()
