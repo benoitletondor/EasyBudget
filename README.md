@@ -14,7 +14,7 @@ I simply decided to create my own app in my free time, with the hope that I'm no
 
 ### Available on PlayStore
 
-EasyBudget is currently in beta, if you have access to the beta channel, you can download it on the PlayStore: [https://play.google.com/store/apps/details?id=com.benoitletondor.easybudgetapp](https://play.google.com/store/apps/details?id=com.benoitletondor.easybudgetapp)
+You can download EasyBudget on the PlayStore: [https://play.google.com/store/apps/details?id=com.benoitletondor.easybudgetapp](https://play.google.com/store/apps/details?id=com.benoitletondor.easybudgetapp)
 
 ### Technical details
 
