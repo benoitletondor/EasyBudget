@@ -111,7 +111,7 @@
 
     <string name="setting_category_app_title">App</string>
     <string name="setting_category_rate_button_title">Vous aimez cette appli ?</string>
-    <string name="setting_category_rate_button_message">Dîtes moi ce que vous en pensez</string>
+    <string name="setting_category_rate_button_message">Dites-moi ce que vous en pensez</string>
     <string name="setting_category_bug_report_send_button_title">Signaler un bug</string>
     <string name="setting_category_bug_report_send_text">\n\n---\n*Ne pas supprimer cette partie*\nEasyBudget id: %s</string>
     <string name="setting_category_bug_report_send_error">Impossible de trouver une application pour envoyer le rapport de bug par email</string>

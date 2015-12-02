@@ -119,7 +119,7 @@
     <string name="setting_category_currency_change_button_title">Währung ändern (%s)</string>
     <string name="setting_category_currency_change_button_message">Wählen Sie die Währung, die Sie verwenden möchten</string>
     <string name="setting_category_currency_change_dialog_title">Währung auswählen</string>
-    <string name="setting_category_limit_set_button_title">Warnschwelle für niedrigen Kontostand (%s)</string>
+    <string name="setting_category_limit_set_button_title">Warnung bei niedrigem Kontostand (%s)</string>
     <string name="setting_category_limit_set_button_message">Ändern Sie die Warnschwelle ab der Sie über einen niedrigen Kontostand gewarnt werden möchten</string>
     <string name="setting_category_app_version_message">Gemacht von @BenoitLetondor</string>
     <string name="setting_category_share_app_title">Mit Freunden teilen</string>
