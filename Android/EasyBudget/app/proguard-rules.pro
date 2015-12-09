@@ -26,3 +26,4 @@
 }
 
 -dontwarn com.batch.android.mediation.**
+-dontwarn com.batch.android.BatchPushService

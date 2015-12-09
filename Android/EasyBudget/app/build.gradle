@@ -20,7 +20,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'io.fabric.tools:gradle:1.20.1'
+        classpath 'io.fabric.tools:gradle:1.21.2'
     }
 }
 
@@ -60,7 +60,7 @@ android {
             buildConfigField "boolean", "ANALYTICS_ACTIVATED", "true"
             buildConfigField "boolean", "DEV_PREFERENCES", "false"
 
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -78,7 +78,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-appinvite:8.3.0'
     compile 'com.roomorama:caldroid:2.3.1'
     compile 'com.getbase:floatingactionbutton:1.10.1'
-    compile 'me.relex:circleindicator:1.1.5@aar'
-    compile('com.crashlytics.sdk.android:crashlytics:2.5.2@aar') { transitive = true; }
+    compile 'me.relex:circleindicator:1.1.6@aar'
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') { transitive = true; }
     compile 'com.batch.android:batch-sdk:1.4'
 }
