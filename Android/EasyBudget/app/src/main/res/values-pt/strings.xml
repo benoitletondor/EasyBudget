@@ -152,6 +152,7 @@
     <string name="onboarding_screen_3_title">Vamos nos conhecer!</string>
     <string name="onboarding_screen_3_message">Passo 2: Quanto você tem atualmente em sua conta?\n(Você pode mudar mais tarde)</string>
     <string name="onboarding_screen_3_cta">Começar com %s</string>
+    <string name="onboarding_screen_3_psst">Psiu: por motivos de simplicidade, você não pode usar virgulas e inserer números de ponto fluante.</string>
 
     <string name="onboarding_screen_4_title">Tudo pronto!</string>
     <string name="onboarding_screen_4_message">(Foi fácil, não é?)</string>
