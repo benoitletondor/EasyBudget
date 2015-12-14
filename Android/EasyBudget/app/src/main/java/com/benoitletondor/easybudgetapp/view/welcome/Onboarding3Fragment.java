@@ -18,8 +18,10 @@ package com.benoitletondor.easybudgetapp.view.welcome;
 
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -29,6 +31,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
@@ -171,7 +174,29 @@ public class Onboarding3Fragment extends OnboardingFragment
     private int getAmountValue()
     {
         String valueString = amountEditText.getText().toString();
-        return ("".equals(valueString) || "-".equals(valueString)) ? 0 : Integer.parseInt(valueString);
+
+        try
+        {
+            return ("".equals(valueString) || "-".equals(valueString)) ? 0 : Integer.parseInt(valueString);
+        }
+        catch (Exception e)
+        {
+            new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.adjust_balance_error_title)
+                .setMessage(R.string.adjust_balance_error_message)
+                .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        dialog.dismiss();
+                    }
+                })
+                .show();
+
+            Logger.error(false, "An error occurred during initial amount parsing: "+valueString, e);
+            return 0;
+        }
     }
 
     private void setButtonText()

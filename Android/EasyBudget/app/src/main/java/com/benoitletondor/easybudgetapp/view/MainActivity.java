@@ -51,6 +51,7 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.benoitletondor.easybudgetapp.EasyBudget;
 import com.benoitletondor.easybudgetapp.R;
@@ -490,82 +491,103 @@ public class MainActivity extends DBActivity
                 @Override
                 public void onClick(DialogInterface dialog, int which)
                 {
-                    // Ajust balance
-                    int newBalance = Integer.valueOf(amountEditText.getText().toString());
-
-                    if( newBalance == currentBalance )
+                    try
                     {
-                        // Nothing to do, balance hasn't change
-                        return;
-                    }
+                        // Ajust balance
+                        int newBalance = Integer.valueOf(amountEditText.getText().toString());
 
-                    final int diff = newBalance - currentBalance;
-
-                    String balanceExpenseTitle = getResources().getString(R.string.adjust_balance_expense_title);
-
-                    // Look for an existing balance for the day
-                    Expense expense = null;
-                    List<Expense> expensesForDay = db.getExpensesForDay(new Date());
-                    for(Expense expenseOfDay : expensesForDay)
-                    {
-                        if( expenseOfDay.getTitle().equals(balanceExpenseTitle) )
+                        if( newBalance == currentBalance )
                         {
-                            expense = expenseOfDay;
-                            break;
+                            // Nothing to do, balance hasn't change
+                            return;
                         }
-                    }
 
-                    View.OnClickListener listener;
+                        final int diff = newBalance - currentBalance;
 
-                    // If the adjust balance exists, just add the diff and persist it
-                    if( expense != null )
-                    {
-                        final Expense persistedExpense = expense;
+                        String balanceExpenseTitle = getResources().getString(R.string.adjust_balance_expense_title);
 
-                        persistedExpense.setAmount(persistedExpense.getAmount() - diff);
-                        db.persistExpense(persistedExpense);
-
-                        // On cancel, remove the diff and persist
-                        listener = new View.OnClickListener()
+                        // Look for an existing balance for the day
+                        Expense expense = null;
+                        List<Expense> expensesForDay = db.getExpensesForDay(new Date());
+                        for(Expense expenseOfDay : expensesForDay)
                         {
-                            @Override
-                            public void onClick(View v)
+                            if( expenseOfDay.getTitle().equals(balanceExpenseTitle) )
                             {
-                                persistedExpense.setAmount(persistedExpense.getAmount() + diff);
-                                db.persistExpense(persistedExpense);
-
-                                refreshAllForDate(expensesViewAdapter.getDate());
+                                expense = expenseOfDay;
+                                break;
                             }
-                        };
-                    }
-                    else // If no adjust balance yet, create a new one
-                    {
-                        final Expense persistedExpense = new Expense(getResources().getString(R.string.adjust_balance_expense_title), -diff, new Date());
-                        db.persistExpense(persistedExpense);
+                        }
 
-                        // On cancel, just delete the inserted balance
-                        listener = new View.OnClickListener()
+                        View.OnClickListener listener;
+
+                        // If the adjust balance exists, just add the diff and persist it
+                        if( expense != null )
                         {
-                            @Override
-                            public void onClick(View v)
+                            final Expense persistedExpense = expense;
+
+                            persistedExpense.setAmount(persistedExpense.getAmount() - diff);
+                            db.persistExpense(persistedExpense);
+
+                            // On cancel, remove the diff and persist
+                            listener = new View.OnClickListener()
                             {
-                                db.deleteExpense(persistedExpense);
+                                @Override
+                                public void onClick(View v)
+                                {
+                                    persistedExpense.setAmount(persistedExpense.getAmount() + diff);
+                                    db.persistExpense(persistedExpense);
 
-                                refreshAllForDate(expensesViewAdapter.getDate());
-                            }
-                        };
+                                    refreshAllForDate(expensesViewAdapter.getDate());
+                                }
+                            };
+                        }
+                        else // If no adjust balance yet, create a new one
+                        {
+                            final Expense persistedExpense = new Expense(getResources().getString(R.string.adjust_balance_expense_title), -diff, new Date());
+                            db.persistExpense(persistedExpense);
+
+                            // On cancel, just delete the inserted balance
+                            listener = new View.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(View v)
+                                {
+                                    db.deleteExpense(persistedExpense);
+
+                                    refreshAllForDate(expensesViewAdapter.getDate());
+                                }
+                            };
+                        }
+
+                        refreshAllForDate(expensesViewAdapter.getDate());
+                        dialog.dismiss();
+
+                        //Show snackbar
+                        Snackbar snackbar = Snackbar.make(coordinatorLayout, getResources().getString(R.string.adjust_balance_snackbar_text, CurrencyHelper.getFormattedCurrencyString(MainActivity.this, newBalance)), Snackbar.LENGTH_LONG);
+                        snackbar.setAction(R.string.undo, listener);
+                        snackbar.setActionTextColor(ContextCompat.getColor(MainActivity.this, R.color.snackbar_action_undo));
+                        //noinspection ResourceType
+                        snackbar.setDuration(ACTION_SNACKBAR_LENGTH);
+                        snackbar.show();
                     }
+                    catch (Exception e)
+                    {
+                        new AlertDialog.Builder(MainActivity.this)
+                            .setTitle(R.string.adjust_balance_error_title)
+                            .setMessage(R.string.adjust_balance_error_message)
+                            .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .show();
 
-                    refreshAllForDate(expensesViewAdapter.getDate());
-                    dialog.dismiss();
-
-                    //Show snackbar
-                    Snackbar snackbar = Snackbar.make(coordinatorLayout, getResources().getString(R.string.adjust_balance_snackbar_text, CurrencyHelper.getFormattedCurrencyString(MainActivity.this, newBalance)), Snackbar.LENGTH_LONG);
-                    snackbar.setAction(R.string.undo, listener);
-                    snackbar.setActionTextColor(ContextCompat.getColor(MainActivity.this, R.color.snackbar_action_undo));
-                    //noinspection ResourceType
-                    snackbar.setDuration(ACTION_SNACKBAR_LENGTH);
-                    snackbar.show();
+                        Logger.error(false, "An error occurred during balance", e);
+                        dialog.dismiss();
+                    }
                 }
             });
 

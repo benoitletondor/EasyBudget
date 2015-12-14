@@ -87,6 +87,8 @@
     <string name="adjust_limit_warning_message">Warnschwellenbetrag einstellen (muss > 0 sein)</string>
     <string name="adjust_limit_warning_error_title">Oops</string>
     <string name="adjust_limit_warning_error_message">Der Betrag, den Sie eingegeben haben, ist ungültig. Es muss eine positive Zahl größer als 0 sein.</string>
+    <string name="adjust_balance_error_title">Oops</string>
+    <string name="adjust_balance_error_message">Der Betrag, den Sie eingegeben haben, ist ungültig.</string>
 
     <string name="monthly">MONATLICH</string>
     <string name="monthly_expense_add_loading_title">Lädt</string>

@@ -89,6 +89,8 @@
     <string name="adjust_limit_warning_message">Set the threshold value (must be > 0)</string>
     <string name="adjust_limit_warning_error_title">Oops</string>
     <string name="adjust_limit_warning_error_message">The value you entered is invalid. It must be a positive number, superior to 0</string>
+    <string name="adjust_balance_error_title">Oops</string>
+    <string name="adjust_balance_error_message">The value you entered is invalid.</string>
 
     <string name="monthly">MONTHLY</string>
     <string name="monthly_expense_add_loading_title">Loading</string>

@@ -205,7 +205,14 @@ public final class DB
             cursor = database.query(SQLiteDBHelper.TABLE_EXPENSE, null, SQLiteDBHelper.COLUMN_EXPENSE_DATE + " = " + date.getTime(), null, null, null, null, null);
             while( cursor.moveToNext() )
             {
-                expenses.add(ExpenseFromCursor(cursor));
+                try
+                {
+                    expenses.add(ExpenseFromCursor(cursor));
+                }
+                catch (Exception e)
+                {
+                    Logger.error(false, "Error occurred querying DB for expense for a day", e);
+                }
             }
 
             return expenses;
