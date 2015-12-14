@@ -115,6 +115,7 @@ public class MainActivity extends DBActivity
 
     private RecyclerView                recyclerView;
     private View                        recyclerViewPlaceholder;
+    private FloatingActionsMenu         menu;
 
     private TextView budgetLine;
     private TextView budgetLineAmount;
@@ -356,6 +357,19 @@ public class MainActivity extends DBActivity
             {
                 finish(); // Finish activity if welcome screen is finish via back button
             }
+        }
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        if( menu != null && menu.isExpanded() )
+        {
+            menu.collapse();
+        }
+        else
+        {
+            super.onBackPressed();
         }
     }
 
@@ -783,7 +797,7 @@ public class MainActivity extends DBActivity
         /*
          * FAB
          */
-        final FloatingActionsMenu menu = (FloatingActionsMenu) findViewById(R.id.fab_choices);
+        menu = (FloatingActionsMenu) findViewById(R.id.fab_choices);
 
         final View background = MainActivity.this.findViewById(R.id.fab_choices_background);
         final float backgroundAlpha = 0.8f;
