@@ -152,6 +152,7 @@
     <string name="onboarding_screen_3_title">Presentiamoci!</string>
     <string name="onboarding_screen_3_message">Tappa n° 2: Di quanto disponi attualmente sul tuo conto?\n(Potrai cambiare la cifra più tardi).</string>
     <string name="onboarding_screen_3_cta">Inizia con %s</string>
+    <string name="onboarding_screen_3_psst">Psssss: per ragioni di semplicita, non puoi utilizzare virgole o numeri con la virgola.</string>
 
     <string name="onboarding_screen_4_title">Perfetto!</string>
     <string name="onboarding_screen_4_message">(È stato facile, no?)</string>

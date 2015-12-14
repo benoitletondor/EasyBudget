@@ -152,6 +152,7 @@
     <string name="onboarding_screen_3_title">Lernen wir uns kennen!</string>
     <string name="onboarding_screen_3_message">Schritt 2: Wie viel haben Sie aktuell auf Ihrem Konto?\n(Sie können das später ändern)</string>
     <string name="onboarding_screen_3_cta">Mit %s beginnen</string>
+    <string name="onboarding_screen_3_psst">Psst: Aus Gründen der Einfachheit können Sie keine Zahlen mit Nachkommastellen verwenden.</string>
 
     <string name="onboarding_screen_4_title">Fertig!</string>
     <string name="onboarding_screen_4_message">(Das war einfach, oder?)</string>
