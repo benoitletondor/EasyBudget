@@ -177,7 +177,7 @@ public class Onboarding3Fragment extends OnboardingFragment
 
         try
         {
-            return ("".equals(valueString) || "-".equals(valueString)) ? 0 : Integer.parseInt(valueString);
+            return ("".equals(valueString) || "-".equals(valueString)) ? 0 : Integer.valueOf(valueString);
         }
         catch (Exception e)
         {
