@@ -26,6 +26,8 @@ import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewTreeObserver;
@@ -211,5 +213,43 @@ public class UIHelper
     public static void setAnimationsEnabled(@NonNull Context context, boolean enabled)
     {
         Parameters.getInstance(context).putBoolean(ParameterKeys.ANIMATIONS_ENABLED, enabled);
+    }
+
+    /**
+     * This helper prevents the user to add more than 2 decimals into the given edittext
+     *
+     * @param editText
+     */
+    public static void preventMoreThan2Decimals(final @NonNull EditText editText)
+    {
+        editText.addTextChangedListener(new TextWatcher()
+        {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+                String value = editText.getText().toString();
+                int dotIndex = value.indexOf(".");
+                if( dotIndex > 0  )
+                {
+                    String decimals = value.substring(dotIndex + 1);
+                    if( decimals.length() > 2 )
+                    {
+                        s.delete(dotIndex + 3, value.length());
+                    }
+                }
+            }
+        });
     }
 }

@@ -49,7 +49,7 @@ public class DBCache
     /**
      * Map that contains balances saved per day
      */
-    private final SimpleArrayMap<Date, Integer> balances = new SimpleArrayMap<>();
+    private final SimpleArrayMap<Date, Float> balances = new SimpleArrayMap<>();
     /**
      * Single thread executor to load data from DB
      */
@@ -170,7 +170,7 @@ public class DBCache
      * @return balance if cached, null otherwise
      */
     @Nullable
-    public Integer getBalanceForDay(@NonNull Date day)
+    public Float getBalanceForDay(@NonNull Date day)
     {
         synchronized (balances)
         {
@@ -308,7 +308,7 @@ public class DBCache
                 while( cal.get(Calendar.MONTH) == month )
                 {
                     Date date = cal.getTime();
-                    int balanceForDay = db.getBalanceForDay(date, false);
+                    float balanceForDay = db.getBalanceForDay(date, false);
 
                     synchronized (balances)
                     {

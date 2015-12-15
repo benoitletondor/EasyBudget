@@ -45,7 +45,7 @@ public class MonthlyExpense implements Serializable
     /**
      * Amount of this expense when created
      */
-    private int     amount;
+    private float     amount;
     /**
      * Is this expense modified (Not implemented yet)
      */
@@ -59,7 +59,7 @@ public class MonthlyExpense implements Serializable
      * @param startAmount
      * @param recurringDate
      */
-    public MonthlyExpense(@NonNull String title, int startAmount, @NonNull Date recurringDate)
+    public MonthlyExpense(@NonNull String title, float startAmount, @NonNull Date recurringDate)
     {
         if (startAmount == 0)
         {
@@ -79,7 +79,7 @@ public class MonthlyExpense implements Serializable
      * @param recurringDate
      * @param modified
      */
-    public MonthlyExpense(Long id, @NonNull String title, int startAmount, @NonNull Date recurringDate, boolean modified)
+    public MonthlyExpense(Long id, @NonNull String title, float startAmount, @NonNull Date recurringDate, boolean modified)
     {
         this(title, startAmount, recurringDate);
 
@@ -113,7 +113,7 @@ public class MonthlyExpense implements Serializable
      *
      * @return
      */
-    public int getAmount()
+    public float getAmount()
     {
         return amount;
     }

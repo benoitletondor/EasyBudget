@@ -39,9 +39,9 @@ public class Expense implements Serializable
      */
     private String  title;
     /**
-     * Amount of this expense (can be < 0)
+     * Amount of this expense (can be < 0).
      */
-    private int     amount;
+    private float     amount;
     /**
      * Date of the expense
      */
@@ -59,7 +59,7 @@ public class Expense implements Serializable
      * @param amount
      * @param date
      */
-    public Expense(@NonNull String title, int amount, @NonNull Date date)
+    public Expense(@NonNull String title, float amount, @NonNull Date date)
     {
         this(null, title, amount, date, null);
     }
@@ -71,7 +71,7 @@ public class Expense implements Serializable
      * @param date
      * @param monthlyId
      */
-    public Expense(@NonNull String title, int amount, @NonNull Date date, Long monthlyId)
+    public Expense(@NonNull String title, float amount, @NonNull Date date, Long monthlyId)
     {
         this(null, title, amount, date, monthlyId);
     }
@@ -84,7 +84,7 @@ public class Expense implements Serializable
      * @param date
      * @param monthlyId
      */
-    public Expense(Long id, @NonNull String title, int amount, @NonNull Date date, Long monthlyId)
+    public Expense(Long id, @NonNull String title, float amount, @NonNull Date date, Long monthlyId)
     {
         this.id = id;
 
@@ -154,12 +154,12 @@ public class Expense implements Serializable
         this.date = DateHelper.cleanDate(date);
     }
 
-    public int getAmount()
+    public float getAmount()
     {
         return amount;
     }
 
-    public void setAmount(int amount)
+    public void setAmount(float amount)
     {
         this.amount = amount;
     }
