@@ -20,6 +20,7 @@ import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
 
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,6 +43,11 @@ public class CurrencyHelper
      * List of main currencies ISO 4217 code
      */
     private static final String[] MAIN_CURRENCIES = {"USD", "EUR", "GBP", "IRN", "AUD", "CAD", "SGD", "CHF", "MYR", "JPY", "CNY", "NZD"};
+
+    /**
+     * Static formatter, that should be used with a synchronized block
+     */
+    private static final DecimalFormat decimalFormatter = new DecimalFormat("#.00");
 
 // ----------------------------------------->
 
@@ -171,13 +177,13 @@ public class CurrencyHelper
      * @param amount
      * @return
      */
-    public static String getFormattedCurrencyString(@NonNull Context context, int amount)
+    public static String getFormattedCurrencyString(@NonNull Context context, float amount)
     {
         NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();
 
         // No fraction digits
-        currencyFormat.setMaximumFractionDigits(0);
-        currencyFormat.setMinimumFractionDigits(0);
+        currencyFormat.setMaximumFractionDigits(2);
+        currencyFormat.setMinimumFractionDigits(2);
 
         currencyFormat.setCurrency(getUserCurrency(context));
 

@@ -81,7 +81,8 @@
                           android:maxLines="1"
                           android:textSize="30dp"
                           android:padding="5dp"
-                          android:inputType="numberSigned"/>
+                          android:inputType="numberDecimal"
+                          android:digits="-0123456789." />
 
                 <TextView android:id="@+id/onboarding_screen3_initial_amount_money_tv"
                     android:layout_width="wrap_content"

@@ -43,7 +43,7 @@ public final class SQLiteDBHelper extends SQLiteOpenHelper
 // -------------------------------------------->
 
     private static final String DATABASE_NAME    = "easybudget.db";
-    private static final int    DATABASE_VERSION = 1;
+    private static final int    DATABASE_VERSION = 2;
 
 // -------------------------------------------->
 
@@ -77,6 +77,10 @@ public final class SQLiteDBHelper extends SQLiteOpenHelper
 	@Override
 	public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion)
 	{
-
+        if( oldVersion<2 )
+        {
+            database.execSQL("UPDATE "+TABLE_EXPENSE+" SET "+COLUMN_EXPENSE_AMOUNT+" = "+COLUMN_EXPENSE_AMOUNT+" * 100");
+            database.execSQL("UPDATE "+TABLE_MONTHLY_EXPENSE+" SET "+COLUMN_MONTHLY_AMOUNT+" = "+COLUMN_MONTHLY_AMOUNT+" * 100");
+        }
 	}
 }

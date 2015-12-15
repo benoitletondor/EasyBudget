@@ -245,14 +245,14 @@ public final class DB
      * @param fromCache should we use DBCache
      * @return
      */
-    protected int getBalanceForDay(@NonNull Date day, boolean fromCache)
+    protected float getBalanceForDay(@NonNull Date day, boolean fromCache)
     {
         day = DateHelper.cleanDate(day);
 
         // Check cache
         if( fromCache )
         {
-            Integer cachedBalance = DBCache.getInstance(context).getBalanceForDay(day);
+            Float cachedBalance = DBCache.getInstance(context).getBalanceForDay(day);
             if( cachedBalance != null )
             {
                 return cachedBalance;
@@ -266,7 +266,8 @@ public final class DB
 
             if(cursor.moveToFirst())
             {
-                return cursor.getInt(0);
+                int value = cursor.getInt(0);
+                return (float) value / 100.f;
             }
 
             return 0;
@@ -286,7 +287,7 @@ public final class DB
      * @param day
      * @return
      */
-    public int getBalanceForDay(@NonNull Date day)
+    public float getBalanceForDay(@NonNull Date day)
     {
         return getBalanceForDay(day, true);
     }
@@ -604,7 +605,7 @@ public final class DB
         (
             cursor.getLong(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_DB_ID)),
             cursor.getString(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_TITLE)),
-            cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_AMOUNT)),
+            (float)cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_AMOUNT)) / 100.f,
             new Date(cursor.getLong(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_DATE))),
             monthlyId > 0 ? monthlyId : null
         );
@@ -628,7 +629,7 @@ public final class DB
 
         values.put(SQLiteDBHelper.COLUMN_EXPENSE_TITLE, expense.getTitle());
         values.put(SQLiteDBHelper.COLUMN_EXPENSE_DATE, expense.getDate().getTime());
-        values.put(SQLiteDBHelper.COLUMN_EXPENSE_AMOUNT, expense.getAmount());
+        values.put(SQLiteDBHelper.COLUMN_EXPENSE_AMOUNT, (int) (expense.getAmount() * 100));
 
         if( expense.isMonthly() )
         {
@@ -652,7 +653,7 @@ public final class DB
         (
             cursor.getLong(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_DB_ID)),
             cursor.getString(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_TITLE)),
-            cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_AMOUNT)),
+            (float) cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_AMOUNT)) / 100.f,
             new Date(cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_RECURRING_DATE))),
             cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_MODIFIED)) == 1
         );
@@ -677,7 +678,7 @@ public final class DB
 
         values.put(SQLiteDBHelper.COLUMN_MONTHLY_TITLE, expense.getTitle());
         values.put(SQLiteDBHelper.COLUMN_MONTHLY_RECURRING_DATE, expense.getRecurringDate().getTime());
-        values.put(SQLiteDBHelper.COLUMN_MONTHLY_AMOUNT, expense.getAmount());
+        values.put(SQLiteDBHelper.COLUMN_MONTHLY_AMOUNT, (int) expense.getAmount() * 100);
         values.put(SQLiteDBHelper.COLUMN_MONTHLY_MODIFIED, expense.isModified() ? 1 : 0);
 
         return values;
