@@ -36,6 +36,7 @@ import android.widget.Toast;
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import com.benoitletondor.easybudgetapp.helper.Logger;
+import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.model.Expense;
 import com.benoitletondor.easybudgetapp.model.db.DB;
 
@@ -71,7 +72,7 @@ public class Onboarding3Fragment extends OnboardingFragment
 
         DB db = getDB();
 
-        int amount = 0;
+        float amount = 0;
         if( db != null )
         {
             amount = -db.getBalanceForDay(new Date());
@@ -81,7 +82,8 @@ public class Onboarding3Fragment extends OnboardingFragment
         setCurrency();
 
         amountEditText = (EditText) v.findViewById(R.id.onboarding_screen3_initial_amount_et);
-        amountEditText.setText(String.valueOf(amount));
+        amountEditText.setText(amount == 0 ? "0" : String.valueOf(amount));
+        UIHelper.preventMoreThan2Decimals(amountEditText);
         amountEditText.addTextChangedListener(new TextWatcher()
         {
             @Override
@@ -112,12 +114,12 @@ public class Onboarding3Fragment extends OnboardingFragment
                 DB db = getDB();
                 if (db != null)
                 {
-                    int currentBalance = -db.getBalanceForDay(new Date());
-                    int newBalance = getAmountValue();
+                    float currentBalance = -db.getBalanceForDay(new Date());
+                    float newBalance = getAmountValue();
 
                     if (newBalance != currentBalance)
                     {
-                        int diff = newBalance - currentBalance;
+                        float diff = newBalance - currentBalance;
 
                         final Expense expense = new Expense(getResources().getString(R.string.adjust_balance_expense_title), -diff, new Date());
                         db.persistExpense(expense);
@@ -171,13 +173,13 @@ public class Onboarding3Fragment extends OnboardingFragment
         }
     }
 
-    private int getAmountValue()
+    private float getAmountValue()
     {
         String valueString = amountEditText.getText().toString();
 
         try
         {
-            return ("".equals(valueString) || "-".equals(valueString)) ? 0 : Integer.parseInt(valueString);
+            return ("".equals(valueString) || "-".equals(valueString)) ? 0 : Float.valueOf(valueString);
         }
         catch (Exception e)
         {
@@ -194,7 +196,7 @@ public class Onboarding3Fragment extends OnboardingFragment
                 })
                 .show();
 
-            Logger.error(false, "An error occurred during initial amount parsing: "+valueString, e);
+            Logger.warning("An error occurred during initial amount parsing: "+valueString, e);
             return 0;
         }
     }
@@ -203,7 +205,7 @@ public class Onboarding3Fragment extends OnboardingFragment
     {
         if( nextButton != null )
         {
-            int value = getAmountValue();
+            float value = getAmountValue();
 
             nextButton.setText(getActivity().getString(R.string.onboarding_screen_3_cta, CurrencyHelper.getFormattedCurrencyString(getActivity(), value)));
         }

@@ -115,6 +115,7 @@ public class MainActivity extends DBActivity
 
     private RecyclerView                recyclerView;
     private View                        recyclerViewPlaceholder;
+    private FloatingActionsMenu         menu;
 
     private TextView budgetLine;
     private TextView budgetLineAmount;
@@ -360,6 +361,19 @@ public class MainActivity extends DBActivity
     }
 
     @Override
+    public void onBackPressed()
+    {
+        if( menu != null && menu.isExpanded() )
+        {
+            menu.collapse();
+        }
+        else
+        {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
     protected void onNewIntent(Intent intent)
     {
         super.onNewIntent(intent);
@@ -467,11 +481,12 @@ public class MainActivity extends DBActivity
         }
         else if( id == R.id.action_balance )
         {
-            final int currentBalance = -db.getBalanceForDay(new Date());
+            final float currentBalance = -db.getBalanceForDay(new Date());
 
             View dialogView = getLayoutInflater().inflate(R.layout.dialog_adjust_balance, null);
             final EditText amountEditText = (EditText) dialogView.findViewById(R.id.balance_amount);
-            amountEditText.setText(String.valueOf(currentBalance));
+            amountEditText.setText(currentBalance == 0 ? "0" : String.valueOf(currentBalance));
+            UIHelper.preventMoreThan2Decimals(amountEditText);
             amountEditText.setSelection(amountEditText.getText().length()); // Put focus at the end of the text
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -494,7 +509,7 @@ public class MainActivity extends DBActivity
                     try
                     {
                         // Ajust balance
-                        int newBalance = Integer.valueOf(amountEditText.getText().toString());
+                        float newBalance = Float.valueOf(amountEditText.getText().toString());
 
                         if( newBalance == currentBalance )
                         {
@@ -502,7 +517,7 @@ public class MainActivity extends DBActivity
                             return;
                         }
 
-                        final int diff = newBalance - currentBalance;
+                        final float diff = newBalance - currentBalance;
 
                         String balanceExpenseTitle = getResources().getString(R.string.adjust_balance_expense_title);
 
@@ -585,7 +600,7 @@ public class MainActivity extends DBActivity
                             })
                             .show();
 
-                        Logger.error(false, "An error occurred during balance", e);
+                        Logger.warning("An error occurred during balance", e);
                         dialog.dismiss();
                     }
                 }
@@ -622,7 +637,7 @@ public class MainActivity extends DBActivity
      */
     private void updateBalanceDisplayForDay(@NonNull Date day)
     {
-        int balance = - db.getBalanceForDay(day);
+        float balance = - db.getBalanceForDay(day);
 
         SimpleDateFormat format = new SimpleDateFormat(getResources().getString(R.string.account_balance_date_format), Locale.getDefault());
 
@@ -783,7 +798,7 @@ public class MainActivity extends DBActivity
         /*
          * FAB
          */
-        final FloatingActionsMenu menu = (FloatingActionsMenu) findViewById(R.id.fab_choices);
+        menu = (FloatingActionsMenu) findViewById(R.id.fab_choices);
 
         final View background = MainActivity.this.findViewById(R.id.fab_choices_background);
         final float backgroundAlpha = 0.8f;
