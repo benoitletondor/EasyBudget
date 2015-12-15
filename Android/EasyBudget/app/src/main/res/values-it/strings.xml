@@ -141,6 +141,7 @@
     <string name="rating_popup_positive_cta_positive">Certo!</string>
     <string name="rating_feedback_send_error">Impossibile trovare un’app per inviare i commenti via email.</string>
     <string name="rating_feedback_send_text"></string>
+    <string name="rating_popup_question_cta_dont_ask_again">Non chiedermelo più</string>
 
     <string name="onboarding_screen_1_title">Benvenuto su EasyBudget</string>
     <string name="onboarding_screen_1_message">Il concetto è semplice: Inserisci entrate e uscite ricorrenti e occasionali, e l’app si occupa di monitorare quanto resta sul tuo conto… in qualsiasi momento!\n\nNiente di più semplice!</string>

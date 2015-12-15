@@ -141,6 +141,7 @@
     <string name="rating_popup_positive_cta_positive">¡Claro!</string>
     <string name="rating_feedback_send_error">No tienes ninguna app para enviar tu comentarios por mail.</string>
     <string name="rating_feedback_send_text"></string>
+    <string name="rating_popup_question_cta_dont_ask_again">No preguntar más</string>
 
     <string name="onboarding_screen_1_title">Bienvenido a EasyBudget</string>
     <string name="onboarding_screen_1_message">El concepto es sencillo: anotas tus ingresos y tus gastos diarios o recurrentes y la app te dice cuánto dinero queda en tu cuenta, en cualquier instante.\n\n¡Es así de fácil!</string>

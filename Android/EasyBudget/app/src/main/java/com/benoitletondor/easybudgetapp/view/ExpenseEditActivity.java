@@ -297,7 +297,7 @@ public class ExpenseEditActivity extends DBActivity
         }
 
         amountEditText = (EditText) findViewById(R.id.amount_edittext);
-        UIHelper.preventMoreThan2Decimals(amountEditText);
+        UIHelper.preventUnsupportedInputForDecimals(amountEditText);
 
         if( expense != null )
         {

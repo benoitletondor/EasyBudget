@@ -152,6 +152,7 @@
     <string name="rating_feedback_email" translatable="false">easybudget@benoitletondor.com</string>
     <string name="rating_feedback_send_subject" translatable="false">EasyBudget - Feedback</string>
     <string name="rating_feedback_send_text"></string>
+    <string name="rating_popup_question_cta_dont_ask_again">Don\'t ask me again</string>
 
     <string name="onboarding_screen_1_title">Welcome to EasyBudget</string>
     <string name="onboarding_screen_1_message">The concept is simple: You enter your recurring and daily expenses and incomes and the app keeps track of how much money you have, had and will have at any given moment.\n\nIt\'s as simple as that.</string>

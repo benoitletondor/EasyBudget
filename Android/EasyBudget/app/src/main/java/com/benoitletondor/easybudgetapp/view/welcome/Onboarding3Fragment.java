@@ -20,7 +20,6 @@ package com.benoitletondor.easybudgetapp.view.welcome;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -31,7 +30,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
@@ -83,7 +81,7 @@ public class Onboarding3Fragment extends OnboardingFragment
 
         amountEditText = (EditText) v.findViewById(R.id.onboarding_screen3_initial_amount_et);
         amountEditText.setText(amount == 0 ? "0" : String.valueOf(amount));
-        UIHelper.preventMoreThan2Decimals(amountEditText);
+        UIHelper.preventUnsupportedInputForDecimals(amountEditText);
         amountEditText.addTextChangedListener(new TextWatcher()
         {
             @Override

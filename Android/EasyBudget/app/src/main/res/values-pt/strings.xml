@@ -141,6 +141,7 @@
     <string name="rating_popup_positive_cta_positive">É claro!</string>
     <string name="rating_feedback_send_error">Não foi possível encontrar uma aplicação para enviar os comentários por email.</string>
     <string name="rating_feedback_send_text"></string>
+    <string name="rating_popup_question_cta_dont_ask_again">Não perguntar novamente</string>
 
     <string name="onboarding_screen_1_title">Bem-vindo ao EasyBudget</string>
     <string name="onboarding_screen_1_message">O conceito é simples: Você insere as suas despesas e receitas diárias e recorrentes, e o app lhe dirá quanto dinheiro você tem, teve ou terá em qualquer momento.\n\nÉ simples assim!</string>

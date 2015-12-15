@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 
@@ -32,6 +33,8 @@ import com.benoitletondor.easybudgetapp.helper.Logger;
 import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
 import com.benoitletondor.easybudgetapp.helper.Parameters;
 
+import com.benoitletondor.easybudgetapp.view.MainActivity;
+import com.benoitletondor.easybudgetapp.view.RatingPopup;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
@@ -173,7 +176,7 @@ public class EasyBudget extends Application
             {
                 if (activityCounter == 0)
                 {
-                    onAppForeground();
+                    onAppForeground(activity);
                 }
 
                 activityCounter++;
@@ -217,6 +220,53 @@ public class EasyBudget extends Application
     }
 
     /**
+     * Show the rating popup if the user didn't asked not to every day after the app has been open
+     * in 3 different days.
+     *
+     * @param activity
+     */
+    private void showRatingPopupIfNeeded(@NonNull Activity activity)
+    {
+        try
+        {
+            if( !(activity instanceof MainActivity) )
+            {
+                Logger.debug("Not showing rating popup cause app is not opened by the MainActivity");
+                return;
+            }
+
+            int dailyOpens = Parameters.getInstance(getApplicationContext()).getInt(ParameterKeys.NUMBER_OF_DAILY_OPEN, 0);
+            if( dailyOpens > 2 )
+            {
+                long lastRatingTS = Parameters.getInstance(getApplicationContext()).getLong(ParameterKeys.RATING_POPUP_LAST_AUTO_SHOW, 0);
+                if( lastRatingTS > 0 )
+                {
+                    Calendar cal = Calendar.getInstance();
+                    int currentDay = cal.get(Calendar.DAY_OF_YEAR);
+
+                    cal.setTime(new Date(lastRatingTS));
+                    int lastTimeDay = cal.get(Calendar.DAY_OF_YEAR);
+
+                    if( currentDay != lastTimeDay )
+                    {
+                        Parameters.getInstance(getApplicationContext()).putLong(ParameterKeys.RATING_POPUP_LAST_AUTO_SHOW, new Date().getTime());
+                        new RatingPopup(activity).show(false);
+                    }
+                }
+                else
+                {
+                    Parameters.getInstance(getApplicationContext()).putLong(ParameterKeys.RATING_POPUP_LAST_AUTO_SHOW, new Date().getTime());
+                    new RatingPopup(activity).show(false);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Logger.error("Error while showing rating popup", e);
+        }
+    }
+
+    /**
      * Set-up Batch SDK config + lifecycle
      */
     private void setUpBatchSDK()
@@ -243,30 +293,43 @@ public class EasyBudget extends Application
                     @Override
                     public void onRedeemAutomaticOffer(Offer offer)
                     {
-                        if( offer.containsFeature("PREMIUM") )
+                        boolean shouldShowPopup = true;
+
+                        if ( offer.containsFeature("PREMIUM") )
                         {
-                            Parameters.getInstance(getApplicationContext()).putBoolean(ParameterKeys.BATCH_OFFER_REDEEMED, true);
+                            boolean alreadyPremium =  Parameters.getInstance(getApplicationContext()).getBoolean(ParameterKeys.BATCH_OFFER_REDEEMED, false);
+                            if( alreadyPremium ) // Not show popup again if user is already premium
+                            {
+                                shouldShowPopup = false;
+                            }
+                            else
+                            {
+                                Parameters.getInstance(getApplicationContext()).putBoolean(ParameterKeys.BATCH_OFFER_REDEEMED, true);
+                            }
                         }
 
-                        Map<String, String> additionalParameters = offer.getOfferAdditionalParameters();
-
-                        String rewardMessage = additionalParameters.get("reward_message");
-                        String rewardTitle = additionalParameters.get("reward_title");
-
-                        if (rewardTitle != null && rewardMessage != null)
+                        if( shouldShowPopup )
                         {
-                            new AlertDialog.Builder(activity)
-                                    .setTitle(rewardTitle)
-                                    .setMessage(rewardMessage)
-                                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
-                                    {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which)
+                            Map<String, String> additionalParameters = offer.getOfferAdditionalParameters();
+
+                            String rewardMessage = additionalParameters.get("reward_message");
+                            String rewardTitle = additionalParameters.get("reward_title");
+
+                            if (rewardTitle != null && rewardMessage != null)
+                            {
+                                new AlertDialog.Builder(activity)
+                                        .setTitle(rewardTitle)
+                                        .setMessage(rewardMessage)
+                                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
                                         {
-                                            dialog.dismiss();
-                                        }
-                                    })
-                                    .show();
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which)
+                                            {
+                                                dialog.dismiss();
+                                            }
+                                        })
+                                        .show();
+                            }
                         }
                     }
                 });
@@ -311,8 +374,8 @@ public class EasyBudget extends Application
      */
     private void checkUpdateAction()
     {
-        int savedVersion = Parameters.getInstance(getApplicationContext()).getInt(ParameterKeys.APP_VERSION, 1);
-        if( savedVersion != BuildConfig.VERSION_CODE )
+        int savedVersion = Parameters.getInstance(getApplicationContext()).getInt(ParameterKeys.APP_VERSION, 0);
+        if( savedVersion > 0 && savedVersion != BuildConfig.VERSION_CODE )
         {
             onUpdate(savedVersion, BuildConfig.VERSION_CODE);
         }
@@ -341,8 +404,10 @@ public class EasyBudget extends Application
 
     /**
      * Called when the app goes foreground
+     *
+     * @param activity The activity that gone foreground
      */
-    private void onAppForeground()
+    private void onAppForeground(@NonNull Activity activity)
     {
         Logger.debug("onAppForeground");
 
@@ -387,6 +452,11 @@ public class EasyBudget extends Application
          * Save last open date
          */
         Parameters.getInstance(getApplicationContext()).putLong(ParameterKeys.LAST_OPEN_DATE, new Date().getTime());
+
+        /*
+         * Rating popup every day after 3 opens
+         */
+        showRatingPopupIfNeeded(activity);
     }
 
     /**
