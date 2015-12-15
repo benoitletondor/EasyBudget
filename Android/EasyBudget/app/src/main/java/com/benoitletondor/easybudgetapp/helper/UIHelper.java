@@ -216,11 +216,11 @@ public class UIHelper
     }
 
     /**
-     * This helper prevents the user to add more than 2 decimals into the given edittext
+     * This helper prevents the user to add unsupported values into an EditText for decimal numbers
      *
      * @param editText
      */
-    public static void preventMoreThan2Decimals(final @NonNull EditText editText)
+    public static void preventUnsupportedInputForDecimals(final @NonNull EditText editText)
     {
         editText.addTextChangedListener(new TextWatcher()
         {
@@ -240,14 +240,64 @@ public class UIHelper
             public void afterTextChanged(Editable s)
             {
                 String value = editText.getText().toString();
-                int dotIndex = value.indexOf(".");
-                if( dotIndex > 0  )
+
+                try
                 {
-                    String decimals = value.substring(dotIndex + 1);
-                    if( decimals.length() > 2 )
+                    // Remove - that is not at first char
+                    int minusIndex = value.lastIndexOf("-");
+                    if( minusIndex > 0 )
                     {
-                        s.delete(dotIndex + 3, value.length());
+                        s.delete(minusIndex, minusIndex+1);
+
+                        if( value.startsWith("-") )
+                        {
+                            s.delete(0, 1);
+                        }
+                        else
+                        {
+                            s.insert(0, "-");
+                        }
+
+                        return;
                     }
+
+                    int comaIndex = value.indexOf(",");
+                    int dotIndex = value.indexOf(".");
+                    int lastDotIndex = value.lastIndexOf(".");
+
+                    // Remove ,
+                    if( comaIndex >= 0 )
+                    {
+                        if( dotIndex >= 0 )
+                        {
+                            s.delete(comaIndex, comaIndex +1);
+                        }
+                        else
+                        {
+                            s.replace(comaIndex, comaIndex +1, ".");
+                        }
+
+                        return;
+                    }
+
+                    // Disallow double .
+                    if( dotIndex >= 0 && dotIndex != lastDotIndex )
+                    {
+                        s.delete(lastDotIndex, lastDotIndex+1);
+                    }
+                    // No more than 2 decimals
+                    else if( dotIndex > 0  )
+                    {
+                        String decimals = value.substring(dotIndex + 1);
+                        if( decimals.length() > 2 )
+                        {
+                            s.delete(dotIndex + 3, value.length());
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.error("An error occurred during text changing watcher. Value: "+value, e);
                 }
             }
         });

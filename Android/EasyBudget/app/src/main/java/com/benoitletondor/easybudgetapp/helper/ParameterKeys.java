@@ -87,4 +87,12 @@ public class ParameterKeys
      * Number of time different day has been open (int)
      */
     public static final String NUMBER_OF_DAILY_OPEN = "number_of_daily_open";
+    /**
+     * Indicate if the rating has been completed by the user (finished or not ask me again) (bool)
+     */
+    public static final String RATING_COMPLETED = "rating_completed";
+    /**
+     * Timestamp that indicates the last time user was presented the rating popup (long)
+     */
+    public static final String RATING_POPUP_LAST_AUTO_SHOW = "rating_popup_last_auto_show";
 }

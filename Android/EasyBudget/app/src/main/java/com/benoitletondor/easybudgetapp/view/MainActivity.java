@@ -42,7 +42,6 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -51,7 +50,6 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.benoitletondor.easybudgetapp.EasyBudget;
 import com.benoitletondor.easybudgetapp.R;
@@ -69,7 +67,6 @@ import com.benoitletondor.easybudgetapp.view.main.ExpensesRecyclerViewAdapter;
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
-import com.google.android.gms.appinvite.AppInvite;
 import com.google.android.gms.appinvite.AppInviteReferral;
 import com.roomorama.caldroid.CaldroidFragment;
 import com.roomorama.caldroid.CaldroidListener;
@@ -486,7 +483,7 @@ public class MainActivity extends DBActivity
             View dialogView = getLayoutInflater().inflate(R.layout.dialog_adjust_balance, null);
             final EditText amountEditText = (EditText) dialogView.findViewById(R.id.balance_amount);
             amountEditText.setText(currentBalance == 0 ? "0" : String.valueOf(currentBalance));
-            UIHelper.preventMoreThan2Decimals(amountEditText);
+            UIHelper.preventUnsupportedInputForDecimals(amountEditText);
             amountEditText.setSelection(amountEditText.getText().length()); // Put focus at the end of the text
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -637,16 +634,17 @@ public class MainActivity extends DBActivity
      */
     private void updateBalanceDisplayForDay(@NonNull Date day)
     {
-        float balance = - db.getBalanceForDay(day);
+        float balance = 0; // Just to keep a positive number if balance == 0
+        balance -= db.getBalanceForDay(day);
 
         SimpleDateFormat format = new SimpleDateFormat(getResources().getString(R.string.account_balance_date_format), Locale.getDefault());
 
         String formatted = getResources().getString(R.string.account_balance_format, format.format(day));
-        if( formatted.endsWith(".:") )
+        if( formatted.endsWith(".:") ) //FIXME it's ugly!!
         {
             formatted = formatted.substring(0, formatted.length() - 2) + ":"; // Remove . at the end of the month (ex: nov.: -> nov:)
         }
-        else if( formatted.endsWith(". :") )
+        else if( formatted.endsWith(". :") ) //FIXME it's ugly!!
         {
             formatted = formatted.substring(0, formatted.length() - 3) + " :"; // Remove . at the end of the month (ex: nov. : -> nov :)
         }

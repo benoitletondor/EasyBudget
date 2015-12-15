@@ -25,9 +25,13 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
+import android.view.Gravity;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.benoitletondor.easybudgetapp.R;
+import com.benoitletondor.easybudgetapp.helper.Logger;
 import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
 import com.benoitletondor.easybudgetapp.helper.Parameters;
 
@@ -54,21 +58,60 @@ public class RatingPopup
 
     /**
      * Show the rating popup to the user
+     *
+     * @param forceShow force show even if the user already completed it. If not forced, the user
+     *                  will have a button to asked not to be asked again
      */
-    public void show()
+    public void show(boolean forceShow)
     {
+        if( !forceShow && Parameters.getInstance(activity).getBoolean(ParameterKeys.RATING_COMPLETED, false) )
+        {
+            Logger.debug("Not showing rating cause user already completed it");
+            return;
+        }
+
         setRatingPopupStep(activity, RatingPopupStep.STEP_SHOWN);
-        buildStep1().show();
+
+        AlertDialog dialog = buildStep1(!forceShow);
+        dialog.show();
+
+        if( !forceShow )
+        {
+            // Center buttons
+            try
+            {
+                final Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                LinearLayout.LayoutParams positiveButtonLL = (LinearLayout.LayoutParams) positiveButton.getLayoutParams();
+                positiveButtonLL.gravity = Gravity.CENTER;
+                positiveButton.setLayoutParams(positiveButtonLL);
+
+                final Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+                LinearLayout.LayoutParams negativeButtonL = (LinearLayout.LayoutParams) negativeButton.getLayoutParams();
+                negativeButtonL.gravity = Gravity.CENTER;
+                negativeButton.setLayoutParams(negativeButtonL);
+
+                final Button neutralButton = dialog.getButton(AlertDialog.BUTTON_NEUTRAL);
+                LinearLayout.LayoutParams neutralButtonL = (LinearLayout.LayoutParams) neutralButton.getLayoutParams();
+                neutralButtonL.gravity = Gravity.CENTER;
+                neutralButton.setLayoutParams(neutralButtonL);
+            }
+            catch (Exception e)
+            {
+                Logger.error("Error while centering dialog buttons", e);
+            }
+        }
     }
 
     /**
      * Build the first step of rating asking the user what he thinks of the app
      *
+     * @param includeDontAskMeAgainButton boolean that indicates of the don't ask me again button
+     *                                    should be included
      * @return A ready to be shown {@link AlertDialog}
      */
-    private AlertDialog buildStep1()
+    private AlertDialog buildStep1(boolean includeDontAskMeAgainButton)
     {
-        return new AlertDialog.Builder(activity)
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity)
             .setTitle(R.string.rating_popup_question_title)
             .setMessage(R.string.rating_popup_question_message)
             .setNegativeButton(R.string.rating_popup_question_cta_negative, new DialogInterface.OnClickListener()
@@ -88,8 +131,23 @@ public class RatingPopup
                     setRatingPopupStep(activity, RatingPopupStep.STEP_LIKE);
                     buildPositiveStep().show();
                 }
-            })
-            .create();
+            });
+
+        if( includeDontAskMeAgainButton )
+        {
+            builder.setNeutralButton(R.string.rating_popup_question_cta_dont_ask_again, new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    setRatingPopupStep(activity, RatingPopupStep.STEP_NOT_ASK_ME_AGAIN);
+                    Parameters.getInstance(activity).putBoolean(ParameterKeys.RATING_COMPLETED, true);
+                    dialog.dismiss();
+                }
+            });
+        }
+
+        return builder.create();
     }
 
     /**
@@ -108,6 +166,7 @@ public class RatingPopup
                 public void onClick(DialogInterface dialog, int which)
                 {
                     setRatingPopupStep(activity, RatingPopupStep.STEP_DISLIKE_NO_FEEDBACK);
+                    Parameters.getInstance(activity).putBoolean(ParameterKeys.RATING_COMPLETED, true);
                 }
             })
             .setPositiveButton(R.string.rating_popup_negative_cta_positive, new DialogInterface.OnClickListener()
@@ -116,6 +175,7 @@ public class RatingPopup
                 public void onClick(DialogInterface dialog, int which)
                 {
                     setRatingPopupStep(activity, RatingPopupStep.STEP_DISLIKE_FEEDBACK);
+                    Parameters.getInstance(activity).putBoolean(ParameterKeys.RATING_COMPLETED, true);
 
                     Intent sendIntent = new Intent();
                     sendIntent.setAction(Intent.ACTION_SENDTO);
@@ -153,6 +213,7 @@ public class RatingPopup
                 public void onClick(DialogInterface dialog, int which)
                 {
                     setRatingPopupStep(activity, RatingPopupStep.STEP_LIKE_NOT_RATED);
+                    Parameters.getInstance(activity).putBoolean(ParameterKeys.RATING_COMPLETED, true);
                 }
             })
             .setPositiveButton(R.string.rating_popup_positive_cta_positive, new DialogInterface.OnClickListener()
@@ -161,6 +222,7 @@ public class RatingPopup
                 public void onClick(DialogInterface dialog, int which)
                 {
                     setRatingPopupStep(activity, RatingPopupStep.STEP_LIKE_RATED);
+                    Parameters.getInstance(activity).putBoolean(ParameterKeys.RATING_COMPLETED, true);
 
                     final String appPackageName = activity.getPackageName();
 
@@ -248,7 +310,12 @@ public class RatingPopup
         /**
          * User clicked "I want to give my feedback"
          */
-        STEP_DISLIKE_FEEDBACK(7);
+        STEP_DISLIKE_FEEDBACK(7),
+
+        /**
+         * User clicked "Don't ask me again" on the first screen
+         */
+        STEP_NOT_ASK_ME_AGAIN(8);
 
         public int value;
 

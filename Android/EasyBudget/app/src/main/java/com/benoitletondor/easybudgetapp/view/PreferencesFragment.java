@@ -83,7 +83,7 @@ public class PreferencesFragment extends PreferenceFragment
             @Override
             public boolean onPreferenceClick(Preference preference)
             {
-                new RatingPopup(getActivity()).show();
+                new RatingPopup(getActivity()).show(true);
                 return false;
             }
         });

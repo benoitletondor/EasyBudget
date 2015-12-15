@@ -85,7 +85,7 @@
                                   android:textColor="@android:color/white"
                                   android:textSize="16dp"
                                   android:inputType="numberDecimal"
-                                  android:digits="0123456789." />
+                                  android:digits="0123456789.," />
 
                     </android.support.design.widget.TextInputLayout>
 
