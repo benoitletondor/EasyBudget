@@ -243,7 +243,10 @@ public class EasyBudget extends Application
                     @Override
                     public void onRedeemAutomaticOffer(Offer offer)
                     {
-                        Parameters.getInstance(getApplicationContext()).getBoolean(ParameterKeys.BATCH_OFFER_REDEEMED, true);
+                        if( offer.containsFeature("PREMIUM") )
+                        {
+                            Parameters.getInstance(getApplicationContext()).putBoolean(ParameterKeys.BATCH_OFFER_REDEEMED, true);
+                        }
 
                         Map<String, String> additionalParameters = offer.getOfferAdditionalParameters();
 
@@ -327,7 +330,11 @@ public class EasyBudget extends Application
     {
         Logger.debug("Update detected, from " + previousVersion + " to " + newVersion);
 
-        // Add action if needed
+        // Fix bad save of Batch premium
+        if( previousVersion <= 23 ) // 1.0.3
+        {
+            Parameters.getInstance(getApplicationContext()).putBoolean(ParameterKeys.BATCH_OFFER_REDEEMED, true);
+        }
     }
 
 // -------------------------------------->
