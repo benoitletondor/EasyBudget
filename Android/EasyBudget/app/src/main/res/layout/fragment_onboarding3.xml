@@ -30,7 +30,7 @@
     <ScrollView android:id="@+id/onboarding_screen_3_top_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="135dp">
+        android:layout_marginBottom="95dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -53,16 +53,6 @@
                 android:text="@string/onboarding_screen_3_message"
                 android:textColor="@android:color/white"
                 android:gravity="center_horizontal" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:text="@string/onboarding_screen_3_psst"
-                android:textStyle="italic|bold"
-                android:layout_marginTop="20dp"
-                android:textColor="@android:color/white"
-                android:maxLines="2"
-                android:ellipsize="end" />
 
             <LinearLayout
                 android:layout_width="match_parent"

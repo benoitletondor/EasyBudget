@@ -154,7 +154,6 @@
     <string name="onboarding_screen_3_title">Faisons connaissance !</string>
     <string name="onboarding_screen_3_message">Étape 2 : Combien avez-vous actuellement sur votre compte ?\n(Vous pouvez le changer plus tard)</string>
     <string name="onboarding_screen_3_cta">Démarrer avec %s</string>
-    <string name="onboarding_screen_3_psst">Psst : Pour faire au plus simple, vous ne pouvez pas entrer de nombres à virgule.</string>
 
     <string name="onboarding_screen_4_title">C\'est tout bon !</string>
     <string name="onboarding_screen_4_message">(C\'était facile non ?)</string>

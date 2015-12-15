@@ -154,7 +154,6 @@
     <string name="onboarding_screen_3_title">¡Empecemos!</string>
     <string name="onboarding_screen_3_message">Paso 2: ¿Cuánto dinero tienes en tu cuenta?\n(puedes modificar el monto después)</string>
     <string name="onboarding_screen_3_cta">Empezar con %s</string>
-    <string name="onboarding_screen_3_psst">¡Pss! He desactivado los puntos y las comas para hacerte ganar tiempo.</string>
 
     <string name="onboarding_screen_4_title">¡Ya está!</string>
     <string name="onboarding_screen_4_message">(Ha sido fácil, ¿verdad?)</string>
