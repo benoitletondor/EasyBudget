@@ -58,7 +58,7 @@ android {
             buildConfigField "boolean", "CRASHLYTICS_ACTIVATED", "true"
             buildConfigField "String", "BATCH_API_KEY", batch_livekey
             buildConfigField "boolean", "ANALYTICS_ACTIVATED", "true"
-            buildConfigField "boolean", "DEV_PREFERENCES", "true"
+            buildConfigField "boolean", "DEV_PREFERENCES", "false"
 
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
