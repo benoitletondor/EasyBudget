@@ -186,7 +186,7 @@ public class ExpenseEditActivity extends DBActivity
         {
             try
             {
-                int value = Integer.parseInt(amount);
+                float value = Float.parseFloat(amount);
                 if( value <= 0 )
                 {
                     amountEditText.setError(getResources().getString(R.string.negative_amount_error));
@@ -236,7 +236,7 @@ public class ExpenseEditActivity extends DBActivity
             {
                 if (validateInputs())
                 {
-                    int value = Integer.parseInt(amountEditText.getText().toString());
+                    float value = Float.parseFloat(amountEditText.getText().toString());
 
                     Expense expenseToSave;
                     if (expense == null)
@@ -297,6 +297,7 @@ public class ExpenseEditActivity extends DBActivity
         }
 
         amountEditText = (EditText) findViewById(R.id.amount_edittext);
+        UIHelper.preventMoreThan2Decimals(amountEditText);
 
         if( expense != null )
         {
