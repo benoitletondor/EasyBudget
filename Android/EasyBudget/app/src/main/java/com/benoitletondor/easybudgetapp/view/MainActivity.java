@@ -478,7 +478,7 @@ public class MainActivity extends DBActivity
         }
         else if( id == R.id.action_balance )
         {
-            final float currentBalance = -db.getBalanceForDay(new Date());
+            final double currentBalance = -db.getBalanceForDay(new Date());
 
             View dialogView = getLayoutInflater().inflate(R.layout.dialog_adjust_balance, null);
             final EditText amountEditText = (EditText) dialogView.findViewById(R.id.balance_amount);
@@ -506,7 +506,7 @@ public class MainActivity extends DBActivity
                     try
                     {
                         // Ajust balance
-                        float newBalance = Float.valueOf(amountEditText.getText().toString());
+                        double newBalance = Double.valueOf(amountEditText.getText().toString());
 
                         if( newBalance == currentBalance )
                         {
@@ -514,7 +514,7 @@ public class MainActivity extends DBActivity
                             return;
                         }
 
-                        final float diff = newBalance - currentBalance;
+                        final double diff = newBalance - currentBalance;
 
                         String balanceExpenseTitle = getResources().getString(R.string.adjust_balance_expense_title);
 
@@ -634,7 +634,7 @@ public class MainActivity extends DBActivity
      */
     private void updateBalanceDisplayForDay(@NonNull Date day)
     {
-        float balance = 0; // Just to keep a positive number if balance == 0
+        double balance = 0; // Just to keep a positive number if balance == 0
         balance -= db.getBalanceForDay(day);
 
         SimpleDateFormat format = new SimpleDateFormat(getResources().getString(R.string.account_balance_date_format), Locale.getDefault());

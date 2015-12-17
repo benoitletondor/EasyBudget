@@ -177,7 +177,7 @@ public class CurrencyHelper
      * @param amount
      * @return
      */
-    public static String getFormattedCurrencyString(@NonNull Context context, float amount)
+    public static String getFormattedCurrencyString(@NonNull Context context, double amount)
     {
         NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();
 
@@ -187,6 +187,7 @@ public class CurrencyHelper
 
         currencyFormat.setCurrency(getUserCurrency(context));
 
+        Logger.error("Formatting: "+amount+". Result: "+currencyFormat.format(amount));
         return currencyFormat.format(amount);
     }
 

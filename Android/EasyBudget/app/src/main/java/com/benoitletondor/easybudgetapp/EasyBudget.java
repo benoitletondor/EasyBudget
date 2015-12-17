@@ -385,7 +385,7 @@ public class EasyBudget extends Application
     }
 
     /**
-     * Called when an update occured
+     * Called when an update occurred
      *
      * @param previousVersion
      * @param newVersion
