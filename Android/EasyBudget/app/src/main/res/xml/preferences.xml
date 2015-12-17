@@ -28,6 +28,15 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:title="@string/setting_category_premium_title">
+
+        <Preference android:key="@string/setting_category_premium_status_key"
+            android:title="@string/setting_category_premium_status_title"
+            android:summary="@string/setting_category_premium_status_message" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:title="@string/setting_category_app_title">
 
         <Preference android:title="@string/setting_category_rate_button_title"

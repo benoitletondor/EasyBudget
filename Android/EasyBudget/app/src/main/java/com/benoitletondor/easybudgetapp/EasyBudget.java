@@ -33,6 +33,7 @@ import com.benoitletondor.easybudgetapp.helper.Logger;
 import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
 import com.benoitletondor.easybudgetapp.helper.Parameters;
 
+import com.benoitletondor.easybudgetapp.helper.UserHelper;
 import com.benoitletondor.easybudgetapp.view.MainActivity;
 import com.benoitletondor.easybudgetapp.view.RatingPopup;
 import com.crashlytics.android.Crashlytics;
@@ -295,7 +296,7 @@ public class EasyBudget extends Application
                     {
                         boolean shouldShowPopup = true;
 
-                        if ( offer.containsFeature("PREMIUM") )
+                        if ( offer.containsFeature(UserHelper.PREMIUM_FEATURE) )
                         {
                             boolean alreadyPremium =  Parameters.getInstance(getApplicationContext()).getBoolean(ParameterKeys.BATCH_OFFER_REDEEMED, false);
                             if( alreadyPremium ) // Not show popup again if user is already premium
@@ -393,7 +394,7 @@ public class EasyBudget extends Application
     {
         Logger.debug("Update detected, from " + previousVersion + " to " + newVersion);
 
-        // Fix bad save of Batch premium
+        // Fix bad save of Batch premium before 1.1
         if( previousVersion <= 23 ) // 1.0.3
         {
             Parameters.getInstance(getApplicationContext()).putBoolean(ParameterKeys.BATCH_OFFER_REDEEMED, true);

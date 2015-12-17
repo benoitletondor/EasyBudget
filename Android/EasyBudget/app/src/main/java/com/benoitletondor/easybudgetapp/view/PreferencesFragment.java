@@ -17,6 +17,7 @@
 package com.benoitletondor.easybudgetapp.view;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -38,6 +39,11 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.batch.android.Batch;
+import com.batch.android.BatchCodeListener;
+import com.batch.android.CodeErrorInfo;
+import com.batch.android.FailReason;
+import com.batch.android.Offer;
 import com.benoitletondor.easybudgetapp.BuildConfig;
 import com.benoitletondor.easybudgetapp.EasyBudget;
 import com.benoitletondor.easybudgetapp.R;
@@ -46,8 +52,11 @@ import com.benoitletondor.easybudgetapp.helper.Logger;
 import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
 import com.benoitletondor.easybudgetapp.helper.Parameters;
 import com.benoitletondor.easybudgetapp.helper.UIHelper;
+import com.benoitletondor.easybudgetapp.helper.UserHelper;
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment;
 import com.google.android.gms.appinvite.AppInviteInvitation;
+
+import java.util.Map;
 
 /**
  * Fragment to display preferences
@@ -260,6 +269,11 @@ public class PreferencesFragment extends PreferenceFragment
         setLimitWarningPreferenceTitle(limitWarningPreference);
 
         /*
+         * Premium status
+         */
+        refreshPremiumPreference();
+
+        /*
          * Hide dev preferences if needed
          */
         PreferenceCategory devCategory = (PreferenceCategory) findPreference(getResources().getString(R.string.setting_category_dev_key));
@@ -340,6 +354,192 @@ public class PreferencesFragment extends PreferenceFragment
     private void setLimitWarningPreferenceTitle(Preference limitWarningPreferenceTitle)
     {
         limitWarningPreferenceTitle.setTitle(getResources().getString(R.string.setting_category_limit_set_button_title, CurrencyHelper.getFormattedCurrencyString(getActivity(), Parameters.getInstance(getActivity()).getInt(ParameterKeys.LOW_MONEY_WARNING_AMOUNT, EasyBudget.DEFAULT_LOW_MONEY_WARNING_AMOUNT))));
+    }
+
+    private void refreshPremiumPreference()
+    {
+        boolean isPremium = UserHelper.isUserPremium(getActivity());
+
+        Preference premiumPref = findPreference(getResources().getString(R.string.setting_category_premium_status_key));
+        if( isPremium )
+        {
+            premiumPref.setTitle(R.string.setting_category_premium_status_title);
+            premiumPref.setSummary(R.string.setting_category_premium_status_message);
+
+            premiumPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+            {
+                @Override
+                public boolean onPreferenceClick(Preference preference)
+                {
+                    return false;
+                }
+            });
+        }
+        else
+        {
+            premiumPref.setTitle(R.string.setting_category_premium_redeem_title);
+            premiumPref.setSummary(null);
+
+            premiumPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+            {
+                @Override
+                public boolean onPreferenceClick(Preference preference)
+                {
+                    View dialogView = getActivity().getLayoutInflater().inflate(R.layout.dialog_redeem_voucher, null);
+                    final EditText voucherEditText = (EditText) dialogView.findViewById(R.id.voucher);
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+                        .setTitle(R.string.voucher_redeem_dialog_title)
+                        .setMessage(R.string.voucher_redeem_dialog_message)
+                        .setView(dialogView)
+                        .setPositiveButton(R.string.voucher_redeem_dialog_cta, new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                dialog.dismiss();
+
+                                String promocode = voucherEditText.getText().toString();
+                                if( promocode.trim().isEmpty() )
+                                {
+                                    new AlertDialog.Builder(getActivity())
+                                        .setTitle(R.string.voucher_redeem_error_dialog_title)
+                                        .setMessage(R.string.voucher_redeem_error_code_invalid_dialog_message)
+                                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                                        {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which)
+                                            {
+                                                dialog.dismiss();
+                                            }
+                                        })
+                                        .show();
+
+                                    return;
+                                }
+
+                                final ProgressDialog loadingDialog = ProgressDialog.show(getActivity(),
+                                    getResources().getString(R.string.voucher_redeem_dialog_loading_title),
+                                    getResources().getString(R.string.voucher_redeem_dialog_loading_message),
+                                    true, false);
+
+                                Batch.Unlock.redeemCode(promocode, new BatchCodeListener()
+                                {
+                                    @Override
+                                    public void onRedeemCodeSuccess(String s, Offer offer)
+                                    {
+                                        loadingDialog.dismiss();
+
+                                        if( offer.containsFeature(UserHelper.PREMIUM_FEATURE) )
+                                        {
+                                            Parameters.getInstance(getActivity()).putBoolean(ParameterKeys.BATCH_OFFER_REDEEMED, true);
+                                            refreshPremiumPreference();
+                                        }
+
+                                        Map<String, String> additionalParameters = offer.getOfferAdditionalParameters();
+
+                                        String rewardMessage = additionalParameters.get("reward_message");
+                                        String rewardTitle = additionalParameters.get("reward_title");
+
+                                        if (rewardTitle != null && rewardMessage != null)
+                                        {
+                                            new AlertDialog.Builder(getActivity())
+                                                .setTitle(rewardTitle)
+                                                .setMessage(rewardMessage)
+                                                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                                                {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which)
+                                                    {
+                                                        dialog.dismiss();
+                                                    }
+                                                })
+                                                .show();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onRedeemCodeFailed(String s, FailReason failReason, CodeErrorInfo codeErrorInfo)
+                                    {
+                                        loadingDialog.dismiss();
+
+                                        if( failReason == FailReason.NETWORK_ERROR )
+                                        {
+                                            new AlertDialog.Builder(getActivity())
+                                                .setTitle(R.string.voucher_redeem_error_dialog_title)
+                                                .setMessage(R.string.voucher_redeem_error_no_internet_dialog_message)
+                                                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                                                {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which)
+                                                    {
+                                                        dialog.dismiss();
+                                                    }
+                                                })
+                                                .show();
+                                        }
+                                        else if( failReason == FailReason.INVALID_CODE )
+                                        {
+                                            new AlertDialog.Builder(getActivity())
+                                                .setTitle(R.string.voucher_redeem_error_dialog_title)
+                                                .setMessage(R.string.voucher_redeem_error_code_invalid_dialog_message)
+                                                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                                                {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which)
+                                                    {
+                                                        dialog.dismiss();
+                                                    }
+                                                })
+                                                .show();
+                                        }
+                                        else
+                                        {
+                                            new AlertDialog.Builder(getActivity())
+                                                .setTitle(R.string.voucher_redeem_error_dialog_title)
+                                                .setMessage(R.string.voucher_redeem_error_generic_dialog_message)
+                                                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                                                {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which)
+                                                    {
+                                                        dialog.dismiss();
+                                                    }
+                                                })
+                                                .show();
+                                        }
+                                    }
+                                });
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                dialog.dismiss();
+                            }
+                        });
+
+                    final Dialog dialog = builder.show();
+
+                    // Directly show keyboard when the dialog pops
+                    voucherEditText.setOnFocusChangeListener(new View.OnFocusChangeListener()
+                    {
+                        @Override
+                        public void onFocusChange(View v, boolean hasFocus)
+                        {
+                            if (hasFocus && getResources().getConfiguration().keyboard == Configuration.KEYBOARD_NOKEYS ) // Check if the device doesn't have a physical keyboard
+                            {
+                                dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                            }
+                        }
+                    });
+
+                    return false;
+                }
+            });
+        }
     }
 
     @Override
