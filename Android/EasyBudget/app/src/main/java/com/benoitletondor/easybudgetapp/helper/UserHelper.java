@@ -29,7 +29,9 @@ public class UserHelper
     /**
      * Feature reference for premium (used by Batch)
      */
-    public static final String PREMIUM_FEATURE = "PREMIUM";
+    public static final String BATCH_PREMIUM_FEATURE = "PREMIUM";
+
+// ------------------------------------>
 
     /**
      * Is the user a premium user
@@ -39,6 +41,38 @@ public class UserHelper
      */
     public static boolean isUserPremium(@NonNull Context context)
     {
-        return false; //Parameters.getInstance(context).getBoolean(ParameterKeys.BATCH_OFFER_REDEEMED, false);
+        return Parameters.getInstance(context).getBoolean(ParameterKeys.BATCH_OFFER_REDEEMED, false);
+    }
+
+    /**
+     * Set this user as premium from Batch
+     *
+     * @param context non null context
+     */
+    public static void setBatchUserPremium(@NonNull Context context)
+    {
+        Parameters.getInstance(context).putBoolean(ParameterKeys.BATCH_OFFER_REDEEMED, true);
+    }
+
+    /**
+     * The user wants or not to receive notification about updates
+     *
+     * @param context non null context
+     * @return true if we can display update notifications, false otherwise
+     */
+    public static boolean isUserAllowingUpdatePushes(@NonNull Context context)
+    {
+        return Parameters.getInstance(context).getBoolean(ParameterKeys.USER_ALLOW_UPDATE_PUSH, true);
+    }
+
+    /**
+     * Set the user choice about update notifications
+     *
+     * @param context non null context
+     * @param value if the user wants or not to receive notifications about updates
+     */
+    public static void setUserAllowUpdatePushes(@NonNull Context context, boolean value)
+    {
+        Parameters.getInstance(context).putBoolean(ParameterKeys.USER_ALLOW_UPDATE_PUSH, value);
     }
 }

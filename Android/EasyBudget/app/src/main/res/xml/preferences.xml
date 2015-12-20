@@ -27,12 +27,21 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory
+    <PreferenceCategory android:key="@string/setting_category_premium_key"
         android:title="@string/setting_category_premium_title">
 
         <Preference android:key="@string/setting_category_premium_status_key"
             android:title="@string/setting_category_premium_status_title"
             android:summary="@string/setting_category_premium_status_message" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:key="@string/setting_category_not_premium_key"
+        android:title="@string/setting_category_premium_title">
+
+        <Preference android:key="@string/setting_category_premium_redeem_key"
+                    android:title="@string/setting_category_premium_redeem_title"
+                    android:summary="@string/setting_category_premium_redeem_message" />
 
     </PreferenceCategory>
 
@@ -44,8 +53,14 @@
             android:key="@string/setting_category_rate_button_key" />
 
         <Preference android:title="@string/setting_category_share_app_title"
-                    android:summary="@string/setting_category_share_app_message"
-                    android:key="@string/setting_category_share_app_key" />
+            android:summary="@string/setting_category_share_app_message"
+            android:key="@string/setting_category_share_app_key" />
+
+        <CheckBoxPreference android:title="@string/setting_category_notifications_update_title"
+            android:summaryOn="@string/setting_category_notifications_update_message"
+            android:summaryOff="@string/setting_category_notifications_update_message"
+            android:key="@string/setting_category_notifications_update_key"
+            android:enabled="true"/>
 
         <Preference android:title="@string/setting_category_bug_report_send_button_title"
             android:key="@string/setting_category_bug_report_send_button_key" />

@@ -946,7 +946,7 @@ public class MainActivity extends DBActivity
     private void refreshRecyclerViewForDate(@NonNull Date date)
     {
         expensesViewAdapter.setDate(date, db);
-        
+
         if( db.hasExpensesForDay(date) )
         {
             recyclerView.setVisibility(View.VISIBLE);

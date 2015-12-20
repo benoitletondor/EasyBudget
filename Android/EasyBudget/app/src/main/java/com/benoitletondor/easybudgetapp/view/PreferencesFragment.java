@@ -18,7 +18,6 @@ package com.benoitletondor.easybudgetapp.view;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -73,6 +72,23 @@ public class PreferencesFragment extends PreferenceFragment
      * Broadcast receiver (used for currency selection)
      */
     private BroadcastReceiver      receiver;
+
+    /**
+     * Category containing premium features (shown to premium users)
+     */
+    private PreferenceCategory premiumCategory;
+    /**
+     * Category containing ways to become premium (shown to not premium users)
+     */
+    private PreferenceCategory notPremiumCategory;
+    /**
+     * Is the premium category shown
+     */
+    private boolean premiumShown = true;
+    /**
+     * Is the not premium category shown
+     */
+    private boolean notPremiumShown = true;
 
 // ---------------------------------------->
 
@@ -220,7 +236,7 @@ public class PreferencesFragment extends PreferenceFragment
                     public void onClick(final DialogInterface dialog, int which)
                     {
                         String limitString = limitEditText.getText().toString();
-                        if( limitString.trim().isEmpty() )
+                        if (limitString.trim().isEmpty())
                         {
                             limitString = "0"; // Set a 0 value if no value is provided (will lead to an error displayed to the user)
                         }
@@ -271,7 +287,24 @@ public class PreferencesFragment extends PreferenceFragment
         /*
          * Premium status
          */
+        premiumCategory = (PreferenceCategory) findPreference(getResources().getString(R.string.setting_category_premium_key));
+        notPremiumCategory = (PreferenceCategory) findPreference(getResources().getString(R.string.setting_category_not_premium_key));
         refreshPremiumPreference();
+
+        /*
+         * Notifications
+         */
+        final CheckBoxPreference updateNotifPref = (CheckBoxPreference) findPreference(getResources().getString(R.string.setting_category_notifications_update_key));
+        updateNotifPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+        {
+            @Override
+            public boolean onPreferenceClick(Preference preference)
+            {
+                UserHelper.setUserAllowUpdatePushes(getActivity(), updateNotifPref.isChecked());
+                return true;
+            }
+        });
+        updateNotifPref.setChecked(UserHelper.isUserAllowingUpdatePushes(getActivity()));
 
         /*
          * Hide dev preferences if needed
@@ -356,31 +389,42 @@ public class PreferencesFragment extends PreferenceFragment
         limitWarningPreferenceTitle.setTitle(getResources().getString(R.string.setting_category_limit_set_button_title, CurrencyHelper.getFormattedCurrencyString(getActivity(), Parameters.getInstance(getActivity()).getInt(ParameterKeys.LOW_MONEY_WARNING_AMOUNT, EasyBudget.DEFAULT_LOW_MONEY_WARNING_AMOUNT))));
     }
 
+    /**
+     * Show the right premium preference depending on the user state
+     */
     private void refreshPremiumPreference()
     {
         boolean isPremium = UserHelper.isUserPremium(getActivity());
 
-        Preference premiumPref = findPreference(getResources().getString(R.string.setting_category_premium_status_key));
         if( isPremium )
         {
-            premiumPref.setTitle(R.string.setting_category_premium_status_title);
-            premiumPref.setSummary(R.string.setting_category_premium_status_message);
-
-            premiumPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+            if( notPremiumShown )
             {
-                @Override
-                public boolean onPreferenceClick(Preference preference)
-                {
-                    return false;
-                }
-            });
+                getPreferenceScreen().removePreference(notPremiumCategory);
+                notPremiumShown = false;
+            }
+
+            if( !premiumShown )
+            {
+                getPreferenceScreen().addPreference(premiumCategory);
+                premiumShown = true;
+            }
         }
         else
         {
-            premiumPref.setTitle(R.string.setting_category_premium_redeem_title);
-            premiumPref.setSummary(null);
+            if( premiumShown )
+            {
+                getPreferenceScreen().removePreference(premiumCategory);
+                premiumShown = false;
+            }
 
-            premiumPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+            if( !notPremiumShown )
+            {
+                getPreferenceScreen().addPreference(notPremiumCategory);
+                notPremiumShown = true;
+            }
+
+            findPreference(getResources().getString(R.string.setting_category_premium_redeem_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
             {
                 @Override
                 public boolean onPreferenceClick(Preference preference)
@@ -430,9 +474,9 @@ public class PreferencesFragment extends PreferenceFragment
                                     {
                                         loadingDialog.dismiss();
 
-                                        if( offer.containsFeature(UserHelper.PREMIUM_FEATURE) )
+                                        if( offer.containsFeature(UserHelper.BATCH_PREMIUM_FEATURE) )
                                         {
-                                            Parameters.getInstance(getActivity()).putBoolean(ParameterKeys.BATCH_OFFER_REDEEMED, true);
+                                            UserHelper.setBatchUserPremium(getActivity());
                                             refreshPremiumPreference();
                                         }
 

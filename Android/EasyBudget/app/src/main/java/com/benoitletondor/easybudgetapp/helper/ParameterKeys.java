@@ -95,4 +95,8 @@ public class ParameterKeys
      * Timestamp that indicates the last time user was presented the rating popup (long)
      */
     public static final String RATING_POPUP_LAST_AUTO_SHOW = "rating_popup_last_auto_show";
+    /**
+     * The user want to receive notifications for updates (bool)
+     */
+    public static final String USER_ALLOW_UPDATE_PUSH = "user_allow_update_push";
 }
