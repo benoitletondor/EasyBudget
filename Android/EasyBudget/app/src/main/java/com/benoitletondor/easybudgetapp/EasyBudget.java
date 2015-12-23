@@ -401,7 +401,7 @@ public class EasyBudget extends Application
         Logger.debug("Update detected, from " + previousVersion + " to " + newVersion);
 
         // Fix bad save of Batch premium before 1.1
-        if( previousVersion <= 23 ) // 1.0.3
+        if( previousVersion <= 25 ) // 1.1
         {
             UserHelper.setBatchUserPremium(this);
         }
