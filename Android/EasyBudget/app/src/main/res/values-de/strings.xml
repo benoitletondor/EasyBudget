@@ -126,6 +126,23 @@
     <string name="setting_category_app_version_message">Gemacht von @BenoitLetondor</string>
     <string name="setting_category_share_app_title">Mit Freunden teilen</string>
     <string name="setting_category_share_app_message">EasyBudget ist gratis, warum sie also nicht mit Ihren Freunden teilen!</string>
+    <string name="setting_category_premium_title">Premium</string>
+    <string name="setting_category_premium_status_title">Sie sind Premium-Nutzer!</string>
+    <string name="setting_category_premium_status_message">Sie haben Zugriff auf Premium-Features</string>
+    <string name="setting_category_premium_redeem_title">Promocode</string>
+    <string name="setting_category_premium_redeem_message">Einen Promocode verwenden</string>
+    <string name="setting_category_notifications_update_title">Updates</string>
+    <string name="setting_category_notifications_update_message">Benachrichtigungen über neue Features erhalten. Kein Spam, versprochen! </string>
+
+    <string name="voucher_redeem_dialog_title">Promocode</string>
+    <string name="voucher_redeem_dialog_message">Einen Promocode eingeben</string>
+    <string name="voucher_redeem_dialog_cta">Einlösen</string>
+    <string name="voucher_redeem_dialog_loading_title">Wird eingelöst</string>
+    <string name="voucher_redeem_dialog_loading_message">Bitte warten</string>
+    <string name="voucher_redeem_error_dialog_title">Oops</string>
+    <string name="voucher_redeem_error_code_invalid_dialog_message">Ihr Promocode ist ungültig.</string>
+    <string name="voucher_redeem_error_no_internet_dialog_message">Netzwerkfehler. Bitte überprüfen Sie Ihre Internetverbindung.</string>
+    <string name="voucher_redeem_error_generic_dialog_message">Ein Fehler ist aufgetreten. Versuchen Sie es später erneut.</string>
 
     <string name="rating_popup_question_title">Was denken Sie über EasyBudget?</string>
     <string name="rating_popup_question_message">Ich entwickle diese App in meiner Freizeit und biete sie gratis an. Es gibt sicher noch Dinge zu verbessern und Ihre Meinung ist mir wichtig.</string>

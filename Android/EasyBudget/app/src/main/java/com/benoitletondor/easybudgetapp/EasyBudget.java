@@ -403,7 +403,7 @@ public class EasyBudget extends Application
         // Fix bad save of Batch premium before 1.1
         if( previousVersion <= 23 ) // 1.0.3
         {
-            Parameters.getInstance(getApplicationContext()).putBoolean(ParameterKeys.BATCH_OFFER_REDEEMED, true);
+            UserHelper.setBatchUserPremium(this);
         }
     }
 

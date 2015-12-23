@@ -187,8 +187,24 @@ public class CurrencyHelper
 
         currencyFormat.setCurrency(getUserCurrency(context));
 
-        Logger.error("Formatting: "+amount+". Result: "+currencyFormat.format(amount));
         return currencyFormat.format(amount);
+    }
+
+    /**
+     * Helper to display an amount into an edit text
+     *
+     * @param amount
+     * @return
+     */
+    public static String getFormattedAmountValue(double amount)
+    {
+        NumberFormat format = NumberFormat.getInstance();
+
+        format.setMaximumFractionDigits(2);
+        format.setMinimumFractionDigits(2);
+        format.setGroupingUsed(false);
+
+        return format.format(amount);
     }
 
     /**

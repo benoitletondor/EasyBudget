@@ -285,7 +285,7 @@ public class MonthlyExpenseEditActivity extends DBActivity
 
         if( expense != null )
         {
-            amountEditText.setText(String.valueOf(Math.abs(expense.getAmount())));
+            amountEditText.setText(CurrencyHelper.getFormattedAmountValue(Math.abs(expense.getAmount())));
         }
     }
 

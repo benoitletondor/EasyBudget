@@ -186,7 +186,7 @@ public class ExpenseEditActivity extends DBActivity
         {
             try
             {
-                double value = Double.parseDouble(amount);
+                double value = Double.valueOf(amount);
                 if( value <= 0 )
                 {
                     amountEditText.setError(getResources().getString(R.string.negative_amount_error));
@@ -301,7 +301,7 @@ public class ExpenseEditActivity extends DBActivity
 
         if( expense != null )
         {
-            amountEditText.setText(String.valueOf(Math.abs(expense.getAmount())));
+            amountEditText.setText(CurrencyHelper.getFormattedAmountValue(Math.abs(expense.getAmount())));
         }
     }
 
