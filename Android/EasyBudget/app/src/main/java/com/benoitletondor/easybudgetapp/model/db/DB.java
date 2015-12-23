@@ -245,14 +245,14 @@ public final class DB
      * @param fromCache should we use DBCache
      * @return
      */
-    protected float getBalanceForDay(@NonNull Date day, boolean fromCache)
+    protected double getBalanceForDay(@NonNull Date day, boolean fromCache)
     {
         day = DateHelper.cleanDate(day);
 
         // Check cache
         if( fromCache )
         {
-            Float cachedBalance = DBCache.getInstance(context).getBalanceForDay(day);
+            Double cachedBalance = DBCache.getInstance(context).getBalanceForDay(day);
             if( cachedBalance != null )
             {
                 return cachedBalance;
@@ -267,7 +267,7 @@ public final class DB
             if(cursor.moveToFirst())
             {
                 int value = cursor.getInt(0);
-                return (float) value / 100.f;
+                return (double) value / 100.d;
             }
 
             return 0;
@@ -287,7 +287,7 @@ public final class DB
      * @param day
      * @return
      */
-    public float getBalanceForDay(@NonNull Date day)
+    public double getBalanceForDay(@NonNull Date day)
     {
         return getBalanceForDay(day, true);
     }
@@ -605,7 +605,7 @@ public final class DB
         (
             cursor.getLong(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_DB_ID)),
             cursor.getString(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_TITLE)),
-            (float)cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_AMOUNT)) / 100.f,
+            (double)cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_AMOUNT)) / 100.d,
             new Date(cursor.getLong(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_DATE))),
             monthlyId > 0 ? monthlyId : null
         );
@@ -653,7 +653,7 @@ public final class DB
         (
             cursor.getLong(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_DB_ID)),
             cursor.getString(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_TITLE)),
-            (float) cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_AMOUNT)) / 100.f,
+            (double) cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_AMOUNT)) / 100.d,
             new Date(cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_RECURRING_DATE))),
             cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_MONTHLY_MODIFIED)) == 1
         );

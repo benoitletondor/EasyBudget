@@ -184,7 +184,7 @@ public class MonthlyExpenseEditActivity extends DBActivity
         {
             try
             {
-                float value = Float.parseFloat(amount);
+                double value = Double.parseDouble(amount);
                 if( value <= 0 )
                 {
                     amountEditText.setError(getResources().getString(R.string.negative_amount_error));
@@ -234,7 +234,7 @@ public class MonthlyExpenseEditActivity extends DBActivity
             {
                 if( validateInputs() )
                 {
-                    float value = Float.parseFloat(amountEditText.getText().toString());
+                    double value = Double.parseDouble(amountEditText.getText().toString());
 
                     MonthlyExpense expense = new MonthlyExpense(descriptionEditText.getText().toString(), isRevenue? -value : value, dateStart);
 
@@ -285,7 +285,7 @@ public class MonthlyExpenseEditActivity extends DBActivity
 
         if( expense != null )
         {
-            amountEditText.setText(String.valueOf(Math.abs(expense.getAmount())));
+            amountEditText.setText(CurrencyHelper.getFormattedAmountValue(Math.abs(expense.getAmount())));
         }
     }
 

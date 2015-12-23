@@ -135,6 +135,23 @@
     <string name="setting_category_show_welcome_screen_button_title" translatable="false">Show welcome screen</string>
     <string name="setting_category_disable_animation_title" translatable="false">Animations</string>
     <string name="setting_category_disable_animation_message" translatable="false">You can disable animations if you experience any bug or glitch</string>
+    <string name="setting_category_premium_title">Premium</string>
+    <string name="setting_category_premium_status_title">You are premium!</string>
+    <string name="setting_category_premium_status_message">You have access to premium features</string>
+    <string name="setting_category_premium_redeem_title">Promo code</string>
+    <string name="setting_category_premium_redeem_message">Redeem a promo code</string>
+    <string name="setting_category_notifications_update_title">Updates</string>
+    <string name="setting_category_notifications_update_message">Get notified of new features of the app. Won’t spam you, I promise!</string>
+
+    <string name="voucher_redeem_dialog_title">Promo code</string>
+    <string name="voucher_redeem_dialog_message">Enter your promo code</string>
+    <string name="voucher_redeem_dialog_cta">Redeem</string>
+    <string name="voucher_redeem_dialog_loading_title">Redeeming</string>
+    <string name="voucher_redeem_dialog_loading_message">Please wait</string>
+    <string name="voucher_redeem_error_dialog_title">Oops</string>
+    <string name="voucher_redeem_error_code_invalid_dialog_message">Your promo code is invalid.</string>
+    <string name="voucher_redeem_error_no_internet_dialog_message">Network error. Please check your connection and try again.</string>
+    <string name="voucher_redeem_error_generic_dialog_message">An error occurred, try again later.</string>
 
     <string name="rating_popup_question_title">What do you think of EasyBudget?</string>
     <string name="rating_popup_question_message">I develop this app in my free time and provide it for free. There still might be things to improve and I would really appreciate your feedback.</string>
@@ -191,4 +208,9 @@
     <string name="setting_category_rate_button_key" translatable="false">rate</string>
     <string name="setting_category_app_version_key" translatable="false">app_version</string>
     <string name="setting_category_share_app_key" translatable="false">share_app</string>
+    <string name="setting_category_premium_key" translatable="false">category_premium</string>
+    <string name="setting_category_not_premium_key" translatable="false">category_not_premium</string>
+    <string name="setting_category_premium_status_key" translatable="false">premium</string>
+    <string name="setting_category_premium_redeem_key" translatable="false">redeem</string>
+    <string name="setting_category_notifications_update_key" translatable="false">update_notifs</string>
 </resources>

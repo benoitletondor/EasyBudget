@@ -28,11 +28,13 @@ import com.batch.android.Batch;
 import com.batch.android.BatchUnlockListener;
 import com.batch.android.Config;
 import com.batch.android.Offer;
+import com.batch.android.PushNotificationType;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import com.benoitletondor.easybudgetapp.helper.Logger;
 import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
 import com.benoitletondor.easybudgetapp.helper.Parameters;
 
+import com.benoitletondor.easybudgetapp.helper.UserHelper;
 import com.benoitletondor.easybudgetapp.view.MainActivity;
 import com.benoitletondor.easybudgetapp.view.RatingPopup;
 import com.crashlytics.android.Crashlytics;
@@ -46,6 +48,7 @@ import io.fabric.sdk.android.Fabric;
 import java.util.Calendar;
 import java.util.Currency;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -277,6 +280,12 @@ public class EasyBudget extends Application
         Batch.Push.setSmallIconResourceId(R.drawable.ic_push);
         Batch.Push.setNotificationsColor(ContextCompat.getColor(this, R.color.accent));
 
+        // Remove vibration & sound
+        EnumSet<PushNotificationType> notificationTypes = EnumSet.allOf(PushNotificationType.class);
+        notificationTypes.remove(PushNotificationType.VIBRATE);
+        notificationTypes.remove(PushNotificationType.SOUND);
+        Batch.Push.setNotificationsType(notificationTypes);
+
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks()
         {
             @Override
@@ -295,20 +304,18 @@ public class EasyBudget extends Application
                     {
                         boolean shouldShowPopup = true;
 
-                        if ( offer.containsFeature("PREMIUM") )
+                        if (offer.containsFeature(UserHelper.BATCH_PREMIUM_FEATURE))
                         {
-                            boolean alreadyPremium =  Parameters.getInstance(getApplicationContext()).getBoolean(ParameterKeys.BATCH_OFFER_REDEEMED, false);
-                            if( alreadyPremium ) // Not show popup again if user is already premium
+                            boolean alreadyPremium = UserHelper.isUserPremium(activity);
+                            if (alreadyPremium) // Not show popup again if user is already premium
                             {
                                 shouldShowPopup = false;
                             }
-                            else
-                            {
-                                Parameters.getInstance(getApplicationContext()).putBoolean(ParameterKeys.BATCH_OFFER_REDEEMED, true);
-                            }
+
+                            UserHelper.setBatchUserPremium(activity);
                         }
 
-                        if( shouldShowPopup )
+                        if (shouldShowPopup)
                         {
                             Map<String, String> additionalParameters = offer.getOfferAdditionalParameters();
 
@@ -384,7 +391,7 @@ public class EasyBudget extends Application
     }
 
     /**
-     * Called when an update occured
+     * Called when an update occurred
      *
      * @param previousVersion
      * @param newVersion
@@ -393,10 +400,10 @@ public class EasyBudget extends Application
     {
         Logger.debug("Update detected, from " + previousVersion + " to " + newVersion);
 
-        // Fix bad save of Batch premium
+        // Fix bad save of Batch premium before 1.1
         if( previousVersion <= 23 ) // 1.0.3
         {
-            Parameters.getInstance(getApplicationContext()).putBoolean(ParameterKeys.BATCH_OFFER_REDEEMED, true);
+            UserHelper.setBatchUserPremium(this);
         }
     }
 

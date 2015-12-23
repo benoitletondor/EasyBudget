@@ -70,7 +70,7 @@ public class Onboarding3Fragment extends OnboardingFragment
 
         DB db = getDB();
 
-        float amount = 0;
+        double amount = 0;
         if( db != null )
         {
             amount = -db.getBalanceForDay(new Date());
@@ -112,12 +112,12 @@ public class Onboarding3Fragment extends OnboardingFragment
                 DB db = getDB();
                 if (db != null)
                 {
-                    float currentBalance = -db.getBalanceForDay(new Date());
-                    float newBalance = getAmountValue();
+                    double currentBalance = -db.getBalanceForDay(new Date());
+                    double newBalance = getAmountValue();
 
                     if (newBalance != currentBalance)
                     {
-                        float diff = newBalance - currentBalance;
+                        double diff = newBalance - currentBalance;
 
                         final Expense expense = new Expense(getResources().getString(R.string.adjust_balance_expense_title), -diff, new Date());
                         db.persistExpense(expense);
@@ -171,13 +171,13 @@ public class Onboarding3Fragment extends OnboardingFragment
         }
     }
 
-    private float getAmountValue()
+    private double getAmountValue()
     {
         String valueString = amountEditText.getText().toString();
 
         try
         {
-            return ("".equals(valueString) || "-".equals(valueString)) ? 0 : Float.valueOf(valueString);
+            return ("".equals(valueString) || "-".equals(valueString)) ? 0 : Double.valueOf(valueString);
         }
         catch (Exception e)
         {
@@ -203,7 +203,7 @@ public class Onboarding3Fragment extends OnboardingFragment
     {
         if( nextButton != null )
         {
-            float value = getAmountValue();
+            double value = getAmountValue();
 
             nextButton.setText(getActivity().getString(R.string.onboarding_screen_3_cta, CurrencyHelper.getFormattedCurrencyString(getActivity(), value)));
         }

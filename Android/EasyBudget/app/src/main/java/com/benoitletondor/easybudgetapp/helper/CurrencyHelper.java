@@ -177,7 +177,7 @@ public class CurrencyHelper
      * @param amount
      * @return
      */
-    public static String getFormattedCurrencyString(@NonNull Context context, float amount)
+    public static String getFormattedCurrencyString(@NonNull Context context, double amount)
     {
         NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();
 
@@ -188,6 +188,23 @@ public class CurrencyHelper
         currencyFormat.setCurrency(getUserCurrency(context));
 
         return currencyFormat.format(amount);
+    }
+
+    /**
+     * Helper to display an amount into an edit text
+     *
+     * @param amount
+     * @return
+     */
+    public static String getFormattedAmountValue(double amount)
+    {
+        NumberFormat format = NumberFormat.getInstance();
+
+        format.setMaximumFractionDigits(2);
+        format.setMinimumFractionDigits(2);
+        format.setGroupingUsed(false);
+
+        return format.format(amount);
     }
 
     /**

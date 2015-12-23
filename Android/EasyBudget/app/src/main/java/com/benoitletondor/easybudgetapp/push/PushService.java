@@ -22,6 +22,12 @@ import android.content.Intent;
 import com.batch.android.Batch;
 import com.benoitletondor.easybudgetapp.BuildConfig;
 import com.benoitletondor.easybudgetapp.helper.Logger;
+import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
+import com.benoitletondor.easybudgetapp.helper.Parameters;
+import com.benoitletondor.easybudgetapp.helper.UserHelper;
+
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Service that handles Batch pushes
@@ -38,6 +44,10 @@ public class PushService extends IntentService
      * Key to retrieve the max version for a push
      */
     private final static String INTENT_MIN_VERSION_KEY = "minVersion";
+    /**
+     * Key to retrieve the daily reminder key for a push
+     */
+    private final static String DAILY_REMINDER_KEY = "daily";
 
 // ----------------------------------->
 
@@ -57,7 +67,7 @@ public class PushService extends IntentService
             {
                 if( !shouldDisplayPush(intent) )
                 {
-                    Logger.debug("Not displaying push cause app version is not matching");
+                    Logger.debug("Not displaying push cause conditions are not matching");
                     return;
                 }
 
@@ -72,12 +82,69 @@ public class PushService extends IntentService
     }
 
     /**
-     * Check if the push should be displayed according to version constrains
+     * Check if the push should be displayed
      *
      * @param intent
      * @return true if should display the push, false otherwise
      */
     private boolean shouldDisplayPush(Intent intent)
+    {
+        return isUserOk(intent) && isVersionCompatible(intent);
+    }
+
+    /**
+     * Check if the push should be displayed according to user choice
+     *
+     * @param intent
+     * @return true if should display the push, false otherwise
+     */
+    private boolean isUserOk(Intent intent)
+    {
+        try
+        {
+            // Check if it's a daily reminder
+            if( intent.hasExtra(DAILY_REMINDER_KEY) && intent.getBooleanExtra(DAILY_REMINDER_KEY, false) )
+            {
+                // TODO check user choice
+
+                if( !UserHelper.isUserPremium(this) )
+                {
+                    return false;
+                }
+
+                long lastOpenTimestamp = Parameters.getInstance(this).getLong(ParameterKeys.LAST_OPEN_DATE, 0);
+                if( lastOpenTimestamp == 0 )
+                {
+                    return false;
+                }
+
+                Date lastOpen = new Date(lastOpenTimestamp);
+
+                Calendar cal = Calendar.getInstance();
+                int currentDay = cal.get(Calendar.DAY_OF_YEAR);
+                cal.setTime(lastOpen);
+                int lastOpenDay = cal.get(Calendar.DAY_OF_YEAR);
+
+                return currentDay != lastOpenDay;
+            }
+
+            // Else it must be an update push
+            return UserHelper.isUserAllowingUpdatePushes(this);
+        }
+        catch (Exception e)
+        {
+            Logger.error("Error while checking user ok for push", e);
+            return false;
+        }
+    }
+
+    /**
+     * Check if the push should be displayed according to version constrains
+     *
+     * @param intent
+     * @return true if should display the push, false otherwise
+     */
+    private boolean isVersionCompatible(Intent intent)
     {
         try
         {
