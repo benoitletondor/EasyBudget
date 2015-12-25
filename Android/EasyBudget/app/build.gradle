@@ -83,7 +83,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-appinvite:8.4.0'
     compile 'com.roomorama:caldroid:2.3.1'
     compile 'com.getbase:floatingactionbutton:1.10.1'
-    compile 'me.relex:circleindicator:1.1.6@aar'
+    compile 'me.relex:circleindicator:1.1.7@aar'
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') { transitive = true; }
     compile 'com.batch.android:batch-sdk:1.4'
 }
