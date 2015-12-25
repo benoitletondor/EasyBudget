@@ -70,19 +70,23 @@ public class SettingsActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == APP_INVITE_REQUEST)
+        // iab management
+        if( !((EasyBudget) getApplication()).handleActivityResult(requestCode, resultCode, data) )
         {
-            if (resultCode == RESULT_OK)
-            {
-                // Check how many invitations were sent and log a message
-                // The ids array contains the unique invitation ids for each invitation sent
-                // (one for each contact select by the user). You can use these for analytics
-                // as the ID will be consistent on the sending and receiving devices.
-                String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
+            super.onActivityResult(requestCode, resultCode, data);
 
-                ((EasyBudget) getApplication()).trackNumberOfInvitsSent(ids.length);
+            if (requestCode == APP_INVITE_REQUEST)
+            {
+                if (resultCode == RESULT_OK)
+                {
+                    // Check how many invitations were sent and log a message
+                    // The ids array contains the unique invitation ids for each invitation sent
+                    // (one for each contact select by the user). You can use these for analytics
+                    // as the ID will be consistent on the sending and receiving devices.
+                    String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
+
+                    ((EasyBudget) getApplication()).trackNumberOfInvitsSent(ids.length);
+                }
             }
         }
     }

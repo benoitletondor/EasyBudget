@@ -118,15 +118,15 @@ public class DailyNotifOptinService extends IntentService
             PendingIntent redirectPendingIntent = PendingIntent.getService(context, 0, redirectIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
             NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(context)
-                    .setSmallIcon(R.drawable.ic_push)
-                    .setContentTitle(context.getResources().getString(R.string.app_name))
-                    .setContentText(context.getResources().getString(R.string.premium_notif_optin_message))
-                    .setStyle(new NotificationCompat.BigTextStyle().bigText(context.getResources().getString(R.string.premium_notif_optin_message)))
-                    .addAction(R.drawable.ic_do_not_disturb, context.getResources().getString(R.string.premium_notif_optin_message_not_ok), optoutPendingIntent)
-                    .addAction(R.drawable.ic_alarm, context.getResources().getString(R.string.premium_notif_optin_message_ok), optinPendingIntent)
-                    .setContentIntent(redirectPendingIntent)
-                    .setDeleteIntent(optoutPendingIntent)
-                    .setColor(ContextCompat.getColor(context, R.color.accent));
+                .setSmallIcon(R.drawable.ic_push)
+                .setContentTitle(context.getResources().getString(R.string.app_name))
+                .setContentText(context.getResources().getString(R.string.premium_notif_optin_message))
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(context.getResources().getString(R.string.premium_notif_optin_message)))
+                .addAction(R.drawable.ic_do_not_disturb, context.getResources().getString(R.string.premium_notif_optin_message_not_ok), optoutPendingIntent)
+                .addAction(R.drawable.ic_alarm, context.getResources().getString(R.string.premium_notif_optin_message_ok), optinPendingIntent)
+                .setContentIntent(redirectPendingIntent)
+                .setDeleteIntent(optoutPendingIntent)
+                .setColor(ContextCompat.getColor(context, R.color.accent));
 
             NotificationManagerCompat.from(context).notify(OPTIN_NOTIFICATION_ID, notifBuilder.build());
         }

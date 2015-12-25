@@ -16,8 +16,12 @@
 
 package com.benoitletondor.easybudgetapp.helper;
 
+import android.app.Application;
 import android.content.Context;
 import android.support.annotation.NonNull;
+
+import com.benoitletondor.easybudgetapp.EasyBudget;
+import com.benoitletondor.easybudgetapp.PremiumCheckStatus;
 
 /**
  * Helper to get user status / preferences
@@ -36,12 +40,13 @@ public class UserHelper
     /**
      * Is the user a premium user
      *
-     * @param context non null context
+     * @param application non null application
      * @return true if the user if premium, false otherwise
      */
-    public static boolean isUserPremium(@NonNull Context context)
+    public static boolean isUserPremium(@NonNull Application application)
     {
-        return Parameters.getInstance(context).getBoolean(ParameterKeys.BATCH_OFFER_REDEEMED, false);
+        return ((EasyBudget) application).getPremiumCheckStatus() == PremiumCheckStatus.PREMIUM ||
+                Parameters.getInstance(application).getBoolean(ParameterKeys.BATCH_OFFER_REDEEMED, false);
     }
 
     /**
