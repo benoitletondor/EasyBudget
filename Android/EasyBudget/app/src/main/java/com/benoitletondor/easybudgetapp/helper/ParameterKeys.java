@@ -96,7 +96,11 @@ public class ParameterKeys
      */
     public static final String RATING_POPUP_LAST_AUTO_SHOW = "rating_popup_last_auto_show";
     /**
-     * The user want to receive notifications for updates (bool)
+     * The user wants to receive notifications for updates (bool)
      */
     public static final String USER_ALLOW_UPDATE_PUSH = "user_allow_update_push";
+    /**
+     * The user wants to receive a daily reminder notification (bool)
+     */
+    public static final String USER_ALLOW_DAILY_PUSH = "user_allow_daily_push";
 }

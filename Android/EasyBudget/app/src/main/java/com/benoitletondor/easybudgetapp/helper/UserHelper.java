@@ -75,4 +75,26 @@ public class UserHelper
     {
         Parameters.getInstance(context).putBoolean(ParameterKeys.USER_ALLOW_UPDATE_PUSH, value);
     }
+
+    /**
+     * The user wants or not to receive a daily reminder notification
+     *
+     * @param context non null context
+     * @return true if we can display daily notifications, false otherwise
+     */
+    public static boolean isUserAllowingDailyReminderPushes(@NonNull Context context)
+    {
+        return Parameters.getInstance(context).getBoolean(ParameterKeys.USER_ALLOW_DAILY_PUSH, true);
+    }
+
+    /**
+     * Set the user choice about daily reminder notifications
+     *
+     * @param context non null context
+     * @param value if the user wants or not to receive daily notifications
+     */
+    public static void setUserAllowDailyReminderPushes(@NonNull Context context, boolean value)
+    {
+        Parameters.getInstance(context).putBoolean(ParameterKeys.USER_ALLOW_DAILY_PUSH, value);
+    }
 }
