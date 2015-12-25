@@ -34,6 +34,12 @@
             android:title="@string/setting_category_premium_status_title"
             android:summary="@string/setting_category_premium_status_message" />
 
+        <CheckBoxPreference android:title="@string/setting_category_notifications_daily_title"
+            android:summaryOn="@string/setting_category_notifications_daily_message"
+            android:summaryOff="@string/setting_category_notifications_daily_message"
+            android:key="@string/setting_category_notifications_daily_key"
+            android:enabled="true"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory android:key="@string/setting_category_not_premium_key"

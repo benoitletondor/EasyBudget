@@ -409,6 +409,19 @@ public class PreferencesFragment extends PreferenceFragment
                 getPreferenceScreen().addPreference(premiumCategory);
                 premiumShown = true;
             }
+
+            // Daily reminder notif preference
+            final CheckBoxPreference dailyNotifPref = (CheckBoxPreference) findPreference(getResources().getString(R.string.setting_category_notifications_daily_key));
+            dailyNotifPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+            {
+                @Override
+                public boolean onPreferenceClick(Preference preference)
+                {
+                    UserHelper.setUserAllowDailyReminderPushes(getActivity(), dailyNotifPref.isChecked());
+                    return true;
+                }
+            });
+            dailyNotifPref.setChecked(UserHelper.isUserAllowingDailyReminderPushes(getActivity()));
         }
         else
         {
@@ -424,6 +437,7 @@ public class PreferencesFragment extends PreferenceFragment
                 notPremiumShown = true;
             }
 
+            // Redeem promo code pref
             findPreference(getResources().getString(R.string.setting_category_premium_redeem_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
             {
                 @Override
