@@ -141,9 +141,17 @@
     <string name="setting_category_premium_redeem_title">Promo code</string>
     <string name="setting_category_premium_redeem_message">Redeem a promo code</string>
     <string name="setting_category_notifications_update_title">Updates</string>
-    <string name="setting_category_notifications_update_message">Get notified of new features of the app. Won’t spam you, I promise!</string>
+    <string name="setting_category_notifications_update_message">Get notified of new features of the app. Won\'t spam you, I promise!</string>
     <string name="setting_category_notifications_daily_title">Daily reminder</string>
-    <string name="setting_category_notifications_daily_message">Receive a notification at the end of the day if you didn’t enter your expenses</string>
+    <string name="setting_category_notifications_daily_message">Receive a notification at the end of the day if you didn\'t enter your expenses</string>
+    <string name="setting_category_not_premium_status_title">Become a premium user</string>
+    <string name="setting_category_not_premium_status_message">Access all the premium features</string>
+
+    <string name="premium_popup_premium_title">You are premium!</string>
+    <string name="premium_popup_premium_message">You have access to premium features:\n\n- Daily reminder if you forgot to enter your expenses during the day\n… and more premium features that will be added soon!</string>
+    <string name="premium_popup_not_premium_title">Become a premium user</string>
+    <string name="premium_popup_not_premium_message">Access all the premium features:\n\n- Daily reminder if you forgot to enter your expenses during the day\n… and more premium features that will be added soon!</string>
+    <string name="premium_popup_not_premium_cta">Purchase</string>
 
     <string name="voucher_redeem_dialog_title">Promo code</string>
     <string name="voucher_redeem_dialog_message">Enter your promo code</string>
@@ -216,4 +224,5 @@
     <string name="setting_category_premium_redeem_key" translatable="false">redeem</string>
     <string name="setting_category_notifications_update_key" translatable="false">update_notifs</string>
     <string name="setting_category_notifications_daily_key" translatable="false">daily_notifs</string>
+    <string name="setting_category_not_premium_status_key" translatable="false">not_premium</string>
 </resources>

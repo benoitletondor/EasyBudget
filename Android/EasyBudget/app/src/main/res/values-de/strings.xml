@@ -178,11 +178,11 @@
     <string name="onboarding_screen_4_message2">Was Sie als nächstes tun müssen?</string>
     <string name="onboarding_screen_4_message3">1. Fügen Sie monatlich wiederkehrende Ausgaben und Einnahmen (Gehalt, Miete, Rechnungen,…) hinzu\n2. Denken Sie daran Ihre täglichen Ausgaben und Einnahmen im Laufe des Tages einzutragen</string>
     <string name="onboarding_screen_4_message4">Danke für das Verwenden von EasyBudget und willkommen :)</string>
-    <string name="onboarding_screen_4_cta">Los geht’s!</string>
+    <string name="onboarding_screen_4_cta">Los geht\'s!</string>
 
     <string name="app_invite_title">Mit Freunden teilen</string>
     <string name="app_invite_message">Du solltest EasyBudget ausprobieren: Eine super einfache App, um deine Finanzen zu verwalten!</string> <!-- 100 chars or less -->
     <string name="app_invite_welcome_title">Willkommen bei EasyBudget</string>
     <string name="app_invite_welcome_message">Es sieht aus, als hätte Ihnen ein Freund diese App empfohlen. Willkommen an Bord und vergessen Sie nicht Ihrem Freund für diesen super Tipp zu danken ;)</string>
-    <string name="app_invite_welcome_cta">Los geht’s!</string>
+    <string name="app_invite_welcome_cta">Los geht\'s!</string>
 </resources>

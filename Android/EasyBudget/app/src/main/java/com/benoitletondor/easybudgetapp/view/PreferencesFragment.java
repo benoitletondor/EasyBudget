@@ -410,6 +410,29 @@ public class PreferencesFragment extends PreferenceFragment
                 premiumShown = true;
             }
 
+            // Premium preference
+            findPreference(getResources().getString(R.string.setting_category_premium_status_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+            {
+                @Override
+                public boolean onPreferenceClick(Preference preference)
+                {
+                    new AlertDialog.Builder(getActivity())
+                        .setTitle(R.string.premium_popup_premium_title)
+                        .setMessage(R.string.premium_popup_premium_message)
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
+
+                    return false;
+                }
+            });
+
             // Daily reminder notif preference
             final CheckBoxPreference dailyNotifPref = (CheckBoxPreference) findPreference(getResources().getString(R.string.setting_category_notifications_daily_key));
             dailyNotifPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
@@ -436,6 +459,17 @@ public class PreferencesFragment extends PreferenceFragment
                 getPreferenceScreen().addPreference(notPremiumCategory);
                 notPremiumShown = true;
             }
+
+            // Not premium preference
+            findPreference(getResources().getString(R.string.setting_category_not_premium_status_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+            {
+                @Override
+                public boolean onPreferenceClick(Preference preference)
+                {
+                    showBecomePremiumDialog();
+                    return false;
+                }
+            });
 
             // Redeem promo code pref
             findPreference(getResources().getString(R.string.setting_category_premium_redeem_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
@@ -598,6 +632,30 @@ public class PreferencesFragment extends PreferenceFragment
                 }
             });
         }
+    }
+
+    private void showBecomePremiumDialog()
+    {
+        new AlertDialog.Builder(getActivity())
+            .setTitle(R.string.premium_popup_not_premium_title)
+            .setMessage(R.string.premium_popup_not_premium_message)
+            .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    dialog.dismiss();
+                }
+            })
+            .setPositiveButton(R.string.premium_popup_not_premium_cta, new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    // TODO iap
+                }
+            })
+            .show();
     }
 
     @Override

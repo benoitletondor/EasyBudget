@@ -45,6 +45,10 @@
     <PreferenceCategory android:key="@string/setting_category_not_premium_key"
         android:title="@string/setting_category_premium_title">
 
+        <Preference android:key="@string/setting_category_not_premium_status_key"
+                    android:title="@string/setting_category_not_premium_status_title"
+                    android:summary="@string/setting_category_not_premium_status_message" />
+
         <Preference android:key="@string/setting_category_premium_redeem_key"
                     android:title="@string/setting_category_premium_redeem_title"
                     android:summary="@string/setting_category_premium_redeem_message" />
