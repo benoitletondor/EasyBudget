@@ -26,8 +26,10 @@ import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewTreeObserver;
@@ -37,6 +39,7 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import com.benoitletondor.easybudgetapp.view.MainActivity;
 
@@ -245,11 +248,11 @@ public class UIHelper
                 {
                     // Remove - that is not at first char
                     int minusIndex = value.lastIndexOf("-");
-                    if( minusIndex > 0 )
+                    if (minusIndex > 0)
                     {
-                        s.delete(minusIndex, minusIndex+1);
+                        s.delete(minusIndex, minusIndex + 1);
 
-                        if( value.startsWith("-") )
+                        if (value.startsWith("-"))
                         {
                             s.delete(0, 1);
                         }
@@ -266,30 +269,30 @@ public class UIHelper
                     int lastDotIndex = value.lastIndexOf(".");
 
                     // Remove ,
-                    if( comaIndex >= 0 )
+                    if (comaIndex >= 0)
                     {
-                        if( dotIndex >= 0 )
+                        if (dotIndex >= 0)
                         {
-                            s.delete(comaIndex, comaIndex +1);
+                            s.delete(comaIndex, comaIndex + 1);
                         }
                         else
                         {
-                            s.replace(comaIndex, comaIndex +1, ".");
+                            s.replace(comaIndex, comaIndex + 1, ".");
                         }
 
                         return;
                     }
 
                     // Disallow double .
-                    if( dotIndex >= 0 && dotIndex != lastDotIndex )
+                    if (dotIndex >= 0 && dotIndex != lastDotIndex)
                     {
-                        s.delete(lastDotIndex, lastDotIndex+1);
+                        s.delete(lastDotIndex, lastDotIndex + 1);
                     }
                     // No more than 2 decimals
-                    else if( dotIndex > 0  )
+                    else if (dotIndex > 0)
                     {
                         String decimals = value.substring(dotIndex + 1);
-                        if( decimals.length() > 2 )
+                        if (decimals.length() > 2)
                         {
                             s.delete(dotIndex + 3, value.length());
                         }
@@ -297,9 +300,39 @@ public class UIHelper
                 }
                 catch (Exception e)
                 {
-                    Logger.error("An error occurred during text changing watcher. Value: "+value, e);
+                    Logger.error("An error occurred during text changing watcher. Value: " + value, e);
                 }
             }
         });
+    }
+
+    /**
+     * Center buttons of the given dialog (used to center when 3 choices are available).
+     *
+     * @param dialog the dialog
+     */
+    public static void centerDialogButtons(@NonNull AlertDialog dialog)
+    {
+        try
+        {
+            final Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            LinearLayout.LayoutParams positiveButtonLL = (LinearLayout.LayoutParams) positiveButton.getLayoutParams();
+            positiveButtonLL.gravity = Gravity.CENTER;
+            positiveButton.setLayoutParams(positiveButtonLL);
+
+            final Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+            LinearLayout.LayoutParams negativeButtonL = (LinearLayout.LayoutParams) negativeButton.getLayoutParams();
+            negativeButtonL.gravity = Gravity.CENTER;
+            negativeButton.setLayoutParams(negativeButtonL);
+
+            final Button neutralButton = dialog.getButton(AlertDialog.BUTTON_NEUTRAL);
+            LinearLayout.LayoutParams neutralButtonL = (LinearLayout.LayoutParams) neutralButton.getLayoutParams();
+            neutralButtonL.gravity = Gravity.CENTER;
+            neutralButton.setLayoutParams(neutralButtonL);
+        }
+        catch (Exception e)
+        {
+            Logger.error("Error while centering dialog buttons", e);
+        }
     }
 }

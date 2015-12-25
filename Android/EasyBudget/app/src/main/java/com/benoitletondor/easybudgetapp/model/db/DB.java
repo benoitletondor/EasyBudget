@@ -109,7 +109,7 @@ public final class DB
             if( rowsAffected > 0 )
             {
                 // Refresh cache for day
-                DBCache.getInstance(context).refreshForDay(this, expense.getDate());
+                DBCache.getInstance(context).wipeAll(); // FIXME we should refresh for the new expense date & the old one
             }
 
             return rowsAffected == 1;

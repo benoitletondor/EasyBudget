@@ -28,6 +28,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 
 apply from: 'batch.gradle'
+apply from: 'iap.gradle'
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
@@ -42,8 +43,8 @@ android {
         applicationId "com.benoitletondor.easybudgetapp"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 28
-        versionName "1.1.3"
+        versionCode 29
+        versionName "1.2b1"
     }
     buildTypes {
         debug {
@@ -52,6 +53,8 @@ android {
             buildConfigField "String", "BATCH_API_KEY", batch_devkey
             buildConfigField "boolean", "ANALYTICS_ACTIVATED", "false"
             buildConfigField "boolean", "DEV_PREFERENCES", "true"
+            buildConfigField "String", "LICENCE_KEY", licence_key
+            buildConfigField "String", "GCM_SENDER_ID", gcm_sender_id
         }
         release {
             buildConfigField "boolean", "DEBUG_LOG", "false"
@@ -59,6 +62,8 @@ android {
             buildConfigField "String", "BATCH_API_KEY", batch_livekey
             buildConfigField "boolean", "ANALYTICS_ACTIVATED", "true"
             buildConfigField "boolean", "DEV_PREFERENCES", "false"
+            buildConfigField "String", "LICENCE_KEY", licence_key
+            buildConfigField "String", "GCM_SENDER_ID", gcm_sender_id
 
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -78,7 +83,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-appinvite:8.4.0'
     compile 'com.roomorama:caldroid:2.3.1'
     compile 'com.getbase:floatingactionbutton:1.10.1'
-    compile 'me.relex:circleindicator:1.1.6@aar'
+    compile 'me.relex:circleindicator:1.1.7@aar'
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') { transitive = true; }
     compile 'com.batch.android:batch-sdk:1.4'
 }
