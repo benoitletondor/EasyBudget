@@ -79,7 +79,7 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
     /**
      * iab SDK used for premium
      */
-    public static final String SKU_PREMIUM = "PREMIUM";
+    public static final String SKU_PREMIUM = "premium";
     /**
      * Intent action broadcast when the status of iab changed
      */
@@ -127,7 +127,7 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
         // Init actions
         init();
 
-        // Check if an update occured and perform action if needed
+        // Check if an update occurred and perform action if needed
         checkUpdateAction();
 
         // Crashlytics
