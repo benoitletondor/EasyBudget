@@ -20,7 +20,6 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -39,6 +38,7 @@ import com.benoitletondor.easybudgetapp.helper.Parameters;
 
 import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.helper.UserHelper;
+import com.benoitletondor.easybudgetapp.notif.DailyNotifOptinService;
 import com.benoitletondor.easybudgetapp.view.MainActivity;
 import com.benoitletondor.easybudgetapp.view.RatingPopup;
 import com.benoitletondor.easybudgetapp.view.SettingsActivity;
@@ -525,7 +525,10 @@ public class EasyBudget extends Application
 
         if( newVersion == BuildVersion.VERSION_1_2 )
         {
-            // TODO show notif about daily reminder pushes
+            if( UserHelper.isUserPremium(getApplicationContext()) )
+            {
+                DailyNotifOptinService.showDailyReminderOptinNotif(getApplicationContext());
+            }
         }
     }
 

@@ -157,6 +157,9 @@
     <string name="premium_popup_become_cta">Discover</string>
     <string name="premium_popup_become_not_now">Not now</string>
     <string name="premium_popup_become_not_ask_again">Don\'t ask me again</string>
+    <string name="premium_notif_optin_message">New premium feature: Daily notification.\nReceive a reminder if you forgot to add your expenses during the day. Are you in?</string>
+    <string name="premium_notif_optin_message_ok">I\'m in</string>
+    <string name="premium_notif_optin_message_not_ok">Don\'t remind me</string>
 
     <string name="voucher_redeem_dialog_title">Promo code</string>
     <string name="voucher_redeem_dialog_message">Enter your promo code</string>
