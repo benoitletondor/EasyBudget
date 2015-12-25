@@ -159,7 +159,7 @@
     <string name="premium_popup_become_not_ask_again">Don\'t ask me again</string>
     <string name="premium_notif_optin_message">New premium feature: Daily notification.\nReceive a reminder if you forgot to add your expenses during the day. Are you in?\n(You can change it later in settings)</string>
     <string name="premium_notif_optin_message_ok">I\'m in</string>
-    <string name="premium_notif_optin_message_not_ok">Don\'t remind me</string>
+    <string name="premium_notif_optin_message_not_ok">No thanks</string>
 
     <string name="voucher_redeem_dialog_title">Promo code</string>
     <string name="voucher_redeem_dialog_message">Enter your promo code</string>

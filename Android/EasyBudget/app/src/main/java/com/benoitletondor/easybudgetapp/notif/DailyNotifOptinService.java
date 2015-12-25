@@ -123,7 +123,7 @@ public class DailyNotifOptinService extends IntentService
                 .setContentText(context.getResources().getString(R.string.premium_notif_optin_message))
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(context.getResources().getString(R.string.premium_notif_optin_message)))
                 .addAction(R.drawable.ic_do_not_disturb, context.getResources().getString(R.string.premium_notif_optin_message_not_ok), optoutPendingIntent)
-                .addAction(R.drawable.ic_alarm, context.getResources().getString(R.string.premium_notif_optin_message_ok), optinPendingIntent)
+                .addAction(R.drawable.ic_thumb_up, context.getResources().getString(R.string.premium_notif_optin_message_ok), optinPendingIntent)
                 .setContentIntent(redirectPendingIntent)
                 .setDeleteIntent(optoutPendingIntent)
                 .setColor(ContextCompat.getColor(context, R.color.accent));

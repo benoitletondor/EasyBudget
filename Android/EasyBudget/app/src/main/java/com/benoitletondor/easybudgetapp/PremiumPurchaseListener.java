@@ -26,6 +26,11 @@ import android.support.annotation.NonNull;
 public interface PremiumPurchaseListener
 {
     /**
+     * Called when the user cancel the purchase
+     */
+    void onUserCancelled();
+
+    /**
      * Called when an error occurred during the iab flow
      *
      * @param error the error description

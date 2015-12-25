@@ -47,10 +47,10 @@ public class BuildVersion
      * Fix amount rounding & display. Add premium status in settings. Add opt-out from update pushes.
      * 23/12/2015
      */
-    public final static int VERSION_1_1_2 = 27;
+    public final static int VERSION_1_1_3 = 28;
     /**
      * Add daily reminder pushes opt-out from settings & premium iAP.
      * TODO
      */
-    public final static int VERSION_1_2 = 28;
+    public final static int VERSION_1_2 = 29;
 }

@@ -577,7 +577,7 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
         Logger.debug("Update detected, from " + previousVersion + " to " + newVersion);
 
         // Fix bad save of Batch premium before 1.1
-        if( previousVersion <= BuildVersion.VERSION_1_1_2 )
+        if( previousVersion <= BuildVersion.VERSION_1_1_3)
         {
             UserHelper.setBatchUserPremium(this);
         }
@@ -807,8 +807,16 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
 
                 if (result.isFailure())
                 {
-                    Logger.error("Error while purchasing premium: "+result);
-                    listener.onPurchaseError(result.getMessage());
+                    Logger.error("Error while purchasing premium: " + result);
+                    if( result.getResponse() == IabHelper.IABHELPER_USER_CANCELLED )
+                    {
+                        listener.onUserCancelled();
+                    }
+                    else
+                    {
+                        listener.onPurchaseError(result.getMessage());
+                    }
+
                     return;
                 }
 

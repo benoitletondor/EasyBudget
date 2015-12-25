@@ -687,6 +687,12 @@ public class PreferencesFragment extends PreferenceFragment
                     ((EasyBudget) getActivity().getApplication()).launchPremiumPurchaseFlow(getActivity(), new PremiumPurchaseListener()
                     {
                         @Override
+                        public void onUserCancelled()
+                        {
+                            loading.dismiss();
+                        }
+
+                        @Override
                         public void onPurchaseError(String error)
                         {
                             loading.dismiss();
