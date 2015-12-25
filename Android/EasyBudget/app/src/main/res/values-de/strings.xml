@@ -133,6 +133,31 @@
     <string name="setting_category_premium_redeem_message">Einen Promocode verwenden</string>
     <string name="setting_category_notifications_update_title">Updates</string>
     <string name="setting_category_notifications_update_message">Benachrichtigungen über neue Features erhalten. Kein Spam, versprochen! </string>
+    <string name="setting_category_notifications_daily_title">Tägliche Erinnerung</string>
+    <string name="setting_category_notifications_daily_message">Erhalten Sie eine Benachrichtigung am Ende des Tages, wenn Sie Ihre Ausgaben noch nicht eingetragen haben</string>
+    <string name="setting_category_not_premium_status_title">Premium-Nutzer werden</string>
+    <string name="setting_category_not_premium_status_message">Auf alle Premium-Features zugreifen</string>
+
+    <string name="premium_popup_premium_title">Sie sind Premium-Nutzer!</string>
+    <string name="premium_popup_premium_message">Sie haben Zugriff auf Premium-Features:\n\n- Tägliche Erinnerungen, wenn Sie vergessen Ihre Ausgaben einzutragen\n… und mehr Premium-Features, die in Kürze hinzugefügt werden!</string>
+    <string name="premium_popup_not_premium_title">Premium-Nutzer werden</string>
+    <string name="premium_popup_not_premium_message">Auf alle Premium-Features zugreifen:\n\n- Daily reminder if you forgot to enter your expenses during the day\n… und mehr Premium-Features, die in Kürze hinzugefügt werden!</string>
+    <string name="premium_popup_not_premium_cta">Kaufen</string>
+    <string name="premium_popup_become_title">Premium-Nutzer werden</string>
+    <string name="premium_popup_become_message">Es sieht so aus als würde Ihnen EasyBudget gefallen!\nWürden Sie gerne in den nächsten Gang schalten und die Premium-Features entdecken?</string>
+    <string name="premium_popup_become_cta">Entdecken</string>
+    <string name="premium_popup_become_not_now">Nicht jetzt</string>
+    <string name="premium_popup_become_not_ask_again">Nicht wieder fragen</string>
+    <string name="premium_notif_optin_message">New premium feature: Daily notification.\nReceive a reminder if you forgot to add your expenses during the day. Are you in?\n(You can change it later in settings)</string>
+    <string name="premium_notif_optin_message_ok">I\'m in</string>
+    <string name="premium_notif_optin_message_not_ok">No thanks</string>
+
+    <string name="iab_purchase_success_title">Danke</string>
+    <string name="iab_purchase_success_message">Vielen Dank für Ihre Unterstützung! Sie haben von nun an Zugriff auf.</string>
+    <string name="iab_purchase_wait_title">Purchasing</string>
+    <string name="iab_purchase_wait_message">Bitte warten</string>
+    <string name="iab_purchase_error_title">Oops</string>
+    <string name="iab_purchase_error_message">An error occurred, try again later or contact me if the problem persists.\n(%s)</string>
 
     <string name="voucher_redeem_dialog_title">Promocode</string>
     <string name="voucher_redeem_dialog_message">Einen Promocode eingeben</string>
@@ -178,11 +203,11 @@
     <string name="onboarding_screen_4_message2">Was Sie als nächstes tun müssen?</string>
     <string name="onboarding_screen_4_message3">1. Fügen Sie monatlich wiederkehrende Ausgaben und Einnahmen (Gehalt, Miete, Rechnungen,…) hinzu\n2. Denken Sie daran Ihre täglichen Ausgaben und Einnahmen im Laufe des Tages einzutragen</string>
     <string name="onboarding_screen_4_message4">Danke für das Verwenden von EasyBudget und willkommen :)</string>
-    <string name="onboarding_screen_4_cta">Los geht’s!</string>
+    <string name="onboarding_screen_4_cta">Los geht\'s!</string>
 
     <string name="app_invite_title">Mit Freunden teilen</string>
     <string name="app_invite_message">Du solltest EasyBudget ausprobieren: Eine super einfache App, um deine Finanzen zu verwalten!</string> <!-- 100 chars or less -->
     <string name="app_invite_welcome_title">Willkommen bei EasyBudget</string>
     <string name="app_invite_welcome_message">Es sieht aus, als hätte Ihnen ein Freund diese App empfohlen. Willkommen an Bord und vergessen Sie nicht Ihrem Freund für diesen super Tipp zu danken ;)</string>
-    <string name="app_invite_welcome_cta">Los geht’s!</string>
+    <string name="app_invite_welcome_cta">Los geht\'s!</string>
 </resources>

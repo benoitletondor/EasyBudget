@@ -30,6 +30,7 @@ import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
@@ -45,6 +46,8 @@ import com.batch.android.FailReason;
 import com.batch.android.Offer;
 import com.benoitletondor.easybudgetapp.BuildConfig;
 import com.benoitletondor.easybudgetapp.EasyBudget;
+import com.benoitletondor.easybudgetapp.PremiumCheckStatus;
+import com.benoitletondor.easybudgetapp.PremiumPurchaseListener;
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import com.benoitletondor.easybudgetapp.helper.Logger;
@@ -347,26 +350,49 @@ public class PreferencesFragment extends PreferenceFragment
             animationsPref.setChecked(UIHelper.areAnimationsEnabled(getActivity()));
         }
 
-
         /*
          * Broadcast receiver
          */
         IntentFilter filter = new IntentFilter(SelectCurrencyFragment.CURRENCY_SELECTED_INTENT);
+        filter.addAction(EasyBudget.INTENT_IAB_STATUS_CHANGED);
         receiver = new BroadcastReceiver()
         {
             @Override
             public void onReceive(Context context, Intent intent)
             {
-                if( selectCurrencyDialog != null )
+                if( SelectCurrencyFragment.CURRENCY_SELECTED_INTENT.equals(intent.getAction()) && selectCurrencyDialog != null )
                 {
                     setCurrencyPreferenceTitle(currencyPreference);
 
                     selectCurrencyDialog.dismiss();
                     selectCurrencyDialog = null;
                 }
+                else if( EasyBudget.INTENT_IAB_STATUS_CHANGED.equals(intent.getAction()) )
+                {
+                    try
+                    {
+                        PremiumCheckStatus status = (PremiumCheckStatus) intent.getSerializableExtra(EasyBudget.INTENT_IAB_STATUS_KEY);
+                        if( status == PremiumCheckStatus.PREMIUM )
+                        {
+                            refreshPremiumPreference();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.error("Error while receiving INTENT_IAB_STATUS_CHANGED intent", e);
+                    }
+                }
             }
         };
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, filter);
+
+        /*
+         * Check if we should show premium popup
+         */
+        if( getActivity().getIntent().getBooleanExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, false) )
+        {
+            showBecomePremiumDialog();
+        }
     }
 
     /**
@@ -394,7 +420,7 @@ public class PreferencesFragment extends PreferenceFragment
      */
     private void refreshPremiumPreference()
     {
-        boolean isPremium = UserHelper.isUserPremium(getActivity());
+        boolean isPremium = UserHelper.isUserPremium(getActivity().getApplication());
 
         if( isPremium )
         {
@@ -409,6 +435,42 @@ public class PreferencesFragment extends PreferenceFragment
                 getPreferenceScreen().addPreference(premiumCategory);
                 premiumShown = true;
             }
+
+            // Premium preference
+            findPreference(getResources().getString(R.string.setting_category_premium_status_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+            {
+                @Override
+                public boolean onPreferenceClick(Preference preference)
+                {
+                    new AlertDialog.Builder(getActivity())
+                        .setTitle(R.string.premium_popup_premium_title)
+                        .setMessage(R.string.premium_popup_premium_message)
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
+
+                    return false;
+                }
+            });
+
+            // Daily reminder notif preference
+            final CheckBoxPreference dailyNotifPref = (CheckBoxPreference) findPreference(getResources().getString(R.string.setting_category_notifications_daily_key));
+            dailyNotifPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+            {
+                @Override
+                public boolean onPreferenceClick(Preference preference)
+                {
+                    UserHelper.setUserAllowDailyReminderPushes(getActivity(), dailyNotifPref.isChecked());
+                    return true;
+                }
+            });
+            dailyNotifPref.setChecked(UserHelper.isUserAllowingDailyReminderPushes(getActivity()));
         }
         else
         {
@@ -424,6 +486,18 @@ public class PreferencesFragment extends PreferenceFragment
                 notPremiumShown = true;
             }
 
+            // Not premium preference
+            findPreference(getResources().getString(R.string.setting_category_not_premium_status_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+            {
+                @Override
+                public boolean onPreferenceClick(Preference preference)
+                {
+                    showBecomePremiumDialog();
+                    return false;
+                }
+            });
+
+            // Redeem promo code pref
             findPreference(getResources().getString(R.string.setting_category_premium_redeem_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
             {
                 @Override
@@ -584,6 +658,82 @@ public class PreferencesFragment extends PreferenceFragment
                 }
             });
         }
+    }
+
+    private void showBecomePremiumDialog()
+    {
+        new AlertDialog.Builder(getActivity())
+            .setTitle(R.string.premium_popup_not_premium_title)
+            .setMessage(R.string.premium_popup_not_premium_message)
+            .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    dialog.dismiss();
+                }
+            })
+            .setPositiveButton(R.string.premium_popup_not_premium_cta, new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    // Show loader
+                    final ProgressDialog loading = ProgressDialog.show(getActivity(),
+                        getResources().getString(R.string.iab_purchase_wait_title),
+                        getResources().getString(R.string.iab_purchase_wait_message),
+                        true, false);
+
+                    ((EasyBudget) getActivity().getApplication()).launchPremiumPurchaseFlow(getActivity(), new PremiumPurchaseListener()
+                    {
+                        @Override
+                        public void onUserCancelled()
+                        {
+                            loading.dismiss();
+                        }
+
+                        @Override
+                        public void onPurchaseError(String error)
+                        {
+                            loading.dismiss();
+
+                            new AlertDialog.Builder(getActivity())
+                                .setTitle(R.string.iab_purchase_error_title)
+                                .setMessage(getResources().getString(R.string.iab_purchase_error_message, error))
+                                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                                {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which)
+                                    {
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .show();
+                        }
+
+                        @Override
+                        public void onPurchaseSuccess()
+                        {
+                            loading.dismiss();
+                            refreshPremiumPreference();
+
+                            new AlertDialog.Builder(getActivity())
+                                .setTitle(R.string.iab_purchase_success_title)
+                                .setMessage(R.string.iab_purchase_success_message)
+                                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                                {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which)
+                                    {
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .show();
+                        }
+                    });
+                }
+            })
+            .show();
     }
 
     @Override

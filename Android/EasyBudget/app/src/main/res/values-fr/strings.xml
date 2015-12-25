@@ -133,6 +133,31 @@
     <string name="setting_category_premium_redeem_message">Utiliser un code promo</string>
     <string name="setting_category_notifications_update_title">Mises à jour</string>
     <string name="setting_category_notifications_update_message">Être notifié des nouveautés de l\'application. Pas de spam, promis !</string>
+    <string name="setting_category_notifications_daily_title">Rappel journalier</string>
+    <string name="setting_category_notifications_daily_message">Recevez une notification à la fin de la journée si vous n’avez pas entré vos dépenses</string>
+    <string name="setting_category_not_premium_status_title">Devenez utilisateur premium</string>
+    <string name="setting_category_not_premium_status_message">Accédez aux fonctionnalités premium</string>
+
+    <string name="premium_popup_premium_title">Vous êtes premium!</string>
+    <string name="premium_popup_premium_message">Vous avez accès aux fonctionnalités premium:\n\n- Rappel journalier si vous avez oublié d’entrer vos dépenses durant la journée\n… et plus de fonctionnalités premium qui seront ajoutées très bientôt !</string>
+    <string name="premium_popup_not_premium_title">Devenez utilisateur premium</string>
+    <string name="premium_popup_not_premium_message">Accédez aux fonctionnalités premium:\n\n- Rappel journalier si vous avez oublié d’entrer vos dépenses durant la journée\n… et plus de fonctionnalités premium qui seront ajoutées très bientôt !</string>
+    <string name="premium_popup_not_premium_cta">Acheter</string>
+    <string name="premium_popup_become_title">Devenez utilisateur premium</string>
+    <string name="premium_popup_become_message">On dirait que vous aimez utiliser EasyBudget !\nVoulez vous passer à la vitesse supérieure et découvrir les fonctionnalités premium ?</string>
+    <string name="premium_popup_become_cta">Découvrir</string>
+    <string name="premium_popup_become_not_now">Pas maintenant</string>
+    <string name="premium_popup_become_not_ask_again">Ne plus me demander</string>
+    <string name="premium_notif_optin_message">Nouvelle fonctionnalité premium : Les rappels journaliers !\nRecevez un rappel si vous avez oublié d’ajouter vos dépenses durant la journée. Ça vous dit?\n(Vous pouvez changer plus tard dans les préférences)</string>
+    <string name="premium_notif_optin_message_ok">Ok</string>
+    <string name="premium_notif_optin_message_not_ok">Non merci</string>
+
+    <string name="iab_purchase_success_title">Merci</string>
+    <string name="iab_purchase_success_message">Merci beaucoup pour votre soutient! Vous avez maintenant accès aux fonctionnalités premium.</string>
+    <string name="iab_purchase_wait_title">Achat</string>
+    <string name="iab_purchase_wait_message">Veuillez patienter</string>
+    <string name="iab_purchase_error_title">Oups</string>
+    <string name="iab_purchase_error_message">Une erreur est survenue. Réessayez plus tard ou contacter moi si le problème persiste.\n(%s)</string>
 
     <string name="voucher_redeem_dialog_title">Code promo</string>
     <string name="voucher_redeem_dialog_message">Entrez votre code promo</string>

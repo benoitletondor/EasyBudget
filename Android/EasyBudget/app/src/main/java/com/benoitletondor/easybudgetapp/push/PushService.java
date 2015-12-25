@@ -109,13 +109,17 @@ public class PushService extends IntentService
             // Check if it's a daily reminder
             if( intent.hasExtra(DAILY_REMINDER_KEY) && intent.getBooleanExtra(DAILY_REMINDER_KEY, false) )
             {
-                // TODO check user choice
-
-                if( !UserHelper.isUserPremium(this) )
+                if( !UserHelper.isUserPremium(getApplication()) ) // Only for premium users
                 {
                     return false;
                 }
 
+                if( !UserHelper.isUserAllowingDailyReminderPushes(this) ) // Check user choice
+                {
+                    return false;
+                }
+
+                // Check if the app hasn't been opened today
                 long lastOpenTimestamp = Parameters.getInstance(this).getLong(ParameterKeys.LAST_OPEN_DATE, 0);
                 if( lastOpenTimestamp == 0 )
                 {
@@ -188,7 +192,7 @@ public class PushService extends IntentService
             {
                 boolean isForPremium = intent.getBooleanExtra(INTENT_PREMIUM_KEY, false);
 
-                return isForPremium == UserHelper.isUserPremium(this);
+                return isForPremium == UserHelper.isUserPremium(getApplication());
             }
 
             return true;

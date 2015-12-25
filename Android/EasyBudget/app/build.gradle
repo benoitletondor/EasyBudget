@@ -28,6 +28,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 
 apply from: 'batch.gradle'
+apply from: 'iap.gradle'
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
@@ -52,6 +53,8 @@ android {
             buildConfigField "String", "BATCH_API_KEY", batch_devkey
             buildConfigField "boolean", "ANALYTICS_ACTIVATED", "false"
             buildConfigField "boolean", "DEV_PREFERENCES", "true"
+            buildConfigField "String", "LICENCE_KEY", licence_key
+            buildConfigField "String", "GCM_SENDER_ID", gcm_sender_id
         }
         release {
             buildConfigField "boolean", "DEBUG_LOG", "false"
@@ -59,6 +62,8 @@ android {
             buildConfigField "String", "BATCH_API_KEY", batch_livekey
             buildConfigField "boolean", "ANALYTICS_ACTIVATED", "true"
             buildConfigField "boolean", "DEV_PREFERENCES", "false"
+            buildConfigField "String", "LICENCE_KEY", licence_key
+            buildConfigField "String", "GCM_SENDER_ID", gcm_sender_id
 
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'

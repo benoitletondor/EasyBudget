@@ -97,6 +97,8 @@ public class MainActivity extends DBActivity
     public static final String INTENT_MONTHLY_EXPENSE_DELETED = "intent.expense.monthly.deleted";
     public static final String INTENT_SHOW_WELCOME_SCREEN = "intent.welcomscreen.show";
 
+    public static final String INTENT_REDIRECT_TO_SETTINGS_EXTRA = "intent.extra.redirecttosettings";
+
     public final static String ANIMATE_TRANSITION_KEY = "animate";
     public final static String CENTER_X_KEY           = "centerX";
     public final static String CENTER_Y_KEY           = "centerY";
@@ -275,6 +277,8 @@ public class MainActivity extends DBActivity
         };
 
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver, filter);
+
+        openSettingsIfNeeded(getIntent());
     }
 
     @Override
@@ -380,6 +384,8 @@ public class MainActivity extends DBActivity
         {
             updateInvitationStatus(intent);
         }
+
+        openSettingsIfNeeded(intent);
     }
 
     /**
@@ -663,6 +669,21 @@ public class MainActivity extends DBActivity
         else
         {
             budgetLineContainer.setBackgroundResource(R.color.budget_green);
+        }
+    }
+
+    /**
+     * Open the settings activity if the given intent contains the {@link #INTENT_REDIRECT_TO_SETTINGS_EXTRA}
+     * extra.
+     *
+     * @param intent
+     */
+    private void openSettingsIfNeeded(Intent intent)
+    {
+        if( intent.getBooleanExtra(INTENT_REDIRECT_TO_SETTINGS_EXTRA, false) )
+        {
+            Intent startIntent = new Intent(this, SettingsActivity.class);
+            ActivityCompat.startActivity(MainActivity.this, startIntent, null);
         }
     }
 

@@ -133,6 +133,31 @@
     <string name="setting_category_premium_redeem_message">Usar un código promocional</string>
     <string name="setting_category_notifications_update_title">Actualización</string>
     <string name="setting_category_notifications_update_message">Recibir una notificación con las novedades de la aplicación. ¡No spams, te lo aseguro!</string>
+    <string name="setting_category_notifications_daily_title">Recordatorio diario</string>
+    <string name="setting_category_notifications_daily_message">Recibe una notificación al final del día si no has entrado tus gastos</string>
+    <string name="setting_category_not_premium_status_title">Vuélvete premium</string>
+    <string name="setting_category_not_premium_status_message">Accede a las funcionalidades premium</string>
+
+    <string name="premium_popup_premium_title">¡Eres premium!</string>
+    <string name="premium_popup_premium_message">Tienes acceso a las funcionalidades premium:\n\n- Recordatorio diario si olvidaste entrar tus gastos durante el día\n… ¡y más funcionalidades premium que serán añadidas pronto!</string>
+    <string name="premium_popup_not_premium_title">Vuélvete premium</string>
+    <string name="premium_popup_not_premium_message">Accede a las funcionalidades premium:\n\n- Recordatorio diario si olvidaste entrar tus gastos durante el día\n… ¡y más funcionalidades premium que serán añadidas pronto!</string>
+    <string name="premium_popup_not_premium_cta">Comprar</string>
+    <string name="premium_popup_become_title">Vuélvete premium</string>
+    <string name="premium_popup_become_message">¡Parece que te gusta usar EasyBudget!\n¿Quieres descubrir las funcionalidades premium?</string>
+    <string name="premium_popup_become_cta">Descubrir</string>
+    <string name="premium_popup_become_not_now">Ahora no</string>
+    <string name="premium_popup_become_not_ask_again">No preguntar más</string>
+    <string name="premium_notif_optin_message">New premium feature: Daily notification.\nReceive a reminder if you forgot to add your expenses during the day. Are you in?\n(You can change it later in settings)</string>
+    <string name="premium_notif_optin_message_ok">I\'m in</string>
+    <string name="premium_notif_optin_message_not_ok">No thanks</string>
+
+    <string name="iab_purchase_success_title">Gracias</string>
+    <string name="iab_purchase_success_message">¡Muchas gracias por tu apoyo! Ahora tienes acceso a las funcionalidades premium.</string>
+    <string name="iab_purchase_wait_title">Purchasing</string>
+    <string name="iab_purchase_wait_message">Por favor espera</string>
+    <string name="iab_purchase_error_title">¡Ups!</string>
+    <string name="iab_purchase_error_message">An error occurred, try again later or contact me if the problem persists.\n(%s)</string>
 
     <string name="voucher_redeem_dialog_title">Código promocional</string>
     <string name="voucher_redeem_dialog_message">Entra el código promocional</string>
