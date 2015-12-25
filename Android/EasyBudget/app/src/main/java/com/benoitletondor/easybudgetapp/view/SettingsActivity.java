@@ -34,6 +34,10 @@ import com.google.android.gms.appinvite.AppInviteInvitation;
 public class SettingsActivity extends AppCompatActivity
 {
     /**
+     * Key to specify that the premium popup should be shown to the user
+     */
+    public static final String SHOW_PREMIUM_INTENT_KEY = "showPremium";
+    /**
      * Request code used by app invite
      */
     protected static final int APP_INVITE_REQUEST = 1001;

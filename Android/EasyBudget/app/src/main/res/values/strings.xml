@@ -152,6 +152,11 @@
     <string name="premium_popup_not_premium_title">Become a premium user</string>
     <string name="premium_popup_not_premium_message">Access all the premium features:\n\n- Daily reminder if you forgot to enter your expenses during the day\n… and more premium features that will be added soon!</string>
     <string name="premium_popup_not_premium_cta">Purchase</string>
+    <string name="premium_popup_become_title">Become a premium user</string>
+    <string name="premium_popup_become_message">It seems that you like using EasyBudget! Would you like to go to take it to next level and discover premium features?</string>
+    <string name="premium_popup_become_cta">Discover</string>
+    <string name="premium_popup_become_not_now">Not now</string>
+    <string name="premium_popup_become_not_ask_again">Don\'t ask me again</string>
 
     <string name="voucher_redeem_dialog_title">Promo code</string>
     <string name="voucher_redeem_dialog_message">Enter your promo code</string>

@@ -97,4 +97,25 @@ public class UserHelper
     {
         Parameters.getInstance(context).putBoolean(ParameterKeys.USER_ALLOW_DAILY_PUSH, value);
     }
+
+    /**
+     * Has the user complete the rating popup
+     *
+     * @param context non null context
+     * @return true if the user has already answered, false otherwise
+     */
+    public static boolean hasUserCompleteRating(@NonNull Context context)
+    {
+        return Parameters.getInstance(context).getBoolean(ParameterKeys.RATING_COMPLETED, false);
+    }
+
+    /**
+     * Set that the user has complete the rating popup process
+     *
+     * @param context non null context
+     */
+    public static void setUserHasCompleteRating(@NonNull Context context)
+    {
+        Parameters.getInstance(context).putBoolean(ParameterKeys.RATING_COMPLETED, true);
+    }
 }

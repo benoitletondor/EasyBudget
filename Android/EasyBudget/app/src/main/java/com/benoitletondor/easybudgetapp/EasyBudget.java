@@ -19,8 +19,10 @@ package com.benoitletondor.easybudgetapp;
 import android.app.Activity;
 import android.app.Application;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 
@@ -34,9 +36,11 @@ import com.benoitletondor.easybudgetapp.helper.Logger;
 import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
 import com.benoitletondor.easybudgetapp.helper.Parameters;
 
+import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.helper.UserHelper;
 import com.benoitletondor.easybudgetapp.view.MainActivity;
 import com.benoitletondor.easybudgetapp.view.RatingPopup;
+import com.benoitletondor.easybudgetapp.view.SettingsActivity;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
@@ -241,22 +245,7 @@ public class EasyBudget extends Application
             int dailyOpens = Parameters.getInstance(getApplicationContext()).getInt(ParameterKeys.NUMBER_OF_DAILY_OPEN, 0);
             if( dailyOpens > 2 )
             {
-                long lastRatingTS = Parameters.getInstance(getApplicationContext()).getLong(ParameterKeys.RATING_POPUP_LAST_AUTO_SHOW, 0);
-                if( lastRatingTS > 0 )
-                {
-                    Calendar cal = Calendar.getInstance();
-                    int currentDay = cal.get(Calendar.DAY_OF_YEAR);
-
-                    cal.setTime(new Date(lastRatingTS));
-                    int lastTimeDay = cal.get(Calendar.DAY_OF_YEAR);
-
-                    if( currentDay != lastTimeDay )
-                    {
-                        Parameters.getInstance(getApplicationContext()).putLong(ParameterKeys.RATING_POPUP_LAST_AUTO_SHOW, new Date().getTime());
-                        new RatingPopup(activity).show(false);
-                    }
-                }
-                else
+                if( !hasRatingPopupBeenShownToday() )
                 {
                     Parameters.getInstance(getApplicationContext()).putLong(ParameterKeys.RATING_POPUP_LAST_AUTO_SHOW, new Date().getTime());
                     new RatingPopup(activity).show(false);
@@ -267,6 +256,130 @@ public class EasyBudget extends Application
         {
             Logger.error("Error while showing rating popup", e);
         }
+    }
+
+    private void showPremiumPopupIfNeeded(@NonNull final Activity activity)
+    {
+        try
+        {
+            if( !(activity instanceof MainActivity) )
+            {
+                return;
+            }
+
+            if( Parameters.getInstance(getApplicationContext()).getBoolean(ParameterKeys.PREMIUM_POPUP_COMPLETE, false) )
+            {
+                return;
+            }
+
+            if( UserHelper.isUserPremium(activity) )
+            {
+                return;
+            }
+
+            if( !UserHelper.hasUserCompleteRating(activity) )
+            {
+                return;
+            }
+
+            RatingPopup.RatingPopupStep currentStep = RatingPopup.getUserStep(activity);
+            if( currentStep == RatingPopup.RatingPopupStep.STEP_LIKE ||
+                    currentStep == RatingPopup.RatingPopupStep.STEP_LIKE_NOT_RATED ||
+                    currentStep == RatingPopup.RatingPopupStep.STEP_LIKE_RATED )
+            {
+                if( !hasRatingPopupBeenShownToday() && shouldShowPremiumPopup() )
+                {
+                    Parameters.getInstance(getApplicationContext()).putLong(ParameterKeys.PREMIUM_POPUP_LAST_AUTO_SHOW, new Date().getTime());
+
+                    AlertDialog dialog = new AlertDialog.Builder(activity)
+                        .setTitle(R.string.premium_popup_become_title)
+                        .setMessage(R.string.premium_popup_become_message)
+                        .setPositiveButton(R.string.premium_popup_become_cta, new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                Intent startIntent = new Intent(activity, SettingsActivity.class);
+                                startIntent.putExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, true);
+                                ActivityCompat.startActivity(activity, startIntent, null);
+
+                                dialog.dismiss();
+                            }
+                        })
+                        .setNegativeButton(R.string.premium_popup_become_not_now, new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                dialog.dismiss();
+                            }
+                        })
+                        .setNeutralButton(R.string.premium_popup_become_not_ask_again, new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                Parameters.getInstance(getApplicationContext()).putBoolean(ParameterKeys.PREMIUM_POPUP_COMPLETE, true);
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
+
+                    UIHelper.centerDialogButtons(dialog);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Logger.error("Error while showing become premium popup", e);
+        }
+    }
+
+    /**
+     * Has the rating popup been shown automatically today
+     *
+     * @return true if the rating popup has been shown today, false otherwise
+     */
+    private boolean hasRatingPopupBeenShownToday()
+    {
+        long lastRatingTS = Parameters.getInstance(getApplicationContext()).getLong(ParameterKeys.RATING_POPUP_LAST_AUTO_SHOW, 0);
+        if( lastRatingTS > 0 )
+        {
+            Calendar cal = Calendar.getInstance();
+            int currentDay = cal.get(Calendar.DAY_OF_YEAR);
+
+            cal.setTime(new Date(lastRatingTS));
+            int lastTimeDay = cal.get(Calendar.DAY_OF_YEAR);
+
+            return currentDay == lastTimeDay;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check that last time the premium popup was shown was 2 days ago or more
+     *
+     * @return true if we can show premium popup, false otherwise
+     */
+    private boolean shouldShowPremiumPopup()
+    {
+        long lastPremiumTS = Parameters.getInstance(getApplicationContext()).getLong(ParameterKeys.PREMIUM_POPUP_LAST_AUTO_SHOW, 0);
+        if( lastPremiumTS == 0 )
+        {
+            return true;
+        }
+
+        // Set calendar to last time 00:00 + 2 days
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date(lastPremiumTS));
+        cal.set(Calendar.HOUR, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        cal.add(Calendar.DAY_OF_YEAR, 2);
+
+        return new Date().after(cal.getTime());
     }
 
     /**
@@ -464,6 +577,11 @@ public class EasyBudget extends Application
          * Rating popup every day after 3 opens
          */
         showRatingPopupIfNeeded(activity);
+
+        /*
+         * Premium popup after rating complete
+         */
+        showPremiumPopupIfNeeded(activity);
     }
 
     /**

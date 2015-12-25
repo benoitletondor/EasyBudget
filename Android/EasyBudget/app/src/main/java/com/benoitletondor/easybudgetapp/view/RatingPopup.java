@@ -34,6 +34,8 @@ import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.Logger;
 import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
 import com.benoitletondor.easybudgetapp.helper.Parameters;
+import com.benoitletondor.easybudgetapp.helper.UIHelper;
+import com.benoitletondor.easybudgetapp.helper.UserHelper;
 
 /**
  * Rating popup that ask user for feedback and redirect them to the PlayStore
@@ -64,7 +66,7 @@ public class RatingPopup
      */
     public void show(boolean forceShow)
     {
-        if( !forceShow && Parameters.getInstance(activity).getBoolean(ParameterKeys.RATING_COMPLETED, false) )
+        if( !forceShow && UserHelper.hasUserCompleteRating(activity) )
         {
             Logger.debug("Not showing rating cause user already completed it");
             return;
@@ -78,27 +80,7 @@ public class RatingPopup
         if( !forceShow )
         {
             // Center buttons
-            try
-            {
-                final Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                LinearLayout.LayoutParams positiveButtonLL = (LinearLayout.LayoutParams) positiveButton.getLayoutParams();
-                positiveButtonLL.gravity = Gravity.CENTER;
-                positiveButton.setLayoutParams(positiveButtonLL);
-
-                final Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
-                LinearLayout.LayoutParams negativeButtonL = (LinearLayout.LayoutParams) negativeButton.getLayoutParams();
-                negativeButtonL.gravity = Gravity.CENTER;
-                negativeButton.setLayoutParams(negativeButtonL);
-
-                final Button neutralButton = dialog.getButton(AlertDialog.BUTTON_NEUTRAL);
-                LinearLayout.LayoutParams neutralButtonL = (LinearLayout.LayoutParams) neutralButton.getLayoutParams();
-                neutralButtonL.gravity = Gravity.CENTER;
-                neutralButton.setLayoutParams(neutralButtonL);
-            }
-            catch (Exception e)
-            {
-                Logger.error("Error while centering dialog buttons", e);
-            }
+            UIHelper.centerDialogButtons(dialog);
         }
     }
 
@@ -141,7 +123,7 @@ public class RatingPopup
                 public void onClick(DialogInterface dialog, int which)
                 {
                     setRatingPopupStep(activity, RatingPopupStep.STEP_NOT_ASK_ME_AGAIN);
-                    Parameters.getInstance(activity).putBoolean(ParameterKeys.RATING_COMPLETED, true);
+                    UserHelper.setUserHasCompleteRating(activity);
                     dialog.dismiss();
                 }
             });
@@ -166,7 +148,7 @@ public class RatingPopup
                 public void onClick(DialogInterface dialog, int which)
                 {
                     setRatingPopupStep(activity, RatingPopupStep.STEP_DISLIKE_NO_FEEDBACK);
-                    Parameters.getInstance(activity).putBoolean(ParameterKeys.RATING_COMPLETED, true);
+                    UserHelper.setUserHasCompleteRating(activity);
                 }
             })
             .setPositiveButton(R.string.rating_popup_negative_cta_positive, new DialogInterface.OnClickListener()
@@ -175,7 +157,7 @@ public class RatingPopup
                 public void onClick(DialogInterface dialog, int which)
                 {
                     setRatingPopupStep(activity, RatingPopupStep.STEP_DISLIKE_FEEDBACK);
-                    Parameters.getInstance(activity).putBoolean(ParameterKeys.RATING_COMPLETED, true);
+                    UserHelper.setUserHasCompleteRating(activity);
 
                     Intent sendIntent = new Intent();
                     sendIntent.setAction(Intent.ACTION_SENDTO);
@@ -213,7 +195,7 @@ public class RatingPopup
                 public void onClick(DialogInterface dialog, int which)
                 {
                     setRatingPopupStep(activity, RatingPopupStep.STEP_LIKE_NOT_RATED);
-                    Parameters.getInstance(activity).putBoolean(ParameterKeys.RATING_COMPLETED, true);
+                    UserHelper.setUserHasCompleteRating(activity);
                 }
             })
             .setPositiveButton(R.string.rating_popup_positive_cta_positive, new DialogInterface.OnClickListener()
@@ -222,7 +204,7 @@ public class RatingPopup
                 public void onClick(DialogInterface dialog, int which)
                 {
                     setRatingPopupStep(activity, RatingPopupStep.STEP_LIKE_RATED);
-                    Parameters.getInstance(activity).putBoolean(ParameterKeys.RATING_COMPLETED, true);
+                    UserHelper.setUserHasCompleteRating(activity);
 
                     final String appPackageName = activity.getPackageName();
 

@@ -103,4 +103,12 @@ public class ParameterKeys
      * The user wants to receive a daily reminder notification (bool)
      */
     public static final String USER_ALLOW_DAILY_PUSH = "user_allow_daily_push";
+    /**
+     * Timestamp that indicates the last time user was presented the become premium popup (long)
+     */
+    public static final String PREMIUM_POPUP_LAST_AUTO_SHOW = "premium_popup_last_auto_show";
+    /**
+     * Has the user complete the premium popup = should we show it again or not (bool)
+     */
+    public static final String PREMIUM_POPUP_COMPLETE = "premium_popup_complete";
 }

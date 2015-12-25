@@ -367,6 +367,14 @@ public class PreferencesFragment extends PreferenceFragment
             }
         };
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, filter);
+
+        /*
+         * Check if we should show premium popup
+         */
+        if( getActivity().getIntent().getBooleanExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, false) )
+        {
+            showBecomePremiumDialog();
+        }
     }
 
     /**
