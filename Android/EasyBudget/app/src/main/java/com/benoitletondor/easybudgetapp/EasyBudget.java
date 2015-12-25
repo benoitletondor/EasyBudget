@@ -66,7 +66,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * EasyBudget application
+ * EasyBudget application. Implements GA tracking, Batch set-up, Crashlytics set-up && iab.
  *
  * @author Benoit LETONDOR
  */

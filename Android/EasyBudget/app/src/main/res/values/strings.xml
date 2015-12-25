@@ -161,6 +161,13 @@
     <string name="premium_notif_optin_message_ok">I\'m in</string>
     <string name="premium_notif_optin_message_not_ok">No thanks</string>
 
+    <string name="iab_purchase_success_title">Thank you</string>
+    <string name="iab_purchase_success_message">Thank you so much for your support! You can now enjoy the premium features.</string>
+    <string name="iab_purchase_wait_title">Purchasing</string>
+    <string name="iab_purchase_wait_message">Please wait</string>
+    <string name="iab_purchase_error_title">Oops</string>
+    <string name="iab_purchase_error_message">An error occurred, try again later or contact me if the problem persists.\n(%s)</string>
+
     <string name="voucher_redeem_dialog_title">Promo code</string>
     <string name="voucher_redeem_dialog_message">Enter your promo code</string>
     <string name="voucher_redeem_dialog_cta">Redeem</string>
@@ -170,13 +177,6 @@
     <string name="voucher_redeem_error_code_invalid_dialog_message">Your promo code is invalid.</string>
     <string name="voucher_redeem_error_no_internet_dialog_message">Network error. Please check your connection and try again.</string>
     <string name="voucher_redeem_error_generic_dialog_message">An error occurred, try again later.</string>
-
-    <string name="iab_purchase_success_title">Thank you</string>
-    <string name="iab_purchase_success_message">Thank you so much for your support! You can now enjoy the premium features.</string>
-    <string name="iab_purchase_wait_title">Purchase</string>
-    <string name="iab_purchase_wait_message">Please wait</string>
-    <string name="iab_purchase_error_title">Oops</string>
-    <string name="iab_purchase_error_message">An error occurred, try again later or contact me if the problem persists.\n(%s)</string>
 
     <string name="rating_popup_question_title">What do you think of EasyBudget?</string>
     <string name="rating_popup_question_message">I develop this app in my free time and provide it for free. There still might be things to improve and I would really appreciate your feedback.</string>
