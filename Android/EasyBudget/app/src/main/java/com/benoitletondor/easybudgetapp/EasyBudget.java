@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -517,9 +518,14 @@ public class EasyBudget extends Application
         Logger.debug("Update detected, from " + previousVersion + " to " + newVersion);
 
         // Fix bad save of Batch premium before 1.1
-        if( previousVersion <= 27 ) // 1.1.2
+        if( previousVersion <= BuildVersion.VERSION_1_1_2 )
         {
             UserHelper.setBatchUserPremium(this);
+        }
+
+        if( newVersion == BuildVersion.VERSION_1_2 )
+        {
+            // TODO show notif about daily reminder pushes
         }
     }
 
