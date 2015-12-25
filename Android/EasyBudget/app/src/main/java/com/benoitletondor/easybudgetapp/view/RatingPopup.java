@@ -63,13 +63,14 @@ public class RatingPopup
      *
      * @param forceShow force show even if the user already completed it. If not forced, the user
      *                  will have a button to asked not to be asked again
+     * @return true if the popup has been shown, false otherwise
      */
-    public void show(boolean forceShow)
+    public boolean show(boolean forceShow)
     {
         if( !forceShow && UserHelper.hasUserCompleteRating(activity) )
         {
             Logger.debug("Not showing rating cause user already completed it");
-            return;
+            return false;
         }
 
         setRatingPopupStep(activity, RatingPopupStep.STEP_SHOWN);
@@ -82,6 +83,8 @@ public class RatingPopup
             // Center buttons
             UIHelper.centerDialogButtons(dialog);
         }
+
+        return true;
     }
 
     /**

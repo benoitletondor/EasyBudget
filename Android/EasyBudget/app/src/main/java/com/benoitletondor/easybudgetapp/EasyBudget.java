@@ -247,8 +247,11 @@ public class EasyBudget extends Application
             {
                 if( !hasRatingPopupBeenShownToday() )
                 {
-                    Parameters.getInstance(getApplicationContext()).putLong(ParameterKeys.RATING_POPUP_LAST_AUTO_SHOW, new Date().getTime());
-                    new RatingPopup(activity).show(false);
+                    boolean shown = new RatingPopup(activity).show(false);
+                    if( shown )
+                    {
+                        Parameters.getInstance(getApplicationContext()).putLong(ParameterKeys.RATING_POPUP_LAST_AUTO_SHOW, new Date().getTime());
+                    }
                 }
             }
         }
