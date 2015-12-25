@@ -45,6 +45,10 @@ public class PushService extends IntentService
      */
     private final static String INTENT_MIN_VERSION_KEY = "minVersion";
     /**
+     * Key to retrieve if a push is intented for premium user or not
+     */
+    private final static String INTENT_PREMIUM_KEY = "premium";
+    /**
      * Key to retrieve the daily reminder key for a push
      */
     private final static String DAILY_REMINDER_KEY = "daily";
@@ -89,7 +93,7 @@ public class PushService extends IntentService
      */
     private boolean shouldDisplayPush(Intent intent)
     {
-        return isUserOk(intent) && isVersionCompatible(intent);
+        return isUserOk(intent) && isVersionCompatible(intent) && isPremiumCompatible(intent);
     }
 
     /**
@@ -166,6 +170,32 @@ public class PushService extends IntentService
         catch(Exception e)
         {
             Logger.error("Error while checking app version for push", e);
+            return false;
+        }
+    }
+
+    /**
+     * Check the user status if a push is marked as for premium or not.
+     *
+     * @param intent push intent
+     * @return true if compatible, false otherwise
+     */
+    private boolean isPremiumCompatible(Intent intent)
+    {
+        try
+        {
+            if( intent.hasExtra(INTENT_PREMIUM_KEY) )
+            {
+                boolean isForPremium = intent.getBooleanExtra(INTENT_PREMIUM_KEY, false);
+
+                return isForPremium == UserHelper.isUserPremium(this);
+            }
+
+            return true;
+        }
+        catch (Exception e)
+        {
+            Logger.error("Error while checking premium compatible for push", e);
             return false;
         }
     }
