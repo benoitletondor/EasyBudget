@@ -107,7 +107,7 @@ public class PushService extends IntentService
         try
         {
             // Check if it's a daily reminder
-            if( intent.hasExtra(DAILY_REMINDER_KEY) && intent.getBooleanExtra(DAILY_REMINDER_KEY, false) )
+            if( intent.hasExtra(DAILY_REMINDER_KEY) && "true".equals(intent.getStringExtra(DAILY_REMINDER_KEY)) )
             {
                 if( !UserHelper.isUserPremium(getApplication()) ) // Only for premium users
                 {
@@ -190,7 +190,7 @@ public class PushService extends IntentService
         {
             if( intent.hasExtra(INTENT_PREMIUM_KEY) )
             {
-                boolean isForPremium = intent.getBooleanExtra(INTENT_PREMIUM_KEY, false);
+                boolean isForPremium = "true".equals(intent.getStringExtra(INTENT_PREMIUM_KEY));
 
                 return isForPremium == UserHelper.isUserPremium(getApplication());
             }
