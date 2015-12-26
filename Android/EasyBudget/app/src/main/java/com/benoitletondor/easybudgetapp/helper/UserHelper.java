@@ -89,7 +89,7 @@ public class UserHelper
      */
     public static boolean isUserAllowingDailyReminderPushes(@NonNull Context context)
     {
-        return Parameters.getInstance(context).getBoolean(ParameterKeys.USER_ALLOW_DAILY_PUSH, false);
+        return Parameters.getInstance(context).getBoolean(ParameterKeys.USER_ALLOW_DAILY_PUSH, true);
     }
 
     /**
