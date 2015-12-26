@@ -584,7 +584,7 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
 
         if( newVersion == BuildVersion.VERSION_1_2 )
         {
-            if( UserHelper.isUserPremium(this) )
+            if( UserHelper.isUserPremium(this) && !DailyNotifOptinService.hasDailyReminderOptinNotifBeenShown(this) )
             {
                 DailyNotifOptinService.showDailyReminderOptinNotif(getApplicationContext());
             }

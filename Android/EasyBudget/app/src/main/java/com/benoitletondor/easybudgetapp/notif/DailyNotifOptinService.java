@@ -27,6 +27,8 @@ import android.support.v4.content.ContextCompat;
 
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.Logger;
+import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
+import com.benoitletondor.easybudgetapp.helper.Parameters;
 import com.benoitletondor.easybudgetapp.helper.UserHelper;
 import com.benoitletondor.easybudgetapp.view.MainActivity;
 
@@ -129,10 +131,23 @@ public class DailyNotifOptinService extends IntentService
                 .setColor(ContextCompat.getColor(context, R.color.accent));
 
             NotificationManagerCompat.from(context).notify(OPTIN_NOTIFICATION_ID, notifBuilder.build());
+
+            Parameters.getInstance(context).putBoolean(ParameterKeys.DAILY_PUSH_NOTIF_SHOWN, true);
         }
         catch (Exception e)
         {
             Logger.error("Error while showing daily notif optin notif", e);
         }
+    }
+
+    /**
+     * Has the daily reminder opt-in notification already been shown
+     *
+     * @param context non null context
+     * @return true if already shown, false otherwise
+     */
+    public static boolean hasDailyReminderOptinNotifBeenShown(@NonNull Context context)
+    {
+        return Parameters.getInstance(context).getBoolean(ParameterKeys.DAILY_PUSH_NOTIF_SHOWN, false);
     }
 }
