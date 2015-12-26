@@ -144,7 +144,7 @@
     <string name="premium_popup_not_premium_title">Torne-se premium</string>
     <string name="premium_popup_not_premium_message">Acesse todas as funções premium!</string>
     <string name="premium_popup_not_premium_feature1_title">1. Lembrete diário</string>
-    <string name="premium_popup_not_premium_feature1_message">Receba uma notificação no final do dia se você não inseriu suas despesas</string>
+    <string name="premium_popup_not_premium_feature1_message">Receba uma notificação no final do dia se você não inseriu suas despesas.</string>
     <string name="premium_popup_not_premium_feature_more_title">… e mais funções premium que virão em breve!</string>
     <string name="premium_popup_not_premium_cta">Comprar</string>
     <string name="premium_popup_become_title">Torne-se premium</string>

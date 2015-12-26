@@ -144,7 +144,7 @@
     <string name="premium_popup_not_premium_title">Premium-Nutzer werden</string>
     <string name="premium_popup_not_premium_message">Auf alle Premium-Features zugreifen!</string>
     <string name="premium_popup_not_premium_feature1_title">1. Tägliche Erinnerung</string>
-    <string name="premium_popup_not_premium_feature1_message">Erhalten Sie eine Benachrichtigung am Ende des Tages, wenn Sie Ihre Ausgaben noch nicht eingetragen haben</string>
+    <string name="premium_popup_not_premium_feature1_message">Erhalten Sie eine Benachrichtigung am Ende des Tages, wenn Sie Ihre Ausgaben noch nicht eingetragen haben.</string>
     <string name="premium_popup_not_premium_feature_more_title">… und mehr Premium-Features, die in Kürze hinzugefügt werden!</string>
     <string name="premium_popup_not_premium_cta">Kaufen</string>
     <string name="premium_popup_become_title">Premium-Nutzer werden</string>

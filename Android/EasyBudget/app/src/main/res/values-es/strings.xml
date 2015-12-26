@@ -144,7 +144,7 @@
     <string name="premium_popup_not_premium_title">Vuélvete premium</string>
     <string name="premium_popup_not_premium_message">¡Accede a las funcionalidades premium!</string>
     <string name="premium_popup_not_premium_feature1_title">1. Recordatorio diario</string>
-    <string name="premium_popup_not_premium_feature1_message">Recibe una notificación al final del día si no has entrado tus gastos</string>
+    <string name="premium_popup_not_premium_feature1_message">Recibe una notificación al final del día si no has entrado tus gastos.</string>
     <string name="premium_popup_not_premium_feature_more_title">… ¡y más funcionalidades premium que serán añadidas pronto!</string>
     <string name="premium_popup_not_premium_cta">Comprar</string>
     <string name="premium_popup_become_title">Vuélvete premium</string>
