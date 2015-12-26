@@ -153,7 +153,7 @@
     <string name="premium_popup_premium_message">You have access to premium features:\n\n- Daily reminder if you forgot to enter your expenses during the day\n… and more premium features that will be added soon!</string>
     <string name="premium_popup_not_premium_title">Become a premium user</string>
     <string name="premium_popup_not_premium_message">Access all the premium features!</string>
-    <string name="premium_popup_not_premium_feature1_title">Daily reminder</string>
+    <string name="premium_popup_not_premium_feature1_title">1. Daily reminder</string>
     <string name="premium_popup_not_premium_feature1_message">Daily reminder if you forgot to enter your expenses during the day</string>
     <string name="premium_popup_not_premium_feature_more_title">… and more premium features that will be added soon!</string>
     <string name="premium_popup_not_premium_cta">Purchase</string>
