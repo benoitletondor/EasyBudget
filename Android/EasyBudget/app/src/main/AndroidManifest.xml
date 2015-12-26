@@ -104,6 +104,13 @@
         <!-- Notif service -->
         <service android:name=".notif.DailyNotifOptinService" />
 
+        <receiver android:name=".notif.AppUpdateBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_REPLACED"/>
+                <data android:scheme="package"  />
+            </intent-filter>
+        </receiver>
+
         <!-- Custom Push receiver -->
         <service android:name=".push.PushService" />
 

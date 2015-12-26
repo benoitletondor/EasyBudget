@@ -104,6 +104,10 @@ public class ParameterKeys
      */
     public static final String USER_ALLOW_DAILY_PUSH = "user_allow_daily_push";
     /**
+     * Has the daily push opt-in been shown to the user yet (bool)
+     */
+    public static final String DAILY_PUSH_NOTIF_SHOWN = "user_saw_daily_push_notif";
+    /**
      * Timestamp that indicates the last time user was presented the become premium popup (long)
      */
     public static final String PREMIUM_POPUP_LAST_AUTO_SHOW = "premium_popup_last_auto_show";
