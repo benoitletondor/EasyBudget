@@ -335,6 +335,19 @@ public class PreferencesFragment extends PreferenceFragment
             });
 
             /*
+             * Show premium screen
+             */
+            findPreference(getResources().getString(R.string.setting_category_dev_show_premium_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+            {
+                @Override
+                public boolean onPreferenceClick(Preference preference)
+                {
+                    showBecomePremiumDialog();
+                    return false;
+                }
+            });
+
+            /*
              * Enable animations pref
              */
             final CheckBoxPreference animationsPref = (CheckBoxPreference) findPreference(getResources().getString(R.string.setting_category_disable_animation_key));
@@ -355,6 +368,7 @@ public class PreferencesFragment extends PreferenceFragment
          */
         IntentFilter filter = new IntentFilter(SelectCurrencyFragment.CURRENCY_SELECTED_INTENT);
         filter.addAction(EasyBudget.INTENT_IAB_STATUS_CHANGED);
+        filter.addAction(SettingsActivity.USER_GONE_PREMIUM_INTENT);
         receiver = new BroadcastReceiver()
         {
             @Override
@@ -381,6 +395,10 @@ public class PreferencesFragment extends PreferenceFragment
                     {
                         Logger.error("Error while receiving INTENT_IAB_STATUS_CHANGED intent", e);
                     }
+                }
+                else if( SettingsActivity.USER_GONE_PREMIUM_INTENT.equals(intent.getAction()) )
+                {
+                    refreshPremiumPreference();
                 }
             }
         };
@@ -663,80 +681,7 @@ public class PreferencesFragment extends PreferenceFragment
     private void showBecomePremiumDialog()
     {
         Intent intent = new Intent(getActivity(), PremiumActivity.class);
-        ActivityCompat.startActivity(getActivity(), intent, null);
-
-        new AlertDialog.Builder(getActivity())
-            .setTitle(R.string.premium_popup_not_premium_title)
-            .setMessage(R.string.premium_popup_not_premium_message)
-            .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener()
-            {
-                @Override
-                public void onClick(DialogInterface dialog, int which)
-                {
-                    dialog.dismiss();
-                }
-            })
-            .setPositiveButton(R.string.premium_popup_not_premium_cta, new DialogInterface.OnClickListener()
-            {
-                @Override
-                public void onClick(DialogInterface dialog, int which)
-                {
-                    // Show loader
-                    final ProgressDialog loading = ProgressDialog.show(getActivity(),
-                        getResources().getString(R.string.iab_purchase_wait_title),
-                        getResources().getString(R.string.iab_purchase_wait_message),
-                        true, false);
-
-                    ((EasyBudget) getActivity().getApplication()).launchPremiumPurchaseFlow(getActivity(), new PremiumPurchaseListener()
-                    {
-                        @Override
-                        public void onUserCancelled()
-                        {
-                            loading.dismiss();
-                        }
-
-                        @Override
-                        public void onPurchaseError(String error)
-                        {
-                            loading.dismiss();
-
-                            new AlertDialog.Builder(getActivity())
-                                .setTitle(R.string.iab_purchase_error_title)
-                                .setMessage(getResources().getString(R.string.iab_purchase_error_message, error))
-                                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
-                                {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which)
-                                    {
-                                        dialog.dismiss();
-                                    }
-                                })
-                                .show();
-                        }
-
-                        @Override
-                        public void onPurchaseSuccess()
-                        {
-                            loading.dismiss();
-                            refreshPremiumPreference();
-
-                            new AlertDialog.Builder(getActivity())
-                                .setTitle(R.string.iab_purchase_success_title)
-                                .setMessage(R.string.iab_purchase_success_message)
-                                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
-                                {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which)
-                                    {
-                                        dialog.dismiss();
-                                    }
-                                })
-                                .show();
-                        }
-                    });
-                }
-            })
-            .show();
+        ActivityCompat.startActivityForResult(getActivity(), intent, SettingsActivity.PREMIUM_ACTIVITY, null);
     }
 
     @Override

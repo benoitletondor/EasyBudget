@@ -45,8 +45,8 @@ public class UserHelper
      */
     public static boolean isUserPremium(@NonNull Application application)
     {
-        return false; //((EasyBudget) application).getPremiumCheckStatus() == PremiumCheckStatus.PREMIUM ||
-                //Parameters.getInstance(application).getBoolean(ParameterKeys.BATCH_OFFER_REDEEMED, false);
+        return ((EasyBudget) application).getPremiumCheckStatus() == PremiumCheckStatus.PREMIUM ||
+                Parameters.getInstance(application).getBoolean(ParameterKeys.BATCH_OFFER_REDEEMED, false);
     }
 
     /**

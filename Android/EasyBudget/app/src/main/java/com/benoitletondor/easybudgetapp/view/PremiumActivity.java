@@ -18,8 +18,11 @@
 package com.benoitletondor.easybudgetapp.view;
 
 import android.animation.Animator;
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
@@ -28,9 +31,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.view.ViewAnimationUtils;
+import android.widget.Button;
 
+import com.benoitletondor.easybudgetapp.EasyBudget;
+import com.benoitletondor.easybudgetapp.PremiumPurchaseListener;
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.view.premium.Premium1Fragment;
 import com.benoitletondor.easybudgetapp.view.premium.Premium2Fragment;
@@ -74,6 +82,8 @@ public class PremiumActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_premium);
+
+        setResult(Activity.RESULT_CANCELED);
 
         pager = (ViewPager) findViewById(R.id.premium_view_pager);
         pager.setAdapter(new FragmentStatePagerAdapter(getSupportFragmentManager())
@@ -148,6 +158,77 @@ public class PremiumActivity extends AppCompatActivity
         };
 
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter);
+
+        findViewById(R.id.premium_not_now_button).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                finish();
+            }
+        });
+
+        findViewById(R.id.premium_cta_button).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                // Show loader
+                final ProgressDialog loading = ProgressDialog.show(PremiumActivity.this,
+                        getResources().getString(R.string.iab_purchase_wait_title),
+                        getResources().getString(R.string.iab_purchase_wait_message),
+                        true, false);
+
+                ((EasyBudget) getApplication()).launchPremiumPurchaseFlow(PremiumActivity.this, new PremiumPurchaseListener()
+                {
+                    @Override
+                    public void onUserCancelled()
+                    {
+                        loading.dismiss();
+                    }
+
+                    @Override
+                    public void onPurchaseError(String error)
+                    {
+                        loading.dismiss();
+
+                        new AlertDialog.Builder(PremiumActivity.this)
+                            .setTitle(R.string.iab_purchase_error_title)
+                            .setMessage(getResources().getString(R.string.iab_purchase_error_message, error))
+                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .show();
+                    }
+
+                    @Override
+                    public void onPurchaseSuccess()
+                    {
+                        loading.dismiss();
+                        setResult(Activity.RESULT_OK);
+                        finish();
+
+                        new AlertDialog.Builder(PremiumActivity.this)
+                            .setTitle(R.string.iab_purchase_success_title)
+                            .setMessage(R.string.iab_purchase_success_message)
+                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .show();
+                    }
+                });
+            }
+        });
     }
 
     @Override
@@ -170,4 +251,13 @@ public class PremiumActivity extends AppCompatActivity
         finish();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        // iab management
+        if( !((EasyBudget) getApplication()).handleActivityResult(requestCode, resultCode, data) )
+        {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
 }
