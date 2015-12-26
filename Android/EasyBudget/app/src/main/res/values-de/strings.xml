@@ -30,6 +30,7 @@
     <string name="title_activity_monthly_income_edit">Monatliche Einnahme bearbeiten</string>
     <string name="title_activity_settings">Einstellungen</string>
     <string name="title_activity_welcome">EasyBudget</string>
+    <string name="title_activity_premium">Premium</string>
     <string name="cancel">Abbrechen</string>
     <string name="undo">RÜCKGÄNGIG</string>
     <string name="ok">OK</string>
@@ -141,7 +142,10 @@
     <string name="premium_popup_premium_title">Sie sind Premium-Nutzer!</string>
     <string name="premium_popup_premium_message">Sie haben Zugriff auf Premium-Features:\n\n- Tägliche Erinnerungen, wenn Sie vergessen Ihre Ausgaben einzutragen\n… und mehr Premium-Features, die in Kürze hinzugefügt werden!</string>
     <string name="premium_popup_not_premium_title">Premium-Nutzer werden</string>
-    <string name="premium_popup_not_premium_message">Auf alle Premium-Features zugreifen:\n\n- Daily reminder if you forgot to enter your expenses during the day\n… und mehr Premium-Features, die in Kürze hinzugefügt werden!</string>
+    <string name="premium_popup_not_premium_message">Auf alle Premium-Features zugreifen!</string>
+    <string name="premium_popup_not_premium_feature1_title">1. Tägliche Erinnerung</string>
+    <string name="premium_popup_not_premium_feature1_message">Erhalten Sie eine Benachrichtigung am Ende des Tages, wenn Sie Ihre Ausgaben noch nicht eingetragen haben.</string>
+    <string name="premium_popup_not_premium_feature_more_title">… und mehr Premium-Features, die in Kürze hinzugefügt werden!</string>
     <string name="premium_popup_not_premium_cta">Kaufen</string>
     <string name="premium_popup_become_title">Premium-Nutzer werden</string>
     <string name="premium_popup_become_message">Es sieht so aus als würde Ihnen EasyBudget gefallen!\nWürden Sie gerne in den nächsten Gang schalten und die Premium-Features entdecken?</string>

@@ -30,6 +30,7 @@
     <string name="title_activity_monthly_income_edit">Modifier le revenu mensuel</string>
     <string name="title_activity_settings">Préférences</string>
     <string name="title_activity_welcome">EasyBudget</string>
+    <string name="title_activity_premium">Premium</string>
     <string name="cancel">Annuler</string>
     <string name="undo">ANNULER</string>
     <string name="ok">OK</string>
@@ -141,7 +142,10 @@
     <string name="premium_popup_premium_title">Vous êtes premium!</string>
     <string name="premium_popup_premium_message">Vous avez accès aux fonctionnalités premium:\n\n- Rappel journalier si vous avez oublié d’entrer vos dépenses durant la journée\n… et plus de fonctionnalités premium qui seront ajoutées très bientôt !</string>
     <string name="premium_popup_not_premium_title">Devenez utilisateur premium</string>
-    <string name="premium_popup_not_premium_message">Accédez aux fonctionnalités premium:\n\n- Rappel journalier si vous avez oublié d’entrer vos dépenses durant la journée\n… et plus de fonctionnalités premium qui seront ajoutées très bientôt !</string>
+    <string name="premium_popup_not_premium_message">Accédez aux fonctionnalités premium !</string>
+    <string name="premium_popup_not_premium_feature1_title">1. Rappel journalier</string>
+    <string name="premium_popup_not_premium_feature1_message">Recevez une notification à la fin de la journée si vous n’avez pas entré vos dépenses.</string>
+    <string name="premium_popup_not_premium_feature_more_title">… et plus de fonctionnalités premium qui seront ajoutées très bientôt !</string>
     <string name="premium_popup_not_premium_cta">Acheter</string>
     <string name="premium_popup_become_title">Devenez utilisateur premium</string>
     <string name="premium_popup_become_message">On dirait que vous aimez utiliser EasyBudget !\nVoulez vous passer à la vitesse supérieure et découvrir les fonctionnalités premium ?</string>

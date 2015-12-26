@@ -53,6 +53,9 @@
     <color name="onboarding_2_nextbutton_pressed">@color/primary_light</color>
     <color name="onboarding_3_background">@color/secondary</color>
     <color name="onboarding_3_statusbar">@color/secondary_dark</color>
+    <color name="onboarding_3_nextbutton_normal">@color/primary_light</color>
+    <color name="onboarding_3_nextbutton_pressed">@android:color/white</color>
     <color name="onboarding_4_background">@color/primary</color>
     <color name="onboarding_4_statusbar">@color/primary_dark</color>
+    <color name="premium_background">@color/primary</color>
 </resources>
