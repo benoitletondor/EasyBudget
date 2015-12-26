@@ -19,7 +19,9 @@ package com.benoitletondor.easybudgetapp.view.premium;
 import android.support.v4.app.Fragment;
 
 /**
- * Created by benoit on 26/12/15.
+ * Common class for all premium welcome screen fragment
+ *
+ * @author Benoit LETONDOR
  */
 public abstract class PremiumFragment extends Fragment
 {

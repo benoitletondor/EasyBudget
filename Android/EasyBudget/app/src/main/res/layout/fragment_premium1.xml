@@ -33,7 +33,6 @@
             android:layout_height="wrap_content"
             android:textSize="25dp"
             android:textColor="@android:color/white"
-            android:maxLines="2"
             android:gravity="center"
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
@@ -47,7 +46,6 @@
             android:textSize="16dp"
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
-            android:maxLines="2"
             android:textColor="@android:color/white"
             android:gravity="center"/>
 

@@ -17,25 +17,17 @@
 
 package com.benoitletondor.easybudgetapp.view;
 
-import android.animation.Animator;
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.view.ViewAnimationUtils;
-import android.widget.Button;
 
 import com.benoitletondor.easybudgetapp.EasyBudget;
 import com.benoitletondor.easybudgetapp.PremiumPurchaseListener;
@@ -45,35 +37,18 @@ import com.benoitletondor.easybudgetapp.view.premium.Premium2Fragment;
 
 import me.relex.circleindicator.CircleIndicator;
 
+/**
+ * Activity that contains the premium onboarding screen. This activity should return with a
+ * {@link Activity#RESULT_OK} if user has successfully purchased premium.
+ *
+ * @author Benoit LETONDOR
+ */
 public class PremiumActivity extends AppCompatActivity
 {
-    /**
-     * Intent broadcast by pager fragments to go next
-     */
-    public final static String PAGER_NEXT_INTENT     = "premium.pager.next";
-    /**
-     * Intent broadcast by pager fragments to go previous
-     */
-    public final static String PAGER_PREVIOUS_INTENT = "premium.pager.previous";
-    /**
-     * Intent broadcast by pager fragments when premium onboarding is done
-     */
-    public final static String PAGER_DONE_INTENT     = "premium.pager.done";
-
-    public final static String ANIMATE_TRANSITION_KEY = "animate";
-    public final static String CENTER_X_KEY           = "centerX";
-    public final static String CENTER_Y_KEY           = "centerY";
-
-// ------------------------------------->
-
     /**
      * The view pager
      */
     private ViewPager pager;
-    /**
-     * Broadcast receiver for intent sent by fragments
-     */
-    private BroadcastReceiver receiver;
 
 // ------------------------------------->
 
@@ -83,6 +58,7 @@ public class PremiumActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_premium);
 
+        // Cancelled by default
         setResult(Activity.RESULT_CANCELED);
 
         pager = (ViewPager) findViewById(R.id.premium_view_pager);
@@ -112,52 +88,6 @@ public class PremiumActivity extends AppCompatActivity
 
         // Circle indicator
         ((CircleIndicator) findViewById(R.id.premium_view_pager_indicator)).setViewPager(pager);
-
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(PAGER_NEXT_INTENT);
-        filter.addAction(PAGER_PREVIOUS_INTENT);
-        filter.addAction(PAGER_DONE_INTENT);
-
-        receiver = new BroadcastReceiver()
-        {
-            @Override
-            public void onReceive(Context context, Intent intent)
-            {
-                if( PAGER_NEXT_INTENT.equals(intent.getAction()) && pager.getCurrentItem() < pager.getAdapter().getCount()-1 )
-                {
-                    if( intent.getBooleanExtra(ANIMATE_TRANSITION_KEY, false) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP )
-                    {
-                        // get the center for the clipping circle
-                        int cx = intent.getIntExtra(CENTER_X_KEY, (int) pager.getX() + pager.getWidth() / 2);
-                        int cy = intent.getIntExtra(CENTER_Y_KEY, (int) pager.getY() + pager.getHeight() / 2);
-
-                        // get the final radius for the clipping circle
-                        int finalRadius = Math.max(pager.getWidth(), pager.getHeight());
-
-                        // create the animator for this view (the start radius is zero)
-                        Animator anim = ViewAnimationUtils.createCircularReveal(pager, cx, cy, 0, finalRadius);
-
-                        // make the view visible and start the animation
-                        pager.setCurrentItem(pager.getCurrentItem() + 1, false);
-                        anim.start();
-                    }
-                    else
-                    {
-                        pager.setCurrentItem(pager.getCurrentItem() + 1, true);
-                    }
-                }
-                else if( PAGER_PREVIOUS_INTENT.equals(intent.getAction()) && pager.getCurrentItem() > 0 )
-                {
-                    pager.setCurrentItem(pager.getCurrentItem()-1, true);
-                }
-                else if( PAGER_DONE_INTENT.equals(intent.getAction()) )
-                {
-                    finish();
-                }
-            }
-        };
-
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter);
 
         findViewById(R.id.premium_not_now_button).setOnClickListener(new View.OnClickListener()
         {
@@ -210,7 +140,7 @@ public class PremiumActivity extends AppCompatActivity
                     public void onPurchaseSuccess()
                     {
                         loading.dismiss();
-                        setResult(Activity.RESULT_OK);
+                        setResult(Activity.RESULT_OK); // Important to update the UI
                         finish();
 
                         new AlertDialog.Builder(PremiumActivity.this)
@@ -232,14 +162,6 @@ public class PremiumActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onDestroy()
-    {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-
-        super.onDestroy();
-    }
-
-    @Override
     public void onBackPressed()
     {
         if( pager.getCurrentItem() > 0 )
@@ -248,7 +170,7 @@ public class PremiumActivity extends AppCompatActivity
             return;
         }
 
-        finish();
+        super.onBackPressed();
     }
 
     @Override

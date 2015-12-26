@@ -24,7 +24,9 @@ import android.view.ViewGroup;
 import com.benoitletondor.easybudgetapp.R;
 
 /**
+ * Fragment 1 of the premium onboarding screen
  *
+ * @author Benoit LETONDOR
  */
 public class Premium1Fragment extends PremiumFragment
 {

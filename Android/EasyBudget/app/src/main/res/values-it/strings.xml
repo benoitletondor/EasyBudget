@@ -139,11 +139,13 @@
     <string name="setting_category_not_premium_status_title">Diventa premium</string>
     <string name="setting_category_not_premium_status_message">Accedi a tutte le funzionalità premium</string>
 
-    <string name="premium">Premium</string>
     <string name="premium_popup_premium_title">Sei… premium!</string>
-    <string name="premium_popup_premium_message">Hai ora accesso alle funzionalità premium:\n\n- Allerta quotidiana se hai dimenticato di inserire le uscite del giorno\n…moltissime altre funzioni che si aggiungeranno poco a poco! </string>
+    <string name="premium_popup_premium_message">Hai ora accesso alle funzionalità premium:\n\n- Allerta quotidiana se hai dimenticato di inserire le uscite del giorno\n…moltissime altre funzioni che si aggiungeranno poco a poco!</string>
     <string name="premium_popup_not_premium_title">Diventa premium</string>
-    <string name="premium_popup_not_premium_message">Accedi a tutte le funzionalità premium:\n\n- Allerta quotidiana se hai dimenticato di inserire le uscite del giorno\n…moltissime altre funzioni che si aggiungeranno poco a poco!</string>
+    <string name="premium_popup_not_premium_message">Accedi a tutte le funzionalità premium!</string>
+    <string name="premium_popup_not_premium_feature1_title">1. Allerta quotidiana</string>
+    <string name="premium_popup_not_premium_feature1_message">Ricevi una notifica alla fine della giornata se non hai inserito le tue spese</string>
+    <string name="premium_popup_not_premium_feature_more_title">…moltissime altre funzioni che si aggiungeranno poco a poco!</string>
     <string name="premium_popup_not_premium_cta">Acquista</string>
     <string name="premium_popup_become_title">Diventa premium</string>
     <string name="premium_popup_become_message">Si direbbe che EasyBudget ti piace!\nVuoi passare al livello successivo e scoprire le funzionalità premium?</string>
