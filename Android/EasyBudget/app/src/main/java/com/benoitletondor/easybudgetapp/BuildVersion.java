@@ -52,5 +52,5 @@ public class BuildVersion
      * Add daily reminder pushes opt-out from settings & premium iAP.
      * TODO
      */
-    public final static int VERSION_1_2 = 31;
+    public final static int VERSION_1_2 = 32;
 }
