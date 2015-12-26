@@ -412,6 +412,19 @@ public class PreferencesFragment extends PreferenceFragment
                 }
                 else if( SettingsActivity.USER_GONE_PREMIUM_INTENT.equals(intent.getAction()) )
                 {
+                    new AlertDialog.Builder(getActivity())
+                        .setTitle(R.string.iab_purchase_success_title)
+                        .setMessage(R.string.iab_purchase_success_message)
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
+
                     refreshPremiumPreference();
                 }
             }

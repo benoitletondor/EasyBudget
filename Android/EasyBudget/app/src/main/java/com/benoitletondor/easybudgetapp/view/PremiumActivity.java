@@ -142,19 +142,6 @@ public class PremiumActivity extends AppCompatActivity
                         loading.dismiss();
                         setResult(Activity.RESULT_OK); // Important to update the UI
                         finish();
-
-                        new AlertDialog.Builder(PremiumActivity.this)
-                            .setTitle(R.string.iab_purchase_success_title)
-                            .setMessage(R.string.iab_purchase_success_message)
-                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
-                            {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    dialog.dismiss();
-                                }
-                            })
-                            .show();
                     }
                 });
             }
