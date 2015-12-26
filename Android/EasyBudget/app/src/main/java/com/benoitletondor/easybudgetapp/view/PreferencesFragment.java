@@ -662,6 +662,9 @@ public class PreferencesFragment extends PreferenceFragment
 
     private void showBecomePremiumDialog()
     {
+        Intent intent = new Intent(getActivity(), PremiumActivity.class);
+        ActivityCompat.startActivity(getActivity(), intent, null);
+
         new AlertDialog.Builder(getActivity())
             .setTitle(R.string.premium_popup_not_premium_title)
             .setMessage(R.string.premium_popup_not_premium_message)

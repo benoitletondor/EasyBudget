@@ -30,6 +30,7 @@
     <string name="title_activity_monthly_income_edit">Monatliche Einnahme bearbeiten</string>
     <string name="title_activity_settings">Einstellungen</string>
     <string name="title_activity_welcome">EasyBudget</string>
+    <string name="title_activity_premium">Premium</string>
     <string name="cancel">Abbrechen</string>
     <string name="undo">RÜCKGÄNGIG</string>
     <string name="ok">OK</string>
@@ -138,6 +139,7 @@
     <string name="setting_category_not_premium_status_title">Premium-Nutzer werden</string>
     <string name="setting_category_not_premium_status_message">Auf alle Premium-Features zugreifen</string>
 
+    <string name="premium">Premium</string>
     <string name="premium_popup_premium_title">Sie sind Premium-Nutzer!</string>
     <string name="premium_popup_premium_message">Sie haben Zugriff auf Premium-Features:\n\n- Tägliche Erinnerungen, wenn Sie vergessen Ihre Ausgaben einzutragen\n… und mehr Premium-Features, die in Kürze hinzugefügt werden!</string>
     <string name="premium_popup_not_premium_title">Premium-Nutzer werden</string>

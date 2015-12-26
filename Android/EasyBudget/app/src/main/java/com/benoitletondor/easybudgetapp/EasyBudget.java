@@ -698,7 +698,7 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
                     Purchase premiumPurchase = inventory.getPurchase(EasyBudget.SKU_PREMIUM);
                     setIabStatusAndNotify(premiumPurchase != null ? PremiumCheckStatus.PREMIUM : PremiumCheckStatus.NOT_PREMIUM);
 
-                    Logger.debug("iab query inventory was successful.");
+                    Logger.debug("iab query inventory was successful: "+iabStatus);
                 }
             };
 

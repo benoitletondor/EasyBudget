@@ -45,8 +45,8 @@ public class UserHelper
      */
     public static boolean isUserPremium(@NonNull Application application)
     {
-        return ((EasyBudget) application).getPremiumCheckStatus() == PremiumCheckStatus.PREMIUM ||
-                Parameters.getInstance(application).getBoolean(ParameterKeys.BATCH_OFFER_REDEEMED, false);
+        return false; //((EasyBudget) application).getPremiumCheckStatus() == PremiumCheckStatus.PREMIUM ||
+                //Parameters.getInstance(application).getBoolean(ParameterKeys.BATCH_OFFER_REDEEMED, false);
     }
 
     /**
@@ -89,7 +89,7 @@ public class UserHelper
      */
     public static boolean isUserAllowingDailyReminderPushes(@NonNull Context context)
     {
-        return Parameters.getInstance(context).getBoolean(ParameterKeys.USER_ALLOW_DAILY_PUSH, false);
+        return Parameters.getInstance(context).getBoolean(ParameterKeys.USER_ALLOW_DAILY_PUSH, true);
     }
 
     /**

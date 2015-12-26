@@ -30,6 +30,7 @@
     <string name="title_activity_monthly_income_edit">Modificar receita mensal</string>
     <string name="title_activity_settings">Preferências</string>
     <string name="title_activity_welcome">EasyBudget</string>
+    <string name="title_activity_premium">Premium</string>
     <string name="cancel">Cancelar</string>
     <string name="undo">DESFAZER</string>
     <string name="ok">OK</string>
@@ -138,6 +139,7 @@
     <string name="setting_category_not_premium_status_title">Torne-se premium</string>
     <string name="setting_category_not_premium_status_message">Acesse todas as funções premium</string>
 
+    <string name="premium">Premium</string>
     <string name="premium_popup_premium_title">Você é premium!</string>
     <string name="premium_popup_premium_message">Você tem acesso às funções premium:\n\n- Lembrete diário se você esqueceu de inserir suas despesas durante o dia\n… e mais funções premium que virão em breve!</string>
     <string name="premium_popup_not_premium_title">Torne-se premium</string>

@@ -55,4 +55,5 @@
     <color name="onboarding_3_statusbar">@color/secondary_dark</color>
     <color name="onboarding_4_background">@color/primary</color>
     <color name="onboarding_4_statusbar">@color/primary_dark</color>
+    <color name="premium_background">@color/primary</color>
 </resources>
