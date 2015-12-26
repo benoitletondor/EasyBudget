@@ -55,6 +55,7 @@ import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
 import com.benoitletondor.easybudgetapp.helper.Parameters;
 import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.helper.UserHelper;
+import com.benoitletondor.easybudgetapp.notif.DailyNotifOptinService;
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment;
 import com.google.android.gms.appinvite.AppInviteInvitation;
 
@@ -343,6 +344,19 @@ public class PreferencesFragment extends PreferenceFragment
                 public boolean onPreferenceClick(Preference preference)
                 {
                     showBecomePremiumDialog();
+                    return false;
+                }
+            });
+
+            /*
+             * Show daily reminder opt-in notif
+             */
+            findPreference(getResources().getString(R.string.setting_category_show_notif_daily_reminder_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+            {
+                @Override
+                public boolean onPreferenceClick(Preference preference)
+                {
+                    DailyNotifOptinService.showDailyReminderOptinNotif(getActivity());
                     return false;
                 }
             });
