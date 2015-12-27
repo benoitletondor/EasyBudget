@@ -152,16 +152,16 @@
     <string name="premium_popup_become_cta">Descubrir</string>
     <string name="premium_popup_become_not_now">Ahora no</string>
     <string name="premium_popup_become_not_ask_again">No preguntar más</string>
-    <string name="premium_notif_optin_message">New premium feature: Daily notification.\nReceive a reminder if you forgot to add your expenses during the day. Are you in?\n(You can change it later in settings)</string>
-    <string name="premium_notif_optin_message_ok">I\'m in</string>
-    <string name="premium_notif_optin_message_not_ok">No thanks</string>
+    <string name="premium_notif_optin_message">Nueva funcionalidad premium: ¡Notificaciones diarias!\nRecibe un recordatorio para que no olvides agregar los gastos del día. ¿Te late?\n(Puedes modificar esto en tus preferencias después)</string>
+    <string name="premium_notif_optin_message_ok">De acuerdo</string>
+    <string name="premium_notif_optin_message_not_ok">No, gracias</string>
 
     <string name="iab_purchase_success_title">Gracias</string>
     <string name="iab_purchase_success_message">¡Muchas gracias por tu apoyo! Ahora tienes acceso a las funcionalidades premium.</string>
-    <string name="iab_purchase_wait_title">Purchasing</string>
+    <string name="iab_purchase_wait_title">Comprando</string>
     <string name="iab_purchase_wait_message">Por favor espera</string>
     <string name="iab_purchase_error_title">¡Ups!</string>
-    <string name="iab_purchase_error_message">An error occurred, try again later or contact me if the problem persists.\n(%s)</string>
+    <string name="iab_purchase_error_message">Ocurrió un error, inténtalo más tarde o contáctame si el problema persiste.\n(%s)</string>
 
     <string name="voucher_redeem_dialog_title">Código promocional</string>
     <string name="voucher_redeem_dialog_message">Entra el código promocional</string>
