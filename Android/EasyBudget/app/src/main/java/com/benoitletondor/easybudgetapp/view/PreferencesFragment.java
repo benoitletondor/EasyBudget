@@ -55,6 +55,7 @@ import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
 import com.benoitletondor.easybudgetapp.helper.Parameters;
 import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.helper.UserHelper;
+import com.benoitletondor.easybudgetapp.notif.DailyNotifOptinService;
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment;
 import com.google.android.gms.appinvite.AppInviteInvitation;
 
@@ -348,6 +349,19 @@ public class PreferencesFragment extends PreferenceFragment
             });
 
             /*
+             * Show daily reminder opt-in notif
+             */
+            findPreference(getResources().getString(R.string.setting_category_show_notif_daily_reminder_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+            {
+                @Override
+                public boolean onPreferenceClick(Preference preference)
+                {
+                    DailyNotifOptinService.showDailyReminderOptinNotif(getActivity());
+                    return false;
+                }
+            });
+
+            /*
              * Enable animations pref
              */
             final CheckBoxPreference animationsPref = (CheckBoxPreference) findPreference(getResources().getString(R.string.setting_category_disable_animation_key));
@@ -398,6 +412,19 @@ public class PreferencesFragment extends PreferenceFragment
                 }
                 else if( SettingsActivity.USER_GONE_PREMIUM_INTENT.equals(intent.getAction()) )
                 {
+                    new AlertDialog.Builder(getActivity())
+                        .setTitle(R.string.iab_purchase_success_title)
+                        .setMessage(R.string.iab_purchase_success_message)
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
+
                     refreshPremiumPreference();
                 }
             }

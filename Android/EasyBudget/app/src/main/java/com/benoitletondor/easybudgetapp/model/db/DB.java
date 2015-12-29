@@ -24,6 +24,7 @@ import android.database.sqlite.SQLiteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
+import android.support.v4.util.Pair;
 
 import com.benoitletondor.easybudgetapp.helper.DateHelper;
 import com.benoitletondor.easybudgetapp.helper.Logger;
@@ -150,10 +151,11 @@ public final class DB
      */
     public boolean hasExpensesForDay(@NonNull Date day)
     {
-        day = DateHelper.cleanDate(day);
+        Pair<Long, Long> range = DateHelper.getTimestampRangeForDay(day);
+        Date gmt = DateHelper.cleanGMTDate(day);
 
         // Check cache
-        Boolean hasExpensesCached = DBCache.getInstance(context).hasExpensesForDay(day);
+        Boolean hasExpensesCached = DBCache.getInstance(context).hasExpensesForDay(gmt);
         if( hasExpensesCached != null )
         {
             return hasExpensesCached;
@@ -162,7 +164,7 @@ public final class DB
         Cursor cursor = null;
         try
         {
-            cursor = database.rawQuery("SELECT COUNT(*) FROM " + SQLiteDBHelper.TABLE_EXPENSE + " WHERE " + SQLiteDBHelper.COLUMN_EXPENSE_DATE + " = " + day.getTime(), null);
+            cursor = database.rawQuery("SELECT COUNT(*) FROM " + SQLiteDBHelper.TABLE_EXPENSE + " WHERE " + SQLiteDBHelper.COLUMN_EXPENSE_DATE + " >= " + range.first + " AND "+SQLiteDBHelper.COLUMN_EXPENSE_DATE + " <= "+ range.second, null);
 
             return cursor.moveToFirst() && cursor.getInt(0) > 0;
         }
@@ -185,12 +187,13 @@ public final class DB
     @NonNull
     protected List<Expense> getExpensesForDay(@NonNull Date date, boolean fromCache)
     {
-        date = DateHelper.cleanDate(date);
+        Pair<Long, Long> range = DateHelper.getTimestampRangeForDay(date);
+        Date gmt = DateHelper.cleanGMTDate(date);
 
         // Check cache
         if( fromCache )
         {
-            List<Expense> cachedExpenses = DBCache.getInstance(context).getExpensesForDay(date);
+            List<Expense> cachedExpenses = DBCache.getInstance(context).getExpensesForDay(gmt);
             if( cachedExpenses != null )
             {
                 return cachedExpenses;
@@ -202,7 +205,7 @@ public final class DB
         {
             List<Expense> expenses = new ArrayList<>();
 
-            cursor = database.query(SQLiteDBHelper.TABLE_EXPENSE, null, SQLiteDBHelper.COLUMN_EXPENSE_DATE + " = " + date.getTime(), null, null, null, null, null);
+            cursor = database.query(SQLiteDBHelper.TABLE_EXPENSE, null, SQLiteDBHelper.COLUMN_EXPENSE_DATE + " >= " + range.first+" AND "+SQLiteDBHelper.COLUMN_EXPENSE_DATE + " <= "+range.second, null, null, null, null, null);
             while( cursor.moveToNext() )
             {
                 try
@@ -247,12 +250,13 @@ public final class DB
      */
     protected double getBalanceForDay(@NonNull Date day, boolean fromCache)
     {
-        day = DateHelper.cleanDate(day);
+        Pair<Long, Long> range = DateHelper.getTimestampRangeForDay(day);
+        Date gmt = DateHelper.cleanGMTDate(day);
 
         // Check cache
         if( fromCache )
         {
-            Double cachedBalance = DBCache.getInstance(context).getBalanceForDay(day);
+            Double cachedBalance = DBCache.getInstance(context).getBalanceForDay(gmt);
             if( cachedBalance != null )
             {
                 return cachedBalance;
@@ -262,7 +266,7 @@ public final class DB
         Cursor cursor = null;
         try
         {
-            cursor = database.rawQuery("SELECT SUM(" + SQLiteDBHelper.COLUMN_EXPENSE_AMOUNT + ") FROM " + SQLiteDBHelper.TABLE_EXPENSE + " WHERE " + SQLiteDBHelper.COLUMN_EXPENSE_DATE + " <= " + day.getTime(), null);
+            cursor = database.rawQuery("SELECT SUM(" + SQLiteDBHelper.COLUMN_EXPENSE_AMOUNT + ") FROM " + SQLiteDBHelper.TABLE_EXPENSE + " WHERE " + SQLiteDBHelper.COLUMN_EXPENSE_DATE + " <= " + range.second, null);
 
             if(cursor.moveToFirst())
             {

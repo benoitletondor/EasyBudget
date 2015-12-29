@@ -90,6 +90,9 @@
         <Preference android:title="@string/setting_category_show_premium"
             android:key="@string/setting_category_dev_show_premium_key" />
 
+        <Preference android:title="@string/setting_category_show_notif_daily_reminder"
+            android:key="@string/setting_category_show_notif_daily_reminder_key" />
+
         <CheckBoxPreference android:title="@string/setting_category_disable_animation_title"
             android:summaryOn="@string/setting_category_disable_animation_message"
             android:summaryOff="@string/setting_category_disable_animation_message"
