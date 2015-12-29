@@ -44,7 +44,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 23
         versionCode 34
-        versionName "1.2"
+        versionName "1.2b6"
     }
     buildTypes {
         debug {
