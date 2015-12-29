@@ -171,7 +171,7 @@ public class CalendarGridAdapter extends CaldroidGridAdapter
                 }
             }
 
-            final Date date = new Date(dateTime.getMilliseconds(TimeZone.getTimeZone("UTC")));
+            final Date date = new Date(dateTime.getMilliseconds(TimeZone.getDefault()));
             if( db.hasExpensesForDay(date) )
             {
                 double balance = db.getBalanceForDay(date);

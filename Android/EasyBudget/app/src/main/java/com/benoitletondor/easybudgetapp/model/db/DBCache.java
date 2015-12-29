@@ -28,6 +28,7 @@ import com.benoitletondor.easybudgetapp.model.Expense;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -96,7 +97,7 @@ public class DBCache
 
         synchronized (expenses)
         {
-            expenses.put(date, db.getExpensesForDay(date, false));
+            expenses.put(DateHelper.cleanGMTDate(date), db.getExpensesForDay(date, false));
         }
     }
 
@@ -219,7 +220,7 @@ public class DBCache
 
                 synchronized (expenses)
                 {
-                    if (expenses.containsKey(cal.getTime()))
+                    if (expenses.containsKey(DateHelper.cleanGMTDate(cal.getTime())))
                     {
                         return;
                     }
@@ -240,7 +241,7 @@ public class DBCache
 
                     synchronized (expenses)
                     {
-                        expenses.put(date, expensesForDay);
+                        expenses.put(DateHelper.cleanGMTDate(date), expensesForDay);
                     }
 
                     cal.add(Calendar.DAY_OF_MONTH, 1);
@@ -291,7 +292,7 @@ public class DBCache
 
                 synchronized (balances)
                 {
-                    if (balances.containsKey(cal.getTime()))
+                    if (balances.containsKey(DateHelper.cleanGMTDate(cal.getTime())))
                     {
                         return;
                     }
@@ -312,7 +313,7 @@ public class DBCache
 
                     synchronized (balances)
                     {
-                        balances.put(date, balanceForDay);
+                        balances.put(DateHelper.cleanGMTDate(date), balanceForDay);
                     }
 
                     cal.add(Calendar.DAY_OF_MONTH, 1);
