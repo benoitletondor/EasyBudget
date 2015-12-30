@@ -50,7 +50,7 @@ public class BuildVersion
     public final static int VERSION_1_1_3 = 28;
     /**
      * Add daily reminder pushes opt-out from settings & premium iAP.
-     * TODO
+     * 30/12/2015
      */
-    public final static int VERSION_1_2 = 34;
+    public final static int VERSION_1_2 = 35;
 }
