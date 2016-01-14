@@ -205,7 +205,7 @@ public final class DB
         {
             List<Expense> expenses = new ArrayList<>();
 
-            cursor = database.query(SQLiteDBHelper.TABLE_EXPENSE, null, SQLiteDBHelper.COLUMN_EXPENSE_DATE + " >= " + range.first+" AND "+SQLiteDBHelper.COLUMN_EXPENSE_DATE + " <= "+range.second, null, null, null, null, null);
+            cursor = database.query(SQLiteDBHelper.TABLE_EXPENSE, null, SQLiteDBHelper.COLUMN_EXPENSE_DATE + " >= " + range.first + " AND " + SQLiteDBHelper.COLUMN_EXPENSE_DATE + " <= " + range.second, null, null, null, null, null);
             while( cursor.moveToNext() )
             {
                 try
@@ -239,6 +239,19 @@ public final class DB
     public List<Expense> getExpensesForDay(@NonNull Date date)
     {
         return getExpensesForDay(date, true);
+    }
+
+    /**
+     * Get all the expenses for the given month ordered by date
+     *
+     * @param date first day of the month at 00:00:000
+     * @return expenses for the given month
+     */
+    @NonNull
+    public List<Expense> getExpensesForMonth(@NonNull Date date)
+    {
+        // TODO
+        return new ArrayList<>();
     }
 
     /**

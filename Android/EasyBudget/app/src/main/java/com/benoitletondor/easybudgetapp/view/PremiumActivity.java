@@ -23,7 +23,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -62,7 +62,7 @@ public class PremiumActivity extends AppCompatActivity
         setResult(Activity.RESULT_CANCELED);
 
         pager = (ViewPager) findViewById(R.id.premium_view_pager);
-        pager.setAdapter(new FragmentStatePagerAdapter(getSupportFragmentManager())
+        pager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager())
         {
             @Override
             public Fragment getItem(int position)

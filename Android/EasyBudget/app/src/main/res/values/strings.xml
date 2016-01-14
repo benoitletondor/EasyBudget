@@ -33,6 +33,7 @@
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_welcome">EasyBudget</string>
     <string name="title_activity_premium">Premium</string>
+    <string name="title_activity_monthly_report">Monthly report</string>
     <string name="cancel">Cancel</string>
     <string name="undo">UNDO</string>
     <string name="ok">OK</string>
@@ -229,6 +230,8 @@
     <string name="app_invite_welcome_title">Welcome to EasyBudget</string>
     <string name="app_invite_welcome_message">It looks like a friend recommended this app to you. Welcome on board and don\'t forget to thank your friend for that great advice ;)</string>
     <string name="app_invite_welcome_cta">Go!</string>
+
+    <string name="monthly_report_button_title">Monthly report</string>
 
     <!-- Keys, not for translations. -->
     <string name="setting_category_bug_report_send_button_key" translatable="false">send_bug_report</string>

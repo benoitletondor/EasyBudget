@@ -626,6 +626,13 @@ public class MainActivity extends DBActivity
 
             return true;
         }
+        else if( id == R.id.action_monthly_report )
+        {
+            Intent startIntent = new Intent(this, MonthlyReportActivity.class);
+            ActivityCompat.startActivity(MainActivity.this, startIntent, null);
+
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }

@@ -16,11 +16,14 @@
 
 package com.benoitletondor.easybudgetapp.helper;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
 /**
@@ -92,5 +95,37 @@ public class DateHelper
         cal.set(Calendar.HOUR_OF_DAY, 0);
 
         return cal.getTime();
+    }
+
+    /**
+     * Get the list of months available for the user for the monthly report view.
+     *
+     * @param context non null context
+     * @return a list of Date object set at the 1st day of the month 00:00:00:000
+     */
+    public static List<Date> getListOfMonthsAvailableForUser(@NonNull Context context)
+    {
+        long initDate = Parameters.getInstance(context).getLong(ParameterKeys.INIT_DATE, System.currentTimeMillis());
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(initDate);
+
+        cal.set(Calendar.MILLISECOND, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+
+        Date today = new Date();
+
+        List<Date> months = new ArrayList<>();
+
+        while( cal.getTime().before(today) )
+        {
+            months.add(cal.getTime());
+            cal.add(Calendar.MONTH, 1);
+        }
+
+        return months;
     }
 }
