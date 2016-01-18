@@ -60,4 +60,5 @@
     <color name="premium_background">@color/primary</color>
 
     <color name="monthly_report_disabled_month_button">@color/primary</color>
+    <color name="monthly_report_hint_background">#DD000000</color>
 </resources>

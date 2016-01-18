@@ -112,6 +112,10 @@ public class ParameterKeys
      */
     public static final String DAILY_PUSH_NOTIF_SHOWN = "user_saw_daily_push_notif";
     /**
+     * Has the monthly report notification been shown to the user yet (bool)
+     */
+    public static final String MONTHLY_PUSH_NOTIF_SHOWN = "user_saw_monthly_push_notif";
+    /**
      * Timestamp that indicates the last time user was presented the become premium popup (long)
      */
     public static final String PREMIUM_POPUP_LAST_AUTO_SHOW = "premium_popup_last_auto_show";
@@ -119,4 +123,8 @@ public class ParameterKeys
      * Has the user complete the premium popup = should we show it again or not (bool)
      */
     public static final String PREMIUM_POPUP_COMPLETE = "premium_popup_complete";
+    /**
+     * Has the user saw the monthly report hint (bool)
+     */
+    public static final String USER_SAW_MONTHLY_REPORT_HINT = "user_saw_monthly_report_hint";
 }

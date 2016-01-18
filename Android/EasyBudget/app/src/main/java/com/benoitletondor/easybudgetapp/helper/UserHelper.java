@@ -145,4 +145,25 @@ public class UserHelper
     {
         Parameters.getInstance(context).putBoolean(ParameterKeys.RATING_COMPLETED, true);
     }
+
+    /**
+     * Has the user saw the monthly report hint so far
+     *
+     * @param context non null context
+     * @return true if the user saw it, false otherwise
+     */
+    public static boolean hasUserSawMonthlyReportHint(@NonNull Context context)
+    {
+        return Parameters.getInstance(context).getBoolean(ParameterKeys.USER_SAW_MONTHLY_REPORT_HINT, false);
+    }
+
+    /**
+     * Set that the user saw the monthly report hint
+     *
+     * @param context non null context
+     */
+    public static void setUserSawMonthlyReportHint(@NonNull Context context)
+    {
+        Parameters.getInstance(context).putBoolean(ParameterKeys.USER_SAW_MONTHLY_REPORT_HINT, true);
+    }
 }

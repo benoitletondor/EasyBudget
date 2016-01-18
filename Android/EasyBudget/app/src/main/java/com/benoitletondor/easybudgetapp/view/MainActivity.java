@@ -98,6 +98,7 @@ public class MainActivity extends DBActivity
     public static final String INTENT_MONTHLY_EXPENSE_DELETED = "intent.expense.monthly.deleted";
     public static final String INTENT_SHOW_WELCOME_SCREEN = "intent.welcomscreen.show";
 
+    public static final String INTENT_REDIRECT_TO_PREMIUM_EXTRA = "intent.extra.premiumshow";
     public static final String INTENT_REDIRECT_TO_SETTINGS_EXTRA = "intent.extra.redirecttosettings";
 
     public final static String ANIMATE_TRANSITION_KEY = "animate";
@@ -281,6 +282,7 @@ public class MainActivity extends DBActivity
 
         openSettingsIfNeeded(getIntent());
         openMonthlyReportIfNeeded(getIntent());
+        openPremiumIfNeeded(getIntent());
     }
 
     @Override
@@ -388,7 +390,8 @@ public class MainActivity extends DBActivity
         }
 
         openSettingsIfNeeded(intent);
-        openMonthlyReportIfNeeded(getIntent());
+        openMonthlyReportIfNeeded(intent);
+        openPremiumIfNeeded(intent);
     }
 
     /**
@@ -471,6 +474,21 @@ public class MainActivity extends DBActivity
         if( !UserHelper.isUserPremium(getApplication()) )
         {
             menu.removeItem(R.id.action_monthly_report);
+        }
+        else if( !UserHelper.hasUserSawMonthlyReportHint(this) )
+        {
+            final View monthlyReportHint = findViewById(R.id.monthly_report_hint);
+            monthlyReportHint.setVisibility(View.VISIBLE);
+
+            findViewById(R.id.monthly_report_hint_button).setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    monthlyReportHint.setVisibility(View.GONE);
+                    UserHelper.setUserSawMonthlyReportHint(MainActivity.this);
+                }
+            });
         }
 
         return true;
@@ -705,7 +723,7 @@ public class MainActivity extends DBActivity
     }
 
     /**
-     * Open the monthly report activity if the given intent.
+     * Open the monthly report activity if the given intent contains the monthly uri part.
      *
      * @param intent
      */
@@ -714,15 +732,33 @@ public class MainActivity extends DBActivity
         try
         {
             Uri data = intent.getData();
-            if( "true".equals(data.getQueryParameter("monthly")) )
+            if( data != null && "true".equals(data.getQueryParameter("monthly")) )
             {
                 Intent startIntent = new Intent(this, MonthlyReportActivity.class);
+                startIntent.putExtra(MonthlyReportActivity.FROM_NOTIFICATION_EXTRA, true);
                 ActivityCompat.startActivity(MainActivity.this, startIntent, null);
             }
         }
         catch (Exception e)
         {
             Logger.error("Error while opening report activity", e);
+        }
+    }
+
+    /**
+     * Open the premium screen if the given intent contains the {@link #INTENT_REDIRECT_TO_PREMIUM_EXTRA}
+     * extra.
+     *
+     * @param intent
+     */
+    private void openPremiumIfNeeded(Intent intent)
+    {
+        if( intent.getBooleanExtra(INTENT_REDIRECT_TO_PREMIUM_EXTRA, false) )
+        {
+            Intent startIntent = new Intent(this, SettingsActivity.class);
+            startIntent.putExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, true);
+
+            ActivityCompat.startActivity(this, startIntent, null);
         }
     }
 

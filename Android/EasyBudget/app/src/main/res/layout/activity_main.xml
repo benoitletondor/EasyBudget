@@ -150,4 +150,45 @@
         </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
     </android.support.design.widget.CoordinatorLayout>
+
+    <LinearLayout android:id="@+id/monthly_report_hint"
+        android:layout_width="220dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="top|right"
+        android:layout_marginTop="-30dp"
+        android:layout_marginRight="34dp"
+        android:visibility="gone">
+
+        <View
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/triangle_drawable"
+            android:layout_gravity="right"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="@color/monthly_report_hint_background"
+            android:padding="10dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="@string/monthly_report_hint"
+                android:textColor="@android:color/white"
+                android:textSize="15dp"/>
+
+            <Button android:id="@+id/monthly_report_hint_button"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:background="@drawable/welcome_screen_next_button_1_drawable"
+                android:text="@string/ok"
+                android:textColor="@android:color/white" />
+
+        </LinearLayout>
+
+    </LinearLayout>
 </FrameLayout>

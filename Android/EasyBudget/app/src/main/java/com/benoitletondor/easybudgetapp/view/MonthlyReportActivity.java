@@ -45,6 +45,12 @@ import java.util.List;
 public class MonthlyReportActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener
 {
     /**
+     * Extra to add the the launch intent to specify that user comes from the notification (used to
+     * show not the current month but the last one)
+     */
+    public static final String FROM_NOTIFICATION_EXTRA = "fromNotif";
+
+    /**
      * List of first date of each month available
      */
     private List<Date> dates;
@@ -177,7 +183,16 @@ public class MonthlyReportActivity extends AppCompatActivity implements ViewPage
             }
         });
         pager.addOnPageChangeListener(this);
-        selectPagerItem(dates.size() - 1, false);
+
+        // Show previous month if user comes from the notification
+        if( getIntent().getBooleanExtra(FROM_NOTIFICATION_EXTRA, false) && dates.size() > 1 )
+        {
+            selectPagerItem(dates.size() - 2, false);
+        }
+        else
+        {
+            selectPagerItem(dates.size() - 1, false);
+        }
     }
 
     /**
