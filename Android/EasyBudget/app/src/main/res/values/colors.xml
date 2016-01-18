@@ -58,4 +58,6 @@
     <color name="onboarding_4_background">@color/primary</color>
     <color name="onboarding_4_statusbar">@color/primary_dark</color>
     <color name="premium_background">@color/primary</color>
+
+    <color name="monthly_report_disabled_month_button">@color/primary</color>
 </resources>

@@ -104,6 +104,28 @@ public class UserHelper
     }
 
     /**
+     * The user wants or not to receive a daily monthly notification when report is available
+     *
+     * @param context non null context
+     * @return true if we can display monthly notifications, false otherwise
+     */
+    public static boolean isUserAllowingMonthlyReminderPushes(@NonNull Context context)
+    {
+        return Parameters.getInstance(context).getBoolean(ParameterKeys.USER_ALLOW_MONTHLY_PUSH, true);
+    }
+
+    /**
+     * Set the user choice about monthly reminder notifications
+     *
+     * @param context non null context
+     * @param value if the user wants or not to receive monthly notifications
+     */
+    public static void setUserAllowMonthlyReminderPushes(@NonNull Context context, boolean value)
+    {
+        Parameters.getInstance(context).putBoolean(ParameterKeys.USER_ALLOW_MONTHLY_PUSH, value);
+    }
+
+    /**
      * Has the user complete the rating popup
      *
      * @param context non null context

@@ -488,17 +488,17 @@ public class PreferencesFragment extends PreferenceFragment
                 public boolean onPreferenceClick(Preference preference)
                 {
                     new AlertDialog.Builder(getActivity())
-                        .setTitle(R.string.premium_popup_premium_title)
-                        .setMessage(R.string.premium_popup_premium_message)
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
+                            .setTitle(R.string.premium_popup_premium_title)
+                            .setMessage(R.string.premium_popup_premium_message)
+                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
                             {
-                                dialog.dismiss();
-                            }
-                        })
-                        .show();
+                                @Override
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .show();
 
                     return false;
                 }
@@ -516,6 +516,19 @@ public class PreferencesFragment extends PreferenceFragment
                 }
             });
             dailyNotifPref.setChecked(UserHelper.isUserAllowingDailyReminderPushes(getActivity()));
+
+            // Monthly reminder for reports
+            final CheckBoxPreference monthlyNotifPref = (CheckBoxPreference) findPreference(getResources().getString(R.string.setting_category_show_notif_monthly_reminder_key));
+            monthlyNotifPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+            {
+                @Override
+                public boolean onPreferenceClick(Preference preference)
+                {
+                    UserHelper.setUserAllowMonthlyReminderPushes(getActivity(), monthlyNotifPref.isChecked());
+                    return true;
+                }
+            });
+            monthlyNotifPref.setChecked(UserHelper.isUserAllowingMonthlyReminderPushes(getActivity()));
         }
         else
         {

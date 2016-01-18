@@ -150,6 +150,8 @@
     <string name="setting_category_notifications_daily_message">Receive a notification at the end of the day if you didn\'t enter your expenses</string>
     <string name="setting_category_not_premium_status_title">Become a premium user</string>
     <string name="setting_category_not_premium_status_message">Access all the premium features</string>
+    <string name="setting_category_notifications_monthly_title">Monthly report notification</string>
+    <string name="setting_category_notifications_monthly_message">Receive a notification when a new monthly report is complete</string>
 
     <string name="premium_popup_premium_title">You are premium!</string>
     <string name="premium_popup_premium_message">You have access to premium features:\n\n- Daily reminder if you forgot to enter your expenses during the day\n… and more premium features that will be added soon!</string>
@@ -232,6 +234,13 @@
     <string name="app_invite_welcome_cta">Go!</string>
 
     <string name="monthly_report_button_title">Monthly report</string>
+    <string name="monthly_report_month_title_format">MMMM yyyy</string>
+    <string name="expenses">Expenses</string>
+    <string name="revenues">Revenues</string>
+    <string name="expenses_total">Expenses total</string>
+    <string name="revenues_total">Revenues total</string>
+    <string name="balance">Balance</string>
+    <string name="monthly_report_no_entries_placeholder">Nothing for this month.</string>
 
     <!-- Keys, not for translations. -->
     <string name="setting_category_bug_report_send_button_key" translatable="false">send_bug_report</string>
@@ -252,4 +261,5 @@
     <string name="setting_category_not_premium_status_key" translatable="false">not_premium</string>
     <string name="setting_category_dev_show_premium_key" translatable="false">show_premium</string>
     <string name="setting_category_show_notif_daily_reminder_key" translatable="false">show_daily_reminder_notif</string>
+    <string name="setting_category_show_notif_monthly_reminder_key" translatable="false">show_monthly_reminder_notif</string>
 </resources>

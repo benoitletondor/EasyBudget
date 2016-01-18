@@ -58,6 +58,7 @@ import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
 import com.benoitletondor.easybudgetapp.helper.Parameters;
+import com.benoitletondor.easybudgetapp.helper.UserHelper;
 import com.benoitletondor.easybudgetapp.model.Expense;
 import com.benoitletondor.easybudgetapp.model.MonthlyExpense;
 import com.benoitletondor.easybudgetapp.model.MonthlyExpenseDeleteType;
@@ -279,6 +280,7 @@ public class MainActivity extends DBActivity
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver, filter);
 
         openSettingsIfNeeded(getIntent());
+        openMonthlyReportIfNeeded(getIntent());
     }
 
     @Override
@@ -386,6 +388,7 @@ public class MainActivity extends DBActivity
         }
 
         openSettingsIfNeeded(intent);
+        openMonthlyReportIfNeeded(getIntent());
     }
 
     /**
@@ -463,6 +466,13 @@ public class MainActivity extends DBActivity
     {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        // Remove monthly report for non premium users
+        if( !UserHelper.isUserPremium(getApplication()) )
+        {
+            menu.removeItem(R.id.action_monthly_report);
+        }
+
         return true;
     }
 
@@ -691,6 +701,28 @@ public class MainActivity extends DBActivity
         {
             Intent startIntent = new Intent(this, SettingsActivity.class);
             ActivityCompat.startActivity(MainActivity.this, startIntent, null);
+        }
+    }
+
+    /**
+     * Open the monthly report activity if the given intent.
+     *
+     * @param intent
+     */
+    private void openMonthlyReportIfNeeded(Intent intent)
+    {
+        try
+        {
+            Uri data = intent.getData();
+            if( "true".equals(data.getQueryParameter("monthly")) )
+            {
+                Intent startIntent = new Intent(this, MonthlyReportActivity.class);
+                ActivityCompat.startActivity(MainActivity.this, startIntent, null);
+            }
+        }
+        catch (Exception e)
+        {
+            Logger.error("Error while opening report activity", e);
         }
     }
 

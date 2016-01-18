@@ -40,6 +40,12 @@
             android:key="@string/setting_category_notifications_daily_key"
             android:enabled="true"/>
 
+        <CheckBoxPreference android:title="@string/setting_category_notifications_monthly_title"
+            android:summaryOn="@string/setting_category_notifications_monthly_message"
+            android:summaryOff="@string/setting_category_notifications_monthly_message"
+            android:key="@string/setting_category_show_notif_monthly_reminder_key"
+            android:enabled="true"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory android:key="@string/setting_category_not_premium_key"

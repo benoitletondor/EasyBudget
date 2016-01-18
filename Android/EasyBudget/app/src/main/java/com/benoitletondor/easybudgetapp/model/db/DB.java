@@ -34,6 +34,7 @@ import com.benoitletondor.easybudgetapp.model.MonthlyExpense;
 import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -244,14 +245,48 @@ public final class DB
     /**
      * Get all the expenses for the given month ordered by date
      *
-     * @param date first day of the month at 00:00:000
+     * @param firstDate first day of the month at 00:00:000
      * @return expenses for the given month
      */
     @NonNull
-    public List<Expense> getExpensesForMonth(@NonNull Date date)
+    public List<Expense> getExpensesForMonth(@NonNull Date firstDate)
     {
-        // TODO
-        return new ArrayList<>();
+        Pair<Long, Long> firstDateRange = DateHelper.getTimestampRangeForDay(firstDate);
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(firstDate);
+        cal.add(Calendar.MONTH, 1);
+        cal.add(Calendar.DAY_OF_MONTH, -1);
+
+        Pair<Long, Long> lastDateRange = DateHelper.getTimestampRangeForDay(cal.getTime());
+
+        Cursor cursor = null;
+        try
+        {
+            List<Expense> expenses = new ArrayList<>();
+
+            cursor = database.query(SQLiteDBHelper.TABLE_EXPENSE, null, SQLiteDBHelper.COLUMN_EXPENSE_DATE + " >= " + firstDateRange.first + " AND " + SQLiteDBHelper.COLUMN_EXPENSE_DATE + " <= " + lastDateRange.second+" ORDER BY "+SQLiteDBHelper.COLUMN_EXPENSE_DATE, null, null, null, null, null);
+            while( cursor.moveToNext() )
+            {
+                try
+                {
+                    expenses.add(ExpenseFromCursor(cursor));
+                }
+                catch (Exception e)
+                {
+                    Logger.error(false, "Error occurred querying DB for expense for a month", e);
+                }
+            }
+
+            return expenses;
+        }
+        finally
+        {
+            if( cursor != null )
+            {
+                cursor.close();
+            }
+        }
     }
 
     /**

@@ -20,10 +20,14 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
 
+import com.benoitletondor.easybudgetapp.R;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 /**
@@ -127,5 +131,18 @@ public class DateHelper
         }
 
         return months;
+    }
+
+    /**
+     * Get the title of the month to display in the report view
+     *
+     * @param context non null context
+     * @param date date of the month
+     * @return a formatted string like "January 2016"
+     */
+    public static String getMonthTitle(@NonNull Context context, @NonNull Date date)
+    {
+        SimpleDateFormat format = new SimpleDateFormat(context.getResources().getString(R.string.monthly_report_month_title_format), Locale.getDefault());
+        return format.format(date);
     }
 }

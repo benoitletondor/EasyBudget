@@ -29,8 +29,41 @@
     <LinearLayout android:id="@+id/monthly_report_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:visibility="gone" >
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="47dp"
+            android:orientation="horizontal"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:gravity="center_vertical"
+            android:background="@color/primary_dark">
+
+            <Button android:id="@+id/monthly_report_previous_month_button"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="24dp"
+                android:background="@drawable/calendar_month_switcher_button_drawable" />
+
+            <TextView android:id="@+id/monthly_report_month_title_tv"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.0"
+                android:textSize="21dp"
+                android:textColor="@android:color/white"
+                android:textAllCaps="true"
+                android:gravity="center" />
+
+            <Button android:id="@+id/monthly_report_next_month_button"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="24dp"
+                android:background="@drawable/calendar_month_switcher_button_drawable" />
+
+        </LinearLayout>
 
         <android.support.v4.view.ViewPager
             android:id="@+id/monthly_report_view_pager"

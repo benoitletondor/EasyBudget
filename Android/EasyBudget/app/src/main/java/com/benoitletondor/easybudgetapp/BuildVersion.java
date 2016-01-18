@@ -53,4 +53,9 @@ public class BuildVersion
      * 30/12/2015
      */
     public final static int VERSION_1_2 = 35;
+    /**
+     * Add monthly report
+     * TODO
+     */
+    public final static int VERSION_1_3 = 36;
 }

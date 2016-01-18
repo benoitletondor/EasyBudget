@@ -67,8 +67,9 @@
         </activity>
         <activity
             android:name=".view.MonthlyReportActivity"
-            android:label="@string/title_activity_monthly_report">
-        </activity>
+            android:label="@string/title_activity_monthly_report"
+            android:configChanges="locale|keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".view.ExpenseEditActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
