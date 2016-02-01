@@ -115,4 +115,8 @@ public class ParameterKeys
      * Has the user complete the premium popup = should we show it again or not (bool)
      */
     public static final String PREMIUM_POPUP_COMPLETE = "premium_popup_complete";
+    /**
+     * Is the user premium from AppTurbo (bool)
+     */
+    public static final String APP_TURBO_PREMIUM = "appturbo_offer";
 }
