@@ -53,4 +53,9 @@ public class BuildVersion
      * 30/12/2015
      */
     public final static int VERSION_1_2 = 35;
+    /**
+     * Add AppTurbo promotion code.
+     * 01/02/2016
+     */
+    public final static int VERSION_1_2_1 = 36;
 }
