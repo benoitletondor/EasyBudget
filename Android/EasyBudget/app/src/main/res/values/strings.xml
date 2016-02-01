@@ -230,6 +230,9 @@
     <string name="app_invite_welcome_message">It looks like a friend recommended this app to you. Welcome on board and don\'t forget to thank your friend for that great advice ;)</string>
     <string name="app_invite_welcome_cta">Go!</string>
 
+    <string name="appturbo_redeem_title" translatable="false">App of the Day</string>
+    <string name="appturbo_redeem_message" translatable="false">Thanks to App of the Day, you have now access to premium features for free!\nHope you\'ll enjoy the app :)</string>
+
     <!-- Keys, not for translations. -->
     <string name="setting_category_bug_report_send_button_key" translatable="false">send_bug_report</string>
     <string name="setting_category_show_welcome_screen_button_key" translatable="false">show_welcome_screen</string>
