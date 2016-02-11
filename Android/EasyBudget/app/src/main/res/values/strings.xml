@@ -245,9 +245,12 @@
     <string name="revenues_total">Revenues total</string>
     <string name="balance">Balance</string>
     <string name="monthly_report_no_entries_placeholder">Nothing for this month.</string>
-    <string name="monthly_report_notif_notpremium_text">New feature for premium users: Monthly report.\nGet a sum-up of your expenses and incomes of the month. Tap to discover premium</string>
+    <string name="monthly_report_notif_notpremium_text">New feature for premium users: Monthly report.\nGet a sum-up of your expenses and incomes of the month. Discover premium?</string>
     <string name="monthly_report_notif_premium_text">New feature available: Monthly report.\nGet a sum-up of your expenses and incomes of the month. Tap to try</string>
     <string name="monthly_report_hint">Psst: You can access monthly reports from this button!</string>
+
+    <string name="appturbo_redeem_title" translatable="false">App of the Day</string>
+    <string name="appturbo_redeem_message" translatable="false">Thanks to App of the Day, you have now access to premium features for free!\nHope you\'ll enjoy the app :)</string>
 
     <!-- Keys, not for translations. -->
     <string name="setting_category_bug_report_send_button_key" translatable="false">send_bug_report</string>

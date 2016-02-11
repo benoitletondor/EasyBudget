@@ -114,8 +114,9 @@
             </intent-filter>
         </receiver>
 
-        <!-- Notif service -->
+        <!-- Notif services -->
         <service android:name=".notif.DailyNotifOptinService"/>
+        <service android:name=".notif.MonthlyReportNotifService"/>
 
         <receiver android:name=".notif.AppUpdateBroadcastReceiver">
             <intent-filter>

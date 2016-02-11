@@ -127,4 +127,8 @@ public class ParameterKeys
      * Has the user saw the monthly report hint (bool)
      */
     public static final String USER_SAW_MONTHLY_REPORT_HINT = "user_saw_monthly_report_hint";
+    /**
+     * Is the user premium from AppTurbo (bool)
+     */
+    public static final String APP_TURBO_PREMIUM = "appturbo_offer";
 }

@@ -46,10 +46,11 @@ import com.benoitletondor.easybudgetapp.iab.IabResult;
 import com.benoitletondor.easybudgetapp.iab.Inventory;
 import com.benoitletondor.easybudgetapp.iab.Purchase;
 import com.benoitletondor.easybudgetapp.notif.DailyNotifOptinService;
-import com.benoitletondor.easybudgetapp.notif.MonthlyReportNotifHelper;
+import com.benoitletondor.easybudgetapp.notif.MonthlyReportNotifService;
 import com.benoitletondor.easybudgetapp.view.MainActivity;
 import com.benoitletondor.easybudgetapp.view.RatingPopup;
 import com.benoitletondor.easybudgetapp.view.SettingsActivity;
+import com.benoitletondor.easybudgetapp.view.WelcomeActivity;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
@@ -519,6 +520,28 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
                 });
 
                 Batch.onStart(activity);
+
+                /*
+                 * Premium from AppTurbo
+                 */
+                if( !UserHelper.isUserPremium(EasyBudget.this) &&
+                        UserHelper.isAppTurboUser(EasyBudget.this) && (activity instanceof WelcomeActivity) )
+                {
+                    UserHelper.setAppTurboUserPremium(activity);
+
+                    new AlertDialog.Builder(activity)
+                        .setTitle(R.string.appturbo_redeem_title)
+                        .setMessage(R.string.appturbo_redeem_message)
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
+                }
             }
 
             @Override
@@ -591,15 +614,15 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
             }
         }
 
-        if( newVersion == BuildVersion.VERSION_1_3 && !MonthlyReportNotifHelper.hasUserSeenMonthlyReportNotif(this) )
+        if( newVersion == BuildVersion.VERSION_1_3 && !MonthlyReportNotifService.hasUserSeenMonthlyReportNotif(this) )
         {
             if( UserHelper.isUserPremium(this) )
             {
-                MonthlyReportNotifHelper.showPremiumNotif(getApplicationContext());
+                MonthlyReportNotifService.showPremiumNotif(getApplicationContext());
             }
             else
             {
-                MonthlyReportNotifHelper.showNotPremiumNotif(getApplicationContext());
+                MonthlyReportNotifService.showNotPremiumNotif(getApplicationContext());
             }
         }
     }

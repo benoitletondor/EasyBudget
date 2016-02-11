@@ -16,6 +16,7 @@
 
 package com.benoitletondor.easybudgetapp.notif;
 
+import android.app.IntentService;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -25,16 +26,17 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 
 import com.benoitletondor.easybudgetapp.R;
+import com.benoitletondor.easybudgetapp.helper.Logger;
 import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
 import com.benoitletondor.easybudgetapp.helper.Parameters;
 import com.benoitletondor.easybudgetapp.view.MainActivity;
 
 /**
- * Helper to build the monthly report notification shown to user on 1.3 update.
+ * Service and helper to build the monthly report notification shown to user on 1.3 update.
  *
  * @author Benoit LETONDOR
  */
-public class MonthlyReportNotifHelper
+public class MonthlyReportNotifService extends IntentService
 {
     /**
      * Id of the notification that must be used to display premium notif
@@ -45,7 +47,43 @@ public class MonthlyReportNotifHelper
      */
     public final static int NOT_PREMIUM_NOTIFICATION_ID = 10044;
 
+    /**
+     * Action for the intent that specifies user doesn't want to discover premium
+     */
+    private final static String INTENT_ACTION_NOT_NOW = "intent.action.notnow";
+    /**
+     * Action for the intent that specifies user wants to discover premium
+     */
+    private final static String INTENT_ACTION_DISCOVER = "intent.action.discover";
+
 // -------------------------------------->
+
+    public MonthlyReportNotifService()
+    {
+        super("MonthlyReportNotifService");
+    }
+
+    @Override
+    protected void onHandleIntent(Intent intent)
+    {
+        try
+        {
+            if( INTENT_ACTION_DISCOVER.equals(intent.getAction()) )
+            {
+                Intent notificationIntent = new Intent(this, MainActivity.class);
+                notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                notificationIntent.putExtra(MainActivity.INTENT_REDIRECT_TO_PREMIUM_EXTRA, true);
+
+                startActivity(notificationIntent);
+            }
+        }
+        catch (Exception e)
+        {
+            Logger.error("Error on non premium monthly report notif intent", e);
+        }
+
+        NotificationManagerCompat.from(this).cancel(NOT_PREMIUM_NOTIFICATION_ID);
+    }
 
     /**
      * Show the notif to premium users about monthly report.
@@ -80,19 +118,22 @@ public class MonthlyReportNotifHelper
      */
     public static void showNotPremiumNotif(@NonNull Context context)
     {
-        Intent notificationIntent = new Intent(context, MainActivity.class);
-        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        notificationIntent.putExtra(MainActivity.INTENT_REDIRECT_TO_PREMIUM_EXTRA, true);
+        Intent notNowIntent = new Intent(context, MonthlyReportNotifService.class);
+        notNowIntent.setAction(INTENT_ACTION_NOT_NOW);
+        PendingIntent notNowPendingIntent = PendingIntent.getService(context, 0, notNowIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        PendingIntent intent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        Intent discoverIntent = new Intent(context, MonthlyReportNotifService.class);
+        discoverIntent.setAction(INTENT_ACTION_DISCOVER);
+        PendingIntent discoverPendingIntent = PendingIntent.getService(context, 0, discoverIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(context)
             .setSmallIcon(R.drawable.ic_push)
             .setContentTitle(context.getResources().getString(R.string.app_name))
             .setContentText(context.getResources().getString(R.string.monthly_report_notif_notpremium_text))
             .setStyle(new NotificationCompat.BigTextStyle().bigText(context.getResources().getString(R.string.monthly_report_notif_notpremium_text)))
-            .setContentIntent(intent)
-            .setAutoCancel(true)
+            .setContentIntent(discoverPendingIntent)
+            .addAction(R.drawable.ic_do_not_disturb, context.getResources().getString(R.string.premium_popup_become_not_now), notNowPendingIntent)
+            .addAction(R.drawable.ic_search, context.getResources().getString(R.string.premium_popup_become_cta), discoverPendingIntent)
             .setColor(ContextCompat.getColor(context, R.color.accent));
 
         NotificationManagerCompat.from(context).notify(NOT_PREMIUM_NOTIFICATION_ID, notifBuilder.build());

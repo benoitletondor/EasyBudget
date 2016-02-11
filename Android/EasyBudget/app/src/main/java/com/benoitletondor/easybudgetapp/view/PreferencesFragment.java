@@ -54,7 +54,7 @@ import com.benoitletondor.easybudgetapp.helper.Parameters;
 import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.helper.UserHelper;
 import com.benoitletondor.easybudgetapp.notif.DailyNotifOptinService;
-import com.benoitletondor.easybudgetapp.notif.MonthlyReportNotifHelper;
+import com.benoitletondor.easybudgetapp.notif.MonthlyReportNotifService;
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment;
 import com.google.android.gms.appinvite.AppInviteInvitation;
 
@@ -368,7 +368,7 @@ public class PreferencesFragment extends PreferenceFragment
                 @Override
                 public boolean onPreferenceClick(Preference preference)
                 {
-                    MonthlyReportNotifHelper.showPremiumNotif(getActivity());
+                    MonthlyReportNotifService.showPremiumNotif(getActivity());
                     return false;
                 }
             });
@@ -381,7 +381,7 @@ public class PreferencesFragment extends PreferenceFragment
                 @Override
                 public boolean onPreferenceClick(Preference preference)
                 {
-                    MonthlyReportNotifHelper.showNotPremiumNotif(getActivity());
+                    MonthlyReportNotifService.showNotPremiumNotif(getActivity());
                     return false;
                 }
             });

@@ -31,6 +31,7 @@
     <string name="title_activity_settings">Préférences</string>
     <string name="title_activity_welcome">EasyBudget</string>
     <string name="title_activity_premium">Premium</string>
+    <string name="title_activity_monthly_report">Récapitulatif mensuel</string>
     <string name="cancel">Annuler</string>
     <string name="undo">ANNULER</string>
     <string name="ok">OK</string>
@@ -138,13 +139,17 @@
     <string name="setting_category_notifications_daily_message">Recevez une notification à la fin de la journée si vous n’avez pas entré vos dépenses</string>
     <string name="setting_category_not_premium_status_title">Devenez utilisateur premium</string>
     <string name="setting_category_not_premium_status_message">Accédez aux fonctionnalités premium</string>
+    <string name="setting_category_notifications_monthly_title">Notification de récapitulatif mensuel</string>
+    <string name="setting_category_notifications_monthly_message">Recevez une notification quand un nouveau récapitulatif mensuel est complet</string>
 
     <string name="premium_popup_premium_title">Vous êtes premium!</string>
     <string name="premium_popup_premium_message">Vous avez accès aux fonctionnalités premium:\n\n- Rappel journalier si vous avez oublié d’entrer vos dépenses durant la journée\n… et plus de fonctionnalités premium qui seront ajoutées très bientôt !</string>
     <string name="premium_popup_not_premium_title">Devenez utilisateur premium</string>
     <string name="premium_popup_not_premium_message">Accédez aux fonctionnalités premium !</string>
-    <string name="premium_popup_not_premium_feature1_title">1. Rappel journalier</string>
+    <string name="premium_popup_not_premium_feature1_title">2. Rappel journalier</string>
     <string name="premium_popup_not_premium_feature1_message">Recevez une notification à la fin de la journée si vous n’avez pas entré vos dépenses.</string>
+    <string name="premium_popup_not_premium_feature2_title">1. Récapitulatif mensuel</string>
+    <string name="premium_popup_not_premium_feature2_message">Accédez à un récapitulatif de vos dépenses et revenues du mois et voyez combien vous avez économisé.</string>
     <string name="premium_popup_not_premium_feature_more_title">… et plus de fonctionnalités premium qui seront ajoutées très bientôt !</string>
     <string name="premium_popup_not_premium_cta">Acheter</string>
     <string name="premium_popup_become_title">Devenez utilisateur premium</string>
@@ -214,4 +219,16 @@
     <string name="app_invite_welcome_title">Bienvenue sur EasyBudget</string>
     <string name="app_invite_welcome_message">On dirait qu\'un ami vous a recommandé cette app ! Bienvenue et n\'oubliez pas de remercier votre amis pour ce bon conseil ;)</string>
     <string name="app_invite_welcome_cta">Go !</string>
+
+    <string name="monthly_report_button_title">Récapitulatif mensuel</string>
+    <string name="monthly_report_month_title_format">MMMM yyyy</string>
+    <string name="expenses">Dépenses</string>
+    <string name="revenues">Revenues</string>
+    <string name="expenses_total">Total des dépenses</string>
+    <string name="revenues_total">Total des revenues</string>
+    <string name="balance">Solde</string>
+    <string name="monthly_report_no_entries_placeholder">Rien pour ce mois.</string>
+    <string name="monthly_report_notif_notpremium_text">Nouvelle fonctionnalité premium: Récapitulatif mensuel.\nRecevez un récapitulatif de vos dépenses et revenues du mois. Découvrir le mode premium ?</string>
+    <string name="monthly_report_notif_premium_text">Nouvelle fonctionnalité : Récapitulatif mensuel.\nRecevez un récapitulatif de vos dépenses et revenues du mois. Tapez pour essayer</string>
+    <string name="monthly_report_hint">Psst : Vous pouvez accéder aux récapitulatifs mensuel depuis ce bouton !</string>
 </resources>

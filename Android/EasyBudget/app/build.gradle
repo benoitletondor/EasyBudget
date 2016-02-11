@@ -43,8 +43,8 @@ android {
         applicationId "com.benoitletondor.easybudgetapp"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 35
-        versionName "1.2"
+        versionCode 36
+        versionName "1.2.1"
     }
     buildTypes {
         debug {
