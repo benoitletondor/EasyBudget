@@ -58,6 +58,7 @@ import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
 import com.benoitletondor.easybudgetapp.helper.Parameters;
+import com.benoitletondor.easybudgetapp.helper.UserHelper;
 import com.benoitletondor.easybudgetapp.model.Expense;
 import com.benoitletondor.easybudgetapp.model.MonthlyExpense;
 import com.benoitletondor.easybudgetapp.model.MonthlyExpenseDeleteType;
@@ -97,6 +98,7 @@ public class MainActivity extends DBActivity
     public static final String INTENT_MONTHLY_EXPENSE_DELETED = "intent.expense.monthly.deleted";
     public static final String INTENT_SHOW_WELCOME_SCREEN = "intent.welcomscreen.show";
 
+    public static final String INTENT_REDIRECT_TO_PREMIUM_EXTRA = "intent.extra.premiumshow";
     public static final String INTENT_REDIRECT_TO_SETTINGS_EXTRA = "intent.extra.redirecttosettings";
 
     public final static String ANIMATE_TRANSITION_KEY = "animate";
@@ -279,6 +281,8 @@ public class MainActivity extends DBActivity
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver, filter);
 
         openSettingsIfNeeded(getIntent());
+        openMonthlyReportIfNeeded(getIntent());
+        openPremiumIfNeeded(getIntent());
     }
 
     @Override
@@ -386,6 +390,8 @@ public class MainActivity extends DBActivity
         }
 
         openSettingsIfNeeded(intent);
+        openMonthlyReportIfNeeded(intent);
+        openPremiumIfNeeded(intent);
     }
 
     /**
@@ -463,6 +469,28 @@ public class MainActivity extends DBActivity
     {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        // Remove monthly report for non premium users
+        if( !UserHelper.isUserPremium(getApplication()) )
+        {
+            menu.removeItem(R.id.action_monthly_report);
+        }
+        else if( !UserHelper.hasUserSawMonthlyReportHint(this) )
+        {
+            final View monthlyReportHint = findViewById(R.id.monthly_report_hint);
+            monthlyReportHint.setVisibility(View.VISIBLE);
+
+            findViewById(R.id.monthly_report_hint_button).setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    monthlyReportHint.setVisibility(View.GONE);
+                    UserHelper.setUserSawMonthlyReportHint(MainActivity.this);
+                }
+            });
+        }
+
         return true;
     }
 
@@ -626,6 +654,13 @@ public class MainActivity extends DBActivity
 
             return true;
         }
+        else if( id == R.id.action_monthly_report )
+        {
+            Intent startIntent = new Intent(this, MonthlyReportActivity.class);
+            ActivityCompat.startActivity(MainActivity.this, startIntent, null);
+
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -684,6 +719,46 @@ public class MainActivity extends DBActivity
         {
             Intent startIntent = new Intent(this, SettingsActivity.class);
             ActivityCompat.startActivity(MainActivity.this, startIntent, null);
+        }
+    }
+
+    /**
+     * Open the monthly report activity if the given intent contains the monthly uri part.
+     *
+     * @param intent
+     */
+    private void openMonthlyReportIfNeeded(Intent intent)
+    {
+        try
+        {
+            Uri data = intent.getData();
+            if( data != null && "true".equals(data.getQueryParameter("monthly")) )
+            {
+                Intent startIntent = new Intent(this, MonthlyReportActivity.class);
+                startIntent.putExtra(MonthlyReportActivity.FROM_NOTIFICATION_EXTRA, true);
+                ActivityCompat.startActivity(MainActivity.this, startIntent, null);
+            }
+        }
+        catch (Exception e)
+        {
+            Logger.error("Error while opening report activity", e);
+        }
+    }
+
+    /**
+     * Open the premium screen if the given intent contains the {@link #INTENT_REDIRECT_TO_PREMIUM_EXTRA}
+     * extra.
+     *
+     * @param intent
+     */
+    private void openPremiumIfNeeded(Intent intent)
+    {
+        if( intent.getBooleanExtra(INTENT_REDIRECT_TO_PREMIUM_EXTRA, false) )
+        {
+            Intent startIntent = new Intent(this, SettingsActivity.class);
+            startIntent.putExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, true);
+
+            ActivityCompat.startActivity(this, startIntent, null);
         }
     }
 

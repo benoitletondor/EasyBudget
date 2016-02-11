@@ -46,6 +46,7 @@ import com.benoitletondor.easybudgetapp.iab.IabResult;
 import com.benoitletondor.easybudgetapp.iab.Inventory;
 import com.benoitletondor.easybudgetapp.iab.Purchase;
 import com.benoitletondor.easybudgetapp.notif.DailyNotifOptinService;
+import com.benoitletondor.easybudgetapp.notif.MonthlyReportNotifService;
 import com.benoitletondor.easybudgetapp.view.MainActivity;
 import com.benoitletondor.easybudgetapp.view.RatingPopup;
 import com.benoitletondor.easybudgetapp.view.SettingsActivity;
@@ -610,6 +611,18 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
             if( UserHelper.isUserPremium(this) && !DailyNotifOptinService.hasDailyReminderOptinNotifBeenShown(this) )
             {
                 DailyNotifOptinService.showDailyReminderOptinNotif(getApplicationContext());
+            }
+        }
+
+        if( newVersion == BuildVersion.VERSION_1_3 && !MonthlyReportNotifService.hasUserSeenMonthlyReportNotif(this) )
+        {
+            if( UserHelper.isUserPremium(this) )
+            {
+                MonthlyReportNotifService.showPremiumNotif(getApplicationContext());
+            }
+            else
+            {
+                MonthlyReportNotifService.showNotPremiumNotif(getApplicationContext());
             }
         }
     }

@@ -36,25 +36,14 @@
             android:gravity="center"
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
-            android:text="@string/premium_popup_not_premium_feature2_title" />
-
-        <TextView
-            android:layout_marginTop="15dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/premium_popup_not_premium_feature2_message"
-            android:textSize="16dp"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:textColor="@android:color/white"
-            android:gravity="center"/>
+            android:text="@string/premium_popup_not_premium_feature_more_title" />
 
         <ImageView
-            android:layout_marginTop="15dp"
-            android:layout_width="225dp"
-            android:layout_height="189dp"
-            android:src="@drawable/monthly_report"
-            android:layout_gravity="center_horizontal"/>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/ic_build"
+            android:layout_marginTop="20dp"/>
 
     </LinearLayout>
 

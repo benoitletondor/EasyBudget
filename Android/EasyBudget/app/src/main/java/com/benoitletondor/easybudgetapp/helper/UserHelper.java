@@ -121,6 +121,28 @@ public class UserHelper
     }
 
     /**
+     * The user wants or not to receive a daily monthly notification when report is available
+     *
+     * @param context non null context
+     * @return true if we can display monthly notifications, false otherwise
+     */
+    public static boolean isUserAllowingMonthlyReminderPushes(@NonNull Context context)
+    {
+        return Parameters.getInstance(context).getBoolean(ParameterKeys.USER_ALLOW_MONTHLY_PUSH, true);
+    }
+
+    /**
+     * Set the user choice about monthly reminder notifications
+     *
+     * @param context non null context
+     * @param value if the user wants or not to receive monthly notifications
+     */
+    public static void setUserAllowMonthlyReminderPushes(@NonNull Context context, boolean value)
+    {
+        Parameters.getInstance(context).putBoolean(ParameterKeys.USER_ALLOW_MONTHLY_PUSH, value);
+    }
+
+    /**
      * Has the user complete the rating popup
      *
      * @param context non null context
@@ -139,6 +161,27 @@ public class UserHelper
     public static void setUserHasCompleteRating(@NonNull Context context)
     {
         Parameters.getInstance(context).putBoolean(ParameterKeys.RATING_COMPLETED, true);
+    }
+
+    /**
+     * Has the user saw the monthly report hint so far
+     *
+     * @param context non null context
+     * @return true if the user saw it, false otherwise
+     */
+    public static boolean hasUserSawMonthlyReportHint(@NonNull Context context)
+    {
+        return Parameters.getInstance(context).getBoolean(ParameterKeys.USER_SAW_MONTHLY_REPORT_HINT, false);
+    }
+
+    /**
+     * Set that the user saw the monthly report hint
+     *
+     * @param context non null context
+     */
+    public static void setUserSawMonthlyReportHint(@NonNull Context context)
+    {
+        Parameters.getInstance(context).putBoolean(ParameterKeys.USER_SAW_MONTHLY_REPORT_HINT, true);
     }
 
     /**
