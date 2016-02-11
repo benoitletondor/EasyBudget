@@ -52,6 +52,10 @@ public class PushService extends IntentService
      * Key to retrieve the daily reminder key for a push
      */
     private final static String DAILY_REMINDER_KEY = "daily";
+    /**
+     * Key to retrieve the monthly reminder key for a push
+     */
+    private final static String MONTHLY_REMINDER_KEY = "monthly";
 
 // ----------------------------------->
 
@@ -134,6 +138,10 @@ public class PushService extends IntentService
                 int lastOpenDay = cal.get(Calendar.DAY_OF_YEAR);
 
                 return currentDay != lastOpenDay;
+            }
+            else if( intent.hasExtra(MONTHLY_REMINDER_KEY) && "true".equals(intent.getStringExtra(MONTHLY_REMINDER_KEY)) )
+            {
+                return UserHelper.isUserPremium(getApplication()) && UserHelper.isUserAllowingMonthlyReminderPushes(this);
             }
 
             // Else it must be an update push

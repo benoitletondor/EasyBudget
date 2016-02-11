@@ -30,7 +30,6 @@ import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
@@ -47,7 +46,6 @@ import com.batch.android.Offer;
 import com.benoitletondor.easybudgetapp.BuildConfig;
 import com.benoitletondor.easybudgetapp.EasyBudget;
 import com.benoitletondor.easybudgetapp.PremiumCheckStatus;
-import com.benoitletondor.easybudgetapp.PremiumPurchaseListener;
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import com.benoitletondor.easybudgetapp.helper.Logger;
@@ -56,6 +54,7 @@ import com.benoitletondor.easybudgetapp.helper.Parameters;
 import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.helper.UserHelper;
 import com.benoitletondor.easybudgetapp.notif.DailyNotifOptinService;
+import com.benoitletondor.easybudgetapp.notif.MonthlyReportNotifService;
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment;
 import com.google.android.gms.appinvite.AppInviteInvitation;
 
@@ -362,6 +361,32 @@ public class PreferencesFragment extends PreferenceFragment
             });
 
             /*
+             * Show monthly report notif for premium users
+             */
+            findPreference(getResources().getString(R.string.setting_category_show_notif_monthly_premium_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+            {
+                @Override
+                public boolean onPreferenceClick(Preference preference)
+                {
+                    MonthlyReportNotifService.showPremiumNotif(getActivity());
+                    return false;
+                }
+            });
+
+            /*
+             * Show monthly report notif for non premium users
+             */
+            findPreference(getResources().getString(R.string.setting_category_show_notif_monthly_notpremium_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+            {
+                @Override
+                public boolean onPreferenceClick(Preference preference)
+                {
+                    MonthlyReportNotifService.showNotPremiumNotif(getActivity());
+                    return false;
+                }
+            });
+
+            /*
              * Enable animations pref
              */
             final CheckBoxPreference animationsPref = (CheckBoxPreference) findPreference(getResources().getString(R.string.setting_category_disable_animation_key));
@@ -488,17 +513,17 @@ public class PreferencesFragment extends PreferenceFragment
                 public boolean onPreferenceClick(Preference preference)
                 {
                     new AlertDialog.Builder(getActivity())
-                        .setTitle(R.string.premium_popup_premium_title)
-                        .setMessage(R.string.premium_popup_premium_message)
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
+                            .setTitle(R.string.premium_popup_premium_title)
+                            .setMessage(R.string.premium_popup_premium_message)
+                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
                             {
-                                dialog.dismiss();
-                            }
-                        })
-                        .show();
+                                @Override
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .show();
 
                     return false;
                 }
@@ -516,6 +541,19 @@ public class PreferencesFragment extends PreferenceFragment
                 }
             });
             dailyNotifPref.setChecked(UserHelper.isUserAllowingDailyReminderPushes(getActivity()));
+
+            // Monthly reminder for reports
+            final CheckBoxPreference monthlyNotifPref = (CheckBoxPreference) findPreference(getResources().getString(R.string.setting_category_notifications_monthly_key));
+            monthlyNotifPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+            {
+                @Override
+                public boolean onPreferenceClick(Preference preference)
+                {
+                    UserHelper.setUserAllowMonthlyReminderPushes(getActivity(), monthlyNotifPref.isChecked());
+                    return true;
+                }
+            });
+            monthlyNotifPref.setChecked(UserHelper.isUserAllowingMonthlyReminderPushes(getActivity()));
         }
         else
         {

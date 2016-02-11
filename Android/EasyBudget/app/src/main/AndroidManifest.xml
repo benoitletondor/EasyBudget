@@ -66,6 +66,11 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".view.MonthlyReportActivity"
+            android:label="@string/title_activity_monthly_report"
+            android:configChanges="locale|keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".view.ExpenseEditActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_add_expense"
@@ -90,10 +95,10 @@
             android:theme="@style/AppThemeNoActionBar"/>
         <activity
             android:name=".view.PremiumActivity"
+            android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_premium"
-            android:theme="@style/AppThemeNoActionBar"
             android:screenOrientation="portrait"
-            android:configChanges="locale|keyboardHidden|orientation|screenSize">
+            android:theme="@style/AppThemeNoActionBar">
         </activity>
 
         <!-- Batch SDK -->
@@ -109,8 +114,9 @@
             </intent-filter>
         </receiver>
 
-        <!-- Notif service -->
+        <!-- Notif services -->
         <service android:name=".notif.DailyNotifOptinService"/>
+        <service android:name=".notif.MonthlyReportNotifService"/>
 
         <receiver android:name=".notif.AppUpdateBroadcastReceiver">
             <intent-filter>

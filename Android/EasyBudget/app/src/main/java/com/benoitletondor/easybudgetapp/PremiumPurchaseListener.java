@@ -16,8 +16,6 @@
 
 package com.benoitletondor.easybudgetapp;
 
-import android.support.annotation.NonNull;
-
 /**
  * Listener for in-app purchase buying flow
  *

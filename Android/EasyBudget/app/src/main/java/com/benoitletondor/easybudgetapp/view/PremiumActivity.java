@@ -23,7 +23,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -34,6 +34,7 @@ import com.benoitletondor.easybudgetapp.PremiumPurchaseListener;
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.view.premium.Premium1Fragment;
 import com.benoitletondor.easybudgetapp.view.premium.Premium2Fragment;
+import com.benoitletondor.easybudgetapp.view.premium.Premium3Fragment;
 
 import me.relex.circleindicator.CircleIndicator;
 
@@ -62,7 +63,7 @@ public class PremiumActivity extends AppCompatActivity
         setResult(Activity.RESULT_CANCELED);
 
         pager = (ViewPager) findViewById(R.id.premium_view_pager);
-        pager.setAdapter(new FragmentStatePagerAdapter(getSupportFragmentManager())
+        pager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager())
         {
             @Override
             public Fragment getItem(int position)
@@ -73,6 +74,8 @@ public class PremiumActivity extends AppCompatActivity
                         return new Premium1Fragment();
                     case 1:
                         return new Premium2Fragment();
+                    case 2:
+                        return new Premium3Fragment();
                 }
 
                 return null;
@@ -81,7 +84,7 @@ public class PremiumActivity extends AppCompatActivity
             @Override
             public int getCount()
             {
-                return 2;
+                return 3;
             }
         });
         pager.setOffscreenPageLimit(pager.getAdapter().getCount()); // preload all fragments for transitions smoothness
