@@ -31,6 +31,7 @@
     <string name="title_activity_settings">Preferências</string>
     <string name="title_activity_welcome">EasyBudget</string>
     <string name="title_activity_premium">Premium</string>
+    <string name="title_activity_monthly_report">Monthly report</string>
     <string name="cancel">Cancelar</string>
     <string name="undo">DESFAZER</string>
     <string name="ok">OK</string>
@@ -138,13 +139,17 @@
     <string name="setting_category_notifications_daily_message">Receba uma notificação no final do dia se você não inseriu suas despesas</string>
     <string name="setting_category_not_premium_status_title">Torne-se premium</string>
     <string name="setting_category_not_premium_status_message">Acesse todas as funções premium</string>
+    <string name="setting_category_notifications_monthly_title">Monthly report notification</string>
+    <string name="setting_category_notifications_monthly_message">Receive a notification when a new monthly report is complete</string>
 
     <string name="premium_popup_premium_title">Você é premium!</string>
     <string name="premium_popup_premium_message">Você tem acesso às funções premium:\n\n- Lembrete diário se você esqueceu de inserir suas despesas durante o dia\n… e mais funções premium que virão em breve!</string>
     <string name="premium_popup_not_premium_title">Torne-se premium</string>
     <string name="premium_popup_not_premium_message">Acesse todas as funções premium!</string>
-    <string name="premium_popup_not_premium_feature1_title">1. Lembrete diário</string>
+    <string name="premium_popup_not_premium_feature1_title">2. Lembrete diário</string>
     <string name="premium_popup_not_premium_feature1_message">Receba uma notificação no final do dia se você não inseriu suas despesas.</string>
+    <string name="premium_popup_not_premium_feature2_title">1. Monthly report</string>
+    <string name="premium_popup_not_premium_feature2_message">Get a sum-up of your expenses and incomes of the month and see how much you saved.</string>
     <string name="premium_popup_not_premium_feature_more_title">… e mais funções premium que virão em breve!</string>
     <string name="premium_popup_not_premium_cta">Comprar</string>
     <string name="premium_popup_become_title">Torne-se premium</string>
@@ -214,4 +219,16 @@
     <string name="app_invite_welcome_title">Bem-vindo ao EasyBudget</string>
     <string name="app_invite_welcome_message">Parece que um amigo lhe recomendou este app! Bem-vindo e não esqueça de agradecer ao seu amigo pelo conselho ;)</string>
     <string name="app_invite_welcome_cta">Vamos!</string>
+
+    <string name="monthly_report_button_title">Monthly report</string>
+    <string name="monthly_report_month_title_format">MMMM yyyy</string>
+    <string name="expenses">Expenses</string>
+    <string name="revenues">Revenues</string>
+    <string name="expenses_total">Expenses total</string>
+    <string name="revenues_total">Revenues total</string>
+    <string name="balance">Balance</string>
+    <string name="monthly_report_no_entries_placeholder">Nothing for this month.</string>
+    <string name="monthly_report_notif_notpremium_text">New feature for premium users: Monthly report.\nGet a sum-up of your expenses and incomes of the month. Discover premium?</string>
+    <string name="monthly_report_notif_premium_text">New feature available: Monthly report.\nGet a sum-up of your expenses and incomes of the month. Tap to try</string>
+    <string name="monthly_report_hint">Psst: You can access monthly reports from this button!</string>
 </resources>
