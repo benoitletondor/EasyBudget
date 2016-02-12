@@ -85,5 +85,5 @@ dependencies {
     compile 'com.getbase:floatingactionbutton:1.10.1'
     compile 'me.relex:circleindicator:1.1.7@aar'
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') { transitive = true; }
-    compile 'com.batch.android:batch-sdk:1.4'
+    compile 'com.batch.android:batch-sdk:1.5.2'
 }
