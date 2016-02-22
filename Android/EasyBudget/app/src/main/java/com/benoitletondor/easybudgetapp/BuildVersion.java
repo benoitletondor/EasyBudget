@@ -62,6 +62,6 @@ public class BuildVersion
      * Add monthly report
      * TODO
      */
-    public final static int VERSION_1_3 = 37;
+    public final static int VERSION_1_3 = 39;
 
 }

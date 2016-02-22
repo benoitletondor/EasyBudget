@@ -139,7 +139,7 @@
     <string name="setting_category_notifications_daily_message">Erhalten Sie eine Benachrichtigung am Ende des Tages, wenn Sie Ihre Ausgaben noch nicht eingetragen haben</string>
     <string name="setting_category_not_premium_status_title">Premium-Nutzer werden</string>
     <string name="setting_category_not_premium_status_message">Auf alle Premium-Features zugreifen</string>
-    <string name="setting_category_notifications_monthly_title">Benachrichtigung über monatliche Zusammenfassung</string>
+    <string name="setting_category_notifications_monthly_title">Monatliche Zusammenfassung</string>
     <string name="setting_category_notifications_monthly_message">Erhalten Sie eine Benachrichtigung, wenn eine neue monatl. Zusammenfassung vollständig ist</string>
 
     <string name="premium_popup_premium_title">Sie sind Premium-Nutzer!</string>
