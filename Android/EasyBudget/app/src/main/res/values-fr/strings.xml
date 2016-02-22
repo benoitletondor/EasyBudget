@@ -149,7 +149,7 @@
     <string name="premium_popup_not_premium_feature1_title">2. Rappel journalier</string>
     <string name="premium_popup_not_premium_feature1_message">Recevez une notification à la fin de la journée si vous n’avez pas entré vos dépenses.</string>
     <string name="premium_popup_not_premium_feature2_title">1. Récapitulatif mensuel</string>
-    <string name="premium_popup_not_premium_feature2_message">Accédez à un récapitulatif de vos dépenses et revenues du mois et voyez combien vous avez économisé.</string>
+    <string name="premium_popup_not_premium_feature2_message">Accédez à un récapitulatif de vos dépenses et revenus du mois et voyez combien vous avez économisé.</string>
     <string name="premium_popup_not_premium_feature_more_title">… et plus de fonctionnalités premium qui seront ajoutées très bientôt !</string>
     <string name="premium_popup_not_premium_cta">Acheter</string>
     <string name="premium_popup_become_title">Devenez utilisateur premium</string>
@@ -223,12 +223,12 @@
     <string name="monthly_report_button_title">Récapitulatif mensuel</string>
     <string name="monthly_report_month_title_format">MMMM yyyy</string>
     <string name="expenses">Dépenses</string>
-    <string name="revenues">Revenues</string>
+    <string name="revenues">Revenus</string>
     <string name="expenses_total">Total des dépenses</string>
-    <string name="revenues_total">Total des revenues</string>
+    <string name="revenues_total">Total des revenus</string>
     <string name="balance">Solde</string>
     <string name="monthly_report_no_entries_placeholder">Rien pour ce mois.</string>
-    <string name="monthly_report_notif_notpremium_text">Nouvelle fonctionnalité premium: Récapitulatif mensuel.\nRecevez un récapitulatif de vos dépenses et revenues du mois. Découvrir le mode premium ?</string>
-    <string name="monthly_report_notif_premium_text">Nouvelle fonctionnalité : Récapitulatif mensuel.\nRecevez un récapitulatif de vos dépenses et revenues du mois. Tapez pour essayer</string>
+    <string name="monthly_report_notif_notpremium_text">Nouvelle fonctionnalité premium: Récapitulatif mensuel.\nRecevez un récapitulatif de vos dépenses et revenus du mois. Découvrir le mode premium ?</string>
+    <string name="monthly_report_notif_premium_text">Nouvelle fonctionnalité : Récapitulatif mensuel.\nRecevez un récapitulatif de vos dépenses et revenus du mois. Tapez pour essayer</string>
     <string name="monthly_report_hint">Psst : Vous pouvez accéder aux récapitulatifs mensuel depuis ce bouton !</string>
 </resources>

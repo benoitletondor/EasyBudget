@@ -32,10 +32,12 @@ import android.widget.TextView;
 
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
+import com.benoitletondor.easybudgetapp.helper.DateHelper;
 import com.benoitletondor.easybudgetapp.model.Expense;
 import com.benoitletondor.easybudgetapp.model.db.DB;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -70,7 +72,19 @@ public class MonthlyReportFragment extends Fragment
 
     public MonthlyReportFragment()
     {
-        throw new RuntimeException("You should not use this fragment in XML");
+        // This is just in case the fragment get instanciated by the OS after activity got killed...
+        // This will probably lead to a badly configured fragment but it's better than a crash...
+        // I guess :/
+        // FIXME find a better solution!
+        Calendar cal = Calendar.getInstance();
+
+        cal.set(Calendar.MILLISECOND, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+
+        date = cal.getTime();
     }
 
 // ---------------------------------->
@@ -78,6 +92,10 @@ public class MonthlyReportFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
+        // Reset totals
+        expensesAmount = 0.0d;
+        revenuesAmount = 0.0d;
+
         // Inflate the layout for this fragment
         final View v = inflater.inflate(R.layout.fragment_monthly_report, container, false);
 

@@ -31,7 +31,7 @@
     <string name="title_activity_settings">Ajustes</string>
     <string name="title_activity_welcome">EasyBudget</string>
     <string name="title_activity_premium">Premium</string>
-    <string name="title_activity_monthly_report">Monthly report</string>
+    <string name="title_activity_monthly_report">Informe mensual</string>
     <string name="cancel">Cancelar</string>
     <string name="undo">DESHACER</string>
     <string name="ok">OK</string>
@@ -139,8 +139,8 @@
     <string name="setting_category_notifications_daily_message">Recibe una notificación al final del día si no has entrado tus gastos</string>
     <string name="setting_category_not_premium_status_title">Vuélvete premium</string>
     <string name="setting_category_not_premium_status_message">Accede a las funcionalidades premium</string>
-    <string name="setting_category_notifications_monthly_title">Monthly report notification</string>
-    <string name="setting_category_notifications_monthly_message">Receive a notification when a new monthly report is complete</string>
+    <string name="setting_category_notifications_monthly_title">Notificación de informe mensual</string>
+    <string name="setting_category_notifications_monthly_message">Recibe una notificación cuando un nuevo informe mensual esté listo</string>
 
     <string name="premium_popup_premium_title">¡Eres premium!</string>
     <string name="premium_popup_premium_message">Tienes acceso a las funcionalidades premium:\n\n- Recordatorio diario si olvidaste entrar tus gastos durante el día\n… ¡y más funcionalidades premium que serán añadidas pronto!</string>
@@ -148,8 +148,8 @@
     <string name="premium_popup_not_premium_message">¡Accede a las funcionalidades premium!</string>
     <string name="premium_popup_not_premium_feature1_title">2. Recordatorio diario</string>
     <string name="premium_popup_not_premium_feature1_message">Recibe una notificación al final del día si no has entrado tus gastos.</string>
-    <string name="premium_popup_not_premium_feature2_title">1. Monthly report</string>
-    <string name="premium_popup_not_premium_feature2_message">Get a sum-up of your expenses and incomes of the month and see how much you saved.</string>
+    <string name="premium_popup_not_premium_feature2_title">1. Informe mensual</string>
+    <string name="premium_popup_not_premium_feature2_message">Descubre cuánto has ahorrado a través de un recapitulativo mensual de tus gastos e ingresos.</string>
     <string name="premium_popup_not_premium_feature_more_title">… ¡y más funcionalidades premium que serán añadidas pronto!</string>
     <string name="premium_popup_not_premium_cta">Comprar</string>
     <string name="premium_popup_become_title">Vuélvete premium</string>
@@ -220,15 +220,15 @@
     <string name="app_invite_welcome_message">¡Parece que un amigo te ha recomendado esta app! Bienvenido, no te olvides de darle las gracias por darte este gran consejo ;)</string>
     <string name="app_invite_welcome_cta">¡Vamos!</string>
 
-    <string name="monthly_report_button_title">Monthly report</string>
+    <string name="monthly_report_button_title">Informe mensual</string>
     <string name="monthly_report_month_title_format">MMMM yyyy</string>
-    <string name="expenses">Expenses</string>
-    <string name="revenues">Revenues</string>
-    <string name="expenses_total">Expenses total</string>
-    <string name="revenues_total">Revenues total</string>
-    <string name="balance">Balance</string>
-    <string name="monthly_report_no_entries_placeholder">Nothing for this month.</string>
-    <string name="monthly_report_notif_notpremium_text">New feature for premium users: Monthly report.\nGet a sum-up of your expenses and incomes of the month. Discover premium?</string>
-    <string name="monthly_report_notif_premium_text">New feature available: Monthly report.\nGet a sum-up of your expenses and incomes of the month. Tap to try</string>
-    <string name="monthly_report_hint">Psst: You can access monthly reports from this button!</string>
+    <string name="expenses">Gastos</string>
+    <string name="revenues">Ingresos</string>
+    <string name="expenses_total">Total de los gastos</string>
+    <string name="revenues_total">Total de los ingresos</string>
+    <string name="balance">Saldo</string>
+    <string name="monthly_report_no_entries_placeholder">Nada para este mes.</string>
+    <string name="monthly_report_notif_notpremium_text">Nueva funcionalidad Premium: informe mensual.\nRecibe un informe de tus gastos e ingresos mensuales. ¿Probar el modo Premium?</string>
+    <string name="monthly_report_notif_premium_text">Nueva funcionalidad disponible: informe mensual.\nRecibe un recapitulativo de los gastos e ingresos del mes. Toca para probarla</string>
+    <string name="monthly_report_hint">Pss: ¡Puedes ver tus informes mensuales pulsando este botón!</string>
 </resources>

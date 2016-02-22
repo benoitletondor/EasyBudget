@@ -516,7 +516,7 @@ public class MainActivity extends DBActivity
 
             View dialogView = getLayoutInflater().inflate(R.layout.dialog_adjust_balance, null);
             final EditText amountEditText = (EditText) dialogView.findViewById(R.id.balance_amount);
-            amountEditText.setText(currentBalance == 0 ? "0" : String.valueOf(currentBalance));
+            amountEditText.setText(currentBalance == 0 ? "0" : CurrencyHelper.getFormattedAmountValue(currentBalance));
             UIHelper.preventUnsupportedInputForDecimals(amountEditText);
             amountEditText.setSelection(amountEditText.getText().length()); // Put focus at the end of the text
 
