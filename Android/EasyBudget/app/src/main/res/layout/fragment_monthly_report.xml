@@ -44,27 +44,29 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center_horizontal"
-                android:layout_marginBottom="3dp">
+                android:layout_marginBottom="3dp"
+                android:baselineAligned="false">
 
                 <TextView
                     android:layout_width="0dip"
                     android:layout_weight="0.5"
-                    android:layout_marginRight="5dp"
+                    android:layout_marginRight="10dp"
                     android:layout_height="wrap_content"
                     android:textColor="@android:color/white"
                     android:textSize="18dp"
                     android:gravity="center"
+                    android:layout_gravity="center_vertical"
                     android:text="@string/revenues_total"/>
 
                 <TextView
                     android:layout_width="0dip"
                     android:layout_weight="0.5"
-                    android:layout_marginLeft="5dp"
+                    android:layout_marginLeft="10dp"
                     android:layout_height="wrap_content"
                     android:textColor="@android:color/white"
                     android:textSize="18dp"
                     android:gravity="center"
+                    android:layout_gravity="center_vertical"
                     android:text="@string/expenses_total"/>
 
             </LinearLayout>
@@ -79,7 +81,7 @@
                 <TextView android:id="@+id/monthly_report_fragment_revenues_total_tv"
                     android:layout_width="0dip"
                     android:layout_weight="0.5"
-                    android:layout_marginRight="5dp"
+                    android:layout_marginRight="10dp"
                     android:layout_height="wrap_content"
                     android:textColor="@android:color/white"
                     android:textSize="22dp"
@@ -89,7 +91,7 @@
                 <TextView android:id="@+id/monthly_report_fragment_expenses_total_tv"
                     android:layout_width="0dip"
                     android:layout_weight="0.5"
-                    android:layout_marginLeft="5dp"
+                    android:layout_marginLeft="10dp"
                     android:layout_height="wrap_content"
                     android:textColor="@android:color/white"
                     android:textSize="22dp"
