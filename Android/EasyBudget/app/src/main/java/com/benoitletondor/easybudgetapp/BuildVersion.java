@@ -59,8 +59,8 @@ public class BuildVersion
      */
     public final static int VERSION_1_2_1 = 36;
 	/**
-     * Add monthly report
-     * TODO
+     * Add monthly report & fix rounding bug
+     * 23/02/2O16
      */
     public final static int VERSION_1_3 = 39;
 
