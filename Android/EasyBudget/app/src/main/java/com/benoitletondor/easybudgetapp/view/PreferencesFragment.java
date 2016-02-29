@@ -53,6 +53,7 @@ import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
 import com.benoitletondor.easybudgetapp.helper.Parameters;
 import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.helper.UserHelper;
+import com.benoitletondor.easybudgetapp.model.Expense;
 import com.benoitletondor.easybudgetapp.notif.DailyNotifOptinService;
 import com.benoitletondor.easybudgetapp.notif.MonthlyReportNotifService;
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment;
@@ -244,10 +245,20 @@ public class PreferencesFragment extends PreferenceFragment
                             limitString = "0"; // Set a 0 value if no value is provided (will lead to an error displayed to the user)
                         }
 
-                        int newLimit = Integer.valueOf(limitString);
+                        try
+                        {
+                            int newLimit = Integer.valueOf(limitString);
 
-                        // Invalid value, alert the user
-                        if (newLimit <= 0)
+                            // Invalid value, alert the user
+                            if (newLimit <= 0)
+                            {
+                                throw new IllegalArgumentException("limit should be > 0");
+                            }
+
+                            Parameters.getInstance(getActivity()).putInt(ParameterKeys.LOW_MONEY_WARNING_AMOUNT, newLimit);
+                            setLimitWarningPreferenceTitle(limitWarningPreference);
+                        }
+                        catch (Exception e)
                         {
                             new AlertDialog.Builder(getActivity()).setTitle(R.string.adjust_limit_warning_error_title).setMessage(getResources().getString(R.string.adjust_limit_warning_error_message)).setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
                             {
@@ -258,12 +269,7 @@ public class PreferencesFragment extends PreferenceFragment
                                 }
 
                             }).show();
-
-                            return;
                         }
-
-                        Parameters.getInstance(getActivity()).putInt(ParameterKeys.LOW_MONEY_WARNING_AMOUNT, newLimit);
-                        setLimitWarningPreferenceTitle(limitWarningPreference);
                     }
                 });
 
