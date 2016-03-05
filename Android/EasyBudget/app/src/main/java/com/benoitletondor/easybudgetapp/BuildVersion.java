@@ -63,5 +63,9 @@ public class BuildVersion
      * 23/02/2O16
      */
     public final static int VERSION_1_3 = 39;
-
+    /**
+     * Bug fixes for rounding, and AppCompat 23.2
+     * 05/03/2016
+     */
+    public final static int VERSION_1_3_1 = 40;
 }
