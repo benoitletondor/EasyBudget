@@ -143,7 +143,7 @@
     <string name="setting_category_notifications_monthly_message">Receba uma notificação quando um novo relatório mensal estiver completo</string>
 
     <string name="premium_popup_premium_title">Você é premium!</string>
-    <string name="premium_popup_premium_message">Você tem acesso às funções premium:\n\n- Lembrete diário se você esqueceu de inserir suas despesas durante o dia\n… e mais funções premium que virão em breve!</string>
+    <string name="premium_popup_premium_message">Você tem acesso às funções premium:\n\n- Relatórios mensais: Receba um relatório de suas despesas e receitas do mês\n- Lembrete diário se você esqueceu de inserir suas despesas durante o dia\n… e mais funções premium que virão em breve!</string>
     <string name="premium_popup_not_premium_title">Torne-se premium</string>
     <string name="premium_popup_not_premium_message">Acesse todas as funções premium!</string>
     <string name="premium_popup_not_premium_feature1_title">2. Lembrete diário</string>

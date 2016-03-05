@@ -156,7 +156,7 @@
     <string name="setting_category_notifications_monthly_message">Receive a notification when a new monthly report is complete</string>
 
     <string name="premium_popup_premium_title">You are premium!</string>
-    <string name="premium_popup_premium_message">You have access to premium features:\n\n- Daily reminder if you forgot to enter your expenses during the day\n… and more premium features that will be added soon!</string>
+    <string name="premium_popup_premium_message">You have access to premium features:\n\n- Monthly report: Get a sum-up of your expenses and incomes of the month\n- Daily reminder if you forgot to enter your expenses during the day\n… and more premium features that will be added soon!</string>
     <string name="premium_popup_not_premium_title">Become a premium user</string>
     <string name="premium_popup_not_premium_message">Access all the premium features!</string>
     <string name="premium_popup_not_premium_feature1_title">2. Daily reminder</string>
