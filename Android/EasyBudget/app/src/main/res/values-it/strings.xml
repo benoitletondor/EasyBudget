@@ -143,7 +143,7 @@
     <string name="setting_category_notifications_monthly_message">Ricevi una notifica quando un nuovo rapporto mensile è completo</string>
 
     <string name="premium_popup_premium_title">Sei… premium!</string>
-    <string name="premium_popup_premium_message">Hai ora accesso alle funzionalità premium:\n\n- Allerta quotidiana se hai dimenticato di inserire le uscite del giorno\n…moltissime altre funzioni che si aggiungeranno poco a poco!</string>
+    <string name="premium_popup_premium_message">Hai ora accesso alle funzionalità premium:\n\n- Rapporto mensile: Ricevi un rapporto delle entrate e delle uscite del mese\n- Allerta quotidiana se hai dimenticato di inserire le uscite del giorno\n…moltissime altre funzioni che si aggiungeranno poco a poco!</string>
     <string name="premium_popup_not_premium_title">Diventa premium</string>
     <string name="premium_popup_not_premium_message">Accedi a tutte le funzionalità premium!</string>
     <string name="premium_popup_not_premium_feature1_title">2. Allerta quotidiana</string>

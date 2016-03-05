@@ -143,7 +143,7 @@
     <string name="setting_category_notifications_monthly_message">Recevez une notification quand un nouveau récapitulatif mensuel est complet</string>
 
     <string name="premium_popup_premium_title">Vous êtes premium!</string>
-    <string name="premium_popup_premium_message">Vous avez accès aux fonctionnalités premium:\n\n- Rappel journalier si vous avez oublié d’entrer vos dépenses durant la journée\n… et plus de fonctionnalités premium qui seront ajoutées très bientôt !</string>
+    <string name="premium_popup_premium_message">Vous avez accès aux fonctionnalités premium:\n\n- Récapitulatif mensuel : Recevez un récapitulatif de vos dépenses et revenus du mois.\n- Rappel journalier si vous avez oublié d’entrer vos dépenses durant la journée\n… et plus de fonctionnalités premium qui seront ajoutées très bientôt !</string>
     <string name="premium_popup_not_premium_title">Devenez utilisateur premium</string>
     <string name="premium_popup_not_premium_message">Accédez aux fonctionnalités premium !</string>
     <string name="premium_popup_not_premium_feature1_title">2. Rappel journalier</string>
