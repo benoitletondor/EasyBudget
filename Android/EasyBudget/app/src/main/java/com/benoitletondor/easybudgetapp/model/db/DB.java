@@ -26,6 +26,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.util.Pair;
 
+import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import com.benoitletondor.easybudgetapp.helper.DateHelper;
 import com.benoitletondor.easybudgetapp.helper.Logger;
 import com.benoitletondor.easybudgetapp.model.Expense;
@@ -681,7 +682,7 @@ public final class DB
 
         values.put(SQLiteDBHelper.COLUMN_EXPENSE_TITLE, expense.getTitle());
         values.put(SQLiteDBHelper.COLUMN_EXPENSE_DATE, expense.getDate().getTime());
-        values.put(SQLiteDBHelper.COLUMN_EXPENSE_AMOUNT, (int) Math.ceil((expense.getAmount() * 100)));
+        values.put(SQLiteDBHelper.COLUMN_EXPENSE_AMOUNT, CurrencyHelper.getDBValueForDouble(expense.getAmount()));
 
         if( expense.isMonthly() )
         {
@@ -730,7 +731,7 @@ public final class DB
 
         values.put(SQLiteDBHelper.COLUMN_MONTHLY_TITLE, expense.getTitle());
         values.put(SQLiteDBHelper.COLUMN_MONTHLY_RECURRING_DATE, expense.getRecurringDate().getTime());
-        values.put(SQLiteDBHelper.COLUMN_MONTHLY_AMOUNT, (int) Math.ceil(expense.getAmount() * 100));
+        values.put(SQLiteDBHelper.COLUMN_MONTHLY_AMOUNT, CurrencyHelper.getDBValueForDouble(expense.getAmount()));
         values.put(SQLiteDBHelper.COLUMN_MONTHLY_MODIFIED, expense.isModified() ? 1 : 0);
 
         return values;

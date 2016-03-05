@@ -20,6 +20,8 @@ import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
 
+import com.benoitletondor.easybudgetapp.BuildConfig;
+
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -205,6 +207,42 @@ public class CurrencyHelper
         format.setGroupingUsed(false);
 
         return format.format(amount);
+    }
+
+    /**
+     * Return the integer value of the double * 100 to store it as integer in DB. This is an ugly
+     * method that shouldn't be there but rounding on doubles are a pain :/
+     *
+     * @param value the double value
+     * @return the corresponding int value (double * 100)
+     */
+    public static int getDBValueForDouble(double value)
+    {
+        String stringValue = getFormattedAmountValue(value);
+        if(BuildConfig.DEBUG_LOG) Logger.debug("getDBValueForDouble: "+stringValue);
+
+        int ceiledValue = (int) Math.ceil(value * 100);
+        double ceiledDoubleValue = ceiledValue / 100.d;
+
+        if( getFormattedAmountValue(ceiledDoubleValue).equals(stringValue) )
+        {
+            if(BuildConfig.DEBUG_LOG) Logger.debug("getDBValueForDouble, return ceiled value: "+ceiledValue);
+            return ceiledValue;
+        }
+
+        int normalValue = (int) value * 100;
+        double normalDoubleValue = normalValue / 100.d;
+
+        if( getFormattedAmountValue(normalDoubleValue).equals(stringValue) )
+        {
+            if(BuildConfig.DEBUG_LOG) Logger.debug("getDBValueForDouble, return normal value: "+normalValue);
+            return normalValue;
+        }
+
+        int flooredValue = (int) Math.floor(value * 100);
+        if(BuildConfig.DEBUG_LOG) Logger.debug("getDBValueForDouble, return floored value: "+flooredValue);
+
+        return flooredValue;
     }
 
     /**
