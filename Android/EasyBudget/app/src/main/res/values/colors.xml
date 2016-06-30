@@ -42,21 +42,6 @@
     <color name="budget_red_out">#f17970</color>
 
     <color name="snackbar_action_undo">#4caf50</color>
-
-    <color name="onboarding_1_background">@color/primary</color>
-    <color name="onboarding_1_statusbar">@color/primary_dark</color>
-    <color name="onboarding_1_nextbutton_normal">@color/secondary</color>
-    <color name="onboarding_1_nextbutton_pressed">@color/secondary_light</color>
-    <color name="onboarding_2_background">@color/secondary</color>
-    <color name="onboarding_2_statusbar">@color/secondary_dark</color>
-    <color name="onboarding_2_nextbutton_normal">@color/primary</color>
-    <color name="onboarding_2_nextbutton_pressed">@color/primary_light</color>
-    <color name="onboarding_3_background">@color/secondary</color>
-    <color name="onboarding_3_statusbar">@color/secondary_dark</color>
-    <color name="onboarding_3_nextbutton_normal">@color/primary_light</color>
-    <color name="onboarding_3_nextbutton_pressed">@android:color/white</color>
-    <color name="onboarding_4_background">@color/primary</color>
-    <color name="onboarding_4_statusbar">@color/primary_dark</color>
     <color name="premium_background">@color/primary</color>
 
     <color name="monthly_report_disabled_month_button">@color/primary</color>

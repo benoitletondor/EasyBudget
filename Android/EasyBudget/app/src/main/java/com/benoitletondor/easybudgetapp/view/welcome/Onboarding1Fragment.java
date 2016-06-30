@@ -59,6 +59,6 @@ public class Onboarding1Fragment extends OnboardingFragment
     @Override
     public int getStatusBarColor()
     {
-        return R.color.onboarding_1_statusbar;
+        return R.color.primary_dark;
     }
 }

@@ -183,10 +183,9 @@
 
             <Button android:id="@+id/monthly_report_hint_button"
                 android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:background="@drawable/welcome_screen_next_button_1_drawable"
-                android:text="@string/ok"
-                android:textColor="@android:color/white" />
+                android:layout_height="40dp"
+                android:theme="@style/BlueButton"
+                android:text="@string/ok"/>
 
         </LinearLayout>
 
