@@ -33,8 +33,6 @@ import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import java.util.Currency;
 import java.util.List;
 
-import io.fabric.sdk.android.services.concurrency.AsyncTask;
-
 /**
  * View adapter for the Recycler view of the {@link SelectCurrencyFragment}
  *

@@ -32,7 +32,6 @@ import android.widget.TextView;
 
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
-import com.benoitletondor.easybudgetapp.helper.DateHelper;
 import com.benoitletondor.easybudgetapp.model.Expense;
 import com.benoitletondor.easybudgetapp.model.db.DB;
 
