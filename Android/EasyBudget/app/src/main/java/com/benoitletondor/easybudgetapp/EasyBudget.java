@@ -793,20 +793,16 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
     {
         iabStatus = status;
 
+        // Save status only on success
+        if( status == PremiumCheckStatus.PREMIUM || status == PremiumCheckStatus.NOT_PREMIUM )
+        {
+            Parameters.getInstance(this).putBoolean(ParameterKeys.PREMIUM, iabStatus == PremiumCheckStatus.PREMIUM);
+        }
+
         Intent intent = new Intent(INTENT_IAB_STATUS_CHANGED);
         intent.putExtra(INTENT_IAB_STATUS_KEY, status);
 
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-    }
-
-    /**
-     * Retrieve the current premium check status
-     *
-     * @return the current status
-     */
-    public PremiumCheckStatus getPremiumCheckStatus()
-    {
-        return iabStatus;
     }
 
     /**
