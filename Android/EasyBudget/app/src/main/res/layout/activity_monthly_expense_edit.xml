@@ -103,7 +103,7 @@
                 android:layout_marginTop="@dimen/fab_margin_top"
                 android:layout_marginBottom="-5dp"
                 android:layout_marginRight="28dp"
-                android:src="@drawable/ic_save"
+                app:srcCompat="@drawable/ic_save_white_24dp"
                 android:scaleX="0"
                 android:scaleY="0"
                 android:alpha="0"
