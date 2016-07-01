@@ -50,7 +50,6 @@ import com.benoitletondor.easybudgetapp.notif.MonthlyReportNotifService;
 import com.benoitletondor.easybudgetapp.view.MainActivity;
 import com.benoitletondor.easybudgetapp.view.RatingPopup;
 import com.benoitletondor.easybudgetapp.view.SettingsActivity;
-import com.benoitletondor.easybudgetapp.view.WelcomeActivity;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
@@ -520,28 +519,6 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
                 });
 
                 Batch.onStart(activity);
-
-                /*
-                 * Premium from AppTurbo
-                 */
-                if( !UserHelper.isUserPremium(EasyBudget.this) &&
-                        UserHelper.isAppTurboUser(EasyBudget.this) && (activity instanceof WelcomeActivity) )
-                {
-                    UserHelper.setAppTurboUserPremium(activity);
-
-                    new AlertDialog.Builder(activity)
-                        .setTitle(R.string.appturbo_redeem_title)
-                        .setMessage(R.string.appturbo_redeem_message)
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-                                dialog.dismiss();
-                            }
-                        })
-                        .show();
-                }
             }
 
             @Override
@@ -793,20 +770,16 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
     {
         iabStatus = status;
 
+        // Save status only on success
+        if( status == PremiumCheckStatus.PREMIUM || status == PremiumCheckStatus.NOT_PREMIUM )
+        {
+            Parameters.getInstance(this).putBoolean(ParameterKeys.PREMIUM, iabStatus == PremiumCheckStatus.PREMIUM);
+        }
+
         Intent intent = new Intent(INTENT_IAB_STATUS_CHANGED);
         intent.putExtra(INTENT_IAB_STATUS_KEY, status);
 
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-    }
-
-    /**
-     * Retrieve the current premium check status
-     *
-     * @return the current status
-     */
-    public PremiumCheckStatus getPremiumCheckStatus()
-    {
-        return iabStatus;
     }
 
     /**

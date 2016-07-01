@@ -29,7 +29,7 @@ import com.benoitletondor.easybudgetapp.model.db.DB;
 import com.roomorama.caldroid.CaldroidGridAdapter;
 
 import java.util.Date;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.TimeZone;
 
 import hirondelle.date4j.DateTime;
@@ -43,7 +43,7 @@ public class CalendarGridAdapter extends CaldroidGridAdapter
 
 // ----------------------------------->
 
-    public CalendarGridAdapter(@NonNull Context context, int month, int year, HashMap<String, Object> caldroidData, HashMap<String, Object> extraData)
+    public CalendarGridAdapter(@NonNull Context context, int month, int year, Map<String, Object> caldroidData, Map<String, Object> extraData)
     {
         super(context, month, year, caldroidData, extraData);
 

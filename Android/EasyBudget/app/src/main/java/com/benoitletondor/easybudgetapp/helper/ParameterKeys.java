@@ -131,4 +131,8 @@ public class ParameterKeys
      * Is the user premium from AppTurbo (bool)
      */
     public static final String APP_TURBO_PREMIUM = "appturbo_offer";
+    /**
+     * Cache storage of the IAB status
+     */
+    public static final String PREMIUM = "premium";
 }

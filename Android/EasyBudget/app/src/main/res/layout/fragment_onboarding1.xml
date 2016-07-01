@@ -18,7 +18,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/onboarding_1_background"
+    android:background="@color/accent"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
@@ -75,18 +75,17 @@
 
     <Button android:id="@+id/onboarding_screen1_next_button"
         android:layout_width="wrap_content"
-        android:layout_height="40dp"
+        android:layout_height="wrap_content"
         android:text="@string/onboarding_screen_1_cta"
         android:gravity="center"
         android:textSize="20dp"
         android:paddingLeft="30dp"
         android:paddingRight="30dp"
         android:layout_marginBottom="15dp"
-        android:textColor="@android:color/white"
-        android:background="@drawable/welcome_screen_next_button_1_drawable"
         android:layout_below="@id/onboarding_screen1_top_layout"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="-65dp"
-        android:textAllCaps="false" />
+        android:textAllCaps="false"
+        android:theme="@style/BlueButton" />
 
 </RelativeLayout>

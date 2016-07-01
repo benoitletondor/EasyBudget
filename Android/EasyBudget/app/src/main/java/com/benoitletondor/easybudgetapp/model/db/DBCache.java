@@ -28,7 +28,6 @@ import com.benoitletondor.easybudgetapp.model.Expense;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 

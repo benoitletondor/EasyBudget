@@ -32,6 +32,23 @@
         <item name="android:windowBackground">@android:color/white</item>
     </style>
 
+    <!-- Buttons -->
+    <style name="BlueButton" parent="Base.Widget.AppCompat.Button.Colored">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="colorButtonNormal">@color/secondary</item>
+    </style>
+
+    <style name="GreenButton" parent="Base.Widget.AppCompat.Button.Colored">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="colorButtonNormal">@color/accent</item>
+    </style>
+
+    <style name="LightGreenButton" parent="Base.Widget.AppCompat.Button.Colored">
+        <item name="android:textColor">@color/accent</item>
+        <item name="colorButtonNormal">@color/accent_ripple</item>
+    </style>
+
+
     <!-- Floating Label text -->
     <style name="TextLabelDark" parent="AppTheme">
         <item name="android:textColorHint">@android:color/white</item>

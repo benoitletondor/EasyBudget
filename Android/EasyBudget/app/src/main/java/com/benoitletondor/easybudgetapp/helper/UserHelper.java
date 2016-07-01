@@ -18,16 +18,7 @@ package com.benoitletondor.easybudgetapp.helper;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.support.annotation.NonNull;
-
-import com.benoitletondor.easybudgetapp.EasyBudget;
-import com.benoitletondor.easybudgetapp.PremiumCheckStatus;
-
-import java.util.List;
 
 /**
  * Helper to get user status / preferences
@@ -51,7 +42,7 @@ public class UserHelper
      */
     public static boolean isUserPremium(@NonNull Application application)
     {
-        return ((EasyBudget) application).getPremiumCheckStatus() == PremiumCheckStatus.PREMIUM ||
+        return Parameters.getInstance(application).getBoolean(ParameterKeys.PREMIUM, false) ||
                 Parameters.getInstance(application).getBoolean(ParameterKeys.BATCH_OFFER_REDEEMED, false) ||
                 Parameters.getInstance(application).getBoolean(ParameterKeys.APP_TURBO_PREMIUM, false);
     }
@@ -64,16 +55,6 @@ public class UserHelper
     public static void setBatchUserPremium(@NonNull Context context)
     {
         Parameters.getInstance(context).putBoolean(ParameterKeys.BATCH_OFFER_REDEEMED, true);
-    }
-
-    /**
-     * Set this user as premium from AppTurbo
-     *
-     * @param context non null context
-     */
-    public static void setAppTurboUserPremium(@NonNull Context context)
-    {
-        Parameters.getInstance(context).putBoolean(ParameterKeys.APP_TURBO_PREMIUM, true);
     }
 
     /**
@@ -183,50 +164,4 @@ public class UserHelper
     {
         Parameters.getInstance(context).putBoolean(ParameterKeys.USER_SAW_MONTHLY_REPORT_HINT, true);
     }
-
-    /**
-     * Return true if the user has at least 1 AppTurbo app installed on its device.
-     *
-     * @param context non-null context
-     * @return true if user comes from AT, false otherwise
-     */
-    public static boolean isAppTurboUser(@NonNull Context context)
-    {
-        try
-        {
-            PackageManager pm = context.getPackageManager();
-
-            return isPackageInstalled("com.appturbo.appturboCA2015", pm) ||
-                    isPackageInstalled("com.appturbo.appoftheday2015", pm) ||
-                    isPackageInstalled("com.appturbo.appofthenight", pm) ||
-                    isIntentHandlable("appturbo://check", pm);
-        }
-        catch (Exception e)
-        {
-            Logger.error("Error while detecting AppTurbo user", e);
-            return false;
-        }
-    }
-
-    private static boolean isPackageInstalled(@NonNull String packagename, @NonNull PackageManager pm)
-    {
-        try
-        {
-            pm.getPackageInfo(packagename, PackageManager.GET_ACTIVITIES);
-            return true;
-        }
-        catch (PackageManager.NameNotFoundException e)
-        {
-            return false;
-        }
-    }
-
-    private static boolean isIntentHandlable(@NonNull String intentUri, @NonNull PackageManager pm)
-    {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.setData(Uri.parse(intentUri));
-        return pm.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY).size() > 0;
-    }
-
 }
