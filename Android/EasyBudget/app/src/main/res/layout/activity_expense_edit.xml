@@ -104,6 +104,7 @@
                 android:layout_marginBottom="-5dp"
                 android:layout_marginRight="28dp"
                 app:srcCompat="@drawable/ic_save_white_24dp"
+                android:scaleType="center"
                 android:scaleX="0"
                 android:scaleY="0"
                 android:alpha="0"
