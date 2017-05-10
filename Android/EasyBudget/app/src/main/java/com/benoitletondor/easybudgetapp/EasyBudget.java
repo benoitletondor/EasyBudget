@@ -748,8 +748,9 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
     {
         Logger.debug("updateIAPStatusIfNeeded: "+iabStatus);
 
-        if( iabStatus == PremiumCheckStatus.NOT_PREMIUM || iabStatus == PremiumCheckStatus.PREMIUM )
+        if( iabStatus == PremiumCheckStatus.NOT_PREMIUM )
         {
+            setIabStatusAndNotify(PremiumCheckStatus.CHECKING);
             iabHelper.queryInventoryAsync(inventoryListener);
         }
     }
