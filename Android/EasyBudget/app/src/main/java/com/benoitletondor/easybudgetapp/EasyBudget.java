@@ -21,6 +21,7 @@ import android.app.Application;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -29,15 +30,12 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 
 import com.batch.android.Batch;
-import com.batch.android.BatchUnlockListener;
 import com.batch.android.Config;
-import com.batch.android.Offer;
 import com.batch.android.PushNotificationType;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import com.benoitletondor.easybudgetapp.helper.Logger;
 import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
 import com.benoitletondor.easybudgetapp.helper.Parameters;
-
 import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.helper.UserHelper;
 import com.benoitletondor.easybudgetapp.iab.IabBroadcastReceiver;
@@ -53,18 +51,18 @@ import com.benoitletondor.easybudgetapp.view.SettingsActivity;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.analytics.Logger.LogLevel;
+import com.google.android.gms.analytics.Tracker;
 
-import io.fabric.sdk.android.Fabric;
-
+import java.net.URLEncoder;
 import java.util.Calendar;
 import java.util.Currency;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.Locale;
-import java.util.Map;
 import java.util.UUID;
+
+import io.fabric.sdk.android.Fabric;
 
 /**
  * EasyBudget application. Implements GA tracking, Batch set-up, Crashlytics set-up && iab.
@@ -474,50 +472,6 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
             @Override
             public void onActivityStarted(final Activity activity)
             {
-                Batch.Unlock.setUnlockListener(new BatchUnlockListener()
-                {
-                    @Override
-                    public void onRedeemAutomaticOffer(Offer offer)
-                    {
-                        boolean shouldShowPopup = true;
-
-                        if (offer.containsFeature(UserHelper.BATCH_PREMIUM_FEATURE))
-                        {
-                            boolean alreadyPremium = UserHelper.isUserPremium(EasyBudget.this);
-                            if (alreadyPremium) // Not show popup again if user is already premium
-                            {
-                                shouldShowPopup = false;
-                            }
-
-                            UserHelper.setBatchUserPremium(activity);
-                        }
-
-                        if (shouldShowPopup)
-                        {
-                            Map<String, String> additionalParameters = offer.getOfferAdditionalParameters();
-
-                            String rewardMessage = additionalParameters.get("reward_message");
-                            String rewardTitle = additionalParameters.get("reward_title");
-
-                            if (rewardTitle != null && rewardMessage != null)
-                            {
-                                new AlertDialog.Builder(activity)
-                                        .setTitle(rewardTitle)
-                                        .setMessage(rewardMessage)
-                                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
-                                        {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which)
-                                            {
-                                                dialog.dismiss();
-                                            }
-                                        })
-                                        .show();
-                            }
-                        }
-                    }
-                });
-
                 Batch.onStart(activity);
             }
 
@@ -666,6 +620,11 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
          * Premium popup after rating complete
          */
         showPremiumPopupIfNeeded(activity);
+
+        /*
+         * Update iap status if needed
+         */
+        updateIAPStatusIfNeeded();
     }
 
     /**
@@ -780,6 +739,40 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
         intent.putExtra(INTENT_IAB_STATUS_KEY, status);
 
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    /**
+     * Update the current IAP status if already checked
+     */
+    private void updateIAPStatusIfNeeded()
+    {
+        Logger.debug("updateIAPStatusIfNeeded: "+iabStatus);
+
+        if( iabStatus == PremiumCheckStatus.NOT_PREMIUM || iabStatus == PremiumCheckStatus.PREMIUM )
+        {
+            iabHelper.queryInventoryAsync(inventoryListener);
+        }
+    }
+
+    /**
+     * Launch the redeem promocode flow
+     *
+     * @param promocode the promocode to redeem
+     * @param activity the current activity
+     */
+    public boolean launchRedeemPromocodeFlow(@NonNull String promocode, @NonNull Activity activity)
+    {
+        try
+        {
+            String url = "https://play.google.com/redeem?code=" + URLEncoder.encode(promocode, "UTF-8");
+            activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+            return true;
+        }
+        catch (Exception e)
+        {
+            Logger.error(false, "Error while redeeming promocode", e);
+            return false;
+        }
     }
 
     /**

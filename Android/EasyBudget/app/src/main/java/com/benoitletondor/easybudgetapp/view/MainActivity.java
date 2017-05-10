@@ -161,6 +161,7 @@ public class MainActivity extends DBActivity
         filter.addAction(SelectCurrencyFragment.CURRENCY_SELECTED_INTENT);
         filter.addAction(INTENT_SHOW_WELCOME_SCREEN);
         filter.addAction(Intent.ACTION_VIEW);
+        filter.addAction(EasyBudget.INTENT_IAB_STATUS_CHANGED);
 
         receiver = new BroadcastReceiver()
         {
@@ -274,6 +275,10 @@ public class MainActivity extends DBActivity
                     {
                         updateInvitationStatus(intent);
                     }
+                }
+                else if( EasyBudget.INTENT_IAB_STATUS_CHANGED.equals(intent.getAction()) )
+                {
+                    invalidateOptionsMenu();
                 }
             }
         };

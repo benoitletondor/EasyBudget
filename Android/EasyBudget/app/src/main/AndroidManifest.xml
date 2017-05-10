@@ -115,6 +115,14 @@
             </intent-filter>
         </receiver>
 
+        <service
+            android:name="com.batch.android.BatchPushInstanceIDService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.iid.InstanceID"/>
+            </intent-filter>
+        </service>
+
         <!-- Notif services -->
         <service android:name=".notif.DailyNotifOptinService"/>
         <service android:name=".notif.MonthlyReportNotifService"/>
