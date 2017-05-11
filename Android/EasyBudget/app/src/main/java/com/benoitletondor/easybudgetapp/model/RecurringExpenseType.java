@@ -1,7 +1,9 @@
 package com.benoitletondor.easybudgetapp.model;
 
 /**
- * Type of recurring expense
+ * Type of recurring expense.
+ * <p>
+ * <b>Important</b>: do not change the order of those fields since its used to display choices to the user.
  *
  * @author Benoit LETONDOR
  */

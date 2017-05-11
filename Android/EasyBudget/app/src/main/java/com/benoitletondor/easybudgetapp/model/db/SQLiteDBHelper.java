@@ -89,7 +89,7 @@ public final class SQLiteDBHelper extends SQLiteOpenHelper
 
         if( oldVersion < 3 )
         {
-            database.execSQL("ALTER TABLE "+TABLE_RECURRING_EXPENSE+" ADD COLUMN "+COLUMN_RECURRING_TYPE+" text not null DEFAULT '"+ RecurringExpenseType.MONTHLY+"'");
+            database.execSQL("ALTER TABLE "+TABLE_RECURRING_EXPENSE+" ADD COLUMN "+COLUMN_RECURRING_TYPE+" text not null DEFAULT '"+RecurringExpenseType.MONTHLY+"'");
         }
 	}
 }
