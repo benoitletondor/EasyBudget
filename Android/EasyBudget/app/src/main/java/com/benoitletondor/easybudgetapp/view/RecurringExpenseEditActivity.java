@@ -43,6 +43,7 @@ import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import com.benoitletondor.easybudgetapp.model.Expense;
 import com.benoitletondor.easybudgetapp.model.RecurringExpense;
+import com.benoitletondor.easybudgetapp.model.RecurringExpenseType;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -236,7 +237,7 @@ public class RecurringExpenseEditActivity extends DBActivity
                 {
                     double value = Double.parseDouble(amountEditText.getText().toString());
 
-                    RecurringExpense expense = new RecurringExpense(descriptionEditText.getText().toString(), isRevenue? -value : value, dateStart);
+                    RecurringExpense expense = new RecurringExpense(descriptionEditText.getText().toString(), isRevenue? -value : value, dateStart, RecurringExpenseType.MONTHLY); // TODO other types
 
                     new SaveRecurringExpenseTask().execute(expense);
                 }

@@ -21,6 +21,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 
+import com.benoitletondor.easybudgetapp.model.RecurringExpenseType;
+
 /**
  * @author Benoit LETONDOR
  */
@@ -39,11 +41,12 @@ public final class SQLiteDBHelper extends SQLiteOpenHelper
     protected static final String COLUMN_RECURRING_AMOUNT           = "amount";
     protected static final String COLUMN_RECURRING_RECURRING_DATE   = "recurringDate";
     protected static final String COLUMN_RECURRING_MODIFIED         = "modified";
+    protected static final String COLUMN_RECURRING_TYPE             = "type";
 
 // -------------------------------------------->
 
     private static final String DATABASE_NAME    = "easybudget.db";
-    private static final int    DATABASE_VERSION = 2;
+    private static final int    DATABASE_VERSION = 3;
 
 // -------------------------------------------->
 
@@ -71,7 +74,8 @@ public final class SQLiteDBHelper extends SQLiteOpenHelper
             + COLUMN_RECURRING_TITLE + " text not null, "
             + COLUMN_RECURRING_AMOUNT + " integer not null, "
             + COLUMN_RECURRING_MODIFIED + " integer not null, "
-            + COLUMN_RECURRING_RECURRING_DATE + " integer not null);");
+            + COLUMN_RECURRING_RECURRING_DATE + " integer not null, "
+            + COLUMN_RECURRING_TYPE + " text not null DEFAULT '"+RecurringExpenseType.MONTHLY+"');");
     }
 
 	@Override
@@ -81,6 +85,11 @@ public final class SQLiteDBHelper extends SQLiteOpenHelper
         {
             database.execSQL("UPDATE "+TABLE_EXPENSE+" SET "+COLUMN_EXPENSE_AMOUNT+" = "+COLUMN_EXPENSE_AMOUNT+" * 100");
             database.execSQL("UPDATE "+ TABLE_RECURRING_EXPENSE +" SET "+ COLUMN_RECURRING_AMOUNT +" = "+ COLUMN_RECURRING_AMOUNT +" * 100");
+        }
+
+        if( oldVersion < 3 )
+        {
+            database.execSQL("ALTER TABLE "+TABLE_RECURRING_EXPENSE+" ADD COLUMN "+COLUMN_RECURRING_TYPE+" text not null DEFAULT '"+ RecurringExpenseType.MONTHLY+"'");
         }
 	}
 }

@@ -31,6 +31,7 @@ import com.benoitletondor.easybudgetapp.helper.DateHelper;
 import com.benoitletondor.easybudgetapp.helper.Logger;
 import com.benoitletondor.easybudgetapp.model.Expense;
 import com.benoitletondor.easybudgetapp.model.RecurringExpense;
+import com.benoitletondor.easybudgetapp.model.RecurringExpenseType;
 
 import org.json.JSONException;
 
@@ -708,6 +709,7 @@ public final class DB
             cursor.getString(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_RECURRING_TITLE)),
             (double) cursor.getLong(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_RECURRING_AMOUNT)) / 100.d,
             new Date(cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_RECURRING_RECURRING_DATE))),
+            RecurringExpenseType.valueOf(cursor.getString(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_RECURRING_TYPE))),
             cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_RECURRING_MODIFIED)) == 1
         );
     }
@@ -732,6 +734,7 @@ public final class DB
         values.put(SQLiteDBHelper.COLUMN_RECURRING_TITLE, expense.getTitle());
         values.put(SQLiteDBHelper.COLUMN_RECURRING_RECURRING_DATE, expense.getRecurringDate().getTime());
         values.put(SQLiteDBHelper.COLUMN_RECURRING_AMOUNT, CurrencyHelper.getDBValueForDouble(expense.getAmount()));
+        values.put(SQLiteDBHelper.COLUMN_RECURRING_TYPE, expense.getType().name());
         values.put(SQLiteDBHelper.COLUMN_RECURRING_MODIFIED, expense.isModified() ? 1 : 0);
 
         return values;

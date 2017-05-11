@@ -50,6 +50,11 @@ public class RecurringExpense implements Serializable
      * Is this expense modified (Not implemented yet)
      */
     private boolean modified = false;
+    /**
+     * Type of recurring expense
+     */
+    @NonNull
+    private final RecurringExpenseType type;
 
 // ---------------------------------->
 
@@ -58,8 +63,9 @@ public class RecurringExpense implements Serializable
      * @param title
      * @param startAmount
      * @param recurringDate
+     * @param type
      */
-    public RecurringExpense(@NonNull String title, double startAmount, @NonNull Date recurringDate)
+    public RecurringExpense(@NonNull String title, double startAmount, @NonNull Date recurringDate, @NonNull RecurringExpenseType type)
     {
         if (startAmount == 0)
         {
@@ -69,6 +75,7 @@ public class RecurringExpense implements Serializable
         this.amount = startAmount;
         this.title = title;
         this.recurringDate = DateHelper.cleanDate(recurringDate);
+        this.type = type;
     }
 
     /**
@@ -77,11 +84,12 @@ public class RecurringExpense implements Serializable
      * @param title
      * @param startAmount
      * @param recurringDate
+     * @param type
      * @param modified
      */
-    public RecurringExpense(Long id, @NonNull String title, double startAmount, @NonNull Date recurringDate, boolean modified)
+    public RecurringExpense(Long id, @NonNull String title, double startAmount, @NonNull Date recurringDate, @NonNull RecurringExpenseType type, boolean modified)
     {
-        this(title, startAmount, recurringDate);
+        this(title, startAmount, recurringDate, type);
 
         this.id = id;
         this.modified = modified;
@@ -145,4 +153,13 @@ public class RecurringExpense implements Serializable
         return id;
     }
 
+    /**
+     *
+     * @return
+     */
+    @NonNull
+    public RecurringExpenseType getType()
+    {
+        return type;
+    }
 }
