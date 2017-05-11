@@ -26,9 +26,9 @@
     <string name="title_activity_add_income">Add income</string>
     <string name="title_activity_edit_expense">Edit expense</string>
     <string name="title_activity_edit_income">Edit income</string>
-    <string name="title_activity_monthly_expense_add">Add monthly expense</string>
-    <string name="title_activity_monthly_income_add">Add monthly income</string>
-    <string name="title_activity_monthly_expense_edit">Edit monthly expense</string>
+    <string name="title_activity_recurring_expense_add">Add monthly expense</string>
+    <string name="title_activity_recurring_income_add">Add monthly income</string>
+    <string name="title_activity_recurring_expense_edit">Edit monthly expense</string>
     <string name="title_activity_monthly_income_edit">Edit monthly income</string>
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_welcome">EasyBudget</string>
@@ -61,16 +61,16 @@
         <item>Edit income</item>
         <item>Delete income</item>
     </string-array>
-    <string name="dialog_edit_monthly_expense_title">Monthly expense: What do you want to do?</string>
-    <string name="dialog_edit_monthly_income_title">Monthly income: What do you want to do?</string>
-    <string-array name="dialog_edit_monthly_expense_choices">
+    <string name="dialog_edit_recurring_expense_title">Monthly expense: What do you want to do?</string>
+    <string name="dialog_edit_recurring_income_title">Monthly income: What do you want to do?</string>
+    <string-array name="dialog_edit_recurring_expense_choices">
         <item>Edit this instance</item>
         <item>Delete this instance only</item>
         <item>Delete all following</item>
         <item>Delete all before</item>
         <item>Delete all</item>
     </string-array>
-    <string-array name="dialog_edit_monthly_income_choices">
+    <string-array name="dialog_edit_recurring_income_choices">
         <item>Edit this instance</item>
         <item>Delete this instance only</item>
         <item>Delete all following</item>
@@ -95,23 +95,23 @@
     <string name="adjust_balance_error_message">The value you entered is invalid.</string>
 
     <string name="monthly">MONTHLY</string>
-    <string name="monthly_expense_add_loading_title">Loading</string>
-    <string name="monthly_expense_add_loading_message">Creating monthly expense…</string>
-    <string name="monthly_income_add_loading_message">Creating monthly income…</string>
-    <string name="monthly_expense_add_error_title">Oops</string>
-    <string name="monthly_expense_add_error_message">An error occurred.</string>
-    <string name="monthly_expense_delete_success_message">Monthly expense deleted with success</string>
-    <string name="monthly_expense_delete_loading_title">Deleting</string>
-    <string name="monthly_expense_delete_loading_message">Deleting monthly expense…</string>
-    <string name="monthly_expense_delete_error_title">Oops</string>
-    <string name="monthly_expense_delete_error_message">An error occurred.</string>
-    <string name="monthly_expense_restoring_loading_title">Canceling</string>
-    <string name="monthly_expense_restoring_loading_message">Restoring deleted monthly expense…</string>
-    <string name="monthly_expense_restored_success_message">Monthly expense restored with success</string>
-    <string name="monthly_expense_restore_error_title">Oops</string>
-    <string name="monthly_expense_restore_error_message">An error occurred.</string>
-    <string name="monthly_expense_delete_first_error_title">Oops</string>
-    <string name="monthly_expense_delete_first_error_message">There are no instances before this one.</string>
+    <string name="recurring_expense_add_loading_title">Loading</string>
+    <string name="recurring_expense_add_loading_message">Creating monthly expense…</string>
+    <string name="recurring_income_add_loading_message">Creating monthly income…</string>
+    <string name="recurring_expense_add_error_title">Oops</string>
+    <string name="recurring_expense_add_error_message">An error occurred.</string>
+    <string name="recurring_expense_delete_success_message">Monthly expense deleted with success</string>
+    <string name="recurring_expense_delete_loading_title">Deleting</string>
+    <string name="recurring_expense_delete_loading_message">Deleting monthly expense…</string>
+    <string name="recurring_expense_delete_error_title">Oops</string>
+    <string name="recurring_expense_delete_error_message">An error occurred.</string>
+    <string name="recurring_expense_restoring_loading_title">Canceling</string>
+    <string name="recurring_expense_restoring_loading_message">Restoring deleted monthly expense…</string>
+    <string name="recurring_expense_restored_success_message">Monthly expense restored with success</string>
+    <string name="recurring_expense_restore_error_title">Oops</string>
+    <string name="recurring_expense_restore_error_message">An error occurred.</string>
+    <string name="recurring_expense_delete_first_error_title">Oops</string>
+    <string name="recurring_expense_delete_first_error_message">There are no instances before this one.</string>
     <string name="expense_delete_error_title">Oops</string>
     <string name="expense_delete_error_message">An error occurred.</string>
 

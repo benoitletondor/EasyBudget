@@ -121,7 +121,7 @@ public class MonthlyReportActivity extends AppCompatActivity implements ViewPage
         UIHelper.removeButtonBorder(previousMonthButton);
         UIHelper.removeButtonBorder(nextMonthButton);
 
-        // Load list of monthly asynchronously since it can take time
+        // Load list of months asynchronously since it can take time
         new AsyncTask<Void, Void, List<Date>>()
         {
             @Override

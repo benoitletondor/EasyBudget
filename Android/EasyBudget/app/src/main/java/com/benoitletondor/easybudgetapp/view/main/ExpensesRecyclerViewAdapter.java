@@ -34,7 +34,7 @@ import android.widget.TextView;
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import com.benoitletondor.easybudgetapp.model.Expense;
-import com.benoitletondor.easybudgetapp.model.MonthlyExpenseDeleteType;
+import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType;
 import com.benoitletondor.easybudgetapp.model.db.DB;
 import com.benoitletondor.easybudgetapp.view.ExpenseEditActivity;
 import com.benoitletondor.easybudgetapp.view.MainActivity;
@@ -148,7 +148,7 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
         viewHolder.expenseTitleTextView.setText(expense.getTitle());
         viewHolder.expenseAmountTextView.setText(CurrencyHelper.getFormattedCurrencyString(viewHolder.view.getContext(), -expense.getAmount()));
         viewHolder.expenseAmountTextView.setTextColor(ContextCompat.getColor(viewHolder.view.getContext(), expense.isRevenue() ? R.color.budget_green : R.color.budget_red));
-        viewHolder.monthlyIndicator.setVisibility(expense.isMonthly() ? View.VISIBLE : View.GONE);
+        viewHolder.recurringIndicator.setVisibility(expense.isRecurring() ? View.VISIBLE : View.GONE);
         viewHolder.positiveIndicator.setImageResource(expense.isRevenue() ? R.drawable.ic_label_green : R.drawable.ic_label_red);
 
         final View.OnClickListener onClickListener = new View.OnClickListener()
@@ -156,11 +156,11 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
             @Override
             public void onClick(View v)
             {
-                if (expense.isMonthly())
+                if (expense.isRecurring())
                 {
                     AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                    builder.setTitle(expense.isRevenue() ? R.string.dialog_edit_monthly_income_title : R.string.dialog_edit_monthly_expense_title);
-                    builder.setItems(expense.isRevenue() ? R.array.dialog_edit_monthly_income_choices : R.array.dialog_edit_monthly_expense_choices, new DialogInterface.OnClickListener()
+                    builder.setTitle(expense.isRevenue() ? R.string.dialog_edit_recurring_income_title : R.string.dialog_edit_recurring_expense_title);
+                    builder.setItems(expense.isRevenue() ? R.array.dialog_edit_recurring_income_choices : R.array.dialog_edit_recurring_expense_choices, new DialogInterface.OnClickListener()
                     {
                         public void onClick(DialogInterface dialog, int which)
                         {
@@ -179,9 +179,9 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
                                 case 1: // Delete this one
                                 {
                                     // Send notification to inform views that this expense has been deleted
-                                    Intent intent = new Intent(MainActivity.INTENT_MONTHLY_EXPENSE_DELETED);
+                                    Intent intent = new Intent(MainActivity.INTENT_RECURRING_EXPENSE_DELETED);
                                     intent.putExtra("expense", expense);
-                                    intent.putExtra("deleteType", MonthlyExpenseDeleteType.ONE.getValue());
+                                    intent.putExtra("deleteType", RecurringExpenseDeleteType.ONE.getValue());
                                     LocalBroadcastManager.getInstance(activity.getApplicationContext()).sendBroadcast(intent);
 
                                     break;
@@ -189,9 +189,9 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
                                 case 2: // Delete from
                                 {
                                     // Send notification to inform views that this expense has been deleted
-                                    Intent intent = new Intent(MainActivity.INTENT_MONTHLY_EXPENSE_DELETED);
+                                    Intent intent = new Intent(MainActivity.INTENT_RECURRING_EXPENSE_DELETED);
                                     intent.putExtra("expense", expense);
-                                    intent.putExtra("deleteType", MonthlyExpenseDeleteType.FROM.getValue());
+                                    intent.putExtra("deleteType", RecurringExpenseDeleteType.FROM.getValue());
                                     LocalBroadcastManager.getInstance(activity.getApplicationContext()).sendBroadcast(intent);
 
                                     break;
@@ -199,9 +199,9 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
                                 case 3: // Delete up to
                                 {
                                     // Send notification to inform views that this expense has been deleted
-                                    Intent intent = new Intent(MainActivity.INTENT_MONTHLY_EXPENSE_DELETED);
+                                    Intent intent = new Intent(MainActivity.INTENT_RECURRING_EXPENSE_DELETED);
                                     intent.putExtra("expense", expense);
-                                    intent.putExtra("deleteType", MonthlyExpenseDeleteType.TO.getValue());
+                                    intent.putExtra("deleteType", RecurringExpenseDeleteType.TO.getValue());
                                     LocalBroadcastManager.getInstance(activity.getApplicationContext()).sendBroadcast(intent);
 
                                     break;
@@ -209,9 +209,9 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
                                 case 4: // Delete all
                                 {
                                     // Send notification to inform views that this expense has been deleted
-                                    Intent intent = new Intent(MainActivity.INTENT_MONTHLY_EXPENSE_DELETED);
+                                    Intent intent = new Intent(MainActivity.INTENT_RECURRING_EXPENSE_DELETED);
                                     intent.putExtra("expense", expense);
-                                    intent.putExtra("deleteType", MonthlyExpenseDeleteType.ALL.getValue());
+                                    intent.putExtra("deleteType", RecurringExpenseDeleteType.ALL.getValue());
                                     LocalBroadcastManager.getInstance(activity.getApplicationContext()).sendBroadcast(intent);
 
                                     break;
@@ -287,7 +287,7 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
     {
         public final TextView expenseTitleTextView;
         public final TextView expenseAmountTextView;
-        public final ViewGroup monthlyIndicator;
+        public final ViewGroup recurringIndicator;
         public final ImageView positiveIndicator;
         public final View view;
 
@@ -298,7 +298,7 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
             view = v;
             expenseTitleTextView = (TextView) v.findViewById(R.id.expense_title);
             expenseAmountTextView = (TextView) v.findViewById(R.id.expense_amount);
-            monthlyIndicator = (ViewGroup) v.findViewById(R.id.monthly_indicator);
+            recurringIndicator = (ViewGroup) v.findViewById(R.id.recurring_indicator);
             positiveIndicator = (ImageView) v.findViewById(R.id.positive_indicator);
         }
     }

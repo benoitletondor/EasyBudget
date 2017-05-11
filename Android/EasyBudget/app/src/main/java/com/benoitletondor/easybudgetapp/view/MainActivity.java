@@ -60,8 +60,8 @@ import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
 import com.benoitletondor.easybudgetapp.helper.Parameters;
 import com.benoitletondor.easybudgetapp.helper.UserHelper;
 import com.benoitletondor.easybudgetapp.model.Expense;
-import com.benoitletondor.easybudgetapp.model.MonthlyExpense;
-import com.benoitletondor.easybudgetapp.model.MonthlyExpenseDeleteType;
+import com.benoitletondor.easybudgetapp.model.RecurringExpense;
+import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType;
 import com.benoitletondor.easybudgetapp.model.db.DBCache;
 import com.benoitletondor.easybudgetapp.view.main.calendar.CalendarFragment;
 import com.benoitletondor.easybudgetapp.view.main.ExpensesRecyclerViewAdapter;
@@ -92,10 +92,10 @@ public class MainActivity extends DBActivity
     private static final int ACTION_SNACKBAR_LENGTH = 5000;
 
     public static final int ADD_EXPENSE_ACTIVITY_CODE = 101;
-    public static final int MANAGE_MONTHLY_EXPENSE_ACTIVITY_CODE = 102;
+    public static final int MANAGE_RECURRING_EXPENSE_ACTIVITY_CODE = 102;
     public static final int WELCOME_SCREEN_ACTIVITY_CODE = 103;
     public static final String INTENT_EXPENSE_DELETED = "intent.expense.deleted";
-    public static final String INTENT_MONTHLY_EXPENSE_DELETED = "intent.expense.monthly.deleted";
+    public static final String INTENT_RECURRING_EXPENSE_DELETED = "intent.expense.monthly.deleted";
     public static final String INTENT_SHOW_WELCOME_SCREEN = "intent.welcomscreen.show";
 
     public static final String INTENT_REDIRECT_TO_PREMIUM_EXTRA = "intent.extra.premiumshow";
@@ -157,7 +157,7 @@ public class MainActivity extends DBActivity
         // Register receiver
         IntentFilter filter = new IntentFilter();
         filter.addAction(INTENT_EXPENSE_DELETED);
-        filter.addAction(INTENT_MONTHLY_EXPENSE_DELETED);
+        filter.addAction(INTENT_RECURRING_EXPENSE_DELETED);
         filter.addAction(SelectCurrencyFragment.CURRENCY_SELECTED_INTENT);
         filter.addAction(INTENT_SHOW_WELCOME_SCREEN);
         filter.addAction(Intent.ACTION_VIEW);
@@ -217,34 +217,34 @@ public class MainActivity extends DBActivity
                     }
 
                 }
-                else if( INTENT_MONTHLY_EXPENSE_DELETED.equals(intent.getAction()) )
+                else if( INTENT_RECURRING_EXPENSE_DELETED.equals(intent.getAction()) )
                 {
                     final Expense expense = (Expense) intent.getSerializableExtra("expense");
-                    final MonthlyExpenseDeleteType deleteType = MonthlyExpenseDeleteType.fromValue(intent.getIntExtra("deleteType", MonthlyExpenseDeleteType.ALL.getValue()));
-                    final MonthlyExpense monthlyExpense = db.findMonthlyExpenseForId(expense.getMonthlyId());
+                    final RecurringExpenseDeleteType deleteType = RecurringExpenseDeleteType.fromValue(intent.getIntExtra("deleteType", RecurringExpenseDeleteType.ALL.getValue()));
+                    final RecurringExpense recurringExpense = db.findRecurringExpenseForId(expense.getRecurringId());
 
                     if( deleteType == null )
                     {
-                        showGenericMonthlyDeleteErrorDialog();
-                        Logger.error("INTENT_MONTHLY_EXPENSE_DELETED came with null delete type");
+                        showGenericRecurringDeleteErrorDialog();
+                        Logger.error("INTENT_RECURRING_EXPENSE_DELETED came with null delete type");
 
                         return;
                     }
 
-                    if( monthlyExpense == null )
+                    if( recurringExpense == null )
                     {
-                        showGenericMonthlyDeleteErrorDialog();
-                        Logger.error("INTENT_MONTHLY_EXPENSE_DELETED: Unable to retrieve monthly expense");
+                        showGenericRecurringDeleteErrorDialog();
+                        Logger.error("INTENT_RECURRING_EXPENSE_DELETED: Unable to retrieve recurring expense");
 
                         return;
                     }
 
                     // Check that if the user wants to delete series before this one, there are actually series to delete
-                    if( deleteType == MonthlyExpenseDeleteType.TO && !db.hasExpensesForMonthlyExpenseBeforeDate(monthlyExpense, expense.getDate()) )
+                    if( deleteType == RecurringExpenseDeleteType.TO && !db.hasExpensesForRecurringExpenseBeforeDate(recurringExpense, expense.getDate()) )
                     {
                         new AlertDialog.Builder(MainActivity.this)
-                            .setTitle(R.string.monthly_expense_delete_first_error_title)
-                            .setMessage(getResources().getString(R.string.monthly_expense_delete_first_error_message))
+                            .setTitle(R.string.recurring_expense_delete_first_error_title)
+                            .setMessage(getResources().getString(R.string.recurring_expense_delete_first_error_message))
                             .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener()
                             {
                                 @Override
@@ -258,7 +258,7 @@ public class MainActivity extends DBActivity
                         return;
                     }
 
-                    new DeleteMonthlyExpenseTask(monthlyExpense, expense, deleteType).execute();
+                    new DeleteRecurringExpenseTask(recurringExpense, expense, deleteType).execute();
                 }
                 else if( SelectCurrencyFragment.CURRENCY_SELECTED_INTENT.equals(intent.getAction()) )
                 {
@@ -350,7 +350,7 @@ public class MainActivity extends DBActivity
     {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if( requestCode == ADD_EXPENSE_ACTIVITY_CODE || requestCode == MANAGE_MONTHLY_EXPENSE_ACTIVITY_CODE )
+        if( requestCode == ADD_EXPENSE_ACTIVITY_CODE || requestCode == MANAGE_RECURRING_EXPENSE_ACTIVITY_CODE)
         {
             if( resultCode == RESULT_OK )
             {
@@ -999,13 +999,13 @@ public class MainActivity extends DBActivity
             }
         });
 
-        FloatingActionButton fabNewMonthlyExpense = (FloatingActionButton) findViewById(R.id.fab_new_monthly_expense);
-        fabNewMonthlyExpense.setOnClickListener(new View.OnClickListener()
+        FloatingActionButton fabNewRecurringExpense = (FloatingActionButton) findViewById(R.id.fab_new_recurring_expense);
+        fabNewRecurringExpense.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                Intent startIntent = new Intent(MainActivity.this, MonthlyExpenseEditActivity.class);
+                Intent startIntent = new Intent(MainActivity.this, RecurringExpenseEditActivity.class);
                 startIntent.putExtra("dateStart", calendarFragment.getSelectedDate());
 
                 if( UIHelper.areAnimationsEnabled(MainActivity.this) )
@@ -1069,13 +1069,13 @@ public class MainActivity extends DBActivity
     }
 
     /**
-     * Show a generic alert dialog telling the user an error occured while deleting monthly expense
+     * Show a generic alert dialog telling the user an error occured while deleting recurring expense
      */
-    private void showGenericMonthlyDeleteErrorDialog()
+    private void showGenericRecurringDeleteErrorDialog()
     {
         new AlertDialog.Builder(MainActivity.this)
-            .setTitle(R.string.monthly_expense_delete_error_title)
-            .setMessage(R.string.monthly_expense_delete_error_message)
+            .setTitle(R.string.recurring_expense_delete_error_title)
+            .setMessage(R.string.recurring_expense_delete_error_message)
             .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener()
             {
                 @Override
@@ -1090,9 +1090,9 @@ public class MainActivity extends DBActivity
 // ---------------------------------------->
 
     /**
-     * An asynctask to delete a monthly expense from DB
+     * An asynctask to delete a recurring expense from DB
      */
-    private class DeleteMonthlyExpenseTask extends AsyncTask<Void, Integer, Boolean>
+    private class DeleteRecurringExpenseTask extends AsyncTask<Void, Integer, Boolean>
     {
         /**
          * Dialog used to display loading to the user
@@ -1104,13 +1104,13 @@ public class MainActivity extends DBActivity
          */
         private final Expense                  expense;
         /**
-         * The monthly expense associated with the expense deleted by the user
+         * The recurring expense associated with the expense deleted by the user
          */
-        private final MonthlyExpense monthlyExpense;
+        private final RecurringExpense recurringExpense;
         /**
          * Type of delete
          */
-        private final MonthlyExpenseDeleteType deleteType;
+        private final RecurringExpenseDeleteType deleteType;
 
         /**
          * Expenses to restore if delete is successful and user cancels it
@@ -1118,16 +1118,16 @@ public class MainActivity extends DBActivity
         @Nullable
         private List<Expense> expensesToRestore;
         /**
-         * Monthly expense to restore if delete is successful and user cancels it
+         * Recurring expense to restore if delete is successful and user cancels it
          */
         @Nullable
-        private MonthlyExpense monthlyExpenseToRestore;
+        private RecurringExpense recurringExpenseToRestore;
 
         // ------------------------------------------->
 
-        DeleteMonthlyExpenseTask(@NonNull MonthlyExpense monthlyExpense, @NonNull Expense expense, @NonNull MonthlyExpenseDeleteType deleteType)
+        DeleteRecurringExpenseTask(@NonNull RecurringExpense recurringExpense, @NonNull Expense expense, @NonNull RecurringExpenseDeleteType deleteType)
         {
-            this.monthlyExpense = monthlyExpense;
+            this.recurringExpense = recurringExpense;
             this.expense = expense;
             this.deleteType = deleteType;
         }
@@ -1141,20 +1141,20 @@ public class MainActivity extends DBActivity
             {
                 case ALL:
                 {
-                    monthlyExpenseToRestore = monthlyExpense;
-                    expensesToRestore = db.getAllExpenseForMonthlyExpense(monthlyExpense);
+                    recurringExpenseToRestore = recurringExpense;
+                    expensesToRestore = db.getAllExpenseForRecurringExpense(recurringExpense);
 
-                    boolean expensesDeleted = db.deleteAllExpenseForMonthlyExpense(monthlyExpense);
+                    boolean expensesDeleted = db.deleteAllExpenseForRecurringExpense(recurringExpense);
                     if( !expensesDeleted )
                     {
-                        Logger.error(false, "Error while deleting expenses for monthly expense (mode ALL). deleteAllExpenseForMonthlyExpense returned false");
+                        Logger.error(false, "Error while deleting expenses for recurring expense (mode ALL). deleteAllExpenseForRecurringExpense returned false");
                         return false;
                     }
 
-                    boolean monthlyExpenseDeleted = db.deleteMonthlyExpense(monthlyExpense);
-                    if( !monthlyExpenseDeleted )
+                    boolean recurringExpenseDeleted = db.deleteRecurringExpense(recurringExpense);
+                    if( !recurringExpenseDeleted )
                     {
-                        Logger.error(false, "Error while deleting monthly expense (mode ALL). deleteMonthlyExpense returned false");
+                        Logger.error(false, "Error while deleting recurring expense (mode ALL). deleteRecurringExpense returned false");
                         return false;
                     }
 
@@ -1162,12 +1162,12 @@ public class MainActivity extends DBActivity
                 }
                 case FROM:
                 {
-                    expensesToRestore = db.getAllExpensesForMonthlyExpenseFromDate(monthlyExpense, expense.getDate());
+                    expensesToRestore = db.getAllExpensesForRecurringExpenseFromDate(recurringExpense, expense.getDate());
 
-                    boolean expensesDeleted = db.deleteAllExpenseForMonthlyExpenseFromDate(monthlyExpense, expense.getDate());
+                    boolean expensesDeleted = db.deleteAllExpenseForRecurringExpenseFromDate(recurringExpense, expense.getDate());
                     if( !expensesDeleted )
                     {
-                        Logger.error(false, "Error while deleting expenses for monthly expense (mode FROM). deleteAllExpenseForMonthlyExpenseFromDate returned false");
+                        Logger.error(false, "Error while deleting expenses for recurring expense (mode FROM). deleteAllExpenseForRecurringExpenseFromDate returned false");
                         return false;
                     }
 
@@ -1175,12 +1175,12 @@ public class MainActivity extends DBActivity
                 }
                 case TO:
                 {
-                    expensesToRestore = db.getAllExpensesForMonthlyExpenseBeforeDate(monthlyExpense, expense.getDate());
+                    expensesToRestore = db.getAllExpensesForRecurringExpenseBeforeDate(recurringExpense, expense.getDate());
 
-                    boolean expensesDeleted = db.deleteAllExpenseForMonthlyExpenseBeforeDate(monthlyExpense, expense.getDate());
+                    boolean expensesDeleted = db.deleteAllExpenseForRecurringExpenseBeforeDate(recurringExpense, expense.getDate());
                     if( !expensesDeleted )
                     {
-                        Logger.error(false, "Error while deleting expenses for monthly expense (mode TO). deleteAllExpenseForMonthlyExpenseBeforeDate returned false");
+                        Logger.error(false, "Error while deleting expenses for recurring expense (mode TO). deleteAllExpenseForRecurringExpenseBeforeDate returned false");
                         return false;
                     }
 
@@ -1194,7 +1194,7 @@ public class MainActivity extends DBActivity
                     boolean expenseDeleted = db.deleteExpense(expense);
                     if( !expenseDeleted )
                     {
-                        Logger.error("Error while deleting expense for monthly expense (mode ONE). deleteExpense returned false");
+                        Logger.error("Error while deleting expense for recurring expense (mode ONE). deleteExpense returned false");
                         return false;
                     }
 
@@ -1211,8 +1211,8 @@ public class MainActivity extends DBActivity
             // Show a ProgressDialog
             dialog = new ProgressDialog(MainActivity.this);
             dialog.setIndeterminate(true);
-            dialog.setTitle(R.string.monthly_expense_delete_loading_title);
-            dialog.setMessage(getResources().getString(R.string.monthly_expense_delete_loading_message));
+            dialog.setTitle(R.string.recurring_expense_delete_loading_title);
+            dialog.setMessage(getResources().getString(R.string.recurring_expense_delete_loading_message));
             dialog.setCanceledOnTouchOutside(false);
             dialog.setCancelable(false);
             dialog.show();
@@ -1228,7 +1228,7 @@ public class MainActivity extends DBActivity
             {
                 // Refresh and show confirm snackbar
                 refreshAllForDate(expensesViewAdapter.getDate());
-                Snackbar snackbar = Snackbar.make(coordinatorLayout, R.string.monthly_expense_delete_success_message, Snackbar.LENGTH_LONG);
+                Snackbar snackbar = Snackbar.make(coordinatorLayout, R.string.recurring_expense_delete_success_message, Snackbar.LENGTH_LONG);
 
                 if( expensesToRestore != null ) // just in case..
                 {
@@ -1237,7 +1237,7 @@ public class MainActivity extends DBActivity
                         @Override
                         public void onClick(View v)
                         {
-                            new CancelDeleteMonthlyExpenseTask(expensesToRestore, monthlyExpenseToRestore).execute();
+                            new CancelDeleteRecurringExpenseTask(expensesToRestore, recurringExpenseToRestore).execute();
                         }
                     });
                 }
@@ -1250,7 +1250,7 @@ public class MainActivity extends DBActivity
             }
             else
             {
-                showGenericMonthlyDeleteErrorDialog();
+                showGenericRecurringDeleteErrorDialog();
             }
         }
 
@@ -1258,9 +1258,9 @@ public class MainActivity extends DBActivity
     }
 
     /**
-     * An asynctask to restore deleted monthly expense from DB
+     * An asynctask to restore deleted recurring expense from DB
      */
-    private class CancelDeleteMonthlyExpenseTask extends AsyncTask<Void, Void, Boolean>
+    private class CancelDeleteRecurringExpenseTask extends AsyncTask<Void, Void, Boolean>
     {
         /**
          * Dialog used to display loading to the user
@@ -1272,21 +1272,21 @@ public class MainActivity extends DBActivity
          */
         private final List<Expense> expensesToRestore;
         /**
-         * Monthly expense to restore (will be null if delete type != ALL)
+         * Recurring expense to restore (will be null if delete type != ALL)
          */
-        private final MonthlyExpense monthlyExpenseToRestore;
+        private final RecurringExpense recurringExpenseToRestore;
 
         // ------------------------------------------->
 
         /**
          *
          * @param expensesToRestore The deleted expenses to restore
-         * @param monthlyExpenseToRestore the deleted monthly expense to restore
+         * @param recurringExpenseToRestore the deleted recurring expense to restore
          */
-        private CancelDeleteMonthlyExpenseTask(@NonNull List<Expense> expensesToRestore, @Nullable MonthlyExpense monthlyExpenseToRestore)
+        private CancelDeleteRecurringExpenseTask(@NonNull List<Expense> expensesToRestore, @Nullable RecurringExpense recurringExpenseToRestore)
         {
             this.expensesToRestore = expensesToRestore;
-            this.monthlyExpenseToRestore = monthlyExpenseToRestore;
+            this.recurringExpenseToRestore = recurringExpenseToRestore;
         }
 
         // ------------------------------------------->
@@ -1297,8 +1297,8 @@ public class MainActivity extends DBActivity
             // Show a ProgressDialog
             dialog = new ProgressDialog(MainActivity.this);
             dialog.setIndeterminate(true);
-            dialog.setTitle(R.string.monthly_expense_restoring_loading_title);
-            dialog.setMessage(getResources().getString(R.string.monthly_expense_restoring_loading_message));
+            dialog.setTitle(R.string.recurring_expense_restoring_loading_title);
+            dialog.setMessage(getResources().getString(R.string.recurring_expense_restoring_loading_message));
             dialog.setCanceledOnTouchOutside(false);
             dialog.setCancelable(false);
             dialog.show();
@@ -1307,9 +1307,9 @@ public class MainActivity extends DBActivity
         @Override
         protected Boolean doInBackground(Void... params)
         {
-            if( monthlyExpenseToRestore != null )
+            if( recurringExpenseToRestore != null )
             {
-                if( !db.addMonthlyExpense(monthlyExpenseToRestore) )
+                if( !db.addRecurringExpense(recurringExpenseToRestore) )
                 {
                     return false;
                 }
@@ -1336,13 +1336,13 @@ public class MainActivity extends DBActivity
             {
                 // Refresh and show confirm snackbar
                 refreshAllForDate(expensesViewAdapter.getDate());
-                Snackbar.make(coordinatorLayout, R.string.monthly_expense_restored_success_message, Snackbar.LENGTH_LONG).show();
+                Snackbar.make(coordinatorLayout, R.string.recurring_expense_restored_success_message, Snackbar.LENGTH_LONG).show();
             }
             else
             {
                 new AlertDialog.Builder(MainActivity.this)
-                    .setTitle(R.string.monthly_expense_restore_error_title)
-                    .setMessage(getResources().getString(R.string.monthly_expense_restore_error_message))
+                    .setTitle(R.string.recurring_expense_restore_error_title)
+                    .setMessage(getResources().getString(R.string.recurring_expense_restore_error_message))
                     .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener()
                     {
                         @Override

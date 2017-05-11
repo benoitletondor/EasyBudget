@@ -28,7 +28,7 @@ import java.util.Date;
  *
  * @author Benoit LETONDOR
  */
-public class MonthlyExpense implements Serializable
+public class RecurringExpense implements Serializable
 {
     /**
      * DB id of this expense (can be null)
@@ -59,7 +59,7 @@ public class MonthlyExpense implements Serializable
      * @param startAmount
      * @param recurringDate
      */
-    public MonthlyExpense(@NonNull String title, double startAmount, @NonNull Date recurringDate)
+    public RecurringExpense(@NonNull String title, double startAmount, @NonNull Date recurringDate)
     {
         if (startAmount == 0)
         {
@@ -79,7 +79,7 @@ public class MonthlyExpense implements Serializable
      * @param recurringDate
      * @param modified
      */
-    public MonthlyExpense(Long id, @NonNull String title, double startAmount, @NonNull Date recurringDate, boolean modified)
+    public RecurringExpense(Long id, @NonNull String title, double startAmount, @NonNull Date recurringDate, boolean modified)
     {
         this(title, startAmount, recurringDate);
 

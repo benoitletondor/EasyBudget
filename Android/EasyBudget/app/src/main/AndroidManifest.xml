@@ -78,9 +78,9 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppThemeNoActionBar"/>
         <activity
-            android:name=".view.MonthlyExpenseEditActivity"
+            android:name=".view.RecurringExpenseEditActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
-            android:label="@string/title_activity_monthly_expense_add"
+            android:label="@string/title_activity_recurring_expense_add"
             android:screenOrientation="portrait"
             android:theme="@style/AppThemeNoActionBar"/>
         <activity

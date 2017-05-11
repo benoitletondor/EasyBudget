@@ -42,14 +42,14 @@ import com.benoitletondor.easybudgetapp.helper.Logger;
 import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import com.benoitletondor.easybudgetapp.model.Expense;
-import com.benoitletondor.easybudgetapp.model.MonthlyExpense;
+import com.benoitletondor.easybudgetapp.model.RecurringExpense;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-public class MonthlyExpenseEditActivity extends DBActivity
+public class RecurringExpenseEditActivity extends DBActivity
 {
     /**
      * Save floating action button
@@ -75,7 +75,7 @@ public class MonthlyExpenseEditActivity extends DBActivity
     /**
      * Expense that is being edited (will be null if it's a new one)
      */
-    private MonthlyExpense expense;
+    private RecurringExpense expense;
     /**
      * The start date of the expense
      */
@@ -96,7 +96,7 @@ public class MonthlyExpenseEditActivity extends DBActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_monthly_expense_edit);
+        setContentView(R.layout.activity_recurring_expense_edit);
 
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
 
@@ -108,9 +108,9 @@ public class MonthlyExpenseEditActivity extends DBActivity
 
         if (getIntent().hasExtra("expense"))
         {
-            expense = (MonthlyExpense) getIntent().getSerializableExtra("expense");
+            expense = (RecurringExpense) getIntent().getSerializableExtra("expense");
 
-            setTitle(R.string.title_activity_monthly_expense_edit);
+            setTitle(R.string.title_activity_recurring_expense_edit);
         }
 
         setUpButtons();
@@ -236,9 +236,9 @@ public class MonthlyExpenseEditActivity extends DBActivity
                 {
                     double value = Double.parseDouble(amountEditText.getText().toString());
 
-                    MonthlyExpense expense = new MonthlyExpense(descriptionEditText.getText().toString(), isRevenue? -value : value, dateStart);
+                    RecurringExpense expense = new RecurringExpense(descriptionEditText.getText().toString(), isRevenue? -value : value, dateStart);
 
-                    new SaveMonthlyExpenseTask().execute(expense);
+                    new SaveRecurringExpenseTask().execute(expense);
                 }
             }
         });
@@ -254,14 +254,14 @@ public class MonthlyExpenseEditActivity extends DBActivity
             expenseType.setText(R.string.income);
             expenseType.setTextColor(ContextCompat.getColor(this, R.color.budget_green));
 
-            setTitle(R.string.title_activity_monthly_income_add);
+            setTitle(R.string.title_activity_recurring_income_add);
         }
         else
         {
             expenseType.setText(R.string.payment);
             expenseType.setTextColor(ContextCompat.getColor(this, R.color.budget_red));
 
-            setTitle(R.string.title_activity_monthly_expense_add);
+            setTitle(R.string.title_activity_recurring_expense_add);
         }
     }
 
@@ -334,9 +334,9 @@ public class MonthlyExpenseEditActivity extends DBActivity
 // ------------------------------------------->
 
     /**
-     * An asynctask to save monthly expense to DB
+     * An asynctask to save recurring expense to DB
      */
-    private class SaveMonthlyExpenseTask extends AsyncTask<MonthlyExpense, Integer, Boolean>
+    private class SaveRecurringExpenseTask extends AsyncTask<RecurringExpense, Integer, Boolean>
     {
         /**
          * Dialog used to display loading to the user
@@ -344,14 +344,14 @@ public class MonthlyExpenseEditActivity extends DBActivity
         private ProgressDialog dialog;
 
         @Override
-        protected Boolean doInBackground(MonthlyExpense... expenses)
+        protected Boolean doInBackground(RecurringExpense... expenses)
         {
-            for (MonthlyExpense expense : expenses)
+            for (RecurringExpense expense : expenses)
             {
-                boolean inserted = db.addMonthlyExpense(expense);
+                boolean inserted = db.addRecurringExpense(expense);
                 if( !inserted )
                 {
-                    Logger.error(false, "Error while inserting monthly expense into DB: addMonthlyExpense returned false");
+                    Logger.error(false, "Error while inserting recurring expense into DB: addRecurringExpense returned false");
                     return false;
                 }
 
@@ -364,7 +364,7 @@ public class MonthlyExpenseEditActivity extends DBActivity
                     boolean expenseInserted = db.persistExpense(new Expense(expense.getTitle(), expense.getAmount(), cal.getTime(), expense.getId()));
                     if (!expenseInserted)
                     {
-                        Logger.error(false, "Error while inserting expense for monthly expense into DB: persistExpense returned false");
+                        Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false");
                         return false;
                     }
 
@@ -384,10 +384,10 @@ public class MonthlyExpenseEditActivity extends DBActivity
         protected void onPreExecute()
         {
             // Show a ProgressDialog
-            dialog = new ProgressDialog(MonthlyExpenseEditActivity.this);
+            dialog = new ProgressDialog(RecurringExpenseEditActivity.this);
             dialog.setIndeterminate(true);
-            dialog.setTitle(R.string.monthly_expense_add_loading_title);
-            dialog.setMessage(getResources().getString(isRevenue ? R.string.monthly_income_add_loading_message : R.string.monthly_expense_add_loading_message));
+            dialog.setTitle(R.string.recurring_expense_add_loading_title);
+            dialog.setMessage(getResources().getString(isRevenue ? R.string.recurring_income_add_loading_message : R.string.recurring_expense_add_loading_message));
             dialog.setCanceledOnTouchOutside(false);
             dialog.setCancelable(false);
             dialog.show();
@@ -406,9 +406,9 @@ public class MonthlyExpenseEditActivity extends DBActivity
             }
             else
             {
-                new AlertDialog.Builder(MonthlyExpenseEditActivity.this)
-                    .setTitle(R.string.monthly_expense_add_error_title)
-                    .setMessage(getResources().getString(R.string.monthly_expense_add_error_message))
+                new AlertDialog.Builder(RecurringExpenseEditActivity.this)
+                    .setTitle(R.string.recurring_expense_add_error_title)
+                    .setMessage(getResources().getString(R.string.recurring_expense_add_error_message))
                     .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener()
                     {
                         @Override

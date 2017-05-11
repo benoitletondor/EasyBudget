@@ -47,9 +47,9 @@ public class Expense implements Serializable
      */
     private Date    date;
     /**
-     * Id of the recurring monthly expense (can be null)
+     * Id of the recurring expense (can be null)
      */
-    private Long monthlyId;
+    private Long recurringId;
 
 // --------------------------------->
 
@@ -69,11 +69,11 @@ public class Expense implements Serializable
      * @param title
      * @param amount
      * @param date
-     * @param monthlyId
+     * @param recurringId
      */
-    public Expense(@NonNull String title, double amount, @NonNull Date date, Long monthlyId)
+    public Expense(@NonNull String title, double amount, @NonNull Date date, Long recurringId)
     {
-        this(null, title, amount, date, monthlyId);
+        this(null, title, amount, date, recurringId);
     }
 
     /**
@@ -82,9 +82,9 @@ public class Expense implements Serializable
      * @param title
      * @param amount
      * @param date
-     * @param monthlyId
+     * @param recurringId
      */
-    public Expense(Long id, @NonNull String title, double amount, @NonNull Date date, Long monthlyId)
+    public Expense(Long id, @NonNull String title, double amount, @NonNull Date date, Long recurringId)
     {
         this.id = id;
 
@@ -102,7 +102,7 @@ public class Expense implements Serializable
 
         this.amount = amount;
         this.date = DateHelper.cleanDate(date);
-        this.monthlyId = monthlyId;
+        this.recurringId = recurringId;
     }
 
 // --------------------------------->
@@ -117,19 +117,19 @@ public class Expense implements Serializable
         this.id = id;
     }
 
-    public Long getMonthlyId()
+    public Long getRecurringId()
     {
-        return monthlyId;
+        return recurringId;
     }
 
-    public void setMonthlyId(Long monthlyId)
+    public void setRecurringId(Long recurringId)
     {
-        this.monthlyId = monthlyId;
+        this.recurringId = recurringId;
     }
 
-    public boolean isMonthly()
+    public boolean isRecurring()
     {
-        return monthlyId != null;
+        return recurringId != null;
     }
 
     @NonNull

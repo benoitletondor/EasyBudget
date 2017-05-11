@@ -68,4 +68,9 @@ public class BuildVersion
      * 05/03/2016
      */
     public final static int VERSION_1_3_1 = 40;
+    /**
+     * Android Nougat compatibility and bug fixes for premium users
+     * 01/07/2016
+     */
+    public final static int VERSION_1_4 = 42;
 }

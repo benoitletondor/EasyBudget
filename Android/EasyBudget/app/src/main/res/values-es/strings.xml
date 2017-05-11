@@ -24,9 +24,9 @@
     <string name="title_activity_add_income">Añadir un ingreso</string>
     <string name="title_activity_edit_expense">Modificar el gasto</string>
     <string name="title_activity_edit_income">Modificar el ingreso</string>
-    <string name="title_activity_monthly_expense_add">Añadir un gasto mensual</string>
-    <string name="title_activity_monthly_income_add">Añadir un ingreso mensual</string>
-    <string name="title_activity_monthly_expense_edit">Modificar el gasto mensual</string>
+    <string name="title_activity_recurring_expense_add">Añadir un gasto mensual</string>
+    <string name="title_activity_recurring_income_add">Añadir un ingreso mensual</string>
+    <string name="title_activity_recurring_expense_edit">Modificar el gasto mensual</string>
     <string name="title_activity_monthly_income_edit">Modificar el ingreso mensual</string>
     <string name="title_activity_settings">Ajustes</string>
     <string name="title_activity_welcome">EasyBudget</string>
@@ -59,16 +59,16 @@
         <item>Modificar el ingreso</item>
         <item>Eliminar el ingreso</item>
     </string-array>
-    <string name="dialog_edit_monthly_expense_title">Gasto mensual: ¿qué quieres hacer?</string>
-    <string name="dialog_edit_monthly_income_title">Ingreso mensual: ¿qué quieres hacer?</string>
-    <string-array name="dialog_edit_monthly_expense_choices">
+    <string name="dialog_edit_recurring_expense_title">Gasto mensual: ¿qué quieres hacer?</string>
+    <string name="dialog_edit_recurring_income_title">Ingreso mensual: ¿qué quieres hacer?</string>
+    <string-array name="dialog_edit_recurring_expense_choices">
         <item>Modificar esta entrada</item>
         <item>Eliminar únicamente esta entrada</item>
         <item>Eliminar todas las siguientes</item>
         <item>Eliminar todas las anteriores</item>
         <item>Eliminarlas todas</item>
     </string-array>
-    <string-array name="dialog_edit_monthly_income_choices">
+    <string-array name="dialog_edit_recurring_income_choices">
         <item>Modificar esta entrada</item>
         <item>Eliminar únicamente esta entrada</item>
         <item>Eliminar todas las siguientes</item>
@@ -93,23 +93,23 @@
     <string name="adjust_balance_error_message">El valor que pusiste no es válido.</string>
 
     <string name="monthly">MENSUAL</string>
-    <string name="monthly_expense_add_loading_title">Cargando</string>
-    <string name="monthly_expense_add_loading_message">Creando un gasto mensual…</string>
-    <string name="monthly_income_add_loading_message">Creando un ingreso mensual…</string>
-    <string name="monthly_expense_add_error_title">¡Ups!</string>
-    <string name="monthly_expense_add_error_message">Ocurrió un problema.</string>
-    <string name="monthly_expense_delete_success_message">Gasto mensual eliminado correctamente.</string>
-    <string name="monthly_expense_delete_loading_title">Eliminando</string>
-    <string name="monthly_expense_delete_loading_message">Eliminando el gasto mensual…</string>
-    <string name="monthly_expense_delete_error_title">¡Ups!</string>
-    <string name="monthly_expense_delete_error_message">Ocurrió un problema.</string>
-    <string name="monthly_expense_restoring_loading_title">Deshaciendo</string>
-    <string name="monthly_expense_restoring_loading_message">Restaurando el gasto mensual…</string>
-    <string name="monthly_expense_restored_success_message">Gasto mensual restaurado correctamente</string>
-    <string name="monthly_expense_restore_error_title">¡Ups!</string>
-    <string name="monthly_expense_restore_error_message">Ocurrió un problema.</string>
-    <string name="monthly_expense_delete_first_error_title">¡Ups!</string>
-    <string name="monthly_expense_delete_first_error_message">No hay ninguna transacción anterior a esta.</string>
+    <string name="recurring_expense_add_loading_title">Cargando</string>
+    <string name="recurring_expense_add_loading_message">Creando un gasto mensual…</string>
+    <string name="recurring_income_add_loading_message">Creando un ingreso mensual…</string>
+    <string name="recurring_expense_add_error_title">¡Ups!</string>
+    <string name="recurring_expense_add_error_message">Ocurrió un problema.</string>
+    <string name="recurring_expense_delete_success_message">Gasto mensual eliminado correctamente.</string>
+    <string name="recurring_expense_delete_loading_title">Eliminando</string>
+    <string name="recurring_expense_delete_loading_message">Eliminando el gasto mensual…</string>
+    <string name="recurring_expense_delete_error_title">¡Ups!</string>
+    <string name="recurring_expense_delete_error_message">Ocurrió un problema.</string>
+    <string name="recurring_expense_restoring_loading_title">Deshaciendo</string>
+    <string name="recurring_expense_restoring_loading_message">Restaurando el gasto mensual…</string>
+    <string name="recurring_expense_restored_success_message">Gasto mensual restaurado correctamente</string>
+    <string name="recurring_expense_restore_error_title">¡Ups!</string>
+    <string name="recurring_expense_restore_error_message">Ocurrió un problema.</string>
+    <string name="recurring_expense_delete_first_error_title">¡Ups!</string>
+    <string name="recurring_expense_delete_first_error_message">No hay ninguna transacción anterior a esta.</string>
     <string name="expense_delete_error_title">¡Ups!</string>
     <string name="expense_delete_error_message">Ocurrió un problema.</string>
 
