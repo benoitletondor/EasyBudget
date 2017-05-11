@@ -658,7 +658,7 @@ public final class DB
         (
             cursor.getLong(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_DB_ID)),
             cursor.getString(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_TITLE)),
-            (double)cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_AMOUNT)) / 100.d,
+            (double) cursor.getLong(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_AMOUNT)) / 100.d,
             new Date(cursor.getLong(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_DATE))),
             recurringId > 0 ? recurringId : null
         );
@@ -706,7 +706,7 @@ public final class DB
         (
             cursor.getLong(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_RECURRING_DB_ID)),
             cursor.getString(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_RECURRING_TITLE)),
-            (double) cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_RECURRING_AMOUNT)) / 100.d,
+            (double) cursor.getLong(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_RECURRING_AMOUNT)) / 100.d,
             new Date(cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_RECURRING_RECURRING_DATE))),
             cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_RECURRING_MODIFIED)) == 1
         );

@@ -216,12 +216,12 @@ public class CurrencyHelper
      * @param value the double value
      * @return the corresponding int value (double * 100)
      */
-    public static int getDBValueForDouble(double value)
+    public static long getDBValueForDouble(double value)
     {
         String stringValue = getFormattedAmountValue(value);
         if(BuildConfig.DEBUG_LOG) Logger.debug("getDBValueForDouble: "+stringValue);
 
-        int ceiledValue = (int) Math.ceil(value * 100);
+        long ceiledValue = (long) Math.ceil(value * 100);
         double ceiledDoubleValue = ceiledValue / 100.d;
 
         if( getFormattedAmountValue(ceiledDoubleValue).equals(stringValue) )
@@ -230,7 +230,7 @@ public class CurrencyHelper
             return ceiledValue;
         }
 
-        int normalValue = (int) value * 100;
+        long normalValue = (long) value * 100;
         double normalDoubleValue = normalValue / 100.d;
 
         if( getFormattedAmountValue(normalDoubleValue).equals(stringValue) )
@@ -239,7 +239,7 @@ public class CurrencyHelper
             return normalValue;
         }
 
-        int flooredValue = (int) Math.floor(value * 100);
+        long flooredValue = (long) Math.floor(value * 100);
         if(BuildConfig.DEBUG_LOG) Logger.debug("getDBValueForDouble, return floored value: "+flooredValue);
 
         return flooredValue;
