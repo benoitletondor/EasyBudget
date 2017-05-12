@@ -17,6 +17,7 @@
 package com.benoitletondor.easybudgetapp.model;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.benoitletondor.easybudgetapp.helper.DateHelper;
 
@@ -47,9 +48,10 @@ public class Expense implements Serializable
      */
     private Date    date;
     /**
-     * Id of the recurring expense (can be null)
+     * Associated recurring expense (can be null if not a recurring one)
      */
-    private Long recurringId;
+    @Nullable
+    private RecurringExpense recurringExpense;
 
 // --------------------------------->
 
@@ -69,11 +71,11 @@ public class Expense implements Serializable
      * @param title
      * @param amount
      * @param date
-     * @param recurringId
+     * @param recurringExpense
      */
-    public Expense(@NonNull String title, double amount, @NonNull Date date, Long recurringId)
+    public Expense(@NonNull String title, double amount, @NonNull Date date, @Nullable RecurringExpense recurringExpense)
     {
-        this(null, title, amount, date, recurringId);
+        this(null, title, amount, date, recurringExpense);
     }
 
     /**
@@ -82,9 +84,9 @@ public class Expense implements Serializable
      * @param title
      * @param amount
      * @param date
-     * @param recurringId
+     * @param recurringExpense
      */
-    public Expense(Long id, @NonNull String title, double amount, @NonNull Date date, Long recurringId)
+    public Expense(Long id, @NonNull String title, double amount, @NonNull Date date, @Nullable RecurringExpense recurringExpense)
     {
         this.id = id;
 
@@ -102,7 +104,7 @@ public class Expense implements Serializable
 
         this.amount = amount;
         this.date = DateHelper.cleanDate(date);
-        this.recurringId = recurringId;
+        this.recurringExpense = recurringExpense;
     }
 
 // --------------------------------->
@@ -117,19 +119,20 @@ public class Expense implements Serializable
         this.id = id;
     }
 
-    public Long getRecurringId()
+    @Nullable
+    public RecurringExpense getAssociatedRecurringExpense()
     {
-        return recurringId;
+        return recurringExpense;
     }
 
-    public void setRecurringId(Long recurringId)
+    public void setAssociatedRecurringExpense(@Nullable RecurringExpense recurringExpense)
     {
-        this.recurringId = recurringId;
+        this.recurringExpense = recurringExpense;
     }
 
     public boolean isRecurring()
     {
-        return recurringId != null;
+        return recurringExpense != null;
     }
 
     @NonNull

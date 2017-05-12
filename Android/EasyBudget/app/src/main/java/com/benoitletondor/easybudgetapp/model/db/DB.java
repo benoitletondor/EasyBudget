@@ -213,7 +213,7 @@ public final class DB
             {
                 try
                 {
-                    expenses.add(ExpenseFromCursor(cursor));
+                    expenses.add(ExpenseFromCursor(cursor, getRecurringExpenseForExpenseCursor(cursor)));
                 }
                 catch (Exception e)
                 {
@@ -272,7 +272,7 @@ public final class DB
             {
                 try
                 {
-                    expenses.add(ExpenseFromCursor(cursor));
+                    expenses.add(ExpenseFromCursor(cursor, getRecurringExpenseForExpenseCursor(cursor)));
                 }
                 catch (Exception e)
                 {
@@ -459,7 +459,7 @@ public final class DB
             cursor = database.query(SQLiteDBHelper.TABLE_EXPENSE, null, SQLiteDBHelper.COLUMN_EXPENSE_RECURRING_ID +"="+ recurringExpense.getId(), null, null, null, null, null);
             while( cursor.moveToNext() )
             {
-                expenses.add(ExpenseFromCursor(cursor));
+                expenses.add(ExpenseFromCursor(cursor, recurringExpense));
             }
 
             return expenses;
@@ -511,7 +511,7 @@ public final class DB
             cursor = database.query(SQLiteDBHelper.TABLE_EXPENSE, null, SQLiteDBHelper.COLUMN_EXPENSE_RECURRING_ID +"="+ recurringExpense.getId()+" AND "+SQLiteDBHelper.COLUMN_EXPENSE_DATE+">"+fromDate.getTime(), null, null, null, null, null);
             while( cursor.moveToNext() )
             {
-                expenses.add(ExpenseFromCursor(cursor));
+                expenses.add(ExpenseFromCursor(cursor, recurringExpense));
             }
 
             return expenses;
@@ -590,7 +590,7 @@ public final class DB
             cursor = database.query(SQLiteDBHelper.TABLE_EXPENSE, null, SQLiteDBHelper.COLUMN_EXPENSE_RECURRING_ID +"="+ recurringExpense.getId()+" AND "+SQLiteDBHelper.COLUMN_EXPENSE_DATE+"<"+toDate.getTime(), null, null, null, null, null);
             while( cursor.moveToNext() )
             {
-                expenses.add(ExpenseFromCursor(cursor));
+                expenses.add(ExpenseFromCursor(cursor, recurringExpense));
             }
 
             return expenses;
@@ -643,7 +643,26 @@ public final class DB
      * @return
      */
     @NonNull
-    private static Expense ExpenseFromCursor(@NonNull Cursor cursor)
+    private static Expense ExpenseFromCursor(@NonNull Cursor cursor, @Nullable RecurringExpense recurringExpense)
+    {
+        return new Expense
+        (
+            cursor.getLong(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_DB_ID)),
+            cursor.getString(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_TITLE)),
+            (double) cursor.getLong(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_AMOUNT)) / 100.d,
+            new Date(cursor.getLong(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_DATE))),
+            recurringExpense
+        );
+    }
+
+    /**
+     * Find the recurring expense associated with an expense cursor
+     *
+     * @param cursor
+     * @return
+     */
+    @Nullable
+    private RecurringExpense getRecurringExpenseForExpenseCursor(@NonNull Cursor cursor)
     {
         long recurringId = 0;
         try
@@ -655,14 +674,12 @@ public final class DB
             // Exception can be thrown on null depending on impl.
         }
 
-        return new Expense
-        (
-            cursor.getLong(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_DB_ID)),
-            cursor.getString(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_TITLE)),
-            (double) cursor.getLong(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_AMOUNT)) / 100.d,
-            new Date(cursor.getLong(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_EXPENSE_DATE))),
-            recurringId > 0 ? recurringId : null
-        );
+        if( recurringId > 0 )
+        {
+            return findRecurringExpenseForId(recurringId);
+        }
+
+        return null;
     }
 
     /**
@@ -687,7 +704,8 @@ public final class DB
 
         if( expense.isRecurring() )
         {
-            values.put(SQLiteDBHelper.COLUMN_EXPENSE_RECURRING_ID, expense.getRecurringId());
+            assert expense.getAssociatedRecurringExpense() != null;
+            values.put(SQLiteDBHelper.COLUMN_EXPENSE_RECURRING_ID, expense.getAssociatedRecurringExpense().getId());
         }
 
         return values;

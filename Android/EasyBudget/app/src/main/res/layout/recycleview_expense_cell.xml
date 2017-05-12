@@ -64,7 +64,8 @@
 
         </LinearLayout>
 
-        <LinearLayout android:id="@+id/recurring_indicator"
+        <LinearLayout
+            android:id="@+id/recurring_indicator"
             android:layout_width="60dp"
             android:layout_height="match_parent"
             android:orientation="vertical"
@@ -77,11 +78,11 @@
                 android:layout_marginBottom="1dp"/>
 
             <TextView
+                android:id="@+id/recurring_indicator_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/secondary_text"
                 android:textSize="9dp"
-                android:text="@string/monthly"
                 android:layout_marginTop="1dp"/>
 
         </LinearLayout>

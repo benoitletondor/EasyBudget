@@ -95,9 +95,12 @@
     <string name="adjust_balance_error_message">The value you entered is invalid.</string>
 
     <string name="monthly">MONTHLY</string>
+    <string name="weekly">WEEKLY</string>
+    <string name="bi_weekly">BI-WEEKLY</string>
+    <string name="yearly">YEARLY</string>
     <string name="recurring_expense_add_loading_title">Loading</string>
-    <string name="recurring_expense_add_loading_message">Creating monthly expense…</string>
-    <string name="recurring_income_add_loading_message">Creating monthly income…</string>
+    <string name="recurring_expense_add_loading_message">Creating recurring expense…</string>
+    <string name="recurring_income_add_loading_message">Creating recurring income…</string>
     <string name="recurring_expense_add_error_title">Oops</string>
     <string name="recurring_expense_add_error_message">An error occurred.</string>
     <string name="recurring_expense_delete_success_message">Monthly expense deleted with success</string>

@@ -221,7 +221,6 @@ public class MainActivity extends DBActivity
                 {
                     final Expense expense = (Expense) intent.getSerializableExtra("expense");
                     final RecurringExpenseDeleteType deleteType = RecurringExpenseDeleteType.fromValue(intent.getIntExtra("deleteType", RecurringExpenseDeleteType.ALL.getValue()));
-                    final RecurringExpense recurringExpense = db.findRecurringExpenseForId(expense.getRecurringId());
 
                     if( deleteType == null )
                     {
@@ -231,7 +230,7 @@ public class MainActivity extends DBActivity
                         return;
                     }
 
-                    if( recurringExpense == null )
+                    if( expense.getAssociatedRecurringExpense() == null )
                     {
                         showGenericRecurringDeleteErrorDialog();
                         Logger.error("INTENT_RECURRING_EXPENSE_DELETED: Unable to retrieve recurring expense");
@@ -240,7 +239,7 @@ public class MainActivity extends DBActivity
                     }
 
                     // Check that if the user wants to delete series before this one, there are actually series to delete
-                    if( deleteType == RecurringExpenseDeleteType.TO && !db.hasExpensesForRecurringExpenseBeforeDate(recurringExpense, expense.getDate()) )
+                    if( deleteType == RecurringExpenseDeleteType.TO && !db.hasExpensesForRecurringExpenseBeforeDate(expense.getAssociatedRecurringExpense(), expense.getDate()) )
                     {
                         new AlertDialog.Builder(MainActivity.this)
                             .setTitle(R.string.recurring_expense_delete_first_error_title)
@@ -258,7 +257,7 @@ public class MainActivity extends DBActivity
                         return;
                     }
 
-                    new DeleteRecurringExpenseTask(recurringExpense, expense, deleteType).execute();
+                    new DeleteRecurringExpenseTask(expense.getAssociatedRecurringExpense(), expense, deleteType).execute();
                 }
                 else if( SelectCurrencyFragment.CURRENCY_SELECTED_INTENT.equals(intent.getAction()) )
                 {

@@ -151,6 +151,26 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
         viewHolder.recurringIndicator.setVisibility(expense.isRecurring() ? View.VISIBLE : View.GONE);
         viewHolder.positiveIndicator.setImageResource(expense.isRevenue() ? R.drawable.ic_label_green : R.drawable.ic_label_red);
 
+        if( expense.isRecurring() )
+        {
+            assert expense.getAssociatedRecurringExpense() != null;
+            switch (expense.getAssociatedRecurringExpense().getType())
+            {
+                case WEEKLY:
+                    viewHolder.recurringIndicatorTextview.setText(viewHolder.view.getContext().getString(R.string.weekly));
+                    break;
+                case BI_WEEKLY:
+                    viewHolder.recurringIndicatorTextview.setText(viewHolder.view.getContext().getString(R.string.bi_weekly));
+                    break;
+                case MONTHLY:
+                    viewHolder.recurringIndicatorTextview.setText(viewHolder.view.getContext().getString(R.string.monthly));
+                    break;
+                case YEARLY:
+                    viewHolder.recurringIndicatorTextview.setText(viewHolder.view.getContext().getString(R.string.yearly));
+                    break;
+            }
+        }
+
         final View.OnClickListener onClickListener = new View.OnClickListener()
         {
             @Override
@@ -288,6 +308,7 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
         public final TextView expenseTitleTextView;
         public final TextView expenseAmountTextView;
         public final ViewGroup recurringIndicator;
+        public final TextView recurringIndicatorTextview;
         public final ImageView positiveIndicator;
         public final View view;
 
@@ -299,6 +320,7 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
             expenseTitleTextView = (TextView) v.findViewById(R.id.expense_title);
             expenseAmountTextView = (TextView) v.findViewById(R.id.expense_amount);
             recurringIndicator = (ViewGroup) v.findViewById(R.id.recurring_indicator);
+            recurringIndicatorTextview = (TextView) v.findViewById(R.id.recurring_indicator_textview);
             positiveIndicator = (ImageView) v.findViewById(R.id.positive_indicator);
         }
     }
