@@ -73,4 +73,9 @@ public class BuildVersion
      * 01/07/2016
      */
     public final static int VERSION_1_4 = 42;
+    /**
+     * PlayStore promo codes and weekly, bi-weekly and yearly recurring entries
+     * TODO
+     */
+    public final static int VERSION_1_5 = 43;
 }

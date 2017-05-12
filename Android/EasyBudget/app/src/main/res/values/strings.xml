@@ -123,6 +123,7 @@
     <string name="recurring_interval_bi_weekly">Every 2 weeks</string>
     <string name="recurring_interval_monthly">Every month</string>
     <string name="recurring_interval_yearly">Every year</string>
+    <string name="recurring_update_notification">New feature: Based on a popular request, you can now add weekly, bi-weekly and yearly recurring expenses!</string>
 
     <string name="setting_category_app_title">App</string>
     <string name="setting_category_rate_button_title">Like the app?</string>

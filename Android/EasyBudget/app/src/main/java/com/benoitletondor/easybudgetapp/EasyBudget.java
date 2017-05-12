@@ -18,6 +18,7 @@ package com.benoitletondor.easybudgetapp;
 
 import android.app.Activity;
 import android.app.Application;
+import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -25,6 +26,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
@@ -445,6 +448,27 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
     }
 
     /**
+     * Show the 1.5 app update notification
+     */
+    private void show1_5UpdateNotif()
+    {
+        NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(getApplicationContext())
+            .setSmallIcon(R.drawable.ic_push)
+            .setContentTitle(getResources().getString(R.string.app_name))
+            .setContentText(getResources().getString(R.string.recurring_update_notification))
+            .setStyle(new NotificationCompat.BigTextStyle().bigText(getResources().getString(R.string.recurring_update_notification)))
+            .setColor(ContextCompat.getColor(getApplicationContext(), R.color.accent))
+            .setAutoCancel(true)
+            .setContentIntent(PendingIntent.getActivity(
+                this,
+                0,
+                new Intent(this, MainActivity.class),
+                PendingIntent.FLAG_CANCEL_CURRENT));
+
+        NotificationManagerCompat.from(getApplicationContext()).notify(4014, notifBuilder.build());
+    }
+
+    /**
      * Set-up Batch SDK config + lifecycle
      */
     private void setUpBatchSDK()
@@ -555,6 +579,11 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
             {
                 MonthlyReportNotifService.showNotPremiumNotif(getApplicationContext());
             }
+        }
+
+        if( newVersion == BuildVersion.VERSION_1_5 )
+        {
+            show1_5UpdateNotif();
         }
     }
 
