@@ -97,6 +97,8 @@ public class MainActivity extends DBActivity
     public static final String INTENT_EXPENSE_DELETED = "intent.expense.deleted";
     public static final String INTENT_RECURRING_EXPENSE_DELETED = "intent.expense.monthly.deleted";
     public static final String INTENT_SHOW_WELCOME_SCREEN = "intent.welcomscreen.show";
+    public static final String INTENT_SHOW_ADD_EXPENSE = "intent.addexpense.show";
+    public final static String INTENT_SHOW_ADD_RECURRING_EXPENSE = "intent.addrecurringexpense.show";
 
     public static final String INTENT_REDIRECT_TO_PREMIUM_EXTRA = "intent.extra.premiumshow";
     public static final String INTENT_REDIRECT_TO_SETTINGS_EXTRA = "intent.extra.redirecttosettings";
@@ -284,9 +286,14 @@ public class MainActivity extends DBActivity
 
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver, filter);
 
-        openSettingsIfNeeded(getIntent());
-        openMonthlyReportIfNeeded(getIntent());
-        openPremiumIfNeeded(getIntent());
+        if( getIntent() != null )
+        {
+            openSettingsIfNeeded(getIntent());
+            openMonthlyReportIfNeeded(getIntent());
+            openPremiumIfNeeded(getIntent());
+            openAddExpenseIfNeeded(getIntent());
+            openAddRecurringExpenseIfNeeded(getIntent());
+        }
     }
 
     @Override
@@ -387,6 +394,11 @@ public class MainActivity extends DBActivity
     {
         super.onNewIntent(intent);
 
+        if( intent == null )
+        {
+            return;
+        }
+
         // App invites
         if (AppInviteReferral.hasReferral(intent))
         {
@@ -396,6 +408,8 @@ public class MainActivity extends DBActivity
         openSettingsIfNeeded(intent);
         openMonthlyReportIfNeeded(intent);
         openPremiumIfNeeded(intent);
+        openAddExpenseIfNeeded(intent);
+        openAddRecurringExpenseIfNeeded(intent);
     }
 
     /**
@@ -763,6 +777,40 @@ public class MainActivity extends DBActivity
             startIntent.putExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, true);
 
             ActivityCompat.startActivity(this, startIntent, null);
+        }
+    }
+
+    /**
+     * Open the add expense screen if the given intent contains the {@link #INTENT_SHOW_ADD_EXPENSE}
+     * extra.
+     *
+     * @param intent
+     */
+    private void openAddExpenseIfNeeded(Intent intent)
+    {
+        if( intent.getBooleanExtra(INTENT_SHOW_ADD_EXPENSE, false) )
+        {
+            Intent startIntent = new Intent(this, ExpenseEditActivity.class);
+            startIntent.putExtra("date", new Date().getTime());
+
+            ActivityCompat.startActivityForResult(this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
+        }
+    }
+
+    /**
+     * Open the add recurring expense screen if the given intent contains the {@link #INTENT_SHOW_ADD_RECURRING_EXPENSE}
+     * extra.
+     *
+     * @param intent
+     */
+    private void openAddRecurringExpenseIfNeeded(Intent intent)
+    {
+        if( intent.getBooleanExtra(INTENT_SHOW_ADD_RECURRING_EXPENSE, false) )
+        {
+            Intent startIntent = new Intent(this, RecurringExpenseEditActivity.class);
+            startIntent.putExtra("dateStart", new Date().getTime());
+
+            ActivityCompat.startActivityForResult(this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
         }
     }
 
