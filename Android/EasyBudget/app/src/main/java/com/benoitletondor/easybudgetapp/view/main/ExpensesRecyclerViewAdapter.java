@@ -189,7 +189,7 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
                                 case 0: // Edit this one
                                 {
                                     Intent startIntent = new Intent(viewHolder.view.getContext(), ExpenseEditActivity.class);
-                                    startIntent.putExtra("date", expense.getDate());
+                                    startIntent.putExtra("date", expense.getDate().getTime());
                                     startIntent.putExtra("expense", expense);
 
                                     ActivityCompat.startActivityForResult(activity, startIntent, MainActivity.ADD_EXPENSE_ACTIVITY_CODE, null);
@@ -254,7 +254,7 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
                                 case 0: // Edit expense
                                 {
                                     Intent startIntent = new Intent(viewHolder.view.getContext(), ExpenseEditActivity.class);
-                                    startIntent.putExtra("date", expense.getDate());
+                                    startIntent.putExtra("date", expense.getDate().getTime());
                                     startIntent.putExtra("expense", expense);
 
                                     ActivityCompat.startActivityForResult(activity, startIntent, MainActivity.ADD_EXPENSE_ACTIVITY_CODE, null);

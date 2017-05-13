@@ -90,7 +90,7 @@ public class RecurringExpenseEditActivity extends DBActivity
      */
     private Date           dateStart;
     /**
-     * The end date of the expense
+     * The end date of the expense (not implemented yet)
      */
     private Date           dateEnd;
     /**
@@ -112,12 +112,11 @@ public class RecurringExpenseEditActivity extends DBActivity
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        dateStart = (Date) getIntent().getSerializableExtra("dateStart");
-        dateEnd = (Date) getIntent().getSerializableExtra("dateEnd");
+        dateStart = new Date(getIntent().getLongExtra("dateStart", 0));
 
         if (getIntent().hasExtra("expense"))
         {
-            expense = (RecurringExpense) getIntent().getSerializableExtra("expense");
+            expense = getIntent().getParcelableExtra("expense");
 
             setTitle(R.string.title_activity_recurring_expense_edit);
         }

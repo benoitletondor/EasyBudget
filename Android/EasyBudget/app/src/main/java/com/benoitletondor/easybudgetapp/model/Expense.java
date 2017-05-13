@@ -16,12 +16,13 @@
 
 package com.benoitletondor.easybudgetapp.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.benoitletondor.easybudgetapp.helper.DateHelper;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -29,7 +30,7 @@ import java.util.Date;
  *
  * @author Benoit LETONDOR
  */
-public class Expense implements Serializable
+public class Expense implements Parcelable
 {
     /**
      * DB id of this expense (can be null)
@@ -107,6 +108,19 @@ public class Expense implements Serializable
         this.recurringExpense = recurringExpense;
     }
 
+    /**
+     *
+     * @param in
+     */
+    private Expense(Parcel in)
+    {
+        id = (Long) in.readValue(Long.class.getClassLoader());
+        title = in.readString();
+        amount = in.readDouble();
+        date = new Date(in.readLong());
+        recurringExpense = in.readParcelable(RecurringExpense.class.getClassLoader());
+    }
+
 // --------------------------------->
 
     public Long getId()
@@ -171,4 +185,37 @@ public class Expense implements Serializable
     {
         return amount < 0;
     }
+
+// --------------------------------->
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags)
+    {
+        dest.writeValue(id);
+        dest.writeString(title);
+        dest.writeDouble(amount);
+        dest.writeLong(date.getTime());
+        dest.writeParcelable(recurringExpense, flags);
+    }
+
+    @Override
+    public int describeContents()
+    {
+        return 0;
+    }
+
+    public static final Creator<Expense> CREATOR = new Creator<Expense>()
+    {
+        @Override
+        public Expense createFromParcel(Parcel in)
+        {
+            return new Expense(in);
+        }
+
+        @Override
+        public Expense[] newArray(int size)
+        {
+            return new Expense[size];
+        }
+    };
 }

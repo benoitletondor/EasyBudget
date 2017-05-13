@@ -96,11 +96,11 @@ public class ExpenseEditActivity extends DBActivity
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        date = (Date) getIntent().getSerializableExtra("date");
+        date = new Date(getIntent().getLongExtra("date", 0));
 
         if ( isEdit() )
         {
-            expense = (Expense) getIntent().getSerializableExtra("expense");
+            expense = getIntent().getParcelableExtra("expense");
             isRevenue = expense.isRevenue();
             date = expense.getDate();
 

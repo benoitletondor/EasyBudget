@@ -16,11 +16,12 @@
 
 package com.benoitletondor.easybudgetapp.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.benoitletondor.easybudgetapp.helper.DateHelper;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -28,7 +29,7 @@ import java.util.Date;
  *
  * @author Benoit LETONDOR
  */
-public class RecurringExpense implements Serializable
+public class RecurringExpense implements Parcelable
 {
     /**
      * DB id of this expense (can be null)
@@ -93,6 +94,20 @@ public class RecurringExpense implements Serializable
 
         this.id = id;
         this.modified = modified;
+    }
+
+    /**
+     *
+     * @param in
+     */
+    private RecurringExpense(Parcel in)
+    {
+        id = (Long) in.readValue(Long.class.getClassLoader());
+        title = in.readString();
+        recurringDate = new Date(in.readLong());
+        amount = in.readDouble();
+        modified = in.readByte() != 0;
+        type = RecurringExpenseType.valueOf(in.readString());
     }
 
 // ---------------------------------->
@@ -162,4 +177,38 @@ public class RecurringExpense implements Serializable
     {
         return type;
     }
+
+// -------------------------------->
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags)
+    {
+        dest.writeValue(id);
+        dest.writeString(title);
+        dest.writeLong(recurringDate.getTime());
+        dest.writeDouble(amount);
+        dest.writeByte((byte) (modified ? 1 : 0));
+        dest.writeString(type.name());
+    }
+
+    @Override
+    public int describeContents()
+    {
+        return 0;
+    }
+
+    public static final Creator<RecurringExpense> CREATOR = new Creator<RecurringExpense>()
+    {
+        @Override
+        public RecurringExpense createFromParcel(Parcel in)
+        {
+            return new RecurringExpense(in);
+        }
+
+        @Override
+        public RecurringExpense[] newArray(int size)
+        {
+            return new RecurringExpense[size];
+        }
+    };
 }

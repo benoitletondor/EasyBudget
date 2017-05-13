@@ -170,7 +170,7 @@ public class MainActivity extends DBActivity
             {
                 if( INTENT_EXPENSE_DELETED.equals(intent.getAction()) )
                 {
-                    final Expense expense = (Expense) intent.getSerializableExtra("expense");
+                    final Expense expense = (Expense) intent.getParcelableExtra("expense");
 
                     if( db.deleteExpense(expense) )
                     {
@@ -219,7 +219,7 @@ public class MainActivity extends DBActivity
                 }
                 else if( INTENT_RECURRING_EXPENSE_DELETED.equals(intent.getAction()) )
                 {
-                    final Expense expense = (Expense) intent.getSerializableExtra("expense");
+                    final Expense expense = intent.getParcelableExtra("expense");
                     final RecurringExpenseDeleteType deleteType = RecurringExpenseDeleteType.fromValue(intent.getIntExtra("deleteType", RecurringExpenseDeleteType.ALL.getValue()));
 
                     if( deleteType == null )
@@ -811,7 +811,7 @@ public class MainActivity extends DBActivity
             public void onLongClickDate(Date date, View view) // Add expense on long press
             {
                 Intent startIntent = new Intent(MainActivity.this, ExpenseEditActivity.class);
-                startIntent.putExtra("date", date);
+                startIntent.putExtra("date", date.getTime());
 
                 if( UIHelper.areAnimationsEnabled(MainActivity.this) )
                 {
@@ -983,7 +983,7 @@ public class MainActivity extends DBActivity
             public void onClick(View v)
             {
                 Intent startIntent = new Intent(MainActivity.this, ExpenseEditActivity.class);
-                startIntent.putExtra("date", calendarFragment.getSelectedDate());
+                startIntent.putExtra("date", calendarFragment.getSelectedDate().getTime());
 
                 if( UIHelper.areAnimationsEnabled(MainActivity.this) )
                 {
@@ -1005,7 +1005,7 @@ public class MainActivity extends DBActivity
             public void onClick(View v)
             {
                 Intent startIntent = new Intent(MainActivity.this, RecurringExpenseEditActivity.class);
-                startIntent.putExtra("dateStart", calendarFragment.getSelectedDate());
+                startIntent.putExtra("dateStart", calendarFragment.getSelectedDate().getTime());
 
                 if( UIHelper.areAnimationsEnabled(MainActivity.this) )
                 {
