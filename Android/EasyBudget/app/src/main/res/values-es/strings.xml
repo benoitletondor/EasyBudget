@@ -19,15 +19,15 @@
     <string name="action_settings">Ajustes</string>
     <string name="action_balance">Ajustar el saldo actual</string>
     <string name="fab_add_expense">Añadir un gasto/ingreso</string>
-    <string name="fab_add_monthly_expense">Añadir un gasto/ingreso mensual</string>
+    <string name="fab_add_monthly_expense">Añadir un gasto/ingreso recurrente</string>
     <string name="title_activity_add_expense">Añadir un gasto</string>
     <string name="title_activity_add_income">Añadir un ingreso</string>
     <string name="title_activity_edit_expense">Modificar el gasto</string>
     <string name="title_activity_edit_income">Modificar el ingreso</string>
-    <string name="title_activity_recurring_expense_add">Añadir un gasto mensual</string>
-    <string name="title_activity_recurring_income_add">Añadir un ingreso mensual</string>
-    <string name="title_activity_recurring_expense_edit">Modificar el gasto mensual</string>
-    <string name="title_activity_monthly_income_edit">Modificar el ingreso mensual</string>
+    <string name="title_activity_recurring_expense_add">Añadir un gasto recurrente</string>
+    <string name="title_activity_recurring_income_add">Añadir un ingreso recurrente</string>
+    <string name="title_activity_recurring_expense_edit">Modificar el gasto recurrente</string>
+    <string name="title_activity_monthly_income_edit">Modificar el ingreso recurrente</string>
     <string name="title_activity_settings">Ajustes</string>
     <string name="title_activity_welcome">EasyBudget</string>
     <string name="title_activity_premium">Premium</string>
@@ -59,8 +59,8 @@
         <item>Modificar el ingreso</item>
         <item>Eliminar el ingreso</item>
     </string-array>
-    <string name="dialog_edit_recurring_expense_title">Gasto mensual: ¿qué quieres hacer?</string>
-    <string name="dialog_edit_recurring_income_title">Ingreso mensual: ¿qué quieres hacer?</string>
+    <string name="dialog_edit_recurring_expense_title">Gasto recurrente: ¿qué quieres hacer?</string>
+    <string name="dialog_edit_recurring_income_title">Ingreso recurrente: ¿qué quieres hacer?</string>
     <string-array name="dialog_edit_recurring_expense_choices">
         <item>Modificar esta entrada</item>
         <item>Eliminar únicamente esta entrada</item>
@@ -93,25 +93,35 @@
     <string name="adjust_balance_error_message">El valor que pusiste no es válido.</string>
 
     <string name="monthly">MENSUAL</string>
+    <string name="weekly">SEMANALMENTE</string>
+    <string name="bi_weekly">CADA DOS SEMANAS</string>
+    <string name="yearly">ANUAL</string>
     <string name="recurring_expense_add_loading_title">Cargando</string>
-    <string name="recurring_expense_add_loading_message">Creando un gasto mensual…</string>
-    <string name="recurring_income_add_loading_message">Creando un ingreso mensual…</string>
+    <string name="recurring_expense_add_loading_message">Creando un gasto recurrente…</string>
+    <string name="recurring_income_add_loading_message">Creando un ingreso recurrente…</string>
     <string name="recurring_expense_add_error_title">¡Ups!</string>
     <string name="recurring_expense_add_error_message">Ocurrió un problema.</string>
-    <string name="recurring_expense_delete_success_message">Gasto mensual eliminado correctamente.</string>
+    <string name="recurring_expense_delete_success_message">Gasto recurrente eliminado correctamente.</string>
     <string name="recurring_expense_delete_loading_title">Eliminando</string>
-    <string name="recurring_expense_delete_loading_message">Eliminando el gasto mensual…</string>
+    <string name="recurring_expense_delete_loading_message">Eliminando el gasto recurrente…</string>
     <string name="recurring_expense_delete_error_title">¡Ups!</string>
     <string name="recurring_expense_delete_error_message">Ocurrió un problema.</string>
     <string name="recurring_expense_restoring_loading_title">Deshaciendo</string>
-    <string name="recurring_expense_restoring_loading_message">Restaurando el gasto mensual…</string>
-    <string name="recurring_expense_restored_success_message">Gasto mensual restaurado correctamente</string>
+    <string name="recurring_expense_restoring_loading_message">Restaurando el gasto recurrente…</string>
+    <string name="recurring_expense_restored_success_message">Gasto recurrente restaurado correctamente</string>
     <string name="recurring_expense_restore_error_title">¡Ups!</string>
     <string name="recurring_expense_restore_error_message">Ocurrió un problema.</string>
     <string name="recurring_expense_delete_first_error_title">¡Ups!</string>
     <string name="recurring_expense_delete_first_error_message">No hay ninguna transacción anterior a esta.</string>
     <string name="expense_delete_error_title">¡Ups!</string>
     <string name="expense_delete_error_message">Ocurrió un problema.</string>
+
+    <string name="recurring_expense_interval">Frecuencia</string>
+    <string name="recurring_interval_weekly">Cada semana</string>
+    <string name="recurring_interval_bi_weekly">Cada 2 semanas</string>
+    <string name="recurring_interval_monthly">Cada mes</string>
+    <string name="recurring_interval_yearly">Cada año</string>
+    <string name="recurring_update_notification">Nueva función: como lo pidieron, ahora puedes agregar gastos/ingresos recurrentes semanales o anuales.</string>
 
     <string name="setting_category_app_title">App</string>
     <string name="setting_category_rate_button_title">¿Te gusta la app?</string>
@@ -210,7 +220,7 @@
     <string name="onboarding_screen_4_title">¡Ya está!</string>
     <string name="onboarding_screen_4_message">(Ha sido fácil, ¿verdad?)</string>
     <string name="onboarding_screen_4_message2">¿Y ahora qué sigue?</string>
-    <string name="onboarding_screen_4_message3">1. Añade tus gastos y tus ingresos mensuales (sueldo, alquiler, facturas…)\n2. No te olvides de añadir tus gastos e ingresos puntuales a lo largo del día</string>
+    <string name="onboarding_screen_4_message3">1. Añade tus gastos y tus ingresos recurrente (sueldo, alquiler, facturas…)\n2. No te olvides de añadir tus gastos e ingresos puntuales a lo largo del día</string>
     <string name="onboarding_screen_4_message4">Gracias por usar EasyBudget, y bienvenido de nuevo :)</string>
     <string name="onboarding_screen_4_cta">¡Vamos!</string>
 

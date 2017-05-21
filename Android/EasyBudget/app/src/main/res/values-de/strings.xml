@@ -19,15 +19,15 @@
     <string name="action_settings">Einstellungen</string>
     <string name="action_balance">Kontostand anpassen</string>
     <string name="fab_add_expense">Neue Ausgabe/Einnahme</string>
-    <string name="fab_add_monthly_expense">Neue monatl. Ausgabe/Einnahme</string>
+    <string name="fab_add_monthly_expense">Wiederkehrende Einnahme/Ausgabe hinzufügen</string>
     <string name="title_activity_add_expense">Ausgabe hinzufügen</string>
     <string name="title_activity_add_income">Einnahme hinzufügen</string>
     <string name="title_activity_edit_expense">Ausgabe bearbeiten</string>
     <string name="title_activity_edit_income">Einnahme bearbeiten</string>
-    <string name="title_activity_recurring_expense_add">Monatliche Ausgabe hinzufügen</string>
-    <string name="title_activity_recurring_income_add">Monatliche Einnahme hinzufügen</string>
-    <string name="title_activity_recurring_expense_edit">Monatliche Ausgabe bearbeiten</string>
-    <string name="title_activity_monthly_income_edit">Monatliche Einnahme bearbeiten</string>
+    <string name="title_activity_recurring_expense_add">Wiederkehrende Ausgabe hinzufügen</string>
+    <string name="title_activity_recurring_income_add">Wiederkehrende Einnahme hinzufügen</string>
+    <string name="title_activity_recurring_expense_edit">Wiederkehrende Ausgabe bearbeiten</string>
+    <string name="title_activity_monthly_income_edit">Wiederkehrende Einnahme bearbeiten</string>
     <string name="title_activity_settings">Einstellungen</string>
     <string name="title_activity_welcome">EasyBudget</string>
     <string name="title_activity_premium">Premium</string>
@@ -59,8 +59,8 @@
         <item>Einnahme bearbeiten</item>
         <item>Einnahme löschen</item>
     </string-array>
-    <string name="dialog_edit_recurring_expense_title">Monatliche Ausgabe: Was möchten Sie tun?</string>
-    <string name="dialog_edit_recurring_income_title">Monatliche Einnahme: Was möchten Sie tun?</string>
+    <string name="dialog_edit_recurring_expense_title">Wiederkehrende Ausgabe: Was möchten Sie tun?</string>
+    <string name="dialog_edit_recurring_income_title">Wiederkehrende Einnahme: Was möchten Sie tun?</string>
     <string-array name="dialog_edit_recurring_expense_choices">
         <item>Dieses Ereignis bearbeiten</item>
         <item>Nur dieses Ereignis löschen</item>
@@ -93,25 +93,35 @@
     <string name="adjust_balance_error_message">Der Betrag, den Sie eingegeben haben, ist ungültig.</string>
 
     <string name="monthly">MONATLICH</string>
+    <string name="weekly">WÖCHENTLICH</string>
+    <string name="bi_weekly">VIERZEHNTÄGIG</string>
+    <string name="yearly">JÄHRLICH</string>
     <string name="recurring_expense_add_loading_title">Lädt</string>
-    <string name="recurring_expense_add_loading_message">Monatliche Ausgabe wird erstellt…</string>
-    <string name="recurring_income_add_loading_message">Monatliche Einnahme wird erstellt…</string>
+    <string name="recurring_expense_add_loading_message">Wiederkehrenden Ausgabe wird erstellt…</string>
+    <string name="recurring_income_add_loading_message">Erstellung der wiederkehrenden Einnahme…</string>
     <string name="recurring_expense_add_error_title">Oops</string>
     <string name="recurring_expense_add_error_message">Ein Fehler ist aufgetreten.</string>
-    <string name="recurring_expense_delete_success_message">Monatliche Ausgabe erfolgreich gelöscht.</string>
+    <string name="recurring_expense_delete_success_message">Wiederkehrende Ausgabe erfolgreich gelöscht.</string>
     <string name="recurring_expense_delete_loading_title">Löschvorgang</string>
-    <string name="recurring_expense_delete_loading_message">Monatliche Ausgabe wird gelöscht…</string>
+    <string name="recurring_expense_delete_loading_message">Wiederkehrende Ausgabe wird gelöscht…</string>
     <string name="recurring_expense_delete_error_title">Oops</string>
     <string name="recurring_expense_delete_error_message">Ein Fehler ist aufgetreten.</string>
     <string name="recurring_expense_restoring_loading_title">Abbruch</string>
-    <string name="recurring_expense_restoring_loading_message">Monatliche Ausgabe wird wiederhergestellt…</string>
-    <string name="recurring_expense_restored_success_message">Monatliche Ausgabe wurde wiederhergestellt.</string>
+    <string name="recurring_expense_restoring_loading_message">Wiederherstellung der gelöschten wiederkehrenden Ausgabe…</string>
+    <string name="recurring_expense_restored_success_message">Wiederkehrende Ausgabe erfolgreich wiederhergestellt.</string>
     <string name="recurring_expense_restore_error_title">Oops</string>
     <string name="recurring_expense_restore_error_message">Ein Fehler ist aufgetreten.</string>
     <string name="recurring_expense_delete_first_error_title">Oops</string>
     <string name="recurring_expense_delete_first_error_message">Es gibt keine Ereignisse vor diesem.</string>
     <string name="expense_delete_error_title">Oops</string>
     <string name="expense_delete_error_message">Ein Fehler ist aufgetreten.</string>
+
+    <string name="recurring_expense_interval">Wiederholung</string>
+    <string name="recurring_interval_weekly">Jede Woche</string>
+    <string name="recurring_interval_bi_weekly">Alle 2 Wochen</string>
+    <string name="recurring_interval_monthly">Jeden Monat</string>
+    <string name="recurring_interval_yearly">Jedes Jahr</string>
+    <string name="recurring_update_notification">Neues Feature: Aufgrund der großen Nachfrage, können Sie nun wöchentliche, zweiwöchentliche und jährliche Ausgaben hinzufügen!</string>
 
     <string name="setting_category_app_title">App</string>
     <string name="setting_category_rate_button_title">Ihnen gefällt diese App?</string>
@@ -210,7 +220,7 @@
     <string name="onboarding_screen_4_title">Fertig!</string>
     <string name="onboarding_screen_4_message">(Das war einfach, oder?)</string>
     <string name="onboarding_screen_4_message2">Was Sie als nächstes tun müssen?</string>
-    <string name="onboarding_screen_4_message3">1. Fügen Sie monatlich wiederkehrende Ausgaben und Einnahmen (Gehalt, Miete, Rechnungen,…) hinzu\n2. Denken Sie daran Ihre täglichen Ausgaben und Einnahmen im Laufe des Tages einzutragen</string>
+    <string name="onboarding_screen_4_message3">1. Fügen Sie wiederkehrende Ausgaben und Einnahmen (Gehalt, Miete, Rechnungen,…) hinzu\n2. Denken Sie daran Ihre täglichen Ausgaben und Einnahmen im Laufe des Tages einzutragen</string>
     <string name="onboarding_screen_4_message4">Danke für das Verwenden von EasyBudget und willkommen :)</string>
     <string name="onboarding_screen_4_cta">Los geht\'s!</string>
 

@@ -19,15 +19,15 @@
     <string name="action_settings">Préférences</string>
     <string name="action_balance">Ajuster le solde</string>
     <string name="fab_add_expense">Ajouter une dépense/revenu</string>
-    <string name="fab_add_monthly_expense">Ajouter une dépense/revenu mensuel</string>
+    <string name="fab_add_monthly_expense">Ajouter une dépense/revenu récurrent</string>
     <string name="title_activity_add_expense">Ajouter une dépense</string>
     <string name="title_activity_add_income">Ajouter un revenu</string>
     <string name="title_activity_edit_expense">Modifier la dépense</string>
     <string name="title_activity_edit_income">Modifier le revenu</string>
-    <string name="title_activity_recurring_expense_add">Ajouter une dépense mensuelle</string>
-    <string name="title_activity_recurring_income_add">Ajouter un revenu mensuel</string>
-    <string name="title_activity_recurring_expense_edit">Modifier la dépense mensuelle</string>
-    <string name="title_activity_monthly_income_edit">Modifier le revenu mensuel</string>
+    <string name="title_activity_recurring_expense_add">Ajouter une dépense récurrente</string>
+    <string name="title_activity_recurring_income_add">Ajouter un revenu récurrent</string>
+    <string name="title_activity_recurring_expense_edit">Modifier la dépense récurrente</string>
+    <string name="title_activity_monthly_income_edit">Modifier le revenu récurrent</string>
     <string name="title_activity_settings">Préférences</string>
     <string name="title_activity_welcome">EasyBudget</string>
     <string name="title_activity_premium">Premium</string>
@@ -59,8 +59,8 @@
         <item>Modifier le revenu</item>
         <item>Supprimer le revenu</item>
     </string-array>
-    <string name="dialog_edit_recurring_expense_title">Dépense mensuelle : que voulez-vous faire ?</string>
-    <string name="dialog_edit_recurring_income_title">Revenu mensuel : que voulez-vous faire ?</string>
+    <string name="dialog_edit_recurring_expense_title">Dépense récurrente : que voulez-vous faire ?</string>
+    <string name="dialog_edit_recurring_income_title">Revenu récurrent : que voulez-vous faire ?</string>
     <string-array name="dialog_edit_recurring_expense_choices">
         <item>Modifier cette occurrence</item>
         <item>Supprimer cette occurrence uniquement</item>
@@ -93,25 +93,35 @@
     <string name="adjust_balance_error_message">La valeur que vous avez entrée est invalide.</string>
 
     <string name="monthly">MENSUEL</string>
+    <string name="weekly">HEBDOMADAIRE</string>
+    <string name="bi_weekly">BI-HEBDOMADAIRE</string>
+    <string name="yearly">ANNUEL</string>
     <string name="recurring_expense_add_loading_title">Chargement</string>
-    <string name="recurring_expense_add_loading_message">Création de la dépense mensuelle…</string>
-    <string name="recurring_income_add_loading_message">Création du revenu mensuel…</string>
+    <string name="recurring_expense_add_loading_message">Création de la dépense récurrente…</string>
+    <string name="recurring_income_add_loading_message">Création du revenu récurrent…</string>
     <string name="recurring_expense_add_error_title">Oups</string>
     <string name="recurring_expense_add_error_message">Une erreur est survenue.</string>
-    <string name="recurring_expense_delete_success_message">Dépense mensuelle supprimée avec succès.</string>
+    <string name="recurring_expense_delete_success_message">Dépense récurrente supprimée avec succès.</string>
     <string name="recurring_expense_delete_loading_title">Suppression</string>
-    <string name="recurring_expense_delete_loading_message">Suppression de la dépense mensuelle…</string>
+    <string name="recurring_expense_delete_loading_message">Suppression de la dépense récurrente…</string>
     <string name="recurring_expense_delete_error_title">Oups</string>
     <string name="recurring_expense_delete_error_message">Une erreur est survenue.</string>
     <string name="recurring_expense_restoring_loading_title">Annulation</string>
-    <string name="recurring_expense_restoring_loading_message">Restauration de la dépense mensuelle…</string>
-    <string name="recurring_expense_restored_success_message">Dépense mensuelle restaurée avec succès</string>
+    <string name="recurring_expense_restoring_loading_message">Restauration de la dépense récurrente…</string>
+    <string name="recurring_expense_restored_success_message">Dépense récurrente restaurée avec succès</string>
     <string name="recurring_expense_restore_error_title">Oups</string>
     <string name="recurring_expense_restore_error_message">Une erreur est survenue.</string>
     <string name="recurring_expense_delete_first_error_title">Oups</string>
     <string name="recurring_expense_delete_first_error_message">Il n\'y a aucune occurrence avant celle-ci.</string>
     <string name="expense_delete_error_title">Oups</string>
     <string name="expense_delete_error_message">Une erreur est survenue.</string>
+
+    <string name="recurring_expense_interval">Répétition</string>
+    <string name="recurring_interval_weekly">Toutes les semaines</string>
+    <string name="recurring_interval_bi_weekly">Toutes les 2 semaines</string>
+    <string name="recurring_interval_monthly">Tous les mois</string>
+    <string name="recurring_interval_yearly">Tous les ans</string>
+    <string name="recurring_update_notification">Nouvelle fonctionnalité : Suite à vos retours, il est maintenant possible d’ajouter des dépenses hebdomadaires, bi-hebdomadaires et annuelles !</string>
 
     <string name="setting_category_app_title">App</string>
     <string name="setting_category_rate_button_title">Vous aimez cette appli ?</string>
@@ -210,7 +220,7 @@
     <string name="onboarding_screen_4_title">C\'est tout bon !</string>
     <string name="onboarding_screen_4_message">(C\'était facile non ?)</string>
     <string name="onboarding_screen_4_message2">Quelles sont les prochaines étapes ?</string>
-    <string name="onboarding_screen_4_message3">1. Ajoutez vos dépenses et revenus mensuels (salaire, loyer, factures…)\n2. N\'oubliez pas d\'ajouter vos dépenses et revenus ponctuels durant la journée</string>
+    <string name="onboarding_screen_4_message3">1. Ajoutez vos dépenses et revenus récurrents (salaire, loyer, factures…)\n2. N\'oubliez pas d\'ajouter vos dépenses et revenus ponctuels durant la journée</string>
     <string name="onboarding_screen_4_message4">Merci d\'utiliser EasyBudget, et bienvenue :)</string>
     <string name="onboarding_screen_4_cta">C\'est parti !</string>
 
