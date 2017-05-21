@@ -581,7 +581,7 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
             }
         }
 
-        if( newVersion == BuildVersion.VERSION_1_5 )
+        if( newVersion == BuildVersion.VERSION_1_5_2 )
         {
             show1_5UpdateNotif();
         }
