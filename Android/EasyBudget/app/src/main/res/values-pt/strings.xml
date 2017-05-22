@@ -19,15 +19,15 @@
     <string name="action_settings">Preferências</string>
     <string name="action_balance">Ajustar o saldo atual</string>
     <string name="fab_add_expense">Adicionar uma despesa/receita</string>
-    <string name="fab_add_monthly_expense">Adicionar uma despesa/receita mensal</string>
+    <string name="fab_add_monthly_expense">Adicionar uma despesa/receita recorrente</string>
     <string name="title_activity_add_expense">Adicionar despesa</string>
     <string name="title_activity_add_income">Adicionar receita</string>
     <string name="title_activity_edit_expense">Modificar despesa</string>
     <string name="title_activity_edit_income">Modificar receita</string>
-    <string name="title_activity_monthly_expense_add">Adicionar despesa mensal</string>
-    <string name="title_activity_monthly_income_add">Adicionar receita mensal</string>
-    <string name="title_activity_monthly_expense_edit">Modificar despesa mensal</string>
-    <string name="title_activity_monthly_income_edit">Modificar receita mensal</string>
+    <string name="title_activity_recurring_expense_add">Adicionar despesa recorrente</string>
+    <string name="title_activity_recurring_income_add">Adicionar receita recorrente</string>
+    <string name="title_activity_recurring_expense_edit">Modificar despesa recorrente</string>
+    <string name="title_activity_monthly_income_edit">Modificar receita recorrente</string>
     <string name="title_activity_settings">Preferências</string>
     <string name="title_activity_welcome">EasyBudget</string>
     <string name="title_activity_premium">Premium</string>
@@ -59,16 +59,16 @@
         <item>Modificar receita</item>
         <item>Excluir receita</item>
     </string-array>
-    <string name="dialog_edit_monthly_expense_title">Despesa mensal: O que você quer fazer?</string>
-    <string name="dialog_edit_monthly_income_title">Receita mensal: O que você quer fazer?</string>
-    <string-array name="dialog_edit_monthly_expense_choices">
+    <string name="dialog_edit_recurring_expense_title">Despesa recorrente: O que você quer fazer?</string>
+    <string name="dialog_edit_recurring_income_title">Receita recorrente: O que você quer fazer?</string>
+    <string-array name="dialog_edit_recurring_expense_choices">
         <item>Modificar esta ocorrência</item>
         <item>Excluir apenas esta ocorrência</item>
         <item>Excluir as próximas ocorrências</item>
         <item>Excluir as ocorrências anteriores</item>
         <item>Excluir tudo</item>
     </string-array>
-    <string-array name="dialog_edit_monthly_income_choices">
+    <string-array name="dialog_edit_recurring_income_choices">
         <item>Modificar esta ocorrência</item>
         <item>Excluir apenas esta ocorrência</item>
         <item>Excluir as próximas ocorrências</item>
@@ -93,25 +93,35 @@
     <string name="adjust_balance_error_message">O valor inserido é inválido.</string>
 
     <string name="monthly">MENSAL</string>
-    <string name="monthly_expense_add_loading_title">Carregando</string>
-    <string name="monthly_expense_add_loading_message">Criando uma despesa mensal…</string>
-    <string name="monthly_income_add_loading_message">Criando uma receita mensal…</string>
-    <string name="monthly_expense_add_error_title">Ops</string>
-    <string name="monthly_expense_add_error_message">Ocorreu um erro.</string>
-    <string name="monthly_expense_delete_success_message">Despesa mensal excluída com sucesso.</string>
-    <string name="monthly_expense_delete_loading_title">Excluindo</string>
-    <string name="monthly_expense_delete_loading_message">Excluindo despesa mensal…</string>
-    <string name="monthly_expense_delete_error_title">Ops</string>
-    <string name="monthly_expense_delete_error_message">Ocorreu um erro.</string>
-    <string name="monthly_expense_restoring_loading_title">Cancelando</string>
-    <string name="monthly_expense_restoring_loading_message">Restaurando despesa mensal excluída…</string>
-    <string name="monthly_expense_restored_success_message">Despesa mensal restaurada com sucesso</string>
-    <string name="monthly_expense_restore_error_title">Ops</string>
-    <string name="monthly_expense_restore_error_message">Ocorreu um erro.</string>
-    <string name="monthly_expense_delete_first_error_title">Ops</string>
-    <string name="monthly_expense_delete_first_error_message">Não há nenhuma ocorrência antes desta.</string>
+    <string name="weekly">SEMANALMENTE</string>
+    <string name="bi_weekly">QUINZENALMENTE</string>
+    <string name="yearly">ANUALMENTE</string>
+    <string name="recurring_expense_add_loading_title">Carregando</string>
+    <string name="recurring_expense_add_loading_message">Criando uma despesa recorrente…</string>
+    <string name="recurring_income_add_loading_message">Criando uma receita recorrente…</string>
+    <string name="recurring_expense_add_error_title">Ops</string>
+    <string name="recurring_expense_add_error_message">Ocorreu um erro.</string>
+    <string name="recurring_expense_delete_success_message">Despesa recorrente excluída com sucesso.</string>
+    <string name="recurring_expense_delete_loading_title">Excluindo</string>
+    <string name="recurring_expense_delete_loading_message">Excluindo despesa recorrente…</string>
+    <string name="recurring_expense_delete_error_title">Ops</string>
+    <string name="recurring_expense_delete_error_message">Ocorreu um erro.</string>
+    <string name="recurring_expense_restoring_loading_title">Cancelando</string>
+    <string name="recurring_expense_restoring_loading_message">Restaurando despesa recorrente excluída…</string>
+    <string name="recurring_expense_restored_success_message">Despesa recorrente restaurada com sucesso</string>
+    <string name="recurring_expense_restore_error_title">Ops</string>
+    <string name="recurring_expense_restore_error_message">Ocorreu um erro.</string>
+    <string name="recurring_expense_delete_first_error_title">Ops</string>
+    <string name="recurring_expense_delete_first_error_message">Não há nenhuma ocorrência antes desta.</string>
     <string name="expense_delete_error_title">Ops</string>
     <string name="expense_delete_error_message">Ocorreu um erro.</string>
+
+    <string name="recurring_expense_interval">Intervalo</string>
+    <string name="recurring_interval_weekly">Todas as semanas</string>
+    <string name="recurring_interval_bi_weekly">A cada duas semanas</string>
+    <string name="recurring_interval_monthly">Todos os meses</string>
+    <string name="recurring_interval_yearly">Todos os anos</string>
+    <string name="recurring_update_notification">Nova função: atendendo a pedidos, agora você pode adicionar despesas recorrentes semanais, quinzenais e anuais!</string>
 
     <string name="setting_category_app_title">App</string>
     <string name="setting_category_rate_button_title">Gostou do app?</string>
@@ -210,7 +220,7 @@
     <string name="onboarding_screen_4_title">Tudo pronto!</string>
     <string name="onboarding_screen_4_message">(Foi fácil, não é?)</string>
     <string name="onboarding_screen_4_message2">Quais são os próximos passos?</string>
-    <string name="onboarding_screen_4_message3">1. Adicione suas despesas e rendas mensais (salário, aluguel, faturas…)\n2. Não esqueça de adicionar gastos ou receitas pontuais ao longo do dia</string>
+    <string name="onboarding_screen_4_message3">1. Adicione suas despesas e rendas recorrente (salário, aluguel, faturas…)\n2. Não esqueça de adicionar gastos ou receitas pontuais ao longo do dia</string>
     <string name="onboarding_screen_4_message4">Obrigado por utilizar EasyBudget, e seja bem-vindo :)</string>
     <string name="onboarding_screen_4_cta">Vamos lá!</string>
 

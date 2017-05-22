@@ -111,7 +111,7 @@ public class MonthlyReportRecyclerViewAdapter extends RecyclerView.Adapter<Recyc
             viewHolder.expenseTitleTextView.setText(expense.getTitle());
             viewHolder.expenseAmountTextView.setText(CurrencyHelper.getFormattedCurrencyString(viewHolder.view.getContext(), -expense.getAmount()));
             viewHolder.expenseAmountTextView.setTextColor(ContextCompat.getColor(viewHolder.view.getContext(), expense.isRevenue() ? R.color.budget_green : R.color.budget_red));
-            viewHolder.monthlyIndicator.setVisibility(expense.isMonthly() ? View.VISIBLE : View.GONE);
+            viewHolder.monthlyIndicator.setVisibility(expense.isRecurring() ? View.VISIBLE : View.GONE);
             viewHolder.dateTextView.setText(dayFormatter.format(expense.getDate()));
         }
     }
@@ -195,7 +195,7 @@ public class MonthlyReportRecyclerViewAdapter extends RecyclerView.Adapter<Recyc
             view = v;
             expenseTitleTextView = (TextView) v.findViewById(R.id.expense_title);
             expenseAmountTextView = (TextView) v.findViewById(R.id.expense_amount);
-            monthlyIndicator = (ViewGroup) v.findViewById(R.id.monthly_indicator);
+            monthlyIndicator = (ViewGroup) v.findViewById(R.id.recurring_indicator);
             dateTextView = (TextView) v.findViewById(R.id.date_tv);
         }
     }

@@ -128,7 +128,7 @@
             tools:ignore="RtlHardcoded">
 
             <com.getbase.floatingactionbutton.FloatingActionButton
-                android:id="@+id/fab_new_monthly_expense"
+                android:id="@+id/fab_new_recurring_expense"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 fab:fab_colorNormal="@color/fab_add_expense"

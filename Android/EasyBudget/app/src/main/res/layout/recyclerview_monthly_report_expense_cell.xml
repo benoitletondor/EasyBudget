@@ -67,7 +67,7 @@
 
         </LinearLayout>
 
-        <LinearLayout android:id="@+id/monthly_indicator"
+        <LinearLayout android:id="@+id/recurring_indicator"
                       android:layout_width="60dp"
                       android:layout_height="match_parent"
                       android:orientation="vertical"

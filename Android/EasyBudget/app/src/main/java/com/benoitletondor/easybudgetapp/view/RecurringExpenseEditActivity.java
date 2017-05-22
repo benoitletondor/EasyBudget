@@ -23,6 +23,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
@@ -31,10 +32,13 @@ import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.benoitletondor.easybudgetapp.R;
@@ -42,14 +46,15 @@ import com.benoitletondor.easybudgetapp.helper.Logger;
 import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import com.benoitletondor.easybudgetapp.model.Expense;
-import com.benoitletondor.easybudgetapp.model.MonthlyExpense;
+import com.benoitletondor.easybudgetapp.model.RecurringExpense;
+import com.benoitletondor.easybudgetapp.model.RecurringExpenseType;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-public class MonthlyExpenseEditActivity extends DBActivity
+public class RecurringExpenseEditActivity extends DBActivity
 {
     /**
      * Save floating action button
@@ -71,17 +76,21 @@ public class MonthlyExpenseEditActivity extends DBActivity
      * Textview that displays the type of expense
      */
     private TextView             expenseType;
+    /**
+     * Spinner to display recurrence interval options
+     */
+    private Spinner              recurringTypeSpinner;
 
     /**
      * Expense that is being edited (will be null if it's a new one)
      */
-    private MonthlyExpense expense;
+    private RecurringExpense expense;
     /**
      * The start date of the expense
      */
     private Date           dateStart;
     /**
-     * The end date of the expense
+     * The end date of the expense (not implemented yet)
      */
     private Date           dateEnd;
     /**
@@ -96,25 +105,24 @@ public class MonthlyExpenseEditActivity extends DBActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_monthly_expense_edit);
+        setContentView(R.layout.activity_recurring_expense_edit);
 
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
 
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        dateStart = (Date) getIntent().getSerializableExtra("dateStart");
-        dateEnd = (Date) getIntent().getSerializableExtra("dateEnd");
+        dateStart = new Date(getIntent().getLongExtra("dateStart", 0));
 
         if (getIntent().hasExtra("expense"))
         {
-            expense = (MonthlyExpense) getIntent().getSerializableExtra("expense");
+            expense = getIntent().getParcelableExtra("expense");
 
-            setTitle(R.string.title_activity_monthly_expense_edit);
+            setTitle(R.string.title_activity_recurring_expense_edit);
         }
 
         setUpButtons();
-        setUpTextFields();
+        setUpInputs();
         setUpDateButton();
 
         setResult(RESULT_CANCELED);
@@ -236,9 +244,9 @@ public class MonthlyExpenseEditActivity extends DBActivity
                 {
                     double value = Double.parseDouble(amountEditText.getText().toString());
 
-                    MonthlyExpense expense = new MonthlyExpense(descriptionEditText.getText().toString(), isRevenue? -value : value, dateStart);
+                    RecurringExpense expense = new RecurringExpense(descriptionEditText.getText().toString(), isRevenue? -value : value, dateStart, getRecurringTypeFromSpinnerSelection(recurringTypeSpinner.getSelectedItemPosition()));
 
-                    new SaveMonthlyExpenseTask().execute(expense);
+                    new SaveRecurringExpenseTask().execute(expense);
                 }
             }
         });
@@ -254,21 +262,21 @@ public class MonthlyExpenseEditActivity extends DBActivity
             expenseType.setText(R.string.income);
             expenseType.setTextColor(ContextCompat.getColor(this, R.color.budget_green));
 
-            setTitle(R.string.title_activity_monthly_income_add);
+            setTitle(R.string.title_activity_recurring_income_add);
         }
         else
         {
             expenseType.setText(R.string.payment);
             expenseType.setTextColor(ContextCompat.getColor(this, R.color.budget_red));
 
-            setTitle(R.string.title_activity_monthly_expense_add);
+            setTitle(R.string.title_activity_recurring_expense_add);
         }
     }
 
     /**
-     * Set up text field focus behavior
+     * Set up text fields, spinner and focus behavior
      */
-    private void setUpTextFields()
+    private void setUpInputs()
     {
         ((TextInputLayout) findViewById(R.id.amount_inputlayout)).setHint(getResources().getString(R.string.amount, CurrencyHelper.getUserCurrency(this).getSymbol()));
 
@@ -287,6 +295,50 @@ public class MonthlyExpenseEditActivity extends DBActivity
         {
             amountEditText.setText(CurrencyHelper.getFormattedAmountValue(Math.abs(expense.getAmount())));
         }
+
+        recurringTypeSpinner = (Spinner) findViewById(R.id.expense_type_spinner);
+
+        final String[] recurringTypesString = new String[4];
+        recurringTypesString[0] = getString(R.string.recurring_interval_weekly);
+        recurringTypesString[1] = getString(R.string.recurring_interval_bi_weekly);
+        recurringTypesString[2] = getString(R.string.recurring_interval_monthly);
+        recurringTypesString[3] = getString(R.string.recurring_interval_yearly);
+
+        final ArrayAdapter adapter = new ArrayAdapter<>(this, R.layout.spinner_item, recurringTypesString);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        recurringTypeSpinner.setAdapter(adapter);
+
+        if( expense != null )
+        {
+            recurringTypeSpinner.setSelection(expense.getType().ordinal(), false);
+        }
+        else
+        {
+            recurringTypeSpinner.setSelection(2, false);
+        }
+    }
+
+    /**
+     * Get the recurring expense type associated with the spinner selection
+     *
+     * @param spinnerSelectedItem index of the spinner selection
+     * @return the corresponding expense type
+     */
+    private RecurringExpenseType getRecurringTypeFromSpinnerSelection(int spinnerSelectedItem)
+    {
+        switch (spinnerSelectedItem)
+        {
+            case 0:
+                return RecurringExpenseType.WEEKLY;
+            case 1:
+                return RecurringExpenseType.BI_WEEKLY;
+            case 2:
+                return RecurringExpenseType.MONTHLY;
+            case 3:
+                return RecurringExpenseType.YEARLY;
+        }
+
+        throw new IllegalStateException("getRecurringTypeFromSpinnerSelection unable to get value for "+spinnerSelectedItem);
     }
 
     /**
@@ -334,9 +386,9 @@ public class MonthlyExpenseEditActivity extends DBActivity
 // ------------------------------------------->
 
     /**
-     * An asynctask to save monthly expense to DB
+     * An asynctask to save recurring expense to DB
      */
-    private class SaveMonthlyExpenseTask extends AsyncTask<MonthlyExpense, Integer, Boolean>
+    private class SaveRecurringExpenseTask extends AsyncTask<RecurringExpense, Integer, Boolean>
     {
         /**
          * Dialog used to display loading to the user
@@ -344,37 +396,110 @@ public class MonthlyExpenseEditActivity extends DBActivity
         private ProgressDialog dialog;
 
         @Override
-        protected Boolean doInBackground(MonthlyExpense... expenses)
+        protected Boolean doInBackground(RecurringExpense... expenses)
         {
-            for (MonthlyExpense expense : expenses)
+            for (RecurringExpense expense : expenses)
             {
-                boolean inserted = db.addMonthlyExpense(expense);
+                boolean inserted = db.addRecurringExpense(expense);
                 if( !inserted )
                 {
-                    Logger.error(false, "Error while inserting monthly expense into DB: addMonthlyExpense returned false");
+                    Logger.error(false, "Error while inserting recurring expense into DB: addRecurringExpense returned false");
                     return false;
                 }
 
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(dateStart);
-
-                // Add up to 10 years of expenses
-                for (int i = 0; i < 12 * 10; i++)
+                if( !flattenExpensesForRecurringExpense(expense) )
                 {
-                    boolean expenseInserted = db.persistExpense(new Expense(expense.getTitle(), expense.getAmount(), cal.getTime(), expense.getId()));
-                    if (!expenseInserted)
-                    {
-                        Logger.error(false, "Error while inserting expense for monthly expense into DB: persistExpense returned false");
-                        return false;
-                    }
-
-                    cal.add(Calendar.MONTH, 1);
-
-                    if (dateEnd != null && cal.getTime().after(dateEnd)) // If we have an end date, stop to that one
-                    {
-                        break;
-                    }
+                    Logger.error(false, "Error while flattening expenses for recurring expense: flattenExpensesForRecurringExpense returned false");
+                    return false;
                 }
+            }
+
+            return true;
+        }
+
+        private boolean flattenExpensesForRecurringExpense(@NonNull RecurringExpense expense)
+        {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(dateStart);
+
+            switch (expense.getType())
+            {
+                case WEEKLY:
+                    // Add up to 5 years of expenses
+                    for (int i = 0; i < 12*4*5; i++)
+                    {
+                        boolean expenseInserted = db.persistExpense(new Expense(expense.getTitle(), expense.getAmount(), cal.getTime(), expense));
+                        if (!expenseInserted)
+                        {
+                            Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false");
+                            return false;
+                        }
+
+                        cal.add(Calendar.WEEK_OF_YEAR, 1);
+
+                        if (dateEnd != null && cal.getTime().after(dateEnd)) // If we have an end date, stop to that one
+                        {
+                            break;
+                        }
+                    }
+                    break;
+                case BI_WEEKLY:
+                    // Add up to 5 years of expenses
+                    for (int i = 0; i < 12*4*5; i++)
+                    {
+                        boolean expenseInserted = db.persistExpense(new Expense(expense.getTitle(), expense.getAmount(), cal.getTime(), expense));
+                        if (!expenseInserted)
+                        {
+                            Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false");
+                            return false;
+                        }
+
+                        cal.add(Calendar.WEEK_OF_YEAR, 2);
+
+                        if (dateEnd != null && cal.getTime().after(dateEnd)) // If we have an end date, stop to that one
+                        {
+                            break;
+                        }
+                    }
+                    break;
+                case MONTHLY:
+                    // Add up to 10 years of expenses
+                    for (int i = 0; i < 12 * 10; i++)
+                    {
+                        boolean expenseInserted = db.persistExpense(new Expense(expense.getTitle(), expense.getAmount(), cal.getTime(), expense));
+                        if (!expenseInserted)
+                        {
+                            Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false");
+                            return false;
+                        }
+
+                        cal.add(Calendar.MONTH, 1);
+
+                        if (dateEnd != null && cal.getTime().after(dateEnd)) // If we have an end date, stop to that one
+                        {
+                            break;
+                        }
+                    }
+                    break;
+                case YEARLY:
+                    // Add up to 100 years of expenses
+                    for (int i = 0; i < 100; i++)
+                    {
+                        boolean expenseInserted = db.persistExpense(new Expense(expense.getTitle(), expense.getAmount(), cal.getTime(), expense));
+                        if (!expenseInserted)
+                        {
+                            Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false");
+                            return false;
+                        }
+
+                        cal.add(Calendar.YEAR, 1);
+
+                        if (dateEnd != null && cal.getTime().after(dateEnd)) // If we have an end date, stop to that one
+                        {
+                            break;
+                        }
+                    }
+                    break;
             }
 
             return true;
@@ -384,10 +509,10 @@ public class MonthlyExpenseEditActivity extends DBActivity
         protected void onPreExecute()
         {
             // Show a ProgressDialog
-            dialog = new ProgressDialog(MonthlyExpenseEditActivity.this);
+            dialog = new ProgressDialog(RecurringExpenseEditActivity.this);
             dialog.setIndeterminate(true);
-            dialog.setTitle(R.string.monthly_expense_add_loading_title);
-            dialog.setMessage(getResources().getString(isRevenue ? R.string.monthly_income_add_loading_message : R.string.monthly_expense_add_loading_message));
+            dialog.setTitle(R.string.recurring_expense_add_loading_title);
+            dialog.setMessage(getResources().getString(isRevenue ? R.string.recurring_income_add_loading_message : R.string.recurring_expense_add_loading_message));
             dialog.setCanceledOnTouchOutside(false);
             dialog.setCancelable(false);
             dialog.show();
@@ -406,9 +531,9 @@ public class MonthlyExpenseEditActivity extends DBActivity
             }
             else
             {
-                new AlertDialog.Builder(MonthlyExpenseEditActivity.this)
-                    .setTitle(R.string.monthly_expense_add_error_title)
-                    .setMessage(getResources().getString(R.string.monthly_expense_add_error_message))
+                new AlertDialog.Builder(RecurringExpenseEditActivity.this)
+                    .setTitle(R.string.recurring_expense_add_error_title)
+                    .setMessage(getResources().getString(R.string.recurring_expense_add_error_message))
                     .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener()
                     {
                         @Override

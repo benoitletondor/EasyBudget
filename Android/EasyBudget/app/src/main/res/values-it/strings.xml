@@ -19,15 +19,15 @@
     <string name="action_settings">Impostazioni</string>
     <string name="action_balance">Correggi il saldo</string>
     <string name="fab_add_expense">Aggiungi un’entrata/uscita</string>
-    <string name="fab_add_monthly_expense">Aggiungi un’entrata/uscita mensile</string>
+    <string name="fab_add_monthly_expense">Aggiungi un’entrata/uscita ricorrente</string>
     <string name="title_activity_add_expense">Aggiungi un’uscita</string>
     <string name="title_activity_add_income">Aggiungi un’entrata</string>
     <string name="title_activity_edit_expense">Modifica l’uscita</string>
     <string name="title_activity_edit_income">Modifica l’entrata</string>
-    <string name="title_activity_monthly_expense_add">Aggiungi un’uscita mensile</string>
-    <string name="title_activity_monthly_income_add">Aggiungi un’entrata mensile</string>
-    <string name="title_activity_monthly_expense_edit">Modifica l’uscita mensile</string>
-    <string name="title_activity_monthly_income_edit">Modifica l’entrata mensile</string>
+    <string name="title_activity_recurring_expense_add">Aggiungi un’uscita ricorrente</string>
+    <string name="title_activity_recurring_income_add">Aggiungi un’entrata ricorrente</string>
+    <string name="title_activity_recurring_expense_edit">Modifica l’uscita ricorrente</string>
+    <string name="title_activity_monthly_income_edit">Modifica l’entrata ricorrente</string>
     <string name="title_activity_settings">Impostazioni</string>
     <string name="title_activity_welcome">EasyBudget</string>
     <string name="title_activity_premium">Premium</string>
@@ -59,16 +59,16 @@
         <item>Modifica l’importo</item>
         <item>Elimina l’importo</item>
     </string-array>
-    <string name="dialog_edit_monthly_expense_title">Uscite mensili: Cosa vuoi fare?</string>
-    <string name="dialog_edit_monthly_income_title">Entrate mensili: Cosa vuoi fare?</string>
-    <string-array name="dialog_edit_monthly_expense_choices">
+    <string name="dialog_edit_recurring_expense_title">Uscite ricorrente: Cosa vuoi fare?</string>
+    <string name="dialog_edit_recurring_income_title">Entrate ricorrente: Cosa vuoi fare?</string>
+    <string-array name="dialog_edit_recurring_expense_choices">
         <item>Modifica questo elemento</item>
         <item>Modifica soltanto questo elemento</item>
         <item>Elimina tutti gli elementi seguenti</item>
         <item>Elimina tutti gli elementi precedenti</item>
         <item>Elimina tutto</item>
     </string-array>
-    <string-array name="dialog_edit_monthly_income_choices">
+    <string-array name="dialog_edit_recurring_income_choices">
         <item>Modifica questo elemento</item>
         <item>Modifica soltanto questo elemento</item>
         <item>Elimina tutti gli elementi seguenti</item>
@@ -93,25 +93,35 @@
     <string name="adjust_balance_error_message">Il valore che hai inserito non è valido.</string>
 
     <string name="monthly">MENSILE</string>
-    <string name="monthly_expense_add_loading_title">Carico</string>
-    <string name="monthly_expense_add_loading_message">Creazione dell’uscita mensile…</string>
-    <string name="monthly_income_add_loading_message">Creazione dell’entrata mensile…</string>
-    <string name="monthly_expense_add_error_title">OPS!</string>
-    <string name="monthly_expense_add_error_message">Errore.</string>
-    <string name="monthly_expense_delete_success_message">Uscita mensile eliminata con successo.</string>
-    <string name="monthly_expense_delete_loading_title">Eliminando</string>
-    <string name="monthly_expense_delete_loading_message">Eliminando l’uscita mensile…</string>
-    <string name="monthly_expense_delete_error_title">OPS!</string>
-    <string name="monthly_expense_delete_error_message">Errore.</string>
-    <string name="monthly_expense_restoring_loading_title">Annulla</string>
-    <string name="monthly_expense_restoring_loading_message">Reinserisci l’uscita mensile…</string>
-    <string name="monthly_expense_restored_success_message">Uscita mensile reinserita con successo</string>
-    <string name="monthly_expense_restore_error_title">OPS!</string>
-    <string name="monthly_expense_restore_error_message">Errore.</string>
-    <string name="monthly_expense_delete_first_error_title">OPS!</string>
-    <string name="monthly_expense_delete_first_error_message">Non ci sono occorrenze prima di questa.</string>
+    <string name="weekly">SETTIMANALE</string>
+    <string name="bi_weekly">BISETTIMANALE</string>
+    <string name="yearly">ANNUALE</string>
+    <string name="recurring_expense_add_loading_title">Carico</string>
+    <string name="recurring_expense_add_loading_message">Creazione dell’uscita ricorrente…</string>
+    <string name="recurring_income_add_loading_message">Creazione dell’entrata ricorrente…</string>
+    <string name="recurring_expense_add_error_title">OPS!</string>
+    <string name="recurring_expense_add_error_message">Errore.</string>
+    <string name="recurring_expense_delete_success_message">Uscita ricorrente eliminata con successo.</string>
+    <string name="recurring_expense_delete_loading_title">Eliminando</string>
+    <string name="recurring_expense_delete_loading_message">Eliminando l’uscita ricorrente…</string>
+    <string name="recurring_expense_delete_error_title">OPS!</string>
+    <string name="recurring_expense_delete_error_message">Errore.</string>
+    <string name="recurring_expense_restoring_loading_title">Annulla</string>
+    <string name="recurring_expense_restoring_loading_message">Reinserisci l’uscita ricorrente…</string>
+    <string name="recurring_expense_restored_success_message">Uscita ricorrente reinserita con successo</string>
+    <string name="recurring_expense_restore_error_title">OPS!</string>
+    <string name="recurring_expense_restore_error_message">Errore.</string>
+    <string name="recurring_expense_delete_first_error_title">OPS!</string>
+    <string name="recurring_expense_delete_first_error_message">Non ci sono occorrenze prima di questa.</string>
     <string name="expense_delete_error_title">OPS!</string>
     <string name="expense_delete_error_message">Errore.</string>
+
+    <string name="recurring_expense_interval">Ripetizione</string>
+    <string name="recurring_interval_weekly">Ogni settimana</string>
+    <string name="recurring_interval_bi_weekly">Ogni 2 settimane</string>
+    <string name="recurring_interval_monthly">Ogni mese</string>
+    <string name="recurring_interval_yearly">Ogni anno</string>
+    <string name="recurring_update_notification">Nuova funzionalità: Come richiesto da molti di voi, ormai è possibile aggiungere le uscite settimanali, bisettimanali e annuali</string>
 
     <string name="setting_category_app_title">App</string>
     <string name="setting_category_rate_button_title">L’app ti piace?</string>
@@ -210,7 +220,7 @@
     <string name="onboarding_screen_4_title">Perfetto!</string>
     <string name="onboarding_screen_4_message">(È stato facile, no?)</string>
     <string name="onboarding_screen_4_message2">Quali sono le prossime tappe?</string>
-    <string name="onboarding_screen_4_message3">1. Aggiungi le tue entrate e uscite mensili (stipendio, affitto, fatture…)\n2. Non dimenticare di aggiungere le entrate e uscite di ogni giorno!</string>
+    <string name="onboarding_screen_4_message3">1. Aggiungi le tue entrate e uscite ricorrente (stipendio, affitto, fatture…)\n2. Non dimenticare di aggiungere le entrate e uscite di ogni giorno!</string>
     <string name="onboarding_screen_4_message4">Grazie di aver scelto EasyBudget, e benvenuto! :)</string>
     <string name="onboarding_screen_4_cta">Avanti</string>
 

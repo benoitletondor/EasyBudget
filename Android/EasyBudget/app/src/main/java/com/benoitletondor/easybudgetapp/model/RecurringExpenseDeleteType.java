@@ -19,11 +19,11 @@ package com.benoitletondor.easybudgetapp.model;
 import android.support.annotation.Nullable;
 
 /**
- * An enum that reference different kind of deletion for a monthly expense
+ * An enum that reference different kind of deletion for a recurring expense
  *
  * @author Benoit LETONDOR
  */
-public enum MonthlyExpenseDeleteType
+public enum RecurringExpenseDeleteType
 {
     /**
      * Delete all from a date
@@ -57,7 +57,7 @@ public enum MonthlyExpenseDeleteType
      *
      * @param value
      */
-    MonthlyExpenseDeleteType(int value)
+    RecurringExpenseDeleteType(int value)
     {
         this.value = value;
     }
@@ -83,9 +83,9 @@ public enum MonthlyExpenseDeleteType
      * @return
      */
     @Nullable
-    public static MonthlyExpenseDeleteType fromValue(int value)
+    public static RecurringExpenseDeleteType fromValue(int value)
     {
-        for (MonthlyExpenseDeleteType type : values())
+        for (RecurringExpenseDeleteType type : values())
         {
             if (value == type.getValue())
             {

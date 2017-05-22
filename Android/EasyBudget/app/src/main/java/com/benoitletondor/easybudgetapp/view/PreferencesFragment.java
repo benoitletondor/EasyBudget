@@ -17,7 +17,6 @@
 package com.benoitletondor.easybudgetapp.view;
 
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -38,11 +37,6 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.batch.android.Batch;
-import com.batch.android.BatchCodeListener;
-import com.batch.android.CodeErrorInfo;
-import com.batch.android.FailReason;
-import com.batch.android.Offer;
 import com.benoitletondor.easybudgetapp.BuildConfig;
 import com.benoitletondor.easybudgetapp.EasyBudget;
 import com.benoitletondor.easybudgetapp.PremiumCheckStatus;
@@ -58,7 +52,7 @@ import com.benoitletondor.easybudgetapp.notif.MonthlyReportNotifService;
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment;
 import com.google.android.gms.appinvite.AppInviteInvitation;
 
-import java.util.Map;
+import static com.benoitletondor.easybudgetapp.view.SettingsActivity.USER_GONE_PREMIUM_INTENT;
 
 /**
  * Fragment to display preferences
@@ -412,7 +406,7 @@ public class PreferencesFragment extends PreferenceFragment
          */
         IntentFilter filter = new IntentFilter(SelectCurrencyFragment.CURRENCY_SELECTED_INTENT);
         filter.addAction(EasyBudget.INTENT_IAB_STATUS_CHANGED);
-        filter.addAction(SettingsActivity.USER_GONE_PREMIUM_INTENT);
+        filter.addAction(USER_GONE_PREMIUM_INTENT);
         receiver = new BroadcastReceiver()
         {
             @Override
@@ -440,7 +434,7 @@ public class PreferencesFragment extends PreferenceFragment
                         Logger.error("Error while receiving INTENT_IAB_STATUS_CHANGED intent", e);
                     }
                 }
-                else if( SettingsActivity.USER_GONE_PREMIUM_INTENT.equals(intent.getAction()) )
+                else if( USER_GONE_PREMIUM_INTENT.equals(intent.getAction()) )
                 {
                     new AlertDialog.Builder(getActivity())
                         .setTitle(R.string.iab_purchase_success_title)
@@ -624,98 +618,21 @@ public class PreferencesFragment extends PreferenceFragment
                                     return;
                                 }
 
-                                final ProgressDialog loadingDialog = ProgressDialog.show(getActivity(),
-                                    getResources().getString(R.string.voucher_redeem_dialog_loading_title),
-                                    getResources().getString(R.string.voucher_redeem_dialog_loading_message),
-                                    true, false);
-
-                                Batch.Unlock.redeemCode(promocode, new BatchCodeListener()
+                                if( !((EasyBudget) getActivity().getApplication()).launchRedeemPromocodeFlow(promocode, getActivity()) )
                                 {
-                                    @Override
-                                    public void onRedeemCodeSuccess(String s, Offer offer)
-                                    {
-                                        loadingDialog.dismiss();
-
-                                        if( offer.containsFeature(UserHelper.BATCH_PREMIUM_FEATURE) )
+                                    new AlertDialog.Builder(getActivity())
+                                        .setTitle(R.string.iab_purchase_error_title)
+                                        .setMessage(getResources().getString(R.string.iab_purchase_error_message, "Error redeeming promo code"))
+                                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
                                         {
-                                            UserHelper.setBatchUserPremium(getActivity());
-                                            refreshPremiumPreference();
-                                        }
-
-                                        Map<String, String> additionalParameters = offer.getOfferAdditionalParameters();
-
-                                        String rewardMessage = additionalParameters.get("reward_message");
-                                        String rewardTitle = additionalParameters.get("reward_title");
-
-                                        if (rewardTitle != null && rewardMessage != null)
-                                        {
-                                            new AlertDialog.Builder(getActivity())
-                                                .setTitle(rewardTitle)
-                                                .setMessage(rewardMessage)
-                                                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
-                                                {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which)
-                                                    {
-                                                        dialog.dismiss();
-                                                    }
-                                                })
-                                                .show();
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onRedeemCodeFailed(String s, FailReason failReason, CodeErrorInfo codeErrorInfo)
-                                    {
-                                        loadingDialog.dismiss();
-
-                                        if( failReason == FailReason.NETWORK_ERROR )
-                                        {
-                                            new AlertDialog.Builder(getActivity())
-                                                .setTitle(R.string.voucher_redeem_error_dialog_title)
-                                                .setMessage(R.string.voucher_redeem_error_no_internet_dialog_message)
-                                                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
-                                                {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which)
-                                                    {
-                                                        dialog.dismiss();
-                                                    }
-                                                })
-                                                .show();
-                                        }
-                                        else if( failReason == FailReason.INVALID_CODE )
-                                        {
-                                            new AlertDialog.Builder(getActivity())
-                                                .setTitle(R.string.voucher_redeem_error_dialog_title)
-                                                .setMessage(R.string.voucher_redeem_error_code_invalid_dialog_message)
-                                                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
-                                                {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which)
-                                                    {
-                                                        dialog.dismiss();
-                                                    }
-                                                })
-                                                .show();
-                                        }
-                                        else
-                                        {
-                                            new AlertDialog.Builder(getActivity())
-                                                .setTitle(R.string.voucher_redeem_error_dialog_title)
-                                                .setMessage(R.string.voucher_redeem_error_generic_dialog_message)
-                                                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
-                                                {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which)
-                                                    {
-                                                        dialog.dismiss();
-                                                    }
-                                                })
-                                                .show();
-                                        }
-                                    }
-                                });
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which)
+                                            {
+                                                dialog.dismiss();
+                                            }
+                                        })
+                                        .show();
+                                }
                             }
                         })
                         .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener()

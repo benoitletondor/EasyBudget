@@ -65,6 +65,10 @@
 
                 <data android:scheme="easybudget"/>
             </intent-filter>
+
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
         </activity>
         <activity
             android:name=".view.MonthlyReportActivity"
@@ -78,9 +82,9 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppThemeNoActionBar"/>
         <activity
-            android:name=".view.MonthlyExpenseEditActivity"
+            android:name=".view.RecurringExpenseEditActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
-            android:label="@string/title_activity_monthly_expense_add"
+            android:label="@string/title_activity_recurring_expense_add"
             android:screenOrientation="portrait"
             android:theme="@style/AppThemeNoActionBar"/>
         <activity
@@ -114,6 +118,14 @@
                 <category android:name="com.benoitletondor.easybudgetapp"/>
             </intent-filter>
         </receiver>
+
+        <service
+            android:name="com.batch.android.BatchPushInstanceIDService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.iid.InstanceID"/>
+            </intent-filter>
+        </service>
 
         <!-- Notif services -->
         <service android:name=".notif.DailyNotifOptinService"/>

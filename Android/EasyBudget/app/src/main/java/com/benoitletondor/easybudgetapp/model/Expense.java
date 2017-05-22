@@ -16,11 +16,13 @@
 
 package com.benoitletondor.easybudgetapp.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.benoitletondor.easybudgetapp.helper.DateHelper;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -28,7 +30,7 @@ import java.util.Date;
  *
  * @author Benoit LETONDOR
  */
-public class Expense implements Serializable
+public class Expense implements Parcelable
 {
     /**
      * DB id of this expense (can be null)
@@ -47,9 +49,10 @@ public class Expense implements Serializable
      */
     private Date    date;
     /**
-     * Id of the recurring monthly expense (can be null)
+     * Associated recurring expense (can be null if not a recurring one)
      */
-    private Long monthlyId;
+    @Nullable
+    private RecurringExpense recurringExpense;
 
 // --------------------------------->
 
@@ -69,11 +72,11 @@ public class Expense implements Serializable
      * @param title
      * @param amount
      * @param date
-     * @param monthlyId
+     * @param recurringExpense
      */
-    public Expense(@NonNull String title, double amount, @NonNull Date date, Long monthlyId)
+    public Expense(@NonNull String title, double amount, @NonNull Date date, @Nullable RecurringExpense recurringExpense)
     {
-        this(null, title, amount, date, monthlyId);
+        this(null, title, amount, date, recurringExpense);
     }
 
     /**
@@ -82,9 +85,9 @@ public class Expense implements Serializable
      * @param title
      * @param amount
      * @param date
-     * @param monthlyId
+     * @param recurringExpense
      */
-    public Expense(Long id, @NonNull String title, double amount, @NonNull Date date, Long monthlyId)
+    public Expense(Long id, @NonNull String title, double amount, @NonNull Date date, @Nullable RecurringExpense recurringExpense)
     {
         this.id = id;
 
@@ -102,7 +105,20 @@ public class Expense implements Serializable
 
         this.amount = amount;
         this.date = DateHelper.cleanDate(date);
-        this.monthlyId = monthlyId;
+        this.recurringExpense = recurringExpense;
+    }
+
+    /**
+     *
+     * @param in
+     */
+    private Expense(Parcel in)
+    {
+        id = (Long) in.readValue(Long.class.getClassLoader());
+        title = in.readString();
+        amount = in.readDouble();
+        date = new Date(in.readLong());
+        recurringExpense = in.readParcelable(RecurringExpense.class.getClassLoader());
     }
 
 // --------------------------------->
@@ -117,19 +133,20 @@ public class Expense implements Serializable
         this.id = id;
     }
 
-    public Long getMonthlyId()
+    @Nullable
+    public RecurringExpense getAssociatedRecurringExpense()
     {
-        return monthlyId;
+        return recurringExpense;
     }
 
-    public void setMonthlyId(Long monthlyId)
+    public void setAssociatedRecurringExpense(@Nullable RecurringExpense recurringExpense)
     {
-        this.monthlyId = monthlyId;
+        this.recurringExpense = recurringExpense;
     }
 
-    public boolean isMonthly()
+    public boolean isRecurring()
     {
-        return monthlyId != null;
+        return recurringExpense != null;
     }
 
     @NonNull
@@ -168,4 +185,37 @@ public class Expense implements Serializable
     {
         return amount < 0;
     }
+
+// --------------------------------->
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags)
+    {
+        dest.writeValue(id);
+        dest.writeString(title);
+        dest.writeDouble(amount);
+        dest.writeLong(date.getTime());
+        dest.writeParcelable(recurringExpense, flags);
+    }
+
+    @Override
+    public int describeContents()
+    {
+        return 0;
+    }
+
+    public static final Creator<Expense> CREATOR = new Creator<Expense>()
+    {
+        @Override
+        public Expense createFromParcel(Parcel in)
+        {
+            return new Expense(in);
+        }
+
+        @Override
+        public Expense[] newArray(int size)
+        {
+            return new Expense[size];
+        }
+    };
 }
