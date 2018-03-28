@@ -32,9 +32,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 
-import com.batch.android.Batch;
-import com.batch.android.Config;
-import com.batch.android.PushNotificationType;
+//import com.batch.android.Batch;
+//import com.batch.android.Config;
+//import com.batch.android.PushNotificationType;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import com.benoitletondor.easybudgetapp.helper.Logger;
 import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
@@ -51,7 +51,7 @@ import com.benoitletondor.easybudgetapp.notif.MonthlyReportNotifService;
 import com.benoitletondor.easybudgetapp.view.MainActivity;
 import com.benoitletondor.easybudgetapp.view.RatingPopup;
 import com.benoitletondor.easybudgetapp.view.SettingsActivity;
-import com.crashlytics.android.Crashlytics;
+//import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Logger.LogLevel;
@@ -65,7 +65,7 @@ import java.util.EnumSet;
 import java.util.Locale;
 import java.util.UUID;
 
-import io.fabric.sdk.android.Fabric;
+//import io.fabric.sdk.android.Fabric;
 
 /**
  * EasyBudget application. Implements GA tracking, Batch set-up, Crashlytics set-up && iab.
@@ -135,9 +135,9 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
         // Crashlytics
         if( BuildConfig.CRASHLYTICS_ACTIVATED )
         {
-            Fabric.with(this, new Crashlytics());
-
-            Crashlytics.setUserIdentifier(Parameters.getInstance(getApplicationContext()).getString(ParameterKeys.LOCAL_ID));
+//            Fabric.with(this, new Crashlytics());
+//
+//            Crashlytics.setUserIdentifier(Parameters.getInstance(getApplicationContext()).getString(ParameterKeys.LOCAL_ID));
         }
 
         // Batch
@@ -154,7 +154,7 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
         analyticsTracker = analytics.newTracker(R.xml.analytics);
 
         // In-app billing
-        setupIab();
+//        setupIab();
     }
 
     @Override
@@ -473,17 +473,17 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
      */
     private void setUpBatchSDK()
     {
-        Batch.setConfig(new Config(BuildConfig.BATCH_API_KEY));
-        Batch.Push.setGCMSenderId(BuildConfig.GCM_SENDER_ID);
-        Batch.Push.setManualDisplay(true);
-        Batch.Push.setSmallIconResourceId(R.drawable.ic_push);
-        Batch.Push.setNotificationsColor(ContextCompat.getColor(this, R.color.accent));
-
-        // Remove vibration & sound
-        EnumSet<PushNotificationType> notificationTypes = EnumSet.allOf(PushNotificationType.class);
-        notificationTypes.remove(PushNotificationType.VIBRATE);
-        notificationTypes.remove(PushNotificationType.SOUND);
-        Batch.Push.setNotificationsType(notificationTypes);
+//        Batch.setConfig(new Config(BuildConfig.BATCH_API_KEY));
+//        Batch.Push.setGCMSenderId(BuildConfig.GCM_SENDER_ID);
+//        Batch.Push.setManualDisplay(true);
+//        Batch.Push.setSmallIconResourceId(R.drawable.ic_push);
+//        Batch.Push.setNotificationsColor(ContextCompat.getColor(this, R.color.accent));
+//
+//        // Remove vibration & sound
+//        EnumSet<PushNotificationType> notificationTypes = EnumSet.allOf(PushNotificationType.class);
+//        notificationTypes.remove(PushNotificationType.VIBRATE);
+//        notificationTypes.remove(PushNotificationType.SOUND);
+//        Batch.Push.setNotificationsType(notificationTypes);
 
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks()
         {
@@ -496,7 +496,7 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
             @Override
             public void onActivityStarted(final Activity activity)
             {
-                Batch.onStart(activity);
+//                Batch.onStart(activity);
             }
 
             @Override
@@ -514,7 +514,7 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
             @Override
             public void onActivityStopped(Activity activity)
             {
-                Batch.onStop(activity);
+//                Batch.onStop(activity);
             }
 
             @Override
@@ -526,7 +526,7 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
             @Override
             public void onActivityDestroyed(Activity activity)
             {
-                Batch.onDestroy(activity);
+//                Batch.onDestroy(activity);
             }
         });
     }
@@ -667,79 +667,79 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
 // -------------------------------------->
     // region iab
 
-    private void setupIab()
-    {
-        try
-        {
-            setIabStatusAndNotify(PremiumCheckStatus.INITIALIZING);
-
-            iabHelper = new IabHelper(this, BuildConfig.LICENCE_KEY);
-            iabHelper.enableDebugLogging(BuildConfig.DEBUG_LOG);
-
-            inventoryListener = new IabHelper.QueryInventoryFinishedListener()
-            {
-                @Override
-                public void onQueryInventoryFinished(IabResult result, Inventory inventory)
-                {
-                    Logger.debug("iab query inventory finished.");
-
-                    // Is it a failure?
-                    if ( result.isFailure() )
-                    {
-                        Logger.error("Error while querying iab inventory: "+result);
-                        iabError = result.getMessage();
-                        setIabStatusAndNotify(PremiumCheckStatus.ERROR);
-                        return;
-                    }
-
-                    /*
-                     * Check for items we own.
-                     * TODO We should check the developer payload to see if it's correct verifyDeveloperPayload(premiumPurchase)!
-                     */
-                    Purchase premiumPurchase = inventory.getPurchase(EasyBudget.SKU_PREMIUM);
-                    setIabStatusAndNotify(premiumPurchase != null ? PremiumCheckStatus.PREMIUM : PremiumCheckStatus.NOT_PREMIUM);
-
-                    Logger.debug("iab query inventory was successful: "+iabStatus);
-                }
-            };
-
-            iabHelper.startSetup(new IabHelper.OnIabSetupFinishedListener()
-            {
-                public void onIabSetupFinished(IabResult result)
-                {
-                    Logger.debug("iab setup finished.");
-
-                    if (!result.isSuccess())
-                    {
-                        // Oh noes, there was a problem.
-                        setIabStatusAndNotify(PremiumCheckStatus.ERROR);
-                        Logger.error("Error while setting-up iab: "+result);
-                        iabError = result.getMessage();
-                        return;
-                    }
-
-                    setIabStatusAndNotify(PremiumCheckStatus.CHECKING);
-
-                    // Important: Dynamically register for broadcast messages about updated purchases.
-                    // We register the receiver here instead of as a <receiver> in the Manifest
-                    // because we always call getPurchases() at startup, so therefore we can ignore
-                    // any broadcasts sent while the app isn't running.
-                    iabBroadcastReceiver = new IabBroadcastReceiver(EasyBudget.this);
-                    IntentFilter broadcastFilter = new IntentFilter(IabBroadcastReceiver.ACTION);
-                    registerReceiver(iabBroadcastReceiver, broadcastFilter);
-
-                    // IAB is fully set up. Now, let's get an inventory of stuff we own.
-                    Logger.debug("iab setup successful. Querying inventory.");
-                    iabHelper.queryInventoryAsync(inventoryListener);
-                }
-            });
-        }
-        catch (Exception e)
-        {
-            Logger.error("Error while checking iab status", e);
-            setIabStatusAndNotify(PremiumCheckStatus.ERROR);
-        }
-    }
+//    private void setupIab()
+//    {
+//        try
+//        {
+//            setIabStatusAndNotify(PremiumCheckStatus.INITIALIZING);
+//
+//            iabHelper = new IabHelper(this, BuildConfig.LICENCE_KEY);
+//            iabHelper.enableDebugLogging(BuildConfig.DEBUG_LOG);
+//
+//            inventoryListener = new IabHelper.QueryInventoryFinishedListener()
+//            {
+//                @Override
+//                public void onQueryInventoryFinished(IabResult result, Inventory inventory)
+//                {
+//                    Logger.debug("iab query inventory finished.");
+//
+//                    // Is it a failure?
+//                    if ( result.isFailure() )
+//                    {
+//                        Logger.error("Error while querying iab inventory: "+result);
+//                        iabError = result.getMessage();
+//                        setIabStatusAndNotify(PremiumCheckStatus.ERROR);
+//                        return;
+//                    }
+//
+//                    /*
+//                     * Check for items we own.
+//                     * TODO We should check the developer payload to see if it's correct verifyDeveloperPayload(premiumPurchase)!
+//                     */
+//                    Purchase premiumPurchase = inventory.getPurchase(EasyBudget.SKU_PREMIUM);
+//                    setIabStatusAndNotify(premiumPurchase != null ? PremiumCheckStatus.PREMIUM : PremiumCheckStatus.NOT_PREMIUM);
+//
+//                    Logger.debug("iab query inventory was successful: "+iabStatus);
+//                }
+//            };
+//
+//            iabHelper.startSetup(new IabHelper.OnIabSetupFinishedListener()
+//            {
+//                public void onIabSetupFinished(IabResult result)
+//                {
+//                    Logger.debug("iab setup finished.");
+//
+//                    if (!result.isSuccess())
+//                    {
+//                        // Oh noes, there was a problem.
+//                        setIabStatusAndNotify(PremiumCheckStatus.ERROR);
+//                        Logger.error("Error while setting-up iab: "+result);
+//                        iabError = result.getMessage();
+//                        return;
+//                    }
+//
+//                    setIabStatusAndNotify(PremiumCheckStatus.CHECKING);
+//
+//                    // Important: Dynamically register for broadcast messages about updated purchases.
+//                    // We register the receiver here instead of as a <receiver> in the Manifest
+//                    // because we always call getPurchases() at startup, so therefore we can ignore
+//                    // any broadcasts sent while the app isn't running.
+//                    iabBroadcastReceiver = new IabBroadcastReceiver(EasyBudget.this);
+//                    IntentFilter broadcastFilter = new IntentFilter(IabBroadcastReceiver.ACTION);
+//                    registerReceiver(iabBroadcastReceiver, broadcastFilter);
+//
+//                    // IAB is fully set up. Now, let's get an inventory of stuff we own.
+//                    Logger.debug("iab setup successful. Querying inventory.");
+//                    iabHelper.queryInventoryAsync(inventoryListener);
+//                }
+//            });
+//        }
+//        catch (Exception e)
+//        {
+//            Logger.error("Error while checking iab status", e);
+//            setIabStatusAndNotify(PremiumCheckStatus.ERROR);
+//        }
+//    }
 
     @Override
     public void receivedBroadcast()

@@ -1,3 +1,0 @@
-#Contains API Secret used to validate your application. Commit to internal source control; avoid making secret public.
-#Wed Aug 26 17:24:08 CEST 2015
-apiSecret=FABRIC_API_SECRET

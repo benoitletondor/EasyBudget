@@ -19,7 +19,7 @@ package com.benoitletondor.easybudgetapp.push;
 import android.app.IntentService;
 import android.content.Intent;
 
-import com.batch.android.Batch;
+//import com.batch.android.Batch;
 import com.benoitletondor.easybudgetapp.BuildConfig;
 import com.benoitletondor.easybudgetapp.helper.Logger;
 import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
@@ -71,17 +71,17 @@ public class PushService extends IntentService
     {
         try
         {
-            if (Batch.Push.shouldDisplayPush(this, intent)) // Check that the push is valid
-            {
-                if( !shouldDisplayPush(intent) )
-                {
-                    Logger.debug("Not displaying push cause conditions are not matching");
-                    return;
-                }
-
-                // Display the notification
-                Batch.Push.displayNotification(this, intent);
-            }
+//            if (Batch.Push.shouldDisplayPush(this, intent)) // Check that the push is valid
+//            {
+//                if( !shouldDisplayPush(intent) )
+//                {
+//                    Logger.debug("Not displaying push cause conditions are not matching");
+//                    return;
+//                }
+//
+//                // Display the notification
+//                Batch.Push.displayNotification(this, intent);
+//            }
         }
         finally
         {
