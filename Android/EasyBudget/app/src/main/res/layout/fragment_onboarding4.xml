@@ -24,7 +24,7 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_vertical_margin"
                 android:paddingBottom="@dimen/activity_vertical_margin"
-                tools:context=".view.welcome.Onboarding3Fragment">
+                tools:context="com.ajapplications.budgeteerbuddy.view.welcome.Onboarding3Fragment">
 
     <ScrollView android:id="@+id/onboarding_screen4_top_layout"
         android:layout_width="match_parent"

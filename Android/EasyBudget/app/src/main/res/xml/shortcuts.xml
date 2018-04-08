@@ -8,8 +8,8 @@
         android:shortcutDisabledMessage="@string/fab_add_monthly_expense">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="com.benoitletondor.easybudgetapp"
-            android:targetClass="com.benoitletondor.easybudgetapp.view.MainActivity">
+            android:targetPackage="com.ajapplications.budgeteerbuddy"
+            android:targetClass="com.ajapplications.budgeteerbuddy.view.MainActivity">
 
             <extra
                 android:name="intent.addrecurringexpense.show"
@@ -29,8 +29,8 @@
         android:shortcutDisabledMessage="@string/fab_add_expense">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="com.benoitletondor.easybudgetapp"
-            android:targetClass="com.benoitletondor.easybudgetapp.view.MainActivity">
+            android:targetPackage="com.ajapplications.budgeteerbuddy"
+            android:targetClass="com.ajapplications.budgeteerbuddy.view.MainActivity">
 
             <extra
                 android:name="intent.addexpense.show"

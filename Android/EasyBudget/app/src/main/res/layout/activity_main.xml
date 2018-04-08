@@ -20,7 +20,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.MainActivity">
+    tools:context="com.ajapplications.budgeteerbuddy.view.MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -124,7 +124,7 @@
             fab:fab_addButtonColorNormal="@color/primary"
             fab:fab_addButtonColorPressed="@color/primary_dark"
             fab:fab_labelStyle="@style/fab_labels_style"
-            app:layout_behavior="com.benoitletondor.easybudgetapp.view.main.FloatingActionButtonBehavior"
+            app:layout_behavior="com.ajapplications.budgeteerbuddy.view.main.FloatingActionButtonBehavior"
             tools:ignore="RtlHardcoded">
 
             <com.getbase.floatingactionbutton.FloatingActionButton
