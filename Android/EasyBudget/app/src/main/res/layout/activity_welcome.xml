@@ -18,7 +18,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.WelcomeActivity">
+    tools:context="com.ajapplications.budgeteerbuddy.view.WelcomeActivity">
 
     <android.support.v4.view.ViewPager
         android:id="@+id/welcome_view_pager"
