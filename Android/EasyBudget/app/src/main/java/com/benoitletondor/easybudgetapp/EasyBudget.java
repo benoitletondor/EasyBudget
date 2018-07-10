@@ -474,7 +474,6 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
     private void setUpBatchSDK()
     {
         Batch.setConfig(new Config(BuildConfig.BATCH_API_KEY));
-        Batch.Push.setGCMSenderId(BuildConfig.GCM_SENDER_ID);
         Batch.Push.setManualDisplay(true);
         Batch.Push.setSmallIconResourceId(R.drawable.ic_push);
         Batch.Push.setNotificationsColor(ContextCompat.getColor(this, R.color.accent));

@@ -23,14 +23,8 @@
     <uses-permission android:name="com.android.vending.BILLING"/>
 
     <!-- Push -->
-    <permission
-        android:name="com.benoitletondor.easybudgetapp.permission.C2D_MESSAGE"
-        android:protectionLevel="signature"/>
-
-    <uses-permission android:name="com.benoitletondor.easybudgetapp.permission.C2D_MESSAGE"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
 
     <application
         android:name=".EasyBudget"
@@ -106,24 +100,13 @@
             android:theme="@style/AppThemeNoActionBar">
         </activity>
 
-        <!-- Batch SDK -->
-        <service android:name="com.batch.android.BatchPushService"/>
-
-        <receiver
-            android:name="com.batch.android.BatchPushReceiver"
-            android:permission="com.google.android.c2dm.permission.SEND">
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
-
-                <category android:name="com.benoitletondor.easybudgetapp"/>
-            </intent-filter>
-        </receiver>
-
+        <!-- Push -->
         <service
-            android:name="com.batch.android.BatchPushInstanceIDService"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.google.android.gms.iid.InstanceID"/>
+            android:name=".push.PushService"
+            tools:ignore="ExportedService">
+            <intent-filter
+                android:priority="999">
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
 
@@ -136,19 +119,6 @@
                 <action android:name="android.intent.action.PACKAGE_REPLACED"/>
 
                 <data android:scheme="package"/>
-            </intent-filter>
-        </receiver>
-
-        <!-- Custom Push receiver -->
-        <service android:name=".push.PushService"/>
-
-        <receiver
-            android:name=".push.PushReceiver"
-            android:permission="com.google.android.c2dm.permission.SEND">
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
-
-                <category android:name="com.benoitletondor.easybudgetapp"/>
             </intent-filter>
         </receiver>
 
