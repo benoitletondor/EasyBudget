@@ -27,3 +27,5 @@
 
 -dontwarn com.batch.android.mediation.**
 -dontwarn com.batch.android.BatchPushService
+
+-keep class com.android.vending.billing.**

@@ -21,10 +21,10 @@ import android.app.Application;
 import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
@@ -32,6 +32,12 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 
+import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.BillingClientStateListener;
+import com.android.billingclient.api.BillingFlowParams;
+import com.android.billingclient.api.Purchase;
+import com.android.billingclient.api.PurchaseHistoryResponseListener;
+import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.batch.android.Batch;
 import com.batch.android.Config;
 import com.batch.android.PushNotificationType;
@@ -41,11 +47,6 @@ import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
 import com.benoitletondor.easybudgetapp.helper.Parameters;
 import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.helper.UserHelper;
-import com.benoitletondor.easybudgetapp.iab.IabBroadcastReceiver;
-import com.benoitletondor.easybudgetapp.iab.IabHelper;
-import com.benoitletondor.easybudgetapp.iab.IabResult;
-import com.benoitletondor.easybudgetapp.iab.Inventory;
-import com.benoitletondor.easybudgetapp.iab.Purchase;
 import com.benoitletondor.easybudgetapp.notif.DailyNotifOptinService;
 import com.benoitletondor.easybudgetapp.notif.MonthlyReportNotifService;
 import com.benoitletondor.easybudgetapp.view.MainActivity;
@@ -62,6 +63,7 @@ import java.util.Calendar;
 import java.util.Currency;
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -72,7 +74,7 @@ import io.fabric.sdk.android.Fabric;
  *
  * @author Benoit LETONDOR
  */
-public class EasyBudget extends Application implements IabBroadcastReceiver.IabBroadcastListener
+public class EasyBudget extends Application implements PurchasesUpdatedListener, BillingClientStateListener, PurchaseHistoryResponseListener
 {
     /**
      * Default amount use for low money warning (can be changed in settings)
@@ -101,23 +103,16 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
     /**
      * Helper to work with iab
      */
-    private IabHelper iabHelper;
-    /**
-     * iab Broadcast Receiver
-     */
-    private IabBroadcastReceiver iabBroadcastReceiver;
+    private BillingClient iabHelper;
     /**
      * iab check status
      */
     private volatile PremiumCheckStatus iabStatus;
     /**
-     * iab inventory listener
+     * Listener for the current purchase
      */
-    private IabHelper.QueryInventoryFinishedListener inventoryListener;
-    /**
-     * Last error received by iab
-     */
-    private String iabError;
+    @Nullable
+    private PremiumPurchaseListener premiumPurchaseListener;
 
 // ------------------------------------------>
 
@@ -146,26 +141,11 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
         // Analytics
         GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
         analytics.setDryRun(!BuildConfig.ANALYTICS_ACTIVATED);
-        if( BuildConfig.DEBUG_LOG )
-        {
-            analytics.getLogger().setLogLevel(LogLevel.VERBOSE);
-        }
 
         analyticsTracker = analytics.newTracker(R.xml.analytics);
 
         // In-app billing
         setupIab();
-    }
-
-    @Override
-    public void onTerminate()
-    {
-        if (iabBroadcastReceiver != null)
-        {
-            unregisterReceiver(iabBroadcastReceiver);
-        }
-
-        super.onTerminate();
     }
 
     /**
@@ -672,80 +652,17 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
         {
             setIabStatusAndNotify(PremiumCheckStatus.INITIALIZING);
 
-            iabHelper = new IabHelper(this, BuildConfig.LICENCE_KEY);
-            iabHelper.enableDebugLogging(BuildConfig.DEBUG_LOG);
+            iabHelper = BillingClient.newBuilder(this)
+                .setListener(this)
+                .build();
 
-            inventoryListener = new IabHelper.QueryInventoryFinishedListener()
-            {
-                @Override
-                public void onQueryInventoryFinished(IabResult result, Inventory inventory)
-                {
-                    Logger.debug("iab query inventory finished.");
-
-                    // Is it a failure?
-                    if ( result.isFailure() )
-                    {
-                        Logger.error("Error while querying iab inventory: "+result);
-                        iabError = result.getMessage();
-                        setIabStatusAndNotify(PremiumCheckStatus.ERROR);
-                        return;
-                    }
-
-                    /*
-                     * Check for items we own.
-                     * TODO We should check the developer payload to see if it's correct verifyDeveloperPayload(premiumPurchase)!
-                     */
-                    Purchase premiumPurchase = inventory.getPurchase(EasyBudget.SKU_PREMIUM);
-                    setIabStatusAndNotify(premiumPurchase != null ? PremiumCheckStatus.PREMIUM : PremiumCheckStatus.NOT_PREMIUM);
-
-                    Logger.debug("iab query inventory was successful: "+iabStatus);
-                }
-            };
-
-            iabHelper.startSetup(new IabHelper.OnIabSetupFinishedListener()
-            {
-                public void onIabSetupFinished(IabResult result)
-                {
-                    Logger.debug("iab setup finished.");
-
-                    if (!result.isSuccess())
-                    {
-                        // Oh noes, there was a problem.
-                        setIabStatusAndNotify(PremiumCheckStatus.ERROR);
-                        Logger.error("Error while setting-up iab: "+result);
-                        iabError = result.getMessage();
-                        return;
-                    }
-
-                    setIabStatusAndNotify(PremiumCheckStatus.CHECKING);
-
-                    // Important: Dynamically register for broadcast messages about updated purchases.
-                    // We register the receiver here instead of as a <receiver> in the Manifest
-                    // because we always call getPurchases() at startup, so therefore we can ignore
-                    // any broadcasts sent while the app isn't running.
-                    iabBroadcastReceiver = new IabBroadcastReceiver(EasyBudget.this);
-                    IntentFilter broadcastFilter = new IntentFilter(IabBroadcastReceiver.ACTION);
-                    registerReceiver(iabBroadcastReceiver, broadcastFilter);
-
-                    // IAB is fully set up. Now, let's get an inventory of stuff we own.
-                    Logger.debug("iab setup successful. Querying inventory.");
-                    iabHelper.queryInventoryAsync(inventoryListener);
-                }
-            });
+            iabHelper.startConnection(this);
         }
         catch (Exception e)
         {
             Logger.error("Error while checking iab status", e);
             setIabStatusAndNotify(PremiumCheckStatus.ERROR);
         }
-    }
-
-    @Override
-    public void receivedBroadcast()
-    {
-        // Received a broadcast notification that the inventory of items has changed
-        Logger.debug("iab: Received broadcast notification. Querying inventory.");
-        iabHelper.queryInventoryAsync(inventoryListener);
     }
 
     /**
@@ -779,7 +696,7 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
         if( iabStatus == PremiumCheckStatus.NOT_PREMIUM )
         {
             setIabStatusAndNotify(PremiumCheckStatus.CHECKING);
-            iabHelper.queryInventoryAsync(inventoryListener);
+            iabHelper.queryPurchaseHistoryAsync(BillingClient.SkuType.INAPP, this);
         }
     }
 
@@ -810,13 +727,17 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
      * @param activity activity that started this purchase
      * @param listener listener for purchase events
      */
-    public void launchPremiumPurchaseFlow(final @NonNull Activity activity, final  @NonNull PremiumPurchaseListener listener)
+    public void launchPremiumPurchaseFlow(final @NonNull Activity activity, final @NonNull PremiumPurchaseListener listener)
     {
         if( iabStatus != PremiumCheckStatus.NOT_PREMIUM )
         {
             if( iabStatus == PremiumCheckStatus.ERROR )
             {
-                listener.onPurchaseError(iabError);
+                listener.onPurchaseError("Unable to connect to your Google account. Please restart the app and try again");
+            }
+            else if( iabStatus == PremiumCheckStatus.PREMIUM )
+            {
+                listener.onPurchaseError("You already bought Premium with that Google account. Restart the app if you don't have access to premium features.");
             }
             else
             {
@@ -826,61 +747,114 @@ public class EasyBudget extends Application implements IabBroadcastReceiver.IabB
             return;
         }
 
-        iabHelper.launchPurchaseFlow(activity, SKU_PREMIUM, 10001, new IabHelper.OnIabPurchaseFinishedListener()
-        {
-            @Override
-            public void onIabPurchaseFinished(IabResult result, Purchase purchase)
-            {
-                Logger.debug("Purchase finished: " + result + ", purchase: " + purchase);
+        premiumPurchaseListener = listener;
 
-                // if we were disposed of in the meantime, quit.
-                if (iabHelper == null) return;
-
-                if (result.isFailure())
-                {
-                    Logger.error("Error while purchasing premium: " + result);
-                    if( result.getResponse() == IabHelper.IABHELPER_USER_CANCELLED )
-                    {
-                        listener.onUserCancelled();
-                    }
-                    else
-                    {
-                        listener.onPurchaseError(result.getMessage());
-                    }
-
-                    return;
-                }
-
-                // TODO verify purchase using verifyDeveloperPayload(purchase)
-
-                Logger.debug("Purchase successful.");
-
-                if (purchase.getSku().equals(SKU_PREMIUM))
-                {
-                    iabStatus = PremiumCheckStatus.PREMIUM;
-                    listener.onPurchaseSuccess();
-                }
-                else // Should not happen but just in case
-                {
-                    listener.onPurchaseError("Unknown SKU");
-                }
-            }
-        }, null);
+        iabHelper.launchBillingFlow(activity, BillingFlowParams.newBuilder()
+            .setSku(EasyBudget.SKU_PREMIUM)
+            .setType(BillingClient.SkuType.INAPP)
+            .build());
     }
 
-    /**
-     * Should be called by the activity calling {@link #launchPremiumPurchaseFlow(Activity, PremiumPurchaseListener)}
-     * when receiving the {@link Activity#onActivityResult(int, int, Intent)} call. If this methods
-     * returns true, the activity shouldn't do anything, not even calling super.
-     *
-     * @param requestCode
-     * @param resultCode
-     * @param data
-     * @return true if the event has been handled by iab, false if the activity should handle it
-     */
-    public boolean handleActivityResult(int requestCode, int resultCode, Intent data)
+    @Override
+    public void onPurchasesUpdated(@BillingClient.BillingResponse int responseCode, @Nullable List<Purchase> purchases)
     {
-        return iabHelper.handleActivityResult(requestCode, resultCode, data);
+        final PremiumPurchaseListener listener = premiumPurchaseListener;
+        premiumPurchaseListener = null;
+
+        if( listener == null ) {
+            return;
+        }
+
+        Logger.debug("Purchase finished: " + responseCode);
+
+        if ( responseCode != BillingClient.BillingResponse.OK )
+        {
+            Logger.error("Error while purchasing premium: " + responseCode);
+            if( responseCode == BillingClient.BillingResponse.USER_CANCELED )
+            {
+                listener.onUserCancelled();
+            }
+            else
+            {
+                listener.onPurchaseError("An error occurred (status code: "+responseCode+")");
+            }
+
+            return;
+        }
+
+        Logger.debug("Purchase successful.");
+
+        if( purchases == null || purchases.size() == 0 )
+        {
+            listener.onPurchaseError("No purchased item found");
+            return;
+        }
+
+        boolean premiumBought = false;
+        for(Purchase purchase : purchases) {
+            if( EasyBudget.SKU_PREMIUM.equals(purchase.getSku()) ) {
+                premiumBought = true;
+            }
+        }
+
+        if( !premiumBought ) {
+            listener.onPurchaseError("No purchased item found");
+            return;
+        }
+
+        setIabStatusAndNotify(PremiumCheckStatus.PREMIUM);
+        listener.onPurchaseSuccess();
+    }
+
+    @Override
+    public void onBillingSetupFinished(@BillingClient.BillingResponse int responseCode)
+    {
+        Logger.debug("iab setup finished.");
+
+        if (responseCode != BillingClient.BillingResponse.OK)
+        {
+            // Oh noes, there was a problem.
+            setIabStatusAndNotify(PremiumCheckStatus.ERROR);
+            Logger.error("Error while setting-up iab: "+responseCode);
+            return;
+        }
+
+        setIabStatusAndNotify(PremiumCheckStatus.CHECKING);
+
+        iabHelper.queryPurchaseHistoryAsync(BillingClient.SkuType.INAPP, this);
+    }
+
+    @Override
+    public void onBillingServiceDisconnected()
+    {
+        // TODO ?
+    }
+
+    @Override
+    public void onPurchaseHistoryResponse(int responseCode, List<Purchase> purchasesList)
+    {
+        Logger.debug("iab query inventory finished.");
+
+        // Is it a failure?
+        if ( responseCode != BillingClient.BillingResponse.OK )
+        {
+            Logger.error("Error while querying iab inventory: "+responseCode);
+            setIabStatusAndNotify(PremiumCheckStatus.ERROR);
+            return;
+        }
+
+        boolean premium = false;
+        if (purchasesList != null) {
+            for (Purchase purchase : purchasesList) {
+                if( EasyBudget.SKU_PREMIUM.equals(purchase.getSku()) ) {
+                    premium = true;
+                }
+            }
+        }
+
+        Logger.debug("iab query inventory was successful: "+premium);
+
+        setIabStatusAndNotify(premium ? PremiumCheckStatus.PREMIUM : PremiumCheckStatus.NOT_PREMIUM);
     }
 
     //endregion

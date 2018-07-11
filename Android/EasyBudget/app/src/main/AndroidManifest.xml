@@ -116,14 +116,11 @@
 
         <receiver android:name=".notif.AppUpdateBroadcastReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.PACKAGE_REPLACED"/>
-
-                <data android:scheme="package"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
             </intent-filter>
         </receiver>
 
         <!-- Analytics -->
-        <service android:name="com.google.android.gms.analytics.CampaignTrackingService"/>
         <service
             android:name="com.google.android.gms.analytics.AnalyticsService"
             android:enabled="true"

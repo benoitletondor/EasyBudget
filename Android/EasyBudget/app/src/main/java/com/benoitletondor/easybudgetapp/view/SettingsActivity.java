@@ -81,12 +81,6 @@ public class SettingsActivity extends AppCompatActivity
     {
         super.onActivityResult(requestCode, resultCode, data);
 
-        // iab management
-        if( ((EasyBudget) getApplication()).handleActivityResult(requestCode, resultCode, data) )
-        {
-            return;
-        }
-
         if (requestCode == APP_INVITE_REQUEST)
         {
             if (resultCode == RESULT_OK)
