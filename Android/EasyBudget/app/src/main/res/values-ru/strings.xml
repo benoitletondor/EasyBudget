@@ -136,6 +136,9 @@
     <string name="setting_category_currency_change_dialog_title">Выберите свою валюту</string>
     <string name="setting_category_limit_set_button_title">Установите порог предупреждения о низком балансе (%s)</string>
     <string name="setting_category_limit_set_button_message">Изменить порог предупреждения о низком балансе</string>
+    <string name="setting_category_start_day_of_week_title">Начать недели в воскресенье</string>
+    <string name="setting_category_start_day_of_week_monday">Недели начнутся в понедельник</string>
+    <string name="setting_category_start_day_of_week_sunday">Недели начнутся в воскресенье</string>
     <string name="setting_category_app_version_message">Создано @BenoitLetondor</string>
     <string name="setting_category_share_app_title">Рассказать друзьям</string>
     <string name="setting_category_share_app_message">Приложение EasyBudget бесплатно, так почему бы не поделиться им с друзьями!</string>
@@ -244,5 +247,4 @@
     <string name="monthly_report_notif_notpremium_text">Новая функция для премиум-пользователей: Месячный отчет.\nПодбейте итог Ваших расходов и доходов за месяц. Открыть премиум-функции?</string>
     <string name="monthly_report_notif_premium_text">Доступна наовая функция: Месячный отчет.\nПодбейте итог Ваших расходов и доходов за месяц. Нажмите, чтобы попробовать</string>
     <string name="monthly_report_hint">Тсс: Отсюда Вы можете получить доступ к месячным отчетам!</string>
-
 </resources>

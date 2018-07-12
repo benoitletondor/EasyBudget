@@ -25,6 +25,11 @@
             android:title="@string/setting_category_limit_set_button_title"
             android:summary="@string/setting_category_limit_set_button_message" />
 
+        <SwitchPreference android:key="@string/setting_category_start_day_of_week_key"
+                    android:title="@string/setting_category_start_day_of_week_title"
+                    android:summaryOff="@string/setting_category_start_day_of_week_monday"
+                    android:summaryOn="@string/setting_category_start_day_of_week_sunday"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory android:key="@string/setting_category_premium_key"

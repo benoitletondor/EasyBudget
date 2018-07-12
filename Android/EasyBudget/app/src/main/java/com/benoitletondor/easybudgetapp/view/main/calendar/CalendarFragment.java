@@ -18,6 +18,7 @@ package com.benoitletondor.easybudgetapp.view.main.calendar;
 
 import com.roomorama.caldroid.CaldroidFragment;
 import com.roomorama.caldroid.CaldroidGridAdapter;
+import com.roomorama.caldroid.WeekdayArrayAdapter;
 
 import java.util.Date;
 
@@ -51,5 +52,17 @@ public class CalendarFragment extends CaldroidFragment
     public Date getSelectedDate()
     {
         return selectedDate;
+    }
+
+    public void setFirstDayOfWeek(int firstDayOfWeek)
+    {
+        if( firstDayOfWeek != startDayOfWeek )
+        {
+            startDayOfWeek = firstDayOfWeek;
+            WeekdayArrayAdapter weekdaysAdapter = getNewWeekdayAdapter(getThemeResource());
+            getWeekdayGridView().setAdapter(weekdaysAdapter);
+            nextMonth();
+            prevMonth();
+        }
     }
 }

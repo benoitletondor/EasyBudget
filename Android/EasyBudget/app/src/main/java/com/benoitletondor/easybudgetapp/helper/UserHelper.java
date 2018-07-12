@@ -19,6 +19,9 @@ package com.benoitletondor.easybudgetapp.helper;
 import android.app.Application;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import com.roomorama.caldroid.CaldroidFragment;
+
+import static com.benoitletondor.easybudgetapp.helper.ParameterKeys.FIRST_DAY_OF_WEEK;
 
 /**
  * Helper to get user status / preferences
@@ -163,5 +166,32 @@ public class UserHelper
     public static void setUserSawMonthlyReportHint(@NonNull Context context)
     {
         Parameters.getInstance(context).putBoolean(ParameterKeys.USER_SAW_MONTHLY_REPORT_HINT, true);
+    }
+
+    /**
+     * Get the first day of the week to display to the user
+     *
+     * @param context non null context
+     * @return the id of the first day of week to display
+     */
+    public static int getFirstDayOfWeek(@NonNull Context context)
+    {
+        final int currentValue = Parameters.getInstance(context).getInt(FIRST_DAY_OF_WEEK, -1);
+        if( currentValue < 1 || currentValue > 7 ) {
+            return CaldroidFragment.MONDAY;
+        }
+
+        return currentValue;
+    }
+
+    /**
+     * Set the first day of week to display to the user
+     *
+     * @param context non null context
+     * @param firstDayOfWeek the id of the first day of week to display
+     */
+    public static void setFirstDayOfWeek(@NonNull Context context,  int firstDayOfWeek)
+    {
+        Parameters.getInstance(context).putInt(FIRST_DAY_OF_WEEK, firstDayOfWeek);
     }
 }

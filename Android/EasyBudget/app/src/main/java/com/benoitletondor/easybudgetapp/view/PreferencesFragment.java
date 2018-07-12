@@ -29,6 +29,7 @@ import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
+import android.preference.SwitchPreference;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
@@ -51,6 +52,7 @@ import com.benoitletondor.easybudgetapp.notif.DailyNotifOptinService;
 import com.benoitletondor.easybudgetapp.notif.MonthlyReportNotifService;
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment;
 import com.google.android.gms.appinvite.AppInviteInvitation;
+import com.roomorama.caldroid.CaldroidFragment;
 
 import static com.benoitletondor.easybudgetapp.view.SettingsActivity.USER_GONE_PREMIUM_INTENT;
 
@@ -107,6 +109,21 @@ public class PreferencesFragment extends PreferenceFragment
             {
                 new RatingPopup(getActivity()).show(true);
                 return false;
+            }
+        });
+
+        /*
+         * Start day of week
+         */
+        final SwitchPreference firstDayOfWeekPref = (SwitchPreference) findPreference(getString(R.string.setting_category_start_day_of_week_key));
+        firstDayOfWeekPref.setChecked(UserHelper.getFirstDayOfWeek(getActivity()) == CaldroidFragment.SUNDAY);
+        firstDayOfWeekPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+        {
+            @Override
+            public boolean onPreferenceClick(Preference preference)
+            {
+                UserHelper.setFirstDayOfWeek(getActivity(), firstDayOfWeekPref.isChecked() ? CaldroidFragment.SUNDAY : CaldroidFragment.MONDAY);
+                return true;
             }
         });
 

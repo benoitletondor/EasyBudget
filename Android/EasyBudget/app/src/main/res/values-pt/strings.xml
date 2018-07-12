@@ -135,6 +135,9 @@
     <string name="setting_category_currency_change_dialog_title">Selecionar a moeda</string>
     <string name="setting_category_limit_set_button_title">Ajuste o limite de alerta de saldo baixo (%s)</string>
     <string name="setting_category_limit_set_button_message">Altere o limite a partir do qual você deseja ser avisado sobre um saldo baixo</string>
+    <string name="setting_category_start_day_of_week_title">Comece semanas no domingo</string>
+    <string name="setting_category_start_day_of_week_monday">As semanas começam na segunda-feira</string>
+    <string name="setting_category_start_day_of_week_sunday">Semanas começarão no domingo</string>
     <string name="setting_category_app_version_message">Criado por @BenoitLetondor</string>
     <string name="setting_category_share_app_title">Compartilhe com os amigos</string>
     <string name="setting_category_share_app_message">EasyBudget é gratuito, então compartilhe com os amigos!</string>

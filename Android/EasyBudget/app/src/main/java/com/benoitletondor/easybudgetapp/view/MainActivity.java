@@ -94,6 +94,7 @@ public class MainActivity extends DBActivity
     public static final int ADD_EXPENSE_ACTIVITY_CODE = 101;
     public static final int MANAGE_RECURRING_EXPENSE_ACTIVITY_CODE = 102;
     public static final int WELCOME_SCREEN_ACTIVITY_CODE = 103;
+    public static final int SETTINGS_SCREEN_ACTIVITY_CODE = 104;
     public static final String INTENT_EXPENSE_DELETED = "intent.expense.deleted";
     public static final String INTENT_RECURRING_EXPENSE_DELETED = "intent.expense.monthly.deleted";
     public static final String INTENT_SHOW_WELCOME_SCREEN = "intent.welcomscreen.show";
@@ -374,6 +375,10 @@ public class MainActivity extends DBActivity
                 finish(); // Finish activity if welcome screen is finish via back button
             }
         }
+        else if( requestCode == SETTINGS_SCREEN_ACTIVITY_CODE )
+        {
+            calendarFragment.setFirstDayOfWeek(UserHelper.getFirstDayOfWeek(this));
+        }
     }
 
     @Override
@@ -524,7 +529,7 @@ public class MainActivity extends DBActivity
         if ( id == R.id.action_settings)
         {
             Intent startIntent = new Intent(this, SettingsActivity.class);
-            ActivityCompat.startActivity(MainActivity.this, startIntent, null);
+            ActivityCompat.startActivityForResult(MainActivity.this, startIntent, SETTINGS_SCREEN_ACTIVITY_CODE, null);
 
             return true;
         }
@@ -736,7 +741,7 @@ public class MainActivity extends DBActivity
         if( intent.getBooleanExtra(INTENT_REDIRECT_TO_SETTINGS_EXTRA, false) )
         {
             Intent startIntent = new Intent(this, SettingsActivity.class);
-            ActivityCompat.startActivity(MainActivity.this, startIntent, null);
+            ActivityCompat.startActivityForResult(MainActivity.this, startIntent, SETTINGS_SCREEN_ACTIVITY_CODE, null);
         }
     }
 
@@ -776,7 +781,7 @@ public class MainActivity extends DBActivity
             Intent startIntent = new Intent(this, SettingsActivity.class);
             startIntent.putExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, true);
 
-            ActivityCompat.startActivity(this, startIntent, null);
+            ActivityCompat.startActivityForResult(this, startIntent, SETTINGS_SCREEN_ACTIVITY_CODE, null);
         }
     }
 
@@ -836,7 +841,7 @@ public class MainActivity extends DBActivity
             args.putInt(CaldroidFragment.YEAR, cal.get(Calendar.YEAR));
             args.putBoolean(CaldroidFragment.ENABLE_SWIPE, true);
             args.putBoolean(CaldroidFragment.SIX_WEEKS_IN_CALENDAR, false);
-            args.putInt(CalendarFragment.START_DAY_OF_WEEK, CalendarFragment.MONDAY);
+            args.putInt(CalendarFragment.START_DAY_OF_WEEK, UserHelper.getFirstDayOfWeek(this));
             args.putBoolean(CalendarFragment.ENABLE_CLICK_ON_DISABLED_DATES, false);
             args.putInt(CaldroidFragment.THEME_RESOURCE, R.style.caldroid_style);
 

@@ -139,6 +139,9 @@
     <string name="setting_category_currency_change_dialog_title">Select your currency</string>
     <string name="setting_category_limit_set_button_title">Set low balance warning threshold (%s)</string>
     <string name="setting_category_limit_set_button_message">Change the threshold at which you want to be warned about a low balance</string>
+    <string name="setting_category_start_day_of_week_title">Start weeks on Sunday</string>
+    <string name="setting_category_start_day_of_week_monday">First day of week: Monday</string>
+    <string name="setting_category_start_day_of_week_sunday">First day of week: Sunday</string>
     <string name="setting_category_app_version_title" translatable="false">EasyBudget %s</string>
     <string name="setting_category_app_version_message">Made by @BenoitLetondor</string>
     <string name="setting_category_share_app_title">Tell your friends</string>
@@ -281,4 +284,5 @@
     <string name="setting_category_show_notif_daily_reminder_key" translatable="false">show_daily_reminder_notif</string>
     <string name="setting_category_show_notif_monthly_notpremium_key" translatable="false">show_montly_notpremium_notif</string>
     <string name="setting_category_show_notif_monthly_premium_key" translatable="false">show_montly_premium_notif</string>
+    <string name="setting_category_start_day_of_week_key" translatable="false">start_day_of_week</string>
 </resources>

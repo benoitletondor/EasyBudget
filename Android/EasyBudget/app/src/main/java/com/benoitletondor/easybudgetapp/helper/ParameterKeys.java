@@ -128,6 +128,10 @@ public class ParameterKeys
      */
     public static final String USER_SAW_MONTHLY_REPORT_HINT = "user_saw_monthly_report_hint";
     /**
+     * First day of week to show (int)
+     */
+    public static final String FIRST_DAY_OF_WEEK = "first_day_of_week";
+    /**
      * Is the user premium from AppTurbo (bool)
      */
     public static final String APP_TURBO_PREMIUM = "appturbo_offer";
