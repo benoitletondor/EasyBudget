@@ -135,7 +135,7 @@
     <string name="setting_category_currency_change_dialog_title">Sélectionnez la monnaie</string>
     <string name="setting_category_limit_set_button_title">Ajustez le seuil d\'alerte de solde bas (%s)</string>
     <string name="setting_category_limit_set_button_message">Ajustez le seuil à partir duquel l\'app vous alertera du niveau bas de votre solde</string>
-    <string name="setting_category_start_day_of_week_title">Démarrer la semaine le Dimanche</string>
+    <string name="setting_category_start_day_of_week_title">Démarrer la semaine le dimanche</string>
     <string name="setting_category_start_day_of_week_monday">Premier jour de la semaine : Lundi</string>
     <string name="setting_category_start_day_of_week_sunday">Premier jour de la semaine : Dimanche</string>
     <string name="setting_category_app_version_message">Créé par @BenoitLetondor</string>
