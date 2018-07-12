@@ -20,7 +20,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'io.fabric.tools:gradle:1.21.6'
+        classpath 'io.fabric.tools:gradle:1.25.4'
     }
 }
 
@@ -36,15 +36,14 @@ repositories {
 }
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.3"
+    compileSdkVersion 27
 
     defaultConfig {
         applicationId "com.benoitletondor.easybudgetapp"
         minSdkVersion 16
-        targetSdkVersion 25
-        versionCode 45
-        versionName "1.5.2"
+        targetSdkVersion 27
+        versionCode 47
+        versionName "1.6.1"
         vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
@@ -55,7 +54,6 @@ android {
             buildConfigField "boolean", "ANALYTICS_ACTIVATED", "false"
             buildConfigField "boolean", "DEV_PREFERENCES", "true"
             buildConfigField "String", "LICENCE_KEY", licence_key
-            buildConfigField "String", "GCM_SENDER_ID", gcm_sender_id
         }
         release {
             buildConfigField "boolean", "DEBUG_LOG", "false"
@@ -64,7 +62,6 @@ android {
             buildConfigField "boolean", "ANALYTICS_ACTIVATED", "true"
             buildConfigField "boolean", "DEV_PREFERENCES", "false"
             buildConfigField "String", "LICENCE_KEY", licence_key
-            buildConfigField "String", "GCM_SENDER_ID", gcm_sender_id
 
             minifyEnabled true
             shrinkResources true
@@ -74,18 +71,21 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support:support-v4:25.3.1'
-    compile 'com.android.support:design:25.3.1'
-    compile 'com.android.support:recyclerview-v7:25.3.1'
-    compile 'com.android.support:percent:25.3.1'
-    compile 'com.google.android.gms:play-services-gcm:10.2.4'
-    compile 'com.google.android.gms:play-services-analytics:10.2.4'
-    compile 'com.google.android.gms:play-services-appinvite:10.2.4'
-    compile 'com.roomorama:caldroid:3.0.1'
-    compile 'com.getbase:floatingactionbutton:1.10.1'
-    compile 'me.relex:circleindicator:1.2.2@aar'
-    compile('com.crashlytics.sdk.android:crashlytics:2.6.8@aar') { transitive = true; }
-    compile 'com.batch.android:batch-sdk:1.8.0'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:support-v4:27.1.1'
+    implementation 'com.android.support:design:27.1.1'
+    implementation 'com.android.support:recyclerview-v7:27.1.1'
+    implementation 'com.android.support:percent:27.1.1'
+    implementation 'com.google.android.gms:play-services-analytics:16.0.1'
+    implementation 'com.google.android.gms:play-services-appinvite:16.0.1'
+    implementation 'com.google.firebase:firebase-core:16.0.1'
+    implementation 'com.google.firebase:firebase-messaging:17.1.0'
+    implementation 'com.android.billingclient:billing:1.1'
+    implementation 'com.roomorama:caldroid:3.0.1'
+    implementation 'com.getbase:floatingactionbutton:1.10.1'
+    implementation 'me.relex:circleindicator:1.2.2@aar'
+    implementation('com.crashlytics.sdk.android:crashlytics:2.9.4@aar') { transitive = true }
+    implementation 'com.batch.android:batch-sdk:1.12.1'
 }
+
+apply plugin: 'com.google.gms.google-services'

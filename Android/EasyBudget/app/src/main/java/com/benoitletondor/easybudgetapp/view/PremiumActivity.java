@@ -20,7 +20,6 @@ package com.benoitletondor.easybudgetapp.view;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -161,15 +160,5 @@ public class PremiumActivity extends AppCompatActivity
         }
 
         super.onBackPressed();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        // iab management
-        if( !((EasyBudget) getApplication()).handleActivityResult(requestCode, resultCode, data) )
-        {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
     }
 }

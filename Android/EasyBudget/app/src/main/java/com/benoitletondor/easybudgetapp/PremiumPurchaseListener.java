@@ -16,6 +16,10 @@
 
 package com.benoitletondor.easybudgetapp;
 
+import android.support.annotation.NonNull;
+
+import com.android.billingclient.api.BillingClient;
+
 /**
  * Listener for in-app purchase buying flow
  *
@@ -31,7 +35,7 @@ public interface PremiumPurchaseListener
     /**
      * Called when an error occurred during the iab flow
      *
-     * @param error the error description
+     * @param error the error
      */
     void onPurchaseError(String error);
 

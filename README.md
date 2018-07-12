@@ -39,9 +39,10 @@ You can contact me regarding EasyBudget using this email: [easybudget@benoitleto
 - [Baptiste Guerre](https://fr.linkedin.com/in/baptiste-guerre-65547484): spanish translations
 - [Aline Tissot](https://fr.linkedin.com/in/alinetissot): portuguese translations
 - [Julie Goaziou](https://fr.linkedin.com/in/julie-goaziou-163a6b76): spanish translations
+- [Nataliia Privezentseva](https://github.com/NataliiaPrivezentseva): russian translations
 
 ### Copyright
 
-    Copyright (C) 2016 Benoit LETONDOR. The name "EasyBudget", the app idea and assets (images, names, wordings etc...) are all under copyright.
+    Copyright (C) 2018 Benoit LETONDOR. The name "EasyBudget", the app idea and assets (images, names, wordings etc...) are all under copyright.
 
     Sources are availables under the Apache 2 licence (See LICENSE for details) and contributions will be warmely welcomed! Feel free to contribute :)

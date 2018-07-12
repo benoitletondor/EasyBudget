@@ -135,6 +135,9 @@
     <string name="setting_category_currency_change_dialog_title">Sélectionnez la monnaie</string>
     <string name="setting_category_limit_set_button_title">Ajustez le seuil d\'alerte de solde bas (%s)</string>
     <string name="setting_category_limit_set_button_message">Ajustez le seuil à partir duquel l\'app vous alertera du niveau bas de votre solde</string>
+    <string name="setting_category_start_day_of_week_title">Démarrer la semaine le dimanche</string>
+    <string name="setting_category_start_day_of_week_monday">Premier jour de la semaine : Lundi</string>
+    <string name="setting_category_start_day_of_week_sunday">Premier jour de la semaine : Dimanche</string>
     <string name="setting_category_app_version_message">Créé par @BenoitLetondor</string>
     <string name="setting_category_share_app_title">Partagez avec vos amis</string>
     <string name="setting_category_share_app_message">EasyBudget est gratuit alors aucune raison de ne pas partager l\'app avec vos amis !</string>
@@ -236,7 +239,7 @@
     <string name="revenues">Revenus</string>
     <string name="expenses_total">Total des dépenses</string>
     <string name="revenues_total">Total des revenus</string>
-    <string name="balance">Solde</string>
+    <string name="balance">Balance</string>
     <string name="monthly_report_no_entries_placeholder">Rien pour ce mois.</string>
     <string name="monthly_report_notif_notpremium_text">Nouvelle fonctionnalité premium: Récapitulatif mensuel.\nRecevez un récapitulatif de vos dépenses et revenus du mois. Découvrir le mode premium ?</string>
     <string name="monthly_report_notif_premium_text">Nouvelle fonctionnalité : Récapitulatif mensuel.\nRecevez un récapitulatif de vos dépenses et revenus du mois. Tapez pour essayer</string>

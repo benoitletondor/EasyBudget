@@ -1,0 +1,250 @@
+<!--
+   Copyright 2015 Benoit LETONDOR
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+
+<resources>
+
+    <string name="action_settings">Настройки</string>
+    <string name="action_balance">Отрегулировать текущий баланс</string>
+    <string name="fab_add_expense">Добавить расход/доход</string>
+    <string name="fab_add_monthly_expense">Добавить периодический расход/доход</string>
+    <string name="title_activity_add_expense">Добавить расход</string>
+    <string name="title_activity_add_income">Добавить доход</string>
+    <string name="title_activity_edit_expense">Редактировать расход</string>
+    <string name="title_activity_edit_income">Редактировать доход</string>
+    <string name="title_activity_recurring_expense_add">Добавить периодический расход</string>
+    <string name="title_activity_recurring_income_add">Добавить периодический доход</string>
+    <string name="title_activity_recurring_expense_edit">Редактировать периодический расход</string>
+    <string name="title_activity_monthly_income_edit">Редактировать периодический доход</string>
+    <string name="title_activity_settings">Настройки</string>
+    <string name="title_activity_welcome">EasyBudget</string>
+    <string name="title_activity_premium">Премиум</string>
+    <string name="title_activity_monthly_report">Месячный отчет</string>
+    <string name="cancel">Отменить</string>
+    <string name="undo">ОТМЕНИТЬ</string>
+    <string name="ok">ДА</string>
+    <string name="amount">Сумма ( %s )</string>
+    <string name="description">Описание</string>
+    <string name="type">Тип</string>
+    <string name="payment">Расход</string>
+    <string name="income">Доход</string>
+    <string name="date">Дата</string>
+    <string name="first_occurence">Первая запись</string>
+    <string name="no_expense_for_today">Пока нет доходов или расходов.</string>
+
+    <string name="no_description_error">Введите описание</string>
+    <string name="no_amount_error">Введите количество</string>
+    <string name="negative_amount_error">Сумма должна быть больше 0</string>
+    <string name="invalid_amount">Недопустимая сумма</string>
+
+    <string name="dialog_edit_expense_title">Что Вы хотите сделать?</string>
+    <string name="dialog_edit_income_title">Что Вы хотите сделать?</string>
+    <string-array name="dialog_edit_expense_choices">
+        <item>Редактировать расход</item>
+        <item>Удалить расход</item>
+    </string-array>
+    <string-array name="dialog_edit_income_choices">
+        <item>Редактировать доход</item>
+        <item>Удалить доход</item>
+    </string-array>
+    <string name="dialog_edit_recurring_expense_title">Периодический расход: Что Вы хотите сделать?</string>
+    <string name="dialog_edit_recurring_income_title">Периодический доход: Что Вы хотите сделать?</string>
+    <string-array name="dialog_edit_recurring_expense_choices">
+        <item>Редактировать данную запись</item>
+        <item>Удалить только данную запись</item>
+        <item>Удалить все следующие записи</item>
+        <item>Удалить все предыдущие записи</item>
+        <item>Удалить все записи</item>
+    </string-array>
+    <string-array name="dialog_edit_recurring_income_choices">
+        <item>Редактировать данную запись</item>
+        <item>Удалить только данную запись</item>
+        <item>Удалить все следующие записи</item>
+        <item>Удалить все предыдущие записи</item>
+        <item>Удалить все записи</item>
+    </string-array>
+    <string name="expense_delete_snackbar_text">Расход удален</string>
+    <string name="income_delete_snackbar_text">Доход удален</string>
+
+    <string name="adjust_balance_title">Отрегулировать текущий баланс</string>
+    <string name="adjust_balance_message">Отрегулировать текущую сумму в Вашей учетной записи</string>
+    <string name="adjust_balance_expense_title">Баланс</string>
+    <string name="adjust_balance_snackbar_text">Текущая сумма на счету %s</string>
+    <string name="account_balance_format">Баланс на %s:</string>
+    <string name="account_balance_date_format">MMM dd</string>
+    <string name="add_expense_date_format">MMM dd yyyy</string>
+    <string name="adjust_limit_warning_title">Изменить порог предупреждения для низкого баланса</string>
+    <string name="adjust_limit_warning_message">Установить пороговое значение (должно быть > 0)</string>
+    <string name="adjust_limit_warning_error_title">Ой…</string>
+    <string name="adjust_limit_warning_error_message">Введенное Вами значение не действительно. Это должно быть положительное число (больше 0)</string>
+    <string name="adjust_balance_error_title">Ой…</string>
+    <string name="adjust_balance_error_message">Введенное Вами значение не действительно.</string>
+
+    <string name="monthly">ЕЖЕМЕСЯЧНО</string>
+    <string name="weekly">ЕЖЕНЕДЕЛЬНО</string>
+    <string name="bi_weekly">ДВА РАЗА В НЕДЕЛЮ</string>
+    <string name="yearly">ЕЖЕГОДНО</string>
+    <string name="recurring_expense_add_loading_title">Загрузка</string>
+    <string name="recurring_expense_add_loading_message">Создание периодического расхода…</string>
+    <string name="recurring_income_add_loading_message">Создание периодического дохода…</string>
+    <string name="recurring_expense_add_error_title">Ой…</string>
+    <string name="recurring_expense_add_error_message">Произошла ошибка.</string>
+    <string name="recurring_expense_delete_success_message">Периодический расход успешно удален</string>
+    <string name="recurring_expense_delete_loading_title">Удаление</string>
+    <string name="recurring_expense_delete_loading_message">Удаление периодического расхода…</string>
+    <string name="recurring_expense_delete_error_title">Ой…</string>
+    <string name="recurring_expense_delete_error_message">Произошла ошибка.</string>
+    <string name="recurring_expense_restoring_loading_title">Отмена</string>
+    <string name="recurring_expense_restoring_loading_message">Восстановление удаленного периодического расхода…</string>
+    <string name="recurring_expense_restored_success_message">Периодический расход успешно восстановлен</string>
+    <string name="recurring_expense_restore_error_title">Ой…</string>
+    <string name="recurring_expense_restore_error_message">Произошла ошибка.</string>
+    <string name="recurring_expense_delete_first_error_title">Ой…</string>
+    <string name="recurring_expense_delete_first_error_message">Предыдущей записи не существует.</string>
+    <string name="expense_delete_error_title">Ой…</string>
+    <string name="expense_delete_error_message">Произошла ошибка.</string>
+
+    <string name="recurring_expense_interval">Периодичность</string>
+    <string name="recurring_interval_weekly">Еженедельно</string>
+    <string name="recurring_interval_bi_weekly">Каждые две недели</string>
+    <string name="recurring_interval_monthly">Ежемесячно</string>
+    <string name="recurring_interval_yearly">Ежегодно</string>
+    <string name="recurring_update_notification">Новая функция: теперь Вы можете добавлять еженедельные, двухнедельные и ежегодные периодические расходы!</string>
+
+    <string name="setting_category_app_title">Приложение</string>
+    <string name="setting_category_rate_button_title">Нравится приложение?</string>
+    <string name="setting_category_rate_button_message">Дайте мне знать, что Вы о нем думаете</string>
+    <string name="setting_category_bug_report_send_button_title">Сообщить об ошибке</string>
+
+    <string name="setting_category_bug_report_send_text">\n\n---\n*Пожалуйста, не удаляйте эту часть*\nEasyBudget id: %s</string>
+    <string name="setting_category_bug_report_send_error">Не удалось найти приложение для отправки сообщения об ошибке</string>
+    <string name="setting_category_general_title">Общие</string>
+    <string name="setting_category_currency_change_button_title">Изменить валюту (%s)</string>
+    <string name="setting_category_currency_change_button_message">Выберите валюту, которую Вы хотите использовать</string>
+    <string name="setting_category_currency_change_dialog_title">Выберите свою валюту</string>
+    <string name="setting_category_limit_set_button_title">Установите порог предупреждения о низком балансе (%s)</string>
+    <string name="setting_category_limit_set_button_message">Изменить порог предупреждения о низком балансе</string>
+    <string name="setting_category_start_day_of_week_title">Начать недели в воскресенье</string>
+    <string name="setting_category_start_day_of_week_monday">Недели начнутся в понедельник</string>
+    <string name="setting_category_start_day_of_week_sunday">Недели начнутся в воскресенье</string>
+    <string name="setting_category_app_version_message">Создано @BenoitLetondor</string>
+    <string name="setting_category_share_app_title">Рассказать друзьям</string>
+    <string name="setting_category_share_app_message">Приложение EasyBudget бесплатно, так почему бы не поделиться им с друзьями!</string>
+    <string name="setting_category_premium_title">Премиум</string>
+    <string name="setting_category_premium_status_title">Вы премиум-пользователь!</string>
+    <string name="setting_category_premium_status_message">У Вас есть доступ к функциям премиум</string>
+    <string name="setting_category_premium_redeem_title">Промокод</string>
+    <string name="setting_category_premium_redeem_message">Использовать промокод</string>
+    <string name="setting_category_notifications_update_title">Обновления</string>
+    <string name="setting_category_notifications_update_message">Получать уведомления о новых возможностях приложения. Я не буду Вас спамить, я обещаю!</string>
+    <string name="setting_category_notifications_daily_title">Ежедневное напоминание</string>
+    <string name="setting_category_notifications_daily_message">Получите уведомление в конце дня, если Вы не указали свои расходы</string>
+    <string name="setting_category_not_premium_status_title">Стать премиум-пользователем</string>
+    <string name="setting_category_not_premium_status_message">Получить доступ ко всем премиум-функциям</string>
+    <string name="setting_category_notifications_monthly_title">Уведомление о ежемесячном отчете</string>
+    <string name="setting_category_notifications_monthly_message">Получать уведомление, когда новый ежемесячный отчет готов</string>
+
+    <string name="premium_popup_premium_title">Вы премиум-пользователь!</string>
+    <string name="premium_popup_premium_message">У Вас есть доступ к премиум-функциям:\n\n- Ежемесячный отчет: Подбейте итог Ваших расходов и доходов за месяц\n- Ежедневное напоминание, если Вы забыли внести свои расходы в течение дня\n… больше премиум-функций будут добавлены в ближайшее время!</string>
+    <string name="premium_popup_not_premium_title">Стать премиум-пользователем</string>
+    <string name="premium_popup_not_premium_message">Получить доступ ко всем премиум-функциям!</string>
+    <string name="premium_popup_not_premium_feature1_title">2. Ежедневное напоминание</string>
+    <string name="premium_popup_not_premium_feature1_message">Получите уведомление в конце дня, если Вы не указали свои расходы.</string>
+    <string name="premium_popup_not_premium_feature2_title">1. Месячный отчет</string>
+    <string name="premium_popup_not_premium_feature2_message">Получить итог Ваших доходов и расходов за месяц и увидеть, сколько Вы съэкономили.</string>
+    <string name="premium_popup_not_premium_feature_more_title">…больше премиум-функций в ближайшее время!</string>
+    <string name="premium_popup_not_premium_cta">Купить</string>
+    <string name="premium_popup_become_title">Стать премиум-пользователем</string>
+
+    <string name="premium_popup_become_message">Похоже, Вам нравится использовать EasyBudget!\nВы бы хотели перейти на следующий уровень и открыть для себя премиум-функции?</string>
+    <string name="premium_popup_become_cta">Открыть</string>
+    <string name="premium_popup_become_not_now">Не сейчас</string>
+    <string name="premium_popup_become_not_ask_again">Не спрашивать в дальнейшем</string>
+    <string name="premium_notif_optin_message">Новая премиум-функция: Ежедневные уведомления.\nПолучите напоминание, если Вы забыли добавить свои расходы в течение дня. Подключить?\n(You can change it later in settings)</string>
+    <string name="premium_notif_optin_message_ok">Да</string>
+    <string name="premium_notif_optin_message_not_ok">Нет, спасибо</string>
+
+    <string name="iab_purchase_success_title">Спасибо</string>
+    <string name="iab_purchase_success_message">Спасибо большое за Вашу поддержку! Теперь Вы можете наслаждаться премиум-функциями.</string>
+    <string name="iab_purchase_wait_title">Покупка</string>
+    <string name="iab_purchase_wait_message">Пожалуйста, подождите</string>
+    <string name="iab_purchase_error_title">Ой…</string>
+    <string name="iab_purchase_error_message">Произошла ошибка, повторите попытку позже или свяжитесь со мной, если проблема не устранена.\n(%s)</string>
+
+    <string name="voucher_redeem_dialog_title">Промокод</string>
+    <string name="voucher_redeem_dialog_message">Введите свой промокод</string>
+    <string name="voucher_redeem_dialog_cta">Использовать</string>
+    <string name="voucher_redeem_dialog_loading_title">Использование</string>
+    <string name="voucher_redeem_dialog_loading_message">Пожалуйста, подождите</string>
+    <string name="voucher_redeem_error_dialog_title">Ой…</string>
+    <string name="voucher_redeem_error_code_invalid_dialog_message">Ваш промокод недействителен.</string>
+    <string name="voucher_redeem_error_no_internet_dialog_message">Ошибка сети. Проверьте подключение и повторите попытку.</string>
+    <string name="voucher_redeem_error_generic_dialog_message">Произошла ошибка, повторите попытку позже.</string>
+
+    <string name="rating_popup_question_title">Что Вы думаете об EasyBudget?</string>
+    <string name="rating_popup_question_message">Я разрабатываю это приложение в свободное время и предоставляю его бесплатно. Там могут быть вещи, которые нужно улучшить, и я был бы очень признателен за ваши отзывы.</string>
+    <string name="rating_popup_question_cta_negative">Мне не нравится приложение</string>
+    <string name="rating_popup_question_cta_positive">Мне нравится приложение</string>
+    <string name="rating_popup_negative_title">:(</string>
+    <string name="rating_popup_negative_message">Мне грустно это слышать. Не могли бы Вы послать мне свой отзыв?</string>
+    <string name="rating_popup_negative_cta_negative">Нет, спасибо</string>
+    <string name="rating_popup_negative_cta_positive">Конечно</string>
+    <string name="rating_popup_positive_title">:)</string>
+    <string name="rating_popup_positive_message">Я рад, что Вам нравится использовать EasyBudget. Не могли бы Вы оставить положительный отзыв в PlayStore?</string>
+    <string name="rating_popup_positive_cta_negative">Нет, спасибо</string>
+    <string name="rating_popup_positive_cta_positive">Конечно</string>
+    <string name="rating_feedback_send_error">Не удалось найти приложение для отправки письма с отзывом.</string>
+    <string name="rating_feedback_send_text"></string>
+    <string name="rating_popup_question_cta_dont_ask_again">Не спрашивать меня в будущем</string>
+
+    <string name="onboarding_screen_1_title">Добро пожаловать в EasyBudget</string>
+    <string name="onboarding_screen_1_message">Концепция проста: Вы вводите свои периодические и ежедневные расходы и доходы, и приложение отслеживает, сколько денег у Вас есть, было и будет в любой момент.\n\nВот как это просто.</string>
+    <string name="onboarding_screen_1_message2">Готовы?</string>
+    <string name="onboarding_screen_1_cta">Да!</string>
+
+    <string name="onboarding_screen_2_title">Давайте узнаем друг друга!</string>
+    <string name="onboarding_screen_2_message">Шаг 1: Какую валюту Вы используете?\n(Вы можете изменить это позже в настройках)</string>
+    <string name="onboarding_screen_2_cta">Выбрать %s</string>
+
+    <string name="onboarding_screen_3_title">Давайте узнаем друг друга!</string>
+    <string name="onboarding_screen_3_message">Шаг 2: Сколько денег сейчас на Вашем счету?\n(Вы можете изменить это позже)</string>
+    <string name="onboarding_screen_3_cta">Начать с %s</string>
+
+    <string name="onboarding_screen_4_title">Все готово!</string>
+    <string name="onboarding_screen_4_message">(Это просто, не так ли?)</string>
+    <string name="onboarding_screen_4_message2">Что Вы должны делать дальше?</string>
+    <string name="onboarding_screen_4_message3">1.Добавьте периодические расходы и доходы (зарплата, аренда, счета…)\n2. Не забывайте добавлять Ваши ежедневные расходы и доходы на протяжении дня</string>
+    <string name="onboarding_screen_4_message4">Благодарим Вас за использование EasyBudget и добро пожаловать :)</string>
+    <string name="onboarding_screen_4_cta">Начнем!</string>
+
+    <string name="app_invite_title">Рассказать друзьям!</string>
+    <string name="app_invite_message">Попробуйте EasyBudget: невероятно простое в использовании приложение для управления Вашим бюджетом!</string>
+    <!-- 100 chars or less -->
+    <string name="app_invite_welcome_title">Добро пожаловать в EasyBudget</string>
+    <string name="app_invite_welcome_message">Похоже, друг рекомендовал Вам это приложение. Добро пожаловать на борт и не забудьте поблагодарить своего друга за этот отличный совет ;)</string>
+    <string name="app_invite_welcome_cta">Начать!</string>
+
+    <string name="monthly_report_button_title">Месячный отчет</string>
+    <string name="monthly_report_month_title_format">MMMM yyyy</string>
+    <string name="expenses">Расходы</string>
+    <string name="revenues">Доходы</string>
+    <string name="expenses_total">Общая сумма расходов</string>
+    <string name="revenues_total">Общая сумма доходов</string>
+    <string name="balance">Баланс</string>
+    <string name="monthly_report_no_entries_placeholder">Ничего за этот месяц.</string>
+    <string name="monthly_report_notif_notpremium_text">Новая функция для премиум-пользователей: Месячный отчет.\nПодбейте итог Ваших расходов и доходов за месяц. Открыть премиум-функции?</string>
+    <string name="monthly_report_notif_premium_text">Доступна наовая функция: Месячный отчет.\nПодбейте итог Ваших расходов и доходов за месяц. Нажмите, чтобы попробовать</string>
+    <string name="monthly_report_hint">Тсс: Отсюда Вы можете получить доступ к месячным отчетам!</string>
+</resources>
