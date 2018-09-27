@@ -55,7 +55,6 @@ import com.benoitletondor.easybudgetapp.view.SettingsActivity;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Logger.LogLevel;
 import com.google.android.gms.analytics.Tracker;
 
 import java.net.URLEncoder;
@@ -453,7 +452,7 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
      */
     private void setUpBatchSDK()
     {
-        Batch.setConfig(new Config(BuildConfig.BATCH_API_KEY));
+        Batch.setConfig(new Config(BuildConfig.BATCH_API_KEY).setCanUseAdvertisingID(false));
         Batch.Push.setManualDisplay(true);
         Batch.Push.setSmallIconResourceId(R.drawable.ic_push);
         Batch.Push.setNotificationsColor(ContextCompat.getColor(this, R.color.accent));
