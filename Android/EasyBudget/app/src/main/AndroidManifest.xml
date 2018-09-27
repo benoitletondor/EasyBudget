@@ -35,6 +35,10 @@
         android:supportsRtl="false"
         tools:ignore="UnusedAttribute">
 
+        <!-- Disable advertising ID for GA & FCM -->
+        <meta-data android:name="google_analytics_adid_collection_enabled" android:value="false" />
+        <meta-data android:name="firebase_analytics_adid_collection_enabled" android:value="false" />
+
         <!-- Fabric.io -->
         <meta-data
             android:name="io.fabric.ApiKey"

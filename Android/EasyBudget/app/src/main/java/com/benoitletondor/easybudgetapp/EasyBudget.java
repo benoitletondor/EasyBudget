@@ -142,6 +142,7 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
         analytics.setDryRun(!BuildConfig.ANALYTICS_ACTIVATED);
 
         analyticsTracker = analytics.newTracker(R.xml.analytics);
+        analyticsTracker.enableAdvertisingIdCollection(false);
 
         // In-app billing
         setupIab();
