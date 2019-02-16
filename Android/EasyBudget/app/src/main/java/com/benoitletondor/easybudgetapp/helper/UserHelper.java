@@ -18,7 +18,7 @@ package com.benoitletondor.easybudgetapp.helper;
 
 import android.app.Application;
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.roomorama.caldroid.CaldroidFragment;
 
 import static com.benoitletondor.easybudgetapp.helper.ParameterKeys.FIRST_DAY_OF_WEEK;

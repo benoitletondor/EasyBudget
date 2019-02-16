@@ -17,8 +17,8 @@
 package com.benoitletondor.easybudgetapp.helper;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.v4.util.Pair;
+import androidx.annotation.NonNull;
+import androidx.core.util.Pair;
 
 import com.benoitletondor.easybudgetapp.R;
 

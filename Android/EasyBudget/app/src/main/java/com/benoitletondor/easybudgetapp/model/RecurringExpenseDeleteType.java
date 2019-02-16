@@ -16,7 +16,7 @@
 
 package com.benoitletondor.easybudgetapp.model;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 /**
  * An enum that reference different kind of deletion for a recurring expense
