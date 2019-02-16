@@ -16,10 +16,6 @@
 
 package com.benoitletondor.easybudgetapp;
 
-import android.support.annotation.NonNull;
-
-import com.android.billingclient.api.BillingClient;
-
 /**
  * Listener for in-app purchase buying flow
  *

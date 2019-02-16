@@ -56,10 +56,6 @@ public class ParameterKeys
      */
     public static final String NUMBER_OF_INVITATIONS = "number_of_invitations";
     /**
-     * ID of the invitation the user came with (String)
-     */
-    public static final String INVITATION_ID = "invitation_id";
-    /**
      * Source of the installation (String)
      */
     public static final String INSTALLATION_SOURCE = "installation_source";

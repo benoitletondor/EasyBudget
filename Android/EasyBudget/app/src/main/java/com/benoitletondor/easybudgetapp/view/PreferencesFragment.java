@@ -51,7 +51,6 @@ import com.benoitletondor.easybudgetapp.helper.UserHelper;
 import com.benoitletondor.easybudgetapp.notif.DailyNotifOptinService;
 import com.benoitletondor.easybudgetapp.notif.MonthlyReportNotifService;
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment;
-import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.roomorama.caldroid.CaldroidFragment;
 
 import static com.benoitletondor.easybudgetapp.view.SettingsActivity.USER_GONE_PREMIUM_INTENT;
@@ -167,16 +166,15 @@ public class PreferencesFragment extends PreferenceFragment
             {
                 try
                 {
-                    Intent intent = new AppInviteInvitation.IntentBuilder(getResources().getString(R.string.app_invite_title))
-                            .setMessage(getResources().getString(R.string.app_invite_message))
-                            .setDeepLink(Uri.parse(MainActivity.buildAppInvitesReferrerDeeplink(getActivity())))
-                            .build();
-
-                    ActivityCompat.startActivityForResult(getActivity(), intent, SettingsActivity.APP_INVITE_REQUEST, null);
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, getResources().getString(R.string.app_invite_message) + "\n" + "https://play.google.com/store/apps/details?id=com.benoitletondor.easybudgetapp");
+                    sendIntent.setType("text/plain");
+                    startActivity(sendIntent);
                 }
                 catch (Exception e)
                 {
-                    Logger.error("An error occured during app invites activity start", e);
+                    Logger.error("An error occurred during sharing app activity start", e);
                 }
 
                 return false;

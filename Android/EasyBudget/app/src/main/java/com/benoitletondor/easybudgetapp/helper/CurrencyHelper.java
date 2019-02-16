@@ -46,11 +46,6 @@ public class CurrencyHelper
      */
     private static final String[] MAIN_CURRENCIES = {"USD", "EUR", "GBP", "IRN", "AUD", "CAD", "SGD", "CHF", "MYR", "JPY", "CNY", "NZD"};
 
-    /**
-     * Static formatter, that should be used with a synchronized block
-     */
-    private static final DecimalFormat decimalFormatter = new DecimalFormat("#.00");
-
 // ----------------------------------------->
 
     /**

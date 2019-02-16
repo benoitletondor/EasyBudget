@@ -20,7 +20,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'io.fabric.tools:gradle:1.25.4'
+        classpath 'io.fabric.tools:gradle:1.27.0'
     }
 }
 
@@ -31,6 +31,7 @@ apply from: 'batch.gradle'
 apply from: 'iap.gradle'
 
 repositories {
+    google()
     maven { url 'https://maven.fabric.io/public' }
     maven { url "http://maven.batch.com/release" }
 }
@@ -76,16 +77,15 @@ dependencies {
     implementation 'com.android.support:design:27.1.1'
     implementation 'com.android.support:recyclerview-v7:27.1.1'
     implementation 'com.android.support:percent:27.1.1'
-    implementation 'com.google.android.gms:play-services-analytics:16.0.3'
-    implementation 'com.google.android.gms:play-services-appinvite:16.0.3'
-    implementation 'com.google.firebase:firebase-core:16.0.3'
-    implementation 'com.google.firebase:firebase-messaging:17.3.2'
-    implementation 'com.android.billingclient:billing:1.1'
+    implementation 'com.google.android.gms:play-services-analytics:16.0.7'
+    implementation 'com.google.firebase:firebase-core:16.0.7'
+    implementation 'com.google.firebase:firebase-messaging:17.3.4'
+    implementation 'com.android.billingclient:billing:1.2'
     implementation 'com.roomorama:caldroid:3.0.1'
     implementation 'com.getbase:floatingactionbutton:1.10.1'
     implementation 'me.relex:circleindicator:1.2.2@aar'
-    implementation('com.crashlytics.sdk.android:crashlytics:2.9.4@aar') { transitive = true }
-    implementation 'com.batch.android:batch-sdk:1.12.1'
+    implementation('com.crashlytics.sdk.android:crashlytics:2.9.9@aar') { transitive = true }
+    implementation 'com.batch.android:batch-sdk:1.13.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

@@ -68,7 +68,6 @@ import com.benoitletondor.easybudgetapp.view.main.ExpensesRecyclerViewAdapter;
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
-import com.google.android.gms.appinvite.AppInviteReferral;
 import com.roomorama.caldroid.CaldroidFragment;
 import com.roomorama.caldroid.CaldroidListener;
 
@@ -141,12 +140,6 @@ public class MainActivity extends DBActivity
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        // App invites
-        if( savedInstanceState == null && AppInviteReferral.hasReferral(getIntent()) )
-        {
-            updateInvitationStatus(getIntent());
-        }
 
         budgetLine = (TextView) findViewById(R.id.budgetLine);
         budgetLineAmount = (TextView) findViewById(R.id.budgetLineAmount);
@@ -270,13 +263,6 @@ public class MainActivity extends DBActivity
                 {
                     Intent startIntent = new Intent(MainActivity.this, WelcomeActivity.class);
                     ActivityCompat.startActivityForResult(MainActivity.this, startIntent, WELCOME_SCREEN_ACTIVITY_CODE, null);
-                }
-                else if( Intent.ACTION_VIEW.equals(intent.getAction()) ) // App invites referrer
-                {
-                    if( AppInviteReferral.hasReferral(intent) )
-                    {
-                        updateInvitationStatus(intent);
-                    }
                 }
                 else if( EasyBudget.INTENT_IAB_STATUS_CHANGED.equals(intent.getAction()) )
                 {
@@ -404,12 +390,6 @@ public class MainActivity extends DBActivity
             return;
         }
 
-        // App invites
-        if (AppInviteReferral.hasReferral(intent))
-        {
-            updateInvitationStatus(intent);
-        }
-
         openSettingsIfNeeded(intent);
         openMonthlyReportIfNeeded(intent);
         openPremiumIfNeeded(intent);
@@ -426,32 +406,6 @@ public class MainActivity extends DBActivity
     {
         try
         {
-            String invitationId = AppInviteReferral.getInvitationId(intent);
-            if( invitationId != null && !invitationId.isEmpty() )
-            {
-                Logger.debug("Installation from invitation: "+invitationId);
-
-                String existingId = Parameters.getInstance(getApplicationContext()).getString(ParameterKeys.INVITATION_ID);
-                if( existingId == null )
-                {
-                    new AlertDialog.Builder(this)
-                        .setTitle(R.string.app_invite_welcome_title)
-                        .setMessage(R.string.app_invite_welcome_message)
-                        .setPositiveButton(R.string.app_invite_welcome_cta, new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-
-                            }
-                        })
-                        .show();
-                }
-
-                Parameters.getInstance(getApplicationContext()).putString(ParameterKeys.INVITATION_ID, invitationId);
-                ((EasyBudget) getApplication()).trackInvitationId(invitationId);
-            }
-
             Uri data = intent.getData();
             String source = data.getQueryParameter("type");
             String referrer = data.getQueryParameter("referrer");
