@@ -397,48 +397,6 @@ public class MainActivity extends DBActivity
         openAddRecurringExpenseIfNeeded(intent);
     }
 
-    /**
-     * Update invitation & conversion status
-     *
-     * @param intent
-     */
-    private void updateInvitationStatus(Intent intent)
-    {
-        try
-        {
-            Uri data = intent.getData();
-            String source = data.getQueryParameter("type");
-            String referrer = data.getQueryParameter("referrer");
-
-            Logger.debug("Found conversion from source: " + source + " and referrer: " + referrer);
-
-            if( source != null )
-            {
-                Parameters.getInstance(getApplicationContext()).putString(ParameterKeys.INSTALLATION_SOURCE, source);
-            }
-
-            if( referrer != null )
-            {
-                Parameters.getInstance(getApplicationContext()).putString(ParameterKeys.INSTALLATION_REFERRER, referrer);
-            }
-        }
-        catch (Exception e)
-        {
-            Logger.error("Error while getting invitation id from intent", e);
-        }
-    }
-
-    /**
-     * Build the deeplink used for app invites invitations
-     *
-     * @param context
-     * @return
-     */
-    public static String buildAppInvitesReferrerDeeplink(@NonNull Context context)
-    {
-        return context.getResources().getString(R.string.app_invite_referral, Parameters.getInstance(context).getString(ParameterKeys.LOCAL_ID));
-    }
-
 // ------------------------------------------>
 
     @Override
