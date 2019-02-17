@@ -749,7 +749,9 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
             }
             else if( responseCode == BillingClient.BillingResponse.ITEM_ALREADY_OWNED )
             {
+                setIabStatusAndNotify(PremiumCheckStatus.PREMIUM);
                 listener.onPurchaseSuccess();
+                return;
             }
             else
             {
