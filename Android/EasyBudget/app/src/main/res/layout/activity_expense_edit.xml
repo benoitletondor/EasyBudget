@@ -23,7 +23,7 @@
     android:focusable="true"
     android:focusableInTouchMode="true">
 
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:minHeight="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
@@ -51,14 +51,14 @@
                 android:paddingLeft="30dp"
                 android:paddingRight="30dp" >
 
-                <android.support.design.widget.TextInputLayout
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/description_inputlayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:theme="@style/TextLabelDark"
                     android:layout_marginBottom="15dp" >
 
-                    <android.support.design.widget.TextInputEditText
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/description_edittext"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -67,20 +67,20 @@
                         android:hint="@string/description"
                         android:inputType="text|textCapSentences" />
 
-                </android.support.design.widget.TextInputLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
-                <android.support.percent.PercentFrameLayout
+                <androidx.percentlayout.widget.PercentFrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" >
 
-                    <android.support.design.widget.TextInputLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/amount_inputlayout"
                         android:layout_width="0dip"
                         app:layout_widthPercent="50%"
                         android:layout_height="wrap_content"
                         android:theme="@style/TextLabelDark" >
 
-                        <android.support.design.widget.TextInputEditText
+                        <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/amount_edittext"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -89,13 +89,13 @@
                             android:inputType="numberDecimal"
                             android:digits="0123456789.," />
 
-                    </android.support.design.widget.TextInputLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
 
-                </android.support.percent.PercentFrameLayout>
+                </androidx.percentlayout.widget.PercentFrameLayout>
 
             </LinearLayout>
 
-            <android.support.design.widget.FloatingActionButton
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/save_expense_fab"
                 android:layout_width="56dp"
                 android:layout_height="56dp"
@@ -138,7 +138,7 @@
                         android:paddingTop="4dp"
                         android:orientation="horizontal">
 
-                        <android.support.v7.widget.SwitchCompat
+                        <androidx.appcompat.widget.SwitchCompat
                             android:id="@+id/expense_type_switch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"

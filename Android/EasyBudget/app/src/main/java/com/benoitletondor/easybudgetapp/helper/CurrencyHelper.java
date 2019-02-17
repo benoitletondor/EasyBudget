@@ -18,11 +18,10 @@ package com.benoitletondor.easybudgetapp.helper;
 
 import android.content.Context;
 import android.os.Build;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.benoitletondor.easybudgetapp.BuildConfig;
 
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,11 +44,6 @@ public class CurrencyHelper
      * List of main currencies ISO 4217 code
      */
     private static final String[] MAIN_CURRENCIES = {"USD", "EUR", "GBP", "IRN", "AUD", "CAD", "SGD", "CHF", "MYR", "JPY", "CNY", "NZD"};
-
-    /**
-     * Static formatter, that should be used with a synchronized block
-     */
-    private static final DecimalFormat decimalFormatter = new DecimalFormat("#.00");
 
 // ----------------------------------------->
 

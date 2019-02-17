@@ -91,7 +91,7 @@
 
         </LinearLayout>
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/expensesRecyclerView"
             android:scrollbars="vertical"
             android:layout_width="match_parent"
@@ -108,7 +108,7 @@
         android:layout_height="match_parent"
         android:background="@android:color/white"/>
 
-    <android.support.design.widget.CoordinatorLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/coordinatorLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -149,7 +149,7 @@
 
         </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
-    </android.support.design.widget.CoordinatorLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <LinearLayout android:id="@+id/monthly_report_hint"
         android:layout_width="220dp"

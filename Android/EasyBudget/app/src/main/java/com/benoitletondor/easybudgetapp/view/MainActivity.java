@@ -27,17 +27,17 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -68,7 +68,6 @@ import com.benoitletondor.easybudgetapp.view.main.ExpensesRecyclerViewAdapter;
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
-import com.google.android.gms.appinvite.AppInviteReferral;
 import com.roomorama.caldroid.CaldroidFragment;
 import com.roomorama.caldroid.CaldroidListener;
 
@@ -141,12 +140,6 @@ public class MainActivity extends DBActivity
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        // App invites
-        if( savedInstanceState == null && AppInviteReferral.hasReferral(getIntent()) )
-        {
-            updateInvitationStatus(getIntent());
-        }
 
         budgetLine = (TextView) findViewById(R.id.budgetLine);
         budgetLineAmount = (TextView) findViewById(R.id.budgetLineAmount);
@@ -270,13 +263,6 @@ public class MainActivity extends DBActivity
                 {
                     Intent startIntent = new Intent(MainActivity.this, WelcomeActivity.class);
                     ActivityCompat.startActivityForResult(MainActivity.this, startIntent, WELCOME_SCREEN_ACTIVITY_CODE, null);
-                }
-                else if( Intent.ACTION_VIEW.equals(intent.getAction()) ) // App invites referrer
-                {
-                    if( AppInviteReferral.hasReferral(intent) )
-                    {
-                        updateInvitationStatus(intent);
-                    }
                 }
                 else if( EasyBudget.INTENT_IAB_STATUS_CHANGED.equals(intent.getAction()) )
                 {
@@ -404,85 +390,11 @@ public class MainActivity extends DBActivity
             return;
         }
 
-        // App invites
-        if (AppInviteReferral.hasReferral(intent))
-        {
-            updateInvitationStatus(intent);
-        }
-
         openSettingsIfNeeded(intent);
         openMonthlyReportIfNeeded(intent);
         openPremiumIfNeeded(intent);
         openAddExpenseIfNeeded(intent);
         openAddRecurringExpenseIfNeeded(intent);
-    }
-
-    /**
-     * Update invitation & conversion status
-     *
-     * @param intent
-     */
-    private void updateInvitationStatus(Intent intent)
-    {
-        try
-        {
-            String invitationId = AppInviteReferral.getInvitationId(intent);
-            if( invitationId != null && !invitationId.isEmpty() )
-            {
-                Logger.debug("Installation from invitation: "+invitationId);
-
-                String existingId = Parameters.getInstance(getApplicationContext()).getString(ParameterKeys.INVITATION_ID);
-                if( existingId == null )
-                {
-                    new AlertDialog.Builder(this)
-                        .setTitle(R.string.app_invite_welcome_title)
-                        .setMessage(R.string.app_invite_welcome_message)
-                        .setPositiveButton(R.string.app_invite_welcome_cta, new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-
-                            }
-                        })
-                        .show();
-                }
-
-                Parameters.getInstance(getApplicationContext()).putString(ParameterKeys.INVITATION_ID, invitationId);
-                ((EasyBudget) getApplication()).trackInvitationId(invitationId);
-            }
-
-            Uri data = intent.getData();
-            String source = data.getQueryParameter("type");
-            String referrer = data.getQueryParameter("referrer");
-
-            Logger.debug("Found conversion from source: " + source + " and referrer: " + referrer);
-
-            if( source != null )
-            {
-                Parameters.getInstance(getApplicationContext()).putString(ParameterKeys.INSTALLATION_SOURCE, source);
-            }
-
-            if( referrer != null )
-            {
-                Parameters.getInstance(getApplicationContext()).putString(ParameterKeys.INSTALLATION_REFERRER, referrer);
-            }
-        }
-        catch (Exception e)
-        {
-            Logger.error("Error while getting invitation id from intent", e);
-        }
-    }
-
-    /**
-     * Build the deeplink used for app invites invitations
-     *
-     * @param context
-     * @return
-     */
-    public static String buildAppInvitesReferrerDeeplink(@NonNull Context context)
-    {
-        return context.getResources().getString(R.string.app_invite_referral, Parameters.getInstance(context).getString(ParameterKeys.LOCAL_ID));
     }
 
 // ------------------------------------------>

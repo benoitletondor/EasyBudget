@@ -23,14 +23,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AlertDialog;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.appcompat.app.AlertDialog;
 
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
@@ -54,7 +54,6 @@ import com.benoitletondor.easybudgetapp.view.RatingPopup;
 import com.benoitletondor.easybudgetapp.view.SettingsActivity;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
 import java.net.URLEncoder;
@@ -146,34 +145,6 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
 
         // In-app billing
         setupIab();
-    }
-
-    /**
-     * Track that user comes from the given invitation id
-     *
-     * @param invitationId
-     */
-    public void trackInvitationId(String invitationId)
-    {
-        analyticsTracker.send(new HitBuilders.ScreenViewBuilder()
-                .setCustomDimension(1, "referral-appinvites")
-                .build());
-    }
-
-    /**
-     * Track the number of invites sent by the user
-     *
-     * @param invitationsSent
-     */
-    public void trackNumberOfInvitsSent(int invitationsSent)
-    {
-        int invitSent = Parameters.getInstance(getApplicationContext()).getInt(ParameterKeys.NUMBER_OF_INVITATIONS, 0);
-        invitSent += invitationsSent;
-        Parameters.getInstance(getApplicationContext()).putInt(ParameterKeys.NUMBER_OF_INVITATIONS, invitSent);
-
-        analyticsTracker.send(new HitBuilders.ScreenViewBuilder()
-                .setCustomMetric(1, (float) invitSent)
-                .build());
     }
 
     /**
@@ -697,6 +668,8 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
         {
             setIabStatusAndNotify(PremiumCheckStatus.CHECKING);
             iabHelper.queryPurchaseHistoryAsync(BillingClient.SkuType.INAPP, this);
+        } else if ( iabStatus == PremiumCheckStatus.ERROR ) {
+            setupIab();
         }
     }
 
@@ -774,6 +747,12 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
             {
                 listener.onUserCancelled();
             }
+            else if( responseCode == BillingClient.BillingResponse.ITEM_ALREADY_OWNED )
+            {
+                setIabStatusAndNotify(PremiumCheckStatus.PREMIUM);
+                listener.onPurchaseSuccess();
+                return;
+            }
             else
             {
                 listener.onPurchaseError("An error occurred (status code: "+responseCode+")");
@@ -827,7 +806,9 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
     @Override
     public void onBillingServiceDisconnected()
     {
-        // TODO ?
+        Logger.debug("onBillingServiceDisconnected");
+
+        setIabStatusAndNotify(PremiumCheckStatus.ERROR);
     }
 
     @Override

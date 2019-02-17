@@ -17,7 +17,7 @@
 package com.benoitletondor.easybudgetapp.view;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.benoitletondor.easybudgetapp.model.db.DB;
 
