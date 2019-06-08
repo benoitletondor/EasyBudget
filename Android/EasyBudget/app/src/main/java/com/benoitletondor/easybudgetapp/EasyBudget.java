@@ -34,9 +34,14 @@ import androidx.appcompat.app.AlertDialog;
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
 import com.android.billingclient.api.BillingFlowParams;
+import com.android.billingclient.api.BillingResult;
 import com.android.billingclient.api.Purchase;
+import com.android.billingclient.api.PurchaseHistoryRecord;
 import com.android.billingclient.api.PurchaseHistoryResponseListener;
 import com.android.billingclient.api.PurchasesUpdatedListener;
+import com.android.billingclient.api.SkuDetails;
+import com.android.billingclient.api.SkuDetailsParams;
+import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.batch.android.Batch;
 import com.batch.android.Config;
 import com.batch.android.PushNotificationType;
@@ -55,13 +60,16 @@ import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 
+import java.lang.ref.WeakReference;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Currency;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.UUID;
 
 import io.fabric.sdk.android.Fabric;
@@ -71,7 +79,7 @@ import io.fabric.sdk.android.Fabric;
  *
  * @author Benoit LETONDOR
  */
-public class EasyBudget extends Application implements PurchasesUpdatedListener, BillingClientStateListener, PurchaseHistoryResponseListener
+public class EasyBudget extends Application implements PurchasesUpdatedListener, BillingClientStateListener, PurchaseHistoryResponseListener, SkuDetailsResponseListener
 {
     /**
      * Default amount use for low money warning (can be changed in settings)
@@ -110,6 +118,11 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
      */
     @Nullable
     private PremiumPurchaseListener premiumPurchaseListener;
+    /**
+     * Activity that triggered the current purchase
+     */
+    @NonNull
+    private WeakReference<Activity> purchaseActivity = new WeakReference<>(null);
 
 // ------------------------------------------>
 
@@ -703,15 +716,114 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
         }
 
         premiumPurchaseListener = listener;
+        purchaseActivity = new WeakReference<>(activity);
 
-        iabHelper.launchBillingFlow(activity, BillingFlowParams.newBuilder()
-            .setSku(EasyBudget.SKU_PREMIUM)
-            .setType(BillingClient.SkuType.INAPP)
-            .build());
+        final List<String> skuList = new ArrayList<>(1);
+        skuList.add(EasyBudget.SKU_PREMIUM);
+
+        Logger.debug("Launching querySkuDetailsAsync");
+
+        iabHelper.querySkuDetailsAsync(
+            SkuDetailsParams.newBuilder()
+                .setSkusList(skuList)
+                .setType(BillingClient.SkuType.INAPP)
+                .build(),
+            this
+        );
     }
 
     @Override
-    public void onPurchasesUpdated(@BillingClient.BillingResponse int responseCode, @Nullable List<Purchase> purchases)
+    public void onSkuDetailsResponse(@NonNull BillingResult billingResult, List<SkuDetails> skuDetailsList)
+    {
+        Logger.debug("onSkuDetailsResponse");
+        final Activity activity = purchaseActivity.get();
+        final PremiumPurchaseListener listener = premiumPurchaseListener;
+
+        if( activity == null || listener == null ) {
+            Logger.debug("onSkuDetailsResponse: activity or listener null");
+            return;
+        }
+
+        if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK)
+        {
+            if( billingResult.getResponseCode() == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED )
+            {
+                setIabStatusAndNotify(PremiumCheckStatus.PREMIUM);
+                listener.onPurchaseSuccess();
+                return;
+            }
+
+            Objects.requireNonNull(premiumPurchaseListener).onPurchaseError("Unable to connect to reach PlayStore (response code: "+billingResult.getResponseCode()+"). Please restart the app and try again");
+            return;
+        }
+
+        if( skuDetailsList.isEmpty() )
+        {
+            Objects.requireNonNull(premiumPurchaseListener).onPurchaseError("Unable to fetch content from PlayStore (response code: skuDetailsList is empty). Please restart the app and try again");
+            return;
+        }
+
+        iabHelper.launchBillingFlow(activity, BillingFlowParams.newBuilder()
+            .setSkuDetails(skuDetailsList.get(0))
+            .build()
+        );
+    }
+
+    @Override
+    public void onBillingSetupFinished(@NonNull BillingResult billingResult)
+    {
+        Logger.debug("iab setup finished.");
+
+        if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK)
+        {
+            // Oh noes, there was a problem.
+            setIabStatusAndNotify(PremiumCheckStatus.ERROR);
+            Logger.error("Error while setting-up iab: "+billingResult.getResponseCode());
+            return;
+        }
+
+        setIabStatusAndNotify(PremiumCheckStatus.CHECKING);
+
+        iabHelper.queryPurchaseHistoryAsync(BillingClient.SkuType.INAPP, this);
+    }
+
+    @Override
+    public void onBillingServiceDisconnected()
+    {
+        Logger.debug("onBillingServiceDisconnected");
+
+        setIabStatusAndNotify(PremiumCheckStatus.ERROR);
+    }
+
+    @Override
+    public void onPurchaseHistoryResponse(@NonNull BillingResult billingResult, List<PurchaseHistoryRecord> purchaseHistoryRecordList)
+    {
+        Logger.debug("iab query inventory finished.");
+
+        // Is it a failure?
+        if ( billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK )
+        {
+            Logger.error("Error while querying iab inventory: "+billingResult.getResponseCode());
+            setIabStatusAndNotify(PremiumCheckStatus.ERROR);
+            return;
+        }
+
+        boolean premium = false;
+        if (purchaseHistoryRecordList != null) {
+            for (PurchaseHistoryRecord purchase : purchaseHistoryRecordList) {
+                if( EasyBudget.SKU_PREMIUM.equals(purchase.getSku()) ) {
+                    premium = true;
+                }
+            }
+        }
+
+        Logger.debug("iab query inventory was successful: "+premium);
+
+        setIabStatusAndNotify(premium ? PremiumCheckStatus.PREMIUM : PremiumCheckStatus.NOT_PREMIUM);
+    }
+
+    @Override
+    public void onPurchasesUpdated(@NonNull BillingResult billingResult, @Nullable List<Purchase> purchases)
     {
         final PremiumPurchaseListener listener = premiumPurchaseListener;
         premiumPurchaseListener = null;
@@ -720,16 +832,16 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
             return;
         }
 
-        Logger.debug("Purchase finished: " + responseCode);
+        Logger.debug("Purchase finished: " + billingResult.getResponseCode());
 
-        if ( responseCode != BillingClient.BillingResponse.OK )
+        if ( billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK )
         {
-            Logger.error("Error while purchasing premium: " + responseCode);
-            if( responseCode == BillingClient.BillingResponse.USER_CANCELED )
+            Logger.error("Error while purchasing premium: " + billingResult.getResponseCode());
+            if( billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED )
             {
                 listener.onUserCancelled();
             }
-            else if( responseCode == BillingClient.BillingResponse.ITEM_ALREADY_OWNED )
+            else if( billingResult.getResponseCode() == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED )
             {
                 setIabStatusAndNotify(PremiumCheckStatus.PREMIUM);
                 listener.onPurchaseSuccess();
@@ -737,7 +849,7 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
             }
             else
             {
-                listener.onPurchaseError("An error occurred (status code: "+responseCode+")");
+                listener.onPurchaseError("An error occurred (status code: "+billingResult.getResponseCode()+")");
             }
 
             return;
@@ -765,59 +877,6 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
 
         setIabStatusAndNotify(PremiumCheckStatus.PREMIUM);
         listener.onPurchaseSuccess();
-    }
-
-    @Override
-    public void onBillingSetupFinished(@BillingClient.BillingResponse int responseCode)
-    {
-        Logger.debug("iab setup finished.");
-
-        if (responseCode != BillingClient.BillingResponse.OK)
-        {
-            // Oh noes, there was a problem.
-            setIabStatusAndNotify(PremiumCheckStatus.ERROR);
-            Logger.error("Error while setting-up iab: "+responseCode);
-            return;
-        }
-
-        setIabStatusAndNotify(PremiumCheckStatus.CHECKING);
-
-        iabHelper.queryPurchaseHistoryAsync(BillingClient.SkuType.INAPP, this);
-    }
-
-    @Override
-    public void onBillingServiceDisconnected()
-    {
-        Logger.debug("onBillingServiceDisconnected");
-
-        setIabStatusAndNotify(PremiumCheckStatus.ERROR);
-    }
-
-    @Override
-    public void onPurchaseHistoryResponse(int responseCode, List<Purchase> purchasesList)
-    {
-        Logger.debug("iab query inventory finished.");
-
-        // Is it a failure?
-        if ( responseCode != BillingClient.BillingResponse.OK )
-        {
-            Logger.error("Error while querying iab inventory: "+responseCode);
-            setIabStatusAndNotify(PremiumCheckStatus.ERROR);
-            return;
-        }
-
-        boolean premium = false;
-        if (purchasesList != null) {
-            for (Purchase purchase : purchasesList) {
-                if( EasyBudget.SKU_PREMIUM.equals(purchase.getSku()) ) {
-                    premium = true;
-                }
-            }
-        }
-
-        Logger.debug("iab query inventory was successful: "+premium);
-
-        setIabStatusAndNotify(premium ? PremiumCheckStatus.PREMIUM : PremiumCheckStatus.NOT_PREMIUM);
     }
 
     //endregion
