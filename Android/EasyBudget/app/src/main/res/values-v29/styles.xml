@@ -3,11 +3,15 @@
     <!-- App theme -->
     <style name="AppTheme" parent="Base.AppTheme">
         <item name="android:forceDarkAllowed">true</item>
+
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
     <!-- App theme without ActionBar -->
     <style name="AppThemeNoActionBar" parent="Base.AppThemeNoActionBar">
         <item name="android:forceDarkAllowed">true</item>
+
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
 </resources>
