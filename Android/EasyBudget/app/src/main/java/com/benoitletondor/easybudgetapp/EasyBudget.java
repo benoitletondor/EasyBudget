@@ -620,6 +620,7 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
 
             iabHelper = BillingClient.newBuilder(this)
                 .setListener(this)
+                .enablePendingPurchases()
                 .build();
 
             iabHelper.startConnection(this);

@@ -18,20 +18,16 @@ package com.benoitletondor.easybudgetapp.view;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.app.DatePickerDialog;
 import android.os.Bundle;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.widget.SwitchCompat;
-import androidx.appcompat.widget.Toolbar;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
