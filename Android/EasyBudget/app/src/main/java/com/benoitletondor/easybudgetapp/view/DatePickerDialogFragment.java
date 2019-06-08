@@ -28,6 +28,7 @@ import com.benoitletondor.easybudgetapp.helper.Parameters;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author Benoit LETONDOR
@@ -66,7 +67,7 @@ public class DatePickerDialogFragment extends DialogFragment
         int day = c.get(Calendar.DAY_OF_MONTH);
 
         // Create a new instance of DatePickerDialog and return it
-        DatePickerDialog dialog = new DatePickerDialog(getActivity(), listener, year, month, day);
+        DatePickerDialog dialog = new DatePickerDialog(Objects.requireNonNull(getContext()), listener, year, month, day);
         dialog.getDatePicker().setMinDate(Parameters.getInstance(getActivity()).getLong(ParameterKeys.INIT_DATE, new Date().getTime()));
         return dialog;
     }

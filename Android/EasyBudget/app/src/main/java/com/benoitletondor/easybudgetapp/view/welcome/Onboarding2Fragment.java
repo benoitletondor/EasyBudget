@@ -21,6 +21,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -34,6 +36,7 @@ import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment;
 
 import java.util.Currency;
+import java.util.Objects;
 
 /**
  * Onboarding step 2 fragment
@@ -60,20 +63,13 @@ public class Onboarding2Fragment extends OnboardingFragment
 // ------------------------------------->
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_onboarding2, container, false);
 
-        nextButton = (Button) v.findViewById(R.id.onboarding_screen2_next_button);
-        nextButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                next();
-            }
-        });
+        nextButton = v.findViewById(R.id.onboarding_screen2_next_button);
+        nextButton.setOnClickListener(v1 -> next());
 
         selectedCurrency = CurrencyHelper.getUserCurrency(v.getContext());
         setNextButtonText();
@@ -101,7 +97,7 @@ public class Onboarding2Fragment extends OnboardingFragment
     @Override
     public void onDestroyView()
     {
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(receiver);
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(getContext())).unregisterReceiver(receiver);
 
         super.onDestroyView();
     }

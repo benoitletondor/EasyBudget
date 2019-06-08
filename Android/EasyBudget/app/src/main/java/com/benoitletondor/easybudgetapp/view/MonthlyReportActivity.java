@@ -18,6 +18,8 @@ package com.benoitletondor.easybudgetapp.view;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.core.content.ContextCompat;
@@ -36,6 +38,7 @@ import com.benoitletondor.easybudgetapp.view.report.MonthlyReportFragment;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Activity that displays monthly report
@@ -81,40 +84,30 @@ public class MonthlyReportActivity extends AppCompatActivity implements ViewPage
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_monthly_report);
 
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        final ProgressBar progressBar = (ProgressBar) findViewById(R.id.monthly_report_progress_bar);
+        final ProgressBar progressBar = findViewById(R.id.monthly_report_progress_bar);
         final View content = findViewById(R.id.monthly_report_content);
-        monthTitleTv = (TextView) findViewById(R.id.monthly_report_month_title_tv);
-        previousMonthButton = (Button) findViewById(R.id.monthly_report_previous_month_button);
-        nextMonthButton = (Button) findViewById(R.id.monthly_report_next_month_button);
-        pager = (ViewPager) findViewById(R.id.monthly_report_view_pager);
+        monthTitleTv = findViewById(R.id.monthly_report_month_title_tv);
+        previousMonthButton = findViewById(R.id.monthly_report_previous_month_button);
+        nextMonthButton = findViewById(R.id.monthly_report_next_month_button);
+        pager = findViewById(R.id.monthly_report_view_pager);
 
         previousMonthButton.setText("<");
         nextMonthButton.setText(">");
 
-        previousMonthButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
+        previousMonthButton.setOnClickListener(v -> {
+            if( selectedPosition > 0 )
             {
-                if( selectedPosition > 0 )
-                {
-                    selectPagerItem(selectedPosition - 1, true);
-                }
+                selectPagerItem(selectedPosition - 1, true);
             }
         });
 
-        nextMonthButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
+        nextMonthButton.setOnClickListener(v -> {
+            if( selectedPosition < dates.size() - 1 )
             {
-                if( selectedPosition < dates.size() - 1 )
-                {
-                    selectPagerItem(selectedPosition + 1, true);
-                }
+                selectPagerItem(selectedPosition + 1, true);
             }
         });
 
@@ -149,7 +142,7 @@ public class MonthlyReportActivity extends AppCompatActivity implements ViewPage
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
+    public boolean onOptionsItemSelected(@NonNull MenuItem item)
     {
         int id = item.getItemId();
 

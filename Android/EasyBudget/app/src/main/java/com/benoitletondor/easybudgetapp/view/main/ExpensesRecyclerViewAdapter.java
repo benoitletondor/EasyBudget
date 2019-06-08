@@ -52,7 +52,7 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
 {
     private List<Expense> expenses;
     private Date date;
-    private Activity activity;
+    private final Activity activity;
 
 // ------------------------------------------->
 
@@ -134,14 +134,15 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
 // ------------------------------------------>
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i)
+    @NonNull
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i)
     {
         View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.recycleview_expense_cell, viewGroup, false);
         return new ViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder viewHolder, int i)
+    public void onBindViewHolder(@NonNull final ViewHolder viewHolder, int i)
     {
         final Expense expense = expenses.get(i);
 
@@ -171,124 +172,106 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
             }
         }
 
-        final View.OnClickListener onClickListener = new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
+        final View.OnClickListener onClickListener = v -> {
+            if (expense.isRecurring())
             {
-                if (expense.isRecurring())
-                {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                    builder.setTitle(expense.isRevenue() ? R.string.dialog_edit_recurring_income_title : R.string.dialog_edit_recurring_expense_title);
-                    builder.setItems(expense.isRevenue() ? R.array.dialog_edit_recurring_income_choices : R.array.dialog_edit_recurring_expense_choices, new DialogInterface.OnClickListener()
+                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                builder.setTitle(expense.isRevenue() ? R.string.dialog_edit_recurring_income_title : R.string.dialog_edit_recurring_expense_title);
+                builder.setItems(expense.isRevenue() ? R.array.dialog_edit_recurring_income_choices : R.array.dialog_edit_recurring_expense_choices, (dialog, which) -> {
+                    switch ( which )
                     {
-                        public void onClick(DialogInterface dialog, int which)
+                        case 0: // Edit this one
                         {
-                            switch (which)
-                            {
-                                case 0: // Edit this one
-                                {
-                                    Intent startIntent = new Intent(viewHolder.view.getContext(), ExpenseEditActivity.class);
-                                    startIntent.putExtra("date", expense.getDate().getTime());
-                                    startIntent.putExtra("expense", expense);
+                            Intent startIntent = new Intent(viewHolder.view.getContext(), ExpenseEditActivity.class);
+                            startIntent.putExtra("date", expense.getDate().getTime());
+                            startIntent.putExtra("expense", expense);
 
-                                    ActivityCompat.startActivityForResult(activity, startIntent, MainActivity.ADD_EXPENSE_ACTIVITY_CODE, null);
+                            ActivityCompat.startActivityForResult(activity, startIntent, MainActivity.ADD_EXPENSE_ACTIVITY_CODE, null);
 
-                                    break;
-                                }
-                                case 1: // Delete this one
-                                {
-                                    // Send notification to inform views that this expense has been deleted
-                                    Intent intent = new Intent(MainActivity.INTENT_RECURRING_EXPENSE_DELETED);
-                                    intent.putExtra("expense", expense);
-                                    intent.putExtra("deleteType", RecurringExpenseDeleteType.ONE.getValue());
-                                    LocalBroadcastManager.getInstance(activity.getApplicationContext()).sendBroadcast(intent);
-
-                                    break;
-                                }
-                                case 2: // Delete from
-                                {
-                                    // Send notification to inform views that this expense has been deleted
-                                    Intent intent = new Intent(MainActivity.INTENT_RECURRING_EXPENSE_DELETED);
-                                    intent.putExtra("expense", expense);
-                                    intent.putExtra("deleteType", RecurringExpenseDeleteType.FROM.getValue());
-                                    LocalBroadcastManager.getInstance(activity.getApplicationContext()).sendBroadcast(intent);
-
-                                    break;
-                                }
-                                case 3: // Delete up to
-                                {
-                                    // Send notification to inform views that this expense has been deleted
-                                    Intent intent = new Intent(MainActivity.INTENT_RECURRING_EXPENSE_DELETED);
-                                    intent.putExtra("expense", expense);
-                                    intent.putExtra("deleteType", RecurringExpenseDeleteType.TO.getValue());
-                                    LocalBroadcastManager.getInstance(activity.getApplicationContext()).sendBroadcast(intent);
-
-                                    break;
-                                }
-                                case 4: // Delete all
-                                {
-                                    // Send notification to inform views that this expense has been deleted
-                                    Intent intent = new Intent(MainActivity.INTENT_RECURRING_EXPENSE_DELETED);
-                                    intent.putExtra("expense", expense);
-                                    intent.putExtra("deleteType", RecurringExpenseDeleteType.ALL.getValue());
-                                    LocalBroadcastManager.getInstance(activity.getApplicationContext()).sendBroadcast(intent);
-
-                                    break;
-                                }
-                            }
+                            break;
                         }
-                    });
-                    builder.show();
-                }
-                else
-                {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                    builder.setTitle(expense.isRevenue() ? R.string.dialog_edit_income_title : R.string.dialog_edit_expense_title);
-                    builder.setItems(expense.isRevenue() ? R.array.dialog_edit_income_choices : R.array.dialog_edit_expense_choices, new DialogInterface.OnClickListener()
-                    {
-                        public void onClick(DialogInterface dialog, int which)
+                        case 1: // Delete this one
                         {
-                            switch (which)
-                            {
-                                case 0: // Edit expense
-                                {
-                                    Intent startIntent = new Intent(viewHolder.view.getContext(), ExpenseEditActivity.class);
-                                    startIntent.putExtra("date", expense.getDate().getTime());
-                                    startIntent.putExtra("expense", expense);
+                            // Send notification to inform views that this expense has been deleted
+                            Intent intent = new Intent(MainActivity.INTENT_RECURRING_EXPENSE_DELETED);
+                            intent.putExtra("expense", expense);
+                            intent.putExtra("deleteType", RecurringExpenseDeleteType.ONE.getValue());
+                            LocalBroadcastManager.getInstance(activity.getApplicationContext()).sendBroadcast(intent);
 
-                                    ActivityCompat.startActivityForResult(activity, startIntent, MainActivity.ADD_EXPENSE_ACTIVITY_CODE, null);
-
-                                    break;
-                                }
-                                case 1: // Delete
-                                {
-                                    // Send notification to inform views that this expense has been deleted
-                                    Intent intent = new Intent(MainActivity.INTENT_EXPENSE_DELETED);
-                                    intent.putExtra("expense", expense);
-                                    LocalBroadcastManager.getInstance(activity.getApplicationContext()).sendBroadcast(intent);
-
-                                    break;
-                                }
-                            }
+                            break;
                         }
-                    });
-                    builder.show();
-                }
+                        case 2: // Delete from
+                        {
+                            // Send notification to inform views that this expense has been deleted
+                            Intent intent = new Intent(MainActivity.INTENT_RECURRING_EXPENSE_DELETED);
+                            intent.putExtra("expense", expense);
+                            intent.putExtra("deleteType", RecurringExpenseDeleteType.FROM.getValue());
+                            LocalBroadcastManager.getInstance(activity.getApplicationContext()).sendBroadcast(intent);
 
+                            break;
+                        }
+                        case 3: // Delete up to
+                        {
+                            // Send notification to inform views that this expense has been deleted
+                            Intent intent = new Intent(MainActivity.INTENT_RECURRING_EXPENSE_DELETED);
+                            intent.putExtra("expense", expense);
+                            intent.putExtra("deleteType", RecurringExpenseDeleteType.TO.getValue());
+                            LocalBroadcastManager.getInstance(activity.getApplicationContext()).sendBroadcast(intent);
+
+                            break;
+                        }
+                        case 4: // Delete all
+                        {
+                            // Send notification to inform views that this expense has been deleted
+                            Intent intent = new Intent(MainActivity.INTENT_RECURRING_EXPENSE_DELETED);
+                            intent.putExtra("expense", expense);
+                            intent.putExtra("deleteType", RecurringExpenseDeleteType.ALL.getValue());
+                            LocalBroadcastManager.getInstance(activity.getApplicationContext()).sendBroadcast(intent);
+
+                            break;
+                        }
+                    }
+                });
+                builder.show();
             }
+            else
+            {
+                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                builder.setTitle(expense.isRevenue() ? R.string.dialog_edit_income_title : R.string.dialog_edit_expense_title);
+                builder.setItems(expense.isRevenue() ? R.array.dialog_edit_income_choices : R.array.dialog_edit_expense_choices, (dialog, which) -> {
+                    switch ( which )
+                    {
+                        case 0: // Edit expense
+                        {
+                            Intent startIntent = new Intent(viewHolder.view.getContext(), ExpenseEditActivity.class);
+                            startIntent.putExtra("date", expense.getDate().getTime());
+                            startIntent.putExtra("expense", expense);
+
+                            ActivityCompat.startActivityForResult(activity, startIntent, MainActivity.ADD_EXPENSE_ACTIVITY_CODE, null);
+
+                            break;
+                        }
+                        case 1: // Delete
+                        {
+                            // Send notification to inform views that this expense has been deleted
+                            Intent intent = new Intent(MainActivity.INTENT_EXPENSE_DELETED);
+                            intent.putExtra("expense", expense);
+                            LocalBroadcastManager.getInstance(activity.getApplicationContext()).sendBroadcast(intent);
+
+                            break;
+                        }
+                    }
+                });
+                builder.show();
+            }
+
         };
 
         viewHolder.view.setOnClickListener(onClickListener);
 
-        viewHolder.view.setOnLongClickListener(new View.OnLongClickListener()
-        {
-            @Override
-            public boolean onLongClick(View v)
-            {
-                onClickListener.onClick(v);
-                return true;
-            }
+        viewHolder.view.setOnLongClickListener(v -> {
+            onClickListener.onClick(v);
+            return true;
         });
     }
 
@@ -317,11 +300,11 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
             super(v);
 
             view = v;
-            expenseTitleTextView = (TextView) v.findViewById(R.id.expense_title);
-            expenseAmountTextView = (TextView) v.findViewById(R.id.expense_amount);
-            recurringIndicator = (ViewGroup) v.findViewById(R.id.recurring_indicator);
-            recurringIndicatorTextview = (TextView) v.findViewById(R.id.recurring_indicator_textview);
-            positiveIndicator = (ImageView) v.findViewById(R.id.positive_indicator);
+            expenseTitleTextView = v.findViewById(R.id.expense_title);
+            expenseAmountTextView = v.findViewById(R.id.expense_amount);
+            recurringIndicator = v.findViewById(R.id.recurring_indicator);
+            recurringIndicatorTextview = v.findViewById(R.id.recurring_indicator_textview);
+            positiveIndicator = v.findViewById(R.id.positive_indicator);
         }
     }
 }

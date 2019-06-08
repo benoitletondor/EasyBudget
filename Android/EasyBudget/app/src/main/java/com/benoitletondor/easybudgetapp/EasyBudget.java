@@ -19,7 +19,6 @@ package com.benoitletondor.easybudgetapp;
 import android.app.Activity;
 import android.app.Application;
 import android.app.PendingIntent;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -186,13 +185,13 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
             private int activityCounter = 0;
 
             @Override
-            public void onActivityCreated(Activity activity, Bundle savedInstanceState)
+            public void onActivityCreated(@NonNull Activity activity, Bundle savedInstanceState)
             {
 
             }
 
             @Override
-            public void onActivityStarted(Activity activity)
+            public void onActivityStarted(@NonNull Activity activity)
             {
                 if (activityCounter == 0)
                 {
@@ -203,19 +202,19 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
             }
 
             @Override
-            public void onActivityResumed(Activity activity)
+            public void onActivityResumed(@NonNull Activity activity)
             {
 
             }
 
             @Override
-            public void onActivityPaused(Activity activity)
+            public void onActivityPaused(@NonNull Activity activity)
             {
 
             }
 
             @Override
-            public void onActivityStopped(Activity activity)
+            public void onActivityStopped(@NonNull Activity activity)
             {
                 if (activityCounter == 1)
                 {
@@ -226,13 +225,13 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
             }
 
             @Override
-            public void onActivitySaveInstanceState(Activity activity, Bundle outState)
+            public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState)
             {
 
             }
 
             @Override
-            public void onActivityDestroyed(Activity activity)
+            public void onActivityDestroyed(@NonNull Activity activity)
             {
 
             }
@@ -310,34 +309,17 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
                     AlertDialog dialog = new AlertDialog.Builder(activity)
                         .setTitle(R.string.premium_popup_become_title)
                         .setMessage(R.string.premium_popup_become_message)
-                        .setPositiveButton(R.string.premium_popup_become_cta, new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-                                Intent startIntent = new Intent(activity, SettingsActivity.class);
-                                startIntent.putExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, true);
-                                ActivityCompat.startActivity(activity, startIntent, null);
+                        .setPositiveButton(R.string.premium_popup_become_cta, (dialog13, which) -> {
+                            Intent startIntent = new Intent(activity, SettingsActivity.class);
+                            startIntent.putExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, true);
+                            ActivityCompat.startActivity(activity, startIntent, null);
 
-                                dialog.dismiss();
-                            }
+                            dialog13.dismiss();
                         })
-                        .setNegativeButton(R.string.premium_popup_become_not_now, new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-                                dialog.dismiss();
-                            }
-                        })
-                        .setNeutralButton(R.string.premium_popup_become_not_ask_again, new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-                                Parameters.getInstance(getApplicationContext()).putBoolean(ParameterKeys.PREMIUM_POPUP_COMPLETE, true);
-                                dialog.dismiss();
-                            }
+                        .setNegativeButton(R.string.premium_popup_become_not_now, (dialog12, which) -> dialog12.dismiss())
+                        .setNeutralButton(R.string.premium_popup_become_not_ask_again, (dialog1, which) -> {
+                            Parameters.getInstance(getApplicationContext()).putBoolean(ParameterKeys.PREMIUM_POPUP_COMPLETE, true);
+                            dialog1.dismiss();
                         })
                         .show();
 
@@ -438,43 +420,43 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks()
         {
             @Override
-            public void onActivityCreated(Activity activity, Bundle savedInstanceState)
+            public void onActivityCreated(@NonNull Activity activity, Bundle savedInstanceState)
             {
 
             }
 
             @Override
-            public void onActivityStarted(final Activity activity)
+            public void onActivityStarted(@NonNull final Activity activity)
             {
                 Batch.onStart(activity);
             }
 
             @Override
-            public void onActivityResumed(Activity activity)
+            public void onActivityResumed(@NonNull Activity activity)
             {
 
             }
 
             @Override
-            public void onActivityPaused(Activity activity)
+            public void onActivityPaused(@NonNull Activity activity)
             {
 
             }
 
             @Override
-            public void onActivityStopped(Activity activity)
+            public void onActivityStopped(@NonNull Activity activity)
             {
                 Batch.onStop(activity);
             }
 
             @Override
-            public void onActivitySaveInstanceState(Activity activity, Bundle outState)
+            public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState)
             {
 
             }
 
             @Override
-            public void onActivityDestroyed(Activity activity)
+            public void onActivityDestroyed(@NonNull Activity activity)
             {
                 Batch.onDestroy(activity);
             }

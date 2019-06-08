@@ -128,14 +128,7 @@ public class CurrencyHelper
             }
 
             List<Currency> currencies = new ArrayList<>(currencySet);
-            Collections.sort(currencies, new Comparator<Currency>()
-            {
-                @Override
-                public int compare(Currency lhs, Currency rhs)
-                {
-                    return lhs.getCurrencyCode().compareTo(rhs.getCurrencyCode());
-                }
-            });
+            Collections.sort(currencies, (lhs, rhs) -> lhs.getCurrencyCode().compareTo(rhs.getCurrencyCode()));
 
             return currencies;
         }

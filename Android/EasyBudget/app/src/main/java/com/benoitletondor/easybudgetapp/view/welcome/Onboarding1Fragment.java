@@ -23,6 +23,8 @@ import android.view.ViewGroup;
 
 import com.benoitletondor.easybudgetapp.R;
 
+import androidx.annotation.NonNull;
+
 /**
  * Onboarding step 1 fragment
  *
@@ -39,18 +41,11 @@ public class Onboarding1Fragment extends OnboardingFragment
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         View v = inflater.inflate(R.layout.fragment_onboarding1, container, false);
 
-        v.findViewById(R.id.onboarding_screen1_next_button).setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                next(v);
-            }
-        });
+        v.findViewById(R.id.onboarding_screen1_next_button).setOnClickListener(this::next);
 
         return v;
     }

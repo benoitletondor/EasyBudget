@@ -52,6 +52,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 
 public class RecurringExpenseEditActivity extends DBActivity
 {
@@ -106,9 +107,9 @@ public class RecurringExpenseEditActivity extends DBActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recurring_expense_edit);
 
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+        setSupportActionBar(findViewById(R.id.toolbar));
 
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         dateStart = new Date(getIntent().getLongExtra("dateStart", 0));
@@ -146,14 +147,13 @@ public class RecurringExpenseEditActivity extends DBActivity
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
+    public boolean onOptionsItemSelected(@NonNull MenuItem item)
     {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if( id == android.R.id.home ) // Back button of the actionbar
         {
             finish();
@@ -213,17 +213,12 @@ public class RecurringExpenseEditActivity extends DBActivity
      */
     private void setUpButtons()
     {
-        expenseType = (TextView) findViewById(R.id.expense_type_tv);
+        expenseType = findViewById(R.id.expense_type_tv);
 
-        SwitchCompat expenseTypeSwitch = (SwitchCompat) findViewById(R.id.expense_type_switch);
-        expenseTypeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
-        {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-            {
-                isRevenue = isChecked;
-                setExpenseTypeTextViewLayout();
-            }
+        SwitchCompat expenseTypeSwitch = findViewById(R.id.expense_type_switch);
+        expenseTypeSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            isRevenue = isChecked;
+            setExpenseTypeTextViewLayout();
         });
 
         // Init value to checked if already a revenue (can be true if we are editing an expense)
@@ -233,20 +228,15 @@ public class RecurringExpenseEditActivity extends DBActivity
             setExpenseTypeTextViewLayout();
         }
 
-        fab = (FloatingActionButton) findViewById(R.id.save_expense_fab);
-        fab.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
+        fab = findViewById(R.id.save_expense_fab);
+        fab.setOnClickListener(v -> {
+            if( validateInputs() )
             {
-                if( validateInputs() )
-                {
-                    double value = Double.parseDouble(amountEditText.getText().toString());
+                double value = Double.parseDouble(amountEditText.getText().toString());
 
-                    RecurringExpense expense = new RecurringExpense(descriptionEditText.getText().toString(), isRevenue? -value : value, dateStart, getRecurringTypeFromSpinnerSelection(recurringTypeSpinner.getSelectedItemPosition()));
+                RecurringExpense expense = new RecurringExpense(descriptionEditText.getText().toString(), isRevenue? -value : value, dateStart, getRecurringTypeFromSpinnerSelection(recurringTypeSpinner.getSelectedItemPosition()));
 
-                    new SaveRecurringExpenseTask().execute(expense);
-                }
+                new SaveRecurringExpenseTask().execute(expense);
             }
         });
     }
@@ -279,7 +269,7 @@ public class RecurringExpenseEditActivity extends DBActivity
     {
         ((TextInputLayout) findViewById(R.id.amount_inputlayout)).setHint(getResources().getString(R.string.amount, CurrencyHelper.getUserCurrency(this).getSymbol()));
 
-        descriptionEditText = (EditText) findViewById(R.id.description_edittext);
+        descriptionEditText = findViewById(R.id.description_edittext);
 
         if( expense != null )
         {
@@ -287,7 +277,7 @@ public class RecurringExpenseEditActivity extends DBActivity
             descriptionEditText.setSelection(descriptionEditText.getText().length()); // Put focus at the end of the text
         }
 
-        amountEditText = (EditText) findViewById(R.id.amount_edittext);
+        amountEditText = findViewById(R.id.amount_edittext);
         UIHelper.preventUnsupportedInputForDecimals(amountEditText);
 
         if( expense != null )
@@ -295,7 +285,7 @@ public class RecurringExpenseEditActivity extends DBActivity
             amountEditText.setText(CurrencyHelper.getFormattedAmountValue(Math.abs(expense.getAmount())));
         }
 
-        recurringTypeSpinner = (Spinner) findViewById(R.id.expense_type_spinner);
+        recurringTypeSpinner = findViewById(R.id.expense_type_spinner);
 
         final String[] recurringTypesString = new String[4];
         recurringTypesString[0] = getString(R.string.recurring_interval_weekly);
@@ -345,34 +335,24 @@ public class RecurringExpenseEditActivity extends DBActivity
      */
     private void setUpDateButton()
     {
-        dateButton = (Button) findViewById(R.id.date_button);
+        dateButton = findViewById(R.id.date_button);
         UIHelper.removeButtonBorder(dateButton); // Remove border on lollipop
 
         updateDateButtonDisplay();
 
-        dateButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-            DatePickerDialogFragment fragment = new DatePickerDialogFragment(dateStart, new DatePickerDialog.OnDateSetListener()
-            {
-                @Override
-                public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
-                {
-                Calendar cal = Calendar.getInstance();
+        dateButton.setOnClickListener(v -> {
+        DatePickerDialogFragment fragment = new DatePickerDialogFragment(dateStart, (view, year, monthOfYear, dayOfMonth) -> {
+            Calendar cal = Calendar.getInstance();
 
-                cal.set(Calendar.YEAR, year);
-                cal.set(Calendar.MONTH, monthOfYear);
-                cal.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            cal.set(Calendar.YEAR, year);
+            cal.set(Calendar.MONTH, monthOfYear);
+            cal.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-                dateStart = cal.getTime();
-                updateDateButtonDisplay();
-                }
-            });
+            dateStart = cal.getTime();
+            updateDateButtonDisplay();
+        });
 
-            fragment.show(getSupportFragmentManager(), "datePicker");
-            }
+        fragment.show(getSupportFragmentManager(), "datePicker");
         });
     }
 
@@ -533,14 +513,7 @@ public class RecurringExpenseEditActivity extends DBActivity
                 new AlertDialog.Builder(RecurringExpenseEditActivity.this)
                     .setTitle(R.string.recurring_expense_add_error_title)
                     .setMessage(getResources().getString(R.string.recurring_expense_add_error_message))
-                    .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener()
-                    {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which)
-                        {
-                            dialog.dismiss();
-                        }
-                    })
+                    .setNegativeButton(R.string.ok, (dialog, which) -> dialog.dismiss())
                     .show();
             }
         }

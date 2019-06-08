@@ -69,7 +69,8 @@ public class SelectCurrencyRecyclerViewAdapter extends RecyclerView.Adapter<Sele
 // ---------------------------------------->
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
+    @NonNull
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
     {
         if( viewType == TYPE_MAIN_CURRENCY || viewType == TYPE_SECONDARY_CURRENCY )
         {
@@ -84,7 +85,7 @@ public class SelectCurrencyRecyclerViewAdapter extends RecyclerView.Adapter<Sele
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position)
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position)
     {
         if( !holder.separator )
         {
@@ -94,22 +95,17 @@ public class SelectCurrencyRecyclerViewAdapter extends RecyclerView.Adapter<Sele
 
             holder.selectedIndicator.setVisibility(userCurrency ? View.VISIBLE : View.INVISIBLE);
             holder.currencyTitle.setText(CurrencyHelper.getCurrencyDisplayName(currency));
-            holder.view.setOnClickListener(new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View v)
-                {
-                    // Set the currency
-                    CurrencyHelper.setUserCurrency(v.getContext(), currency);
-                    // Reload date to change the checkmark
-                    notifyDataSetChanged();
+            holder.view.setOnClickListener(v -> {
+                // Set the currency
+                CurrencyHelper.setUserCurrency(v.getContext(), currency);
+                // Reload date to change the checkmark
+                notifyDataSetChanged();
 
-                    // Broadcast the intent
-                    Intent intent = new Intent(SelectCurrencyFragment.CURRENCY_SELECTED_INTENT);
-                    intent.putExtra(SelectCurrencyFragment.CURRENCY_ISO_EXTRA, currency.getCurrencyCode());
+                // Broadcast the intent
+                Intent intent = new Intent(SelectCurrencyFragment.CURRENCY_SELECTED_INTENT);
+                intent.putExtra(SelectCurrencyFragment.CURRENCY_ISO_EXTRA, currency.getCurrencyCode());
 
-                    LocalBroadcastManager.getInstance(v.getContext()).sendBroadcast(intent);
-                }
+                LocalBroadcastManager.getInstance(v.getContext()).sendBroadcast(intent);
             });
         }
     }
@@ -155,8 +151,8 @@ public class SelectCurrencyRecyclerViewAdapter extends RecyclerView.Adapter<Sele
 
     public static class ViewHolder extends RecyclerView.ViewHolder
     {
-        public boolean separator;
-        public int type;
+        public final boolean separator;
+        public final int type;
 
         public View view;
         public TextView currencyTitle;
@@ -172,8 +168,8 @@ public class SelectCurrencyRecyclerViewAdapter extends RecyclerView.Adapter<Sele
             if( !separator )
             {
                 view = v;
-                currencyTitle = (TextView) v.findViewById(R.id.currency_cell_title_tv);
-                selectedIndicator = (ImageView) v.findViewById(R.id.currency_cell_selected_indicator_iv);
+                currencyTitle = v.findViewById(R.id.currency_cell_title_tv);
+                selectedIndicator = v.findViewById(R.id.currency_cell_selected_indicator_iv);
             }
         }
 

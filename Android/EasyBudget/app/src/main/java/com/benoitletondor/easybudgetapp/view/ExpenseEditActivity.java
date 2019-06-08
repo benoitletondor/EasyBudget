@@ -22,6 +22,8 @@ import android.app.DatePickerDialog;
 import android.os.Bundle;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
+
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
@@ -42,6 +44,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Activity to add a new expense
@@ -91,9 +94,9 @@ public class ExpenseEditActivity extends DBActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_expense_edit);
 
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+        setSupportActionBar(findViewById(R.id.toolbar));
 
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         date = new Date(getIntent().getLongExtra("date", 0));
@@ -101,7 +104,7 @@ public class ExpenseEditActivity extends DBActivity
         if ( isEdit() )
         {
             expense = getIntent().getParcelableExtra("expense");
-            isRevenue = expense.isRevenue();
+            isRevenue = Objects.requireNonNull(expense).isRevenue();
             date = expense.getDate();
 
             setTitle(isRevenue ? R.string.title_activity_edit_income : R.string.title_activity_edit_expense);
@@ -135,7 +138,7 @@ public class ExpenseEditActivity extends DBActivity
 // ----------------------------------->
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
+    public boolean onOptionsItemSelected(@NonNull MenuItem item)
     {
         int id = item.getItemId();
 
@@ -208,17 +211,12 @@ public class ExpenseEditActivity extends DBActivity
      */
     private void setUpButtons()
     {
-        expenseType = (TextView) findViewById(R.id.expense_type_tv);
+        expenseType = findViewById(R.id.expense_type_tv);
 
-        SwitchCompat expenseTypeSwitch = (SwitchCompat) findViewById(R.id.expense_type_switch);
-        expenseTypeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
-        {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-            {
-                isRevenue = isChecked;
-                setExpenseTypeTextViewLayout();
-            }
+        SwitchCompat expenseTypeSwitch = findViewById(R.id.expense_type_switch);
+        expenseTypeSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            isRevenue = isChecked;
+            setExpenseTypeTextViewLayout();
         });
 
         // Init value to checked if already a revenue (can be true if we are editing an expense)
@@ -228,34 +226,29 @@ public class ExpenseEditActivity extends DBActivity
             setExpenseTypeTextViewLayout();
         }
 
-        fab = (FloatingActionButton) findViewById(R.id.save_expense_fab);
-        fab.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
+        fab = findViewById(R.id.save_expense_fab);
+        fab.setOnClickListener(v -> {
+            if (validateInputs())
             {
-                if (validateInputs())
+                double value = Double.parseDouble(amountEditText.getText().toString());
+
+                Expense expenseToSave;
+                if (expense == null)
                 {
-                    double value = Double.parseDouble(amountEditText.getText().toString());
-
-                    Expense expenseToSave;
-                    if (expense == null)
-                    {
-                        expenseToSave = new Expense(descriptionEditText.getText().toString(), isRevenue ? -value : value, date);
-                    }
-                    else
-                    {
-                        expenseToSave = expense;
-                        expenseToSave.setTitle(descriptionEditText.getText().toString());
-                        expenseToSave.setAmount(isRevenue ? -value : value);
-                        expenseToSave.setDate(date);
-                    }
-
-                    db.persistExpense(expenseToSave);
-
-                    setResult(RESULT_OK);
-                    finish();
+                    expenseToSave = new Expense(descriptionEditText.getText().toString(), isRevenue ? -value : value, date);
                 }
+                else
+                {
+                    expenseToSave = expense;
+                    expenseToSave.setTitle(descriptionEditText.getText().toString());
+                    expenseToSave.setAmount(isRevenue ? -value : value);
+                    expenseToSave.setDate(date);
+                }
+
+                db.persistExpense(expenseToSave);
+
+                setResult(RESULT_OK);
+                finish();
             }
         });
     }
@@ -288,7 +281,7 @@ public class ExpenseEditActivity extends DBActivity
     {
         ((TextInputLayout) findViewById(R.id.amount_inputlayout)).setHint(getResources().getString(R.string.amount, CurrencyHelper.getUserCurrency(this).getSymbol()));
 
-        descriptionEditText = (EditText) findViewById(R.id.description_edittext);
+        descriptionEditText = findViewById(R.id.description_edittext);
 
         if( expense != null )
         {
@@ -296,7 +289,7 @@ public class ExpenseEditActivity extends DBActivity
             descriptionEditText.setSelection(descriptionEditText.getText().length()); // Put focus at the end of the text
         }
 
-        amountEditText = (EditText) findViewById(R.id.amount_edittext);
+        amountEditText = findViewById(R.id.amount_edittext);
         UIHelper.preventUnsupportedInputForDecimals(amountEditText);
 
         if( expense != null )
@@ -310,34 +303,24 @@ public class ExpenseEditActivity extends DBActivity
      */
     private void setUpDateButton()
     {
-        dateButton = (Button) findViewById(R.id.date_button);
+        dateButton = findViewById(R.id.date_button);
         UIHelper.removeButtonBorder(dateButton); // Remove border on lollipop
 
         updateDateButtonDisplay();
 
-        dateButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                DatePickerDialogFragment fragment = new DatePickerDialogFragment(date, new DatePickerDialog.OnDateSetListener()
-                {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
-                    {
-                        Calendar cal = Calendar.getInstance();
+        dateButton.setOnClickListener(v -> {
+            DatePickerDialogFragment fragment = new DatePickerDialogFragment(date, (view, year, monthOfYear, dayOfMonth) -> {
+                Calendar cal = Calendar.getInstance();
 
-                        cal.set(Calendar.YEAR, year);
-                        cal.set(Calendar.MONTH, monthOfYear);
-                        cal.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                cal.set(Calendar.YEAR, year);
+                cal.set(Calendar.MONTH, monthOfYear);
+                cal.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-                        date = cal.getTime();
-                        updateDateButtonDisplay();
-                    }
-                });
+                date = cal.getTime();
+                updateDateButtonDisplay();
+            });
 
-                fragment.show(getSupportFragmentManager(), "datePicker");
-            }
+            fragment.show(getSupportFragmentManager(), "datePicker");
         });
     }
 

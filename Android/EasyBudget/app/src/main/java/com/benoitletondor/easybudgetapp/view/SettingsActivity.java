@@ -19,11 +19,15 @@ package com.benoitletondor.easybudgetapp.view;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import com.benoitletondor.easybudgetapp.R;
+
+import java.util.Objects;
 
 /**
  * Activity that displays settings using the {@link PreferencesFragment}
@@ -51,16 +55,15 @@ public class SettingsActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
+    public boolean onOptionsItemSelected(@NonNull MenuItem item)
     {
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if( id == android.R.id.home ) // Back button of the actionbar
         {
             finish();

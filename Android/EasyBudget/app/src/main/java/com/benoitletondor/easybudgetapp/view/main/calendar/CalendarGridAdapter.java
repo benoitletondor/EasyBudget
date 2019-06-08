@@ -228,8 +228,8 @@ public class CalendarGridAdapter extends CaldroidGridAdapter
         View v = LayoutInflater.from(context).inflate(R.layout.custom_grid_cell, parent, false);
         ViewData viewData = new ViewData();
 
-        viewData.dayTextView = (TextView) v.findViewById(R.id.grid_cell_tv1);
-        viewData.amountTextView = (TextView) v.findViewById(R.id.grid_cell_tv2);
+        viewData.dayTextView = v.findViewById(R.id.grid_cell_tv1);
+        viewData.amountTextView = v.findViewById(R.id.grid_cell_tv2);
 
         v.setTag(viewData);
 

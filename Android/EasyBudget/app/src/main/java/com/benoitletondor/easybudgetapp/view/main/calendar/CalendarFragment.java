@@ -21,6 +21,7 @@ import com.roomorama.caldroid.CaldroidGridAdapter;
 import com.roomorama.caldroid.WeekdayArrayAdapter;
 
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author Benoit LETONDOR
@@ -34,7 +35,7 @@ public class CalendarFragment extends CaldroidFragment
     @Override
     public CaldroidGridAdapter getNewDatesGridAdapter(int month, int year)
     {
-        return new CalendarGridAdapter(getActivity(), month, year, getCaldroidData(), extraData);
+        return new CalendarGridAdapter(Objects.requireNonNull(getContext()), month, year, getCaldroidData(), extraData);
     }
 
     @Override

@@ -53,6 +53,8 @@ import com.benoitletondor.easybudgetapp.notif.MonthlyReportNotifService;
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment;
 import com.roomorama.caldroid.CaldroidFragment;
 
+import java.util.Objects;
+
 import static com.benoitletondor.easybudgetapp.view.SettingsActivity.USER_GONE_PREMIUM_INTENT;
 
 /**
@@ -101,14 +103,9 @@ public class PreferencesFragment extends PreferenceFragment
         /*
          * Rating button
          */
-        findPreference(getResources().getString(R.string.setting_category_rate_button_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
-        {
-            @Override
-            public boolean onPreferenceClick(Preference preference)
-            {
-                new RatingPopup(getActivity()).show(true);
-                return false;
-            }
+        findPreference(getResources().getString(R.string.setting_category_rate_button_key)).setOnPreferenceClickListener(preference -> {
+            new RatingPopup(getActivity()).show(true);
+            return false;
         });
 
         /*
@@ -116,69 +113,54 @@ public class PreferencesFragment extends PreferenceFragment
          */
         final SwitchPreference firstDayOfWeekPref = (SwitchPreference) findPreference(getString(R.string.setting_category_start_day_of_week_key));
         firstDayOfWeekPref.setChecked(UserHelper.getFirstDayOfWeek(getActivity()) == CaldroidFragment.SUNDAY);
-        firstDayOfWeekPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
-        {
-            @Override
-            public boolean onPreferenceClick(Preference preference)
-            {
-                UserHelper.setFirstDayOfWeek(getActivity(), firstDayOfWeekPref.isChecked() ? CaldroidFragment.SUNDAY : CaldroidFragment.MONDAY);
-                return true;
-            }
+        firstDayOfWeekPref.setOnPreferenceClickListener(preference -> {
+            UserHelper.setFirstDayOfWeek(getActivity(), firstDayOfWeekPref.isChecked() ? CaldroidFragment.SUNDAY : CaldroidFragment.MONDAY);
+            return true;
         });
 
         /*
          * Bind bug report button
          */
-        findPreference(getResources().getString(R.string.setting_category_bug_report_send_button_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
-        {
-            @Override
-            public boolean onPreferenceClick(Preference preference)
+        findPreference(getResources().getString(R.string.setting_category_bug_report_send_button_key)).setOnPreferenceClickListener(preference -> {
+            String localId = Parameters.getInstance(getActivity()).getString(ParameterKeys.LOCAL_ID);
+
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SENDTO);
+            sendIntent.setData(Uri.parse("mailto:")); // only email apps should handle this
+            sendIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{getResources().getString(R.string.bug_report_email)});
+            sendIntent.putExtra(Intent.EXTRA_TEXT, getResources().getString(R.string.setting_category_bug_report_send_text, localId));
+            sendIntent.putExtra(Intent.EXTRA_SUBJECT, getResources().getString(R.string.setting_category_bug_report_send_subject));
+
+            if (sendIntent.resolveActivity(getActivity().getPackageManager()) != null)
             {
-                String localId = Parameters.getInstance(getActivity()).getString(ParameterKeys.LOCAL_ID);
-
-                Intent sendIntent = new Intent();
-                sendIntent.setAction(Intent.ACTION_SENDTO);
-                sendIntent.setData(Uri.parse("mailto:")); // only email apps should handle this
-                sendIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{getResources().getString(R.string.bug_report_email)});
-                sendIntent.putExtra(Intent.EXTRA_TEXT, getResources().getString(R.string.setting_category_bug_report_send_text, localId));
-                sendIntent.putExtra(Intent.EXTRA_SUBJECT, getResources().getString(R.string.setting_category_bug_report_send_subject));
-
-                if (sendIntent.resolveActivity(getActivity().getPackageManager()) != null)
-                {
-                    startActivity(sendIntent);
-                }
-                else
-                {
-                    Toast.makeText(getActivity(), getResources().getString(R.string.setting_category_bug_report_send_error), Toast.LENGTH_SHORT).show();
-                }
-
-                return false;
+                startActivity(sendIntent);
             }
+            else
+            {
+                Toast.makeText(getActivity(), getResources().getString(R.string.setting_category_bug_report_send_error), Toast.LENGTH_SHORT).show();
+            }
+
+            return false;
         });
 
         /*
          * Share app
          */
-        findPreference(getResources().getString(R.string.setting_category_share_app_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
-        {
-            @Override
-            public boolean onPreferenceClick(Preference preference)
+        findPreference(getResources().getString(R.string.setting_category_share_app_key)).setOnPreferenceClickListener(preference -> {
+            try
             {
-                try
-                {
-                    Intent sendIntent = new Intent();
-                    sendIntent.setAction(Intent.ACTION_SEND);
-                    sendIntent.putExtra(Intent.EXTRA_TEXT, getResources().getString(R.string.app_invite_message) + "\n" + "https://play.google.com/store/apps/details?id=com.benoitletondor.easybudgetapp");
-                    sendIntent.setType("text/plain");
-                    startActivity(sendIntent);
-                }
-                catch (Exception e)
-                {
-                    Logger.error("An error occurred during sharing app activity start", e);
-                }
-
-                return false;
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, getResources().getString(R.string.app_invite_message) + "\n" + "https://play.google.com/store/apps/details?id=com.benoitletondor.easybudgetapp");
+                sendIntent.setType("text/plain");
+                startActivity(sendIntent);
             }
+            catch (Exception e)
+            {
+                Logger.error("An error occurred during sharing app activity start", e);
+            }
+
+            return false;
         });
 
         /*
@@ -186,33 +168,23 @@ public class PreferencesFragment extends PreferenceFragment
          */
         final Preference appVersionPreference = findPreference(getResources().getString(R.string.setting_category_app_version_key));
         appVersionPreference.setTitle(getResources().getString(R.string.setting_category_app_version_title, BuildConfig.VERSION_NAME));
-        appVersionPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
-        {
-            @Override
-            public boolean onPreferenceClick(Preference preference)
-            {
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse("https://twitter.com/BenoitLetondor"));
-                getActivity().startActivity(i);
+        appVersionPreference.setOnPreferenceClickListener(preference -> {
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse("https://twitter.com/BenoitLetondor"));
+            getActivity().startActivity(i);
 
-                return false;
-            }
+            return false;
         });
 
         /*
          * Currency change button
          */
         final Preference currencyPreference = findPreference(getResources().getString(R.string.setting_category_currency_change_button_key));
-        currencyPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
-        {
-            @Override
-            public boolean onPreferenceClick(Preference preference)
-            {
-                selectCurrencyDialog = new SelectCurrencyFragment();
-                selectCurrencyDialog.show(((SettingsActivity) getActivity()).getSupportFragmentManager(), "SelectCurrency");
+        currencyPreference.setOnPreferenceClickListener(preference -> {
+            selectCurrencyDialog = new SelectCurrencyFragment();
+            selectCurrencyDialog.show(((SettingsActivity) getActivity()).getSupportFragmentManager(), "SelectCurrency");
 
-                return false;
-            }
+            return false;
         });
         setCurrencyPreferenceTitle(currencyPreference);
 
@@ -220,84 +192,54 @@ public class PreferencesFragment extends PreferenceFragment
          * Warning limit button
          */
         final Preference limitWarningPreference = findPreference(getResources().getString(R.string.setting_category_limit_set_button_key));
-        limitWarningPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
-        {
-            @Override
-            public boolean onPreferenceClick(Preference preference)
-            {
-                View dialogView = getActivity().getLayoutInflater().inflate(R.layout.dialog_set_warning_limit, null);
-                final EditText limitEditText = (EditText) dialogView.findViewById(R.id.warning_limit);
-                limitEditText.setText(String.valueOf(Parameters.getInstance(getActivity()).getInt(ParameterKeys.LOW_MONEY_WARNING_AMOUNT, EasyBudget.DEFAULT_LOW_MONEY_WARNING_AMOUNT)));
-                limitEditText.setSelection(limitEditText.getText().length()); // Put focus at the end of the text
+        limitWarningPreference.setOnPreferenceClickListener(preference -> {
+            View dialogView = getActivity().getLayoutInflater().inflate(R.layout.dialog_set_warning_limit, null);
+            final EditText limitEditText = (EditText) dialogView.findViewById(R.id.warning_limit);
+            limitEditText.setText(String.valueOf(Parameters.getInstance(getActivity()).getInt(ParameterKeys.LOW_MONEY_WARNING_AMOUNT, EasyBudget.DEFAULT_LOW_MONEY_WARNING_AMOUNT)));
+            limitEditText.setSelection(limitEditText.getText().length()); // Put focus at the end of the text
 
-                final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setTitle(R.string.adjust_limit_warning_title);
-                builder.setMessage(R.string.adjust_limit_warning_message);
-                builder.setView(dialogView);
-                builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener()
+            final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle(R.string.adjust_limit_warning_title);
+            builder.setMessage(R.string.adjust_limit_warning_message);
+            builder.setView(dialogView);
+            builder.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
+            builder.setPositiveButton(R.string.ok, (dialog, which) -> {
+                String limitString = limitEditText.getText().toString();
+                if ( limitString.trim().isEmpty() )
                 {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which)
-                    {
-                        dialog.dismiss();
-                    }
-                });
-                builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                    limitString = "0"; // Set a 0 value if no value is provided (will lead to an error displayed to the user)
+                }
+
+                try
                 {
-                    @Override
-                    public void onClick(final DialogInterface dialog, int which)
+                    int newLimit = Integer.valueOf(limitString);
+
+                    // Invalid value, alert the user
+                    if ( newLimit <= 0 )
                     {
-                        String limitString = limitEditText.getText().toString();
-                        if (limitString.trim().isEmpty())
-                        {
-                            limitString = "0"; // Set a 0 value if no value is provided (will lead to an error displayed to the user)
-                        }
-
-                        try
-                        {
-                            int newLimit = Integer.valueOf(limitString);
-
-                            // Invalid value, alert the user
-                            if (newLimit <= 0)
-                            {
-                                throw new IllegalArgumentException("limit should be > 0");
-                            }
-
-                            Parameters.getInstance(getActivity()).putInt(ParameterKeys.LOW_MONEY_WARNING_AMOUNT, newLimit);
-                            setLimitWarningPreferenceTitle(limitWarningPreference);
-                        }
-                        catch (Exception e)
-                        {
-                            new AlertDialog.Builder(getActivity()).setTitle(R.string.adjust_limit_warning_error_title).setMessage(getResources().getString(R.string.adjust_limit_warning_error_message)).setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
-                            {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    dialog.dismiss();
-                                }
-
-                            }).show();
-                        }
+                        throw new IllegalArgumentException("limit should be > 0");
                     }
-                });
 
-                final Dialog dialog = builder.show();
-
-                // Directly show keyboard when the dialog pops
-                limitEditText.setOnFocusChangeListener(new View.OnFocusChangeListener()
+                    Parameters.getInstance(getActivity()).putInt(ParameterKeys.LOW_MONEY_WARNING_AMOUNT, newLimit);
+                    setLimitWarningPreferenceTitle(limitWarningPreference);
+                }
+                catch ( Exception e )
                 {
-                    @Override
-                    public void onFocusChange(View v, boolean hasFocus)
-                    {
-                        if (hasFocus && getResources().getConfiguration().keyboard == Configuration.KEYBOARD_NOKEYS) // Check if the device doesn't have a physical keyboard
-                        {
-                            dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-                        }
-                    }
-                });
+                    new AlertDialog.Builder(getActivity()).setTitle(R.string.adjust_limit_warning_error_title).setMessage(getResources().getString(R.string.adjust_limit_warning_error_message)).setPositiveButton(R.string.ok, (dialog1, which1) -> dialog1.dismiss()).show();
+                }
+            });
 
-                return false;
-            }
+            final Dialog dialog = builder.show();
+
+            // Directly show keyboard when the dialog pops
+            limitEditText.setOnFocusChangeListener((v, hasFocus) -> {
+                if ( hasFocus && getResources().getConfiguration().keyboard == Configuration.KEYBOARD_NOKEYS ) // Check if the device doesn't have a physical keyboard
+                {
+                    Objects.requireNonNull(dialog.getWindow()).setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                }
+            });
+
+            return false;
         });
         setLimitWarningPreferenceTitle(limitWarningPreference);
 
@@ -312,14 +254,9 @@ public class PreferencesFragment extends PreferenceFragment
          * Notifications
          */
         final CheckBoxPreference updateNotifPref = (CheckBoxPreference) findPreference(getResources().getString(R.string.setting_category_notifications_update_key));
-        updateNotifPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
-        {
-            @Override
-            public boolean onPreferenceClick(Preference preference)
-            {
-                UserHelper.setUserAllowUpdatePushes(getActivity(), updateNotifPref.isChecked());
-                return true;
-            }
+        updateNotifPref.setOnPreferenceClickListener(preference -> {
+            UserHelper.setUserAllowUpdatePushes(getActivity(), updateNotifPref.isChecked());
+            return true;
         });
         updateNotifPref.setChecked(UserHelper.isUserAllowingUpdatePushes(getActivity()));
 
@@ -336,82 +273,52 @@ public class PreferencesFragment extends PreferenceFragment
             /*
              * Show welcome screen button
              */
-            findPreference(getResources().getString(R.string.setting_category_show_welcome_screen_button_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
-            {
-                @Override
-                public boolean onPreferenceClick(Preference preference)
-                {
-                    LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(new Intent(MainActivity.INTENT_SHOW_WELCOME_SCREEN));
+            findPreference(getResources().getString(R.string.setting_category_show_welcome_screen_button_key)).setOnPreferenceClickListener(preference -> {
+                LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(new Intent(MainActivity.INTENT_SHOW_WELCOME_SCREEN));
 
-                    getActivity().finish();
-                    return false;
-                }
+                getActivity().finish();
+                return false;
             });
 
             /*
              * Show premium screen
              */
-            findPreference(getResources().getString(R.string.setting_category_dev_show_premium_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
-            {
-                @Override
-                public boolean onPreferenceClick(Preference preference)
-                {
-                    showBecomePremiumDialog();
-                    return false;
-                }
+            findPreference(getResources().getString(R.string.setting_category_dev_show_premium_key)).setOnPreferenceClickListener(preference -> {
+                showBecomePremiumDialog();
+                return false;
             });
 
             /*
              * Show daily reminder opt-in notif
              */
-            findPreference(getResources().getString(R.string.setting_category_show_notif_daily_reminder_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
-            {
-                @Override
-                public boolean onPreferenceClick(Preference preference)
-                {
-                    DailyNotifOptinService.showDailyReminderOptinNotif(getActivity());
-                    return false;
-                }
+            findPreference(getResources().getString(R.string.setting_category_show_notif_daily_reminder_key)).setOnPreferenceClickListener(preference -> {
+                DailyNotifOptinService.showDailyReminderOptinNotif(getActivity());
+                return false;
             });
 
             /*
              * Show monthly report notif for premium users
              */
-            findPreference(getResources().getString(R.string.setting_category_show_notif_monthly_premium_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
-            {
-                @Override
-                public boolean onPreferenceClick(Preference preference)
-                {
-                    MonthlyReportNotifService.showPremiumNotif(getActivity());
-                    return false;
-                }
+            findPreference(getResources().getString(R.string.setting_category_show_notif_monthly_premium_key)).setOnPreferenceClickListener(preference -> {
+                MonthlyReportNotifService.showPremiumNotif(getActivity());
+                return false;
             });
 
             /*
              * Show monthly report notif for non premium users
              */
-            findPreference(getResources().getString(R.string.setting_category_show_notif_monthly_notpremium_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
-            {
-                @Override
-                public boolean onPreferenceClick(Preference preference)
-                {
-                    MonthlyReportNotifService.showNotPremiumNotif(getActivity());
-                    return false;
-                }
+            findPreference(getResources().getString(R.string.setting_category_show_notif_monthly_notpremium_key)).setOnPreferenceClickListener(preference -> {
+                MonthlyReportNotifService.showNotPremiumNotif(getActivity());
+                return false;
             });
 
             /*
              * Enable animations pref
              */
             final CheckBoxPreference animationsPref = (CheckBoxPreference) findPreference(getResources().getString(R.string.setting_category_disable_animation_key));
-            animationsPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
-            {
-                @Override
-                public boolean onPreferenceClick(Preference preference)
-                {
-                    UIHelper.setAnimationsEnabled(getActivity(), animationsPref.isChecked());
-                    return true;
-                }
+            animationsPref.setOnPreferenceClickListener(preference -> {
+                UIHelper.setAnimationsEnabled(getActivity(), animationsPref.isChecked());
+                return true;
             });
             animationsPref.setChecked(UIHelper.areAnimationsEnabled(getActivity()));
         }
@@ -454,14 +361,7 @@ public class PreferencesFragment extends PreferenceFragment
                     new AlertDialog.Builder(getActivity())
                         .setTitle(R.string.iab_purchase_success_title)
                         .setMessage(R.string.iab_purchase_success_message)
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-                                dialog.dismiss();
-                            }
-                        })
+                        .setPositiveButton(R.string.ok, (dialog, which) -> dialog.dismiss())
                         .show();
 
                     refreshPremiumPreference();
@@ -521,51 +421,29 @@ public class PreferencesFragment extends PreferenceFragment
             }
 
             // Premium preference
-            findPreference(getResources().getString(R.string.setting_category_premium_status_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
-            {
-                @Override
-                public boolean onPreferenceClick(Preference preference)
-                {
-                    new AlertDialog.Builder(getActivity())
-                            .setTitle(R.string.premium_popup_premium_title)
-                            .setMessage(R.string.premium_popup_premium_message)
-                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
-                            {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    dialog.dismiss();
-                                }
-                            })
-                            .show();
+            findPreference(getResources().getString(R.string.setting_category_premium_status_key)).setOnPreferenceClickListener(preference -> {
+                new AlertDialog.Builder(getActivity())
+                        .setTitle(R.string.premium_popup_premium_title)
+                        .setMessage(R.string.premium_popup_premium_message)
+                        .setPositiveButton(R.string.ok, (dialog, which) -> dialog.dismiss())
+                        .show();
 
-                    return false;
-                }
+                return false;
             });
 
             // Daily reminder notif preference
             final CheckBoxPreference dailyNotifPref = (CheckBoxPreference) findPreference(getResources().getString(R.string.setting_category_notifications_daily_key));
-            dailyNotifPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
-            {
-                @Override
-                public boolean onPreferenceClick(Preference preference)
-                {
-                    UserHelper.setUserAllowDailyReminderPushes(getActivity(), dailyNotifPref.isChecked());
-                    return true;
-                }
+            dailyNotifPref.setOnPreferenceClickListener(preference -> {
+                UserHelper.setUserAllowDailyReminderPushes(getActivity(), dailyNotifPref.isChecked());
+                return true;
             });
             dailyNotifPref.setChecked(UserHelper.isUserAllowingDailyReminderPushes(getActivity()));
 
             // Monthly reminder for reports
             final CheckBoxPreference monthlyNotifPref = (CheckBoxPreference) findPreference(getResources().getString(R.string.setting_category_notifications_monthly_key));
-            monthlyNotifPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
-            {
-                @Override
-                public boolean onPreferenceClick(Preference preference)
-                {
-                    UserHelper.setUserAllowMonthlyReminderPushes(getActivity(), monthlyNotifPref.isChecked());
-                    return true;
-                }
+            monthlyNotifPref.setOnPreferenceClickListener(preference -> {
+                UserHelper.setUserAllowMonthlyReminderPushes(getActivity(), monthlyNotifPref.isChecked());
+                return true;
             });
             monthlyNotifPref.setChecked(UserHelper.isUserAllowingMonthlyReminderPushes(getActivity()));
         }
@@ -584,98 +462,57 @@ public class PreferencesFragment extends PreferenceFragment
             }
 
             // Not premium preference
-            findPreference(getResources().getString(R.string.setting_category_not_premium_status_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
-            {
-                @Override
-                public boolean onPreferenceClick(Preference preference)
-                {
-                    showBecomePremiumDialog();
-                    return false;
-                }
+            findPreference(getResources().getString(R.string.setting_category_not_premium_status_key)).setOnPreferenceClickListener(preference -> {
+                showBecomePremiumDialog();
+                return false;
             });
 
             // Redeem promo code pref
-            findPreference(getResources().getString(R.string.setting_category_premium_redeem_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
-            {
-                @Override
-                public boolean onPreferenceClick(Preference preference)
-                {
-                    View dialogView = getActivity().getLayoutInflater().inflate(R.layout.dialog_redeem_voucher, null);
-                    final EditText voucherEditText = (EditText) dialogView.findViewById(R.id.voucher);
+            findPreference(getResources().getString(R.string.setting_category_premium_redeem_key)).setOnPreferenceClickListener(preference -> {
+                View dialogView = getActivity().getLayoutInflater().inflate(R.layout.dialog_redeem_voucher, null);
+                final EditText voucherEditText = (EditText) dialogView.findViewById(R.id.voucher);
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
-                        .setTitle(R.string.voucher_redeem_dialog_title)
-                        .setMessage(R.string.voucher_redeem_dialog_message)
-                        .setView(dialogView)
-                        .setPositiveButton(R.string.voucher_redeem_dialog_cta, new DialogInterface.OnClickListener()
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+                    .setTitle(R.string.voucher_redeem_dialog_title)
+                    .setMessage(R.string.voucher_redeem_dialog_message)
+                    .setView(dialogView)
+                    .setPositiveButton(R.string.voucher_redeem_dialog_cta, (dialog, which) -> {
+                        dialog.dismiss();
+
+                        String promocode = voucherEditText.getText().toString();
+                        if ( promocode.trim().isEmpty() )
                         {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-                                dialog.dismiss();
+                            new AlertDialog.Builder(getActivity())
+                                    .setTitle(R.string.voucher_redeem_error_dialog_title)
+                                    .setMessage(R.string.voucher_redeem_error_code_invalid_dialog_message)
+                                    .setPositiveButton(R.string.ok, (dialog12, which12) -> dialog12.dismiss())
+                                    .show();
 
-                                String promocode = voucherEditText.getText().toString();
-                                if( promocode.trim().isEmpty() )
-                                {
-                                    new AlertDialog.Builder(getActivity())
-                                        .setTitle(R.string.voucher_redeem_error_dialog_title)
-                                        .setMessage(R.string.voucher_redeem_error_code_invalid_dialog_message)
-                                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
-                                        {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which)
-                                            {
-                                                dialog.dismiss();
-                                            }
-                                        })
-                                        .show();
-
-                                    return;
-                                }
-
-                                if( !((EasyBudget) getActivity().getApplication()).launchRedeemPromocodeFlow(promocode, getActivity()) )
-                                {
-                                    new AlertDialog.Builder(getActivity())
-                                        .setTitle(R.string.iab_purchase_error_title)
-                                        .setMessage(getResources().getString(R.string.iab_purchase_error_message, "Error redeeming promo code"))
-                                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
-                                        {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which)
-                                            {
-                                                dialog.dismiss();
-                                            }
-                                        })
-                                        .show();
-                                }
-                            }
-                        })
-                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-                                dialog.dismiss();
-                            }
-                        });
-
-                    final Dialog dialog = builder.show();
-
-                    // Directly show keyboard when the dialog pops
-                    voucherEditText.setOnFocusChangeListener(new View.OnFocusChangeListener()
-                    {
-                        @Override
-                        public void onFocusChange(View v, boolean hasFocus)
-                        {
-                            if (hasFocus && getResources().getConfiguration().keyboard == Configuration.KEYBOARD_NOKEYS ) // Check if the device doesn't have a physical keyboard
-                            {
-                                dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-                            }
+                            return;
                         }
-                    });
 
-                    return false;
-                }
+                        if ( !((EasyBudget) getActivity().getApplication()).launchRedeemPromocodeFlow(promocode, getActivity()) )
+                        {
+                            new AlertDialog.Builder(getActivity())
+                                    .setTitle(R.string.iab_purchase_error_title)
+                                    .setMessage(getResources().getString(R.string.iab_purchase_error_message, "Error redeeming promo code"))
+                                    .setPositiveButton(R.string.ok, (dialog1, which1) -> dialog1.dismiss())
+                                    .show();
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
+
+                final Dialog dialog = builder.show();
+
+                // Directly show keyboard when the dialog pops
+                voucherEditText.setOnFocusChangeListener((v, hasFocus) -> {
+                    if ( hasFocus && getResources().getConfiguration().keyboard == Configuration.KEYBOARD_NOKEYS ) // Check if the device doesn't have a physical keyboard
+                    {
+                        Objects.requireNonNull(dialog.getWindow()).setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                    }
+                });
+
+                return false;
             });
         }
     }
