@@ -18,9 +18,12 @@ package com.benoitletondor.easybudgetapp;
 
 import android.app.Activity;
 import android.app.Application;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -73,6 +76,13 @@ import java.util.Objects;
 import java.util.UUID;
 
 import io.fabric.sdk.android.Fabric;
+
+import static com.batch.android.BatchNotificationChannelsManager.DEFAULT_CHANNEL_ID;
+import static com.benoitletondor.easybudgetapp.notif.NotificationsChannels.CHANNEL_MONTHLY_REMINDERS;
+import static com.benoitletondor.easybudgetapp.notif.NotificationsChannels.CHANNEL_NEW_FEATURES;
+import static com.benoitletondor.easybudgetapp.notif.NotificationsChannels.CHANNEL_DAILY_REMINDERS;
+import static com.benoitletondor.easybudgetapp.push.PushService.DAILY_REMINDER_KEY;
+import static com.benoitletondor.easybudgetapp.push.PushService.MONTHLY_REMINDER_KEY;
 
 /**
  * EasyBudget application. Implements GA tracking, Batch set-up, Crashlytics set-up && iab.
@@ -254,8 +264,6 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
     /**
      * Show the rating popup if the user didn't asked not to every day after the app has been open
      * in 3 different days.
-     *
-     * @param activity
      */
     private void showRatingPopupIfNeeded(@NonNull Activity activity)
     {
@@ -398,7 +406,7 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
      */
     private void show1_5UpdateNotif()
     {
-        NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(getApplicationContext())
+        NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_NEW_FEATURES)
             .setSmallIcon(R.drawable.ic_push)
             .setContentTitle(getResources().getString(R.string.app_name))
             .setContentText(getResources().getString(R.string.recurring_update_notification))
@@ -419,10 +427,60 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
      */
     private void setUpBatchSDK()
     {
+        if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ) {
+            // Monthly report channel
+            final CharSequence name = getString(R.string.setting_category_notifications_monthly_title);
+            final String description = getString(R.string.setting_category_notifications_monthly_message);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+
+            NotificationChannel monthlyReportChannel = new NotificationChannel(CHANNEL_MONTHLY_REMINDERS, name, importance);
+            monthlyReportChannel.setDescription(description);
+
+            // Daily reminder channel
+            final CharSequence dailyName = getString(R.string.setting_category_notifications_daily_title);
+            final String dailyDescription = getString(R.string.setting_category_notifications_daily_message);
+            int dailyImportance = NotificationManager.IMPORTANCE_DEFAULT;
+
+            NotificationChannel dailyReportChannel = new NotificationChannel(CHANNEL_DAILY_REMINDERS, dailyName, dailyImportance);
+            dailyReportChannel.setDescription(dailyDescription);
+
+            // New features channel
+            final CharSequence newFeatureName = getString(R.string.setting_category_notifications_update_title);
+            final String newFeatureDescription = getString(R.string.setting_category_notifications_update_message);
+            int newFeatureImportance = NotificationManager.IMPORTANCE_LOW;
+
+            NotificationChannel newFeatureChannel = new NotificationChannel(CHANNEL_NEW_FEATURES, newFeatureName, newFeatureImportance);
+            newFeatureChannel.setDescription(newFeatureDescription);
+
+            final NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            if( notificationManager != null )
+            {
+                notificationManager.createNotificationChannel(newFeatureChannel);
+                notificationManager.createNotificationChannel(monthlyReportChannel);
+                notificationManager.createNotificationChannel(dailyReportChannel);
+
+                // Remove Batch's default
+                notificationManager.deleteNotificationChannel(DEFAULT_CHANNEL_ID);
+            }
+        }
+
         Batch.setConfig(new Config(BuildConfig.BATCH_API_KEY).setCanUseAdvertisingID(false));
         Batch.Push.setManualDisplay(true);
         Batch.Push.setSmallIconResourceId(R.drawable.ic_push);
         Batch.Push.setNotificationsColor(ContextCompat.getColor(this, R.color.accent));
+        Batch.Push.getChannelsManager().setChannelIdInterceptor((payload, deductedChannelId) -> {
+            if ( "true".equalsIgnoreCase(payload.getPushBundle().getString(DAILY_REMINDER_KEY)) )
+            {
+                return CHANNEL_DAILY_REMINDERS;
+            }
+
+            if ( "true".equalsIgnoreCase(payload.getPushBundle().getString(MONTHLY_REMINDER_KEY)) )
+            {
+                return CHANNEL_MONTHLY_REMINDERS;
+            }
+
+            return CHANNEL_NEW_FEATURES;
+        });
 
         // Remove vibration & sound
         EnumSet<PushNotificationType> notificationTypes = EnumSet.allOf(PushNotificationType.class);
@@ -492,9 +550,6 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
 
     /**
      * Called when an update occurred
-     *
-     * @param previousVersion
-     * @param newVersion
      */
     private void onUpdate(int previousVersion, int newVersion)
     {
