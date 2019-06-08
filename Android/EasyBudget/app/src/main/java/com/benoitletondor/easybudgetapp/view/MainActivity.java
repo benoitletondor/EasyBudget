@@ -20,7 +20,6 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
@@ -171,7 +170,7 @@ public class MainActivity extends DBActivity
 
                     if( db.deleteExpense(Objects.requireNonNull(expense)) )
                     {
-                        final int position = expensesViewAdapter.removeExpense(expense);
+                        expensesViewAdapter.removeExpense(expense);
                         updateBalanceDisplayForDay(expensesViewAdapter.getDate());
                         calendarFragment.refreshView();
 
@@ -179,13 +178,7 @@ public class MainActivity extends DBActivity
                         snackbar.setAction(R.string.undo, v -> {
                             db.persistExpense(expense, true);
 
-                            if( calendarFragment.getSelectedDate().equals(expense.getDate()) )
-                            {
-                                expensesViewAdapter.addExpense(expense, position);
-                            }
-
-                            updateBalanceDisplayForDay(calendarFragment.getSelectedDate());
-                            calendarFragment.refreshView();
+                            refreshAllForDate(calendarFragment.getSelectedDate());
                         });
                         snackbar.setActionTextColor(ContextCompat.getColor(MainActivity.this, R.color.snackbar_action_undo));
                         //noinspection ResourceType

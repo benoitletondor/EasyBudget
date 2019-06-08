@@ -18,7 +18,6 @@ package com.benoitletondor.easybudgetapp.view.welcome;
 
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
