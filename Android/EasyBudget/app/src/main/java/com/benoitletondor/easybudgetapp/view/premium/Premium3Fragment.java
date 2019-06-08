@@ -23,6 +23,8 @@ import android.view.ViewGroup;
 
 import com.benoitletondor.easybudgetapp.R;
 
+import androidx.annotation.NonNull;
+
 /**
  * Fragment 3 of the premium onboarding screen
  *
@@ -36,7 +38,7 @@ public class Premium3Fragment extends PremiumFragment
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_premium3, container, false);

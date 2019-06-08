@@ -50,11 +50,11 @@ public class PushService extends FirebaseMessagingService
     /**
      * Key to retrieve the daily reminder key for a push
      */
-    private final static String DAILY_REMINDER_KEY = "daily";
+    public final static String DAILY_REMINDER_KEY = "daily";
     /**
      * Key to retrieve the monthly reminder key for a push
      */
-    private final static String MONTHLY_REMINDER_KEY = "monthly";
+    public final static String MONTHLY_REMINDER_KEY = "monthly";
 
 // ----------------------------------->
 

@@ -80,7 +80,8 @@ public class MonthlyReportRecyclerViewAdapter extends RecyclerView.Adapter<Recyc
 // --------------------------------------->
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
+    @NonNull
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
     {
         if( HEADER_VIEW_TYPE == viewType )
         {
@@ -93,7 +94,7 @@ public class MonthlyReportRecyclerViewAdapter extends RecyclerView.Adapter<Recyc
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position)
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position)
     {
         if( holder instanceof HeaderViewHolder )
         {
@@ -112,6 +113,27 @@ public class MonthlyReportRecyclerViewAdapter extends RecyclerView.Adapter<Recyc
             viewHolder.expenseAmountTextView.setText(CurrencyHelper.getFormattedCurrencyString(viewHolder.view.getContext(), -expense.getAmount()));
             viewHolder.expenseAmountTextView.setTextColor(ContextCompat.getColor(viewHolder.view.getContext(), expense.isRevenue() ? R.color.budget_green : R.color.budget_red));
             viewHolder.monthlyIndicator.setVisibility(expense.isRecurring() ? View.VISIBLE : View.GONE);
+
+            if( expense.isRecurring() )
+            {
+                assert expense.getAssociatedRecurringExpense() != null;
+                switch (expense.getAssociatedRecurringExpense().getType())
+                {
+                    case WEEKLY:
+                        viewHolder.recurringExpenseTypeTextView.setText(viewHolder.view.getContext().getString(R.string.weekly));
+                        break;
+                    case BI_WEEKLY:
+                        viewHolder.recurringExpenseTypeTextView.setText(viewHolder.view.getContext().getString(R.string.bi_weekly));
+                        break;
+                    case MONTHLY:
+                        viewHolder.recurringExpenseTypeTextView.setText(viewHolder.view.getContext().getString(R.string.monthly));
+                        break;
+                    case YEARLY:
+                        viewHolder.recurringExpenseTypeTextView.setText(viewHolder.view.getContext().getString(R.string.yearly));
+                        break;
+                }
+            }
+
             viewHolder.dateTextView.setText(dayFormatter.format(expense.getDate()));
         }
     }
@@ -186,6 +208,7 @@ public class MonthlyReportRecyclerViewAdapter extends RecyclerView.Adapter<Recyc
         public final TextView expenseAmountTextView;
         public final ViewGroup monthlyIndicator;
         public final TextView dateTextView;
+        public final TextView recurringExpenseTypeTextView;
         public final View view;
 
         public ExpenseViewHolder(View v)
@@ -193,10 +216,11 @@ public class MonthlyReportRecyclerViewAdapter extends RecyclerView.Adapter<Recyc
             super(v);
 
             view = v;
-            expenseTitleTextView = (TextView) v.findViewById(R.id.expense_title);
-            expenseAmountTextView = (TextView) v.findViewById(R.id.expense_amount);
-            monthlyIndicator = (ViewGroup) v.findViewById(R.id.recurring_indicator);
-            dateTextView = (TextView) v.findViewById(R.id.date_tv);
+            expenseTitleTextView = v.findViewById(R.id.expense_title);
+            expenseAmountTextView = v.findViewById(R.id.expense_amount);
+            monthlyIndicator = v.findViewById(R.id.recurring_indicator);
+            dateTextView = v.findViewById(R.id.date_tv);
+            recurringExpenseTypeTextView = v.findViewById(R.id.recurring_expense_type);
         }
     }
 
@@ -210,7 +234,7 @@ public class MonthlyReportRecyclerViewAdapter extends RecyclerView.Adapter<Recyc
             super(v);
 
             view = v;
-            headerTitle = (TextView) v.findViewById(R.id.monthly_recycler_view_header_tv);
+            headerTitle = v.findViewById(R.id.monthly_recycler_view_header_tv);
         }
     }
 }

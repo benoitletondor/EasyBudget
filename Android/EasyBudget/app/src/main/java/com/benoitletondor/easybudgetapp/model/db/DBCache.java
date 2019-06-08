@@ -194,11 +194,11 @@ public class DBCache
         /**
          * Date containing the month to load
          */
-        private Date month;
+        private final Date month;
         /**
          * Saved context to get DB
          */
-        private Context context;
+        private final Context context;
 
         private LoadMonthRunnable(@NonNull Context context, @NonNull Date month)
         {
@@ -266,11 +266,11 @@ public class DBCache
         /**
          * Date containing the month to load
          */
-        private Date month;
+        private final Date month;
         /**
          * Saved context to get DB
          */
-        private Context context;
+        private final Context context;
 
         private LoadBalanceMonthRunnable(@NonNull Context context, @NonNull Date month)
         {

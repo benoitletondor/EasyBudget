@@ -23,7 +23,7 @@ import android.content.Intent;
 /**
  * Simple Broadcast receiver that is just here to receive events when a package is updated. This is
  * made to awake our application on an update (especially EasyBudget ones) to perform action. Those
- * actions are made on {@link com.benoitletondor.easybudgetapp.EasyBudget#onUpdate(int, int)}.
+ * actions are made on {EasyBudget#onUpdate(int, int)}.
  *
  * @author Benoit LETONDOR
  */

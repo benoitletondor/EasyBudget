@@ -18,10 +18,12 @@ package com.benoitletondor.easybudgetapp;
 
 import android.app.Activity;
 import android.app.Application;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -35,9 +37,14 @@ import androidx.appcompat.app.AlertDialog;
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
 import com.android.billingclient.api.BillingFlowParams;
+import com.android.billingclient.api.BillingResult;
 import com.android.billingclient.api.Purchase;
+import com.android.billingclient.api.PurchaseHistoryRecord;
 import com.android.billingclient.api.PurchaseHistoryResponseListener;
 import com.android.billingclient.api.PurchasesUpdatedListener;
+import com.android.billingclient.api.SkuDetails;
+import com.android.billingclient.api.SkuDetailsParams;
+import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.batch.android.Batch;
 import com.batch.android.Config;
 import com.batch.android.PushNotificationType;
@@ -56,23 +63,33 @@ import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 
+import java.lang.ref.WeakReference;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Currency;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.UUID;
 
 import io.fabric.sdk.android.Fabric;
+
+import static com.batch.android.BatchNotificationChannelsManager.DEFAULT_CHANNEL_ID;
+import static com.benoitletondor.easybudgetapp.notif.NotificationsChannels.CHANNEL_MONTHLY_REMINDERS;
+import static com.benoitletondor.easybudgetapp.notif.NotificationsChannels.CHANNEL_NEW_FEATURES;
+import static com.benoitletondor.easybudgetapp.notif.NotificationsChannels.CHANNEL_DAILY_REMINDERS;
+import static com.benoitletondor.easybudgetapp.push.PushService.DAILY_REMINDER_KEY;
+import static com.benoitletondor.easybudgetapp.push.PushService.MONTHLY_REMINDER_KEY;
 
 /**
  * EasyBudget application. Implements GA tracking, Batch set-up, Crashlytics set-up && iab.
  *
  * @author Benoit LETONDOR
  */
-public class EasyBudget extends Application implements PurchasesUpdatedListener, BillingClientStateListener, PurchaseHistoryResponseListener
+public class EasyBudget extends Application implements PurchasesUpdatedListener, BillingClientStateListener, PurchaseHistoryResponseListener, SkuDetailsResponseListener
 {
     /**
      * Default amount use for low money warning (can be changed in settings)
@@ -111,6 +128,11 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
      */
     @Nullable
     private PremiumPurchaseListener premiumPurchaseListener;
+    /**
+     * Activity that triggered the current purchase
+     */
+    @NonNull
+    private WeakReference<Activity> purchaseActivity = new WeakReference<>(null);
 
 // ------------------------------------------>
 
@@ -186,13 +208,13 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
             private int activityCounter = 0;
 
             @Override
-            public void onActivityCreated(Activity activity, Bundle savedInstanceState)
+            public void onActivityCreated(@NonNull Activity activity, Bundle savedInstanceState)
             {
 
             }
 
             @Override
-            public void onActivityStarted(Activity activity)
+            public void onActivityStarted(@NonNull Activity activity)
             {
                 if (activityCounter == 0)
                 {
@@ -203,19 +225,19 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
             }
 
             @Override
-            public void onActivityResumed(Activity activity)
+            public void onActivityResumed(@NonNull Activity activity)
             {
 
             }
 
             @Override
-            public void onActivityPaused(Activity activity)
+            public void onActivityPaused(@NonNull Activity activity)
             {
 
             }
 
             @Override
-            public void onActivityStopped(Activity activity)
+            public void onActivityStopped(@NonNull Activity activity)
             {
                 if (activityCounter == 1)
                 {
@@ -226,13 +248,13 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
             }
 
             @Override
-            public void onActivitySaveInstanceState(Activity activity, Bundle outState)
+            public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState)
             {
 
             }
 
             @Override
-            public void onActivityDestroyed(Activity activity)
+            public void onActivityDestroyed(@NonNull Activity activity)
             {
 
             }
@@ -242,8 +264,6 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
     /**
      * Show the rating popup if the user didn't asked not to every day after the app has been open
      * in 3 different days.
-     *
-     * @param activity
      */
     private void showRatingPopupIfNeeded(@NonNull Activity activity)
     {
@@ -310,34 +330,17 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
                     AlertDialog dialog = new AlertDialog.Builder(activity)
                         .setTitle(R.string.premium_popup_become_title)
                         .setMessage(R.string.premium_popup_become_message)
-                        .setPositiveButton(R.string.premium_popup_become_cta, new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-                                Intent startIntent = new Intent(activity, SettingsActivity.class);
-                                startIntent.putExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, true);
-                                ActivityCompat.startActivity(activity, startIntent, null);
+                        .setPositiveButton(R.string.premium_popup_become_cta, (dialog13, which) -> {
+                            Intent startIntent = new Intent(activity, SettingsActivity.class);
+                            startIntent.putExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, true);
+                            ActivityCompat.startActivity(activity, startIntent, null);
 
-                                dialog.dismiss();
-                            }
+                            dialog13.dismiss();
                         })
-                        .setNegativeButton(R.string.premium_popup_become_not_now, new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-                                dialog.dismiss();
-                            }
-                        })
-                        .setNeutralButton(R.string.premium_popup_become_not_ask_again, new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-                                Parameters.getInstance(getApplicationContext()).putBoolean(ParameterKeys.PREMIUM_POPUP_COMPLETE, true);
-                                dialog.dismiss();
-                            }
+                        .setNegativeButton(R.string.premium_popup_become_not_now, (dialog12, which) -> dialog12.dismiss())
+                        .setNeutralButton(R.string.premium_popup_become_not_ask_again, (dialog1, which) -> {
+                            Parameters.getInstance(getApplicationContext()).putBoolean(ParameterKeys.PREMIUM_POPUP_COMPLETE, true);
+                            dialog1.dismiss();
                         })
                         .show();
 
@@ -403,7 +406,7 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
      */
     private void show1_5UpdateNotif()
     {
-        NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(getApplicationContext())
+        NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_NEW_FEATURES)
             .setSmallIcon(R.drawable.ic_push)
             .setContentTitle(getResources().getString(R.string.app_name))
             .setContentText(getResources().getString(R.string.recurring_update_notification))
@@ -424,10 +427,60 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
      */
     private void setUpBatchSDK()
     {
+        if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ) {
+            // Monthly report channel
+            final CharSequence name = getString(R.string.setting_category_notifications_monthly_title);
+            final String description = getString(R.string.setting_category_notifications_monthly_message);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+
+            NotificationChannel monthlyReportChannel = new NotificationChannel(CHANNEL_MONTHLY_REMINDERS, name, importance);
+            monthlyReportChannel.setDescription(description);
+
+            // Daily reminder channel
+            final CharSequence dailyName = getString(R.string.setting_category_notifications_daily_title);
+            final String dailyDescription = getString(R.string.setting_category_notifications_daily_message);
+            int dailyImportance = NotificationManager.IMPORTANCE_DEFAULT;
+
+            NotificationChannel dailyReportChannel = new NotificationChannel(CHANNEL_DAILY_REMINDERS, dailyName, dailyImportance);
+            dailyReportChannel.setDescription(dailyDescription);
+
+            // New features channel
+            final CharSequence newFeatureName = getString(R.string.setting_category_notifications_update_title);
+            final String newFeatureDescription = getString(R.string.setting_category_notifications_update_message);
+            int newFeatureImportance = NotificationManager.IMPORTANCE_LOW;
+
+            NotificationChannel newFeatureChannel = new NotificationChannel(CHANNEL_NEW_FEATURES, newFeatureName, newFeatureImportance);
+            newFeatureChannel.setDescription(newFeatureDescription);
+
+            final NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            if( notificationManager != null )
+            {
+                notificationManager.createNotificationChannel(newFeatureChannel);
+                notificationManager.createNotificationChannel(monthlyReportChannel);
+                notificationManager.createNotificationChannel(dailyReportChannel);
+
+                // Remove Batch's default
+                notificationManager.deleteNotificationChannel(DEFAULT_CHANNEL_ID);
+            }
+        }
+
         Batch.setConfig(new Config(BuildConfig.BATCH_API_KEY).setCanUseAdvertisingID(false));
         Batch.Push.setManualDisplay(true);
         Batch.Push.setSmallIconResourceId(R.drawable.ic_push);
         Batch.Push.setNotificationsColor(ContextCompat.getColor(this, R.color.accent));
+        Batch.Push.getChannelsManager().setChannelIdInterceptor((payload, deductedChannelId) -> {
+            if ( "true".equalsIgnoreCase(payload.getPushBundle().getString(DAILY_REMINDER_KEY)) )
+            {
+                return CHANNEL_DAILY_REMINDERS;
+            }
+
+            if ( "true".equalsIgnoreCase(payload.getPushBundle().getString(MONTHLY_REMINDER_KEY)) )
+            {
+                return CHANNEL_MONTHLY_REMINDERS;
+            }
+
+            return CHANNEL_NEW_FEATURES;
+        });
 
         // Remove vibration & sound
         EnumSet<PushNotificationType> notificationTypes = EnumSet.allOf(PushNotificationType.class);
@@ -438,43 +491,43 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks()
         {
             @Override
-            public void onActivityCreated(Activity activity, Bundle savedInstanceState)
+            public void onActivityCreated(@NonNull Activity activity, Bundle savedInstanceState)
             {
 
             }
 
             @Override
-            public void onActivityStarted(final Activity activity)
+            public void onActivityStarted(@NonNull final Activity activity)
             {
                 Batch.onStart(activity);
             }
 
             @Override
-            public void onActivityResumed(Activity activity)
+            public void onActivityResumed(@NonNull Activity activity)
             {
 
             }
 
             @Override
-            public void onActivityPaused(Activity activity)
+            public void onActivityPaused(@NonNull Activity activity)
             {
 
             }
 
             @Override
-            public void onActivityStopped(Activity activity)
+            public void onActivityStopped(@NonNull Activity activity)
             {
                 Batch.onStop(activity);
             }
 
             @Override
-            public void onActivitySaveInstanceState(Activity activity, Bundle outState)
+            public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState)
             {
 
             }
 
             @Override
-            public void onActivityDestroyed(Activity activity)
+            public void onActivityDestroyed(@NonNull Activity activity)
             {
                 Batch.onDestroy(activity);
             }
@@ -497,9 +550,6 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
 
     /**
      * Called when an update occurred
-     *
-     * @param previousVersion
-     * @param newVersion
      */
     private void onUpdate(int previousVersion, int newVersion)
     {
@@ -625,6 +675,7 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
 
             iabHelper = BillingClient.newBuilder(this)
                 .setListener(this)
+                .enablePendingPurchases()
                 .build();
 
             iabHelper.startConnection(this);
@@ -721,15 +772,114 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
         }
 
         premiumPurchaseListener = listener;
+        purchaseActivity = new WeakReference<>(activity);
 
-        iabHelper.launchBillingFlow(activity, BillingFlowParams.newBuilder()
-            .setSku(EasyBudget.SKU_PREMIUM)
-            .setType(BillingClient.SkuType.INAPP)
-            .build());
+        final List<String> skuList = new ArrayList<>(1);
+        skuList.add(EasyBudget.SKU_PREMIUM);
+
+        Logger.debug("Launching querySkuDetailsAsync");
+
+        iabHelper.querySkuDetailsAsync(
+            SkuDetailsParams.newBuilder()
+                .setSkusList(skuList)
+                .setType(BillingClient.SkuType.INAPP)
+                .build(),
+            this
+        );
     }
 
     @Override
-    public void onPurchasesUpdated(@BillingClient.BillingResponse int responseCode, @Nullable List<Purchase> purchases)
+    public void onSkuDetailsResponse(@NonNull BillingResult billingResult, List<SkuDetails> skuDetailsList)
+    {
+        Logger.debug("onSkuDetailsResponse");
+        final Activity activity = purchaseActivity.get();
+        final PremiumPurchaseListener listener = premiumPurchaseListener;
+
+        if( activity == null || listener == null ) {
+            Logger.debug("onSkuDetailsResponse: activity or listener null");
+            return;
+        }
+
+        if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK)
+        {
+            if( billingResult.getResponseCode() == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED )
+            {
+                setIabStatusAndNotify(PremiumCheckStatus.PREMIUM);
+                listener.onPurchaseSuccess();
+                return;
+            }
+
+            Objects.requireNonNull(premiumPurchaseListener).onPurchaseError("Unable to connect to reach PlayStore (response code: "+billingResult.getResponseCode()+"). Please restart the app and try again");
+            return;
+        }
+
+        if( skuDetailsList.isEmpty() )
+        {
+            Objects.requireNonNull(premiumPurchaseListener).onPurchaseError("Unable to fetch content from PlayStore (response code: skuDetailsList is empty). Please restart the app and try again");
+            return;
+        }
+
+        iabHelper.launchBillingFlow(activity, BillingFlowParams.newBuilder()
+            .setSkuDetails(skuDetailsList.get(0))
+            .build()
+        );
+    }
+
+    @Override
+    public void onBillingSetupFinished(@NonNull BillingResult billingResult)
+    {
+        Logger.debug("iab setup finished.");
+
+        if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK)
+        {
+            // Oh noes, there was a problem.
+            setIabStatusAndNotify(PremiumCheckStatus.ERROR);
+            Logger.error("Error while setting-up iab: "+billingResult.getResponseCode());
+            return;
+        }
+
+        setIabStatusAndNotify(PremiumCheckStatus.CHECKING);
+
+        iabHelper.queryPurchaseHistoryAsync(BillingClient.SkuType.INAPP, this);
+    }
+
+    @Override
+    public void onBillingServiceDisconnected()
+    {
+        Logger.debug("onBillingServiceDisconnected");
+
+        setIabStatusAndNotify(PremiumCheckStatus.ERROR);
+    }
+
+    @Override
+    public void onPurchaseHistoryResponse(@NonNull BillingResult billingResult, List<PurchaseHistoryRecord> purchaseHistoryRecordList)
+    {
+        Logger.debug("iab query inventory finished.");
+
+        // Is it a failure?
+        if ( billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK )
+        {
+            Logger.error("Error while querying iab inventory: "+billingResult.getResponseCode());
+            setIabStatusAndNotify(PremiumCheckStatus.ERROR);
+            return;
+        }
+
+        boolean premium = false;
+        if (purchaseHistoryRecordList != null) {
+            for (PurchaseHistoryRecord purchase : purchaseHistoryRecordList) {
+                if( EasyBudget.SKU_PREMIUM.equals(purchase.getSku()) ) {
+                    premium = true;
+                }
+            }
+        }
+
+        Logger.debug("iab query inventory was successful: "+premium);
+
+        setIabStatusAndNotify(premium ? PremiumCheckStatus.PREMIUM : PremiumCheckStatus.NOT_PREMIUM);
+    }
+
+    @Override
+    public void onPurchasesUpdated(@NonNull BillingResult billingResult, @Nullable List<Purchase> purchases)
     {
         final PremiumPurchaseListener listener = premiumPurchaseListener;
         premiumPurchaseListener = null;
@@ -738,16 +888,16 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
             return;
         }
 
-        Logger.debug("Purchase finished: " + responseCode);
+        Logger.debug("Purchase finished: " + billingResult.getResponseCode());
 
-        if ( responseCode != BillingClient.BillingResponse.OK )
+        if ( billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK )
         {
-            Logger.error("Error while purchasing premium: " + responseCode);
-            if( responseCode == BillingClient.BillingResponse.USER_CANCELED )
+            Logger.error("Error while purchasing premium: " + billingResult.getResponseCode());
+            if( billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED )
             {
                 listener.onUserCancelled();
             }
-            else if( responseCode == BillingClient.BillingResponse.ITEM_ALREADY_OWNED )
+            else if( billingResult.getResponseCode() == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED )
             {
                 setIabStatusAndNotify(PremiumCheckStatus.PREMIUM);
                 listener.onPurchaseSuccess();
@@ -755,7 +905,7 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
             }
             else
             {
-                listener.onPurchaseError("An error occurred (status code: "+responseCode+")");
+                listener.onPurchaseError("An error occurred (status code: "+billingResult.getResponseCode()+")");
             }
 
             return;
@@ -783,59 +933,6 @@ public class EasyBudget extends Application implements PurchasesUpdatedListener,
 
         setIabStatusAndNotify(PremiumCheckStatus.PREMIUM);
         listener.onPurchaseSuccess();
-    }
-
-    @Override
-    public void onBillingSetupFinished(@BillingClient.BillingResponse int responseCode)
-    {
-        Logger.debug("iab setup finished.");
-
-        if (responseCode != BillingClient.BillingResponse.OK)
-        {
-            // Oh noes, there was a problem.
-            setIabStatusAndNotify(PremiumCheckStatus.ERROR);
-            Logger.error("Error while setting-up iab: "+responseCode);
-            return;
-        }
-
-        setIabStatusAndNotify(PremiumCheckStatus.CHECKING);
-
-        iabHelper.queryPurchaseHistoryAsync(BillingClient.SkuType.INAPP, this);
-    }
-
-    @Override
-    public void onBillingServiceDisconnected()
-    {
-        Logger.debug("onBillingServiceDisconnected");
-
-        setIabStatusAndNotify(PremiumCheckStatus.ERROR);
-    }
-
-    @Override
-    public void onPurchaseHistoryResponse(int responseCode, List<Purchase> purchasesList)
-    {
-        Logger.debug("iab query inventory finished.");
-
-        // Is it a failure?
-        if ( responseCode != BillingClient.BillingResponse.OK )
-        {
-            Logger.error("Error while querying iab inventory: "+responseCode);
-            setIabStatusAndNotify(PremiumCheckStatus.ERROR);
-            return;
-        }
-
-        boolean premium = false;
-        if (purchasesList != null) {
-            for (Purchase purchase : purchasesList) {
-                if( EasyBudget.SKU_PREMIUM.equals(purchase.getSku()) ) {
-                    premium = true;
-                }
-            }
-        }
-
-        Logger.debug("iab query inventory was successful: "+premium);
-
-        setIabStatusAndNotify(premium ? PremiumCheckStatus.PREMIUM : PremiumCheckStatus.NOT_PREMIUM);
     }
 
     //endregion

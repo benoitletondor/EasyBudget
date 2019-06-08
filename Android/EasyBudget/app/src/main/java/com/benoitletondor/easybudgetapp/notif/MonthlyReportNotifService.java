@@ -31,6 +31,8 @@ import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
 import com.benoitletondor.easybudgetapp.helper.Parameters;
 import com.benoitletondor.easybudgetapp.view.MainActivity;
 
+import static com.benoitletondor.easybudgetapp.notif.NotificationsChannels.CHANNEL_NEW_FEATURES;
+
 /**
  * Service and helper to build the monthly report notification shown to user on 1.3 update.
  *
@@ -97,7 +99,7 @@ public class MonthlyReportNotifService extends IntentService
 
         PendingIntent intent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(context)
+        NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(context, CHANNEL_NEW_FEATURES)
             .setSmallIcon(R.drawable.ic_push)
             .setContentTitle(context.getResources().getString(R.string.app_name))
             .setContentText(context.getResources().getString(R.string.monthly_report_notif_premium_text))
@@ -126,7 +128,7 @@ public class MonthlyReportNotifService extends IntentService
         discoverIntent.setAction(INTENT_ACTION_DISCOVER);
         PendingIntent discoverPendingIntent = PendingIntent.getService(context, 0, discoverIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(context)
+        NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(context, CHANNEL_NEW_FEATURES)
             .setSmallIcon(R.drawable.ic_push)
             .setContentTitle(context.getResources().getString(R.string.app_name))
             .setContentText(context.getResources().getString(R.string.monthly_report_notif_notpremium_text))

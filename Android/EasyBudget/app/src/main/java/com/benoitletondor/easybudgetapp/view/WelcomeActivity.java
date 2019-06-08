@@ -42,6 +42,8 @@ import com.benoitletondor.easybudgetapp.view.welcome.Onboarding3Fragment;
 import com.benoitletondor.easybudgetapp.view.welcome.Onboarding4Fragment;
 import com.benoitletondor.easybudgetapp.view.welcome.OnboardingFragment;
 
+import java.util.Objects;
+
 import me.relex.circleindicator.CircleIndicator;
 
 /**
@@ -98,7 +100,7 @@ public class WelcomeActivity extends DBActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
 
-        pager = (ViewPager) findViewById(R.id.welcome_view_pager);
+        pager = findViewById(R.id.welcome_view_pager);
         pager.setAdapter(new FragmentStatePagerAdapter(getSupportFragmentManager())
         {
             @Override
@@ -136,7 +138,7 @@ public class WelcomeActivity extends DBActivity
             @Override
             public void onPageSelected(int position)
             {
-                OnboardingFragment fragment = (OnboardingFragment) ((FragmentStatePagerAdapter) pager.getAdapter()).getItem(position);
+                OnboardingFragment fragment = (OnboardingFragment) ((FragmentStatePagerAdapter) Objects.requireNonNull(pager.getAdapter())).getItem(position);
                 UIHelper.setStatusBarColor(WelcomeActivity.this, fragment.getStatusBarColor());
 
                 setStep(position);
@@ -148,7 +150,7 @@ public class WelcomeActivity extends DBActivity
 
             }
         });
-        pager.setOffscreenPageLimit(pager.getAdapter().getCount()); // preload all fragments for transitions smoothness
+        pager.setOffscreenPageLimit(Objects.requireNonNull(pager.getAdapter()).getCount()); // preload all fragments for transitions smoothness
 
         // Circle indicator
         ((CircleIndicator) findViewById(R.id.welcome_view_pager_indicator)).setViewPager(pager);
@@ -207,7 +209,7 @@ public class WelcomeActivity extends DBActivity
         pager.setCurrentItem(initialStep, false);
 
         // Set status bar color
-        OnboardingFragment fragment = (OnboardingFragment) ((FragmentStatePagerAdapter) pager.getAdapter()).getItem(initialStep);
+        OnboardingFragment fragment = (OnboardingFragment) ((FragmentStatePagerAdapter) Objects.requireNonNull(pager.getAdapter())).getItem(initialStep);
         UIHelper.setStatusBarColor(this, fragment.getStatusBarColor());
     }
 

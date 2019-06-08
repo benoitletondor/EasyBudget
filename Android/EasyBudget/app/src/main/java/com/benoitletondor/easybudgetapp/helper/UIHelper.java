@@ -43,6 +43,8 @@ import android.widget.LinearLayout;
 
 import com.benoitletondor.easybudgetapp.view.MainActivity;
 
+import java.util.Objects;
+
 /**
  * Helper to manage compat with 5+
  *
@@ -168,7 +170,7 @@ public class UIHelper
         editText.requestFocus();
 
         InputMethodManager imm = (InputMethodManager) editText.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
+        Objects.requireNonNull(imm).showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
     }
 
     /**

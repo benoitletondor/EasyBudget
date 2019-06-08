@@ -20,7 +20,6 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
@@ -77,6 +76,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Main activity containing Calendar and List of expenses
@@ -141,10 +141,10 @@ public class MainActivity extends DBActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        budgetLine = (TextView) findViewById(R.id.budgetLine);
-        budgetLineAmount = (TextView) findViewById(R.id.budgetLineAmount);
+        budgetLine = findViewById(R.id.budgetLine);
+        budgetLineAmount = findViewById(R.id.budgetLineAmount);
         budgetLineContainer = findViewById(R.id.budgetLineContainer);
-        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
+        coordinatorLayout = findViewById(R.id.coordinatorLayout);
         recyclerViewPlaceholder = findViewById(R.id.emptyExpensesRecyclerViewPlaceholder);
 
         initCalendarFragment(savedInstanceState);
@@ -166,30 +166,19 @@ public class MainActivity extends DBActivity
             {
                 if( INTENT_EXPENSE_DELETED.equals(intent.getAction()) )
                 {
-                    final Expense expense = (Expense) intent.getParcelableExtra("expense");
+                    final Expense expense = intent.getParcelableExtra("expense");
 
-                    if( db.deleteExpense(expense) )
+                    if( db.deleteExpense(Objects.requireNonNull(expense)) )
                     {
-                        final int position = expensesViewAdapter.removeExpense(expense);
+                        expensesViewAdapter.removeExpense(expense);
                         updateBalanceDisplayForDay(expensesViewAdapter.getDate());
                         calendarFragment.refreshView();
 
                         Snackbar snackbar = Snackbar.make(coordinatorLayout, expense.isRevenue() ? R.string.income_delete_snackbar_text : R.string.expense_delete_snackbar_text, Snackbar.LENGTH_LONG);
-                        snackbar.setAction(R.string.undo, new View.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(View v)
-                            {
-                                db.persistExpense(expense, true);
+                        snackbar.setAction(R.string.undo, v -> {
+                            db.persistExpense(expense, true);
 
-                                if( calendarFragment.getSelectedDate().equals(expense.getDate()) )
-                                {
-                                    expensesViewAdapter.addExpense(expense, position);
-                                }
-
-                                updateBalanceDisplayForDay(calendarFragment.getSelectedDate());
-                                calendarFragment.refreshView();
-                            }
+                            refreshAllForDate(calendarFragment.getSelectedDate());
                         });
                         snackbar.setActionTextColor(ContextCompat.getColor(MainActivity.this, R.color.snackbar_action_undo));
                         //noinspection ResourceType
@@ -201,14 +190,7 @@ public class MainActivity extends DBActivity
                         new AlertDialog.Builder(MainActivity.this)
                             .setTitle(R.string.expense_delete_error_title)
                             .setMessage(R.string.expense_delete_error_message)
-                            .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener()
-                            {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    dialog.dismiss();
-                                }
-                            })
+                            .setNegativeButton(R.string.ok, (dialog, which) -> dialog.dismiss())
                             .show();
                     }
 
@@ -226,7 +208,7 @@ public class MainActivity extends DBActivity
                         return;
                     }
 
-                    if( expense.getAssociatedRecurringExpense() == null )
+                    if( Objects.requireNonNull(expense).getAssociatedRecurringExpense() == null )
                     {
                         showGenericRecurringDeleteErrorDialog();
                         Logger.error("INTENT_RECURRING_EXPENSE_DELETED: Unable to retrieve recurring expense");
@@ -240,14 +222,7 @@ public class MainActivity extends DBActivity
                         new AlertDialog.Builder(MainActivity.this)
                             .setTitle(R.string.recurring_expense_delete_first_error_title)
                             .setMessage(getResources().getString(R.string.recurring_expense_delete_first_error_message))
-                            .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener()
-                            {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    dialog.dismiss();
-                                }
-                            })
+                            .setNegativeButton(R.string.ok, (dialog, which) -> dialog.dismiss())
                             .show();
 
                         return;
@@ -415,14 +390,9 @@ public class MainActivity extends DBActivity
             final View monthlyReportHint = findViewById(R.id.monthly_report_hint);
             monthlyReportHint.setVisibility(View.VISIBLE);
 
-            findViewById(R.id.monthly_report_hint_button).setOnClickListener(new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View v)
-                {
-                    monthlyReportHint.setVisibility(View.GONE);
-                    UserHelper.setUserSawMonthlyReportHint(MainActivity.this);
-                }
+            findViewById(R.id.monthly_report_hint_button).setOnClickListener(v -> {
+                monthlyReportHint.setVisibility(View.GONE);
+                UserHelper.setUserSawMonthlyReportHint(MainActivity.this);
             });
         }
 
@@ -430,14 +400,13 @@ public class MainActivity extends DBActivity
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
+    public boolean onOptionsItemSelected(@NonNull MenuItem item)
     {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if ( id == R.id.action_settings)
         {
             Intent startIntent = new Intent(this, SettingsActivity.class);
@@ -450,7 +419,7 @@ public class MainActivity extends DBActivity
             final double currentBalance = -db.getBalanceForDay(new Date());
 
             View dialogView = getLayoutInflater().inflate(R.layout.dialog_adjust_balance, null);
-            final EditText amountEditText = (EditText) dialogView.findViewById(R.id.balance_amount);
+            final EditText amountEditText = dialogView.findViewById(R.id.balance_amount);
             amountEditText.setText(currentBalance == 0 ? "0" : CurrencyHelper.getFormattedAmountValue(currentBalance));
             UIHelper.preventUnsupportedInputForDecimals(amountEditText);
             amountEditText.setSelection(amountEditText.getText().length()); // Put focus at the end of the text
@@ -459,131 +428,97 @@ public class MainActivity extends DBActivity
             builder.setTitle(R.string.adjust_balance_title);
             builder.setMessage(R.string.adjust_balance_message);
             builder.setView(dialogView);
-            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener()
-            {
-                @Override
-                public void onClick(DialogInterface dialog, int which)
+            builder.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
+            builder.setPositiveButton(R.string.ok, (dialog, which) -> {
+                try
                 {
+                    // Ajust balance
+                    double newBalance = Double.valueOf(amountEditText.getText().toString());
+
+                    if( newBalance == currentBalance )
+                    {
+                        // Nothing to do, balance hasn't change
+                        return;
+                    }
+
+                    final double diff = newBalance - currentBalance;
+
+                    String balanceExpenseTitle = getResources().getString(R.string.adjust_balance_expense_title);
+
+                    // Look for an existing balance for the day
+                    Expense expense = null;
+                    List<Expense> expensesForDay = db.getExpensesForDay(new Date());
+                    for(Expense expenseOfDay : expensesForDay)
+                    {
+                        if( expenseOfDay.getTitle().equals(balanceExpenseTitle) )
+                        {
+                            expense = expenseOfDay;
+                            break;
+                        }
+                    }
+
+                    View.OnClickListener listener;
+
+                    // If the adjust balance exists, just add the diff and persist it
+                    if( expense != null )
+                    {
+                        final Expense persistedExpense = expense;
+
+                        persistedExpense.setAmount(persistedExpense.getAmount() - diff);
+                        db.persistExpense(persistedExpense);
+
+                        // On cancel, remove the diff and persist
+                        listener = v -> {
+                            persistedExpense.setAmount(persistedExpense.getAmount() + diff);
+                            db.persistExpense(persistedExpense);
+
+                            refreshAllForDate(expensesViewAdapter.getDate());
+                        };
+                    }
+                    else // If no adjust balance yet, create a new one
+                    {
+                        final Expense persistedExpense = new Expense(getResources().getString(R.string.adjust_balance_expense_title), -diff, new Date());
+                        db.persistExpense(persistedExpense);
+
+                        // On cancel, just delete the inserted balance
+                        listener = v -> {
+                            db.deleteExpense(persistedExpense);
+
+                            refreshAllForDate(expensesViewAdapter.getDate());
+                        };
+                    }
+
+                    refreshAllForDate(expensesViewAdapter.getDate());
                     dialog.dismiss();
+
+                    //Show snackbar
+                    Snackbar snackbar = Snackbar.make(coordinatorLayout, getResources().getString(R.string.adjust_balance_snackbar_text, CurrencyHelper.getFormattedCurrencyString(MainActivity.this, newBalance)), Snackbar.LENGTH_LONG);
+                    snackbar.setAction(R.string.undo, listener);
+                    snackbar.setActionTextColor(ContextCompat.getColor(MainActivity.this, R.color.snackbar_action_undo));
+                    //noinspection ResourceType
+                    snackbar.setDuration(ACTION_SNACKBAR_LENGTH);
+                    snackbar.show();
                 }
-            });
-            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
-            {
-                @Override
-                public void onClick(DialogInterface dialog, int which)
+                catch (Exception e)
                 {
-                    try
-                    {
-                        // Ajust balance
-                        double newBalance = Double.valueOf(amountEditText.getText().toString());
+                    new AlertDialog.Builder(MainActivity.this)
+                        .setTitle(R.string.adjust_balance_error_title)
+                        .setMessage(R.string.adjust_balance_error_message)
+                        .setNegativeButton(R.string.ok, (dialog1, which1) -> dialog1.dismiss())
+                        .show();
 
-                        if( newBalance == currentBalance )
-                        {
-                            // Nothing to do, balance hasn't change
-                            return;
-                        }
-
-                        final double diff = newBalance - currentBalance;
-
-                        String balanceExpenseTitle = getResources().getString(R.string.adjust_balance_expense_title);
-
-                        // Look for an existing balance for the day
-                        Expense expense = null;
-                        List<Expense> expensesForDay = db.getExpensesForDay(new Date());
-                        for(Expense expenseOfDay : expensesForDay)
-                        {
-                            if( expenseOfDay.getTitle().equals(balanceExpenseTitle) )
-                            {
-                                expense = expenseOfDay;
-                                break;
-                            }
-                        }
-
-                        View.OnClickListener listener;
-
-                        // If the adjust balance exists, just add the diff and persist it
-                        if( expense != null )
-                        {
-                            final Expense persistedExpense = expense;
-
-                            persistedExpense.setAmount(persistedExpense.getAmount() - diff);
-                            db.persistExpense(persistedExpense);
-
-                            // On cancel, remove the diff and persist
-                            listener = new View.OnClickListener()
-                            {
-                                @Override
-                                public void onClick(View v)
-                                {
-                                    persistedExpense.setAmount(persistedExpense.getAmount() + diff);
-                                    db.persistExpense(persistedExpense);
-
-                                    refreshAllForDate(expensesViewAdapter.getDate());
-                                }
-                            };
-                        }
-                        else // If no adjust balance yet, create a new one
-                        {
-                            final Expense persistedExpense = new Expense(getResources().getString(R.string.adjust_balance_expense_title), -diff, new Date());
-                            db.persistExpense(persistedExpense);
-
-                            // On cancel, just delete the inserted balance
-                            listener = new View.OnClickListener()
-                            {
-                                @Override
-                                public void onClick(View v)
-                                {
-                                    db.deleteExpense(persistedExpense);
-
-                                    refreshAllForDate(expensesViewAdapter.getDate());
-                                }
-                            };
-                        }
-
-                        refreshAllForDate(expensesViewAdapter.getDate());
-                        dialog.dismiss();
-
-                        //Show snackbar
-                        Snackbar snackbar = Snackbar.make(coordinatorLayout, getResources().getString(R.string.adjust_balance_snackbar_text, CurrencyHelper.getFormattedCurrencyString(MainActivity.this, newBalance)), Snackbar.LENGTH_LONG);
-                        snackbar.setAction(R.string.undo, listener);
-                        snackbar.setActionTextColor(ContextCompat.getColor(MainActivity.this, R.color.snackbar_action_undo));
-                        //noinspection ResourceType
-                        snackbar.setDuration(ACTION_SNACKBAR_LENGTH);
-                        snackbar.show();
-                    }
-                    catch (Exception e)
-                    {
-                        new AlertDialog.Builder(MainActivity.this)
-                            .setTitle(R.string.adjust_balance_error_title)
-                            .setMessage(R.string.adjust_balance_error_message)
-                            .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener()
-                            {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    dialog.dismiss();
-                                }
-                            })
-                            .show();
-
-                        Logger.warning("An error occurred during balance", e);
-                        dialog.dismiss();
-                    }
+                    Logger.warning("An error occurred during balance", e);
+                    dialog.dismiss();
                 }
             });
 
             final Dialog dialog = builder.show();
 
             // Directly show keyboard when the dialog pops
-            amountEditText.setOnFocusChangeListener(new View.OnFocusChangeListener()
-            {
-                @Override
-                public void onFocusChange(View v, boolean hasFocus)
+            amountEditText.setOnFocusChangeListener((v, hasFocus) -> {
+                if (hasFocus && getResources().getConfiguration().keyboard == Configuration.KEYBOARD_NOKEYS ) // Check if the device doesn't have a physical keyboard
                 {
-                    if (hasFocus && getResources().getConfiguration().keyboard == Configuration.KEYBOARD_NOKEYS ) // Check if the device doesn't have a physical keyboard
-                    {
-                        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-                    }
+                    Objects.requireNonNull(dialog.getWindow()).setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
                 }
             });
 
@@ -781,7 +716,7 @@ public class MainActivity extends DBActivity
                 if( UIHelper.areAnimationsEnabled(MainActivity.this) )
                 {
                     // Get the absolute location on window for Y value
-                    int viewLocation[] = new int[2];
+                    int[] viewLocation = new int[2];
                     view.getLocationInWindow(viewLocation);
 
                     startIntent.putExtra(ANIMATE_TRANSITION_KEY, true);
@@ -809,7 +744,7 @@ public class MainActivity extends DBActivity
                 Button rightButton = calendarFragment.getRightArrowButton();
                 TextView textView = calendarFragment.getMonthTitleTextView();
                 GridView weekDayGreedView = calendarFragment.getWeekdayGridView();
-                LinearLayout topLayout = (LinearLayout) MainActivity.this.findViewById(com.caldroid.R.id.calendar_title_view);
+                LinearLayout topLayout = MainActivity.this.findViewById(com.caldroid.R.id.calendar_title_view);
 
                 LinearLayout.LayoutParams  params = (LinearLayout.LayoutParams)textView.getLayoutParams();
                 params.gravity = Gravity.TOP;
@@ -861,20 +796,13 @@ public class MainActivity extends DBActivity
         /*
          * FAB
          */
-        menu = (FloatingActionsMenu) findViewById(R.id.fab_choices);
+        menu = findViewById(R.id.fab_choices);
 
         final View background = MainActivity.this.findViewById(R.id.fab_choices_background);
         final float backgroundAlpha = 0.8f;
         final long backgroundAnimationDuration = 200;
 
-        background.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                menu.collapse();
-            }
-        });
+        background.setOnClickListener(v -> menu.collapse());
 
         menu.setOnFloatingActionsMenuUpdateListener(new FloatingActionsMenu.OnFloatingActionsMenuUpdateListener()
         {
@@ -941,54 +869,44 @@ public class MainActivity extends DBActivity
             }
         });
 
-        FloatingActionButton fabNewExpense = (FloatingActionButton) findViewById(R.id.fab_new_expense);
-        fabNewExpense.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
+        FloatingActionButton fabNewExpense = findViewById(R.id.fab_new_expense);
+        fabNewExpense.setOnClickListener(v -> {
+            Intent startIntent = new Intent(MainActivity.this, ExpenseEditActivity.class);
+            startIntent.putExtra("date", calendarFragment.getSelectedDate().getTime());
+
+            if( UIHelper.areAnimationsEnabled(MainActivity.this) )
             {
-                Intent startIntent = new Intent(MainActivity.this, ExpenseEditActivity.class);
-                startIntent.putExtra("date", calendarFragment.getSelectedDate().getTime());
-
-                if( UIHelper.areAnimationsEnabled(MainActivity.this) )
-                {
-                    startIntent.putExtra(ANIMATE_TRANSITION_KEY, true);
-                    startIntent.putExtra(CENTER_X_KEY, (int) menu.getX() + (int) ((float) menu.getWidth() / 1.2f));
-                    startIntent.putExtra(CENTER_Y_KEY, (int) menu.getY() + (int) ((float) menu.getHeight() / 1.2f));
-                }
-
-                ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
-
-                menu.collapse();
+                startIntent.putExtra(ANIMATE_TRANSITION_KEY, true);
+                startIntent.putExtra(CENTER_X_KEY, (int) menu.getX() + (int) ((float) menu.getWidth() / 1.2f));
+                startIntent.putExtra(CENTER_Y_KEY, (int) menu.getY() + (int) ((float) menu.getHeight() / 1.2f));
             }
+
+            ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
+
+            menu.collapse();
         });
 
-        FloatingActionButton fabNewRecurringExpense = (FloatingActionButton) findViewById(R.id.fab_new_recurring_expense);
-        fabNewRecurringExpense.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
+        FloatingActionButton fabNewRecurringExpense = findViewById(R.id.fab_new_recurring_expense);
+        fabNewRecurringExpense.setOnClickListener(v -> {
+            Intent startIntent = new Intent(MainActivity.this, RecurringExpenseEditActivity.class);
+            startIntent.putExtra("dateStart", calendarFragment.getSelectedDate().getTime());
+
+            if( UIHelper.areAnimationsEnabled(MainActivity.this) )
             {
-                Intent startIntent = new Intent(MainActivity.this, RecurringExpenseEditActivity.class);
-                startIntent.putExtra("dateStart", calendarFragment.getSelectedDate().getTime());
-
-                if( UIHelper.areAnimationsEnabled(MainActivity.this) )
-                {
-                    startIntent.putExtra(ANIMATE_TRANSITION_KEY, true);
-                    startIntent.putExtra(CENTER_X_KEY, (int) menu.getX() + (int) ((float) menu.getWidth() / 1.2f));
-                    startIntent.putExtra(CENTER_Y_KEY, (int) menu.getY() + (int) ((float) menu.getHeight() / 1.2f));
-                }
-
-                ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
-
-                menu.collapse();
+                startIntent.putExtra(ANIMATE_TRANSITION_KEY, true);
+                startIntent.putExtra(CENTER_X_KEY, (int) menu.getX() + (int) ((float) menu.getWidth() / 1.2f));
+                startIntent.putExtra(CENTER_Y_KEY, (int) menu.getY() + (int) ((float) menu.getHeight() / 1.2f));
             }
+
+            ActivityCompat.startActivityForResult(MainActivity.this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null);
+
+            menu.collapse();
         });
 
         /*
          * Expense Recycler view
          */
-        recyclerView = (RecyclerView) findViewById(R.id.expensesRecyclerView);
+        recyclerView = findViewById(R.id.expensesRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         Date date = new Date();
@@ -1040,14 +958,7 @@ public class MainActivity extends DBActivity
         new AlertDialog.Builder(MainActivity.this)
             .setTitle(R.string.recurring_expense_delete_error_title)
             .setMessage(R.string.recurring_expense_delete_error_message)
-            .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener()
-            {
-                @Override
-                public void onClick(DialogInterface dialog, int which)
-                {
-                    dialog.dismiss();
-                }
-            })
+            .setNegativeButton(R.string.ok, (dialog, which) -> dialog.dismiss())
             .show();
     }
 
@@ -1196,14 +1107,7 @@ public class MainActivity extends DBActivity
 
                 if( expensesToRestore != null ) // just in case..
                 {
-                    snackbar.setAction(R.string.undo, new View.OnClickListener()
-                    {
-                        @Override
-                        public void onClick(View v)
-                        {
-                            new CancelDeleteRecurringExpenseTask(expensesToRestore, recurringExpenseToRestore).execute();
-                        }
-                    });
+                    snackbar.setAction(R.string.undo, v -> new CancelDeleteRecurringExpenseTask(expensesToRestore, recurringExpenseToRestore).execute());
                 }
 
                 snackbar.setActionTextColor(ContextCompat.getColor(MainActivity.this, R.color.snackbar_action_undo));
@@ -1307,14 +1211,7 @@ public class MainActivity extends DBActivity
                 new AlertDialog.Builder(MainActivity.this)
                     .setTitle(R.string.recurring_expense_restore_error_title)
                     .setMessage(getResources().getString(R.string.recurring_expense_restore_error_message))
-                    .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener()
-                    {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which)
-                        {
-                            dialog.dismiss();
-                        }
-                    })
+                    .setNegativeButton(R.string.ok, (dialog, which) -> dialog.dismiss())
                     .show();
             }
         }

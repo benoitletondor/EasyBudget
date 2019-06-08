@@ -32,6 +32,8 @@ import com.benoitletondor.easybudgetapp.helper.Parameters;
 import com.benoitletondor.easybudgetapp.helper.UserHelper;
 import com.benoitletondor.easybudgetapp.view.MainActivity;
 
+import static com.benoitletondor.easybudgetapp.notif.NotificationsChannels.CHANNEL_NEW_FEATURES;
+
 /**
  * Service that will receive events from the daily reminder opt-in notification
  *
@@ -119,7 +121,7 @@ public class DailyNotifOptinService extends IntentService
             redirectIntent.setAction(DailyNotifOptinService.INTENT_REDIRECT_ACTION);
             PendingIntent redirectPendingIntent = PendingIntent.getService(context, 0, redirectIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-            NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(context)
+            NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(context, CHANNEL_NEW_FEATURES)
                 .setSmallIcon(R.drawable.ic_push)
                 .setContentTitle(context.getResources().getString(R.string.app_name))
                 .setContentText(context.getResources().getString(R.string.premium_notif_optin_message))

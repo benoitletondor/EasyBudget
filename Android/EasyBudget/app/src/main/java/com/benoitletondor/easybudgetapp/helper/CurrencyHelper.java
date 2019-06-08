@@ -25,7 +25,6 @@ import com.benoitletondor.easybudgetapp.BuildConfig;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Currency;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -128,14 +127,7 @@ public class CurrencyHelper
             }
 
             List<Currency> currencies = new ArrayList<>(currencySet);
-            Collections.sort(currencies, new Comparator<Currency>()
-            {
-                @Override
-                public int compare(Currency lhs, Currency rhs)
-                {
-                    return lhs.getCurrencyCode().compareTo(rhs.getCurrencyCode());
-                }
-            });
+            Collections.sort(currencies, (lhs, rhs) -> lhs.getCurrencyCode().compareTo(rhs.getCurrencyCode()));
 
             return currencies;
         }

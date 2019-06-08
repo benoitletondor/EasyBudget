@@ -35,6 +35,7 @@ import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 
 import java.util.Currency;
+import java.util.Objects;
 
 /**
  * Fragment that contains UI for user to chose its currency.<br />
@@ -67,7 +68,7 @@ public class SelectCurrencyFragment extends DialogFragment
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         if( getShowsDialog() )
         {
@@ -91,7 +92,7 @@ public class SelectCurrencyFragment extends DialogFragment
         setupRecyclerView(v);
 
         // Put some padding between title and content
-        v.setPadding(0, getActivity().getResources().getDimensionPixelSize(R.dimen.select_currency_dialog_padding_top), 0, 0);
+        v.setPadding(0, Objects.requireNonNull(getActivity()).getResources().getDimensionPixelSize(R.dimen.select_currency_dialog_padding_top), 0, 0);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
@@ -110,7 +111,7 @@ public class SelectCurrencyFragment extends DialogFragment
      */
     private void setupRecyclerView(final View v)
     {
-        final RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.select_currency_recycler_view);
+        final RecyclerView recyclerView = v.findViewById(R.id.select_currency_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(v.getContext()));
 
         // Load available currencies asynchronously
@@ -120,7 +121,7 @@ public class SelectCurrencyFragment extends DialogFragment
             protected Pair<SelectCurrencyRecyclerViewAdapter, Integer> doInBackground(Void... voids)
             {
                 SelectCurrencyRecyclerViewAdapter adapter = new SelectCurrencyRecyclerViewAdapter(CurrencyHelper.getMainAvailableCurrencies(), CurrencyHelper.getOtherAvailableCurrencies());
-                return Pair.create(adapter, adapter.getSelectedCurrencyPosition(getContext()));
+                return Pair.create(adapter, adapter.getSelectedCurrencyPosition(Objects.requireNonNull(getContext())));
             }
 
             @Override

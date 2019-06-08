@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Fragment that displays monthly report for a given month
@@ -89,7 +90,7 @@ public class MonthlyReportFragment extends Fragment
 // ---------------------------------->
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         // Reset totals
         expensesAmount = 0.0d;
@@ -98,20 +99,20 @@ public class MonthlyReportFragment extends Fragment
         // Inflate the layout for this fragment
         final View v = inflater.inflate(R.layout.fragment_monthly_report, container, false);
 
-        final ProgressBar progressBar = (ProgressBar) v.findViewById(R.id.monthly_report_fragment_progress_bar);
+        final ProgressBar progressBar = v.findViewById(R.id.monthly_report_fragment_progress_bar);
         final View content = v.findViewById(R.id.monthly_report_fragment_content);
-        final RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.monthly_report_fragment_recycler_view);
+        final RecyclerView recyclerView = v.findViewById(R.id.monthly_report_fragment_recycler_view);
         final View emptyState = v.findViewById(R.id.monthly_report_fragment_empty_state);
-        final TextView revenuesAmountTextView = (TextView) v.findViewById(R.id.monthly_report_fragment_revenues_total_tv);
-        final TextView expensesAmountTextView = (TextView) v.findViewById(R.id.monthly_report_fragment_expenses_total_tv);
-        final TextView balanceTextView = (TextView) v.findViewById(R.id.monthly_report_fragment_balance_tv);
+        final TextView revenuesAmountTextView = v.findViewById(R.id.monthly_report_fragment_revenues_total_tv);
+        final TextView expensesAmountTextView = v.findViewById(R.id.monthly_report_fragment_expenses_total_tv);
+        final TextView balanceTextView = v.findViewById(R.id.monthly_report_fragment_balance_tv);
 
         new AsyncTask<Void, Void, MonthlyReportRecyclerViewAdapter>()
         {
             @Override
             protected MonthlyReportRecyclerViewAdapter doInBackground(Void... params)
             {
-                final DB db = new DB(getActivity());
+                final DB db = new DB(Objects.requireNonNull(getContext()));
                 try
                 {
                     List<Expense> expensesForMonth = db.getExpensesForMonth(date);

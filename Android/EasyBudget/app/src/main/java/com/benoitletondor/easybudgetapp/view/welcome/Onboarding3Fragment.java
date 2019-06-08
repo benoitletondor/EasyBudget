@@ -18,8 +18,9 @@ package com.benoitletondor.easybudgetapp.view.welcome;
 
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -39,6 +40,7 @@ import com.benoitletondor.easybudgetapp.model.Expense;
 import com.benoitletondor.easybudgetapp.model.db.DB;
 
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * Onboarding step 3 fragment
@@ -63,7 +65,7 @@ public class Onboarding3Fragment extends OnboardingFragment
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_onboarding3, container, false);
@@ -76,10 +78,10 @@ public class Onboarding3Fragment extends OnboardingFragment
             amount = -db.getBalanceForDay(new Date());
         }
 
-        moneyTextView = (TextView) v.findViewById(R.id.onboarding_screen3_initial_amount_money_tv);
+        moneyTextView = v.findViewById(R.id.onboarding_screen3_initial_amount_money_tv);
         setCurrency();
 
-        amountEditText = (EditText) v.findViewById(R.id.onboarding_screen3_initial_amount_et);
+        amountEditText = v.findViewById(R.id.onboarding_screen3_initial_amount_et);
         amountEditText.setText(amount == 0 ? "0" : String.valueOf(amount));
         UIHelper.preventUnsupportedInputForDecimals(amountEditText);
         amountEditText.addTextChangedListener(new TextWatcher()
@@ -103,40 +105,35 @@ public class Onboarding3Fragment extends OnboardingFragment
             }
         });
 
-        nextButton = (Button) v.findViewById(R.id.onboarding_screen3_next_button);
-        nextButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
+        nextButton = v.findViewById(R.id.onboarding_screen3_next_button);
+        nextButton.setOnClickListener(v1 -> {
+            DB db1 = getDB();
+            if ( db1 != null)
             {
-                DB db = getDB();
-                if (db != null)
+                double currentBalance = -db1.getBalanceForDay(new Date());
+                double newBalance = getAmountValue();
+
+                if (newBalance != currentBalance)
                 {
-                    double currentBalance = -db.getBalanceForDay(new Date());
-                    double newBalance = getAmountValue();
+                    double diff = newBalance - currentBalance;
 
-                    if (newBalance != currentBalance)
-                    {
-                        double diff = newBalance - currentBalance;
-
-                        final Expense expense = new Expense(getResources().getString(R.string.adjust_balance_expense_title), -diff, new Date());
-                        db.persistExpense(expense);
-                    }
+                    final Expense expense = new Expense(getResources().getString(R.string.adjust_balance_expense_title), -diff, new Date());
+                    db1.persistExpense(expense);
                 }
-
-                // Hide keyboard
-                try
-                {
-                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(amountEditText.getWindowToken(), 0);
-                }
-                catch(Exception e)
-                {
-                    Logger.error("Error while hiding keyboard", e);
-                }
-
-                next(v);
             }
+
+            // Hide keyboard
+            try
+            {
+                InputMethodManager imm = (InputMethodManager) Objects.requireNonNull(getActivity()).getSystemService(Context.INPUT_METHOD_SERVICE);
+                Objects.requireNonNull(imm).hideSoftInputFromWindow(amountEditText.getWindowToken(), 0);
+            }
+            catch(Exception e)
+            {
+                Logger.error("Error while hiding keyboard", e);
+            }
+
+            next(v1);
         });
         setButtonText();
 
@@ -167,7 +164,7 @@ public class Onboarding3Fragment extends OnboardingFragment
     {
         if( moneyTextView != null ) // Will be null if view is not yet created
         {
-            moneyTextView.setText(CurrencyHelper.getUserCurrency(getActivity()).getSymbol());
+            moneyTextView.setText(CurrencyHelper.getUserCurrency(Objects.requireNonNull(getContext())).getSymbol());
         }
     }
 
@@ -181,17 +178,10 @@ public class Onboarding3Fragment extends OnboardingFragment
         }
         catch (Exception e)
         {
-            new AlertDialog.Builder(getActivity())
+            new AlertDialog.Builder(Objects.requireNonNull(getContext()))
                 .setTitle(R.string.adjust_balance_error_title)
                 .setMessage(R.string.adjust_balance_error_message)
-                .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener()
-                {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which)
-                    {
-                        dialog.dismiss();
-                    }
-                })
+                .setNegativeButton(R.string.ok, (dialog, which) -> dialog.dismiss())
                 .show();
 
             Logger.warning("An error occurred during initial amount parsing: "+valueString, e);
@@ -205,7 +195,7 @@ public class Onboarding3Fragment extends OnboardingFragment
         {
             double value = getAmountValue();
 
-            nextButton.setText(getActivity().getString(R.string.onboarding_screen_3_cta, CurrencyHelper.getFormattedCurrencyString(getActivity(), value)));
+            nextButton.setText(Objects.requireNonNull(getContext()).getString(R.string.onboarding_screen_3_cta, CurrencyHelper.getFormattedCurrencyString(Objects.requireNonNull(getActivity()), value)));
         }
     }
 }

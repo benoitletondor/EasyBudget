@@ -164,19 +164,10 @@ public final class DB
             return hasExpensesCached;
         }
 
-        Cursor cursor = null;
-        try
+        try ( Cursor cursor = database.rawQuery("SELECT COUNT(*) FROM " + SQLiteDBHelper.TABLE_EXPENSE + " WHERE " + SQLiteDBHelper.COLUMN_EXPENSE_DATE + " >= " + range.first + " AND " + SQLiteDBHelper.COLUMN_EXPENSE_DATE + " <= " + range.second, null) )
         {
-            cursor = database.rawQuery("SELECT COUNT(*) FROM " + SQLiteDBHelper.TABLE_EXPENSE + " WHERE " + SQLiteDBHelper.COLUMN_EXPENSE_DATE + " >= " + range.first + " AND "+SQLiteDBHelper.COLUMN_EXPENSE_DATE + " <= "+ range.second, null);
 
             return cursor.moveToFirst() && cursor.getInt(0) > 0;
-        }
-        finally
-        {
-            if( cursor != null )
-            {
-                cursor.close();
-            }
         }
     }
 
@@ -313,25 +304,16 @@ public final class DB
             }
         }
 
-        Cursor cursor = null;
-        try
+        try ( Cursor cursor = database.rawQuery("SELECT SUM(" + SQLiteDBHelper.COLUMN_EXPENSE_AMOUNT + ") FROM " + SQLiteDBHelper.TABLE_EXPENSE + " WHERE " + SQLiteDBHelper.COLUMN_EXPENSE_DATE + " <= " + range.second, null) )
         {
-            cursor = database.rawQuery("SELECT SUM(" + SQLiteDBHelper.COLUMN_EXPENSE_AMOUNT + ") FROM " + SQLiteDBHelper.TABLE_EXPENSE + " WHERE " + SQLiteDBHelper.COLUMN_EXPENSE_DATE + " <= " + range.second, null);
 
-            if(cursor.moveToFirst())
+            if ( cursor.moveToFirst() )
             {
                 int value = cursor.getInt(0);
                 return (double) value / 100.d;
             }
 
             return 0;
-        }
-        finally
-        {
-            if( cursor != null )
-            {
-                cursor.close();
-            }
         }
     }
 
@@ -555,19 +537,10 @@ public final class DB
     {
         toDate = DateHelper.cleanDate(toDate);
 
-        Cursor cursor = null;
-        try
+        try ( Cursor cursor = database.rawQuery("SELECT COUNT(*) FROM " + SQLiteDBHelper.TABLE_EXPENSE + " WHERE " + SQLiteDBHelper.COLUMN_EXPENSE_RECURRING_ID + "=" + recurringExpense.getId() + " AND " + SQLiteDBHelper.COLUMN_EXPENSE_DATE + "<" + toDate.getTime() + " LIMIT 1", null) )
         {
-            cursor = database.rawQuery("SELECT COUNT(*) FROM "+SQLiteDBHelper.TABLE_EXPENSE+" WHERE "+SQLiteDBHelper.COLUMN_EXPENSE_RECURRING_ID +"="+ recurringExpense.getId()+" AND "+SQLiteDBHelper.COLUMN_EXPENSE_DATE+"<"+toDate.getTime()+" LIMIT 1", null);
 
             return cursor.moveToFirst() && cursor.getInt(0) > 0;
-        }
-        finally
-        {
-            if( cursor != null )
-            {
-                cursor.close();
-            }
         }
     }
 
@@ -613,24 +586,15 @@ public final class DB
     @Nullable
     public RecurringExpense findRecurringExpenseForId(long id)
     {
-        Cursor cursor = null;
-        try
+        try ( Cursor cursor = database.query(SQLiteDBHelper.TABLE_RECURRING_EXPENSE, null, SQLiteDBHelper.COLUMN_RECURRING_DB_ID + " = " + id, null, null, null, null, "1") )
         {
-            cursor = database.query(SQLiteDBHelper.TABLE_RECURRING_EXPENSE, null, SQLiteDBHelper.COLUMN_RECURRING_DB_ID + " = " + id, null, null, null, null, "1");
 
-            if(cursor.moveToFirst())
+            if ( cursor.moveToFirst() )
             {
                 return recurringExpenseFromCursor(cursor);
             }
 
             return null;
-        }
-        finally
-        {
-            if( cursor != null )
-            {
-                cursor.close();
-            }
         }
     }
 

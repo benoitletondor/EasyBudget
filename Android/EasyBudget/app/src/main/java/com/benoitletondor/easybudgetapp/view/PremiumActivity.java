@@ -19,14 +19,12 @@ package com.benoitletondor.easybudgetapp.view;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import android.view.View;
 
 import com.benoitletondor.easybudgetapp.EasyBudget;
 import com.benoitletondor.easybudgetapp.PremiumPurchaseListener;
@@ -34,6 +32,8 @@ import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.view.premium.Premium1Fragment;
 import com.benoitletondor.easybudgetapp.view.premium.Premium2Fragment;
 import com.benoitletondor.easybudgetapp.view.premium.Premium3Fragment;
+
+import java.util.Objects;
 
 import me.relex.circleindicator.CircleIndicator;
 
@@ -61,7 +61,7 @@ public class PremiumActivity extends AppCompatActivity
         // Cancelled by default
         setResult(Activity.RESULT_CANCELED);
 
-        pager = (ViewPager) findViewById(R.id.premium_view_pager);
+        pager = findViewById(R.id.premium_view_pager);
         pager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager())
         {
             @Override
@@ -86,67 +86,48 @@ public class PremiumActivity extends AppCompatActivity
                 return 3;
             }
         });
-        pager.setOffscreenPageLimit(pager.getAdapter().getCount()); // preload all fragments for transitions smoothness
+        pager.setOffscreenPageLimit(Objects.requireNonNull(pager.getAdapter()).getCount()); // preload all fragments for transitions smoothness
 
         // Circle indicator
         ((CircleIndicator) findViewById(R.id.premium_view_pager_indicator)).setViewPager(pager);
 
-        findViewById(R.id.premium_not_now_button).setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                finish();
-            }
-        });
+        findViewById(R.id.premium_not_now_button).setOnClickListener(v -> finish());
 
-        findViewById(R.id.premium_cta_button).setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                // Show loader
-                final ProgressDialog loading = ProgressDialog.show(PremiumActivity.this,
-                        getResources().getString(R.string.iab_purchase_wait_title),
-                        getResources().getString(R.string.iab_purchase_wait_message),
-                        true, false);
+        findViewById(R.id.premium_cta_button).setOnClickListener(v -> {
+            // Show loader
+            final ProgressDialog loading = ProgressDialog.show(PremiumActivity.this,
+                    getResources().getString(R.string.iab_purchase_wait_title),
+                    getResources().getString(R.string.iab_purchase_wait_message),
+                    true, false);
 
-                ((EasyBudget) getApplication()).launchPremiumPurchaseFlow(PremiumActivity.this, new PremiumPurchaseListener()
+            ((EasyBudget) getApplication()).launchPremiumPurchaseFlow(PremiumActivity.this, new PremiumPurchaseListener()
+            {
+                @Override
+                public void onUserCancelled()
                 {
-                    @Override
-                    public void onUserCancelled()
-                    {
-                        loading.dismiss();
-                    }
+                    loading.dismiss();
+                }
 
-                    @Override
-                    public void onPurchaseError(String error)
-                    {
-                        loading.dismiss();
+                @Override
+                public void onPurchaseError(String error)
+                {
+                    loading.dismiss();
 
-                        new AlertDialog.Builder(PremiumActivity.this)
-                            .setTitle(R.string.iab_purchase_error_title)
-                            .setMessage(getResources().getString(R.string.iab_purchase_error_message, error))
-                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
-                            {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    dialog.dismiss();
-                                }
-                            })
-                            .show();
-                    }
+                    new AlertDialog.Builder(PremiumActivity.this)
+                        .setTitle(R.string.iab_purchase_error_title)
+                        .setMessage(getResources().getString(R.string.iab_purchase_error_message, error))
+                        .setPositiveButton(R.string.ok, (dialog, which) -> dialog.dismiss())
+                        .show();
+                }
 
-                    @Override
-                    public void onPurchaseSuccess()
-                    {
-                        loading.dismiss();
-                        setResult(Activity.RESULT_OK); // Important to update the UI
-                        finish();
-                    }
-                });
-            }
+                @Override
+                public void onPurchaseSuccess()
+                {
+                    loading.dismiss();
+                    setResult(Activity.RESULT_OK); // Important to update the UI
+                    finish();
+                }
+            });
         });
     }
 

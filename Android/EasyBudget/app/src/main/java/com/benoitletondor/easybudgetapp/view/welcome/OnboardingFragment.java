@@ -28,6 +28,8 @@ import android.view.View;
 import com.benoitletondor.easybudgetapp.model.db.DB;
 import com.benoitletondor.easybudgetapp.view.WelcomeActivity;
 
+import java.util.Objects;
+
 /**
  * Abstract fragment that contains common methods of all onboarding fragments
  *
@@ -58,7 +60,7 @@ public abstract class OnboardingFragment extends Fragment
     protected void next()
     {
         Intent intent = new Intent(WelcomeActivity.PAGER_NEXT_INTENT);
-        LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(getContext())).sendBroadcast(intent);
     }
 
     /**
@@ -72,7 +74,7 @@ public abstract class OnboardingFragment extends Fragment
         intent.putExtra(WelcomeActivity.ANIMATE_TRANSITION_KEY, true);
         intent.putExtra(WelcomeActivity.CENTER_X_KEY, (int) animationCenter.getX() + animationCenter.getWidth() / 2);
         intent.putExtra(WelcomeActivity.CENTER_Y_KEY, (int) animationCenter.getY() + animationCenter.getHeight() / 2);
-        LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(getContext())).sendBroadcast(intent);
     }
 
     /**
@@ -81,7 +83,7 @@ public abstract class OnboardingFragment extends Fragment
     protected void done()
     {
         Intent intent = new Intent(WelcomeActivity.PAGER_DONE_INTENT);
-        LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(getContext())).sendBroadcast(intent);
     }
 
     /**
