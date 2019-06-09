@@ -68,10 +68,6 @@ public class ParameterKeys
      */
     public static final String RATING_STEP = "rating_step";
     /**
-     * Has the user redeemed a Batch offer (bool)
-     */
-    public static final String BATCH_OFFER_REDEEMED = "batch_offer_redeemed";
-    /**
      * Number of time the app has been opened (int)
      */
     public static final String NUMBER_OF_OPEN = "number_of_open";
@@ -127,12 +123,4 @@ public class ParameterKeys
      * First day of week to show (int)
      */
     public static final String FIRST_DAY_OF_WEEK = "first_day_of_week";
-    /**
-     * Is the user premium from AppTurbo (bool)
-     */
-    public static final String APP_TURBO_PREMIUM = "appturbo_offer";
-    /**
-     * Cache storage of the IAB status
-     */
-    public static final String PREMIUM = "premium";
 }

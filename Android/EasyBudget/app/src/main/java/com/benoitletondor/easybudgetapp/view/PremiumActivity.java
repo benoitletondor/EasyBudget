@@ -20,14 +20,16 @@ package com.benoitletondor.easybudgetapp.view;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.benoitletondor.easybudgetapp.EasyBudget;
-import com.benoitletondor.easybudgetapp.PremiumPurchaseListener;
+import com.benoitletondor.easybudgetapp.iab.Iab;
+import com.benoitletondor.easybudgetapp.iab.PremiumPurchaseListener;
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.view.premium.Premium1Fragment;
 import com.benoitletondor.easybudgetapp.view.premium.Premium2Fragment;
@@ -36,6 +38,8 @@ import com.benoitletondor.easybudgetapp.view.premium.Premium3Fragment;
 import java.util.Objects;
 
 import me.relex.circleindicator.CircleIndicator;
+
+import static org.koin.java.KoinJavaComponent.get;
 
 /**
  * Activity that contains the premium onboarding screen. This activity should return with a
@@ -49,6 +53,8 @@ public class PremiumActivity extends AppCompatActivity
      * The view pager
      */
     private ViewPager pager;
+
+    private Iab iab = get(Iab.class);
 
 // ------------------------------------->
 
@@ -100,7 +106,7 @@ public class PremiumActivity extends AppCompatActivity
                     getResources().getString(R.string.iab_purchase_wait_message),
                     true, false);
 
-            ((EasyBudget) getApplication()).launchPremiumPurchaseFlow(PremiumActivity.this, new PremiumPurchaseListener()
+            iab.launchPremiumPurchaseFlow(PremiumActivity.this, new PremiumPurchaseListener()
             {
                 @Override
                 public void onUserCancelled()
@@ -109,7 +115,7 @@ public class PremiumActivity extends AppCompatActivity
                 }
 
                 @Override
-                public void onPurchaseError(String error)
+                public void onPurchaseError(@NonNull String error)
                 {
                     loading.dismiss();
 

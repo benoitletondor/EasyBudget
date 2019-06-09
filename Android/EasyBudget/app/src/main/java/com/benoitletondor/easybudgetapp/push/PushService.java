@@ -22,11 +22,14 @@ import com.benoitletondor.easybudgetapp.helper.Logger;
 import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
 import com.benoitletondor.easybudgetapp.helper.Parameters;
 import com.benoitletondor.easybudgetapp.helper.UserHelper;
+import com.benoitletondor.easybudgetapp.iab.Iab;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.Calendar;
 import java.util.Date;
+
+import static org.koin.java.KoinJavaComponent.get;
 
 /**
  * Service that handles Batch pushes
@@ -55,6 +58,10 @@ public class PushService extends FirebaseMessagingService
      * Key to retrieve the monthly reminder key for a push
      */
     public final static String MONTHLY_REMINDER_KEY = "monthly";
+
+// ----------------------------------->
+
+    private Iab iab = get(Iab.class);
 
 // ----------------------------------->
 
@@ -100,7 +107,7 @@ public class PushService extends FirebaseMessagingService
             // Check if it's a daily reminder
             if( remoteMessage.getData().containsKey(DAILY_REMINDER_KEY) && "true".equals(remoteMessage.getData().get(DAILY_REMINDER_KEY)) )
             {
-                if( !UserHelper.isUserPremium(getApplication()) ) // Only for premium users
+                if( !iab.isUserPremium() ) // Only for premium users
                 {
                     return false;
                 }
@@ -128,7 +135,7 @@ public class PushService extends FirebaseMessagingService
             }
             else if( remoteMessage.getData().containsKey(MONTHLY_REMINDER_KEY) && "true".equals(remoteMessage.getData().get(MONTHLY_REMINDER_KEY)) )
             {
-                return UserHelper.isUserPremium(getApplication()) && UserHelper.isUserAllowingMonthlyReminderPushes(this);
+                return iab.isUserPremium() && UserHelper.isUserAllowingMonthlyReminderPushes(this);
             }
 
             // Else it must be an update push
@@ -187,7 +194,7 @@ public class PushService extends FirebaseMessagingService
             {
                 boolean isForPremium = "true".equals(remoteMessage.getData().get(INTENT_PREMIUM_KEY));
 
-                return isForPremium == UserHelper.isUserPremium(getApplication());
+                return isForPremium == iab.isUserPremium();
             }
 
             return true;

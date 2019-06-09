@@ -16,7 +16,6 @@
 
 package com.benoitletondor.easybudgetapp.helper;
 
-import android.app.Application;
 import android.content.Context;
 import androidx.annotation.NonNull;
 import com.roomorama.caldroid.CaldroidFragment;
@@ -30,36 +29,6 @@ import static com.benoitletondor.easybudgetapp.helper.ParameterKeys.FIRST_DAY_OF
  */
 public class UserHelper
 {
-    /**
-     * Feature reference for premium (used by Batch)
-     */
-    public static final String BATCH_PREMIUM_FEATURE = "PREMIUM";
-
-// ------------------------------------>
-
-    /**
-     * Is the user a premium user
-     *
-     * @param application non null application
-     * @return true if the user if premium, false otherwise
-     */
-    public static boolean isUserPremium(@NonNull Application application)
-    {
-        return Parameters.getInstance(application).getBoolean(ParameterKeys.PREMIUM, false) ||
-                Parameters.getInstance(application).getBoolean(ParameterKeys.BATCH_OFFER_REDEEMED, false) ||
-                Parameters.getInstance(application).getBoolean(ParameterKeys.APP_TURBO_PREMIUM, false);
-    }
-
-    /**
-     * Set this user as premium from Batch
-     *
-     * @param context non null context
-     */
-    public static void setBatchUserPremium(@NonNull Context context)
-    {
-        Parameters.getInstance(context).putBoolean(ParameterKeys.BATCH_OFFER_REDEEMED, true);
-    }
-
     /**
      * The user wants or not to receive notification about updates
      *

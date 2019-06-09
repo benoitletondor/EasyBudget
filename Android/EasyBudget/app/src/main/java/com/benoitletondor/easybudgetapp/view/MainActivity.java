@@ -29,6 +29,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+
+import com.benoitletondor.easybudgetapp.iab.Iab;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentTransaction;
@@ -78,6 +80,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+import static com.benoitletondor.easybudgetapp.EasyBudgetKt.DEFAULT_LOW_MONEY_WARNING_AMOUNT;
+import static com.benoitletondor.easybudgetapp.iab.IabKt.INTENT_IAB_STATUS_CHANGED;
+import static org.koin.java.KoinJavaComponent.get;
+
 /**
  * Main activity containing Calendar and List of expenses
  *
@@ -126,6 +132,8 @@ public class MainActivity extends DBActivity
     @Nullable
     private Date lastStopDate;
 
+    private Iab iab = get(Iab.class);
+
 // ------------------------------------------>
 
     @Override
@@ -157,7 +165,7 @@ public class MainActivity extends DBActivity
         filter.addAction(SelectCurrencyFragment.CURRENCY_SELECTED_INTENT);
         filter.addAction(INTENT_SHOW_WELCOME_SCREEN);
         filter.addAction(Intent.ACTION_VIEW);
-        filter.addAction(EasyBudget.INTENT_IAB_STATUS_CHANGED);
+        filter.addAction(INTENT_IAB_STATUS_CHANGED);
 
         receiver = new BroadcastReceiver()
         {
@@ -239,7 +247,7 @@ public class MainActivity extends DBActivity
                     Intent startIntent = new Intent(MainActivity.this, WelcomeActivity.class);
                     ActivityCompat.startActivityForResult(MainActivity.this, startIntent, WELCOME_SCREEN_ACTIVITY_CODE, null);
                 }
-                else if( EasyBudget.INTENT_IAB_STATUS_CHANGED.equals(intent.getAction()) )
+                else if( INTENT_IAB_STATUS_CHANGED.equals(intent.getAction()) )
                 {
                     invalidateOptionsMenu();
                 }
@@ -381,7 +389,7 @@ public class MainActivity extends DBActivity
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
         // Remove monthly report for non premium users
-        if( !UserHelper.isUserPremium(getApplication()) )
+        if( !iab.isUserPremium() )
         {
             menu.removeItem(R.id.action_monthly_report);
         }
@@ -567,7 +575,7 @@ public class MainActivity extends DBActivity
         {
             budgetLineContainer.setBackgroundResource(R.color.budget_red);
         }
-        else if( balance < Parameters.getInstance(getApplicationContext()).getInt(ParameterKeys.LOW_MONEY_WARNING_AMOUNT, EasyBudget.DEFAULT_LOW_MONEY_WARNING_AMOUNT) )
+        else if( balance < Parameters.getInstance(getApplicationContext()).getInt(ParameterKeys.LOW_MONEY_WARNING_AMOUNT, DEFAULT_LOW_MONEY_WARNING_AMOUNT) )
         {
             budgetLineContainer.setBackgroundResource(R.color.budget_orange);
         }

@@ -39,7 +39,6 @@ import android.widget.Toast;
 
 import com.benoitletondor.easybudgetapp.BuildConfig;
 import com.benoitletondor.easybudgetapp.EasyBudget;
-import com.benoitletondor.easybudgetapp.PremiumCheckStatus;
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import com.benoitletondor.easybudgetapp.helper.Logger;
@@ -47,6 +46,7 @@ import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
 import com.benoitletondor.easybudgetapp.helper.Parameters;
 import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.helper.UserHelper;
+import com.benoitletondor.easybudgetapp.iab.Iab;
 import com.benoitletondor.easybudgetapp.notif.DailyNotifOptinService;
 import com.benoitletondor.easybudgetapp.notif.MonthlyReportNotifService;
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment;
@@ -54,7 +54,10 @@ import com.roomorama.caldroid.CaldroidFragment;
 
 import java.util.Objects;
 
+import static com.benoitletondor.easybudgetapp.EasyBudgetKt.DEFAULT_LOW_MONEY_WARNING_AMOUNT;
+import static com.benoitletondor.easybudgetapp.iab.IabKt.INTENT_IAB_STATUS_CHANGED;
 import static com.benoitletondor.easybudgetapp.view.SettingsActivity.USER_GONE_PREMIUM_INTENT;
+import static org.koin.java.KoinJavaComponent.get;
 
 /**
  * Fragment to display preferences
@@ -88,6 +91,8 @@ public class PreferencesFragment extends PreferenceFragment
      * Is the not premium category shown
      */
     private boolean notPremiumShown = true;
+
+    private Iab iab = get(Iab.class);
 
 // ---------------------------------------->
 
@@ -194,7 +199,7 @@ public class PreferencesFragment extends PreferenceFragment
         limitWarningPreference.setOnPreferenceClickListener(preference -> {
             View dialogView = getActivity().getLayoutInflater().inflate(R.layout.dialog_set_warning_limit, null);
             final EditText limitEditText = (EditText) dialogView.findViewById(R.id.warning_limit);
-            limitEditText.setText(String.valueOf(Parameters.getInstance(getActivity()).getInt(ParameterKeys.LOW_MONEY_WARNING_AMOUNT, EasyBudget.DEFAULT_LOW_MONEY_WARNING_AMOUNT)));
+            limitEditText.setText(String.valueOf(Parameters.getInstance(getActivity()).getInt(ParameterKeys.LOW_MONEY_WARNING_AMOUNT, DEFAULT_LOW_MONEY_WARNING_AMOUNT)));
             limitEditText.setSelection(limitEditText.getText().length()); // Put focus at the end of the text
 
             final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -326,7 +331,7 @@ public class PreferencesFragment extends PreferenceFragment
          * Broadcast receiver
          */
         IntentFilter filter = new IntentFilter(SelectCurrencyFragment.CURRENCY_SELECTED_INTENT);
-        filter.addAction(EasyBudget.INTENT_IAB_STATUS_CHANGED);
+        filter.addAction(INTENT_IAB_STATUS_CHANGED);
         filter.addAction(USER_GONE_PREMIUM_INTENT);
         receiver = new BroadcastReceiver()
         {
@@ -340,15 +345,11 @@ public class PreferencesFragment extends PreferenceFragment
                     selectCurrencyDialog.dismiss();
                     selectCurrencyDialog = null;
                 }
-                else if( EasyBudget.INTENT_IAB_STATUS_CHANGED.equals(intent.getAction()) )
+                else if( INTENT_IAB_STATUS_CHANGED.equals(intent.getAction()) )
                 {
                     try
                     {
-                        PremiumCheckStatus status = (PremiumCheckStatus) intent.getSerializableExtra(EasyBudget.INTENT_IAB_STATUS_KEY);
-                        if( status == PremiumCheckStatus.PREMIUM )
-                        {
-                            refreshPremiumPreference();
-                        }
+                        refreshPremiumPreference();
                     }
                     catch (Exception e)
                     {
@@ -395,7 +396,7 @@ public class PreferencesFragment extends PreferenceFragment
      */
     private void setLimitWarningPreferenceTitle(Preference limitWarningPreferenceTitle)
     {
-        limitWarningPreferenceTitle.setTitle(getResources().getString(R.string.setting_category_limit_set_button_title, CurrencyHelper.getFormattedCurrencyString(getActivity(), Parameters.getInstance(getActivity()).getInt(ParameterKeys.LOW_MONEY_WARNING_AMOUNT, EasyBudget.DEFAULT_LOW_MONEY_WARNING_AMOUNT))));
+        limitWarningPreferenceTitle.setTitle(getResources().getString(R.string.setting_category_limit_set_button_title, CurrencyHelper.getFormattedCurrencyString(getActivity(), Parameters.getInstance(getActivity()).getInt(ParameterKeys.LOW_MONEY_WARNING_AMOUNT, DEFAULT_LOW_MONEY_WARNING_AMOUNT))));
     }
 
     /**
@@ -403,7 +404,7 @@ public class PreferencesFragment extends PreferenceFragment
      */
     private void refreshPremiumPreference()
     {
-        boolean isPremium = UserHelper.isUserPremium(getActivity().getApplication());
+        boolean isPremium = iab.isUserPremium();
 
         if( isPremium )
         {
