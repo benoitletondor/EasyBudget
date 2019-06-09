@@ -437,10 +437,8 @@ public final class DB
 
     /**
      * Get all expenses associated with this recurring expense
-     *
-     * @param recurringExpense
-     * @return
      */
+    @NonNull
     public List<Expense> getAllExpenseForRecurringExpense(@NonNull RecurringExpense recurringExpense)
     {
         Cursor cursor = null;

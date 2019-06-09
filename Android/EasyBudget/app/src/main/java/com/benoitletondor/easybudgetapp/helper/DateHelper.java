@@ -40,7 +40,6 @@ public class DateHelper
     /**
      * Remove hour, minutes, seconds and ms data from a date.
      *
-     * @param date
      * @return a new cleaned date
      */
     public static Date cleanDate(@NonNull Date date)
@@ -84,7 +83,6 @@ public class DateHelper
     /**
      * Remove hour, minutes, seconds and ms data from a date and return its GMT value
      *
-     * @param date
      * @return a cleaned value of this date at GMT
      */
     public static Date cleanGMTDate(@NonNull Date date)

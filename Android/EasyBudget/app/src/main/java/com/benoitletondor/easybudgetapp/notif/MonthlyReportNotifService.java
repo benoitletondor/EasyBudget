@@ -29,7 +29,7 @@ import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.Logger;
 import com.benoitletondor.easybudgetapp.helper.ParameterKeys;
 import com.benoitletondor.easybudgetapp.helper.Parameters;
-import com.benoitletondor.easybudgetapp.view.MainActivity;
+import com.benoitletondor.easybudgetapp.view.main.MainActivity;
 
 import static com.benoitletondor.easybudgetapp.notif.NotificationsChannels.CHANNEL_NEW_FEATURES;
 

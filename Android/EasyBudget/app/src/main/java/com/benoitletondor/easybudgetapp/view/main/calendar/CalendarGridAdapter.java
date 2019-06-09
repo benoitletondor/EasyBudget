@@ -44,7 +44,7 @@ public class CalendarGridAdapter extends CaldroidGridAdapter
 
 // ----------------------------------->
 
-    public CalendarGridAdapter(@NonNull Context context, @NonNull DB db, int month, int year, Map<String, Object> caldroidData, Map<String, Object> extraData)
+    CalendarGridAdapter(@NonNull Context context, @NonNull DB db, int month, int year, Map<String, Object> caldroidData, Map<String, Object> extraData)
     {
         super(context, month, year, caldroidData, extraData);
 
@@ -212,9 +212,6 @@ public class CalendarGridAdapter extends CaldroidGridAdapter
 
     /**
      * Inflate a new cell view and attach ViewData as tag
-     *
-     * @param parent
-     * @return
      */
     private View createView(ViewGroup parent)
     {
@@ -239,35 +236,35 @@ public class CalendarGridAdapter extends CaldroidGridAdapter
         /**
          * TextView that contains the day
          */
-        public TextView dayTextView;
+        TextView dayTextView;
         /**
          * TextView that contains the amount of money for the day
          */
-        public TextView amountTextView;
+        TextView amountTextView;
 
         /**
          * Is this cell a disabled date
          */
-        public boolean isDisabled                   = false;
+        boolean isDisabled                   = false;
         /**
          * Is this cell out of the current month
          */
-        public boolean isOutOfMonth                 = false;
+        boolean isOutOfMonth                 = false;
         /**
          * Is this cell today's cell
          */
-        public boolean isToday                      = false;
+        boolean isToday                      = false;
         /**
          * Is this cell selected
          */
-        public boolean isSelected                   = false;
+        boolean isSelected                   = false;
         /**
          * Does this cell contain expenses
          */
-        public boolean containsExpenses             = false;
+        boolean containsExpenses             = false;
         /**
          * Are color indicator margin set for today
          */
-        public boolean colorIndicatorMarginForToday = false;
+        boolean colorIndicatorMarginForToday = false;
     }
 }

@@ -35,9 +35,6 @@ public class FloatingActionButtonBehavior extends CoordinatorLayout.Behavior<Flo
 {
     /**
      * Constructor to make it inflatable from XML
-     *
-     * @param context
-     * @param attrs
      */
     public FloatingActionButtonBehavior(Context context, AttributeSet attrs)
     {}

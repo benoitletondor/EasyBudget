@@ -39,7 +39,7 @@ import com.benoitletondor.easybudgetapp.notif.MonthlyReportNotifService
 import com.benoitletondor.easybudgetapp.notif.NotificationsChannels.*
 import com.benoitletondor.easybudgetapp.push.PushService.DAILY_REMINDER_KEY
 import com.benoitletondor.easybudgetapp.push.PushService.MONTHLY_REMINDER_KEY
-import com.benoitletondor.easybudgetapp.view.MainActivity
+import com.benoitletondor.easybudgetapp.view.main.MainActivity
 import com.benoitletondor.easybudgetapp.view.RatingPopup
 import com.benoitletondor.easybudgetapp.view.SettingsActivity
 import com.crashlytics.android.Crashlytics

@@ -37,7 +37,6 @@ import com.benoitletondor.easybudgetapp.model.Expense;
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType;
 import com.benoitletondor.easybudgetapp.model.db.DB;
 import com.benoitletondor.easybudgetapp.view.ExpenseEditActivity;
-import com.benoitletondor.easybudgetapp.view.MainActivity;
 
 import java.util.Date;
 import java.util.Iterator;

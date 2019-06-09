@@ -41,7 +41,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-import com.benoitletondor.easybudgetapp.view.MainActivity;
+import com.benoitletondor.easybudgetapp.view.main.MainActivity;
 
 import java.util.Objects;
 

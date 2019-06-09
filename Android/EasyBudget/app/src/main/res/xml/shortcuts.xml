@@ -9,7 +9,7 @@
         <intent
             android:action="android.intent.action.VIEW"
             android:targetPackage="com.benoitletondor.easybudgetapp"
-            android:targetClass="com.benoitletondor.easybudgetapp.view.MainActivity">
+            android:targetClass="com.benoitletondor.easybudgetapp.view.main.MainActivity">
 
             <extra
                 android:name="intent.addrecurringexpense.show"
@@ -30,7 +30,7 @@
         <intent
             android:action="android.intent.action.VIEW"
             android:targetPackage="com.benoitletondor.easybudgetapp"
-            android:targetClass="com.benoitletondor.easybudgetapp.view.MainActivity">
+            android:targetClass="com.benoitletondor.easybudgetapp.view.main.MainActivity">
 
             <extra
                 android:name="intent.addexpense.show"
