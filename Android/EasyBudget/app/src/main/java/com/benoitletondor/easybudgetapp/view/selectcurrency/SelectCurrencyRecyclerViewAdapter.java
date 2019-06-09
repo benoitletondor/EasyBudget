@@ -57,7 +57,7 @@ public class SelectCurrencyRecyclerViewAdapter extends RecyclerView.Adapter<Sele
 
 // ---------------------------------------->
 
-    public SelectCurrencyRecyclerViewAdapter(@NonNull List<Currency> mainCurrencies, @NonNull List<Currency> secondaryCurrencies, @NonNull Parameters parameters)
+    SelectCurrencyRecyclerViewAdapter(@NonNull List<Currency> mainCurrencies, @NonNull List<Currency> secondaryCurrencies, @NonNull Parameters parameters)
     {
         this.mainCurrencies = mainCurrencies;
         this.secondaryCurrencies = secondaryCurrencies;
@@ -135,7 +135,7 @@ public class SelectCurrencyRecyclerViewAdapter extends RecyclerView.Adapter<Sele
     /**
      * Get the position of the selected currency
      */
-    public int getSelectedCurrencyPosition()
+    int getSelectedCurrencyPosition()
     {
         Currency currency = CurrencyHelper.getUserCurrency(parameters);
 
@@ -144,16 +144,16 @@ public class SelectCurrencyRecyclerViewAdapter extends RecyclerView.Adapter<Sele
 
 // ------------------------------------------->
 
-    public static class ViewHolder extends RecyclerView.ViewHolder
+    static class ViewHolder extends RecyclerView.ViewHolder
     {
-        public final boolean separator;
-        public final int type;
+        final boolean separator;
+        final int type;
 
-        public View view;
-        public TextView currencyTitle;
-        public ImageView selectedIndicator;
+        View view;
+        TextView currencyTitle;
+        ImageView selectedIndicator;
 
-        public ViewHolder(View v, int type, boolean separator)
+        ViewHolder(View v, int type, boolean separator)
         {
             super(v);
 
@@ -168,18 +168,9 @@ public class SelectCurrencyRecyclerViewAdapter extends RecyclerView.Adapter<Sele
             }
         }
 
-        public ViewHolder(View v, int type)
+        ViewHolder(View v, int type)
         {
             this(v, type, false);
-        }
-    }
-
-    public static class SeparatorViewHolder extends RecyclerView.ViewHolder
-    {
-
-        public SeparatorViewHolder(View itemView)
-        {
-            super(itemView);
         }
     }
 }
