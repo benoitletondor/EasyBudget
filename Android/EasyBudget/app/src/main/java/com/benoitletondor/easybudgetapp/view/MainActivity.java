@@ -52,7 +52,6 @@ import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.benoitletondor.easybudgetapp.EasyBudget;
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.Logger;
 import com.benoitletondor.easybudgetapp.helper.UIHelper;
@@ -63,7 +62,6 @@ import com.benoitletondor.easybudgetapp.helper.UserHelper;
 import com.benoitletondor.easybudgetapp.model.Expense;
 import com.benoitletondor.easybudgetapp.model.RecurringExpense;
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType;
-import com.benoitletondor.easybudgetapp.model.db.DBCache;
 import com.benoitletondor.easybudgetapp.view.main.calendar.CalendarFragment;
 import com.benoitletondor.easybudgetapp.view.main.ExpensesRecyclerViewAdapter;
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment;
@@ -743,7 +741,7 @@ public class MainActivity extends DBActivity
                 cal.set(Calendar.MONTH, month);
                 cal.set(Calendar.YEAR, year);
 
-                DBCache.getInstance(MainActivity.this).loadMonth(cal.getTime());
+                db.preloadMonth(cal.getTime());
             }
 
             @Override

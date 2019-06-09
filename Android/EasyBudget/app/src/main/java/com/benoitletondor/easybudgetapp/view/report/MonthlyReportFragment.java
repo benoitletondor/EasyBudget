@@ -40,7 +40,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 import static org.koin.java.KoinJavaComponent.get;
 
@@ -66,6 +65,7 @@ public class MonthlyReportFragment extends Fragment
     private double expensesAmount = 0d;
 
     private Parameters parameters = get(Parameters.class);
+    private DB db = get(DB.class);
 
 // ---------------------------------->
 
@@ -117,38 +117,30 @@ public class MonthlyReportFragment extends Fragment
             @Override
             protected MonthlyReportRecyclerViewAdapter doInBackground(Void... params)
             {
-                final DB db = new DB(Objects.requireNonNull(getContext()));
-                try
+                List<Expense> expensesForMonth = db.getExpensesForMonth(date);
+                if( expensesForMonth.isEmpty() )
                 {
-                    List<Expense> expensesForMonth = db.getExpensesForMonth(date);
-                    if( expensesForMonth.isEmpty() )
-                    {
-                        return null;
-                    }
-
-                    final List<Expense> expenses = new ArrayList<>();
-                    final List<Expense> revenues = new ArrayList<>();
-
-                    for(Expense expense : expensesForMonth)
-                    {
-                        if( expense.isRevenue() )
-                        {
-                            revenues.add(expense);
-                            revenuesAmount -= expense.getAmount();
-                        }
-                        else
-                        {
-                            expenses.add(expense);
-                            expensesAmount += expense.getAmount();
-                        }
-                    }
-
-                    return new MonthlyReportRecyclerViewAdapter(expenses, revenues, parameters);
+                    return null;
                 }
-                finally
+
+                final List<Expense> expenses = new ArrayList<>();
+                final List<Expense> revenues = new ArrayList<>();
+
+                for(Expense expense : expensesForMonth)
                 {
-                    db.close();
+                    if( expense.isRevenue() )
+                    {
+                        revenues.add(expense);
+                        revenuesAmount -= expense.getAmount();
+                    }
+                    else
+                    {
+                        expenses.add(expense);
+                        expensesAmount += expense.getAmount();
+                    }
                 }
+
+                return new MonthlyReportRecyclerViewAdapter(expenses, revenues, parameters);
             }
 
             @Override
@@ -172,6 +164,14 @@ public class MonthlyReportFragment extends Fragment
         }.execute();
 
         return v;
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        db.close();
+
+        super.onDestroy();
     }
 
     /**

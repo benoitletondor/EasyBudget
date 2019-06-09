@@ -16,12 +16,15 @@
 
 package com.benoitletondor.easybudgetapp.view.main.calendar;
 
+import com.benoitletondor.easybudgetapp.model.db.DB;
 import com.roomorama.caldroid.CaldroidFragment;
 import com.roomorama.caldroid.CaldroidGridAdapter;
 import com.roomorama.caldroid.WeekdayArrayAdapter;
 
 import java.util.Date;
 import java.util.Objects;
+
+import static org.koin.java.KoinJavaComponent.get;
 
 /**
  * @author Benoit LETONDOR
@@ -30,12 +33,22 @@ public class CalendarFragment extends CaldroidFragment
 {
     private Date selectedDate;
 
+    private DB db = get(DB.class);
+
 // --------------------------------------->
 
     @Override
     public CaldroidGridAdapter getNewDatesGridAdapter(int month, int year)
     {
-        return new CalendarGridAdapter(Objects.requireNonNull(getContext()), month, year, getCaldroidData(), extraData);
+        return new CalendarGridAdapter(Objects.requireNonNull(getContext()), db, month, year, getCaldroidData(), extraData);
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        db.close();
+
+        super.onDestroy();
     }
 
     @Override

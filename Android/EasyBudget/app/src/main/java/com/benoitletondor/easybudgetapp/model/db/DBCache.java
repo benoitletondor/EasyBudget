@@ -16,7 +16,6 @@
 
 package com.benoitletondor.easybudgetapp.model.db;
 
-import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.collection.SimpleArrayMap;
@@ -39,44 +38,34 @@ import java.util.concurrent.Executors;
 public class DBCache
 {
     /**
-     * Saved application context
-     */
-    private final Context context;
-    /**
      * Map that contains expenses saved per day
      */
+    @NonNull
     private final SimpleArrayMap<Date, List<Expense>> expenses = new SimpleArrayMap<>();
     /**
      * Map that contains balances saved per day
      */
+    @NonNull
     private final SimpleArrayMap<Date, Double> balances = new SimpleArrayMap<>();
     /**
      * Single thread executor to load data from DB
      */
+    @NonNull
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
 // ------------------------------------->
-
-    /**
-     *
-     * @param context
-     */
-    private DBCache(@NonNull Context context)
-    {
-        this.context = context.getApplicationContext();
-    }
 
     /**
      * Load data for the given month if not already cached
      *
      * @param date the month we wanna load data for (no need to clear the date before)
      */
-    public void loadMonth(@NonNull Date date)
+    public void loadMonth(@NonNull DB db, @NonNull Date date)
     {
         Logger.debug("DBCache: Request to cache month: "+date);
 
-        executor.execute(new LoadMonthRunnable(context, date));
-        executor.execute(new LoadBalanceMonthRunnable(context, date));
+        executor.execute(new LoadMonthRunnable(db, date));
+        executor.execute(new LoadBalanceMonthRunnable(db, date));
     }
 
     /**
@@ -127,7 +116,7 @@ public class DBCache
      * @return list of expense if cached data is available, null otherwise
      */
     @Nullable
-    public List<Expense> getExpensesForDay(@NonNull Date date)
+    public List<Expense> getExpensesForDay(@NonNull DB db, @NonNull Date date)
     {
         synchronized (expenses)
         {
@@ -136,7 +125,7 @@ public class DBCache
                 return expenses.get(date);
             }
 
-            executor.execute(new LoadMonthRunnable(context, date));
+            executor.execute(new LoadMonthRunnable(db, date));
             return null;
         }
     }
@@ -148,14 +137,14 @@ public class DBCache
      * @return true or false if data is cached, null otherwise
      */
     @Nullable
-    public Boolean hasExpensesForDay(@NonNull Date date)
+    public Boolean hasExpensesForDay(@NonNull DB db, @NonNull Date date)
     {
         synchronized (expenses)
         {
             List<Expense> expensesForDay = expenses.get(date);
             if( expensesForDay == null )
             {
-                executor.execute(new LoadMonthRunnable(context, date));
+                executor.execute(new LoadMonthRunnable(db, date));
                 return null;
             }
 
@@ -170,7 +159,7 @@ public class DBCache
      * @return balance if cached, null otherwise
      */
     @Nullable
-    public Double getBalanceForDay(@NonNull Date day)
+    public Double getBalanceForDay(@NonNull DB db, @NonNull Date day)
     {
         synchronized (balances)
         {
@@ -179,7 +168,7 @@ public class DBCache
                 return balances.get(day);
             }
 
-            executor.execute(new LoadBalanceMonthRunnable(context, day));
+            executor.execute(new LoadBalanceMonthRunnable(db, day));
             return null;
         }
     }
@@ -191,70 +180,53 @@ public class DBCache
      */
     private class LoadMonthRunnable implements Runnable
     {
-        /**
-         * Date containing the month to load
-         */
+        @NonNull
         private final Date month;
-        /**
-         * Saved context to get DB
-         */
-        private final Context context;
+        @NonNull
+        private final DB db;
 
-        private LoadMonthRunnable(@NonNull Context context, @NonNull Date month)
+        private LoadMonthRunnable(@NonNull DB db, @NonNull Date month)
         {
             this.month = month;
-            this.context = context;
+            this.db = db;
         }
 
         @Override
         public void run()
         {
-            DB db = null;
-            try
+            // Init a calendar to the given date, setting the day of month to 1
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(DateHelper.cleanDate(month));
+            cal.set(Calendar.DAY_OF_MONTH, 1);
+
+            synchronized (expenses)
             {
-                // Init a calendar to the given date, setting the day of month to 1
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(DateHelper.cleanDate(month));
-                cal.set(Calendar.DAY_OF_MONTH, 1);
+                if (expenses.containsKey(DateHelper.cleanGMTDate(cal.getTime())))
+                {
+                    return;
+                }
+            }
+
+            // Save the month we wanna load cache for
+            int month = cal.get(Calendar.MONTH);
+
+            Logger.debug("DBCache: Caching data for month: "+month);
+
+            // Iterate over day of month (while are still on that month)
+            while( cal.get(Calendar.MONTH) == month )
+            {
+                Date date = cal.getTime();
+                List<Expense> expensesForDay = db.getExpensesForDay(date, false);
 
                 synchronized (expenses)
                 {
-                    if (expenses.containsKey(DateHelper.cleanGMTDate(cal.getTime())))
-                    {
-                        return;
-                    }
+                    expenses.put(DateHelper.cleanGMTDate(date), expensesForDay);
                 }
 
-                db = new DB(context.getApplicationContext());
-
-                // Save the month we wanna load cache for
-                int month = cal.get(Calendar.MONTH);
-
-                Logger.debug("DBCache: Caching data for month: "+month);
-
-                // Iterate over day of month (while are still on that month)
-                while( cal.get(Calendar.MONTH) == month )
-                {
-                    Date date = cal.getTime();
-                    List<Expense> expensesForDay = db.getExpensesForDay(date, false);
-
-                    synchronized (expenses)
-                    {
-                        expenses.put(DateHelper.cleanGMTDate(date), expensesForDay);
-                    }
-
-                    cal.add(Calendar.DAY_OF_MONTH, 1);
-                }
-
-                Logger.debug("DBCache: Data cached for month: "+month);
+                cal.add(Calendar.DAY_OF_MONTH, 1);
             }
-            finally
-            {
-                if( db != null )
-                {
-                    db.close();
-                }
-            }
+
+            Logger.debug("DBCache: Data cached for month: "+month);
         }
     }
 
@@ -263,93 +235,53 @@ public class DBCache
      */
     private class LoadBalanceMonthRunnable implements Runnable
     {
-        /**
-         * Date containing the month to load
-         */
+        @NonNull
         private final Date month;
-        /**
-         * Saved context to get DB
-         */
-        private final Context context;
+        @NonNull
+        private final DB db;
 
-        private LoadBalanceMonthRunnable(@NonNull Context context, @NonNull Date month)
+        private LoadBalanceMonthRunnable(@NonNull DB db, @NonNull Date month)
         {
             this.month = month;
-            this.context = context;
+            this.db = db;
         }
 
         @Override
         public void run()
         {
-            DB db = null;
-            try
+            // Init a calendar to the given date, setting the day of month to 1
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(DateHelper.cleanDate(month));
+            cal.set(Calendar.DAY_OF_MONTH, 1);
+
+            synchronized (balances)
             {
-                // Init a calendar to the given date, setting the day of month to 1
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(DateHelper.cleanDate(month));
-                cal.set(Calendar.DAY_OF_MONTH, 1);
+                if (balances.containsKey(DateHelper.cleanGMTDate(cal.getTime())))
+                {
+                    return;
+                }
+            }
+
+            // Save the month we wanna load cache for
+            int month = cal.get(Calendar.MONTH);
+
+            Logger.debug("DBCache: Caching balance data for month: "+month);
+
+            // Iterate over day of month (while are still on that month)
+            while( cal.get(Calendar.MONTH) == month )
+            {
+                Date date = cal.getTime();
+                double balanceForDay = db.getBalanceForDay(date, false);
 
                 synchronized (balances)
                 {
-                    if (balances.containsKey(DateHelper.cleanGMTDate(cal.getTime())))
-                    {
-                        return;
-                    }
+                    balances.put(DateHelper.cleanGMTDate(date), balanceForDay);
                 }
 
-                db = new DB(context.getApplicationContext());
-
-                // Save the month we wanna load cache for
-                int month = cal.get(Calendar.MONTH);
-
-                Logger.debug("DBCache: Caching balance data for month: "+month);
-
-                // Iterate over day of month (while are still on that month)
-                while( cal.get(Calendar.MONTH) == month )
-                {
-                    Date date = cal.getTime();
-                    double balanceForDay = db.getBalanceForDay(date, false);
-
-                    synchronized (balances)
-                    {
-                        balances.put(DateHelper.cleanGMTDate(date), balanceForDay);
-                    }
-
-                    cal.add(Calendar.DAY_OF_MONTH, 1);
-                }
-
-                Logger.debug("DBCache: Data balance cached for month: "+month);
+                cal.add(Calendar.DAY_OF_MONTH, 1);
             }
-            finally
-            {
-                if( db != null )
-                {
-                    db.close();
-                }
-            }
+
+            Logger.debug("DBCache: Data balance cached for month: "+month);
         }
-    }
-
-// --------------------------------------->
-
-    /**
-     * Singleton instance
-     */
-    private static DBCache instance;
-
-    /**
-     * Instance accessor
-     *
-     * @param context
-     * @return
-     */
-    public synchronized static DBCache getInstance(@NonNull Context context)
-    {
-        if( instance == null )
-        {
-            instance = new DBCache(context);
-        }
-
-        return instance;
     }
 }

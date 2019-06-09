@@ -28,20 +28,19 @@ import com.benoitletondor.easybudgetapp.model.RecurringExpenseType;
  */
 public final class SQLiteDBHelper extends SQLiteOpenHelper
 {
-    protected static final String TABLE_EXPENSE                 = "expense";
-    protected static final String COLUMN_EXPENSE_DB_ID          = "_expense_id";
-    protected static final String COLUMN_EXPENSE_TITLE          = "title";
-    protected static final String COLUMN_EXPENSE_AMOUNT         = "amount";
-    protected static final String COLUMN_EXPENSE_DATE           = "date";
-    protected static final String COLUMN_EXPENSE_RECURRING_ID   = "monthly_id";
-
-    protected static final String TABLE_RECURRING_EXPENSE           = "monthlyexpense";
-    protected static final String COLUMN_RECURRING_DB_ID            = "_expense_id";
-    protected static final String COLUMN_RECURRING_TITLE            = "title";
-    protected static final String COLUMN_RECURRING_AMOUNT           = "amount";
-    protected static final String COLUMN_RECURRING_RECURRING_DATE   = "recurringDate";
-    protected static final String COLUMN_RECURRING_MODIFIED         = "modified";
-    protected static final String COLUMN_RECURRING_TYPE             = "type";
+    static final String TABLE_EXPENSE                 = "expense";
+    static final String COLUMN_EXPENSE_DB_ID          = "_expense_id";
+    static final String COLUMN_EXPENSE_TITLE          = "title";
+    static final String COLUMN_EXPENSE_AMOUNT         = "amount";
+    static final String COLUMN_EXPENSE_DATE           = "date";
+    static final String COLUMN_EXPENSE_RECURRING_ID   = "monthly_id";
+    static final String TABLE_RECURRING_EXPENSE           = "monthlyexpense";
+    static final String COLUMN_RECURRING_DB_ID            = "_expense_id";
+    static final String COLUMN_RECURRING_TITLE            = "title";
+    static final String COLUMN_RECURRING_AMOUNT           = "amount";
+    static final String COLUMN_RECURRING_RECURRING_DATE   = "recurringDate";
+    static final String COLUMN_RECURRING_MODIFIED         = "modified";
+    static final String COLUMN_RECURRING_TYPE             = "type";
 
 // -------------------------------------------->
 
@@ -50,7 +49,7 @@ public final class SQLiteDBHelper extends SQLiteOpenHelper
 
 // -------------------------------------------->
 
-    public SQLiteDBHelper(@NonNull Context context)
+    SQLiteDBHelper(@NonNull Context context)
     {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }

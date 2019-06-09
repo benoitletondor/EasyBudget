@@ -50,11 +50,15 @@ public final class DB
     /**
      * The SQLLite DB
      */
+    @NonNull
     private final SQLiteDatabase database;
     /**
      * Saved context
      */
+    @NonNull
     private final Context context;
+    @NonNull
+    private final DBCache cache;
 
 // -------------------------------------------->
 
@@ -64,11 +68,12 @@ public final class DB
      * @param context
      * @throws SQLiteException
      */
-    public DB(@NonNull Context context) throws SQLiteException
+    public DB(@NonNull Context context, @NonNull DBCache cache) throws SQLiteException
     {
         this.context = context.getApplicationContext();
         SQLiteDBHelper databaseHelper = new SQLiteDBHelper(this.context);
 		database = databaseHelper.getWritableDatabase();
+		this.cache = cache;
 	}
 
     /**
@@ -113,7 +118,7 @@ public final class DB
             if( rowsAffected > 0 )
             {
                 // Refresh cache for day
-                DBCache.getInstance(context).wipeAll(); // FIXME we should refresh for the new expense date & the old one
+                cache.wipeAll(); // FIXME we should refresh for the new expense date & the old one
             }
 
             return rowsAffected == 1;
@@ -125,7 +130,7 @@ public final class DB
             if( id > 0 )
             {
                 // Refresh cache for day
-                DBCache.getInstance(context).refreshForDay(this, expense.getDate());
+                cache.refreshForDay(this, expense.getDate());
 
                 expense.setId(id);
                 return true;
@@ -146,6 +151,11 @@ public final class DB
         return persistExpense(expense, false);
     }
 
+    public void preloadMonth(@NonNull Date date)
+    {
+        cache.loadMonth(this, date);
+    }
+
     /**
      * Check if an expense is set to the given day
      *
@@ -158,7 +168,7 @@ public final class DB
         Date gmt = DateHelper.cleanGMTDate(day);
 
         // Check cache
-        Boolean hasExpensesCached = DBCache.getInstance(context).hasExpensesForDay(gmt);
+        Boolean hasExpensesCached = cache.hasExpensesForDay(this, gmt);
         if( hasExpensesCached != null )
         {
             return hasExpensesCached;
@@ -187,7 +197,7 @@ public final class DB
         // Check cache
         if( fromCache )
         {
-            List<Expense> cachedExpenses = DBCache.getInstance(context).getExpensesForDay(gmt);
+            List<Expense> cachedExpenses = cache.getExpensesForDay(this, gmt);
             if( cachedExpenses != null )
             {
                 return cachedExpenses;
@@ -297,7 +307,7 @@ public final class DB
         // Check cache
         if( fromCache )
         {
-            Double cachedBalance = DBCache.getInstance(context).getBalanceForDay(gmt);
+            Double cachedBalance = cache.getBalanceForDay(this, gmt);
             if( cachedBalance != null )
             {
                 return cachedBalance;
@@ -401,7 +411,7 @@ public final class DB
         if( delete )
         {
             // Refresh cache for day
-            DBCache.getInstance(context).refreshForDay(this, expense.getDate());
+            cache.refreshForDay(this, expense.getDate());
         }
 
         return delete;
@@ -419,7 +429,7 @@ public final class DB
 
         if( deleted )
         {
-            DBCache.getInstance(context).wipeAll();
+            cache.wipeAll();
         }
 
         return deleted;
@@ -468,7 +478,7 @@ public final class DB
 
         if( deleted )
         {
-            DBCache.getInstance(context).wipeAll();
+            cache.wipeAll();
         }
 
         return  deleted;
@@ -520,7 +530,7 @@ public final class DB
 
         if( deleted )
         {
-            DBCache.getInstance(context).wipeAll();
+            cache.wipeAll();
         }
 
         return deleted;

@@ -39,23 +39,16 @@ import hirondelle.date4j.DateTime;
  */
 public class CalendarGridAdapter extends CaldroidGridAdapter
 {
-    private final DB       db;
+    @NonNull
+    private final DB db;
 
 // ----------------------------------->
 
-    public CalendarGridAdapter(@NonNull Context context, int month, int year, Map<String, Object> caldroidData, Map<String, Object> extraData)
+    public CalendarGridAdapter(@NonNull Context context, @NonNull DB db, int month, int year, Map<String, Object> caldroidData, Map<String, Object> extraData)
     {
         super(context, month, year, caldroidData, extraData);
 
-        db = new DB(context.getApplicationContext());
-    }
-
-    @Override
-    protected void finalize() throws Throwable
-    {
-        db.close();
-
-        super.finalize();
+        this.db = db;
     }
 
 // ----------------------------------->

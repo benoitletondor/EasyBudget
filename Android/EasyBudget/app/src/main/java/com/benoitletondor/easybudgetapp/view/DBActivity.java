@@ -16,10 +16,11 @@
 
 package com.benoitletondor.easybudgetapp.view;
 
-import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.benoitletondor.easybudgetapp.model.db.DB;
+
+import static org.koin.java.KoinJavaComponent.get;
 
 /**
  * An {@link AppCompatActivity} that contains an opened DB connection to perform queries
@@ -31,17 +32,9 @@ public abstract class DBActivity extends AppCompatActivity
     /**
      * An opened DB connection that is ready to be used
      */
-    protected DB db;
+    protected DB db = get(DB.class);
 
 // ------------------------------------------>
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-
-        db = new DB(getApplicationContext());
-    }
 
     @Override
     protected void onDestroy()
