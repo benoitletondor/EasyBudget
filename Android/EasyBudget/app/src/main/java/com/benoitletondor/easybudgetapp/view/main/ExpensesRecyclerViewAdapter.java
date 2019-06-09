@@ -73,6 +73,7 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
     /**
      * Return the date content is displayed for displayed
      */
+    @NonNull
     public Date getDate()
     {
         return date;

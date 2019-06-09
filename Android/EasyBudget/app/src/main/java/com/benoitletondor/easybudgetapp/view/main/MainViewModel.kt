@@ -3,6 +3,7 @@ package com.benoitletondor.easybudgetapp.view.main
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.benoitletondor.easybudgetapp.helper.SingleLiveEvent
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
@@ -17,19 +18,20 @@ class MainViewModel(private val db: DB,
                     private val iab: Iab) : ViewModel() {
     private var selectedDate: Date = Date()
 
-    val premiumStatusStream: MutableLiveData<Boolean> = MutableLiveData()
-    val expenseDeletionSuccessStream : MutableLiveData<Pair<Expense, Double>> = MutableLiveData()
-    val expenseDeletionErrorStream: MutableLiveData<Expense> = MutableLiveData()
-    val expenseRecoverySuccessStream : MutableLiveData<Expense> = MutableLiveData()
-    val expenseRecoveryErrorStream: MutableLiveData<Expense> = MutableLiveData()
-    val recurringExpenseDeletionDeleteProgressStream: MutableLiveData<RecurringExpenseDeleteProgressState> = MutableLiveData()
-    val recurringExpenseRestoreProgressStream: MutableLiveData<RecurringExpenseRestoreProgressState> = MutableLiveData()
-    val currentBalanceEditorStream: MutableLiveData<Double> = MutableLiveData()
-    val currentBalanceEditingErrorStream: MutableLiveData<Exception> = MutableLiveData()
-    val currentBalanceEditedStream: MutableLiveData<Triple<Expense, Double, Double>> = MutableLiveData()
-    val currentBalanceRestoringStream: MutableLiveData<Unit> = MutableLiveData()
-    val currentBalanceRestoringErrorStream: MutableLiveData<Exception> = MutableLiveData()
-    val selectedDateChangeStream: MutableLiveData<Triple<Date, Double, List<Expense>>> = MutableLiveData()
+    val premiumStatusStream = MutableLiveData<Boolean>()
+    val selectedDateChangeStream = MutableLiveData<Triple<Date, Double, List<Expense>>>()
+
+    val expenseDeletionSuccessStream = SingleLiveEvent<Pair<Expense, Double>>()
+    val expenseDeletionErrorStream = SingleLiveEvent<Expense>()
+    val expenseRecoverySuccessStream = SingleLiveEvent<Expense>()
+    val expenseRecoveryErrorStream = SingleLiveEvent<Expense>()
+    val recurringExpenseDeletionDeleteProgressStream = SingleLiveEvent<RecurringExpenseDeleteProgressState>()
+    val recurringExpenseRestoreProgressStream = SingleLiveEvent<RecurringExpenseRestoreProgressState>()
+    val currentBalanceEditorStream = SingleLiveEvent<Double>()
+    val currentBalanceEditingErrorStream = SingleLiveEvent<Exception>()
+    val currentBalanceEditedStream = SingleLiveEvent<Triple<Expense, Double, Double>>()
+    val currentBalanceRestoringStream = SingleLiveEvent<Unit>()
+    val currentBalanceRestoringErrorStream = SingleLiveEvent<Exception>()
 
     sealed class RecurringExpenseDeleteProgressState {
         class Starting(val expense: Expense): RecurringExpenseDeleteProgressState()

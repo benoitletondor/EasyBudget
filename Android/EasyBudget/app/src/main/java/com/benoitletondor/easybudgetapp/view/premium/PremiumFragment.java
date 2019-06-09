@@ -23,7 +23,7 @@ import androidx.fragment.app.Fragment;
  *
  * @author Benoit LETONDOR
  */
-public abstract class PremiumFragment extends Fragment
+abstract class PremiumFragment extends Fragment
 {
 
 }
