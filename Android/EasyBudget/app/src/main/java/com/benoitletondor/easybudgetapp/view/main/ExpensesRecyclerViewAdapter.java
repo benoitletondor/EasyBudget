@@ -35,9 +35,9 @@ import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import com.benoitletondor.easybudgetapp.helper.Parameters;
 import com.benoitletondor.easybudgetapp.model.Expense;
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType;
-import com.benoitletondor.easybudgetapp.model.db.DB;
 import com.benoitletondor.easybudgetapp.view.ExpenseEditActivity;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -50,7 +50,7 @@ import java.util.List;
 public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRecyclerViewAdapter.ViewHolder>
 {
     @NonNull
-    private List<Expense> expenses;
+    private List<Expense> expenses = new ArrayList<>(0);
     @NonNull
     private Date date;
     @NonNull
@@ -63,12 +63,11 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
     /**
      * Instanciate an adapter for the given date
      */
-    public ExpensesRecyclerViewAdapter(@NonNull Activity activity, @NonNull Parameters parameters, @NonNull DB db, @NonNull Date date)
+    public ExpensesRecyclerViewAdapter(@NonNull Activity activity, @NonNull Parameters parameters, @NonNull Date date)
     {
         this.activity = activity;
         this.parameters = parameters;
         this.date = date;
-        this.expenses = db.getExpensesForDay(date);
     }
 
     /**
@@ -80,15 +79,12 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
     }
 
     /**
-     * Set a new date to display
-     *
-     * @param date
-     * @param db
+     * Set a new date and data to display
      */
-    public void setDate(@NonNull Date date, @NonNull DB db)
+    public void setDate(@NonNull Date date, @NonNull List<Expense> expenses)
     {
         this.date = date;
-        this.expenses = db.getExpensesForDay(date);
+        this.expenses = expenses;
         notifyDataSetChanged();
     }
 

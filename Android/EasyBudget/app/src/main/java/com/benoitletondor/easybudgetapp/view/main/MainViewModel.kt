@@ -3,6 +3,7 @@ package com.benoitletondor.easybudgetapp.view.main
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType
@@ -12,8 +13,12 @@ import kotlinx.coroutines.launch
 import java.lang.Exception
 import java.util.*
 
-class MainViewModel(private val db: DB) : ViewModel() {
-    val expenseDeletionSuccessStream : MutableLiveData<Expense> = MutableLiveData()
+class MainViewModel(private val db: DB,
+                    private val iab: Iab) : ViewModel() {
+    private var selectedDate: Date = Date()
+
+    val premiumStatusStream: MutableLiveData<Boolean> = MutableLiveData()
+    val expenseDeletionSuccessStream : MutableLiveData<Pair<Expense, Double>> = MutableLiveData()
     val expenseDeletionErrorStream: MutableLiveData<Expense> = MutableLiveData()
     val expenseRecoverySuccessStream : MutableLiveData<Expense> = MutableLiveData()
     val expenseRecoveryErrorStream: MutableLiveData<Expense> = MutableLiveData()
@@ -24,6 +29,7 @@ class MainViewModel(private val db: DB) : ViewModel() {
     val currentBalanceEditedStream: MutableLiveData<Triple<Expense, Double, Double>> = MutableLiveData()
     val currentBalanceRestoringStream: MutableLiveData<Unit> = MutableLiveData()
     val currentBalanceRestoringErrorStream: MutableLiveData<Exception> = MutableLiveData()
+    val selectedDateChangeStream: MutableLiveData<Triple<Date, Double, List<Expense>>> = MutableLiveData()
 
     sealed class RecurringExpenseDeleteProgressState {
         class Starting(val expense: Expense): RecurringExpenseDeleteProgressState()
@@ -41,12 +47,18 @@ class MainViewModel(private val db: DB) : ViewModel() {
         class Restored(val recurringExpense: RecurringExpense, val expensesToRestore: List<Expense>): RecurringExpenseRestoreProgressState()
     }
 
+    init {
+        premiumStatusStream.value = iab.isUserPremium()
+        refreshDataForDate(selectedDate)
+    }
+
     fun onDeleteExpenseClicked(expense: Expense) {
         viewModelScope.launch(Dispatchers.Default) {
             val expenseDeleted = db.deleteExpense(expense)
 
+
             if( expenseDeleted ) {
-                expenseDeletionSuccessStream.postValue(expense)
+                expenseDeletionSuccessStream.postValue(Pair(expense, getBalanceForDay(selectedDate)))
             } else {
                 expenseDeletionErrorStream.postValue(expense)
             }
@@ -59,6 +71,7 @@ class MainViewModel(private val db: DB) : ViewModel() {
 
             if( expensePersisted ) {
                 expenseRecoverySuccessStream.postValue(expense)
+                refreshDataForDate(selectedDate)
             } else {
                 expenseRecoveryErrorStream.postValue(expense)
             }
@@ -134,6 +147,7 @@ class MainViewModel(private val db: DB) : ViewModel() {
             }
 
             recurringExpenseDeletionDeleteProgressStream.postValue(RecurringExpenseDeleteProgressState.Deleted(associatedRecurringExpense, expensesToRestore))
+            refreshDataForDate(selectedDate)
         }
 
     }
@@ -155,6 +169,7 @@ class MainViewModel(private val db: DB) : ViewModel() {
             }
 
             recurringExpenseRestoreProgressStream.postValue(RecurringExpenseRestoreProgressState.Restored(recurringExpense, expensesToRestore))
+            refreshDataForDate(selectedDate)
         }
     }
 
@@ -182,14 +197,13 @@ class MainViewModel(private val db: DB) : ViewModel() {
                 // Look for an existing balance for the day
                 val existingExpense = db.getExpensesForDay(Date()).find { it.title == balanceExpenseTitle }
 
-                // If the adjust balance exists, just add the diff and persist it
-                if (existingExpense != null) {
+                if (existingExpense != null) { // If the adjust balance exists, just add the diff and persist it
                     existingExpense.amount = existingExpense.amount - diff
                     db.persistExpense(existingExpense)
 
                     currentBalanceEditedStream.postValue(Triple(existingExpense, diff, newBalance))
-                    // If no adjust balance yet, create a new one
-                } else {
+                    refreshDataForDate(selectedDate)
+                } else { // If no adjust balance yet, create a new one
                     val persistedExpense = Expense(balanceExpenseTitle, -diff, Date())
                     db.persistExpense(persistedExpense)
 
@@ -213,10 +227,53 @@ class MainViewModel(private val db: DB) : ViewModel() {
                 db.persistExpense(expense)
 
                 currentBalanceRestoringStream.postValue(Unit)
+                refreshDataForDate(selectedDate)
             } catch (e: Exception) {
                 currentBalanceRestoringErrorStream.postValue(e)
             }
         }
+    }
+
+    fun onIabStatusChanged() {
+        premiumStatusStream.value = iab.isUserPremium()
+    }
+
+    fun onSelectDate(date: Date) {
+        selectedDate = date
+        refreshDataForDate(date)
+    }
+
+    fun onCurrencySelected() {
+        refreshDataForDate(selectedDate)
+    }
+
+    private fun refreshDataForDate(date: Date) {
+        viewModelScope.launch(Dispatchers.Default) {
+            val balance = getBalanceForDay(date)
+            val expenses = db.getExpensesForDay(date)
+
+            selectedDateChangeStream.postValue(Triple(date, balance, expenses))
+        }
+    }
+
+    private fun getBalanceForDay(date: Date): Double {
+        var balance = 0.0 // Just to keep a positive number if balance == 0
+        balance -= db.getBalanceForDay(date)
+
+        return balance
+    }
+
+    fun onDayChanged() {
+        selectedDate = Date()
+        refreshDataForDate(selectedDate)
+    }
+
+    fun onExpenseAdded() {
+        refreshDataForDate(selectedDate)
+    }
+
+    fun onWelcomeScreenFinished() {
+        refreshDataForDate(selectedDate)
     }
 
 // ----------------------------------------->

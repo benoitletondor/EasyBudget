@@ -25,7 +25,6 @@ import android.content.IntentFilter
 import android.content.res.Configuration
 import android.os.Bundle
 
-import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.view.welcome.WelcomeActivity
 import com.google.android.material.snackbar.Snackbar
 import androidx.core.app.ActivityCompat
@@ -42,6 +41,7 @@ import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.widget.EditText
 import android.widget.LinearLayout
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 
 import com.benoitletondor.easybudgetapp.R
@@ -79,7 +79,7 @@ import kotlinx.android.synthetic.main.activity_main.*
  *
  * @author Benoit LETONDOR
  */
-class MainActivity : DBActivity() {
+class MainActivity : AppCompatActivity() {
 
     private lateinit var receiver: BroadcastReceiver
 
@@ -88,10 +88,11 @@ class MainActivity : DBActivity() {
 
     private lateinit var menu: FloatingActionsMenu
 
+    private var isUserPremium = false
+
     private var lastStopDate: Date? = null
 
     private val viewModel: MainViewModel by viewModel()
-    private val iab = get(Iab::class.java)
     private val parameters = get(Parameters::class.java)
 
 // ------------------------------------------>
@@ -107,7 +108,7 @@ class MainActivity : DBActivity() {
         setContentView(R.layout.activity_main)
 
         initCalendarFragment(savedInstanceState)
-        initRecyclerView(savedInstanceState)
+        initRecyclerView()
 
         // Register receiver
         val filter = IntentFilter()
@@ -132,12 +133,12 @@ class MainActivity : DBActivity() {
 
                         viewModel.onDeleteRecurringExpenseClicked(expense, deleteType)
                     }
-                    SelectCurrencyFragment.CURRENCY_SELECTED_INTENT == intent.action -> refreshAllForDate(expensesViewAdapter.date)
+                    SelectCurrencyFragment.CURRENCY_SELECTED_INTENT == intent.action -> viewModel.onCurrencySelected()
                     INTENT_SHOW_WELCOME_SCREEN == intent.action -> {
                         val startIntent = Intent(this@MainActivity, WelcomeActivity::class.java)
                         ActivityCompat.startActivityForResult(this@MainActivity, startIntent, WELCOME_SCREEN_ACTIVITY_CODE, null)
                     }
-                    INTENT_IAB_STATUS_CHANGED == intent.action -> invalidateOptionsMenu()
+                    INTENT_IAB_STATUS_CHANGED == intent.action -> viewModel.onIabStatusChanged()
                 }
             }
         }
@@ -152,10 +153,10 @@ class MainActivity : DBActivity() {
             openAddRecurringExpenseIfNeeded(intent)
         }
 
-        viewModel.expenseDeletionSuccessStream.observe(this, Observer { deletedExpense ->
+        viewModel.expenseDeletionSuccessStream.observe(this, Observer { (deletedExpense, newBalance) ->
 
             expensesViewAdapter.removeExpense(deletedExpense)
-            updateBalanceDisplayForDay(expensesViewAdapter.date)
+            updateBalanceDisplayForDay(expensesViewAdapter.date, newBalance)
             calendarFragment.refreshView()
 
             val snackbar = Snackbar.make(coordinatorLayout, if (deletedExpense.isRevenue) R.string.income_delete_snackbar_text else R.string.expense_delete_snackbar_text, Snackbar.LENGTH_LONG)
@@ -177,7 +178,7 @@ class MainActivity : DBActivity() {
         })
 
         viewModel.expenseRecoverySuccessStream.observe(this, Observer {
-            refreshAllForDate(calendarFragment.selectedDate)
+            // Nothing to do
         })
 
         viewModel.expenseRecoveryErrorStream.observe(this, Observer { expense ->
@@ -217,7 +218,6 @@ class MainActivity : DBActivity() {
                     expenseDeletionDialog = null
                 }
                 is MainViewModel.RecurringExpenseDeleteProgressState.Deleted -> {
-                    refreshAllForDate(expensesViewAdapter.date)
                     val snackbar = Snackbar.make(coordinatorLayout, R.string.recurring_expense_delete_success_message, Snackbar.LENGTH_LONG)
 
                     snackbar.setAction(R.string.undo) {
@@ -259,8 +259,6 @@ class MainActivity : DBActivity() {
                     expenseRestoreDialog = null
                 }
                 is MainViewModel.RecurringExpenseRestoreProgressState.Restored -> {
-                    // Refresh and show confirm snackbar
-                    refreshAllForDate(expensesViewAdapter.date)
                     Snackbar.make(coordinatorLayout, R.string.recurring_expense_restored_success_message, Snackbar.LENGTH_LONG).show()
 
                     expenseRestoreDialog?.dismiss()
@@ -312,8 +310,6 @@ class MainActivity : DBActivity() {
         })
 
         viewModel.currentBalanceEditedStream.observe(this, Observer { (expense, diff, newBalance) ->
-            refreshAllForDate(expensesViewAdapter.date)
-
             //Show snackbar
             val snackbar = Snackbar.make(coordinatorLayout, resources.getString(R.string.adjust_balance_snackbar_text, CurrencyHelper.getFormattedCurrencyString(parameters, newBalance)), Snackbar.LENGTH_LONG)
             snackbar.setAction(R.string.undo) {
@@ -326,7 +322,7 @@ class MainActivity : DBActivity() {
         })
 
         viewModel.currentBalanceRestoringStream.observe(this, Observer {
-            refreshAllForDate(expensesViewAdapter.date)
+            // Nothing to do
         })
 
         viewModel.currentBalanceRestoringErrorStream.observe(this, Observer { exception ->
@@ -337,6 +333,15 @@ class MainActivity : DBActivity() {
                 .setMessage(R.string.adjust_balance_error_message)
                 .setNegativeButton(R.string.ok) { dialog1, _ -> dialog1.dismiss() }
                 .show()
+        })
+
+        viewModel.premiumStatusStream.observe(this, Observer { isPremium ->
+            isUserPremium = isPremium
+            invalidateOptionsMenu()
+        })
+
+        viewModel.selectedDateChangeStream.observe(this, Observer { (date, balance, expenses) ->
+            refreshAllForDate(date, balance, expenses)
         })
     }
 
@@ -352,7 +357,7 @@ class MainActivity : DBActivity() {
             val lastStopDay = cal.get(Calendar.DAY_OF_YEAR)
 
             if (currentDay != lastStopDay) {
-                refreshAllForDate(Date())
+                viewModel.onDayChanged()
             }
 
             lastStopDate = null
@@ -373,7 +378,6 @@ class MainActivity : DBActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         calendarFragment.saveStatesToKey(outState, CALENDAR_SAVED_STATE)
-        outState.putSerializable(RECYCLE_VIEW_SAVED_DATE, expensesViewAdapter.date)
 
         super.onSaveInstanceState(outState)
     }
@@ -383,11 +387,11 @@ class MainActivity : DBActivity() {
 
         if (requestCode == ADD_EXPENSE_ACTIVITY_CODE || requestCode == MANAGE_RECURRING_EXPENSE_ACTIVITY_CODE) {
             if (resultCode == RESULT_OK) {
-                refreshAllForDate(calendarFragment.selectedDate)
+                viewModel.onExpenseAdded()
             }
         } else if (requestCode == WELCOME_SCREEN_ACTIVITY_CODE) {
             if (resultCode == RESULT_OK) {
-                refreshAllForDate(calendarFragment.selectedDate)
+                viewModel.onWelcomeScreenFinished()
             } else if (resultCode == RESULT_CANCELED) {
                 finish() // Finish activity if welcome screen is finish via back button
             }
@@ -425,7 +429,7 @@ class MainActivity : DBActivity() {
         menuInflater.inflate(R.menu.menu_main, menu)
 
         // Remove monthly report for non premium users
-        if (!iab.isUserPremium()) {
+        if ( !isUserPremium ) {
             menu.removeItem(R.id.action_monthly_report)
         } else if (!UserHelper.hasUserSawMonthlyReportHint(parameters)) {
             monthly_report_hint.visibility = View.VISIBLE
@@ -468,10 +472,7 @@ class MainActivity : DBActivity() {
      * Update the balance for the given day
      * TODO optimization
      */
-    private fun updateBalanceDisplayForDay(day: Date) {
-        var balance = 0.0 // Just to keep a positive number if balance == 0
-        balance -= db.getBalanceForDay(day)
-
+    private fun updateBalanceDisplayForDay(day: Date, balance: Double) {
         val format = SimpleDateFormat(resources.getString(R.string.account_balance_date_format), Locale.getDefault())
 
         var formatted = resources.getString(R.string.account_balance_format, format.format(day))
@@ -483,13 +484,13 @@ class MainActivity : DBActivity() {
             formatted = formatted.substring(0, formatted.length - 3) + " :" // Remove . at the end of the month (ex: nov. : -> nov :)
         }
 
-        budgetLine!!.text = formatted
-        budgetLineAmount!!.text = CurrencyHelper.getFormattedCurrencyString(parameters, balance)
+        budgetLine.text = formatted
+        budgetLineAmount.text = CurrencyHelper.getFormattedCurrencyString(parameters, balance)
 
         when {
-            balance <= 0 -> budgetLineContainer!!.setBackgroundResource(R.color.budget_red)
-            balance < parameters.getInt(ParameterKeys.LOW_MONEY_WARNING_AMOUNT, DEFAULT_LOW_MONEY_WARNING_AMOUNT) -> budgetLineContainer!!.setBackgroundResource(R.color.budget_orange)
-            else -> budgetLineContainer!!.setBackgroundResource(R.color.budget_green)
+            balance <= 0 -> budgetLineContainer.setBackgroundResource(R.color.budget_red)
+            balance < parameters.getInt(ParameterKeys.LOW_MONEY_WARNING_AMOUNT, DEFAULT_LOW_MONEY_WARNING_AMOUNT) -> budgetLineContainer.setBackgroundResource(R.color.budget_orange)
+            else -> budgetLineContainer.setBackgroundResource(R.color.budget_green)
         }
     }
 
@@ -573,12 +574,8 @@ class MainActivity : DBActivity() {
     private fun initCalendarFragment(savedInstanceState: Bundle?) {
         calendarFragment = CalendarFragment()
 
-        if (savedInstanceState != null && savedInstanceState.containsKey(CALENDAR_SAVED_STATE) && savedInstanceState.containsKey(RECYCLE_VIEW_SAVED_DATE)) {
+        if (savedInstanceState != null && savedInstanceState.containsKey(CALENDAR_SAVED_STATE) ) {
             calendarFragment.restoreStatesFromKey(savedInstanceState, CALENDAR_SAVED_STATE)
-
-            val selectedDate = savedInstanceState.getSerializable(RECYCLE_VIEW_SAVED_DATE) as Date?
-            calendarFragment.setSelectedDates(selectedDate, selectedDate)
-            lastStopDate = selectedDate // Set last stop date that will be check on next onStart call
         } else {
             val args = Bundle()
             val cal = Calendar.getInstance()
@@ -591,7 +588,6 @@ class MainActivity : DBActivity() {
             args.putInt(CaldroidFragment.THEME_RESOURCE, R.style.caldroid_style)
 
             calendarFragment.arguments = args
-            calendarFragment.setSelectedDates(Date(), Date())
 
             val minDate = Date(parameters.getLong(ParameterKeys.INIT_DATE, Date().time))
             calendarFragment.setMinDate(minDate)
@@ -599,7 +595,7 @@ class MainActivity : DBActivity() {
 
         val listener = object : CaldroidListener() {
             override fun onSelectDate(date: Date, view: View) {
-                refreshAllForDate(date)
+                viewModel.onSelectDate(date)
             }
 
             override fun onLongClickDate(date: Date, view: View?) // Add expense on long press
@@ -680,7 +676,7 @@ class MainActivity : DBActivity() {
         t.commit()
     }
 
-    private fun initRecyclerView(savedInstanceState: Bundle?) {
+    private fun initRecyclerView() {
         /*
          * FAB
          */
@@ -775,25 +771,14 @@ class MainActivity : DBActivity() {
          */
         expensesRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        var date = Date()
-        if (savedInstanceState != null && savedInstanceState.containsKey(RECYCLE_VIEW_SAVED_DATE)) {
-            val savedDate = savedInstanceState.getSerializable(RECYCLE_VIEW_SAVED_DATE) as Date?
-            if (savedDate != null) {
-                date = savedDate
-            }
-        }
-
-        expensesViewAdapter = ExpensesRecyclerViewAdapter(this, parameters, db, date)
+        expensesViewAdapter = ExpensesRecyclerViewAdapter(this, parameters, Date())
         expensesRecyclerView.adapter = expensesViewAdapter
-
-        refreshRecyclerViewForDate(date)
-        updateBalanceDisplayForDay(date)
     }
 
-    private fun refreshRecyclerViewForDate(date: Date) {
-        expensesViewAdapter.setDate(date, db)
+    private fun refreshRecyclerViewForDate(date: Date, expenses: List<Expense>) {
+        expensesViewAdapter.setDate(date, expenses)
 
-        if (db.hasExpensesForDay(date)) {
+        if ( expenses.isNotEmpty() ) {
             expensesRecyclerView.visibility = View.VISIBLE
             emptyExpensesRecyclerViewPlaceholder.visibility = View.GONE
         } else {
@@ -802,9 +787,9 @@ class MainActivity : DBActivity() {
         }
     }
 
-    private fun refreshAllForDate(date: Date) {
-        refreshRecyclerViewForDate(date)
-        updateBalanceDisplayForDay(date)
+    private fun refreshAllForDate(date: Date, balance: Double, expenses: List<Expense>) {
+        refreshRecyclerViewForDate(date, expenses)
+        updateBalanceDisplayForDay(date, balance)
         calendarFragment.setSelectedDates(date, date)
         calendarFragment.refreshView()
     }
@@ -839,6 +824,5 @@ class MainActivity : DBActivity() {
         const val CENTER_Y_KEY = "centerY"
 
         private const val CALENDAR_SAVED_STATE = "calendar_saved_state"
-        private const val RECYCLE_VIEW_SAVED_DATE = "recycleViewSavedDate"
     }
 }
