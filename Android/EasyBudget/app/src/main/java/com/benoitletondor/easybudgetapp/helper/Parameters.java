@@ -40,11 +40,7 @@ public class Parameters
      */
     private final SharedPreferences preferences;
 
-    /**
-     *
-     * @param context
-     */
-    private Parameters(@NonNull Context context)
+    public Parameters(@NonNull Context context)
     {
         preferences = context.getApplicationContext().getSharedPreferences(SHARED_PREFERENCES_FILE_NAME, Context.MODE_PRIVATE);
     }
@@ -141,28 +137,5 @@ public class Parameters
     public String getString(String key)
     {
         return preferences.getString(key, null);
-    }
-
-// --------------------------------------->
-
-    /**
-     * Singleton instance
-     */
-    private static Parameters ourInstance;
-
-    /**
-     * Singleton getter
-     *
-     * @param context
-     * @return
-     */
-    public static synchronized Parameters getInstance(Context context)
-    {
-        if (ourInstance == null)
-        {
-            ourInstance = new Parameters(context);
-        }
-
-        return ourInstance;
     }
 }

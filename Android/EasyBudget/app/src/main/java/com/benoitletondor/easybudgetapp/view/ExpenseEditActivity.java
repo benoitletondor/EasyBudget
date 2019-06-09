@@ -20,6 +20,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.os.Bundle;
 
+import com.benoitletondor.easybudgetapp.helper.Parameters;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -41,6 +42,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
+
+import static org.koin.java.KoinJavaComponent.get;
 
 /**
  * Activity to add a new expense
@@ -82,6 +85,8 @@ public class ExpenseEditActivity extends DBActivity
      */
     private boolean isRevenue = false;
 
+    private Parameters parameters = get(Parameters.class);
+
 // -------------------------------------->
 
     @Override
@@ -120,14 +125,14 @@ public class ExpenseEditActivity extends DBActivity
                 public void onAnimationEnd(Animator animation)
                 {
                     UIHelper.setFocus(descriptionEditText);
-                    UIHelper.showFAB(fab);
+                    UIHelper.showFAB(fab, parameters);
                 }
             });
         }
         else
         {
             UIHelper.setFocus(descriptionEditText);
-            UIHelper.showFAB(fab);
+            UIHelper.showFAB(fab, parameters);
         }
     }
 
@@ -275,7 +280,7 @@ public class ExpenseEditActivity extends DBActivity
      */
     private void setUpTextFields()
     {
-        ((TextInputLayout) findViewById(R.id.amount_inputlayout)).setHint(getResources().getString(R.string.amount, CurrencyHelper.getUserCurrency(this).getSymbol()));
+        ((TextInputLayout) findViewById(R.id.amount_inputlayout)).setHint(getResources().getString(R.string.amount, CurrencyHelper.getUserCurrency(parameters).getSymbol()));
 
         descriptionEditText = findViewById(R.id.description_edittext);
 

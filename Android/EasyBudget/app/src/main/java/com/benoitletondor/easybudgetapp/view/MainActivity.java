@@ -133,6 +133,7 @@ public class MainActivity extends DBActivity
     private Date lastStopDate;
 
     private Iab iab = get(Iab.class);
+    private Parameters parameters = get(Parameters.class);
 
 // ------------------------------------------>
 
@@ -140,7 +141,7 @@ public class MainActivity extends DBActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         // Launch welcome screen if needed
-        if( Parameters.getInstance(this).getInt(ParameterKeys.ONBOARDING_STEP, -1) != WelcomeActivity.STEP_COMPLETED )
+        if( parameters.getInt(ParameterKeys.ONBOARDING_STEP, -1) != WelcomeActivity.STEP_COMPLETED )
         {
             Intent startIntent = new Intent(this, WelcomeActivity.class);
             ActivityCompat.startActivityForResult(this, startIntent, WELCOME_SCREEN_ACTIVITY_CODE, null);
@@ -346,7 +347,7 @@ public class MainActivity extends DBActivity
         }
         else if( requestCode == SETTINGS_SCREEN_ACTIVITY_CODE )
         {
-            calendarFragment.setFirstDayOfWeek(UserHelper.getFirstDayOfWeek(this));
+            calendarFragment.setFirstDayOfWeek(UserHelper.getFirstDayOfWeek(parameters));
         }
     }
 
@@ -393,14 +394,14 @@ public class MainActivity extends DBActivity
         {
             menu.removeItem(R.id.action_monthly_report);
         }
-        else if( !UserHelper.hasUserSawMonthlyReportHint(this) )
+        else if( !UserHelper.hasUserSawMonthlyReportHint(parameters) )
         {
             final View monthlyReportHint = findViewById(R.id.monthly_report_hint);
             monthlyReportHint.setVisibility(View.VISIBLE);
 
             findViewById(R.id.monthly_report_hint_button).setOnClickListener(v -> {
                 monthlyReportHint.setVisibility(View.GONE);
-                UserHelper.setUserSawMonthlyReportHint(MainActivity.this);
+                UserHelper.setUserSawMonthlyReportHint(parameters);
             });
         }
 
@@ -500,7 +501,7 @@ public class MainActivity extends DBActivity
                     dialog.dismiss();
 
                     //Show snackbar
-                    Snackbar snackbar = Snackbar.make(coordinatorLayout, getResources().getString(R.string.adjust_balance_snackbar_text, CurrencyHelper.getFormattedCurrencyString(MainActivity.this, newBalance)), Snackbar.LENGTH_LONG);
+                    Snackbar snackbar = Snackbar.make(coordinatorLayout, getResources().getString(R.string.adjust_balance_snackbar_text, CurrencyHelper.getFormattedCurrencyString(parameters, newBalance)), Snackbar.LENGTH_LONG);
                     snackbar.setAction(R.string.undo, listener);
                     snackbar.setActionTextColor(ContextCompat.getColor(MainActivity.this, R.color.snackbar_action_undo));
                     //noinspection ResourceType
@@ -569,13 +570,13 @@ public class MainActivity extends DBActivity
         }
 
         budgetLine.setText(formatted);
-        budgetLineAmount.setText(CurrencyHelper.getFormattedCurrencyString(this, balance));
+        budgetLineAmount.setText(CurrencyHelper.getFormattedCurrencyString(parameters, balance));
 
         if( balance <= 0 )
         {
             budgetLineContainer.setBackgroundResource(R.color.budget_red);
         }
-        else if( balance < Parameters.getInstance(getApplicationContext()).getInt(ParameterKeys.LOW_MONEY_WARNING_AMOUNT, DEFAULT_LOW_MONEY_WARNING_AMOUNT) )
+        else if( balance < parameters.getInt(ParameterKeys.LOW_MONEY_WARNING_AMOUNT, DEFAULT_LOW_MONEY_WARNING_AMOUNT) )
         {
             budgetLineContainer.setBackgroundResource(R.color.budget_orange);
         }
@@ -696,14 +697,14 @@ public class MainActivity extends DBActivity
             args.putInt(CaldroidFragment.YEAR, cal.get(Calendar.YEAR));
             args.putBoolean(CaldroidFragment.ENABLE_SWIPE, true);
             args.putBoolean(CaldroidFragment.SIX_WEEKS_IN_CALENDAR, false);
-            args.putInt(CalendarFragment.START_DAY_OF_WEEK, UserHelper.getFirstDayOfWeek(this));
+            args.putInt(CalendarFragment.START_DAY_OF_WEEK, UserHelper.getFirstDayOfWeek(parameters));
             args.putBoolean(CalendarFragment.ENABLE_CLICK_ON_DISABLED_DATES, false);
             args.putInt(CaldroidFragment.THEME_RESOURCE, R.style.caldroid_style);
 
             calendarFragment.setArguments(args);
             calendarFragment.setSelectedDates(new Date(), new Date());
 
-            Date minDate = new Date(Parameters.getInstance(this).getLong(ParameterKeys.INIT_DATE, new Date().getTime()));
+            Date minDate = new Date(parameters.getLong(ParameterKeys.INIT_DATE, new Date().getTime()));
             calendarFragment.setMinDate(minDate);
         }
 
@@ -721,7 +722,7 @@ public class MainActivity extends DBActivity
                 Intent startIntent = new Intent(MainActivity.this, ExpenseEditActivity.class);
                 startIntent.putExtra("date", date.getTime());
 
-                if( UIHelper.areAnimationsEnabled(MainActivity.this) )
+                if( UIHelper.areAnimationsEnabled(parameters) )
                 {
                     // Get the absolute location on window for Y value
                     int[] viewLocation = new int[2];
@@ -882,7 +883,7 @@ public class MainActivity extends DBActivity
             Intent startIntent = new Intent(MainActivity.this, ExpenseEditActivity.class);
             startIntent.putExtra("date", calendarFragment.getSelectedDate().getTime());
 
-            if( UIHelper.areAnimationsEnabled(MainActivity.this) )
+            if( UIHelper.areAnimationsEnabled(parameters) )
             {
                 startIntent.putExtra(ANIMATE_TRANSITION_KEY, true);
                 startIntent.putExtra(CENTER_X_KEY, (int) menu.getX() + (int) ((float) menu.getWidth() / 1.2f));
@@ -899,7 +900,7 @@ public class MainActivity extends DBActivity
             Intent startIntent = new Intent(MainActivity.this, RecurringExpenseEditActivity.class);
             startIntent.putExtra("dateStart", calendarFragment.getSelectedDate().getTime());
 
-            if( UIHelper.areAnimationsEnabled(MainActivity.this) )
+            if( UIHelper.areAnimationsEnabled(parameters) )
             {
                 startIntent.putExtra(ANIMATE_TRANSITION_KEY, true);
                 startIntent.putExtra(CENTER_X_KEY, (int) menu.getX() + (int) ((float) menu.getWidth() / 1.2f));
@@ -927,7 +928,7 @@ public class MainActivity extends DBActivity
             }
         }
 
-        expensesViewAdapter = new ExpensesRecyclerViewAdapter(this, db, date);
+        expensesViewAdapter = new ExpensesRecyclerViewAdapter(this, parameters, db, date);
         recyclerView.setAdapter(expensesViewAdapter);
 
         refreshRecyclerViewForDate(date);

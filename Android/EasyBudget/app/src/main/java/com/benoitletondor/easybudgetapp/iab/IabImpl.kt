@@ -27,7 +27,8 @@ private const val PREMIUM_PARAMETER_KEY = "premium"
  */
 private const val BATCH_OFFER_REDEEMED_PARAMETER_KEY = "batch_offer_redeemed"
 
-class IabImpl(context: Context) : Iab, PurchasesUpdatedListener, BillingClientStateListener, PurchaseHistoryResponseListener, SkuDetailsResponseListener {
+class IabImpl(context: Context,
+              private val parameters: Parameters) : Iab, PurchasesUpdatedListener, BillingClientStateListener, PurchaseHistoryResponseListener, SkuDetailsResponseListener {
     private val appContext = context.applicationContext
     private val billingClient = BillingClient.newBuilder(appContext)
         .setListener(this)
@@ -72,7 +73,7 @@ class IabImpl(context: Context) : Iab, PurchasesUpdatedListener, BillingClientSt
 
         // Save status only on success
         if (status == PremiumCheckStatus.PREMIUM || status == PremiumCheckStatus.NOT_PREMIUM) {
-            Parameters.getInstance(appContext).putBoolean(PREMIUM_PARAMETER_KEY, iabStatus == PremiumCheckStatus.PREMIUM)
+            parameters.putBoolean(PREMIUM_PARAMETER_KEY, iabStatus == PremiumCheckStatus.PREMIUM)
         }
 
         val intent = Intent(INTENT_IAB_STATUS_CHANGED)
@@ -87,9 +88,9 @@ class IabImpl(context: Context) : Iab, PurchasesUpdatedListener, BillingClientSt
      */
     override fun isUserPremium(): Boolean
     {
-        return Parameters.getInstance(appContext).getBoolean(PREMIUM_PARAMETER_KEY, false) ||
-            Parameters.getInstance(appContext).getBoolean(BATCH_OFFER_REDEEMED_PARAMETER_KEY, false) ||
-            Parameters.getInstance(appContext).getBoolean(APP_TURBO_PREMIUM_PARAMETER_KEY, false) ||
+        return parameters.getBoolean(PREMIUM_PARAMETER_KEY, false) ||
+            parameters.getBoolean(BATCH_OFFER_REDEEMED_PARAMETER_KEY, false) ||
+            parameters.getBoolean(APP_TURBO_PREMIUM_PARAMETER_KEY, false) ||
             iabStatus == PremiumCheckStatus.PREMIUM
     }
 

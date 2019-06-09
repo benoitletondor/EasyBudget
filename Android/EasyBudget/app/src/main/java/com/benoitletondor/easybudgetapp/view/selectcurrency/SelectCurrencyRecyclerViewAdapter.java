@@ -16,7 +16,6 @@
 
 package com.benoitletondor.easybudgetapp.view.selectcurrency;
 
-import android.content.Context;
 import android.content.Intent;
 import androidx.annotation.NonNull;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -29,6 +28,7 @@ import android.widget.TextView;
 
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
+import com.benoitletondor.easybudgetapp.helper.Parameters;
 
 import java.util.Currency;
 import java.util.List;
@@ -52,18 +52,16 @@ public class SelectCurrencyRecyclerViewAdapter extends RecyclerView.Adapter<Sele
      * List of secondary currencies
      */
     private final List<Currency> secondaryCurrencies;
+    @NonNull
+    private final Parameters parameters;
 
 // ---------------------------------------->
 
-    /**
-     *
-     * @param mainCurrencies
-     * @param secondaryCurrencies
-     */
-    public SelectCurrencyRecyclerViewAdapter(@NonNull List<Currency> mainCurrencies, @NonNull List<Currency> secondaryCurrencies)
+    public SelectCurrencyRecyclerViewAdapter(@NonNull List<Currency> mainCurrencies, @NonNull List<Currency> secondaryCurrencies, @NonNull Parameters parameters)
     {
         this.mainCurrencies = mainCurrencies;
         this.secondaryCurrencies = secondaryCurrencies;
+        this.parameters = parameters;
     }
 
 // ---------------------------------------->
@@ -91,13 +89,13 @@ public class SelectCurrencyRecyclerViewAdapter extends RecyclerView.Adapter<Sele
         {
             final Currency currency = holder.type == TYPE_MAIN_CURRENCY ? mainCurrencies.get(position) : secondaryCurrencies.get(position - 1 - mainCurrencies.size());
 
-            boolean userCurrency = CurrencyHelper.getUserCurrency(holder.view.getContext()).equals(currency);
+            boolean userCurrency = CurrencyHelper.getUserCurrency(parameters).equals(currency);
 
             holder.selectedIndicator.setVisibility(userCurrency ? View.VISIBLE : View.INVISIBLE);
             holder.currencyTitle.setText(CurrencyHelper.getCurrencyDisplayName(currency));
             holder.view.setOnClickListener(v -> {
                 // Set the currency
-                CurrencyHelper.setUserCurrency(v.getContext(), currency);
+                CurrencyHelper.setUserCurrency(parameters, currency);
                 // Reload date to change the checkmark
                 notifyDataSetChanged();
 
@@ -136,13 +134,10 @@ public class SelectCurrencyRecyclerViewAdapter extends RecyclerView.Adapter<Sele
 
     /**
      * Get the position of the selected currency
-     *
-     * @param context
-     * @return
      */
-    public int getSelectedCurrencyPosition(@NonNull Context context)
+    public int getSelectedCurrencyPosition()
     {
-        Currency currency = CurrencyHelper.getUserCurrency(context);
+        Currency currency = CurrencyHelper.getUserCurrency(parameters);
 
         return mainCurrencies.contains(currency) ? mainCurrencies.indexOf(currency) : (secondaryCurrencies.indexOf(currency) + 1 + mainCurrencies.size() );
     }

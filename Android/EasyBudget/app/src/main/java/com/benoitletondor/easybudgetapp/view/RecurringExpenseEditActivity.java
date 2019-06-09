@@ -31,6 +31,7 @@ import android.widget.TextView;
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import com.benoitletondor.easybudgetapp.helper.Logger;
+import com.benoitletondor.easybudgetapp.helper.Parameters;
 import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.model.Expense;
 import com.benoitletondor.easybudgetapp.model.RecurringExpense;
@@ -48,6 +49,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.ContextCompat;
+
+import static org.koin.java.KoinJavaComponent.get;
 
 public class RecurringExpenseEditActivity extends DBActivity
 {
@@ -93,6 +96,7 @@ public class RecurringExpenseEditActivity extends DBActivity
      */
     private boolean isRevenue = false;
 
+    private Parameters parameters = get(Parameters.class);
 
 // ------------------------------------------->
 
@@ -130,14 +134,14 @@ public class RecurringExpenseEditActivity extends DBActivity
                 public void onAnimationEnd(Animator animation)
                 {
                     UIHelper.setFocus(descriptionEditText);
-                    UIHelper.showFAB(fab);
+                    UIHelper.showFAB(fab, parameters);
                 }
             });
         }
         else
         {
             UIHelper.setFocus(descriptionEditText);
-            UIHelper.showFAB(fab);
+            UIHelper.showFAB(fab, parameters);
         }
     }
 
@@ -262,7 +266,7 @@ public class RecurringExpenseEditActivity extends DBActivity
      */
     private void setUpInputs()
     {
-        ((TextInputLayout) findViewById(R.id.amount_inputlayout)).setHint(getResources().getString(R.string.amount, CurrencyHelper.getUserCurrency(this).getSymbol()));
+        ((TextInputLayout) findViewById(R.id.amount_inputlayout)).setHint(getResources().getString(R.string.amount, CurrencyHelper.getUserCurrency(parameters).getSymbol()));
 
         descriptionEditText = findViewById(R.id.description_edittext);
 

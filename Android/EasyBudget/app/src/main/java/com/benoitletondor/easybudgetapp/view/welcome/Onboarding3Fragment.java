@@ -16,7 +16,6 @@
 
 package com.benoitletondor.easybudgetapp.view.welcome;
 
-
 import android.content.Context;
 import android.os.Bundle;
 
@@ -35,12 +34,15 @@ import android.widget.TextView;
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import com.benoitletondor.easybudgetapp.helper.Logger;
+import com.benoitletondor.easybudgetapp.helper.Parameters;
 import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.model.Expense;
 import com.benoitletondor.easybudgetapp.model.db.DB;
 
 import java.util.Date;
 import java.util.Objects;
+
+import static org.koin.java.KoinJavaComponent.get;
 
 /**
  * Onboarding step 3 fragment
@@ -52,6 +54,8 @@ public class Onboarding3Fragment extends OnboardingFragment
     private TextView moneyTextView;
     private EditText amountEditText;
     private Button nextButton;
+
+    private Parameters parameters = get(Parameters.class);
 
 // -------------------------------------->
 
@@ -164,7 +168,7 @@ public class Onboarding3Fragment extends OnboardingFragment
     {
         if( moneyTextView != null ) // Will be null if view is not yet created
         {
-            moneyTextView.setText(CurrencyHelper.getUserCurrency(Objects.requireNonNull(getContext())).getSymbol());
+            moneyTextView.setText(CurrencyHelper.getUserCurrency(parameters).getSymbol());
         }
     }
 
@@ -195,7 +199,7 @@ public class Onboarding3Fragment extends OnboardingFragment
         {
             double value = getAmountValue();
 
-            nextButton.setText(Objects.requireNonNull(getContext()).getString(R.string.onboarding_screen_3_cta, CurrencyHelper.getFormattedCurrencyString(Objects.requireNonNull(getActivity()), value)));
+            nextButton.setText(Objects.requireNonNull(getContext()).getString(R.string.onboarding_screen_3_cta, CurrencyHelper.getFormattedCurrencyString(parameters, value)));
         }
     }
 }

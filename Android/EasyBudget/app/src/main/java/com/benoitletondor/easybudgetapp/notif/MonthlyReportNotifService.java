@@ -92,7 +92,7 @@ public class MonthlyReportNotifService extends IntentService
      *
      * @param context non null context
      */
-    public static void showPremiumNotif(@NonNull Context context)
+    public static void showPremiumNotif(@NonNull Context context, @NonNull Parameters parameters)
     {
         Intent notificationIntent = new Intent(context, MainActivity.class);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -110,7 +110,7 @@ public class MonthlyReportNotifService extends IntentService
 
         NotificationManagerCompat.from(context).notify(PREMIUM_NOTIFICATION_ID, notifBuilder.build());
 
-        setUserSawMonthlyReportNotif(context);
+        setUserSawMonthlyReportNotif(parameters);
     }
 
     /**
@@ -118,7 +118,7 @@ public class MonthlyReportNotifService extends IntentService
      *
      * @param context non null context
      */
-    public static void showNotPremiumNotif(@NonNull Context context)
+    public static void showNotPremiumNotif(@NonNull Context context, @NonNull Parameters parameters)
     {
         Intent notNowIntent = new Intent(context, MonthlyReportNotifService.class);
         notNowIntent.setAction(INTENT_ACTION_NOT_NOW);
@@ -140,7 +140,7 @@ public class MonthlyReportNotifService extends IntentService
 
         NotificationManagerCompat.from(context).notify(NOT_PREMIUM_NOTIFICATION_ID, notifBuilder.build());
 
-        setUserSawMonthlyReportNotif(context);
+        setUserSawMonthlyReportNotif(parameters);
     }
 
 // -------------------------------------->
@@ -148,21 +148,18 @@ public class MonthlyReportNotifService extends IntentService
     /**
      * Has the user already saw the monthly report notification.
      *
-     * @param context non null context
      * @return true if user saw it, false otherwise
      */
-    public static boolean hasUserSeenMonthlyReportNotif(@NonNull Context context)
+    public static boolean hasUserSeenMonthlyReportNotif(@NonNull Parameters parameters)
     {
-        return Parameters.getInstance(context).getBoolean(ParameterKeys.MONTHLY_PUSH_NOTIF_SHOWN, false);
+        return parameters.getBoolean(ParameterKeys.MONTHLY_PUSH_NOTIF_SHOWN, false);
     }
 
     /**
      * Set that the user saw the monthly report notification.
-     *
-     * @param context non null context
      */
-    private static void setUserSawMonthlyReportNotif(@NonNull Context context)
+    private static void setUserSawMonthlyReportNotif(@NonNull Parameters parameters)
     {
-        Parameters.getInstance(context).putBoolean(ParameterKeys.MONTHLY_PUSH_NOTIF_SHOWN, true);
+        parameters.putBoolean(ParameterKeys.MONTHLY_PUSH_NOTIF_SHOWN, true);
     }
 }

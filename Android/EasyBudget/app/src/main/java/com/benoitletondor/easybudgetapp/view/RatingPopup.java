@@ -42,14 +42,17 @@ import com.benoitletondor.easybudgetapp.helper.UserHelper;
 public class RatingPopup
 {
     /**
-     * Stored activity (beware of leaks !)
+     * Stored context (beware of leaks !)
      */
     @NonNull
-    private final Context activity;
+    private final Context context;
+    @NonNull
+    private final Parameters parameters;
 
-    public RatingPopup(@NonNull Activity activity)
+    public RatingPopup(@NonNull Activity context, @NonNull Parameters parameters)
     {
-        this.activity = activity;
+        this.context = context;
+        this.parameters = parameters;
     }
 
 // ------------------------------------------>
@@ -63,13 +66,13 @@ public class RatingPopup
      */
     public boolean show(boolean forceShow)
     {
-        if( !forceShow && UserHelper.hasUserCompleteRating(activity) )
+        if( !forceShow && UserHelper.hasUserCompleteRating(parameters) )
         {
             Logger.debug("Not showing rating cause user already completed it");
             return false;
         }
 
-        setRatingPopupStep(activity, RatingPopupStep.STEP_SHOWN);
+        setRatingPopupStep(parameters, RatingPopupStep.STEP_SHOWN);
 
         AlertDialog dialog = buildStep1(!forceShow);
         dialog.show();
@@ -92,23 +95,23 @@ public class RatingPopup
      */
     private AlertDialog buildStep1(boolean includeDontAskMeAgainButton)
     {
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity)
+        AlertDialog.Builder builder = new AlertDialog.Builder(context)
             .setTitle(R.string.rating_popup_question_title)
             .setMessage(R.string.rating_popup_question_message)
             .setNegativeButton(R.string.rating_popup_question_cta_negative, (dialog, which) -> {
-                setRatingPopupStep(activity, RatingPopupStep.STEP_DISLIKE);
+                setRatingPopupStep(parameters, RatingPopupStep.STEP_DISLIKE);
                 buildNegativeStep().show();
             })
             .setPositiveButton(R.string.rating_popup_question_cta_positive, (dialog, which) -> {
-                setRatingPopupStep(activity, RatingPopupStep.STEP_LIKE);
+                setRatingPopupStep(parameters, RatingPopupStep.STEP_LIKE);
                 buildPositiveStep().show();
             });
 
         if( includeDontAskMeAgainButton )
         {
             builder.setNeutralButton(R.string.rating_popup_question_cta_dont_ask_again, (dialog, which) -> {
-                setRatingPopupStep(activity, RatingPopupStep.STEP_NOT_ASK_ME_AGAIN);
-                UserHelper.setUserHasCompleteRating(activity);
+                setRatingPopupStep(parameters, RatingPopupStep.STEP_NOT_ASK_ME_AGAIN);
+                UserHelper.setUserHasCompleteRating(parameters);
                 dialog.dismiss();
             });
         }
@@ -123,31 +126,31 @@ public class RatingPopup
      */
     private AlertDialog buildNegativeStep()
     {
-        return new AlertDialog.Builder(activity)
+        return new AlertDialog.Builder(context)
             .setTitle(R.string.rating_popup_negative_title)
             .setMessage(R.string.rating_popup_negative_message)
             .setNegativeButton(R.string.rating_popup_negative_cta_negative, (dialog, which) -> {
-                setRatingPopupStep(activity, RatingPopupStep.STEP_DISLIKE_NO_FEEDBACK);
-                UserHelper.setUserHasCompleteRating(activity);
+                setRatingPopupStep(parameters, RatingPopupStep.STEP_DISLIKE_NO_FEEDBACK);
+                UserHelper.setUserHasCompleteRating(parameters);
             })
             .setPositiveButton(R.string.rating_popup_negative_cta_positive, (dialog, which) -> {
-                setRatingPopupStep(activity, RatingPopupStep.STEP_DISLIKE_FEEDBACK);
-                UserHelper.setUserHasCompleteRating(activity);
+                setRatingPopupStep(parameters, RatingPopupStep.STEP_DISLIKE_FEEDBACK);
+                UserHelper.setUserHasCompleteRating(parameters);
 
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SENDTO);
                 sendIntent.setData(Uri.parse("mailto:")); // only email apps should handle this
-                sendIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{activity.getResources().getString(R.string.rating_feedback_email)});
-                sendIntent.putExtra(Intent.EXTRA_TEXT, activity.getResources().getString(R.string.rating_feedback_send_text));
-                sendIntent.putExtra(Intent.EXTRA_SUBJECT, activity.getResources().getString(R.string.rating_feedback_send_subject));
+                sendIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{context.getResources().getString(R.string.rating_feedback_email)});
+                sendIntent.putExtra(Intent.EXTRA_TEXT, context.getResources().getString(R.string.rating_feedback_send_text));
+                sendIntent.putExtra(Intent.EXTRA_SUBJECT, context.getResources().getString(R.string.rating_feedback_send_subject));
 
-                if (sendIntent.resolveActivity(activity.getPackageManager()) != null)
+                if (sendIntent.resolveActivity(context.getPackageManager()) != null)
                 {
-                    activity.startActivity(sendIntent);
+                    context.startActivity(sendIntent);
                 }
                 else
                 {
-                    Toast.makeText(activity, activity.getResources().getString(R.string.rating_feedback_send_error), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, context.getResources().getString(R.string.rating_feedback_send_error), Toast.LENGTH_SHORT).show();
                 }
             })
             .create();
@@ -160,30 +163,30 @@ public class RatingPopup
      */
     private AlertDialog buildPositiveStep()
     {
-        return new AlertDialog.Builder(activity)
+        return new AlertDialog.Builder(context)
             .setTitle(R.string.rating_popup_positive_title)
             .setMessage(R.string.rating_popup_positive_message)
             .setNegativeButton(R.string.rating_popup_positive_cta_negative, (dialog, which) -> {
-                setRatingPopupStep(activity, RatingPopupStep.STEP_LIKE_NOT_RATED);
-                UserHelper.setUserHasCompleteRating(activity);
+                setRatingPopupStep(parameters, RatingPopupStep.STEP_LIKE_NOT_RATED);
+                UserHelper.setUserHasCompleteRating(parameters);
             })
             .setPositiveButton(R.string.rating_popup_positive_cta_positive, (dialog, which) -> {
-                setRatingPopupStep(activity, RatingPopupStep.STEP_LIKE_RATED);
-                UserHelper.setUserHasCompleteRating(activity);
+                setRatingPopupStep(parameters, RatingPopupStep.STEP_LIKE_RATED);
+                UserHelper.setUserHasCompleteRating(parameters);
 
-                final String appPackageName = activity.getPackageName();
+                final String appPackageName = context.getPackageName();
 
                 try
                 {
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName));
 
-                    activity.startActivity(intent);
+                    context.startActivity(intent);
                 }
                 catch (ActivityNotFoundException e)
                 {
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName));
 
-                    activity.startActivity(intent);
+                    context.startActivity(intent);
                 }
             })
             .create();
@@ -193,24 +196,18 @@ public class RatingPopup
 
     /**
      * Get the current user rating step
-     *
-     * @param context
-     * @return
      */
-    public static RatingPopupStep getUserStep(@NonNull Context context)
+    public static RatingPopupStep getUserStep(@NonNull Parameters parameters)
     {
-        return RatingPopupStep.fromValue(Parameters.getInstance(context).getInt(ParameterKeys.RATING_STEP, RatingPopupStep.STEP_NOT_SHOWN.value));
+        return RatingPopupStep.fromValue(parameters.getInt(ParameterKeys.RATING_STEP, RatingPopupStep.STEP_NOT_SHOWN.value));
     }
 
     /**
      * Set the current user rating step
-     *
-     * @param context
-     * @param step
      */
-    public static void setRatingPopupStep(@NonNull Context context, @NonNull RatingPopupStep step)
+    private static void setRatingPopupStep(@NonNull Parameters parameters, @NonNull RatingPopupStep step)
     {
-        Parameters.getInstance(context).putInt(ParameterKeys.RATING_STEP, step.value);
+        parameters.putInt(ParameterKeys.RATING_STEP, step.value);
     }
 
     /**

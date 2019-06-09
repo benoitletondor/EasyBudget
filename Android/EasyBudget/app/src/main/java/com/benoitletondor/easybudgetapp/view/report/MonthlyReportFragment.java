@@ -32,6 +32,7 @@ import android.widget.TextView;
 
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
+import com.benoitletondor.easybudgetapp.helper.Parameters;
 import com.benoitletondor.easybudgetapp.model.Expense;
 import com.benoitletondor.easybudgetapp.model.db.DB;
 
@@ -40,6 +41,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+
+import static org.koin.java.KoinJavaComponent.get;
 
 /**
  * Fragment that displays monthly report for a given month
@@ -61,6 +64,8 @@ public class MonthlyReportFragment extends Fragment
      * The computed expenses amount (always >= 0)
      */
     private double expensesAmount = 0d;
+
+    private Parameters parameters = get(Parameters.class);
 
 // ---------------------------------->
 
@@ -138,7 +143,7 @@ public class MonthlyReportFragment extends Fragment
                         }
                     }
 
-                    return new MonthlyReportRecyclerViewAdapter(expenses, revenues);
+                    return new MonthlyReportRecyclerViewAdapter(expenses, revenues, parameters);
                 }
                 finally
                 {
@@ -171,9 +176,6 @@ public class MonthlyReportFragment extends Fragment
 
     /**
      * Configure recycler view LayoutManager & adapter
-     *
-     * @param recyclerView
-     * @param adapter
      */
     private void configureRecyclerView(@NonNull RecyclerView recyclerView, @NonNull MonthlyReportRecyclerViewAdapter adapter)
     {
@@ -183,18 +185,14 @@ public class MonthlyReportFragment extends Fragment
 
     /**
      * Configure textviews for expenses, revenues & balance
-     *
-     * @param revenuesAmountTextView
-     * @param expensesAmountTextView
-     * @param balanceTextView
      */
     private void configureTotalView(@NonNull TextView revenuesAmountTextView, @NonNull TextView expensesAmountTextView, @NonNull TextView balanceTextView)
     {
-        revenuesAmountTextView.setText(CurrencyHelper.getFormattedCurrencyString(revenuesAmountTextView.getContext(), revenuesAmount));
-        expensesAmountTextView.setText(CurrencyHelper.getFormattedCurrencyString(expensesAmountTextView.getContext(), expensesAmount));
+        revenuesAmountTextView.setText(CurrencyHelper.getFormattedCurrencyString(parameters, revenuesAmount));
+        expensesAmountTextView.setText(CurrencyHelper.getFormattedCurrencyString(parameters, expensesAmount));
 
         double balance = revenuesAmount - expensesAmount;
-        balanceTextView.setText(CurrencyHelper.getFormattedCurrencyString(balanceTextView.getContext(), balance));
+        balanceTextView.setText(CurrencyHelper.getFormattedCurrencyString(parameters, balance));
         balanceTextView.setTextColor(ContextCompat.getColor(balanceTextView.getContext(), balance >= 0 ? R.color.budget_green : R.color.budget_red));
     }
 }

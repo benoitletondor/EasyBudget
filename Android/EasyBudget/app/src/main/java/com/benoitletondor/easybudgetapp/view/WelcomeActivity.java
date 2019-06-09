@@ -46,6 +46,8 @@ import java.util.Objects;
 
 import me.relex.circleindicator.CircleIndicator;
 
+import static org.koin.java.KoinJavaComponent.get;
+
 /**
  * Welcome screen activity
  *
@@ -85,6 +87,8 @@ public class WelcomeActivity extends DBActivity
      * Broadcast receiver for intent sent by fragments
      */
     private BroadcastReceiver receiver;
+
+    private Parameters parameters = get(Parameters.class);
 
 // ------------------------------------------>
 
@@ -254,7 +258,7 @@ public class WelcomeActivity extends DBActivity
      */
     private int getStep()
     {
-        return Parameters.getInstance(this).getInt(ParameterKeys.ONBOARDING_STEP, 0);
+        return parameters.getInt(ParameterKeys.ONBOARDING_STEP, 0);
     }
 
     /**
@@ -264,6 +268,6 @@ public class WelcomeActivity extends DBActivity
      */
     private void setStep(int step)
     {
-        Parameters.getInstance(this).putInt(ParameterKeys.ONBOARDING_STEP, step);
+        parameters.putInt(ParameterKeys.ONBOARDING_STEP, step);
     }
 }

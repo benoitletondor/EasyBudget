@@ -104,12 +104,11 @@ public class DateHelper
     /**
      * Get the list of months available for the user for the monthly report view.
      *
-     * @param context non null context
      * @return a list of Date object set at the 1st day of the month 00:00:00:000
      */
-    public static List<Date> getListOfMonthsAvailableForUser(@NonNull Context context)
+    public static List<Date> getListOfMonthsAvailableForUser(@NonNull Parameters parameters)
     {
-        long initDate = Parameters.getInstance(context).getLong(ParameterKeys.INIT_DATE, System.currentTimeMillis());
+        long initDate = parameters.getLong(ParameterKeys.INIT_DATE, System.currentTimeMillis());
 
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(initDate);

@@ -16,9 +16,7 @@
 
 package com.benoitletondor.easybudgetapp.view.selectcurrency;
 
-
 import android.app.Dialog;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -33,9 +31,12 @@ import android.view.ViewGroup;
 
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
+import com.benoitletondor.easybudgetapp.helper.Parameters;
 
 import java.util.Currency;
 import java.util.Objects;
+
+import static org.koin.java.KoinJavaComponent.get;
 
 /**
  * Fragment that contains UI for user to chose its currency.<br />
@@ -43,7 +44,7 @@ import java.util.Objects;
  * the selected currency has changed. The newly selected currency ISO code is available in
  * the {@link #CURRENCY_ISO_EXTRA} string extra.<br />
  * <br />
- * NB: The {@link com.benoitletondor.easybudgetapp.helper.CurrencyHelper#setUserCurrency(Context, Currency)}
+ * NB: The {@link com.benoitletondor.easybudgetapp.helper.CurrencyHelper#setUserCurrency(Parameters, Currency)}
  * method is automaticaly called by the fragment on selection, you don't have to do it yourself.
  *
  * @author Benoit LETONDOR
@@ -58,6 +59,8 @@ public class SelectCurrencyFragment extends DialogFragment
      * Key to retrieve the newly selected currency ISO code in Intent extras
      */
     public final static String CURRENCY_ISO_EXTRA       = "currency.iso.key";
+
+    private Parameters parameters = get(Parameters.class);
 
 // -------------------------------------->
 
@@ -120,8 +123,8 @@ public class SelectCurrencyFragment extends DialogFragment
             @Override
             protected Pair<SelectCurrencyRecyclerViewAdapter, Integer> doInBackground(Void... voids)
             {
-                SelectCurrencyRecyclerViewAdapter adapter = new SelectCurrencyRecyclerViewAdapter(CurrencyHelper.getMainAvailableCurrencies(), CurrencyHelper.getOtherAvailableCurrencies());
-                return Pair.create(adapter, adapter.getSelectedCurrencyPosition(Objects.requireNonNull(getContext())));
+                SelectCurrencyRecyclerViewAdapter adapter = new SelectCurrencyRecyclerViewAdapter(CurrencyHelper.getMainAvailableCurrencies(), CurrencyHelper.getOtherAvailableCurrencies(), parameters);
+                return Pair.create(adapter, adapter.getSelectedCurrencyPosition());
             }
 
             @Override

@@ -16,7 +16,6 @@
 
 package com.benoitletondor.easybudgetapp.helper;
 
-import android.content.Context;
 import androidx.annotation.NonNull;
 import com.roomorama.caldroid.CaldroidFragment;
 
@@ -32,120 +31,107 @@ public class UserHelper
     /**
      * The user wants or not to receive notification about updates
      *
-     * @param context non null context
      * @return true if we can display update notifications, false otherwise
      */
-    public static boolean isUserAllowingUpdatePushes(@NonNull Context context)
+    public static boolean isUserAllowingUpdatePushes(@NonNull Parameters parameters)
     {
-        return Parameters.getInstance(context).getBoolean(ParameterKeys.USER_ALLOW_UPDATE_PUSH, true);
+        return parameters.getBoolean(ParameterKeys.USER_ALLOW_UPDATE_PUSH, true);
     }
 
     /**
      * Set the user choice about update notifications
      *
-     * @param context non null context
      * @param value if the user wants or not to receive notifications about updates
      */
-    public static void setUserAllowUpdatePushes(@NonNull Context context, boolean value)
+    public static void setUserAllowUpdatePushes(@NonNull Parameters parameters, boolean value)
     {
-        Parameters.getInstance(context).putBoolean(ParameterKeys.USER_ALLOW_UPDATE_PUSH, value);
+        parameters.putBoolean(ParameterKeys.USER_ALLOW_UPDATE_PUSH, value);
     }
 
     /**
      * The user wants or not to receive a daily reminder notification
      *
-     * @param context non null context
      * @return true if we can display daily notifications, false otherwise
      */
-    public static boolean isUserAllowingDailyReminderPushes(@NonNull Context context)
+    public static boolean isUserAllowingDailyReminderPushes(@NonNull Parameters parameters)
     {
-        return Parameters.getInstance(context).getBoolean(ParameterKeys.USER_ALLOW_DAILY_PUSH, true);
+        return parameters.getBoolean(ParameterKeys.USER_ALLOW_DAILY_PUSH, true);
     }
 
     /**
      * Set the user choice about daily reminder notifications
      *
-     * @param context non null context
      * @param value if the user wants or not to receive daily notifications
      */
-    public static void setUserAllowDailyReminderPushes(@NonNull Context context, boolean value)
+    public static void setUserAllowDailyReminderPushes(@NonNull Parameters parameters, boolean value)
     {
-        Parameters.getInstance(context).putBoolean(ParameterKeys.USER_ALLOW_DAILY_PUSH, value);
+        parameters.putBoolean(ParameterKeys.USER_ALLOW_DAILY_PUSH, value);
     }
 
     /**
      * The user wants or not to receive a daily monthly notification when report is available
      *
-     * @param context non null context
      * @return true if we can display monthly notifications, false otherwise
      */
-    public static boolean isUserAllowingMonthlyReminderPushes(@NonNull Context context)
+    public static boolean isUserAllowingMonthlyReminderPushes(@NonNull Parameters parameters)
     {
-        return Parameters.getInstance(context).getBoolean(ParameterKeys.USER_ALLOW_MONTHLY_PUSH, true);
+        return parameters.getBoolean(ParameterKeys.USER_ALLOW_MONTHLY_PUSH, true);
     }
 
     /**
      * Set the user choice about monthly reminder notifications
      *
-     * @param context non null context
      * @param value if the user wants or not to receive monthly notifications
      */
-    public static void setUserAllowMonthlyReminderPushes(@NonNull Context context, boolean value)
+    public static void setUserAllowMonthlyReminderPushes(@NonNull Parameters parameters, boolean value)
     {
-        Parameters.getInstance(context).putBoolean(ParameterKeys.USER_ALLOW_MONTHLY_PUSH, value);
+        parameters.putBoolean(ParameterKeys.USER_ALLOW_MONTHLY_PUSH, value);
     }
 
     /**
      * Has the user complete the rating popup
      *
-     * @param context non null context
      * @return true if the user has already answered, false otherwise
      */
-    public static boolean hasUserCompleteRating(@NonNull Context context)
+    public static boolean hasUserCompleteRating(@NonNull Parameters parameters)
     {
-        return Parameters.getInstance(context).getBoolean(ParameterKeys.RATING_COMPLETED, false);
+        return parameters.getBoolean(ParameterKeys.RATING_COMPLETED, false);
     }
 
     /**
      * Set that the user has complete the rating popup process
-     *
-     * @param context non null context
      */
-    public static void setUserHasCompleteRating(@NonNull Context context)
+    public static void setUserHasCompleteRating(@NonNull Parameters parameters)
     {
-        Parameters.getInstance(context).putBoolean(ParameterKeys.RATING_COMPLETED, true);
+        parameters.putBoolean(ParameterKeys.RATING_COMPLETED, true);
     }
 
     /**
      * Has the user saw the monthly report hint so far
      *
-     * @param context non null context
      * @return true if the user saw it, false otherwise
      */
-    public static boolean hasUserSawMonthlyReportHint(@NonNull Context context)
+    public static boolean hasUserSawMonthlyReportHint(@NonNull Parameters parameters)
     {
-        return Parameters.getInstance(context).getBoolean(ParameterKeys.USER_SAW_MONTHLY_REPORT_HINT, false);
+        return parameters.getBoolean(ParameterKeys.USER_SAW_MONTHLY_REPORT_HINT, false);
     }
 
     /**
      * Set that the user saw the monthly report hint
-     *
-     * @param context non null context
      */
-    public static void setUserSawMonthlyReportHint(@NonNull Context context)
+    public static void setUserSawMonthlyReportHint(@NonNull Parameters parameters)
     {
-        Parameters.getInstance(context).putBoolean(ParameterKeys.USER_SAW_MONTHLY_REPORT_HINT, true);
+        parameters.putBoolean(ParameterKeys.USER_SAW_MONTHLY_REPORT_HINT, true);
     }
 
     /**
      * Get the first day of the week to display to the user
      *
-     * @param context non null context
      * @return the id of the first day of week to display
      */
-    public static int getFirstDayOfWeek(@NonNull Context context)
+    public static int getFirstDayOfWeek(@NonNull Parameters parameters)
     {
-        final int currentValue = Parameters.getInstance(context).getInt(FIRST_DAY_OF_WEEK, -1);
+        final int currentValue = parameters.getInt(FIRST_DAY_OF_WEEK, -1);
         if( currentValue < 1 || currentValue > 7 ) {
             return CaldroidFragment.MONDAY;
         }
@@ -156,11 +142,10 @@ public class UserHelper
     /**
      * Set the first day of week to display to the user
      *
-     * @param context non null context
      * @param firstDayOfWeek the id of the first day of week to display
      */
-    public static void setFirstDayOfWeek(@NonNull Context context,  int firstDayOfWeek)
+    public static void setFirstDayOfWeek(@NonNull Parameters parameters, int firstDayOfWeek)
     {
-        Parameters.getInstance(context).putInt(FIRST_DAY_OF_WEEK, firstDayOfWeek);
+        parameters.putInt(FIRST_DAY_OF_WEEK, firstDayOfWeek);
     }
 }

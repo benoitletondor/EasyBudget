@@ -30,6 +30,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 
+import static org.koin.java.KoinJavaComponent.get;
+
 /**
  * @author Benoit LETONDOR
  */
@@ -37,6 +39,7 @@ public class DatePickerDialogFragment extends DialogFragment
 {
     private Date originalDate;
     private DatePickerDialog.OnDateSetListener listener;
+    private Parameters parameters = get(Parameters.class);
 
 // ------------------------------------------>
 
@@ -68,7 +71,7 @@ public class DatePickerDialogFragment extends DialogFragment
 
         // Create a new instance of DatePickerDialog and return it
         DatePickerDialog dialog = new DatePickerDialog(Objects.requireNonNull(getContext()), listener, year, month, day);
-        dialog.getDatePicker().setMinDate(Parameters.getInstance(getActivity()).getLong(ParameterKeys.INIT_DATE, new Date().getTime()));
+        dialog.getDatePicker().setMinDate(parameters.getLong(ParameterKeys.INIT_DATE, new Date().getTime()));
         return dialog;
     }
 

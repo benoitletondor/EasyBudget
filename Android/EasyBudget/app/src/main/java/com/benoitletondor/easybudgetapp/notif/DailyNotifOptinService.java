@@ -33,6 +33,7 @@ import com.benoitletondor.easybudgetapp.helper.UserHelper;
 import com.benoitletondor.easybudgetapp.view.MainActivity;
 
 import static com.benoitletondor.easybudgetapp.notif.NotificationsChannels.CHANNEL_NEW_FEATURES;
+import static org.koin.java.KoinJavaComponent.get;
 
 /**
  * Service that will receive events from the daily reminder opt-in notification
@@ -59,6 +60,8 @@ public class DailyNotifOptinService extends IntentService
      */
     public final static String INTENT_REDIRECT_ACTION = "daily_reminder_redirect";
 
+    private Parameters parameters = get(Parameters.class);
+
 // ---------------------------------------->
 
     public DailyNotifOptinService()
@@ -79,15 +82,15 @@ public class DailyNotifOptinService extends IntentService
 
         if( INTENT_OPTOUT_ACTION.equals(intent.getAction()) )
         {
-            UserHelper.setUserAllowDailyReminderPushes(this, false);
+            UserHelper.setUserAllowDailyReminderPushes(parameters, false);
         }
         else if( INTENT_OPTIN_ACTION.equals(intent.getAction()) )
         {
-            UserHelper.setUserAllowDailyReminderPushes(this, true);
+            UserHelper.setUserAllowDailyReminderPushes(parameters, true);
         }
         else if( INTENT_REDIRECT_ACTION.equals(intent.getAction()) )
         {
-            UserHelper.setUserAllowDailyReminderPushes(this, true);
+            UserHelper.setUserAllowDailyReminderPushes(parameters, true);
 
             Intent openSettingsIntent = new Intent(this, MainActivity.class);
             openSettingsIntent.putExtra(MainActivity.INTENT_REDIRECT_TO_SETTINGS_EXTRA, true);
@@ -105,7 +108,7 @@ public class DailyNotifOptinService extends IntentService
      *
      * @param context a non null context
      */
-    public static void showDailyReminderOptinNotif(@NonNull Context context)
+    public static void showDailyReminderOptinNotif(@NonNull Context context, @NonNull Parameters parameters)
     {
         try
         {
@@ -134,7 +137,7 @@ public class DailyNotifOptinService extends IntentService
 
             NotificationManagerCompat.from(context).notify(OPTIN_NOTIFICATION_ID, notifBuilder.build());
 
-            Parameters.getInstance(context).putBoolean(ParameterKeys.DAILY_PUSH_NOTIF_SHOWN, true);
+            parameters.putBoolean(ParameterKeys.DAILY_PUSH_NOTIF_SHOWN, true);
         }
         catch (Exception e)
         {
@@ -145,11 +148,10 @@ public class DailyNotifOptinService extends IntentService
     /**
      * Has the daily reminder opt-in notification already been shown
      *
-     * @param context non null context
      * @return true if already shown, false otherwise
      */
-    public static boolean hasDailyReminderOptinNotifBeenShown(@NonNull Context context)
+    public static boolean hasDailyReminderOptinNotifBeenShown(@NonNull Parameters parameters)
     {
-        return Parameters.getInstance(context).getBoolean(ParameterKeys.DAILY_PUSH_NOTIF_SHOWN, false);
+        return parameters.getBoolean(ParameterKeys.DAILY_PUSH_NOTIF_SHOWN, false);
     }
 }

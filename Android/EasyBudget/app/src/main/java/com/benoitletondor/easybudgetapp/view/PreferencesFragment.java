@@ -93,6 +93,7 @@ public class PreferencesFragment extends PreferenceFragment
     private boolean notPremiumShown = true;
 
     private Iab iab = get(Iab.class);
+    private Parameters parameters = get(Parameters.class);
 
 // ---------------------------------------->
 
@@ -108,7 +109,7 @@ public class PreferencesFragment extends PreferenceFragment
          * Rating button
          */
         findPreference(getResources().getString(R.string.setting_category_rate_button_key)).setOnPreferenceClickListener(preference -> {
-            new RatingPopup(getActivity()).show(true);
+            new RatingPopup(getActivity(), parameters).show(true);
             return false;
         });
 
@@ -116,9 +117,9 @@ public class PreferencesFragment extends PreferenceFragment
          * Start day of week
          */
         final SwitchPreference firstDayOfWeekPref = (SwitchPreference) findPreference(getString(R.string.setting_category_start_day_of_week_key));
-        firstDayOfWeekPref.setChecked(UserHelper.getFirstDayOfWeek(getActivity()) == CaldroidFragment.SUNDAY);
+        firstDayOfWeekPref.setChecked(UserHelper.getFirstDayOfWeek(parameters) == CaldroidFragment.SUNDAY);
         firstDayOfWeekPref.setOnPreferenceClickListener(preference -> {
-            UserHelper.setFirstDayOfWeek(getActivity(), firstDayOfWeekPref.isChecked() ? CaldroidFragment.SUNDAY : CaldroidFragment.MONDAY);
+            UserHelper.setFirstDayOfWeek(parameters, firstDayOfWeekPref.isChecked() ? CaldroidFragment.SUNDAY : CaldroidFragment.MONDAY);
             return true;
         });
 
@@ -126,7 +127,7 @@ public class PreferencesFragment extends PreferenceFragment
          * Bind bug report button
          */
         findPreference(getResources().getString(R.string.setting_category_bug_report_send_button_key)).setOnPreferenceClickListener(preference -> {
-            String localId = Parameters.getInstance(getActivity()).getString(ParameterKeys.LOCAL_ID);
+            String localId = parameters.getString(ParameterKeys.LOCAL_ID);
 
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SENDTO);
@@ -199,7 +200,7 @@ public class PreferencesFragment extends PreferenceFragment
         limitWarningPreference.setOnPreferenceClickListener(preference -> {
             View dialogView = getActivity().getLayoutInflater().inflate(R.layout.dialog_set_warning_limit, null);
             final EditText limitEditText = (EditText) dialogView.findViewById(R.id.warning_limit);
-            limitEditText.setText(String.valueOf(Parameters.getInstance(getActivity()).getInt(ParameterKeys.LOW_MONEY_WARNING_AMOUNT, DEFAULT_LOW_MONEY_WARNING_AMOUNT)));
+            limitEditText.setText(String.valueOf(parameters.getInt(ParameterKeys.LOW_MONEY_WARNING_AMOUNT, DEFAULT_LOW_MONEY_WARNING_AMOUNT)));
             limitEditText.setSelection(limitEditText.getText().length()); // Put focus at the end of the text
 
             final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -224,7 +225,7 @@ public class PreferencesFragment extends PreferenceFragment
                         throw new IllegalArgumentException("limit should be > 0");
                     }
 
-                    Parameters.getInstance(getActivity()).putInt(ParameterKeys.LOW_MONEY_WARNING_AMOUNT, newLimit);
+                    parameters.putInt(ParameterKeys.LOW_MONEY_WARNING_AMOUNT, newLimit);
                     setLimitWarningPreferenceTitle(limitWarningPreference);
                 }
                 catch ( Exception e )
@@ -259,10 +260,10 @@ public class PreferencesFragment extends PreferenceFragment
          */
         final CheckBoxPreference updateNotifPref = (CheckBoxPreference) findPreference(getResources().getString(R.string.setting_category_notifications_update_key));
         updateNotifPref.setOnPreferenceClickListener(preference -> {
-            UserHelper.setUserAllowUpdatePushes(getActivity(), updateNotifPref.isChecked());
+            UserHelper.setUserAllowUpdatePushes(parameters, updateNotifPref.isChecked());
             return true;
         });
-        updateNotifPref.setChecked(UserHelper.isUserAllowingUpdatePushes(getActivity()));
+        updateNotifPref.setChecked(UserHelper.isUserAllowingUpdatePushes(parameters));
 
         /*
          * Hide dev preferences if needed
@@ -296,7 +297,7 @@ public class PreferencesFragment extends PreferenceFragment
              * Show daily reminder opt-in notif
              */
             findPreference(getResources().getString(R.string.setting_category_show_notif_daily_reminder_key)).setOnPreferenceClickListener(preference -> {
-                DailyNotifOptinService.showDailyReminderOptinNotif(getActivity());
+                DailyNotifOptinService.showDailyReminderOptinNotif(getActivity(), parameters);
                 return false;
             });
 
@@ -304,7 +305,7 @@ public class PreferencesFragment extends PreferenceFragment
              * Show monthly report notif for premium users
              */
             findPreference(getResources().getString(R.string.setting_category_show_notif_monthly_premium_key)).setOnPreferenceClickListener(preference -> {
-                MonthlyReportNotifService.showPremiumNotif(getActivity());
+                MonthlyReportNotifService.showPremiumNotif(getActivity(), parameters);
                 return false;
             });
 
@@ -312,7 +313,7 @@ public class PreferencesFragment extends PreferenceFragment
              * Show monthly report notif for non premium users
              */
             findPreference(getResources().getString(R.string.setting_category_show_notif_monthly_notpremium_key)).setOnPreferenceClickListener(preference -> {
-                MonthlyReportNotifService.showNotPremiumNotif(getActivity());
+                MonthlyReportNotifService.showNotPremiumNotif(getActivity(), parameters);
                 return false;
             });
 
@@ -321,10 +322,10 @@ public class PreferencesFragment extends PreferenceFragment
              */
             final CheckBoxPreference animationsPref = (CheckBoxPreference) findPreference(getResources().getString(R.string.setting_category_disable_animation_key));
             animationsPref.setOnPreferenceClickListener(preference -> {
-                UIHelper.setAnimationsEnabled(getActivity(), animationsPref.isChecked());
+                UIHelper.setAnimationsEnabled(parameters, animationsPref.isChecked());
                 return true;
             });
-            animationsPref.setChecked(UIHelper.areAnimationsEnabled(getActivity()));
+            animationsPref.setChecked(UIHelper.areAnimationsEnabled(parameters));
         }
 
         /*
@@ -386,7 +387,7 @@ public class PreferencesFragment extends PreferenceFragment
      */
     private void setCurrencyPreferenceTitle(Preference currencyPreference)
     {
-        currencyPreference.setTitle(getResources().getString(R.string.setting_category_currency_change_button_title, CurrencyHelper.getUserCurrency(getActivity()).getSymbol()));
+        currencyPreference.setTitle(getResources().getString(R.string.setting_category_currency_change_button_title, CurrencyHelper.getUserCurrency(parameters).getSymbol()));
     }
 
     /**
@@ -396,7 +397,7 @@ public class PreferencesFragment extends PreferenceFragment
      */
     private void setLimitWarningPreferenceTitle(Preference limitWarningPreferenceTitle)
     {
-        limitWarningPreferenceTitle.setTitle(getResources().getString(R.string.setting_category_limit_set_button_title, CurrencyHelper.getFormattedCurrencyString(getActivity(), Parameters.getInstance(getActivity()).getInt(ParameterKeys.LOW_MONEY_WARNING_AMOUNT, DEFAULT_LOW_MONEY_WARNING_AMOUNT))));
+        limitWarningPreferenceTitle.setTitle(getResources().getString(R.string.setting_category_limit_set_button_title, CurrencyHelper.getFormattedCurrencyString(parameters, parameters.getInt(ParameterKeys.LOW_MONEY_WARNING_AMOUNT, DEFAULT_LOW_MONEY_WARNING_AMOUNT))));
     }
 
     /**
@@ -434,18 +435,18 @@ public class PreferencesFragment extends PreferenceFragment
             // Daily reminder notif preference
             final CheckBoxPreference dailyNotifPref = (CheckBoxPreference) findPreference(getResources().getString(R.string.setting_category_notifications_daily_key));
             dailyNotifPref.setOnPreferenceClickListener(preference -> {
-                UserHelper.setUserAllowDailyReminderPushes(getActivity(), dailyNotifPref.isChecked());
+                UserHelper.setUserAllowDailyReminderPushes(parameters, dailyNotifPref.isChecked());
                 return true;
             });
-            dailyNotifPref.setChecked(UserHelper.isUserAllowingDailyReminderPushes(getActivity()));
+            dailyNotifPref.setChecked(UserHelper.isUserAllowingDailyReminderPushes(parameters));
 
             // Monthly reminder for reports
             final CheckBoxPreference monthlyNotifPref = (CheckBoxPreference) findPreference(getResources().getString(R.string.setting_category_notifications_monthly_key));
             monthlyNotifPref.setOnPreferenceClickListener(preference -> {
-                UserHelper.setUserAllowMonthlyReminderPushes(getActivity(), monthlyNotifPref.isChecked());
+                UserHelper.setUserAllowMonthlyReminderPushes(parameters, monthlyNotifPref.isChecked());
                 return true;
             });
-            monthlyNotifPref.setChecked(UserHelper.isUserAllowingMonthlyReminderPushes(getActivity()));
+            monthlyNotifPref.setChecked(UserHelper.isUserAllowingMonthlyReminderPushes(parameters));
         }
         else
         {

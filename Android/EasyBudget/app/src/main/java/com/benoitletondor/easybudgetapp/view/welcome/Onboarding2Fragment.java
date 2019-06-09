@@ -33,10 +33,13 @@ import android.widget.Button;
 
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
+import com.benoitletondor.easybudgetapp.helper.Parameters;
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment;
 
 import java.util.Currency;
 import java.util.Objects;
+
+import static org.koin.java.KoinJavaComponent.get;
 
 /**
  * Onboarding step 2 fragment
@@ -49,6 +52,8 @@ public class Onboarding2Fragment extends OnboardingFragment
     private Button nextButton;
 
     private BroadcastReceiver receiver;
+
+    private Parameters parameters = get(Parameters.class);
 
 // ------------------------------------->
 
@@ -71,7 +76,7 @@ public class Onboarding2Fragment extends OnboardingFragment
         nextButton = v.findViewById(R.id.onboarding_screen2_next_button);
         nextButton.setOnClickListener(v1 -> next());
 
-        selectedCurrency = CurrencyHelper.getUserCurrency(v.getContext());
+        selectedCurrency = CurrencyHelper.getUserCurrency(parameters);
         setNextButtonText();
 
         Fragment selectCurrencyFragment = new SelectCurrencyFragment();

@@ -32,6 +32,7 @@ import android.widget.TextView;
 
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
+import com.benoitletondor.easybudgetapp.helper.Parameters;
 import com.benoitletondor.easybudgetapp.model.Expense;
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType;
 import com.benoitletondor.easybudgetapp.model.db.DB;
@@ -49,30 +50,30 @@ import java.util.List;
  */
 public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRecyclerViewAdapter.ViewHolder>
 {
+    @NonNull
     private List<Expense> expenses;
+    @NonNull
     private Date date;
+    @NonNull
     private final Activity activity;
+    @NonNull
+    private final Parameters parameters;
 
 // ------------------------------------------->
 
     /**
      * Instanciate an adapter for the given date
-     *
-     * @param activity
-     * @param db
-     * @param date
      */
-    public ExpensesRecyclerViewAdapter(@NonNull Activity activity, @NonNull DB db, @NonNull Date date)
+    public ExpensesRecyclerViewAdapter(@NonNull Activity activity, @NonNull Parameters parameters, @NonNull DB db, @NonNull Date date)
     {
         this.activity = activity;
+        this.parameters = parameters;
         this.date = date;
         this.expenses = db.getExpensesForDay(date);
     }
 
     /**
      * Return the date content is displayed for displayed
-     *
-     * @return
      */
     public Date getDate()
     {
@@ -95,7 +96,7 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
     /**
      * Remove given expense
      *
-     * @param expense
+     * @param expense the expense to remove
      * @return position of the deleted expense (-1 if not found)
      */
     public int removeExpense(Expense expense)
@@ -120,9 +121,6 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
 
     /**
      * Add an expense at the given position
-     *
-     * @param expense
-     * @param position
      */
     public void addExpense(Expense expense, int position)
     {
@@ -146,7 +144,7 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
         final Expense expense = expenses.get(i);
 
         viewHolder.expenseTitleTextView.setText(expense.getTitle());
-        viewHolder.expenseAmountTextView.setText(CurrencyHelper.getFormattedCurrencyString(viewHolder.view.getContext(), -expense.getAmount()));
+        viewHolder.expenseAmountTextView.setText(CurrencyHelper.getFormattedCurrencyString(parameters, -expense.getAmount()));
         viewHolder.expenseAmountTextView.setTextColor(ContextCompat.getColor(viewHolder.view.getContext(), expense.isRevenue() ? R.color.budget_green : R.color.budget_red));
         viewHolder.recurringIndicator.setVisibility(expense.isRecurring() ? View.VISIBLE : View.GONE);
         viewHolder.positiveIndicator.setImageResource(expense.isRevenue() ? R.drawable.ic_label_green : R.drawable.ic_label_red);
@@ -285,16 +283,16 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
-    public static class ViewHolder extends RecyclerView.ViewHolder
+    static class ViewHolder extends RecyclerView.ViewHolder
     {
-        public final TextView expenseTitleTextView;
-        public final TextView expenseAmountTextView;
-        public final ViewGroup recurringIndicator;
-        public final TextView recurringIndicatorTextview;
-        public final ImageView positiveIndicator;
-        public final View view;
+        final TextView expenseTitleTextView;
+        final TextView expenseAmountTextView;
+        final ViewGroup recurringIndicator;
+        final TextView recurringIndicatorTextview;
+        final ImageView positiveIndicator;
+        final View view;
 
-        public ViewHolder(View v)
+        ViewHolder(View v)
         {
             super(v);
 

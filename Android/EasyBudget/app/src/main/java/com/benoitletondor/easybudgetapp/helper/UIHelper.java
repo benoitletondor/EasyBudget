@@ -54,8 +54,6 @@ public class UIHelper
 {
     /**
      * Remove border of the button for Android 5+
-     *
-     * @param button
      */
     public static void removeButtonBorder(@NonNull Button button)
     {
@@ -67,9 +65,6 @@ public class UIHelper
 
     /**
      * Set the status bar color for Android 5+
-     *
-     * @param activity
-     * @param colorRes
      */
     public static void setStatusBarColor(@NonNull Activity activity, @ColorRes int colorRes)
     {
@@ -88,8 +83,6 @@ public class UIHelper
 
     /**
      * Check if the os version is compatible with activity enter animations (Android 5+)
-     *
-     * @return
      */
     public static boolean isCompatibleWithActivityEnterAnimation()
     {
@@ -99,8 +92,6 @@ public class UIHelper
     /**
      * Check if the os version is compatible with activity enter animations (Android 5+) && the
      * activity contains the animation key
-     *
-     * @return
      */
     public static boolean willAnimateActivityEnter(Activity activity)
     {
@@ -109,9 +100,6 @@ public class UIHelper
 
     /**
      * Animate activity enter if compatible
-     *
-     * @param activity
-     * @param listener
      */
     public static void animateActivityEnter(@NonNull final Activity activity, @NonNull final Animator.AnimatorListener listener)
     {
@@ -162,8 +150,6 @@ public class UIHelper
 
     /**
      * Set the focus on the given text view
-     *
-     * @param editText
      */
     public static void setFocus(@NonNull EditText editText)
     {
@@ -175,12 +161,10 @@ public class UIHelper
 
     /**
      * Show the FAB, animating the appearance if activated (the FAB should be configured with scale & alpha to 0)
-     *
-     * @param fab
      */
-    public static void showFAB(@NonNull final View fab)
+    public static void showFAB(@NonNull final View fab, @NonNull Parameters parameters)
     {
-        if( UIHelper.areAnimationsEnabled(fab.getContext()) )
+        if( UIHelper.areAnimationsEnabled(parameters) )
         {
             ViewCompat.animate(fab)
                 .scaleX(1.0f)
@@ -200,30 +184,22 @@ public class UIHelper
 
     /**
      * Are animations enabled (can be disabled by user in settings)
-     *
-     * @param context
-     * @return
      */
-    public static boolean areAnimationsEnabled(@NonNull Context context)
+    public static boolean areAnimationsEnabled(@NonNull Parameters parameters)
     {
-        return Parameters.getInstance(context).getBoolean(ParameterKeys.ANIMATIONS_ENABLED, true);
+        return parameters.getBoolean(ParameterKeys.ANIMATIONS_ENABLED, true);
     }
 
     /**
      * Set animation enabled value
-     *
-     * @param context
-     * @param enabled
      */
-    public static void setAnimationsEnabled(@NonNull Context context, boolean enabled)
+    public static void setAnimationsEnabled(@NonNull Parameters parameters, boolean enabled)
     {
-        Parameters.getInstance(context).putBoolean(ParameterKeys.ANIMATIONS_ENABLED, enabled);
+        parameters.putBoolean(ParameterKeys.ANIMATIONS_ENABLED, enabled);
     }
 
     /**
      * This helper prevents the user to add unsupported values into an EditText for decimal numbers
-     *
-     * @param editText
      */
     public static void preventUnsupportedInputForDecimals(final @NonNull EditText editText)
     {

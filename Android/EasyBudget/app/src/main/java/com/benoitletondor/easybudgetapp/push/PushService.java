@@ -62,6 +62,7 @@ public class PushService extends FirebaseMessagingService
 // ----------------------------------->
 
     private Iab iab = get(Iab.class);
+    private Parameters parameters = get(Parameters.class);
 
 // ----------------------------------->
 
@@ -112,13 +113,13 @@ public class PushService extends FirebaseMessagingService
                     return false;
                 }
 
-                if( !UserHelper.isUserAllowingDailyReminderPushes(this) ) // Check user choice
+                if( !UserHelper.isUserAllowingDailyReminderPushes(parameters) ) // Check user choice
                 {
                     return false;
                 }
 
                 // Check if the app hasn't been opened today
-                long lastOpenTimestamp = Parameters.getInstance(this).getLong(ParameterKeys.LAST_OPEN_DATE, 0);
+                long lastOpenTimestamp = parameters.getLong(ParameterKeys.LAST_OPEN_DATE, 0);
                 if( lastOpenTimestamp == 0 )
                 {
                     return false;
@@ -135,11 +136,11 @@ public class PushService extends FirebaseMessagingService
             }
             else if( remoteMessage.getData().containsKey(MONTHLY_REMINDER_KEY) && "true".equals(remoteMessage.getData().get(MONTHLY_REMINDER_KEY)) )
             {
-                return iab.isUserPremium() && UserHelper.isUserAllowingMonthlyReminderPushes(this);
+                return iab.isUserPremium() && UserHelper.isUserAllowingMonthlyReminderPushes(parameters);
             }
 
             // Else it must be an update push
-            return UserHelper.isUserAllowingUpdatePushes(this);
+            return UserHelper.isUserAllowingUpdatePushes(parameters);
         }
         catch (Exception e)
         {

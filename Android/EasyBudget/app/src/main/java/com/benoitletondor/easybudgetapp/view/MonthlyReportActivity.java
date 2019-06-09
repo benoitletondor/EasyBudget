@@ -33,12 +33,15 @@ import android.widget.TextView;
 
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.DateHelper;
+import com.benoitletondor.easybudgetapp.helper.Parameters;
 import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.view.report.MonthlyReportFragment;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+
+import static org.koin.java.KoinJavaComponent.get;
 
 /**
  * Activity that displays monthly report
@@ -77,6 +80,8 @@ public class MonthlyReportActivity extends AppCompatActivity implements ViewPage
      * The current {@link #pager} position
      */
     private int selectedPosition;
+
+    private Parameters parameters = get(Parameters.class);
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -120,7 +125,7 @@ public class MonthlyReportActivity extends AppCompatActivity implements ViewPage
             @Override
             protected List<Date> doInBackground(Void... params)
             {
-                return DateHelper.getListOfMonthsAvailableForUser(MonthlyReportActivity.this);
+                return DateHelper.getListOfMonthsAvailableForUser(parameters);
             }
 
             @Override

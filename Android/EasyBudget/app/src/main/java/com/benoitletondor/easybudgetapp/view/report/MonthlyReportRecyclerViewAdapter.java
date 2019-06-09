@@ -26,6 +26,7 @@ import android.widget.TextView;
 
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
+import com.benoitletondor.easybudgetapp.helper.Parameters;
 import com.benoitletondor.easybudgetapp.model.Expense;
 
 import java.text.SimpleDateFormat;
@@ -51,7 +52,7 @@ public class MonthlyReportRecyclerViewAdapter extends RecyclerView.Adapter<Recyc
     /**
      * Formatter to get day number for each date
      */
-    private static final SimpleDateFormat dayFormatter = new SimpleDateFormat("dd", Locale.getDefault());
+    private final SimpleDateFormat dayFormatter = new SimpleDateFormat("dd", Locale.getDefault());
 
     /**
      * List of expenses (may be empty)
@@ -63,18 +64,16 @@ public class MonthlyReportRecyclerViewAdapter extends RecyclerView.Adapter<Recyc
      */
     @NonNull
     private final List<Expense> revenues;
+    @NonNull
+    private final Parameters parameters;
 
 // --------------------------------------->
 
-    /**
-     *
-     * @param expenses
-     * @param revenues
-     */
-    public MonthlyReportRecyclerViewAdapter(@NonNull List<Expense> expenses, @NonNull List<Expense> revenues)
+    MonthlyReportRecyclerViewAdapter(@NonNull List<Expense> expenses, @NonNull List<Expense> revenues, @NonNull Parameters parameters)
     {
         this.expenses = expenses;
         this.revenues = revenues;
+        this.parameters = parameters;
     }
 
 // --------------------------------------->
@@ -110,7 +109,7 @@ public class MonthlyReportRecyclerViewAdapter extends RecyclerView.Adapter<Recyc
             Expense expense = getExpense(position);
 
             viewHolder.expenseTitleTextView.setText(expense.getTitle());
-            viewHolder.expenseAmountTextView.setText(CurrencyHelper.getFormattedCurrencyString(viewHolder.view.getContext(), -expense.getAmount()));
+            viewHolder.expenseAmountTextView.setText(CurrencyHelper.getFormattedCurrencyString(parameters, -expense.getAmount()));
             viewHolder.expenseAmountTextView.setTextColor(ContextCompat.getColor(viewHolder.view.getContext(), expense.isRevenue() ? R.color.budget_green : R.color.budget_red));
             viewHolder.monthlyIndicator.setVisibility(expense.isRecurring() ? View.VISIBLE : View.GONE);
 
@@ -204,14 +203,14 @@ public class MonthlyReportRecyclerViewAdapter extends RecyclerView.Adapter<Recyc
 
     public static class ExpenseViewHolder extends RecyclerView.ViewHolder
     {
-        public final TextView expenseTitleTextView;
-        public final TextView expenseAmountTextView;
-        public final ViewGroup monthlyIndicator;
-        public final TextView dateTextView;
-        public final TextView recurringExpenseTypeTextView;
-        public final View view;
+        final TextView expenseTitleTextView;
+        final TextView expenseAmountTextView;
+        final ViewGroup monthlyIndicator;
+        final TextView dateTextView;
+        final TextView recurringExpenseTypeTextView;
+        final View view;
 
-        public ExpenseViewHolder(View v)
+        ExpenseViewHolder(View v)
         {
             super(v);
 
@@ -226,10 +225,10 @@ public class MonthlyReportRecyclerViewAdapter extends RecyclerView.Adapter<Recyc
 
     public static class HeaderViewHolder extends RecyclerView.ViewHolder
     {
-        public final TextView headerTitle;
-        public final View view;
+        final TextView headerTitle;
+        final View view;
 
-        public HeaderViewHolder(View v)
+        HeaderViewHolder(View v)
         {
             super(v);
 

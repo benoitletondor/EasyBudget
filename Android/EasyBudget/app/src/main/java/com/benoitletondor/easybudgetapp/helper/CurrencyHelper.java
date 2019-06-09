@@ -135,9 +135,6 @@ public class CurrencyHelper
 
     /**
      * Get the currency display name (using compat)
-     *
-     * @param currency
-     * @return
      */
     public static String getCurrencyDisplayName(Currency currency)
     {
@@ -160,12 +157,8 @@ public class CurrencyHelper
 
     /**
      * Helper to display an amount using the user currency
-     *
-     * @param context
-     * @param amount
-     * @return
      */
-    public static String getFormattedCurrencyString(@NonNull Context context, double amount)
+    public static String getFormattedCurrencyString(@NonNull Parameters parameters, double amount)
     {
         NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();
 
@@ -173,16 +166,13 @@ public class CurrencyHelper
         currencyFormat.setMaximumFractionDigits(2);
         currencyFormat.setMinimumFractionDigits(2);
 
-        currencyFormat.setCurrency(getUserCurrency(context));
+        currencyFormat.setCurrency(getUserCurrency(parameters));
 
         return currencyFormat.format(amount);
     }
 
     /**
      * Helper to display an amount into an edit text
-     *
-     * @param amount
-     * @return
      */
     public static String getFormattedAmountValue(double amount)
     {
@@ -233,23 +223,17 @@ public class CurrencyHelper
 
     /**
      * Convenience method to get user currency
-     *
-     * @param context
-     * @return
      */
-    public static Currency getUserCurrency(@NonNull Context context)
+    public static Currency getUserCurrency(@NonNull Parameters parameters)
     {
-        return Currency.getInstance(Parameters.getInstance(context).getString(ParameterKeys.CURRENCY_ISO));
+        return Currency.getInstance(parameters.getString(ParameterKeys.CURRENCY_ISO));
     }
 
     /**
      * Convenience method to set user currency
-     *
-     * @param context
-     * @param currency
      */
-    public static void setUserCurrency(@NonNull Context context, @NonNull Currency currency)
+    public static void setUserCurrency(@NonNull Parameters parameters, @NonNull Currency currency)
     {
-        Parameters.getInstance(context).putString(ParameterKeys.CURRENCY_ISO, currency.getCurrencyCode());
+        parameters.putString(ParameterKeys.CURRENCY_ISO, currency.getCurrencyCode());
     }
 }
