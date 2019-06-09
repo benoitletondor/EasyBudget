@@ -92,7 +92,7 @@
             android:label="@string/title_activity_settings"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".view.WelcomeActivity"
+            android:name=".view.welcome.WelcomeActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_welcome"
             android:screenOrientation="portrait"

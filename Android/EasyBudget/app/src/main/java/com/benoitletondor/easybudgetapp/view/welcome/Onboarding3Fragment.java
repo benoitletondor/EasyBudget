@@ -37,7 +37,6 @@ import com.benoitletondor.easybudgetapp.helper.Logger;
 import com.benoitletondor.easybudgetapp.helper.Parameters;
 import com.benoitletondor.easybudgetapp.helper.UIHelper;
 import com.benoitletondor.easybudgetapp.model.Expense;
-import com.benoitletondor.easybudgetapp.model.db.DB;
 
 import java.util.Date;
 import java.util.Objects;
@@ -74,13 +73,7 @@ public class Onboarding3Fragment extends OnboardingFragment
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_onboarding3, container, false);
 
-        DB db = getDB();
-
-        double amount = 0;
-        if( db != null )
-        {
-            amount = -db.getBalanceForDay(new Date());
-        }
+        double amount = -getDb().getBalanceForDay(new Date());
 
         moneyTextView = v.findViewById(R.id.onboarding_screen3_initial_amount_money_tv);
         setCurrency();
@@ -111,19 +104,15 @@ public class Onboarding3Fragment extends OnboardingFragment
 
         nextButton = v.findViewById(R.id.onboarding_screen3_next_button);
         nextButton.setOnClickListener(v1 -> {
-            DB db1 = getDB();
-            if ( db1 != null)
+            double currentBalance = -getDb().getBalanceForDay(new Date());
+            double newBalance = getAmountValue();
+
+            if (newBalance != currentBalance)
             {
-                double currentBalance = -db1.getBalanceForDay(new Date());
-                double newBalance = getAmountValue();
+                double diff = newBalance - currentBalance;
 
-                if (newBalance != currentBalance)
-                {
-                    double diff = newBalance - currentBalance;
-
-                    final Expense expense = new Expense(getResources().getString(R.string.adjust_balance_expense_title), -diff, new Date());
-                    db1.persistExpense(expense);
-                }
+                final Expense expense = new Expense(getResources().getString(R.string.adjust_balance_expense_title), -diff, new Date());
+                getDb().persistExpense(expense);
             }
 
             // Hide keyboard

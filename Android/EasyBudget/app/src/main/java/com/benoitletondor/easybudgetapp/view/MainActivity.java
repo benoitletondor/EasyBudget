@@ -31,6 +31,7 @@ import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.benoitletondor.easybudgetapp.iab.Iab;
+import com.benoitletondor.easybudgetapp.view.welcome.WelcomeActivity;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentTransaction;

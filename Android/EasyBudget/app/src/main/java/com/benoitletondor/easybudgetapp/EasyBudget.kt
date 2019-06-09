@@ -33,6 +33,7 @@ import com.batch.android.PushNotificationType
 import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.injection.appModule
+import com.benoitletondor.easybudgetapp.injection.viewModelModule
 import com.benoitletondor.easybudgetapp.notif.DailyNotifOptinService
 import com.benoitletondor.easybudgetapp.notif.MonthlyReportNotifService
 import com.benoitletondor.easybudgetapp.notif.NotificationsChannels.*
@@ -73,7 +74,7 @@ class EasyBudget : Application() {
         startKoin {
             androidLogger()
             androidContext(this@EasyBudget)
-            modules(appModule)
+            modules(listOf(appModule, viewModelModule))
         }
 
         // Init actions
