@@ -171,7 +171,7 @@ public class MonthlyReportActivity extends AppCompatActivity implements ViewPage
             @Override
             public Fragment getItem(int position)
             {
-                return new MonthlyReportFragment(dates.get(position));
+                return MonthlyReportFragment.newInstance(dates.get(position));
             }
 
             @Override
