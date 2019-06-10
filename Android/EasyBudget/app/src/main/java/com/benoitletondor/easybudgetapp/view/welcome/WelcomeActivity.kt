@@ -28,12 +28,12 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.viewpager.widget.ViewPager
 import android.os.Bundle
 import android.view.ViewAnimationUtils
+import androidx.appcompat.app.AppCompatActivity
 
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.UIHelper
 import com.benoitletondor.easybudgetapp.helper.ParameterKeys
 import com.benoitletondor.easybudgetapp.helper.Parameters
-import com.benoitletondor.easybudgetapp.view.DBActivity
 
 import kotlinx.android.synthetic.main.activity_welcome.*
 
@@ -44,7 +44,7 @@ import org.koin.android.ext.android.inject
  *
  * @author Benoit LETONDOR
  */
-class WelcomeActivity : DBActivity() {
+class WelcomeActivity : AppCompatActivity() {
     /**
      * Broadcast receiver for intent sent by fragments
      */
@@ -54,11 +54,6 @@ class WelcomeActivity : DBActivity() {
 
 // ------------------------------------>
 
-    /**
-     * Save the given step as onboarding step
-     *
-     * @param step
-     */
     private var step: Int
         get() = parameters.getInt(ParameterKeys.ONBOARDING_STEP, 0)
         set(step) = parameters.putInt(ParameterKeys.ONBOARDING_STEP, step)
@@ -150,7 +145,7 @@ class WelcomeActivity : DBActivity() {
             }
         }
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver!!, filter)
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter)
 
         val initialStep = step
 
@@ -164,7 +159,7 @@ class WelcomeActivity : DBActivity() {
     }
 
     override fun onDestroy() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver!!)
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
 
         super.onDestroy()
     }

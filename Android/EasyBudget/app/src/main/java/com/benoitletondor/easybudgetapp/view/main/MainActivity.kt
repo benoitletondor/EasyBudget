@@ -68,6 +68,7 @@ import java.util.Locale
 import com.benoitletondor.easybudgetapp.DEFAULT_LOW_MONEY_WARNING_AMOUNT
 import com.benoitletondor.easybudgetapp.iab.INTENT_IAB_STATUS_CHANGED
 import com.benoitletondor.easybudgetapp.view.*
+import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.java.KoinJavaComponent.get
@@ -457,7 +458,7 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
             R.id.action_monthly_report -> {
-                val startIntent = Intent(this, MonthlyReportActivity::class.java)
+                val startIntent = Intent(this, MonthlyReportBaseActivity::class.java)
                 ActivityCompat.startActivity(this@MainActivity, startIntent, null)
 
                 return true
@@ -514,8 +515,8 @@ class MainActivity : AppCompatActivity() {
         try {
             val data = intent.data
             if (data != null && "true" == data.getQueryParameter("monthly")) {
-                val startIntent = Intent(this, MonthlyReportActivity::class.java)
-                startIntent.putExtra(MonthlyReportActivity.FROM_NOTIFICATION_EXTRA, true)
+                val startIntent = Intent(this, MonthlyReportBaseActivity::class.java)
+                startIntent.putExtra(MonthlyReportBaseActivity.FROM_NOTIFICATION_EXTRA, true)
                 ActivityCompat.startActivity(this@MainActivity, startIntent, null)
             }
         } catch (e: Exception) {

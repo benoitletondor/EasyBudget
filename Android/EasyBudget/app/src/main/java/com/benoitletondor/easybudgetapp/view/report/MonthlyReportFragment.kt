@@ -74,6 +74,11 @@ class MonthlyReportFragment : Fragment() {
                 MonthlyReportViewModel.MonthlyReportData.Empty -> {
                     recyclerView.visibility = View.GONE
                     emptyState.visibility = View.VISIBLE
+
+                    revenuesAmountTextView.text = CurrencyHelper.getFormattedCurrencyString(parameters, 0.0)
+                    expensesAmountTextView.text = CurrencyHelper.getFormattedCurrencyString(parameters, 0.0)
+                    balanceTextView.text = CurrencyHelper.getFormattedCurrencyString(parameters, 0.0)
+                    balanceTextView.setTextColor(ContextCompat.getColor(balanceTextView.context, R.color.budget_green))
                 }
                 is MonthlyReportViewModel.MonthlyReportData.Data -> {
                     configureRecyclerView(recyclerView, MonthlyReportRecyclerViewAdapter(result.expenses, result.revenues, parameters))

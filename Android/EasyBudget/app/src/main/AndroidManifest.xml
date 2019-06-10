@@ -70,7 +70,7 @@
                 android:resource="@xml/shortcuts" />
         </activity>
         <activity
-            android:name=".view.MonthlyReportActivity"
+            android:name=".view.report.base.MonthlyReportBaseActivity"
             android:label="@string/title_activity_monthly_report"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait" />
