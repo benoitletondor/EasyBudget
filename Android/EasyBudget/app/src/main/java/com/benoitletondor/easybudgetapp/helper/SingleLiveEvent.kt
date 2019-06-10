@@ -61,12 +61,4 @@ class SingleLiveEvent<T> : MutableLiveData<T>() {
         pending.set(true)
         super.postValue(value)
     }
-
-    /**
-     * Used for cases where T is Void, to make calls cleaner.
-     */
-    @MainThread
-    fun callWithNullValue() {
-        value = null
-    }
 }
