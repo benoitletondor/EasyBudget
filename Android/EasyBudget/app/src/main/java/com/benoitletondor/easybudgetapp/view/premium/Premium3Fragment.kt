@@ -1,5 +1,5 @@
 /*
- *   Copyright 2015 Benoit LETONDOR
+ *   Copyright 2016 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -14,25 +14,23 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp;
+package com.benoitletondor.easybudgetapp.view.premium
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 
-import com.google.android.gms.analytics.CampaignTrackingReceiver;
+import com.benoitletondor.easybudgetapp.R
 
 /**
- * A receiver for referrer intents
+ * Fragment 3 of the premium onboarding screen
  *
  * @author Benoit LETONDOR
  */
-public class ReferrerReceiver extends BroadcastReceiver
-{
-    @Override
-    public void onReceive(Context context, Intent intent)
-    {
-        // Forward to Google analytics
-        new CampaignTrackingReceiver().onReceive(context, intent);
+class Premium3Fragment : PremiumFragment() {
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.fragment_premium3, container, false)
     }
 }

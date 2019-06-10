@@ -43,8 +43,6 @@ import org.koin.android.viewmodel.ext.android.viewModel
  *
  * @author Benoit LETONDOR
  */
-// -------------------------------------->
-
 class SelectCurrencyFragment : DialogFragment() {
 
     private val parameters: Parameters by inject()

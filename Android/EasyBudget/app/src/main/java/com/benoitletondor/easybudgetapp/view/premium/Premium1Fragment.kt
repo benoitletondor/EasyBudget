@@ -14,36 +14,24 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp.view.premium;
+package com.benoitletondor.easybudgetapp.view.premium
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 
-import com.benoitletondor.easybudgetapp.R;
-
-import androidx.annotation.NonNull;
+import com.benoitletondor.easybudgetapp.R
 
 /**
  * Fragment 1 of the premium onboarding screen
  *
  * @author Benoit LETONDOR
  */
-public class Premium1Fragment extends PremiumFragment
-{
+class Premium1Fragment : PremiumFragment() {
 
-    public Premium1Fragment()
-    {
-        // Required empty public constructor
-    }
-
-
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-    {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_premium1, container, false);
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.fragment_premium1, container, false)
     }
 
 }
