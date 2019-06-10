@@ -29,6 +29,8 @@ import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.SwitchPreference;
+
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.AlertDialog;
@@ -38,7 +40,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.benoitletondor.easybudgetapp.BuildConfig;
-import com.benoitletondor.easybudgetapp.EasyBudget;
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
 import com.benoitletondor.easybudgetapp.helper.Logger;
@@ -53,6 +54,7 @@ import com.benoitletondor.easybudgetapp.view.main.MainActivity;
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment;
 import com.roomorama.caldroid.CaldroidFragment;
 
+import java.net.URLEncoder;
 import java.util.Objects;
 
 import static com.benoitletondor.easybudgetapp.EasyBudgetKt.DEFAULT_LOW_MONEY_WARNING_AMOUNT;
@@ -493,7 +495,7 @@ public class PreferencesFragment extends PreferenceFragment
                             return;
                         }
 
-                        if ( !((EasyBudget) getActivity().getApplication()).launchRedeemPromocodeFlow(promocode, getActivity()) )
+                        if ( !launchRedeemPromocodeFlow(promocode) )
                         {
                             new AlertDialog.Builder(getActivity())
                                     .setTitle(R.string.iab_purchase_error_title)
@@ -523,6 +525,25 @@ public class PreferencesFragment extends PreferenceFragment
     {
         Intent intent = new Intent(getActivity(), PremiumActivity.class);
         ActivityCompat.startActivityForResult(getActivity(), intent, SettingsActivity.PREMIUM_ACTIVITY, null);
+    }
+
+    /**
+     * Launch the redeem promocode flow
+     *
+     * @param promocode the promocode to redeem
+     */
+    private boolean launchRedeemPromocodeFlow(@NonNull String promocode) {
+        try
+        {
+            final String url = "https://play.google.com/redeem?code=" + URLEncoder.encode(promocode, "UTF-8");
+            getActivity().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+            return true;
+        }
+        catch ( Exception e )
+        {
+            Logger.error(false, "Error while redeeming promocode", e);
+            return false;
+        }
     }
 
     @Override

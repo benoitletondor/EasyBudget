@@ -18,7 +18,6 @@ package com.benoitletondor.easybudgetapp
 
 import android.app.*
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
@@ -27,6 +26,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.batch.android.Batch
+import com.batch.android.BatchActivityLifecycleHelper
 import com.batch.android.BatchNotificationChannelsManager.DEFAULT_CHANNEL_ID
 import com.batch.android.Config
 import com.batch.android.PushNotificationType
@@ -50,7 +50,6 @@ import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
-import java.net.URLEncoder
 import java.util.*
 
 const val DEFAULT_LOW_MONEY_WARNING_AMOUNT = 100
@@ -373,35 +372,7 @@ class EasyBudget : Application() {
         notificationTypes.remove(PushNotificationType.SOUND)
         Batch.Push.setNotificationsType(notificationTypes)
 
-        registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
-            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-
-            }
-
-            override fun onActivityStarted(activity: Activity) {
-                Batch.onStart(activity)
-            }
-
-            override fun onActivityResumed(activity: Activity) {
-
-            }
-
-            override fun onActivityPaused(activity: Activity) {
-
-            }
-
-            override fun onActivityStopped(activity: Activity) {
-                Batch.onStop(activity)
-            }
-
-            override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
-
-            }
-
-            override fun onActivityDestroyed(activity: Activity) {
-                Batch.onDestroy(activity)
-            }
-        })
+        registerActivityLifecycleCallbacks(BatchActivityLifecycleHelper())
     }
 
     /**
@@ -441,7 +412,7 @@ class EasyBudget : Application() {
         }
     }
 
-    // -------------------------------------->
+// -------------------------------------->
 
     /**
      * Called when the app goes foreground
@@ -509,25 +480,5 @@ class EasyBudget : Application() {
      */
     private fun onAppBackground() {
         Logger.debug("onAppBackground")
-    }
-
-
-
-    /**
-     * Launch the redeem promocode flow
-     *
-     * @param promocode the promocode to redeem
-     * @param activity the current activity
-     */
-    fun launchRedeemPromocodeFlow(promocode: String, activity: Activity): Boolean {
-        try {
-            val url = "https://play.google.com/redeem?code=" + URLEncoder.encode(promocode, "UTF-8")
-            activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-            return true
-        } catch (e: Exception) {
-            Logger.error(false, "Error while redeeming promocode", e)
-            return false
-        }
-
     }
 }

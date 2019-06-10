@@ -83,6 +83,8 @@ class ExpenseEditActivity : AppCompatActivity() {
             UIHelper.showFAB(save_expense_fab, parameters)
         }
 
+        UIHelper.removeButtonBorder(date_button) // Remove border on lollipop
+
         viewModel.editTypeLiveData.observe(this, Observer { (isRevenue, isEdit) ->
             setExpenseTypeTextViewLayout(isRevenue, isEdit)
         })
@@ -205,8 +207,6 @@ class ExpenseEditActivity : AppCompatActivity() {
      * Set up the date button
      */
     private fun setUpDateButton(date: Date) {
-        UIHelper.removeButtonBorder(date_button) // Remove border on lollipop
-
         val formatter = SimpleDateFormat(resources.getString(R.string.add_expense_date_format), Locale.getDefault())
         date_button.text = formatter.format(date)
 
