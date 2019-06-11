@@ -69,6 +69,7 @@ import com.benoitletondor.easybudgetapp.DEFAULT_LOW_MONEY_WARNING_AMOUNT
 import com.benoitletondor.easybudgetapp.iab.INTENT_IAB_STATUS_CHANGED
 import com.benoitletondor.easybudgetapp.view.*
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
+import com.benoitletondor.easybudgetapp.view.recurringexpenseedit.RecurringExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import org.koin.android.viewmodel.ext.android.viewModel
