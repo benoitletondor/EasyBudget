@@ -171,7 +171,7 @@ class MainViewModel(private val db: DB,
             val recurringExpenseAdd = withContext(Dispatchers.Default) {
                 db.addRecurringExpense(recurringExpense)
             }
-            if ( !recurringExpenseAdd ) {
+            if ( recurringExpenseAdd == null ) {
                 recurringExpenseRestoreProgressStream.postValue(RecurringExpenseRestoreProgressState.ErrorIO(recurringExpense, expensesToRestore))
                 return@launch
             }

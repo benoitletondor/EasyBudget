@@ -349,20 +349,20 @@ public final class DB
     /**
      * Add a recurring expense
      *
-     * @param expense
-     * @return true on success, false on error
+     * @param expense the expense to add
+     * @return created expense on success, null on error
      */
-    public boolean addRecurringExpense(@NonNull RecurringExpense expense)
+    @Nullable
+    public RecurringExpense addRecurringExpense(@NonNull RecurringExpense expense)
     {
         long id = database.insert(SQLiteDBHelper.TABLE_RECURRING_EXPENSE, null, generateContentValuesForRecurringExpense(expense));
 
         if( id > 0 )
         {
-            expense.setId(id);
-            return true;
+            return expense.copy(id, expense.getTitle(), expense.getOriginalAmount(), expense.getRecurringDate(), expense.getModified(), expense.getType());
         }
 
-        return false;
+        return null;
     }
 
     /**
@@ -707,8 +707,8 @@ public final class DB
             cursor.getString(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_RECURRING_TITLE)),
             (double) cursor.getLong(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_RECURRING_AMOUNT)) / 100.d,
             new Date(cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_RECURRING_RECURRING_DATE))),
-            RecurringExpenseType.valueOf(cursor.getString(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_RECURRING_TYPE))),
-            cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_RECURRING_MODIFIED)) == 1
+            cursor.getInt(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_RECURRING_MODIFIED)) == 1,
+            RecurringExpenseType.valueOf(cursor.getString(cursor.getColumnIndex(SQLiteDBHelper.COLUMN_RECURRING_TYPE)))
         );
     }
 
@@ -731,9 +731,9 @@ public final class DB
 
         values.put(SQLiteDBHelper.COLUMN_RECURRING_TITLE, expense.getTitle());
         values.put(SQLiteDBHelper.COLUMN_RECURRING_RECURRING_DATE, expense.getRecurringDate().getTime());
-        values.put(SQLiteDBHelper.COLUMN_RECURRING_AMOUNT, CurrencyHelper.getDBValueForDouble(expense.getAmount()));
+        values.put(SQLiteDBHelper.COLUMN_RECURRING_AMOUNT, CurrencyHelper.getDBValueForDouble(expense.getOriginalAmount()));
         values.put(SQLiteDBHelper.COLUMN_RECURRING_TYPE, expense.getType().name());
-        values.put(SQLiteDBHelper.COLUMN_RECURRING_MODIFIED, expense.isModified() ? 1 : 0);
+        values.put(SQLiteDBHelper.COLUMN_RECURRING_MODIFIED, expense.getModified() ? 1 : 0);
 
         return values;
     }

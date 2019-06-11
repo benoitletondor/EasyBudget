@@ -39,16 +39,13 @@ class RecurringExpenseAddViewModel(private val db: DB) : ViewModel() {
 
         viewModelScope.launch {
             val inserted = withContext(Dispatchers.Default) {
-                val expense = RecurringExpense(description, if (isRevenue) -value else value, date, recurringExpenseType)
-
-                val inserted = db.addRecurringExpense(expense)
-                if( !inserted )
-                {
+                val insertedExpense = db.addRecurringExpense(RecurringExpense(description, if (isRevenue) -value else value, date, recurringExpenseType))
+                if( insertedExpense == null ) {
                     Logger.error(false, "Error while inserting recurring expense into DB: addRecurringExpense returned false")
                     return@withContext false
                 }
 
-                if( !flattenExpensesForRecurringExpense(expense, date) ) {
+                if( !flattenExpensesForRecurringExpense(insertedExpense, date) ) {
                     Logger.error(false, "Error while flattening expenses for recurring expense: flattenExpensesForRecurringExpense returned false")
                     return@withContext false
                 }
@@ -74,7 +71,7 @@ class RecurringExpenseAddViewModel(private val db: DB) : ViewModel() {
             RecurringExpenseType.WEEKLY -> {
                 // Add up to 5 years of expenses
                 for (i in 0 until 12*4*5) {
-                    val insertedExpense = db.persistExpense(Expense(expense.title, expense.amount, cal.time, expense))
+                    val insertedExpense = db.persistExpense(Expense(expense.title, expense.originalAmount, cal.time, expense))
                     if ( insertedExpense == null ) {
                         Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false")
                         return false
@@ -86,7 +83,7 @@ class RecurringExpenseAddViewModel(private val db: DB) : ViewModel() {
             RecurringExpenseType.BI_WEEKLY -> {
                 // Add up to 5 years of expenses
                 for (i in 0 until 12*4*5) {
-                    val insertedExpense = db.persistExpense(Expense(expense.title, expense.amount, cal.time, expense))
+                    val insertedExpense = db.persistExpense(Expense(expense.title, expense.originalAmount, cal.time, expense))
                     if ( insertedExpense == null ) {
                         Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false")
                         return false
@@ -98,7 +95,7 @@ class RecurringExpenseAddViewModel(private val db: DB) : ViewModel() {
             RecurringExpenseType.MONTHLY -> {
                 // Add up to 10 years of expenses
                 for (i in 0 until 12*10) {
-                    val insertedExpense = db.persistExpense(Expense(expense.title, expense.amount, cal.time, expense))
+                    val insertedExpense = db.persistExpense(Expense(expense.title, expense.originalAmount, cal.time, expense))
                     if ( insertedExpense == null ) {
                         Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false")
                         return false
@@ -110,7 +107,7 @@ class RecurringExpenseAddViewModel(private val db: DB) : ViewModel() {
             RecurringExpenseType.YEARLY -> {
                 // Add up to 100 years of expenses
                 for (i in 0 until 100) {
-                    val insertedExpense = db.persistExpense(Expense(expense.title, expense.amount, cal.time, expense))
+                    val insertedExpense = db.persistExpense(Expense(expense.title, expense.originalAmount, cal.time, expense))
                     if ( insertedExpense == null ) {
                         Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false")
                         return false
