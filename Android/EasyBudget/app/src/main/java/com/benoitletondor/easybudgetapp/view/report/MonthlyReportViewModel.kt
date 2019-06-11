@@ -7,6 +7,7 @@ import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.db.DB
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class MonthlyReportViewModel(private val db: DB) : ViewModel() {
@@ -18,10 +19,12 @@ class MonthlyReportViewModel(private val db: DB) : ViewModel() {
     }
 
     fun loadDataForMonth(month: Date) {
-        viewModelScope.launch(Dispatchers.Default) {
-            val expensesForMonth = db.getExpensesForMonth(month)
+        viewModelScope.launch {
+            val expensesForMonth = withContext(Dispatchers.Default) {
+                db.getExpensesForMonth(month)
+            }
             if( expensesForMonth.isEmpty() ) {
-                monthlyReportLiveData.postValue(MonthlyReportData.Empty)
+                monthlyReportLiveData.value = MonthlyReportData.Empty
                 return@launch
             }
 
@@ -30,20 +33,19 @@ class MonthlyReportViewModel(private val db: DB) : ViewModel() {
             var revenuesAmount = 0.0
             var expensesAmount = 0.0
 
-            for(expense in expensesForMonth) {
-                if( expense.isRevenue )
-                {
-                    revenues.add(expense)
-                    revenuesAmount -= expense.amount
-                }
-                else
-                {
-                    expenses.add(expense);
-                    expensesAmount += expense.amount
+            withContext(Dispatchers.Default) {
+                for(expense in expensesForMonth) {
+                    if( expense.isRevenue ) {
+                        revenues.add(expense)
+                        revenuesAmount -= expense.amount
+                    } else {
+                        expenses.add(expense)
+                        expensesAmount += expense.amount
+                    }
                 }
             }
 
-            monthlyReportLiveData.postValue(MonthlyReportData.Data(expenses, revenues, expensesAmount, revenuesAmount))
+            monthlyReportLiveData.value = MonthlyReportData.Data(expenses, revenues, expensesAmount, revenuesAmount)
         }
     }
 

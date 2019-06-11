@@ -6,17 +6,19 @@ import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class SelectCurrencyViewModel : ViewModel() {
     val currenciesLiveData = MutableLiveData<Pair<List<Currency>, List<Currency>>>()
 
     init {
-        viewModelScope.launch(Dispatchers.Default) {
-            val availableCurrencies = CurrencyHelper.getMainAvailableCurrencies()
-            val otherAvailableCurrencies = CurrencyHelper.getOtherAvailableCurrencies()
+        viewModelScope.launch {
+            val data = withContext(Dispatchers.Default) {
+                Pair(CurrencyHelper.getMainAvailableCurrencies(), CurrencyHelper.getOtherAvailableCurrencies())
+            }
 
-            currenciesLiveData.postValue(Pair(availableCurrencies, otherAvailableCurrencies))
+            currenciesLiveData.value = data
         }
     }
 }
