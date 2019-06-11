@@ -106,11 +106,12 @@ public final class DB
     /**
      * Add or update a one time expense into DB
      *
-     * @param expense
+     * @param expense the expense to persist
      * @param forcePersist if true, it will be an insert even if an id already exists
-     * @return true on success, false on error
+     * @return the persisted expense on success, null on error
      */
-    public boolean persistExpense(@NonNull Expense expense, boolean forcePersist)
+    @Nullable
+    public Expense persistExpense(@NonNull Expense expense, boolean forcePersist)
     {
         if( expense.getId() != null && !forcePersist )
         {
@@ -121,7 +122,14 @@ public final class DB
                 cache.wipeAll(); // FIXME we should refresh for the new expense date & the old one
             }
 
-            return rowsAffected == 1;
+            if( rowsAffected == 1 )
+            {
+                return expense;
+            }
+            else
+            {
+                return null;
+            }
         }
         else
         {
@@ -132,21 +140,21 @@ public final class DB
                 // Refresh cache for day
                 cache.refreshForDay(this, expense.getDate());
 
-                expense.setId(id);
-                return true;
+                return expense.copy(id, expense.getTitle(), expense.getAmount(), expense.getDate(), expense.getAssociatedRecurringExpense());
             }
         }
 
-        return false;
+        return null;
     }
 
     /**
      * Add or update a one time expense into DB
      *
-     * @param expense
-     * @return true on success, false on error
+     * @param expense the expense to persist
+     * @return the persisted expense on success, null on error
      */
-    public boolean persistExpense(@NonNull Expense expense)
+    @Nullable
+    public Expense persistExpense(@NonNull Expense expense)
     {
         return persistExpense(expense, false);
     }

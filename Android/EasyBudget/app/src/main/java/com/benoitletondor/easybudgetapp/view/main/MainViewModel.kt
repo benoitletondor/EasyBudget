@@ -75,8 +75,8 @@ class MainViewModel(private val db: DB,
                 db.persistExpense(expense, true)
             }
 
-            if( expensePersisted ) {
-                expenseRecoverySuccessStream.value = expense
+            if( expensePersisted != null ) {
+                expenseRecoverySuccessStream.value = expensePersisted
                 refreshDataForDate(selectedDate)
             } else {
                 expenseRecoveryErrorStream.value = expense
@@ -178,7 +178,7 @@ class MainViewModel(private val db: DB,
 
             val expensesAdd = withContext(Dispatchers.Default) {
                 for (expense in expensesToRestore) {
-                    if (!db.persistExpense(expense, true)) {
+                    if ( db.persistExpense(expense, true) == null ) {
                         return@withContext false
                     }
                 }
@@ -230,16 +230,17 @@ class MainViewModel(private val db: DB,
                 }
 
                 if (existingExpense != null) { // If the adjust balance exists, just add the diff and persist it
-                    existingExpense.amount = existingExpense.amount - diff
+                    val newExpense = existingExpense.copy(amount = existingExpense.amount - diff)
 
                     withContext(Dispatchers.Default) {
-                        db.persistExpense(existingExpense)
+                        db.persistExpense(newExpense)
                     }
 
-                    currentBalanceEditedStream.value = Triple(existingExpense, diff, newBalance)
+                    currentBalanceEditedStream.value = Triple(newExpense, diff, newBalance)
                     refreshDataForDate(selectedDate)
                 } else { // If no adjust balance yet, create a new one
                     val persistedExpense = Expense(balanceExpenseTitle, -diff, Date())
+
                     withContext(Dispatchers.Default) {
                         db.persistExpense(persistedExpense)
                     }
@@ -261,8 +262,8 @@ class MainViewModel(private val db: DB,
                         return@withContext
                     }
 
-                    expense.amount += diff
-                    db.persistExpense(expense)
+                    val newExpense = expense.copy(amount = expense.amount + diff)
+                    db.persistExpense(newExpense)
                 }
 
                 currentBalanceRestoringStream.value = Unit

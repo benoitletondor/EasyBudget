@@ -162,7 +162,7 @@ class MainActivity : AppCompatActivity() {
             updateBalanceDisplayForDay(expensesViewAdapter.date, newBalance)
             calendarFragment.refreshView()
 
-            val snackbar = Snackbar.make(coordinatorLayout, if (deletedExpense.isRevenue) R.string.income_delete_snackbar_text else R.string.expense_delete_snackbar_text, Snackbar.LENGTH_LONG)
+            val snackbar = Snackbar.make(coordinatorLayout, if (deletedExpense.isRevenue()) R.string.income_delete_snackbar_text else R.string.expense_delete_snackbar_text, Snackbar.LENGTH_LONG)
             snackbar.setAction(R.string.undo) {
                 viewModel.onExpenseDeletionCancelled(deletedExpense)
             }

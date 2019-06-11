@@ -24,7 +24,7 @@ class ExpenseEditViewModel(private val db: DB) : ViewModel() {
     fun initWithDateAndExpense(date: Date, expense: Expense?) {
         this.expense = expense
         this.dateLiveData.value = expense?.date ?: date
-        this.editTypeLiveData.value = Pair(expense?.isRevenue ?: false, expense != null)
+        this.editTypeLiveData.value = Pair(expense?.isRevenue() ?: false, expense != null)
 
         existingExpenseStream.value = if( expense != null ) Pair(expense.title, expense.amount) else null
     }
@@ -39,17 +39,11 @@ class ExpenseEditViewModel(private val db: DB) : ViewModel() {
 
         viewModelScope.launch {
             withContext(Dispatchers.Default) {
-                val editedExpense = expense
-
-                val expense = if( editedExpense == null ) {
-                    Expense(description, if (isRevenue) -value else value, date)
-                } else {
-                    editedExpense.title = description
-                    editedExpense.amount = if (isRevenue) -value else value
-                    editedExpense.date = date
-
-                    editedExpense
-                }
+                val expense = expense?.copy(
+                    title = description,
+                    amount = if (isRevenue) -value else value,
+                    date = date
+                ) ?: Expense(description, if (isRevenue) -value else value, date)
 
                 db.persistExpense(expense)
             }

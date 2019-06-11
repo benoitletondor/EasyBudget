@@ -35,7 +35,7 @@ class MonthlyReportViewModel(private val db: DB) : ViewModel() {
 
             withContext(Dispatchers.Default) {
                 for(expense in expensesForMonth) {
-                    if( expense.isRevenue ) {
+                    if( expense.isRevenue() ) {
                         revenues.add(expense)
                         revenuesAmount -= expense.amount
                     } else {
