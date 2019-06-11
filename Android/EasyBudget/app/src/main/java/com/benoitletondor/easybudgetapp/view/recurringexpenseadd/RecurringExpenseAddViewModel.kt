@@ -1,4 +1,4 @@
-package com.benoitletondor.easybudgetapp.view.recurringexpenseedit
+package com.benoitletondor.easybudgetapp.view.recurringexpenseadd
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -15,32 +15,24 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 
-class RecurringExpenseEditViewModel(private val db: DB) : ViewModel() {
-    /**
-     * Expense that is being edited (will be null if it's a new one)
-     */
-    private var expense: Expense? = null
+class RecurringExpenseAddViewModel(private val db: DB) : ViewModel() {
     val dateLiveData = MutableLiveData<Date>()
-    val editTypeLiveData = MutableLiveData<Pair<Boolean, Boolean>>()
-    val existingExpenseStream = SingleLiveEvent<Triple<String, Double, RecurringExpenseType>?>()
+    val editTypeLiveData = MutableLiveData<Boolean>()
     val savingStream = SingleLiveEvent<Boolean>()
     val finishStream = MutableLiveData<Unit>()
     val errorStream = SingleLiveEvent<Unit>()
 
-    fun initWithDateAndExpense(date: Date, expense: Expense?) {
-        this.expense = expense
-        this.dateLiveData.value = expense?.date ?: date
-        this.editTypeLiveData.value = Pair(expense?.isRevenue ?: false, expense != null)
-
-        existingExpenseStream.value = if( expense != null ) Triple(expense.title, expense.amount, expense.associatedRecurringExpense!!.type) else null
+    fun initWithDateAndExpense(date: Date) {
+        this.dateLiveData.value = date
+        this.editTypeLiveData.value = false
     }
 
     fun onExpenseRevenueValueChanged(isRevenue: Boolean) {
-        editTypeLiveData.value = Pair(isRevenue, expense != null)
+        editTypeLiveData.value = isRevenue
     }
 
     fun onSave(value: Double, description: String, recurringExpenseType: RecurringExpenseType) {
-        val isRevenue = editTypeLiveData.value?.first ?: return
+        val isRevenue = editTypeLiveData.value ?: return
         val date = dateLiveData.value ?: return
 
         savingStream.value = isRevenue
@@ -52,12 +44,12 @@ class RecurringExpenseEditViewModel(private val db: DB) : ViewModel() {
                 val inserted = db.addRecurringExpense(expense)
                 if( !inserted )
                 {
-                    Logger.error(false, "Error while inserting recurring expense into DB: addRecurringExpense returned false");
+                    Logger.error(false, "Error while inserting recurring expense into DB: addRecurringExpense returned false")
                     return@withContext false
                 }
 
                 if( !flattenExpensesForRecurringExpense(expense, date) ) {
-                    Logger.error(false, "Error while flattening expenses for recurring expense: flattenExpensesForRecurringExpense returned false");
+                    Logger.error(false, "Error while flattening expenses for recurring expense: flattenExpensesForRecurringExpense returned false")
                     return@withContext false
                 }
 

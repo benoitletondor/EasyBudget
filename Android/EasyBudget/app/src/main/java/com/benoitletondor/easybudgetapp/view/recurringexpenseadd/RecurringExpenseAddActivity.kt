@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp.view.recurringexpenseedit
+package com.benoitletondor.easybudgetapp.view.recurringexpenseadd
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
@@ -33,37 +33,30 @@ import com.benoitletondor.easybudgetapp.helper.Parameters
 import com.benoitletondor.easybudgetapp.helper.UIHelper
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import com.benoitletondor.easybudgetapp.view.DatePickerDialogFragment
-import kotlinx.android.synthetic.main.activity_recurring_expense_edit.*
+import kotlinx.android.synthetic.main.activity_recurring_expense_add.*
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
-class RecurringExpenseEditActivity : AppCompatActivity() {
+class RecurringExpenseAddActivity : AppCompatActivity() {
     private val parameters: Parameters by inject()
-    private val viewModel: RecurringExpenseEditViewModel by viewModel()
+    private val viewModel: RecurringExpenseAddViewModel by viewModel()
 
 // ------------------------------------------->
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_recurring_expense_edit)
+        setContentView(R.layout.activity_recurring_expense_add)
 
         setSupportActionBar(toolbar)
 
         supportActionBar?.setDisplayShowHomeEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        viewModel.existingExpenseStream.observe(this, Observer { existingValues ->
-            if (existingValues != null) {
-                setUpInputs(existingValues.first, existingValues.second, existingValues.third)
-            } else {
-                setUpInputs(description = null, amount = null, type = null)
-            }
-        })
-
         if (savedInstanceState == null) {
-            viewModel.initWithDateAndExpense(Date(intent.getLongExtra("dateStart", 0)), intent.getParcelableExtra("expense"))
+            viewModel.initWithDateAndExpense(Date(intent.getLongExtra("dateStart", 0)))
+            setUpInputs()
         }
 
         setUpButtons()
@@ -84,8 +77,8 @@ class RecurringExpenseEditActivity : AppCompatActivity() {
 
         UIHelper.removeButtonBorder(date_button) // Remove border on lollipop
 
-        viewModel.editTypeLiveData.observe(this, Observer { (isRevenue, isEdit) ->
-            setExpenseTypeTextViewLayout(isRevenue, isEdit)
+        viewModel.editTypeLiveData.observe(this, Observer { isRevenue ->
+            setExpenseTypeTextViewLayout(isRevenue)
         })
 
         viewModel.dateLiveData.observe(this, Observer { date ->
@@ -194,45 +187,27 @@ class RecurringExpenseEditActivity : AppCompatActivity() {
     /**
      * Set revenue text view layout
      */
-    private fun setExpenseTypeTextViewLayout(isRevenue: Boolean, isEdit: Boolean) {
+    private fun setExpenseTypeTextViewLayout(isRevenue: Boolean) {
         if (isRevenue) {
             expense_type_tv.setText(R.string.income)
             expense_type_tv.setTextColor(ContextCompat.getColor(this, R.color.budget_green))
 
-            if (isEdit) {
-                setTitle(R.string.title_activity_recurring_expense_edit)
-            } else {
-                setTitle(R.string.title_activity_recurring_income_add)
-            }
+            setTitle(R.string.title_activity_recurring_income_add)
         } else {
             expense_type_tv.setText(R.string.payment)
             expense_type_tv.setTextColor(ContextCompat.getColor(this, R.color.budget_red))
 
-            if (isEdit) {
-                setTitle(R.string.title_activity_recurring_expense_edit)
-            } else {
-                setTitle(R.string.title_activity_recurring_expense_add)
-            }
+            setTitle(R.string.title_activity_recurring_expense_add)
         }
     }
 
     /**
      * Set up text fields, spinner and focus behavior
      */
-    private fun setUpInputs(description: String?, amount: Double?, type: RecurringExpenseType?) {
+    private fun setUpInputs() {
         amount_inputlayout.hint = resources.getString(R.string.amount, CurrencyHelper.getUserCurrency(parameters).symbol)
 
-
-        if (description != null) {
-            description_edittext.setText(description)
-            description_edittext.setSelection(description.length) // Put focus at the end of the text
-        }
-
         UIHelper.preventUnsupportedInputForDecimals(amount_edittext)
-
-        if (amount != null) {
-            amount_edittext.setText(CurrencyHelper.getFormattedAmountValue(Math.abs(amount)))
-        }
 
         val recurringTypesString = arrayOfNulls<String>(4)
         recurringTypesString[0] = getString(R.string.recurring_interval_weekly)
@@ -244,11 +219,7 @@ class RecurringExpenseEditActivity : AppCompatActivity() {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         expense_type_spinner.adapter = adapter
 
-        if (type != null) {
-            expense_type_spinner.setSelection(type.ordinal, false)
-        } else {
-            expense_type_spinner.setSelection(2, false)
-        }
+        expense_type_spinner.setSelection(2, false)
     }
 
     /**

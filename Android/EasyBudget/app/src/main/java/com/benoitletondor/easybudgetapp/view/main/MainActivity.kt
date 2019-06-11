@@ -69,7 +69,7 @@ import com.benoitletondor.easybudgetapp.DEFAULT_LOW_MONEY_WARNING_AMOUNT
 import com.benoitletondor.easybudgetapp.iab.INTENT_IAB_STATUS_CHANGED
 import com.benoitletondor.easybudgetapp.view.*
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
-import com.benoitletondor.easybudgetapp.view.recurringexpenseedit.RecurringExpenseEditActivity
+import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseAddActivity
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -565,7 +565,7 @@ class MainActivity : AppCompatActivity() {
      */
     private fun openAddRecurringExpenseIfNeeded(intent: Intent) {
         if (intent.getBooleanExtra(INTENT_SHOW_ADD_RECURRING_EXPENSE, false)) {
-            val startIntent = Intent(this, RecurringExpenseEditActivity::class.java)
+            val startIntent = Intent(this, RecurringExpenseAddActivity::class.java)
             startIntent.putExtra("dateStart", Date().time)
 
             ActivityCompat.startActivityForResult(this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null)
@@ -755,7 +755,7 @@ class MainActivity : AppCompatActivity() {
 
         val fabNewRecurringExpense = findViewById<FloatingActionButton>(R.id.fab_new_recurring_expense)
         fabNewRecurringExpense.setOnClickListener {
-            val startIntent = Intent(this@MainActivity, RecurringExpenseEditActivity::class.java)
+            val startIntent = Intent(this@MainActivity, RecurringExpenseAddActivity::class.java)
             startIntent.putExtra("dateStart", calendarFragment.selectedDate.time)
 
             if (UIHelper.areAnimationsEnabled(parameters)) {
