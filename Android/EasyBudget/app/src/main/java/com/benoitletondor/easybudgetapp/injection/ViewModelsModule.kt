@@ -2,6 +2,7 @@ package com.benoitletondor.easybudgetapp.injection
 
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditViewModel
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
+import com.benoitletondor.easybudgetapp.view.premium.PremiumViewModel
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseAddViewModel
 import com.benoitletondor.easybudgetapp.view.report.MonthlyReportViewModel
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseViewModel
@@ -16,4 +17,5 @@ val viewModelModule = module {
     viewModel { MonthlyReportBaseViewModel(get()) }
     viewModel { ExpenseEditViewModel(get()) }
     viewModel { RecurringExpenseAddViewModel(get()) }
+    viewModel { PremiumViewModel(get()) }
 }

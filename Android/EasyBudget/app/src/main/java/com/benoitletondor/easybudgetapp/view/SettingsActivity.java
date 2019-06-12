@@ -26,6 +26,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import com.benoitletondor.easybudgetapp.R;
+import com.benoitletondor.easybudgetapp.view.premium.PremiumActivity;
 
 import java.util.Objects;
 

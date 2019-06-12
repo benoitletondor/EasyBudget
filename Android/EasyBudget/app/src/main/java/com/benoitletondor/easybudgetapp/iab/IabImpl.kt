@@ -7,8 +7,9 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.android.billingclient.api.*
 import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.helper.Parameters
-import java.lang.ref.WeakReference
 import java.util.*
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * SKU premium
@@ -28,7 +29,7 @@ private const val PREMIUM_PARAMETER_KEY = "premium"
 private const val BATCH_OFFER_REDEEMED_PARAMETER_KEY = "batch_offer_redeemed"
 
 class IabImpl(context: Context,
-              private val parameters: Parameters) : Iab, PurchasesUpdatedListener, BillingClientStateListener, PurchaseHistoryResponseListener, SkuDetailsResponseListener {
+              private val parameters: Parameters) : Iab, PurchasesUpdatedListener, BillingClientStateListener, PurchaseHistoryResponseListener {
     private val appContext = context.applicationContext
     private val billingClient = BillingClient.newBuilder(appContext)
         .setListener(this)
@@ -39,14 +40,8 @@ class IabImpl(context: Context,
      * iab check status
      */
     private var iabStatus: PremiumCheckStatus = PremiumCheckStatus.INITIALIZING
-    /**
-     * Listener for the current purchase
-     */
-    private var premiumPurchaseListener: PremiumPurchaseListener? = null
-    /**
-     * Activity that triggered the current purchase
-     */
-    private var purchaseActivity = WeakReference<Activity>(null)
+
+    private var premiumFlowContinuation: Continuation<PremiumPurchaseFlowResult>? = null
 
     init {
         startBillingClient()
@@ -112,66 +107,55 @@ class IabImpl(context: Context,
      * Launch the premium purchase flow
      *
      * @param activity activity that started this purchase
-     * @param listener listener for purchase events
      */
-    override fun launchPremiumPurchaseFlow(activity: Activity, listener: PremiumPurchaseListener) {
-        if (iabStatus != PremiumCheckStatus.NOT_PREMIUM) {
-            when (iabStatus) {
-                PremiumCheckStatus.ERROR -> listener.onPurchaseError("Unable to connect to your Google account. Please restart the app and try again")
-                PremiumCheckStatus.PREMIUM -> listener.onPurchaseError("You already bought Premium with that Google account. Restart the app if you don't have access to premium features.")
-                else -> listener.onPurchaseError("Runtime error: $iabStatus")
+    override suspend fun launchPremiumPurchaseFlow(activity: Activity): PremiumPurchaseFlowResult {
+        if ( iabStatus != PremiumCheckStatus.NOT_PREMIUM ) {
+            return when (iabStatus) {
+                PremiumCheckStatus.ERROR -> PremiumPurchaseFlowResult.Error("Unable to connect to your Google account. Please restart the app and try again")
+                PremiumCheckStatus.PREMIUM -> PremiumPurchaseFlowResult.Error("You already bought Premium with that Google account. Restart the app if you don't have access to premium features.")
+                else -> PremiumPurchaseFlowResult.Error("Runtime error: $iabStatus")
             }
-
-            return
         }
-
-        premiumPurchaseListener = listener
-        purchaseActivity = WeakReference(activity)
 
         val skuList = ArrayList<String>(1)
         skuList.add(SKU_PREMIUM)
 
-        Logger.debug("Launching querySkuDetailsAsync")
-
-        billingClient.querySkuDetailsAsync(
+        val (billingResult, skuDetailsList) = querySkuDetails(
             SkuDetailsParams.newBuilder()
                 .setSkusList(skuList)
                 .setType(BillingClient.SkuType.INAPP)
-                .build(),
-            this
+                .build()
         )
-    }
-
-    override fun onSkuDetailsResponse(billingResult: BillingResult, skuDetailsList: List<SkuDetails>) {
-        Logger.debug("onSkuDetailsResponse")
-        val activity = purchaseActivity.get()
-        val listener = premiumPurchaseListener
-
-        if (activity == null || listener == null) {
-            Logger.debug("onSkuDetailsResponse: activity or listener null")
-            return
-        }
 
         if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
             if (billingResult.responseCode == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED) {
                 setIabStatusAndNotify(PremiumCheckStatus.PREMIUM)
-                listener.onPurchaseSuccess()
-                return
+                return PremiumPurchaseFlowResult.Success
             }
 
-            Objects.requireNonNull<PremiumPurchaseListener>(premiumPurchaseListener).onPurchaseError("Unable to connect to reach PlayStore (response code: " + billingResult.responseCode + "). Please restart the app and try again")
-            return
+            return PremiumPurchaseFlowResult.Error("Unable to connect to reach PlayStore (response code: " + billingResult.responseCode + "). Please restart the app and try again")
         }
 
         if (skuDetailsList.isEmpty()) {
-            Objects.requireNonNull<PremiumPurchaseListener>(premiumPurchaseListener).onPurchaseError("Unable to fetch content from PlayStore (response code: skuDetailsList is empty). Please restart the app and try again")
-            return
+            return PremiumPurchaseFlowResult.Error("Unable to fetch content from PlayStore (response code: skuDetailsList is empty). Please restart the app and try again")
         }
 
-        billingClient.launchBillingFlow(activity, BillingFlowParams.newBuilder()
-            .setSkuDetails(skuDetailsList[0])
-            .build()
-        )
+        return suspendCoroutine { continuation ->
+            premiumFlowContinuation = continuation
+
+            billingClient.launchBillingFlow(activity, BillingFlowParams.newBuilder()
+                .setSkuDetails(skuDetailsList[0])
+                .build()
+            )
+        }
+    }
+
+    data class SkuDetailsResponse(val billingResult: BillingResult, val skuDetailsList: List<SkuDetails>)
+
+    private suspend fun querySkuDetails(params: SkuDetailsParams): SkuDetailsResponse = suspendCoroutine { continuation ->
+        billingClient.querySkuDetailsAsync(params) { billingResult, skuDetailsList ->
+            continuation.resumeWith(Result.success(SkuDetailsResponse(billingResult, skuDetailsList)))
+        }
     }
 
     override fun onBillingSetupFinished(billingResult: BillingResult) {
@@ -220,36 +204,30 @@ class IabImpl(context: Context,
     }
 
     override fun onPurchasesUpdated(billingResult: BillingResult, purchases: List<Purchase>?) {
-        val listener = premiumPurchaseListener
-        premiumPurchaseListener = null
-
-        if (listener == null) {
-            return
-        }
-
         Logger.debug("Purchase finished: " + billingResult.responseCode)
 
         if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
             Logger.error("Error while purchasing premium: " + billingResult.responseCode)
             when {
-                billingResult.responseCode == BillingClient.BillingResponseCode.USER_CANCELED -> listener.onUserCancelled()
+                billingResult.responseCode == BillingClient.BillingResponseCode.USER_CANCELED -> premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Cancelled))
                 billingResult.responseCode == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> {
                     setIabStatusAndNotify(PremiumCheckStatus.PREMIUM)
-                    listener.onPurchaseSuccess()
+                    premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Success))
                     return
                 }
-                else -> listener.onPurchaseError("An error occurred (status code: " + billingResult.responseCode + ")")
+                else -> premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Error("An error occurred (status code: " + billingResult.responseCode + ")")))
             }
 
             return
         }
 
-        Logger.debug("Purchase successful.")
 
         if ( purchases.isNullOrEmpty() ) {
-            listener.onPurchaseError("No purchased item found")
+            premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Error("No purchased item found")))
             return
         }
+
+        Logger.debug("Purchase successful.")
 
         var premiumBought = false
         for (purchase in purchases) {
@@ -259,12 +237,14 @@ class IabImpl(context: Context,
         }
 
         if (!premiumBought) {
-            listener.onPurchaseError("No purchased item found")
+            premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Error("No purchased item found")))
             return
         }
 
         setIabStatusAndNotify(PremiumCheckStatus.PREMIUM)
-        listener.onPurchaseSuccess()
+        premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Success))
+
+        premiumFlowContinuation = null
     }
 }
 

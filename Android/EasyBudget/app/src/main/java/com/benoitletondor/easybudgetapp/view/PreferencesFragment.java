@@ -51,6 +51,7 @@ import com.benoitletondor.easybudgetapp.iab.Iab;
 import com.benoitletondor.easybudgetapp.notif.DailyNotifOptinService;
 import com.benoitletondor.easybudgetapp.notif.MonthlyReportNotifService;
 import com.benoitletondor.easybudgetapp.view.main.MainActivity;
+import com.benoitletondor.easybudgetapp.view.premium.PremiumActivity;
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment;
 import com.roomorama.caldroid.CaldroidFragment;
 

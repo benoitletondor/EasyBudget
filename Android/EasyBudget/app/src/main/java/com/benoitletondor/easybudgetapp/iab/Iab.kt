@@ -5,31 +5,13 @@ import android.app.Activity
 interface Iab {
     fun isUserPremium(): Boolean
     fun updateIAPStatusIfNeeded()
-    fun launchPremiumPurchaseFlow(activity: Activity, listener: PremiumPurchaseListener)
+    suspend fun launchPremiumPurchaseFlow(activity: Activity): PremiumPurchaseFlowResult
 }
 
-/**
- * Listener for in-app purchase buying flow
- *
- * @author Benoit LETONDOR
- */
-interface PremiumPurchaseListener {
-    /**
-     * Called when the user cancel the purchase
-     */
-    fun onUserCancelled()
-
-    /**
-     * Called when an error occurred during the iab flow
-     *
-     * @param error the error
-     */
-    fun onPurchaseError(error: String)
-
-    /**
-     * Called on success
-     */
-    fun onPurchaseSuccess()
+sealed class PremiumPurchaseFlowResult {
+    object Cancelled : PremiumPurchaseFlowResult()
+    object Success : PremiumPurchaseFlowResult()
+    class Error(val reason: String): PremiumPurchaseFlowResult()
 }
 
 /**

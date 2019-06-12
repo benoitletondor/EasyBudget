@@ -98,7 +98,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppThemeNoActionBar"/>
         <activity
-            android:name=".view.PremiumActivity"
+            android:name=".view.premium.PremiumActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_premium"
             android:screenOrientation="portrait"
