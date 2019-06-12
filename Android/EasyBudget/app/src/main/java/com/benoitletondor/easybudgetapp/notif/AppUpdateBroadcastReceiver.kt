@@ -14,11 +14,12 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp.notif;
+package com.benoitletondor.easybudgetapp.notif
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
+import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
 
 /**
  * Simple Broadcast receiver that is just here to receive events when a package is updated. This is
@@ -27,11 +28,8 @@ import android.content.Intent;
  *
  * @author Benoit LETONDOR
  */
-public class AppUpdateBroadcastReceiver extends BroadcastReceiver
-{
-    @Override
-    public void onReceive(Context context, Intent intent)
-    {
+class AppUpdateBroadcastReceiver : BroadcastReceiver() {
 
-    }
+    @SuppressLint("UnsafeProtectedBroadcastReceiver")
+    override fun onReceive(context: Context, intent: Intent) {}
 }

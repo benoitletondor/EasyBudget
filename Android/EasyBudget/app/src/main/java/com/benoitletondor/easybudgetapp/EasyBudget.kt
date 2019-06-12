@@ -36,9 +36,11 @@ import com.benoitletondor.easybudgetapp.injection.appModule
 import com.benoitletondor.easybudgetapp.injection.viewModelModule
 import com.benoitletondor.easybudgetapp.notif.DailyNotifOptinService
 import com.benoitletondor.easybudgetapp.notif.MonthlyReportNotifService
-import com.benoitletondor.easybudgetapp.notif.NotificationsChannels.*
-import com.benoitletondor.easybudgetapp.push.PushService.DAILY_REMINDER_KEY
-import com.benoitletondor.easybudgetapp.push.PushService.MONTHLY_REMINDER_KEY
+import com.benoitletondor.easybudgetapp.notif.NotificationsChannels.CHANNEL_DAILY_REMINDERS
+import com.benoitletondor.easybudgetapp.notif.NotificationsChannels.CHANNEL_MONTHLY_REMINDERS
+import com.benoitletondor.easybudgetapp.notif.NotificationsChannels.CHANNEL_NEW_FEATURES
+import com.benoitletondor.easybudgetapp.push.PushService.Companion.DAILY_REMINDER_KEY
+import com.benoitletondor.easybudgetapp.push.PushService.Companion.MONTHLY_REMINDER_KEY
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
 import com.benoitletondor.easybudgetapp.view.RatingPopup
 import com.benoitletondor.easybudgetapp.view.SettingsActivity
