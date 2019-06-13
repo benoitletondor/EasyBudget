@@ -45,12 +45,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 
 import com.benoitletondor.easybudgetapp.R
-import com.benoitletondor.easybudgetapp.helper.Logger
-import com.benoitletondor.easybudgetapp.helper.UIHelper
-import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
-import com.benoitletondor.easybudgetapp.helper.ParameterKeys
-import com.benoitletondor.easybudgetapp.helper.Parameters
-import com.benoitletondor.easybudgetapp.helper.UserHelper
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType
 import com.benoitletondor.easybudgetapp.view.main.calendar.CalendarFragment
@@ -65,12 +59,14 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-import com.benoitletondor.easybudgetapp.DEFAULT_LOW_MONEY_WARNING_AMOUNT
+import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.iab.INTENT_IAB_STATUS_CHANGED
+import com.benoitletondor.easybudgetapp.parameters.*
 import com.benoitletondor.easybudgetapp.view.*
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseAddActivity
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
+import com.benoitletondor.easybudgetapp.view.welcome.getOnboardingStep
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.java.KoinJavaComponent.get
@@ -102,7 +98,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Launch welcome screen if needed
-        if (parameters.getInt(ParameterKeys.ONBOARDING_STEP, -1) != WelcomeActivity.STEP_COMPLETED) {
+        if (parameters.getOnboardingStep() != WelcomeActivity.STEP_COMPLETED) {
             val startIntent = Intent(this, WelcomeActivity::class.java)
             ActivityCompat.startActivityForResult(this, startIntent, WELCOME_SCREEN_ACTIVITY_CODE, null)
         }
@@ -399,7 +395,7 @@ class MainActivity : AppCompatActivity() {
                 finish() // Finish activity if welcome screen is finish via back button
             }
         } else if (requestCode == SETTINGS_SCREEN_ACTIVITY_CODE) {
-            calendarFragment.setFirstDayOfWeek(UserHelper.getFirstDayOfWeek(parameters))
+            calendarFragment.setFirstDayOfWeek(parameters.getCaldroidFirstDayOfWeek())
         }
     }
 
@@ -434,12 +430,12 @@ class MainActivity : AppCompatActivity() {
         // Remove monthly report for non premium users
         if ( !isUserPremium ) {
             menu.removeItem(R.id.action_monthly_report)
-        } else if (!UserHelper.hasUserSawMonthlyReportHint(parameters)) {
+        } else if ( !parameters.hasUserSawMonthlyReportHint() ) {
             monthly_report_hint.visibility = View.VISIBLE
 
             monthly_report_hint_button.setOnClickListener {
                 monthly_report_hint.visibility = View.GONE
-                UserHelper.setUserSawMonthlyReportHint(parameters)
+                parameters.setUserSawMonthlyReportHint()
             }
         }
 
@@ -492,7 +488,7 @@ class MainActivity : AppCompatActivity() {
 
         when {
             balance <= 0 -> budgetLineContainer.setBackgroundResource(R.color.budget_red)
-            balance < parameters.getInt(ParameterKeys.LOW_MONEY_WARNING_AMOUNT, DEFAULT_LOW_MONEY_WARNING_AMOUNT) -> budgetLineContainer.setBackgroundResource(R.color.budget_orange)
+            balance < parameters.getLowMoneyWarningAmount() -> budgetLineContainer.setBackgroundResource(R.color.budget_orange)
             else -> budgetLineContainer.setBackgroundResource(R.color.budget_green)
         }
     }
@@ -586,13 +582,13 @@ class MainActivity : AppCompatActivity() {
             args.putInt(CaldroidFragment.YEAR, cal.get(Calendar.YEAR))
             args.putBoolean(CaldroidFragment.ENABLE_SWIPE, true)
             args.putBoolean(CaldroidFragment.SIX_WEEKS_IN_CALENDAR, false)
-            args.putInt(CalendarFragment.START_DAY_OF_WEEK, UserHelper.getFirstDayOfWeek(parameters))
+            args.putInt(CalendarFragment.START_DAY_OF_WEEK, parameters.getCaldroidFirstDayOfWeek())
             args.putBoolean(CalendarFragment.ENABLE_CLICK_ON_DISABLED_DATES, false)
             args.putInt(CaldroidFragment.THEME_RESOURCE, R.style.caldroid_style)
 
             calendarFragment.arguments = args
 
-            val minDate = Date(parameters.getLong(ParameterKeys.INIT_DATE, Date().time))
+            val minDate = Date(parameters.getInitTimestamp())
             calendarFragment.setMinDate(minDate)
         }
 
@@ -606,7 +602,7 @@ class MainActivity : AppCompatActivity() {
                 val startIntent = Intent(this@MainActivity, ExpenseEditActivity::class.java)
                 startIntent.putExtra("date", date.time)
 
-                if (UIHelper.areAnimationsEnabled(parameters)) {
+                if ( parameters.areAnimationsEnabled() ) {
                     // Get the absolute location on window for Y value
                     val viewLocation = IntArray(2)
                     view!!.getLocationInWindow(viewLocation)
@@ -742,7 +738,7 @@ class MainActivity : AppCompatActivity() {
             val startIntent = Intent(this@MainActivity, ExpenseEditActivity::class.java)
             startIntent.putExtra("date", calendarFragment.selectedDate.time)
 
-            if (UIHelper.areAnimationsEnabled(parameters)) {
+            if ( parameters.areAnimationsEnabled() ) {
                 startIntent.putExtra(ANIMATE_TRANSITION_KEY, true)
                 startIntent.putExtra(CENTER_X_KEY, menu.x.toInt() + (menu.width.toFloat() / 1.2f).toInt())
                 startIntent.putExtra(CENTER_Y_KEY, menu.y.toInt() + (menu.height.toFloat() / 1.2f).toInt())
@@ -758,7 +754,7 @@ class MainActivity : AppCompatActivity() {
             val startIntent = Intent(this@MainActivity, RecurringExpenseAddActivity::class.java)
             startIntent.putExtra("dateStart", calendarFragment.selectedDate.time)
 
-            if (UIHelper.areAnimationsEnabled(parameters)) {
+            if ( parameters.areAnimationsEnabled() ) {
                 startIntent.putExtra(ANIMATE_TRANSITION_KEY, true)
                 startIntent.putExtra(CENTER_X_KEY, menu.x.toInt() + (menu.width.toFloat() / 1.2f).toInt())
                 startIntent.putExtra(CENTER_Y_KEY, menu.y.toInt() + (menu.height.toFloat() / 1.2f).toInt())

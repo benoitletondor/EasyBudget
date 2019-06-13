@@ -6,7 +6,7 @@ import android.content.Intent
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.android.billingclient.api.*
 import com.benoitletondor.easybudgetapp.helper.Logger
-import com.benoitletondor.easybudgetapp.helper.Parameters
+import com.benoitletondor.easybudgetapp.parameters.Parameters
 import java.util.*
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine

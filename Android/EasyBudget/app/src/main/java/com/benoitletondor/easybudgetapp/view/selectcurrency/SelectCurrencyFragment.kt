@@ -28,7 +28,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 
 import com.benoitletondor.easybudgetapp.R
-import com.benoitletondor.easybudgetapp.helper.Parameters
+import com.benoitletondor.easybudgetapp.parameters.Parameters
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 
@@ -92,8 +92,8 @@ class SelectCurrencyFragment : DialogFragment() {
             val adapter = SelectCurrencyRecyclerViewAdapter(availableCurrencies, otherAvailableCurrencies, parameters)
             recyclerView.adapter = adapter
 
-            if( adapter.selectedCurrencyPosition > 1 ) {
-                recyclerView.scrollToPosition(adapter.selectedCurrencyPosition-1)
+            if( adapter.selectedCurrencyPosition() > 1 ) {
+                recyclerView.scrollToPosition(adapter.selectedCurrencyPosition()-1)
             }
         })
     }

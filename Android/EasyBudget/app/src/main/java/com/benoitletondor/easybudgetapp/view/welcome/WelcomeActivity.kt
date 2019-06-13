@@ -32,8 +32,7 @@ import androidx.appcompat.app.AppCompatActivity
 
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.UIHelper
-import com.benoitletondor.easybudgetapp.helper.ParameterKeys
-import com.benoitletondor.easybudgetapp.helper.Parameters
+import com.benoitletondor.easybudgetapp.parameters.Parameters
 
 import kotlinx.android.synthetic.main.activity_welcome.*
 
@@ -55,8 +54,8 @@ class WelcomeActivity : AppCompatActivity() {
 // ------------------------------------>
 
     private var step: Int
-        get() = parameters.getInt(ParameterKeys.ONBOARDING_STEP, 0)
-        set(step) = parameters.putInt(ParameterKeys.ONBOARDING_STEP, step)
+        get() = parameters.getOnboardingStep()
+        set(step) = parameters.setOnboardingStep(step)
 
 // ------------------------------------------>
 
@@ -197,4 +196,17 @@ class WelcomeActivity : AppCompatActivity() {
          */
         const val PAGER_DONE_INTENT = "welcome.pager.done"
     }
+}
+
+/**
+ * The current onboarding step (int)
+ */
+private const val ONBOARDING_STEP_PARAMETERS_KEY = "onboarding_step"
+
+fun Parameters.getOnboardingStep(): Int {
+    return getInt(ONBOARDING_STEP_PARAMETERS_KEY, -1)
+}
+
+private fun Parameters.setOnboardingStep(step: Int) {
+    putInt(ONBOARDING_STEP_PARAMETERS_KEY, step)
 }

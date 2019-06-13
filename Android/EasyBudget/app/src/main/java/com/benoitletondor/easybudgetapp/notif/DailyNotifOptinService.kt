@@ -26,9 +26,8 @@ import androidx.core.content.ContextCompat
 
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.Logger
-import com.benoitletondor.easybudgetapp.helper.ParameterKeys
-import com.benoitletondor.easybudgetapp.helper.Parameters
-import com.benoitletondor.easybudgetapp.helper.UserHelper
+import com.benoitletondor.easybudgetapp.parameters.Parameters
+import com.benoitletondor.easybudgetapp.parameters.setUserAllowDailyReminderPushes
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
 
 import com.benoitletondor.easybudgetapp.notif.NotificationsChannels.CHANNEL_NEW_FEATURES
@@ -52,10 +51,10 @@ class DailyNotifOptinService : IntentService("DailyNotifOptinService") {
         Logger.debug("DailyNotifOptinService: received intent: " + intent.action!!)
 
         when {
-            INTENT_OPTOUT_ACTION == intent.action -> UserHelper.setUserAllowDailyReminderPushes(parameters, false)
-            INTENT_OPTIN_ACTION == intent.action -> UserHelper.setUserAllowDailyReminderPushes(parameters, true)
+            INTENT_OPTOUT_ACTION == intent.action -> parameters.setUserAllowDailyReminderPushes(false)
+            INTENT_OPTIN_ACTION == intent.action -> parameters.setUserAllowDailyReminderPushes(true)
             INTENT_REDIRECT_ACTION == intent.action -> {
-                UserHelper.setUserAllowDailyReminderPushes(parameters, true)
+                parameters.setUserAllowDailyReminderPushes(true)
 
                 val openSettingsIntent = Intent(this, MainActivity::class.java)
                 openSettingsIntent.putExtra(MainActivity.INTENT_REDIRECT_TO_SETTINGS_EXTRA, true)
@@ -121,19 +120,28 @@ class DailyNotifOptinService : IntentService("DailyNotifOptinService") {
 
                 NotificationManagerCompat.from(context).notify(OPTIN_NOTIFICATION_ID, notifBuilder.build())
 
-                parameters.putBoolean(ParameterKeys.DAILY_PUSH_NOTIF_SHOWN, true)
+                parameters.setDailyReminderOptinNotifShown()
             } catch (e: Exception) {
                 Logger.error("Error while showing daily notif optin notif", e)
             }
         }
-
-        /**
-         * Has the daily reminder opt-in notification already been shown
-         *
-         * @return true if already shown, false otherwise
-         */
-        fun hasDailyReminderOptinNotifBeenShown(parameters: Parameters): Boolean {
-            return parameters.getBoolean(ParameterKeys.DAILY_PUSH_NOTIF_SHOWN, false)
-        }
     }
+}
+
+/**
+ * Has the daily push opt-in been shown to the user yet (bool)
+ */
+private const val DAILY_PUSH_NOTIF_SHOWN_PARAMETERS_KEY = "user_saw_daily_push_notif"
+
+private fun Parameters.setDailyReminderOptinNotifShown() {
+    putBoolean(DAILY_PUSH_NOTIF_SHOWN_PARAMETERS_KEY, true)
+}
+
+/**
+ * Has the daily reminder opt-in notification already been shown
+ *
+ * @return true if already shown, false otherwise
+ */
+fun Parameters.hasDailyReminderOptinNotifBeenShow(): Boolean {
+    return getBoolean(DAILY_PUSH_NOTIF_SHOWN_PARAMETERS_KEY, false)
 }

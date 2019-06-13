@@ -26,11 +26,9 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AlertDialog
 import com.benoitletondor.easybudgetapp.R
-import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
-import com.benoitletondor.easybudgetapp.helper.Logger
-import com.benoitletondor.easybudgetapp.helper.Parameters
-import com.benoitletondor.easybudgetapp.helper.UIHelper
+import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.model.Expense
+import com.benoitletondor.easybudgetapp.parameters.Parameters
 import kotlinx.android.synthetic.main.fragment_onboarding3.*
 import org.koin.android.ext.android.inject
 import java.util.*
@@ -133,7 +131,7 @@ class Onboarding3Fragment : OnboardingFragment() {
     // -------------------------------------->
 
     private fun setCurrency() {
-        onboarding_screen3_initial_amount_money_tv?.text = CurrencyHelper.getUserCurrency(parameters).symbol
+        onboarding_screen3_initial_amount_money_tv?.text = parameters.getUserCurrency().symbol
     }
 
     private fun setButtonText() {

@@ -39,11 +39,15 @@ import com.benoitletondor.easybudgetapp.notif.MonthlyReportNotifService
 import com.benoitletondor.easybudgetapp.notif.NotificationsChannels.CHANNEL_DAILY_REMINDERS
 import com.benoitletondor.easybudgetapp.notif.NotificationsChannels.CHANNEL_MONTHLY_REMINDERS
 import com.benoitletondor.easybudgetapp.notif.NotificationsChannels.CHANNEL_NEW_FEATURES
+import com.benoitletondor.easybudgetapp.notif.hasDailyReminderOptinNotifBeenShow
+import com.benoitletondor.easybudgetapp.notif.hasUserSeenMonthlyReportNotif
+import com.benoitletondor.easybudgetapp.parameters.*
 import com.benoitletondor.easybudgetapp.push.PushService.Companion.DAILY_REMINDER_KEY
 import com.benoitletondor.easybudgetapp.push.PushService.Companion.MONTHLY_REMINDER_KEY
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
 import com.benoitletondor.easybudgetapp.view.RatingPopup
 import com.benoitletondor.easybudgetapp.view.SettingsActivity
+import com.benoitletondor.easybudgetapp.view.getRatingPopupUserStep
 import com.crashlytics.android.Crashlytics
 import com.google.android.gms.analytics.GoogleAnalytics
 import com.google.android.gms.analytics.Tracker
@@ -88,7 +92,7 @@ class EasyBudget : Application() {
         if (BuildConfig.CRASHLYTICS_ACTIVATED) {
             Fabric.with(this, Crashlytics())
 
-            Crashlytics.setUserIdentifier(parameters.getString(ParameterKeys.LOCAL_ID))
+            Crashlytics.setUserIdentifier(parameters.getLocalId())
         }
 
         // Batch
@@ -109,23 +113,23 @@ class EasyBudget : Application() {
         /*
          * Save first launch date if needed
          */
-        val initDate = parameters.getLong(ParameterKeys.INIT_DATE, 0)
+        val initDate = parameters.getInitTimestamp()
         if (initDate <= 0) {
             Logger.debug("Registering first launch date")
 
-            parameters.putLong(ParameterKeys.INIT_DATE, Date().time)
-            CurrencyHelper.setUserCurrency(parameters, Currency.getInstance(Locale.getDefault())) // Set a default currency before onboarding
+            parameters.setInitTimestamp(Date().time)
+            parameters.setUserCurrency(Currency.getInstance(Locale.getDefault())) // Set a default currency before onboarding
         }
 
         /*
          * Create local ID if needed
          */
-        var localId = parameters.getString(ParameterKeys.LOCAL_ID)
+        var localId = parameters.getLocalId()
         if (localId == null) {
             localId = UUID.randomUUID().toString()
             Logger.debug("Generating local id : $localId")
 
-            parameters.putString(ParameterKeys.LOCAL_ID, localId)
+            parameters.setLocalId(localId)
         } else {
             Logger.debug("Local id : $localId")
         }
@@ -183,12 +187,12 @@ class EasyBudget : Application() {
                 return
             }
 
-            val dailyOpens = parameters.getInt(ParameterKeys.NUMBER_OF_DAILY_OPEN, 0)
+            val dailyOpens = parameters.getNumberOfDailyOpen()
             if (dailyOpens > 2) {
                 if (!hasRatingPopupBeenShownToday()) {
                     val shown = RatingPopup(activity, parameters).show(false)
                     if (shown) {
-                        parameters.putLong(ParameterKeys.RATING_POPUP_LAST_AUTO_SHOW, Date().time)
+                        parameters.setRatingPopupLastAutoShowTimestamp(Date().time)
                     }
                 }
             }
@@ -204,7 +208,7 @@ class EasyBudget : Application() {
                 return
             }
 
-            if (parameters.getBoolean(ParameterKeys.PREMIUM_POPUP_COMPLETE, false)) {
+            if ( parameters.hasPremiumPopupBeenShow() ) {
                 return
             }
 
@@ -212,16 +216,16 @@ class EasyBudget : Application() {
                 return
             }
 
-            if (!UserHelper.hasUserCompleteRating(parameters)) {
+            if ( !parameters.hasUserCompleteRating() ) {
                 return
             }
 
-            val currentStep = RatingPopup.getUserStep(parameters)
+            val currentStep = parameters.getRatingPopupUserStep()
             if (currentStep == RatingPopup.RatingPopupStep.STEP_LIKE ||
                 currentStep == RatingPopup.RatingPopupStep.STEP_LIKE_NOT_RATED ||
                 currentStep == RatingPopup.RatingPopupStep.STEP_LIKE_RATED) {
                 if (!hasRatingPopupBeenShownToday() && shouldShowPremiumPopup()) {
-                    parameters.putLong(ParameterKeys.PREMIUM_POPUP_LAST_AUTO_SHOW, Date().time)
+                    parameters.setPremiumPopupLastAutoShowTimestamp(Date().time)
 
                     val dialog = AlertDialog.Builder(activity)
                         .setTitle(R.string.premium_popup_become_title)
@@ -235,7 +239,7 @@ class EasyBudget : Application() {
                         }
                         .setNegativeButton(R.string.premium_popup_become_not_now) { dialog12, _ -> dialog12.dismiss() }
                         .setNeutralButton(R.string.premium_popup_become_not_ask_again) { dialog1, _ ->
-                            parameters.putBoolean(ParameterKeys.PREMIUM_POPUP_COMPLETE, true)
+                            parameters.setPremiumPopupShown()
                             dialog1.dismiss()
                         }
                         .show()
@@ -255,7 +259,7 @@ class EasyBudget : Application() {
      * @return true if the rating popup has been shown today, false otherwise
      */
     private fun hasRatingPopupBeenShownToday(): Boolean {
-        val lastRatingTS = parameters.getLong(ParameterKeys.RATING_POPUP_LAST_AUTO_SHOW, 0)
+        val lastRatingTS = parameters.getRatingPopupLastAutoShowTimestamp()
         if (lastRatingTS > 0) {
             val cal = Calendar.getInstance()
             val currentDay = cal.get(Calendar.DAY_OF_YEAR)
@@ -275,7 +279,7 @@ class EasyBudget : Application() {
      * @return true if we can show premium popup, false otherwise
      */
     private fun shouldShowPremiumPopup(): Boolean {
-        val lastPremiumTS = parameters.getLong(ParameterKeys.PREMIUM_POPUP_LAST_AUTO_SHOW, 0)
+        val lastPremiumTS = parameters.getPremiumPopupLastAutoShowTimestamp()
         if (lastPremiumTS == 0L) {
             return true
         }
@@ -381,27 +385,27 @@ class EasyBudget : Application() {
      * Check if a an update occured and call [.onUpdate] if so
      */
     private fun checkUpdateAction() {
-        val savedVersion = parameters.getInt(ParameterKeys.APP_VERSION, 0)
+        val savedVersion = parameters.getCurrentAppVersion()
         if (savedVersion > 0 && savedVersion != BuildConfig.VERSION_CODE) {
             onUpdate(savedVersion, BuildConfig.VERSION_CODE)
         }
 
-        parameters.putInt(ParameterKeys.APP_VERSION, BuildConfig.VERSION_CODE)
+        parameters.setCurrentAppVersion(BuildConfig.VERSION_CODE)
     }
 
     /**
      * Called when an update occurred
      */
-    private fun onUpdate(previousVersion: Int, newVersion: Int) {
+    private fun onUpdate(previousVersion: Int, @Suppress("SameParameterValue") newVersion: Int) {
         Logger.debug("Update detected, from $previousVersion to $newVersion")
 
         if (newVersion == BuildVersion.VERSION_1_2) {
-            if (iab.isUserPremium() && !DailyNotifOptinService.hasDailyReminderOptinNotifBeenShown(parameters)) {
+            if (iab.isUserPremium() && !parameters.hasDailyReminderOptinNotifBeenShow()) {
                 DailyNotifOptinService.showDailyReminderOptinNotif(applicationContext, parameters)
             }
         }
 
-        if (newVersion == BuildVersion.VERSION_1_3 && !MonthlyReportNotifService.hasUserSeenMonthlyReportNotif(parameters)) {
+        if (newVersion == BuildVersion.VERSION_1_3 && !parameters.hasUserSeenMonthlyReportNotif()) {
             if (iab.isUserPremium()) {
                 MonthlyReportNotifService.showPremiumNotif(applicationContext, parameters)
             } else {
@@ -427,14 +431,14 @@ class EasyBudget : Application() {
         /*
          * Increment the number of open
          */
-        parameters.putInt(ParameterKeys.NUMBER_OF_OPEN, parameters.getInt(ParameterKeys.NUMBER_OF_OPEN, 0) + 1)
+        parameters.setNumberOfOpen(parameters.getNumberOfOpen() + 1)
 
         /*
          * Check if last open is from another day
          */
         var shouldIncrementDailyOpen = false
 
-        val lastOpen = parameters.getLong(ParameterKeys.LAST_OPEN_DATE, 0)
+        val lastOpen = parameters.getLastOpenTimestamp()
         if (lastOpen > 0) {
             val cal = Calendar.getInstance()
             cal.time = Date(lastOpen)
@@ -453,13 +457,13 @@ class EasyBudget : Application() {
 
         // Increment daily open
         if (shouldIncrementDailyOpen) {
-            parameters.putInt(ParameterKeys.NUMBER_OF_DAILY_OPEN, parameters.getInt(ParameterKeys.NUMBER_OF_DAILY_OPEN, 0) + 1)
+            parameters.setNumberOfDailyOpen(parameters.getNumberOfDailyOpen() + 1)
         }
 
         /*
          * Save last open date
          */
-        parameters.putLong(ParameterKeys.LAST_OPEN_DATE, Date().time)
+        parameters.setLastOpenTimestamp(Date().time)
 
         /*
          * Rating popup every day after 3 opens

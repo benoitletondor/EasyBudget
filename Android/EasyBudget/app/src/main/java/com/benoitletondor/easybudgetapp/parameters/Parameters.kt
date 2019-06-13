@@ -14,36 +14,28 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp.helper;
+package com.benoitletondor.easybudgetapp.parameters
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import android.content.Context
+import android.content.SharedPreferences
 
 /**
- * Singleton to manage parameters into the app (wrapper of SharedPreferences).
+ * Name of the shared preferences file
+ */
+private const val SHARED_PREFERENCES_FILE_NAME = "easybudget_sp"
+
+/**
+ * Manage parameters into the app (wrapper of SharedPreferences).
  *
  * @author Benoit LETONDOR
  */
-public class Parameters
-{
-    /**
-     * Name of the shared preferences file
-     */
-    private final static String SHARED_PREFERENCES_FILE_NAME = "easybudget_sp";
-
-// --------------------------------------->
+class Parameters(context: Context) {
 
     /**
      * Instance of shared preferences
      */
-    private final SharedPreferences preferences;
-
-    public Parameters(@NonNull Context context)
-    {
-        preferences = context.getApplicationContext().getSharedPreferences(SHARED_PREFERENCES_FILE_NAME, Context.MODE_PRIVATE);
-    }
+    private val preferences: SharedPreferences
+        = context.applicationContext.getSharedPreferences(SHARED_PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)
 
 // --------------------------------------->
 
@@ -53,9 +45,8 @@ public class Parameters
      * @param key
      * @param value
      */
-    public void putInt(@NonNull String key, int value)
-    {
-        preferences.edit().putInt(key, value).apply();
+    fun putInt(key: String, value: Int) {
+        preferences.edit().putInt(key, value).apply()
     }
 
     /**
@@ -64,9 +55,8 @@ public class Parameters
      * @param key
      * @param value
      */
-    public void putLong(@NonNull String key, long value)
-    {
-        preferences.edit().putLong(key, value).apply();
+    fun putLong(key: String, value: Long) {
+        preferences.edit().putLong(key, value).apply()
     }
 
     /**
@@ -75,9 +65,8 @@ public class Parameters
      * @param key
      * @param value
      */
-    public void putString(@NonNull String key, @NonNull String value)
-    {
-        preferences.edit().putString(key, value).apply();
+    fun putString(key: String, value: String) {
+        preferences.edit().putString(key, value).apply()
     }
 
     /**
@@ -86,9 +75,8 @@ public class Parameters
      * @param key
      * @param value
      */
-    public void putBoolean(String key, boolean value)
-    {
-        preferences.edit().putBoolean(key, value).apply();
+    fun putBoolean(key: String, value: Boolean) {
+        preferences.edit().putBoolean(key, value).apply()
     }
 
     /**
@@ -98,9 +86,8 @@ public class Parameters
      * @param defaultValue
      * @return
      */
-    public int getInt(@NonNull String key, int defaultValue)
-    {
-        return preferences.getInt(key, defaultValue);
+    fun getInt(key: String, defaultValue: Int): Int {
+        return preferences.getInt(key, defaultValue)
     }
 
     /**
@@ -110,9 +97,8 @@ public class Parameters
      * @param defaultValue
      * @return
      */
-    public long getLong(@NonNull String key, long defaultValue)
-    {
-        return preferences.getLong(key, defaultValue);
+    fun getLong(key: String, defaultValue: Long): Long {
+        return preferences.getLong(key, defaultValue)
     }
 
     /**
@@ -122,9 +108,8 @@ public class Parameters
      * @param defaultValue
      * @return
      */
-    public boolean getBoolean(@NonNull String key, boolean defaultValue)
-    {
-        return preferences.getBoolean(key, defaultValue);
+    fun getBoolean(key: String, defaultValue: Boolean): Boolean {
+        return preferences.getBoolean(key, defaultValue)
     }
 
     /**
@@ -133,9 +118,7 @@ public class Parameters
      * @param key
      * @return
      */
-    @Nullable
-    public String getString(String key)
-    {
-        return preferences.getString(key, null);
+    fun getString(key: String): String? {
+        return preferences.getString(key, null)
     }
 }

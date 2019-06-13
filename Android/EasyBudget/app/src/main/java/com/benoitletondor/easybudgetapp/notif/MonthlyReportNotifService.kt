@@ -26,8 +26,7 @@ import androidx.core.content.ContextCompat
 
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.Logger
-import com.benoitletondor.easybudgetapp.helper.ParameterKeys
-import com.benoitletondor.easybudgetapp.helper.Parameters
+import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
 
 import com.benoitletondor.easybudgetapp.notif.NotificationsChannels.CHANNEL_NEW_FEATURES
@@ -37,8 +36,6 @@ import com.benoitletondor.easybudgetapp.notif.NotificationsChannels.CHANNEL_NEW_
  *
  * @author Benoit LETONDOR
  */
-// -------------------------------------->
-
 class MonthlyReportNotifService : IntentService("MonthlyReportNotifService") {
 
     override fun onHandleIntent(intent: Intent?) {
@@ -103,7 +100,7 @@ class MonthlyReportNotifService : IntentService("MonthlyReportNotifService") {
 
             NotificationManagerCompat.from(context).notify(PREMIUM_NOTIFICATION_ID, notifBuilder.build())
 
-            setUserSawMonthlyReportNotif(parameters)
+            parameters.setUserSawMonthlyReportNotif()
         }
 
         /**
@@ -133,25 +130,28 @@ class MonthlyReportNotifService : IntentService("MonthlyReportNotifService") {
 
             NotificationManagerCompat.from(context).notify(NOT_PREMIUM_NOTIFICATION_ID, notifBuilder.build())
 
-            setUserSawMonthlyReportNotif(parameters)
-        }
-
-    // -------------------------------------->
-
-        /**
-         * Has the user already saw the monthly report notification.
-         *
-         * @return true if user saw it, false otherwise
-         */
-        fun hasUserSeenMonthlyReportNotif(parameters: Parameters): Boolean {
-            return parameters.getBoolean(ParameterKeys.MONTHLY_PUSH_NOTIF_SHOWN, false)
-        }
-
-        /**
-         * Set that the user saw the monthly report notification.
-         */
-        private fun setUserSawMonthlyReportNotif(parameters: Parameters) {
-            parameters.putBoolean(ParameterKeys.MONTHLY_PUSH_NOTIF_SHOWN, true)
+            parameters.setUserSawMonthlyReportNotif()
         }
     }
+}
+
+/**
+ * Has the monthly report notification been shown to the user yet (bool)
+ */
+private const val MONTHLY_PUSH_NOTIF_SHOWN_PARAMETERS_KEY = "user_saw_monthly_push_notif"
+
+/**
+ * Has the user already saw the monthly report notification.
+ *
+ * @return true if user saw it, false otherwise
+ */
+fun Parameters.hasUserSeenMonthlyReportNotif(): Boolean {
+    return getBoolean(MONTHLY_PUSH_NOTIF_SHOWN_PARAMETERS_KEY, false)
+}
+
+/**
+ * Set that the user saw the monthly report notification.
+ */
+private fun Parameters.setUserSawMonthlyReportNotif() {
+    putBoolean(MONTHLY_PUSH_NOTIF_SHOWN_PARAMETERS_KEY, true)
 }

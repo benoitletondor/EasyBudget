@@ -19,6 +19,7 @@ package com.benoitletondor.easybudgetapp.view.recurringexpenseadd
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.app.Activity
+import android.app.DatePickerDialog
 import android.app.ProgressDialog
 import android.os.Bundle
 import android.view.MenuItem
@@ -28,9 +29,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.benoitletondor.easybudgetapp.R
-import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
-import com.benoitletondor.easybudgetapp.helper.Parameters
+import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.helper.UIHelper
+import com.benoitletondor.easybudgetapp.helper.getUserCurrency
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import com.benoitletondor.easybudgetapp.view.DatePickerDialogFragment
 import kotlinx.android.synthetic.main.activity_recurring_expense_add.*
@@ -205,7 +206,7 @@ class RecurringExpenseAddActivity : AppCompatActivity() {
      * Set up text fields, spinner and focus behavior
      */
     private fun setUpInputs() {
-        amount_inputlayout.hint = resources.getString(R.string.amount, CurrencyHelper.getUserCurrency(parameters).symbol)
+        amount_inputlayout.hint = resources.getString(R.string.amount, parameters.getUserCurrency().symbol)
 
         UIHelper.preventUnsupportedInputForDecimals(amount_edittext)
 
@@ -247,7 +248,7 @@ class RecurringExpenseAddActivity : AppCompatActivity() {
         date_button.text = formatter.format(date)
 
         date_button.setOnClickListener {
-            val fragment = DatePickerDialogFragment(date) { _, year, monthOfYear, dayOfMonth ->
+            val fragment = DatePickerDialogFragment(date, DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
                 val cal = Calendar.getInstance()
 
                 cal.set(Calendar.YEAR, year)
@@ -255,7 +256,7 @@ class RecurringExpenseAddActivity : AppCompatActivity() {
                 cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
 
                 viewModel.onDateChanged(cal.time)
-            }
+            })
 
             fragment.show(supportFragmentManager, "datePicker")
         }

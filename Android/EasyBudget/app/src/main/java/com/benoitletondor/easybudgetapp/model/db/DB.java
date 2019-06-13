@@ -33,8 +33,6 @@ import com.benoitletondor.easybudgetapp.model.Expense;
 import com.benoitletondor.easybudgetapp.model.RecurringExpense;
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseType;
 
-import org.json.JSONException;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -166,9 +164,6 @@ public final class DB
 
     /**
      * Check if an expense is set to the given day
-     *
-     * @param day
-     * @return
      */
     public boolean hasExpensesForDay(@NonNull Date day)
     {
@@ -191,10 +186,6 @@ public final class DB
 
     /**
      * Get all one time expense for a day
-     *
-     * @param date
-     * @param fromCache should we use cache or not
-     * @return
      */
     @NonNull
     protected List<Expense> getExpensesForDay(@NonNull Date date, boolean fromCache)
@@ -243,9 +234,6 @@ public final class DB
 
     /**
      * Get all one time expense for a day
-     *
-     * @param date
-     * @return
      */
     @NonNull
     public List<Expense> getExpensesForDay(@NonNull Date date)
@@ -302,10 +290,6 @@ public final class DB
 
     /**
      * Get a sum of all amount of expenses until the given day
-     *
-     * @param day
-     * @param fromCache should we use DBCache
-     * @return
      */
     protected double getBalanceForDay(@NonNull Date day, boolean fromCache)
     {
@@ -337,9 +321,6 @@ public final class DB
 
     /**
      * Get a sum of all amount of expenses until the given day
-     *
-     * @param day
-     * @return
      */
     public double getBalanceForDay(@NonNull Date day)
     {
@@ -367,8 +348,6 @@ public final class DB
 
     /**
      * Get all recurring expenses
-     *
-     * @return
      */
     @NonNull
     public List<RecurringExpense> getAllRecurringExpenses()
@@ -398,7 +377,6 @@ public final class DB
     /**
      * Delete this recurring expense
      *
-     * @param recurringExpense
      * @return true on success, false on error
      */
     public boolean deleteRecurringExpense(@NonNull RecurringExpense recurringExpense)
@@ -409,7 +387,6 @@ public final class DB
     /**
      * Delete this expense
      *
-     * @param expense
      * @return true on success, false on error
      */
     public boolean deleteExpense(@NonNull Expense expense)
@@ -428,7 +405,6 @@ public final class DB
     /**
      * Delete all expense for this recurring expense
      *
-     * @param recurringExpense
      * @return true on success, false on error
      */
     public boolean deleteAllExpenseForRecurringExpense(@NonNull RecurringExpense recurringExpense)
@@ -474,8 +450,6 @@ public final class DB
     /**
      * Delete all expense for this recurring expense from the given date (not included)
      *
-     * @param recurringExpense
-     * @param fromDate
      * @return true on success, false on error
      */
     public boolean deleteAllExpenseForRecurringExpenseFromDate(@NonNull RecurringExpense recurringExpense, @NonNull Date fromDate)
@@ -492,10 +466,6 @@ public final class DB
 
     /**
      * Retrieve all expenses associated with this recurring expense happening after the given date (not included)
-     *
-     * @param recurringExpense
-     * @param fromDate
-     * @return
      */
     public List<Expense> getAllExpensesForRecurringExpenseFromDate(@NonNull RecurringExpense recurringExpense, @NonNull Date fromDate)
     {
@@ -525,9 +495,6 @@ public final class DB
 
     /**
      * Delete all expense for this recurring expense before the given date (excluded)
-     *
-     * @param recurringExpense
-     * @param toDate
      * @return true on success, false on error
      */
     public boolean deleteAllExpenseForRecurringExpenseBeforeDate(@NonNull RecurringExpense recurringExpense, @NonNull Date toDate)
@@ -544,10 +511,6 @@ public final class DB
 
     /**
      * Check if there are expenses before this date for the given recurring expense
-     *
-     * @param recurringExpense
-     * @param toDate
-     * @return
      */
     public boolean hasExpensesForRecurringExpenseBeforeDate(@NonNull RecurringExpense recurringExpense, @NonNull Date toDate)
     {
@@ -562,10 +525,6 @@ public final class DB
 
     /**
      * Retrieve all expenses associated with this recurring expense happening before the given date
-     *
-     * @param recurringExpense
-     * @param toDate
-     * @return
      */
     public List<Expense> getAllExpensesForRecurringExpenseBeforeDate(@NonNull RecurringExpense recurringExpense, @NonNull Date toDate)
     {
@@ -596,7 +555,6 @@ public final class DB
     /**
      * Find the recurring expense for the given ID
      *
-     * @param id
      * @return recurring expense if found, null otherwise
      */
     @Nullable
@@ -618,9 +576,6 @@ public final class DB
 
     /**
      * Deserialize an expense from DB
-     *
-     * @param cursor
-     * @return
      */
     @NonNull
     private static Expense ExpenseFromCursor(@NonNull Cursor cursor, @Nullable RecurringExpense recurringExpense)
@@ -637,9 +592,6 @@ public final class DB
 
     /**
      * Find the recurring expense associated with an expense cursor
-     *
-     * @param cursor
-     * @return
      */
     @Nullable
     private RecurringExpense getRecurringExpenseForExpenseCursor(@NonNull Cursor cursor)
@@ -664,9 +616,6 @@ public final class DB
 
     /**
      * Generate serialized values for an expense
-     *
-     * @param expense
-     * @return
      */
     @NonNull
     private static ContentValues generateContentValuesForExpense(@NonNull Expense expense)
@@ -693,10 +642,6 @@ public final class DB
 
     /**
      * Deserialize a recurring expense from DB
-     *
-     * @param cursor
-     * @return
-     * @throws JSONException
      */
     @NonNull
     private static RecurringExpense recurringExpenseFromCursor(@NonNull Cursor cursor)
@@ -714,10 +659,6 @@ public final class DB
 
     /**
      * Generate serialized values for a recurring expense
-     *
-     * @param expense
-     * @return
-     * @throws JSONException
      */
     @NonNull
     private static ContentValues generateContentValuesForRecurringExpense(@NonNull RecurringExpense expense)

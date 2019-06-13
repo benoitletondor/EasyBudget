@@ -18,11 +18,9 @@ package com.benoitletondor.easybudgetapp.push
 
 import com.batch.android.Batch
 import com.benoitletondor.easybudgetapp.BuildConfig
-import com.benoitletondor.easybudgetapp.helper.Logger
-import com.benoitletondor.easybudgetapp.helper.ParameterKeys
-import com.benoitletondor.easybudgetapp.helper.Parameters
-import com.benoitletondor.easybudgetapp.helper.UserHelper
+import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.iab.Iab
+import com.benoitletondor.easybudgetapp.parameters.*
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
@@ -84,14 +82,14 @@ class PushService : FirebaseMessagingService() {
                     return false
                 }
 
-                if (!UserHelper.isUserAllowingDailyReminderPushes(parameters))
+                if ( !parameters.isUserAllowingDailyReminderPushes() )
                 // Check user choice
                 {
                     return false
                 }
 
                 // Check if the app hasn't been opened today
-                val lastOpenTimestamp = parameters.getLong(ParameterKeys.LAST_OPEN_DATE, 0)
+                val lastOpenTimestamp = parameters.getLastOpenTimestamp()
                 if (lastOpenTimestamp == 0L) {
                     return false
                 }
@@ -105,11 +103,11 @@ class PushService : FirebaseMessagingService() {
 
                 return currentDay != lastOpenDay
             } else if (remoteMessage.data.containsKey(MONTHLY_REMINDER_KEY) && "true" == remoteMessage.data[MONTHLY_REMINDER_KEY]) {
-                return iab.isUserPremium() && UserHelper.isUserAllowingMonthlyReminderPushes(parameters)
+                return iab.isUserPremium() && parameters.isUserAllowingMonthlyReminderPushes()
             }
 
             // Else it must be an update push
-            return UserHelper.isUserAllowingUpdatePushes(parameters)
+            return parameters.isUserAllowingUpdatePushes()
         } catch (e: Exception) {
             Logger.error("Error while checking user ok for push", e)
             return false

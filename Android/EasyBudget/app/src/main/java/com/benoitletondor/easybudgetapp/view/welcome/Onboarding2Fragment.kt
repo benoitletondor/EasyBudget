@@ -26,8 +26,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.benoitletondor.easybudgetapp.R
-import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
-import com.benoitletondor.easybudgetapp.helper.Parameters
+import com.benoitletondor.easybudgetapp.parameters.Parameters
+import com.benoitletondor.easybudgetapp.helper.getUserCurrency
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment
 import kotlinx.android.synthetic.main.fragment_onboarding2.*
 import org.koin.android.ext.android.inject
@@ -56,7 +56,7 @@ class Onboarding2Fragment : OnboardingFragment() {
             next()
         }
 
-        selectedCurrency = CurrencyHelper.getUserCurrency(parameters)
+        selectedCurrency = parameters.getUserCurrency()
         setNextButtonText()
 
         val selectCurrencyFragment = SelectCurrencyFragment()

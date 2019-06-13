@@ -1,6 +1,6 @@
 package com.benoitletondor.easybudgetapp.injection
 
-import com.benoitletondor.easybudgetapp.helper.Parameters
+import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.iab.IabImpl
 import com.benoitletondor.easybudgetapp.model.db.DB

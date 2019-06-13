@@ -32,7 +32,7 @@ import android.widget.TextView;
 
 import com.benoitletondor.easybudgetapp.R;
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper;
-import com.benoitletondor.easybudgetapp.helper.Parameters;
+import com.benoitletondor.easybudgetapp.parameters.Parameters;
 import com.benoitletondor.easybudgetapp.model.Expense;
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType;
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity;
@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Recycler view adapter to display expenses for a given date
@@ -102,7 +103,7 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
         while( expenseIterator.hasNext() )
         {
             Expense shownExpense = expenseIterator.next();
-            if( shownExpense.getId().equals(expense.getId()) )
+            if( Objects.equals(shownExpense.getId(), expense.getId()) )
             {
                 expenseIterator.remove();
                 notifyItemRemoved(position);
