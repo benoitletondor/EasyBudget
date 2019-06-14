@@ -27,6 +27,7 @@ buildscript {
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 apply plugin: 'io.fabric'
 
 apply from: 'batch.gradle'
@@ -108,6 +109,10 @@ dependencies {
     implementation 'org.koin:koin-android:2.0.1'
     implementation 'org.koin:koin-android-viewmodel:2.0.1'
     implementation 'org.koin:koin-java:2.0.1'
+
+    kapt "androidx.room:room-compiler:2.1.0"
+    implementation "androidx.room:room-runtime:2.1.0"
+    implementation "androidx.room:room-ktx:2.1.0"
 }
 
 apply plugin: 'com.google.gms.google-services'

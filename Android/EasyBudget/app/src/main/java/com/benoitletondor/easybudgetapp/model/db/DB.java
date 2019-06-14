@@ -50,11 +50,6 @@ public final class DB
      */
     @NonNull
     private final SQLiteDatabase database;
-    /**
-     * Saved context
-     */
-    @NonNull
-    private final Context context;
     @NonNull
     private final DBCache cache;
 
@@ -62,14 +57,10 @@ public final class DB
 
     /**
      * Create and open a new DB
-     *
-     * @param context
-     * @throws SQLiteException
      */
     public DB(@NonNull Context context, @NonNull DBCache cache) throws SQLiteException
     {
-        this.context = context.getApplicationContext();
-        SQLiteDBHelper databaseHelper = new SQLiteDBHelper(this.context);
+        SQLiteDBHelper databaseHelper = new SQLiteDBHelper(context);
 		database = databaseHelper.getWritableDatabase();
 		this.cache = cache;
 	}
@@ -87,16 +78,6 @@ public final class DB
         {
             Logger.error("Error while closing SQLite DB", e);
         }
-    }
-
-    /**
-     * Clear all DB content (<b>for test purpose</b>)
-     */
-    @VisibleForTesting
-    public void clearDB()
-    {
-        database.delete(SQLiteDBHelper.TABLE_EXPENSE, null, null);
-        database.delete(SQLiteDBHelper.TABLE_RECURRING_EXPENSE, null, null);
     }
 
 // -------------------------------------------->
