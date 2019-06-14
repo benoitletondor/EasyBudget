@@ -41,7 +41,7 @@ class MainViewModel(private val db: DB,
         class ErrorCantDeleteBeforeFirstOccurrence(val expense: Expense): RecurringExpenseDeleteProgressState()
         class ErrorIO(val expense: Expense): RecurringExpenseDeleteProgressState()
 
-        class Deleted(val recurringExpense: RecurringExpense, val expensesToRestore: List<Expense>): RecurringExpenseDeleteProgressState()
+        class Deleted(val recurringExpense: RecurringExpense, val restoreRecurring: Boolean, val expensesToRestore: List<Expense>): RecurringExpenseDeleteProgressState()
     }
 
     sealed class RecurringExpenseRestoreProgressState {
@@ -158,22 +158,25 @@ class MainViewModel(private val db: DB,
                 return@launch
             }
 
-            recurringExpenseDeletionDeleteProgressStream.value = RecurringExpenseDeleteProgressState.Deleted(associatedRecurringExpense, expensesToRestore)
+            recurringExpenseDeletionDeleteProgressStream.value = RecurringExpenseDeleteProgressState.Deleted(associatedRecurringExpense, deleteType == RecurringExpenseDeleteType.ALL, expensesToRestore)
             refreshDataForDate(selectedDate)
         }
 
     }
 
-    fun onRestoreRecurringExpenseClicked(recurringExpense: RecurringExpense, expensesToRestore: List<Expense>) {
+    fun onRestoreRecurringExpenseClicked(recurringExpense: RecurringExpense, restoreRecurring: Boolean, expensesToRestore: List<Expense>) {
         viewModelScope.launch {
             recurringExpenseRestoreProgressStream.value = RecurringExpenseRestoreProgressState.Starting(recurringExpense, expensesToRestore)
 
-            val recurringExpenseAdd = withContext(Dispatchers.Default) {
-                db.addRecurringExpense(recurringExpense)
-            }
-            if ( recurringExpenseAdd == null ) {
-                recurringExpenseRestoreProgressStream.postValue(RecurringExpenseRestoreProgressState.ErrorIO(recurringExpense, expensesToRestore))
-                return@launch
+            if( restoreRecurring ) {
+                val recurringExpenseAdd = withContext(Dispatchers.Default) {
+                    db.addRecurringExpense(recurringExpense)
+                }
+
+                if ( recurringExpenseAdd == null ) {
+                    recurringExpenseRestoreProgressStream.postValue(RecurringExpenseRestoreProgressState.ErrorIO(recurringExpense, expensesToRestore))
+                    return@launch
+                }
             }
 
             val expensesAdd = withContext(Dispatchers.Default) {

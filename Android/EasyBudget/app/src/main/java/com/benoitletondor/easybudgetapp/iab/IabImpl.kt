@@ -68,7 +68,7 @@ class IabImpl(context: Context,
 
         // Save status only on success
         if (status == PremiumCheckStatus.PREMIUM || status == PremiumCheckStatus.NOT_PREMIUM) {
-            parameters.putBoolean(PREMIUM_PARAMETER_KEY, iabStatus == PremiumCheckStatus.PREMIUM)
+            parameters.setUserPremium(iabStatus == PremiumCheckStatus.PREMIUM)
         }
 
         val intent = Intent(INTENT_IAB_STATUS_CHANGED)
@@ -83,7 +83,7 @@ class IabImpl(context: Context,
      */
     override fun isUserPremium(): Boolean
     {
-        return parameters.getBoolean(PREMIUM_PARAMETER_KEY, false) ||
+        return parameters.isUserPremium() ||
             parameters.getBoolean(BATCH_OFFER_REDEEMED_PARAMETER_KEY, false) ||
             parameters.getBoolean(APP_TURBO_PREMIUM_PARAMETER_KEY, false) ||
             iabStatus == PremiumCheckStatus.PREMIUM
@@ -246,6 +246,14 @@ class IabImpl(context: Context,
 
         premiumFlowContinuation = null
     }
+}
+
+private fun Parameters.setUserPremium(premium: Boolean) {
+    putBoolean(PREMIUM_PARAMETER_KEY, premium)
+}
+
+private fun Parameters.isUserPremium(): Boolean {
+    return getBoolean(PREMIUM_PARAMETER_KEY, false)
 }
 
 private enum class PremiumCheckStatus {

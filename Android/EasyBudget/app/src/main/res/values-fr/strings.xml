@@ -26,8 +26,6 @@
     <string name="title_activity_edit_income">Modifier le revenu</string>
     <string name="title_activity_recurring_expense_add">Ajouter une dépense récurrente</string>
     <string name="title_activity_recurring_income_add">Ajouter un revenu récurrent</string>
-    <string name="title_activity_recurring_expense_edit">Modifier la dépense récurrente</string>
-    <string name="title_activity_monthly_income_edit">Modifier le revenu récurrent</string>
     <string name="title_activity_settings">Préférences</string>
     <string name="title_activity_welcome">EasyBudget</string>
     <string name="title_activity_premium">Premium</string>
@@ -111,8 +109,6 @@
     <string name="recurring_expense_restored_success_message">Dépense récurrente restaurée avec succès</string>
     <string name="recurring_expense_restore_error_title">Oups</string>
     <string name="recurring_expense_restore_error_message">Une erreur est survenue.</string>
-    <string name="recurring_expense_delete_first_error_title">Oups</string>
-    <string name="recurring_expense_delete_first_error_message">Il n\'y a aucune occurrence avant celle-ci.</string>
     <string name="expense_delete_error_title">Oups</string>
     <string name="expense_delete_error_message">Une erreur est survenue.</string>
 
@@ -121,7 +117,6 @@
     <string name="recurring_interval_bi_weekly">Toutes les 2 semaines</string>
     <string name="recurring_interval_monthly">Tous les mois</string>
     <string name="recurring_interval_yearly">Tous les ans</string>
-    <string name="recurring_update_notification">Nouvelle fonctionnalité : Suite à vos retours, il est maintenant possible d’ajouter des dépenses hebdomadaires, bi-hebdomadaires et annuelles !</string>
 
     <string name="setting_category_app_title">App</string>
     <string name="setting_category_rate_button_title">Vous aimez cette appli ?</string>
@@ -170,9 +165,6 @@
     <string name="premium_popup_become_cta">Découvrir</string>
     <string name="premium_popup_become_not_now">Pas maintenant</string>
     <string name="premium_popup_become_not_ask_again">Ne plus me demander</string>
-    <string name="premium_notif_optin_message">Nouvelle fonctionnalité premium : Les rappels journaliers !\nRecevez un rappel si vous avez oublié d’ajouter vos dépenses durant la journée. Ça vous dit?\n(Vous pouvez changer plus tard dans les préférences)</string>
-    <string name="premium_notif_optin_message_ok">Ok</string>
-    <string name="premium_notif_optin_message_not_ok">Non merci</string>
 
     <string name="iab_purchase_success_title">Merci</string>
     <string name="iab_purchase_success_message">Merci beaucoup pour votre soutient! Vous avez maintenant accès aux fonctionnalités premium.</string>
@@ -184,12 +176,8 @@
     <string name="voucher_redeem_dialog_title">Code promo</string>
     <string name="voucher_redeem_dialog_message">Entrez votre code promo</string>
     <string name="voucher_redeem_dialog_cta">Utiliser</string>
-    <string name="voucher_redeem_dialog_loading_title">Validation</string>
-    <string name="voucher_redeem_dialog_loading_message">Patientez</string>
     <string name="voucher_redeem_error_dialog_title">Oups</string>
     <string name="voucher_redeem_error_code_invalid_dialog_message">Votre code promo est invalide.</string>
-    <string name="voucher_redeem_error_no_internet_dialog_message">Erreur de réseau. Vérifiez votre connexion et réessayez.</string>
-    <string name="voucher_redeem_error_generic_dialog_message">Une erreur est survenue, réessayez plus tard.</string>
 
     <string name="rating_popup_question_title">Que pensez vous d\'EasyBudget ?</string>
     <string name="rating_popup_question_message">Je développe cette application sur mon temps libre et je la propose gratuitement. Il y a sûrement des choses à améliorer et votre avis compte pour moi.</string>
@@ -227,11 +215,7 @@
     <string name="onboarding_screen_4_message4">Merci d\'utiliser EasyBudget, et bienvenue :)</string>
     <string name="onboarding_screen_4_cta">C\'est parti !</string>
 
-    <string name="app_invite_title">Partagez avec vos amis !</string>
     <string name="app_invite_message">Tu devrais essayer EasyBudget : une app super simple à utiliser pour gérer ton budget !</string> <!-- 100 chars or less -->
-    <string name="app_invite_welcome_title">Bienvenue sur EasyBudget</string>
-    <string name="app_invite_welcome_message">On dirait qu\'un ami vous a recommandé cette app ! Bienvenue et n\'oubliez pas de remercier votre amis pour ce bon conseil ;)</string>
-    <string name="app_invite_welcome_cta">Go !</string>
 
     <string name="monthly_report_button_title">Récapitulatif mensuel</string>
     <string name="monthly_report_month_title_format">MMMM yyyy</string>
@@ -241,7 +225,5 @@
     <string name="revenues_total">Total des revenus</string>
     <string name="balance">Balance</string>
     <string name="monthly_report_no_entries_placeholder">Rien pour ce mois.</string>
-    <string name="monthly_report_notif_notpremium_text">Nouvelle fonctionnalité premium: Récapitulatif mensuel.\nRecevez un récapitulatif de vos dépenses et revenus du mois. Découvrir le mode premium ?</string>
-    <string name="monthly_report_notif_premium_text">Nouvelle fonctionnalité : Récapitulatif mensuel.\nRecevez un récapitulatif de vos dépenses et revenus du mois. Tapez pour essayer</string>
     <string name="monthly_report_hint">Psst : Vous pouvez accéder aux récapitulatifs mensuel depuis ce bouton !</string>
 </resources>

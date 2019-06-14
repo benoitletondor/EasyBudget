@@ -36,8 +36,6 @@ import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.iab.INTENT_IAB_STATUS_CHANGED
 import com.benoitletondor.easybudgetapp.iab.Iab
-import com.benoitletondor.easybudgetapp.notif.DailyNotifOptinService
-import com.benoitletondor.easybudgetapp.notif.MonthlyReportNotifService
 import com.benoitletondor.easybudgetapp.parameters.*
 import com.benoitletondor.easybudgetapp.view.SettingsActivity.USER_GONE_PREMIUM_INTENT
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
@@ -266,30 +264,6 @@ class PreferencesFragment : PreferenceFragment() {
              */
             findPreference(resources.getString(R.string.setting_category_dev_show_premium_key)).setOnPreferenceClickListener {
                 showBecomePremiumDialog()
-                false
-            }
-
-            /*
-             * Show daily reminder opt-in notif
-             */
-            findPreference(resources.getString(R.string.setting_category_show_notif_daily_reminder_key)).setOnPreferenceClickListener {
-                DailyNotifOptinService.showDailyReminderOptinNotif(activity, parameters)
-                false
-            }
-
-            /*
-             * Show monthly report notif for premium users
-             */
-            findPreference(resources.getString(R.string.setting_category_show_notif_monthly_premium_key)).setOnPreferenceClickListener {
-                MonthlyReportNotifService.showPremiumNotif(activity, parameters)
-                false
-            }
-
-            /*
-             * Show monthly report notif for non premium users
-             */
-            findPreference(resources.getString(R.string.setting_category_show_notif_monthly_notpremium_key)).setOnPreferenceClickListener {
-                MonthlyReportNotifService.showNotPremiumNotif(activity, parameters)
                 false
             }
 

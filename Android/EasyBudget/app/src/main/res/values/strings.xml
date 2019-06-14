@@ -28,8 +28,6 @@
     <string name="title_activity_edit_income">Edit income</string>
     <string name="title_activity_recurring_expense_add">Add recurring expense</string>
     <string name="title_activity_recurring_income_add">Add recurring income</string>
-    <string name="title_activity_recurring_expense_edit">Edit recurring expense</string>
-    <string name="title_activity_monthly_income_edit">Edit recurring income</string>
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_welcome">EasyBudget</string>
     <string name="title_activity_premium">Premium</string>
@@ -113,8 +111,6 @@
     <string name="recurring_expense_restored_success_message">Recurring expense restored with success</string>
     <string name="recurring_expense_restore_error_title">Oops</string>
     <string name="recurring_expense_restore_error_message">An error occurred.</string>
-    <string name="recurring_expense_delete_first_error_title">Oops</string>
-    <string name="recurring_expense_delete_first_error_message">There are no instances before this one.</string>
     <string name="expense_delete_error_title">Oops</string>
     <string name="expense_delete_error_message">An error occurred.</string>
 
@@ -123,7 +119,6 @@
     <string name="recurring_interval_bi_weekly">Every 2 weeks</string>
     <string name="recurring_interval_monthly">Every month</string>
     <string name="recurring_interval_yearly">Every year</string>
-    <string name="recurring_update_notification">New feature: Based on a popular request, you can now add weekly, bi-weekly and yearly recurring expenses!</string>
 
     <string name="setting_category_app_title">App</string>
     <string name="setting_category_rate_button_title">Like the app?</string>
@@ -151,9 +146,6 @@
     <string name="setting_category_disable_animation_title" translatable="false">Animations</string>
     <string name="setting_category_disable_animation_message" translatable="false">You can disable animations if you experience any bug or glitch</string>
     <string name="setting_category_show_premium" translatable="false">Show premium screen</string>
-    <string name="setting_category_show_notif_daily_reminder" translatable="false">Show daily reminder opt-in notif</string>
-    <string name="setting_category_show_notif_monthly_report_premium" translatable="false">Show monthly report notif (Premium)</string>
-    <string name="setting_category_show_notif_monthly_report_notpremium" translatable="false">Show monthly report notif (Non premium)</string>
     <string name="setting_category_premium_title">Premium</string>
     <string name="setting_category_premium_status_title">You are premium!</string>
     <string name="setting_category_premium_status_message">You have access to premium features</string>
@@ -183,9 +175,6 @@
     <string name="premium_popup_become_cta">Discover</string>
     <string name="premium_popup_become_not_now">Not now</string>
     <string name="premium_popup_become_not_ask_again">Don\'t ask me again</string>
-    <string name="premium_notif_optin_message">New premium feature: Daily notification.\nReceive a reminder if you forgot to add your expenses during the day. Are you in?\n(You can change it later in settings)</string>
-    <string name="premium_notif_optin_message_ok">I\'m in</string>
-    <string name="premium_notif_optin_message_not_ok">No thanks</string>
 
     <string name="iab_purchase_success_title">Thank you</string>
     <string name="iab_purchase_success_message">Thank you so much for your support! You can now enjoy the premium features.</string>
@@ -197,12 +186,8 @@
     <string name="voucher_redeem_dialog_title">Promo code</string>
     <string name="voucher_redeem_dialog_message">Enter your promo code</string>
     <string name="voucher_redeem_dialog_cta">Redeem</string>
-    <string name="voucher_redeem_dialog_loading_title">Redeeming</string>
-    <string name="voucher_redeem_dialog_loading_message">Please wait</string>
     <string name="voucher_redeem_error_dialog_title">Oops</string>
     <string name="voucher_redeem_error_code_invalid_dialog_message">Your promo code is invalid.</string>
-    <string name="voucher_redeem_error_no_internet_dialog_message">Network error. Please check your connection and try again.</string>
-    <string name="voucher_redeem_error_generic_dialog_message">An error occurred, try again later.</string>
 
     <string name="rating_popup_question_title">What do you think of EasyBudget?</string>
     <string name="rating_popup_question_message">I develop this app in my free time and provide it for free. There still might be things to improve and I would really appreciate your feedback.</string>
@@ -242,13 +227,8 @@
     <string name="onboarding_screen_4_message4">Thank you for using EasyBudget, and welcome :)</string>
     <string name="onboarding_screen_4_cta">Let\'s go!</string>
 
-    <string name="app_invite_title">Tell your friends!</string>
     <string name="app_invite_message">You should try EasyBudget: An incredibly easy to use app to manage your budget!</string>
     <!-- 100 chars or less -->
-    <string name="app_invite_referral" translatable="false">easybudget://referral?type=appinvite&amp;referrer=%s</string>
-    <string name="app_invite_welcome_title">Welcome to EasyBudget</string>
-    <string name="app_invite_welcome_message">It looks like a friend recommended this app to you. Welcome on board and don\'t forget to thank your friend for that great advice ;)</string>
-    <string name="app_invite_welcome_cta">Go!</string>
 
     <string name="monthly_report_button_title">Monthly report</string>
     <string name="monthly_report_month_title_format">MMMM yyyy</string>
@@ -258,8 +238,6 @@
     <string name="revenues_total">Revenues total</string>
     <string name="balance">Balance</string>
     <string name="monthly_report_no_entries_placeholder">Nothing for this month.</string>
-    <string name="monthly_report_notif_notpremium_text">New feature for premium users: Monthly report.\nGet a sum-up of your expenses and incomes of the month. Discover premium?</string>
-    <string name="monthly_report_notif_premium_text">New feature available: Monthly report.\nGet a sum-up of your expenses and incomes of the month. Tap to try</string>
     <string name="monthly_report_hint">Psst: You can access monthly reports from this button!</string>
 
     <!-- Keys, not for translations. -->
@@ -281,8 +259,5 @@
     <string name="setting_category_notifications_monthly_key" translatable="false">monthly_notifs</string>
     <string name="setting_category_not_premium_status_key" translatable="false">not_premium</string>
     <string name="setting_category_dev_show_premium_key" translatable="false">show_premium</string>
-    <string name="setting_category_show_notif_daily_reminder_key" translatable="false">show_daily_reminder_notif</string>
-    <string name="setting_category_show_notif_monthly_notpremium_key" translatable="false">show_montly_notpremium_notif</string>
-    <string name="setting_category_show_notif_monthly_premium_key" translatable="false">show_montly_premium_notif</string>
     <string name="setting_category_start_day_of_week_key" translatable="false">start_day_of_week</string>
 </resources>

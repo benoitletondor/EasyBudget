@@ -155,7 +155,7 @@ class MainActivity : AppCompatActivity() {
         viewModel.expenseDeletionSuccessStream.observe(this, Observer { (deletedExpense, newBalance) ->
 
             expensesViewAdapter.removeExpense(deletedExpense)
-            updateBalanceDisplayForDay(expensesViewAdapter.date, newBalance)
+            updateBalanceDisplayForDay(expensesViewAdapter.getDate(), newBalance)
             calendarFragment.refreshView()
 
             val snackbar = Snackbar.make(coordinatorLayout, if (deletedExpense.isRevenue()) R.string.income_delete_snackbar_text else R.string.expense_delete_snackbar_text, Snackbar.LENGTH_LONG)
@@ -220,7 +220,7 @@ class MainActivity : AppCompatActivity() {
                     val snackbar = Snackbar.make(coordinatorLayout, R.string.recurring_expense_delete_success_message, Snackbar.LENGTH_LONG)
 
                     snackbar.setAction(R.string.undo) {
-                        viewModel.onRestoreRecurringExpenseClicked(status.recurringExpense, status.expensesToRestore)
+                        viewModel.onRestoreRecurringExpenseClicked(status.recurringExpense, status.restoreRecurring, status.expensesToRestore)
                     }
 
                     snackbar.setActionTextColor(ContextCompat.getColor(this@MainActivity, R.color.snackbar_action_undo))

@@ -26,8 +26,6 @@
     <string name="title_activity_edit_income">Редактировать доход</string>
     <string name="title_activity_recurring_expense_add">Добавить периодический расход</string>
     <string name="title_activity_recurring_income_add">Добавить периодический доход</string>
-    <string name="title_activity_recurring_expense_edit">Редактировать периодический расход</string>
-    <string name="title_activity_monthly_income_edit">Редактировать периодический доход</string>
     <string name="title_activity_settings">Настройки</string>
     <string name="title_activity_welcome">EasyBudget</string>
     <string name="title_activity_premium">Премиум</string>
@@ -111,8 +109,6 @@
     <string name="recurring_expense_restored_success_message">Периодический расход успешно восстановлен</string>
     <string name="recurring_expense_restore_error_title">Ой…</string>
     <string name="recurring_expense_restore_error_message">Произошла ошибка.</string>
-    <string name="recurring_expense_delete_first_error_title">Ой…</string>
-    <string name="recurring_expense_delete_first_error_message">Предыдущей записи не существует.</string>
     <string name="expense_delete_error_title">Ой…</string>
     <string name="expense_delete_error_message">Произошла ошибка.</string>
 
@@ -121,7 +117,6 @@
     <string name="recurring_interval_bi_weekly">Каждые две недели</string>
     <string name="recurring_interval_monthly">Ежемесячно</string>
     <string name="recurring_interval_yearly">Ежегодно</string>
-    <string name="recurring_update_notification">Новая функция: теперь Вы можете добавлять еженедельные, двухнедельные и ежегодные периодические расходы!</string>
 
     <string name="setting_category_app_title">Приложение</string>
     <string name="setting_category_rate_button_title">Нравится приложение?</string>
@@ -172,9 +167,6 @@
     <string name="premium_popup_become_cta">Открыть</string>
     <string name="premium_popup_become_not_now">Не сейчас</string>
     <string name="premium_popup_become_not_ask_again">Не спрашивать в дальнейшем</string>
-    <string name="premium_notif_optin_message">Новая премиум-функция: Ежедневные уведомления.\nПолучите напоминание, если Вы забыли добавить свои расходы в течение дня. Подключить?\n(You can change it later in settings)</string>
-    <string name="premium_notif_optin_message_ok">Да</string>
-    <string name="premium_notif_optin_message_not_ok">Нет, спасибо</string>
 
     <string name="iab_purchase_success_title">Спасибо</string>
     <string name="iab_purchase_success_message">Спасибо большое за Вашу поддержку! Теперь Вы можете наслаждаться премиум-функциями.</string>
@@ -186,12 +178,8 @@
     <string name="voucher_redeem_dialog_title">Промокод</string>
     <string name="voucher_redeem_dialog_message">Введите свой промокод</string>
     <string name="voucher_redeem_dialog_cta">Использовать</string>
-    <string name="voucher_redeem_dialog_loading_title">Использование</string>
-    <string name="voucher_redeem_dialog_loading_message">Пожалуйста, подождите</string>
     <string name="voucher_redeem_error_dialog_title">Ой…</string>
     <string name="voucher_redeem_error_code_invalid_dialog_message">Ваш промокод недействителен.</string>
-    <string name="voucher_redeem_error_no_internet_dialog_message">Ошибка сети. Проверьте подключение и повторите попытку.</string>
-    <string name="voucher_redeem_error_generic_dialog_message">Произошла ошибка, повторите попытку позже.</string>
 
     <string name="rating_popup_question_title">Что Вы думаете об EasyBudget?</string>
     <string name="rating_popup_question_message">Я разрабатываю это приложение в свободное время и предоставляю его бесплатно. Там могут быть вещи, которые нужно улучшить, и я был бы очень признателен за ваши отзывы.</string>
@@ -229,12 +217,8 @@
     <string name="onboarding_screen_4_message4">Благодарим Вас за использование EasyBudget и добро пожаловать :)</string>
     <string name="onboarding_screen_4_cta">Начнем!</string>
 
-    <string name="app_invite_title">Рассказать друзьям!</string>
     <string name="app_invite_message">Попробуйте EasyBudget: невероятно простое в использовании приложение для управления Вашим бюджетом!</string>
     <!-- 100 chars or less -->
-    <string name="app_invite_welcome_title">Добро пожаловать в EasyBudget</string>
-    <string name="app_invite_welcome_message">Похоже, друг рекомендовал Вам это приложение. Добро пожаловать на борт и не забудьте поблагодарить своего друга за этот отличный совет ;)</string>
-    <string name="app_invite_welcome_cta">Начать!</string>
 
     <string name="monthly_report_button_title">Месячный отчет</string>
     <string name="monthly_report_month_title_format">MMMM yyyy</string>
@@ -244,7 +228,5 @@
     <string name="revenues_total">Общая сумма доходов</string>
     <string name="balance">Баланс</string>
     <string name="monthly_report_no_entries_placeholder">Ничего за этот месяц.</string>
-    <string name="monthly_report_notif_notpremium_text">Новая функция для премиум-пользователей: Месячный отчет.\nПодбейте итог Ваших расходов и доходов за месяц. Открыть премиум-функции?</string>
-    <string name="monthly_report_notif_premium_text">Доступна наовая функция: Месячный отчет.\nПодбейте итог Ваших расходов и доходов за месяц. Нажмите, чтобы попробовать</string>
     <string name="monthly_report_hint">Тсс: Отсюда Вы можете получить доступ к месячным отчетам!</string>
 </resources>

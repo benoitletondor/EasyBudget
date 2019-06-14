@@ -30,5 +30,4 @@
     <dimen name="calendar_month_text_padding_bottom">3dp</dimen>
     <dimen name="calendar_weekdays_padding_top">10dp</dimen>
     <dimen name="calendar_weekdays_padding_bottom">0dp</dimen>
-    <dimen name="calendar_weekdays_border_bottom_height">1dp</dimen>
 </resources>

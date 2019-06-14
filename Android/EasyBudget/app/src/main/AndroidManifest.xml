@@ -116,9 +116,6 @@
         </service>
 
         <!-- Notif services -->
-        <service android:name=".notif.DailyNotifOptinService"/>
-        <service android:name=".notif.MonthlyReportNotifService"/>
-
         <receiver android:name=".notif.AppUpdateBroadcastReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>

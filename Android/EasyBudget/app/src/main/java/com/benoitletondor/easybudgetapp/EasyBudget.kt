@@ -22,8 +22,6 @@ import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.batch.android.Batch
 import com.batch.android.BatchActivityLifecycleHelper
@@ -34,13 +32,9 @@ import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.injection.appModule
 import com.benoitletondor.easybudgetapp.injection.viewModelModule
-import com.benoitletondor.easybudgetapp.notif.DailyNotifOptinService
-import com.benoitletondor.easybudgetapp.notif.MonthlyReportNotifService
 import com.benoitletondor.easybudgetapp.notif.NotificationsChannels.CHANNEL_DAILY_REMINDERS
 import com.benoitletondor.easybudgetapp.notif.NotificationsChannels.CHANNEL_MONTHLY_REMINDERS
 import com.benoitletondor.easybudgetapp.notif.NotificationsChannels.CHANNEL_NEW_FEATURES
-import com.benoitletondor.easybudgetapp.notif.hasDailyReminderOptinNotifBeenShow
-import com.benoitletondor.easybudgetapp.notif.hasUserSeenMonthlyReportNotif
 import com.benoitletondor.easybudgetapp.parameters.*
 import com.benoitletondor.easybudgetapp.push.PushService.Companion.DAILY_REMINDER_KEY
 import com.benoitletondor.easybudgetapp.push.PushService.Companion.MONTHLY_REMINDER_KEY
@@ -89,7 +83,7 @@ class EasyBudget : Application() {
         checkUpdateAction()
 
         // Crashlytics
-        if (BuildConfig.CRASHLYTICS_ACTIVATED) {
+        if ( BuildConfig.CRASHLYTICS_ACTIVATED ) {
             Fabric.with(this, Crashlytics())
 
             Crashlytics.setUserIdentifier(parameters.getLocalId())
@@ -297,26 +291,6 @@ class EasyBudget : Application() {
     }
 
     /**
-     * Show the 1.5 app update notification
-     */
-    private fun show1_5UpdateNotif() {
-        val notifBuilder = NotificationCompat.Builder(applicationContext, CHANNEL_NEW_FEATURES)
-            .setSmallIcon(R.drawable.ic_push)
-            .setContentTitle(resources.getString(R.string.app_name))
-            .setContentText(resources.getString(R.string.recurring_update_notification))
-            .setStyle(NotificationCompat.BigTextStyle().bigText(resources.getString(R.string.recurring_update_notification)))
-            .setColor(ContextCompat.getColor(applicationContext, R.color.accent))
-            .setAutoCancel(true)
-            .setContentIntent(PendingIntent.getActivity(
-                this,
-                0,
-                Intent(this, MainActivity::class.java),
-                PendingIntent.FLAG_CANCEL_CURRENT))
-
-        NotificationManagerCompat.from(applicationContext).notify(4014, notifBuilder.build())
-    }
-
-    /**
      * Set-up Batch SDK config + lifecycle
      */
     private fun setUpBatchSDK() {
@@ -398,24 +372,6 @@ class EasyBudget : Application() {
      */
     private fun onUpdate(previousVersion: Int, @Suppress("SameParameterValue") newVersion: Int) {
         Logger.debug("Update detected, from $previousVersion to $newVersion")
-
-        if (newVersion == BuildVersion.VERSION_1_2) {
-            if (iab.isUserPremium() && !parameters.hasDailyReminderOptinNotifBeenShow()) {
-                DailyNotifOptinService.showDailyReminderOptinNotif(applicationContext, parameters)
-            }
-        }
-
-        if (newVersion == BuildVersion.VERSION_1_3 && !parameters.hasUserSeenMonthlyReportNotif()) {
-            if (iab.isUserPremium()) {
-                MonthlyReportNotifService.showPremiumNotif(applicationContext, parameters)
-            } else {
-                MonthlyReportNotifService.showNotPremiumNotif(applicationContext, parameters)
-            }
-        }
-
-        if (newVersion == BuildVersion.VERSION_1_5_2) {
-            show1_5UpdateNotif()
-        }
     }
 
 // -------------------------------------->

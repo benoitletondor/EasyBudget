@@ -30,7 +30,6 @@ import com.benoitletondor.easybudgetapp.parameters.setUserHasCompleteRating
 
 /**
  * Rating popup that ask user for feedback and redirect them to the PlayStore
- * TODO send data to GA
  *
  * @author Benoit LETONDOR
  */
