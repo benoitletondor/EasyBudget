@@ -47,7 +47,7 @@ class Onboarding3Fragment : OnboardingFragment(), CoroutineScope by MainScope() 
 
     private val amountValue: Double
         get() {
-            val valueString = onboarding_screen3_initial_amount_money_tv.text.toString()
+            val valueString = onboarding_screen3_initial_amount_et.text.toString()
 
             return try {
                 if ( "" == valueString || "-" == valueString) 0.0 else java.lang.Double.valueOf(valueString)
