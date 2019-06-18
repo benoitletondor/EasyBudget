@@ -68,7 +68,11 @@ class Onboarding3Fragment : OnboardingFragment(), CoroutineScope by MainScope() 
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val v = inflater.inflate(R.layout.fragment_onboarding3, container, false)
+        return inflater.inflate(R.layout.fragment_onboarding3, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         launch {
             val amount = withContext(Dispatchers.Default) {
@@ -122,8 +126,6 @@ class Onboarding3Fragment : OnboardingFragment(), CoroutineScope by MainScope() 
         }
 
         setButtonText()
-
-        return v
     }
 
     override fun onDestroy() {

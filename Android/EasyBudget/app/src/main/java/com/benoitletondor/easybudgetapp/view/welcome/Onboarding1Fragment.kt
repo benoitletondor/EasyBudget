@@ -35,12 +35,14 @@ class Onboarding1Fragment : OnboardingFragment() {
         get() = R.color.primary_dark
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val v = inflater.inflate(R.layout.fragment_onboarding1, container, false)
+        return inflater.inflate(R.layout.fragment_onboarding1, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         onboarding_screen1_next_button.setOnClickListener {
             next(onboarding_screen1_next_button)
         }
-
-        return v
     }
 }

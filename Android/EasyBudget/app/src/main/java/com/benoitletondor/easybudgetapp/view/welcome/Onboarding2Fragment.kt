@@ -50,11 +50,11 @@ class Onboarding2Fragment : OnboardingFragment() {
 // ------------------------------------->
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val v = inflater.inflate(R.layout.fragment_onboarding2, container, false)
+        return inflater.inflate(R.layout.fragment_onboarding2, container, false)
+    }
 
-        onboarding_screen2_next_button.setOnClickListener {
-            next()
-        }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         selectedCurrency = parameters.getUserCurrency()
         setNextButtonText()
@@ -71,9 +71,11 @@ class Onboarding2Fragment : OnboardingFragment() {
             }
         }
 
-        LocalBroadcastManager.getInstance(v.context).registerReceiver(receiver, filter)
+        LocalBroadcastManager.getInstance(view.context).registerReceiver(receiver, filter)
 
-        return v
+        onboarding_screen2_next_button.setOnClickListener {
+            next()
+        }
     }
 
     override fun onDestroyView() {

@@ -85,7 +85,7 @@ private const val RATING_COMPLETED_PARAMETERS_KEY = "rating_completed"
 private const val USER_SAW_MONTHLY_REPORT_HINT_PARAMETERS_KEY = "user_saw_monthly_report_hint"
 
 fun Parameters.getInitTimestamp(): Long {
-    return getLong(INIT_DATE_PARAMETERS_KEY, System.currentTimeMillis())
+    return getLong(INIT_DATE_PARAMETERS_KEY, 0L)
 }
 
 fun Parameters.setInitTimestamp(value: Long) {
