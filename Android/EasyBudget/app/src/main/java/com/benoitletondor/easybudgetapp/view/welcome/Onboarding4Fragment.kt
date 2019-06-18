@@ -22,6 +22,7 @@ import android.view.View
 import android.view.ViewGroup
 
 import com.benoitletondor.easybudgetapp.R
+import kotlinx.android.synthetic.main.fragment_onboarding4.*
 
 /**
  * Onboarding step 4 fragment
@@ -34,12 +35,14 @@ class Onboarding4Fragment : OnboardingFragment() {
         get() = R.color.primary_dark
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val v = inflater.inflate(R.layout.fragment_onboarding4, container, false)
+        return inflater.inflate(R.layout.fragment_onboarding4, container, false)
+    }
 
-        v.findViewById<View>(R.id.onboarding_screen4_next_button).setOnClickListener {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        onboarding_screen4_next_button.setOnClickListener {
             done()
         }
-
-        return v
     }
 }

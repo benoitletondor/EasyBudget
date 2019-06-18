@@ -67,8 +67,11 @@ class Onboarding3Fragment : OnboardingFragment() {
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
-        val v = inflater.inflate(R.layout.fragment_onboarding3, container, false)
+        return inflater.inflate(R.layout.fragment_onboarding3, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         val amount = -db.getBalanceForDay(Date())
 
@@ -113,8 +116,6 @@ class Onboarding3Fragment : OnboardingFragment() {
         }
 
         setButtonText()
-
-        return v
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
