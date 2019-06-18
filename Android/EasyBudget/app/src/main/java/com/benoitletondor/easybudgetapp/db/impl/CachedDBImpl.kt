@@ -3,6 +3,7 @@ package com.benoitletondor.easybudgetapp.db.impl
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.db.DB
+import com.benoitletondor.easybudgetapp.helper.Logger
 import kotlinx.coroutines.*
 import java.util.*
 import java.util.concurrent.Executor
@@ -133,6 +134,8 @@ class CachedDBImpl(private val wrappedDB: DB,
      * Instantly wipe all cached data
      */
     private fun wipeAll() {
+        Logger.debug("DBCache: Wipe all")
+
         synchronized(cacheStorage.balances) {
             cacheStorage.balances.clear()
         }
@@ -149,6 +152,8 @@ class CachedDBImpl(private val wrappedDB: DB,
      */
     private fun refreshCacheForDay(date: Date) {
         async {
+            Logger.debug("DBCache: Refreshing for day: $date")
+
             synchronized(cacheStorage.balances) {
                 cacheStorage.balances.clear() // TODO be smarter than delete all ?
             }
@@ -176,6 +181,8 @@ class CachedDBImpl(private val wrappedDB: DB,
             // Save the month we wanna load cache for
             val month = cal.get(Calendar.MONTH)
 
+            Logger.debug("DBCache: Caching expenses for month: $month")
+
             // Iterate over day of month (while are still on that month)
             while (cal.get(Calendar.MONTH) == month) {
                 val date = cal.time
@@ -187,6 +194,8 @@ class CachedDBImpl(private val wrappedDB: DB,
 
                 cal.add(Calendar.DAY_OF_MONTH, 1)
             }
+
+            Logger.debug("DBCache: Expenses cached for month: $month")
         }
     }
 
@@ -206,6 +215,8 @@ class CachedDBImpl(private val wrappedDB: DB,
             // Save the month we wanna load cache for
             val month = cal.get(Calendar.MONTH)
 
+            Logger.debug("DBCache: Caching balance for month: $month")
+
             // Iterate over day of month (while are still on that month)
             while (cal.get(Calendar.MONTH) == month) {
                 val date = cal.time
@@ -217,6 +228,8 @@ class CachedDBImpl(private val wrappedDB: DB,
 
                 cal.add(Calendar.DAY_OF_MONTH, 1)
             }
+
+            Logger.debug("DBCache: Balance cached for month: $month")
         }
     }
 
