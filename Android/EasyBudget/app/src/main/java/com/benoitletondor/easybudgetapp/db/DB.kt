@@ -1,4 +1,4 @@
-package com.benoitletondor.easybudgetapp.model.db
+package com.benoitletondor.easybudgetapp.db
 
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense

@@ -16,7 +16,7 @@
 
 package com.benoitletondor.easybudgetapp.view.main.calendar
 
-import com.benoitletondor.easybudgetapp.model.db.DB
+import com.benoitletondor.easybudgetapp.db.DB
 import com.roomorama.caldroid.CaldroidFragment
 import com.roomorama.caldroid.CaldroidGridAdapter
 import org.koin.android.ext.android.inject

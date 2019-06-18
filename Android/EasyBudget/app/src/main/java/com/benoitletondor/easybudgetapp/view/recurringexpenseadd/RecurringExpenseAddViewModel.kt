@@ -7,7 +7,7 @@ import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.helper.SingleLiveEvent
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
-import com.benoitletondor.easybudgetapp.model.db.DB
+import com.benoitletondor.easybudgetapp.db.DB
 import kotlinx.coroutines.launch
 import java.util.*
 import com.benoitletondor.easybudgetapp.model.RecurringExpense

@@ -5,11 +5,11 @@ import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.iab.IabImpl
 import com.benoitletondor.easybudgetapp.model.Expense
-import com.benoitletondor.easybudgetapp.model.db.DB
-import com.benoitletondor.easybudgetapp.model.db.impl.CachedDBImpl
-import com.benoitletondor.easybudgetapp.model.db.impl.CacheDBStorage
-import com.benoitletondor.easybudgetapp.model.db.impl.DBImpl
-import com.benoitletondor.easybudgetapp.model.db.impl.RoomDB
+import com.benoitletondor.easybudgetapp.db.DB
+import com.benoitletondor.easybudgetapp.db.impl.CachedDBImpl
+import com.benoitletondor.easybudgetapp.db.impl.CacheDBStorage
+import com.benoitletondor.easybudgetapp.db.impl.DBImpl
+import com.benoitletondor.easybudgetapp.db.impl.RoomDB
 import org.koin.dsl.module
 import java.util.*
 import java.util.concurrent.Executor

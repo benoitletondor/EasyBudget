@@ -1,8 +1,8 @@
-package com.benoitletondor.easybudgetapp.model.db.impl
+package com.benoitletondor.easybudgetapp.db.impl
 
 import androidx.room.*
-import com.benoitletondor.easybudgetapp.model.db.impl.entity.ExpenseEntity
-import com.benoitletondor.easybudgetapp.model.db.impl.entity.RecurringExpenseEntity
+import com.benoitletondor.easybudgetapp.db.impl.entity.ExpenseEntity
+import com.benoitletondor.easybudgetapp.db.impl.entity.RecurringExpenseEntity
 import java.util.*
 
 @Dao

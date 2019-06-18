@@ -1,11 +1,11 @@
-package com.benoitletondor.easybudgetapp.model.db.impl
+package com.benoitletondor.easybudgetapp.db.impl
 
 import android.content.Context
 import androidx.room.*
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.benoitletondor.easybudgetapp.model.db.impl.entity.ExpenseEntity
-import com.benoitletondor.easybudgetapp.model.db.impl.entity.RecurringExpenseEntity
+import com.benoitletondor.easybudgetapp.db.impl.entity.ExpenseEntity
+import com.benoitletondor.easybudgetapp.db.impl.entity.RecurringExpenseEntity
 import java.util.*
 
 @Database(exportSchema = false,

@@ -24,7 +24,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 
 import com.benoitletondor.easybudgetapp.R
-import com.benoitletondor.easybudgetapp.model.db.DB
+import com.benoitletondor.easybudgetapp.db.DB
 import com.roomorama.caldroid.CaldroidGridAdapter
 
 import java.util.Date

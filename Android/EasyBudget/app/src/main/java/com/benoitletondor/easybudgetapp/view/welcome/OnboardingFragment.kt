@@ -22,7 +22,7 @@ import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import android.view.View
 
-import com.benoitletondor.easybudgetapp.model.db.DB
+import com.benoitletondor.easybudgetapp.db.DB
 import org.koin.android.ext.android.inject
 
 /**

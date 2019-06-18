@@ -1,4 +1,4 @@
-package com.benoitletondor.easybudgetapp.model.db.impl.entity
+package com.benoitletondor.easybudgetapp.db.impl.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

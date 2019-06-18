@@ -1,8 +1,8 @@
-package com.benoitletondor.easybudgetapp.model.db.impl
+package com.benoitletondor.easybudgetapp.db.impl
 
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
-import com.benoitletondor.easybudgetapp.model.db.DB
+import com.benoitletondor.easybudgetapp.db.DB
 import kotlinx.coroutines.*
 import java.util.*
 import java.util.concurrent.Executor
