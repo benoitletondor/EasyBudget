@@ -20,7 +20,7 @@ val appModule = module {
 
     single<Iab> { IabImpl(get(), get()) }
 
-    single { object : CacheDBStorage {
+    single<CacheDBStorage> { object : CacheDBStorage {
         override val expenses: MutableMap<Date, List<Expense>> = ArrayMap()
         override val balances: MutableMap<Date, Double> = ArrayMap()
     } }

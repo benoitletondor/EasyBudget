@@ -21,7 +21,7 @@ interface ExpenseDao {
     suspend fun getExpensesForMonth(monthStartDate: Date, monthEndDate: Date): List<ExpenseEntity>
 
     @Query("SELECT SUM(amount) FROM expense WHERE date <= :dayEndDate")
-    suspend fun getBalanceForDay(dayEndDate: Date): Double
+    suspend fun getBalanceForDay(dayEndDate: Date): Long?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun persistRecurringExpense(recurringExpenseEntity: RecurringExpenseEntity): Long

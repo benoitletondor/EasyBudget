@@ -157,7 +157,6 @@ object CurrencyHelper {
      * @param value the double value
      * @return the corresponding int value (double * 100)
      */
-    @JvmStatic
     fun getDBValueForDouble(value: Double): Long {
         val stringValue = getFormattedAmountValue(value)
         if (BuildConfig.DEBUG_LOG) {

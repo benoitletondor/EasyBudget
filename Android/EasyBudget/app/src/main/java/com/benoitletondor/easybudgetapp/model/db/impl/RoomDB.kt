@@ -9,7 +9,7 @@ import com.benoitletondor.easybudgetapp.model.db.impl.entity.RecurringExpenseEnt
 import java.util.*
 
 @Database(exportSchema = false,
-          version = 2,
+          version = 4,
           entities = [
               ExpenseEntity::class,
               RecurringExpenseEntity::class
@@ -22,14 +22,14 @@ abstract class RoomDB : RoomDatabase() {
     companion object {
         fun create(context: Context): RoomDB = Room
             .databaseBuilder(context, RoomDB::class.java, "easybudget.db")
-            .addMigrations(initialMigration)
+            .addMigrations(initialMigrationToRoom)
             .build()
     }
 }
 
 private class TimestampConverters {
     @TypeConverter
-    fun fromTimestamp(value: Long?): Date? {
+    fun dateFromTimestamp(value: Long?): Date? {
         return value?.let { Date(it) }
     }
 
@@ -39,8 +39,8 @@ private class TimestampConverters {
     }
 }
 
-private val initialMigration = object : Migration(1, 2) {
+private val initialMigrationToRoom = object : Migration(3, 4) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        // No-op
+        // No-op, simple migration from SQLite to Room
     }
 }

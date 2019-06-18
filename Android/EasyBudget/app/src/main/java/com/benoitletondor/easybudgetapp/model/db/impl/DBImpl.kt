@@ -1,5 +1,6 @@
 package com.benoitletondor.easybudgetapp.model.db.impl
 
+import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.model.db.DB
@@ -43,7 +44,9 @@ class DBImpl(private val roomDB: RoomDB) : DB {
 
     override suspend fun getBalanceForDay(dayDate: Date): Double {
         val (_, endDate) = dayDate.getDayDatesRange()
-        return roomDB.expenseDao().getBalanceForDay(endDate)
+        val sum = roomDB.expenseDao().getBalanceForDay(endDate)
+
+        return if( sum != null ) sum / 100.0 else 0.0
     }
 
     override suspend fun persistRecurringExpense(recurringExpense: RecurringExpense): RecurringExpense {
@@ -127,7 +130,7 @@ private suspend fun ExpenseEntity.toExpense(db: DB): Expense {
 private fun Expense.toExpenseEntity() = ExpenseEntity(
     id,
     title,
-    amount,
+    CurrencyHelper.getDBValueForDouble(amount),
     date,
     associatedRecurringExpense?.id
 )
@@ -135,7 +138,7 @@ private fun Expense.toExpenseEntity() = ExpenseEntity(
 private fun RecurringExpense.toRecurringExpenseEntity() = RecurringExpenseEntity (
     id,
     title,
-    originalAmount,
+    CurrencyHelper.getDBValueForDouble(originalAmount),
     recurringDate,
     modified,
     type.name
