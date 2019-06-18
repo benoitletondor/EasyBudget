@@ -17,7 +17,6 @@
 package com.benoitletondor.easybudgetapp.helper
 
 import android.content.Context
-import androidx.core.util.Pair
 
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.parameters.Parameters
@@ -28,7 +27,6 @@ import java.util.ArrayList
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-import java.util.TimeZone
 
 /**
  * Helper to work with dates
@@ -36,67 +34,6 @@ import java.util.TimeZone
  * @author Benoit LETONDOR
  */
 object DateHelper {
-    /**
-     * Remove hour, minutes, seconds and ms data from a date.
-     *
-     * @return a new cleaned date
-     */
-    @JvmStatic
-    fun cleanDate(date: Date): Date {
-        val cal = Calendar.getInstance()
-        cal.time = date
-
-        cal.set(Calendar.MILLISECOND, 0)
-        cal.set(Calendar.SECOND, 0)
-        cal.set(Calendar.MINUTE, 0)
-        cal.set(Calendar.HOUR_OF_DAY, 0)
-
-        return cal.time
-    }
-
-    /**
-     * Get the timestamp range for a given day starting at GMT - 11 finishing at GMT + 12
-     *
-     * @param date the day
-     * @return a range of timestamps
-     */
-    @JvmStatic
-    fun getTimestampRangeForDay(date: Date): Pair<Long, Long> {
-        val cal = Calendar.getInstance()
-        cal.time = date
-        cal.timeZone = TimeZone.getTimeZone("GMT")
-
-        cal.set(Calendar.MILLISECOND, 0)
-        cal.set(Calendar.SECOND, 0)
-        cal.set(Calendar.MINUTE, 0)
-        cal.set(Calendar.HOUR_OF_DAY, 0)
-
-        cal.add(Calendar.HOUR_OF_DAY, -11)
-        val start = cal.timeInMillis
-        cal.add(Calendar.HOUR_OF_DAY, 23)
-        val end = cal.timeInMillis
-
-        return Pair(start, end)
-    }
-
-    /**
-     * Remove hour, minutes, seconds and ms data from a date and return its GMT value
-     *
-     * @return a cleaned value of this date at GMT
-     */
-    @JvmStatic
-    fun cleanGMTDate(date: Date): Date {
-        val cal = Calendar.getInstance()
-        cal.time = date
-        cal.timeZone = TimeZone.getTimeZone("GMT")
-
-        cal.set(Calendar.MILLISECOND, 0)
-        cal.set(Calendar.SECOND, 0)
-        cal.set(Calendar.MINUTE, 0)
-        cal.set(Calendar.HOUR_OF_DAY, 0)
-
-        return cal.time
-    }
 
     /**
      * Get the list of months available for the user for the monthly report view.

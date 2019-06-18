@@ -57,13 +57,13 @@ class MainViewModel(private val db: DB,
 
     fun onDeleteExpenseClicked(expense: Expense) {
         viewModelScope.launch {
-            val expenseDeleted = withContext(Dispatchers.Default) {
-                db.deleteExpense(expense)
-            }
+            try {
+                withContext(Dispatchers.Default) {
+                    db.deleteExpense(expense)
+                }
 
-            if( expenseDeleted ) {
                 expenseDeletionSuccessStream.value = Pair(expense, getBalanceForDay(selectedDate))
-            } else {
+            } catch (t: Throwable) {
                 expenseDeletionErrorStream.value = expense
             }
         }
@@ -71,14 +71,14 @@ class MainViewModel(private val db: DB,
 
     fun onExpenseDeletionCancelled(expense: Expense) {
         viewModelScope.launch {
-            val expensePersisted = withContext(Dispatchers.Default) {
-                db.persistExpense(expense, true)
-            }
+            try {
+                val expensePersisted = withContext(Dispatchers.Default) {
+                    db.persistExpense(expense)
+                }
 
-            if( expensePersisted != null ) {
                 expenseRecoverySuccessStream.value = expensePersisted
                 refreshDataForDate(selectedDate)
-            } else {
+            } catch (t: Throwable) {
                 expenseRecoveryErrorStream.value = expense
             }
         }
@@ -108,13 +108,15 @@ class MainViewModel(private val db: DB,
                     RecurringExpenseDeleteType.ALL -> {
                         val expensesToRestore = db.getAllExpenseForRecurringExpense(associatedRecurringExpense)
 
-                        val expensesDeleted = db.deleteAllExpenseForRecurringExpense(associatedRecurringExpense)
-                        if (!expensesDeleted) {
+                        try {
+                            db.deleteAllExpenseForRecurringExpense(associatedRecurringExpense)
+                        } catch (t: Throwable) {
                             return@withContext null
                         }
 
-                        val recurringExpenseDeleted = db.deleteRecurringExpense(associatedRecurringExpense)
-                        if (!recurringExpenseDeleted) {
+                        try {
+                            db.deleteRecurringExpense(associatedRecurringExpense)
+                        } catch (t: Throwable) {
                             return@withContext null
                         }
 
@@ -123,8 +125,9 @@ class MainViewModel(private val db: DB,
                     RecurringExpenseDeleteType.FROM -> {
                         val expensesToRestore = db.getAllExpensesForRecurringExpenseFromDate(associatedRecurringExpense, expense.date)
 
-                        val expensesDeleted = db.deleteAllExpenseForRecurringExpenseFromDate(associatedRecurringExpense, expense.date)
-                        if (!expensesDeleted) {
+                        try {
+                            db.deleteAllExpenseForRecurringExpenseFromDate(associatedRecurringExpense, expense.date)
+                        } catch (t: Throwable) {
                             return@withContext null
                         }
 
@@ -133,8 +136,9 @@ class MainViewModel(private val db: DB,
                     RecurringExpenseDeleteType.TO -> {
                         val expensesToRestore = db.getAllExpensesForRecurringExpenseBeforeDate(associatedRecurringExpense, expense.date)
 
-                        val expensesDeleted = db.deleteAllExpenseForRecurringExpenseBeforeDate(associatedRecurringExpense, expense.date)
-                        if (!expensesDeleted) {
+                        try {
+                            db.deleteAllExpenseForRecurringExpenseBeforeDate(associatedRecurringExpense, expense.date)
+                        } catch (t: Throwable) {
                             return@withContext null
                         }
 
@@ -143,8 +147,9 @@ class MainViewModel(private val db: DB,
                     RecurringExpenseDeleteType.ONE -> {
                         val expensesToRestore = listOf(expense)
 
-                        val expenseDeleted = db.deleteExpense(expense)
-                        if (!expenseDeleted) {
+                        try {
+                            db.deleteExpense(expense)
+                        } catch (t: Throwable) {
                             return@withContext null
                         }
 
@@ -169,11 +174,11 @@ class MainViewModel(private val db: DB,
             recurringExpenseRestoreProgressStream.value = RecurringExpenseRestoreProgressState.Starting(recurringExpense, expensesToRestore)
 
             if( restoreRecurring ) {
-                val recurringExpenseAdd = withContext(Dispatchers.Default) {
-                    db.addRecurringExpense(recurringExpense)
-                }
-
-                if ( recurringExpenseAdd == null ) {
+                try {
+                    withContext(Dispatchers.Default) {
+                        db.persistRecurringExpense(recurringExpense)
+                    }
+                } catch (t: Throwable) {
                     recurringExpenseRestoreProgressStream.postValue(RecurringExpenseRestoreProgressState.ErrorIO(recurringExpense, expensesToRestore))
                     return@launch
                 }
@@ -181,7 +186,9 @@ class MainViewModel(private val db: DB,
 
             val expensesAdd = withContext(Dispatchers.Default) {
                 for (expense in expensesToRestore) {
-                    if ( db.persistExpense(expense, true) == null ) {
+                    try {
+                        db.persistExpense(expense)
+                    } catch (t: Throwable) {
                         return@withContext false
                     }
                 }
@@ -200,7 +207,7 @@ class MainViewModel(private val db: DB,
     }
 
     fun onChangeMonth(time: Date) {
-        db.preloadMonth(time)
+        // No-op
     }
 
     fun onAdjustCurrentBalanceClicked() {
@@ -300,7 +307,7 @@ class MainViewModel(private val db: DB,
         }
     }
 
-    private fun getBalanceForDay(date: Date): Double {
+    private suspend fun getBalanceForDay(date: Date): Double {
         var balance = 0.0 // Just to keep a positive number if balance == 0
         balance -= db.getBalanceForDay(date)
 

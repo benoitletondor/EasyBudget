@@ -30,6 +30,7 @@ import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import kotlinx.android.synthetic.main.fragment_onboarding3.*
+import kotlinx.coroutines.*
 import org.koin.android.ext.android.inject
 import java.util.*
 
@@ -38,7 +39,7 @@ import java.util.*
  *
  * @author Benoit LETONDOR
  */
-class Onboarding3Fragment : OnboardingFragment() {
+class Onboarding3Fragment : OnboardingFragment(), CoroutineScope by MainScope() {
     private val parameters: Parameters by inject()
 
     override val statusBarColor: Int
@@ -67,14 +68,18 @@ class Onboarding3Fragment : OnboardingFragment() {
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
         val v = inflater.inflate(R.layout.fragment_onboarding3, container, false)
 
-        val amount = -db.getBalanceForDay(Date())
+        launch {
+            val amount = withContext(Dispatchers.Default) {
+                -db.getBalanceForDay(Date())
+            }
+
+            onboarding_screen3_initial_amount_et.setText(if (amount == 0.0) "0" else amount.toString())
+        }
 
         setCurrency()
 
-        onboarding_screen3_initial_amount_et.setText(if (amount == 0.0) "0" else amount.toString())
         UIHelper.preventUnsupportedInputForDecimals(onboarding_screen3_initial_amount_et)
         onboarding_screen3_initial_amount_et.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
@@ -91,30 +96,40 @@ class Onboarding3Fragment : OnboardingFragment() {
         })
 
         onboarding_screen3_next_button.setOnClickListener {
-            val currentBalance = -db.getBalanceForDay(Date())
-            val newBalance = amountValue
+            launch {
+                withContext(Dispatchers.Default) {
+                    val currentBalance = -db.getBalanceForDay(Date())
+                    val newBalance = amountValue
 
-            if (newBalance != currentBalance) {
-                val diff = newBalance - currentBalance
+                    if (newBalance != currentBalance) {
+                        val diff = newBalance - currentBalance
 
-                val expense = Expense(resources.getString(R.string.adjust_balance_expense_title), -diff, Date())
-                db.persistExpense(expense)
+                        val expense = Expense(resources.getString(R.string.adjust_balance_expense_title), -diff, Date())
+                        db.persistExpense(expense)
+                    }
+                }
+
+                // Hide keyboard
+                try {
+                    val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                    imm?.hideSoftInputFromWindow(onboarding_screen3_initial_amount_et.windowToken, 0)
+                } catch (e: Exception) {
+                    Logger.error("Error while hiding keyboard", e)
+                }
+
+                next(onboarding_screen3_next_button)
             }
-
-            // Hide keyboard
-            try {
-                val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-                imm?.hideSoftInputFromWindow(onboarding_screen3_initial_amount_et.windowToken, 0)
-            } catch (e: Exception) {
-                Logger.error("Error while hiding keyboard", e)
-            }
-
-            next(onboarding_screen3_next_button)
         }
 
         setButtonText()
 
         return v
+    }
+
+    override fun onDestroy() {
+        cancel()
+
+        super.onDestroy()
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {

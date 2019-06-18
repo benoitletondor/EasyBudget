@@ -582,8 +582,8 @@ class MainActivity : AppCompatActivity() {
             args.putInt(CaldroidFragment.YEAR, cal.get(Calendar.YEAR))
             args.putBoolean(CaldroidFragment.ENABLE_SWIPE, true)
             args.putBoolean(CaldroidFragment.SIX_WEEKS_IN_CALENDAR, false)
-            args.putInt(CalendarFragment.START_DAY_OF_WEEK, parameters.getCaldroidFirstDayOfWeek())
-            args.putBoolean(CalendarFragment.ENABLE_CLICK_ON_DISABLED_DATES, false)
+            args.putInt(CaldroidFragment.START_DAY_OF_WEEK, parameters.getCaldroidFirstDayOfWeek())
+            args.putBoolean(CaldroidFragment.ENABLE_CLICK_ON_DISABLED_DATES, false)
             args.putInt(CaldroidFragment.THEME_RESOURCE, R.style.caldroid_style)
 
             calendarFragment.arguments = args
@@ -736,7 +736,7 @@ class MainActivity : AppCompatActivity() {
         val fabNewExpense = findViewById<FloatingActionButton>(R.id.fab_new_expense)
         fabNewExpense.setOnClickListener {
             val startIntent = Intent(this@MainActivity, ExpenseEditActivity::class.java)
-            startIntent.putExtra("date", calendarFragment.selectedDate.time)
+            startIntent.putExtra("date", calendarFragment.getSelectedDate().time)
 
             if ( parameters.areAnimationsEnabled() ) {
                 startIntent.putExtra(ANIMATE_TRANSITION_KEY, true)
@@ -752,7 +752,7 @@ class MainActivity : AppCompatActivity() {
         val fabNewRecurringExpense = findViewById<FloatingActionButton>(R.id.fab_new_recurring_expense)
         fabNewRecurringExpense.setOnClickListener {
             val startIntent = Intent(this@MainActivity, RecurringExpenseAddActivity::class.java)
-            startIntent.putExtra("dateStart", calendarFragment.selectedDate.time)
+            startIntent.putExtra("dateStart", calendarFragment.getSelectedDate().time)
 
             if ( parameters.areAnimationsEnabled() ) {
                 startIntent.putExtra(ANIMATE_TRANSITION_KEY, true)
