@@ -4,22 +4,17 @@ import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.Logger
-import kotlinx.coroutines.*
+import kotlinx.coroutines.runBlocking
 import java.util.*
 import java.util.concurrent.Executor
-import kotlin.coroutines.CoroutineContext
 
 @Suppress("DeferredResultUnused")
 class CachedDBImpl(private val wrappedDB: DB,
                    private val cacheStorage: CacheDBStorage,
-                   private val executor: Executor) : DB, CoroutineScope {
-
-    override val coroutineContext: CoroutineContext
-        get() = executor.asCoroutineDispatcher() + SupervisorJob()
+                   private val executor: Executor) : DB {
 
     override fun close() {
         wrappedDB.close()
-        cancel()
     }
 
     override suspend fun persistExpense(expense: Expense): Expense {
@@ -151,14 +146,14 @@ class CachedDBImpl(private val wrappedDB: DB,
      * @param date cleaned date for the day
      */
     private fun refreshCacheForDay(date: Date) {
-        async {
+        executor.execute {
             Logger.debug("DBCache: Refreshing for day: $date")
 
             synchronized(cacheStorage.balances) {
                 cacheStorage.balances.clear() // TODO be smarter than delete all ?
             }
 
-            val loadedExpenses = getExpensesForDayWithoutCache(date)
+            val loadedExpenses = runBlocking { getExpensesForDayWithoutCache(date) }
             synchronized(cacheStorage.expenses) {
                 cacheStorage.expenses.put(date.cleanGMTDate(), loadedExpenses)
             }
@@ -166,7 +161,7 @@ class CachedDBImpl(private val wrappedDB: DB,
     }
 
     private fun cacheExpensesMonth(monthDate: Date) {
-        async {
+        executor.execute {
             // Init a calendar to the given date, setting the day of month to 1
             val cal = Calendar.getInstance()
             cal.time = monthDate.clean()
@@ -174,7 +169,7 @@ class CachedDBImpl(private val wrappedDB: DB,
 
             synchronized(cacheStorage.expenses) {
                 if (cacheStorage.expenses.containsKey(cal.time.cleanGMTDate())) {
-                    return@async
+                    return@execute
                 }
             }
 
@@ -186,7 +181,7 @@ class CachedDBImpl(private val wrappedDB: DB,
             // Iterate over day of month (while are still on that month)
             while (cal.get(Calendar.MONTH) == month) {
                 val date = cal.time
-                val expensesForDay = getExpensesForDayWithoutCache(date)
+                val expensesForDay = runBlocking { getExpensesForDayWithoutCache(date) }
 
                 synchronized(cacheStorage.expenses) {
                     cacheStorage.expenses.put(date.cleanGMTDate(), expensesForDay)
@@ -200,7 +195,7 @@ class CachedDBImpl(private val wrappedDB: DB,
     }
 
     private fun cacheBalanceForMonth(monthDate: Date) {
-        async {
+        executor.execute {
             // Init a calendar to the given date, setting the day of month to 1
             val cal = Calendar.getInstance()
             cal.time = monthDate.clean()
@@ -208,7 +203,7 @@ class CachedDBImpl(private val wrappedDB: DB,
 
             synchronized(cacheStorage.balances) {
                 if (cacheStorage.balances.containsKey(cal.time.cleanGMTDate())) {
-                    return@async
+                    return@execute
                 }
             }
 
@@ -220,7 +215,7 @@ class CachedDBImpl(private val wrappedDB: DB,
             // Iterate over day of month (while are still on that month)
             while (cal.get(Calendar.MONTH) == month) {
                 val date = cal.time
-                val balanceForDay = getBalanceForDayWithoutCache(date)
+                val balanceForDay = runBlocking { getBalanceForDayWithoutCache(date) }
 
                 synchronized(cacheStorage.balances) {
                     cacheStorage.balances.put(date.cleanGMTDate(), balanceForDay)
