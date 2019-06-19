@@ -28,4 +28,6 @@ val appModule = module {
     single<Executor> { Executors.newSingleThreadExecutor() }
 
     factory<DB> { CachedDBImpl(DBImpl(RoomDB.create(get())), get(), get()) }
+
+    factory { CachedDBImpl(DBImpl(RoomDB.create(get())), get(), get()) }
 }
