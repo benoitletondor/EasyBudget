@@ -16,26 +16,27 @@ class ExpenseEditViewModel(private val db: DB) : ViewModel() {
      * Expense that is being edited (will be null if it's a new one)
      */
     private var expense: Expense? = null
-    val dateLiveData = MutableLiveData<Date>()
-    val editTypeLiveData = MutableLiveData<Pair<Boolean, Boolean>>()
-    val existingExpenseStream = SingleLiveEvent<Pair<String, Double>?>()
-    val finishStream = MutableLiveData<Unit>()
+
+    val expenseDateLiveData = MutableLiveData<Date>()
+    val editTypeLiveData = MutableLiveData<ExpenseEditType>()
+    val existingExpenseEventStream = SingleLiveEvent<ExistingExpenseData?>()
+    val finishEventStream = MutableLiveData<Unit>()
 
     fun initWithDateAndExpense(date: Date, expense: Expense?) {
         this.expense = expense
-        this.dateLiveData.value = expense?.date ?: date
-        this.editTypeLiveData.value = Pair(expense?.isRevenue() ?: false, expense != null)
+        this.expenseDateLiveData.value = expense?.date ?: date
+        this.editTypeLiveData.value = ExpenseEditType(expense?.isRevenue() ?: false, expense != null)
 
-        existingExpenseStream.value = if( expense != null ) Pair(expense.title, expense.amount) else null
+        existingExpenseEventStream.value = if( expense != null ) ExistingExpenseData(expense.title, expense.amount) else null
     }
 
     fun onExpenseRevenueValueChanged(isRevenue: Boolean) {
-        editTypeLiveData.value = Pair(isRevenue, expense != null)
+        editTypeLiveData.value = ExpenseEditType(isRevenue, expense != null)
     }
 
     fun onSave(value: Double, description: String) {
-        val isRevenue = editTypeLiveData.value?.first ?: return
-        val date = dateLiveData.value ?: return
+        val isRevenue = editTypeLiveData.value?.isRevenue ?: return
+        val date = expenseDateLiveData.value ?: return
 
         viewModelScope.launch {
             withContext(Dispatchers.Default) {
@@ -48,11 +49,15 @@ class ExpenseEditViewModel(private val db: DB) : ViewModel() {
                 db.persistExpense(expense)
             }
 
-            finishStream.value = null
+            finishEventStream.value = null
         }
     }
 
     fun onDateChanged(date: Date) {
-        this.dateLiveData.value = date
+        this.expenseDateLiveData.value = date
     }
 }
+
+data class ExpenseEditType(val isRevenue: Boolean, val editing: Boolean)
+
+data class ExistingExpenseData(val title: String, val amount: Double)

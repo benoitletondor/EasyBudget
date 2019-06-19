@@ -14,7 +14,7 @@ class MonthlyReportBaseViewModel(private val parameters: Parameters) : ViewModel
     /**
      * The current selected position
      */
-    val selectedPositionLiveData = MutableLiveData<Triple<Int, Date, Boolean>>()
+    val selectedPositionLiveData = MutableLiveData<MonthlyReportSelectedPosition>()
     val datesLiveData = MutableLiveData<List<Date>>()
 
     fun loadData(fromNotification: Boolean) {
@@ -25,9 +25,9 @@ class MonthlyReportBaseViewModel(private val parameters: Parameters) : ViewModel
 
             datesLiveData.value = dates
             if( !fromNotification || dates.size == 1) {
-                selectedPositionLiveData.value = Triple(dates.size - 1, dates[dates.size - 1], true)
+                selectedPositionLiveData.value = MonthlyReportSelectedPosition(dates.size - 1, dates[dates.size - 1], true)
             } else {
-                selectedPositionLiveData.value = Triple(dates.size - 2, dates[dates.size - 2], false)
+                selectedPositionLiveData.value = MonthlyReportSelectedPosition(dates.size - 2, dates[dates.size - 2], false)
             }
         }
     }
@@ -37,7 +37,7 @@ class MonthlyReportBaseViewModel(private val parameters: Parameters) : ViewModel
         val (selectedPosition) = selectedPositionLiveData.value ?: return
 
         if (selectedPosition > 0) {
-            selectedPositionLiveData.value = Triple(selectedPosition - 1, dates[selectedPosition - 1], false)
+            selectedPositionLiveData.value = MonthlyReportSelectedPosition(selectedPosition - 1, dates[selectedPosition - 1], false)
         }
     }
 
@@ -46,13 +46,15 @@ class MonthlyReportBaseViewModel(private val parameters: Parameters) : ViewModel
         val (selectedPosition) = selectedPositionLiveData.value ?: return
 
         if ( selectedPosition < dates.size - 1 ) {
-            selectedPositionLiveData.value = Triple(selectedPosition + 1, dates[selectedPosition + 1], dates.size == selectedPosition + 2)
+            selectedPositionLiveData.value = MonthlyReportSelectedPosition(selectedPosition + 1, dates[selectedPosition + 1], dates.size == selectedPosition + 2)
         }
     }
 
     fun onPageSelected(position: Int) {
         val dates = datesLiveData.value ?: return
 
-        selectedPositionLiveData.value = Triple(position, dates[position], dates.size == position + 1)
+        selectedPositionLiveData.value = MonthlyReportSelectedPosition(position, dates[position], dates.size == position + 1)
     }
 }
+
+data class MonthlyReportSelectedPosition(val position: Int, val date: Date, val latest: Boolean)

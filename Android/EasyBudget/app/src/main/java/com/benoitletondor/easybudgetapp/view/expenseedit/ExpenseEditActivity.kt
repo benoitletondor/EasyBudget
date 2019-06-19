@@ -57,9 +57,9 @@ class ExpenseEditActivity : AppCompatActivity() {
         supportActionBar?.setDisplayShowHomeEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        viewModel.existingExpenseStream.observe(this, Observer { existingValues ->
+        viewModel.existingExpenseEventStream.observe(this, Observer { existingValues ->
             if( existingValues != null ) {
-                setUpTextFields(existingValues.first, existingValues.second)
+                setUpTextFields(existingValues.title, existingValues.amount)
             } else {
                 setUpTextFields(description = null, amount = null)
             }
@@ -91,11 +91,11 @@ class ExpenseEditActivity : AppCompatActivity() {
             setExpenseTypeTextViewLayout(isRevenue, isEdit)
         })
 
-        viewModel.dateLiveData.observe(this, Observer { date ->
+        viewModel.expenseDateLiveData.observe(this, Observer { date ->
             setUpDateButton(date)
         })
 
-        viewModel.finishStream.observe(this, Observer {
+        viewModel.finishEventStream.observe(this, Observer {
             setResult(Activity.RESULT_OK)
             finish()
         })

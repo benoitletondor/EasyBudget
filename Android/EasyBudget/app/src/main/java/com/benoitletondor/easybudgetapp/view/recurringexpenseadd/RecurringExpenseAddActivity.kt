@@ -78,16 +78,16 @@ class RecurringExpenseAddActivity : AppCompatActivity() {
 
         UIHelper.removeButtonBorder(date_button) // Remove border on lollipop
 
-        viewModel.editTypeLiveData.observe(this, Observer { isRevenue ->
+        viewModel.editTypeIsRevenueLiveData.observe(this, Observer { isRevenue ->
             setExpenseTypeTextViewLayout(isRevenue)
         })
 
-        viewModel.dateLiveData.observe(this, Observer { date ->
+        viewModel.expenseDateLiveData.observe(this, Observer { date ->
             setUpDateButton(date)
         })
 
         var progressDialog: ProgressDialog? = null
-        viewModel.savingStream.observe(this, Observer { isRevenue ->
+        viewModel.savingIsRevenueEventStream.observe(this, Observer { isRevenue ->
             // Show a ProgressDialog
             val dialog = ProgressDialog(this)
             dialog.setIndeterminate(true)
@@ -100,7 +100,7 @@ class RecurringExpenseAddActivity : AppCompatActivity() {
             progressDialog = dialog
         })
 
-        viewModel.finishStream.observe(this, Observer {
+        viewModel.finishLiveData.observe(this, Observer {
             progressDialog?.dismiss()
             progressDialog = null
 
@@ -108,7 +108,7 @@ class RecurringExpenseAddActivity : AppCompatActivity() {
             finish()
         })
 
-        viewModel.errorStream.observe(this, Observer {
+        viewModel.errorEventStream.observe(this, Observer {
             progressDialog?.dismiss()
             progressDialog = null
 

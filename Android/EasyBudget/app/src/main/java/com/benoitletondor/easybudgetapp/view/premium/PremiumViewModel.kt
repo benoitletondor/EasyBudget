@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 class PremiumViewModel(private val iab: Iab) : ViewModel() {
     val premiumFlowStatusLiveData = MutableLiveData<PremiumFlowStatus>(PremiumFlowStatus.NOT_STARTED)
-    val premiumFlowErrorEvent = SingleLiveEvent<PremiumPurchaseFlowResult>()
+    val premiumFlowErrorEventStream = SingleLiveEvent<PremiumPurchaseFlowResult>()
 
     fun onBuyPremiumClicked(activity: Activity) {
         premiumFlowStatusLiveData.value = PremiumFlowStatus.LOADING
@@ -19,14 +19,14 @@ class PremiumViewModel(private val iab: Iab) : ViewModel() {
         viewModelScope.launch {
             when(val result = iab.launchPremiumPurchaseFlow(activity)) {
                 PremiumPurchaseFlowResult.Cancelled -> {
-                    premiumFlowErrorEvent.value = result
+                    premiumFlowErrorEventStream.value = result
                     premiumFlowStatusLiveData.value = PremiumFlowStatus.NOT_STARTED
                 }
                 PremiumPurchaseFlowResult.Success -> {
                     premiumFlowStatusLiveData.value = PremiumFlowStatus.DONE
                 }
                 is PremiumPurchaseFlowResult.Error -> {
-                    premiumFlowErrorEvent.value = result
+                    premiumFlowErrorEventStream.value = result
                     premiumFlowStatusLiveData.value = PremiumFlowStatus.NOT_STARTED
                 }
             }

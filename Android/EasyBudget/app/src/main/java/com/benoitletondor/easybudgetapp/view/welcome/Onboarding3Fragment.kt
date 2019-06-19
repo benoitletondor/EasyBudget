@@ -145,7 +145,7 @@ class Onboarding3Fragment : OnboardingFragment(), CoroutineScope by MainScope() 
         }
     }
 
-    // -------------------------------------->
+// -------------------------------------->
 
     private fun setCurrency() {
         onboarding_screen3_initial_amount_money_tv?.text = parameters.getUserCurrency().symbol

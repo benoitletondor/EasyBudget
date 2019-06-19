@@ -11,7 +11,7 @@ import kotlinx.coroutines.withContext
 import java.util.*
 
 class MonthlyReportViewModel(private val db: DB) : ViewModel() {
-    val monthlyReportLiveData = MutableLiveData<MonthlyReportData>()
+    val monthlyReportDataLiveData = MutableLiveData<MonthlyReportData>()
 
     sealed class MonthlyReportData {
         object Empty: MonthlyReportData()
@@ -24,7 +24,7 @@ class MonthlyReportViewModel(private val db: DB) : ViewModel() {
                 db.getExpensesForMonth(month)
             }
             if( expensesForMonth.isEmpty() ) {
-                monthlyReportLiveData.value = MonthlyReportData.Empty
+                monthlyReportDataLiveData.value = MonthlyReportData.Empty
                 return@launch
             }
 
@@ -45,7 +45,7 @@ class MonthlyReportViewModel(private val db: DB) : ViewModel() {
                 }
             }
 
-            monthlyReportLiveData.value = MonthlyReportData.Data(expenses, revenues, expensesAmount, revenuesAmount)
+            monthlyReportDataLiveData.value = MonthlyReportData.Data(expenses, revenues, expensesAmount, revenuesAmount)
         }
     }
 

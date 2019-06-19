@@ -76,7 +76,7 @@ class PremiumActivity : AppCompatActivity() {
         }
 
         var loadingProgressDialog: ProgressDialog? = null
-        viewModel.premiumFlowErrorEvent.observe(this, Observer { status ->
+        viewModel.premiumFlowErrorEventStream.observe(this, Observer { status ->
             when(status) {
                 PremiumPurchaseFlowResult.Cancelled -> {
                     loadingProgressDialog?.dismiss()

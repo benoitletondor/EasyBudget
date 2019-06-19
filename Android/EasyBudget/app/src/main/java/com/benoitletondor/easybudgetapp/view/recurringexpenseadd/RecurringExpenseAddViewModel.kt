@@ -16,26 +16,26 @@ import kotlinx.coroutines.withContext
 
 
 class RecurringExpenseAddViewModel(private val db: DB) : ViewModel() {
-    val dateLiveData = MutableLiveData<Date>()
-    val editTypeLiveData = MutableLiveData<Boolean>()
-    val savingStream = SingleLiveEvent<Boolean>()
-    val finishStream = MutableLiveData<Unit>()
-    val errorStream = SingleLiveEvent<Unit>()
+    val expenseDateLiveData = MutableLiveData<Date>()
+    val editTypeIsRevenueLiveData = MutableLiveData<Boolean>()
+    val savingIsRevenueEventStream = SingleLiveEvent<Boolean>()
+    val finishLiveData = MutableLiveData<Unit>()
+    val errorEventStream = SingleLiveEvent<Unit>()
 
     fun initWithDateAndExpense(date: Date) {
-        this.dateLiveData.value = date
-        this.editTypeLiveData.value = false
+        this.expenseDateLiveData.value = date
+        this.editTypeIsRevenueLiveData.value = false
     }
 
     fun onExpenseRevenueValueChanged(isRevenue: Boolean) {
-        editTypeLiveData.value = isRevenue
+        editTypeIsRevenueLiveData.value = isRevenue
     }
 
     fun onSave(value: Double, description: String, recurringExpenseType: RecurringExpenseType) {
-        val isRevenue = editTypeLiveData.value ?: return
-        val date = dateLiveData.value ?: return
+        val isRevenue = editTypeIsRevenueLiveData.value ?: return
+        val date = expenseDateLiveData.value ?: return
 
-        savingStream.value = isRevenue
+        savingIsRevenueEventStream.value = isRevenue
 
         viewModelScope.launch {
             val inserted = withContext(Dispatchers.Default) {
@@ -55,9 +55,9 @@ class RecurringExpenseAddViewModel(private val db: DB) : ViewModel() {
             }
 
             if( inserted ) {
-                finishStream.value = null
+                finishLiveData.value = null
             } else {
-                errorStream.value = null
+                errorEventStream.value = null
             }
         }
     }
@@ -126,6 +126,6 @@ class RecurringExpenseAddViewModel(private val db: DB) : ViewModel() {
     }
 
     fun onDateChanged(date: Date) {
-        this.dateLiveData.value = date
+        this.expenseDateLiveData.value = date
     }
 }

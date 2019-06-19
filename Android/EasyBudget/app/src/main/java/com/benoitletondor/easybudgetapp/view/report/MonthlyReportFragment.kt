@@ -66,7 +66,7 @@ class MonthlyReportFragment : Fragment() {
         val expensesAmountTextView = v.findViewById<TextView>(R.id.monthly_report_fragment_expenses_total_tv)
         val balanceTextView = v.findViewById<TextView>(R.id.monthly_report_fragment_balance_tv)
 
-        viewModel.monthlyReportLiveData.observe(this, Observer { result ->
+        viewModel.monthlyReportDataLiveData.observe(this, Observer { result ->
             progressBar.visibility = View.GONE
             content.visibility = View.VISIBLE
 

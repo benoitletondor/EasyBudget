@@ -19,20 +19,20 @@ class MainViewModel(private val db: DB,
                     private val iab: Iab) : ViewModel() {
     private var selectedDate: Date = Date()
 
-    val premiumStatusStream = MutableLiveData<Boolean>()
-    val selectedDateChangeStream = MutableLiveData<Triple<Date, Double, List<Expense>>>()
+    val premiumStatusLiveData = MutableLiveData<Boolean>()
+    val selectedDateChangeLiveData = MutableLiveData<SelectedDateExpensesData>()
 
-    val expenseDeletionSuccessStream = SingleLiveEvent<Pair<Expense, Double>>()
-    val expenseDeletionErrorStream = SingleLiveEvent<Expense>()
-    val expenseRecoverySuccessStream = SingleLiveEvent<Expense>()
-    val expenseRecoveryErrorStream = SingleLiveEvent<Expense>()
-    val recurringExpenseDeletionDeleteProgressStream = SingleLiveEvent<RecurringExpenseDeleteProgressState>()
-    val recurringExpenseRestoreProgressStream = SingleLiveEvent<RecurringExpenseRestoreProgressState>()
-    val currentBalanceEditorStream = SingleLiveEvent<Double>()
-    val currentBalanceEditingErrorStream = SingleLiveEvent<Exception>()
-    val currentBalanceEditedStream = SingleLiveEvent<Triple<Expense, Double, Double>>()
-    val currentBalanceRestoringStream = SingleLiveEvent<Unit>()
-    val currentBalanceRestoringErrorStream = SingleLiveEvent<Exception>()
+    val expenseDeletionSuccessEventStream = SingleLiveEvent<ExpenseDeletionSuccessData>()
+    val expenseDeletionErrorEventStream = SingleLiveEvent<Expense>()
+    val expenseRecoverySuccessEventStream = SingleLiveEvent<Expense>()
+    val expenseRecoveryErrorEventStream = SingleLiveEvent<Expense>()
+    val recurringExpenseDeletionProgressEventStream = SingleLiveEvent<RecurringExpenseDeleteProgressState>()
+    val recurringExpenseRestoreProgressEventStream = SingleLiveEvent<RecurringExpenseRestoreProgressState>()
+    val startCurrentBalanceEditorEventStream = SingleLiveEvent<Double>()
+    val currentBalanceEditingErrorEventStream = SingleLiveEvent<Exception>()
+    val currentBalanceEditedEventStream = SingleLiveEvent<BalanceAdjustedData>()
+    val currentBalanceRestoringEventStream = SingleLiveEvent<Unit>()
+    val currentBalanceRestoringErrorEventStream = SingleLiveEvent<Exception>()
 
     sealed class RecurringExpenseDeleteProgressState {
         class Starting(val expense: Expense): RecurringExpenseDeleteProgressState()
@@ -51,7 +51,7 @@ class MainViewModel(private val db: DB,
     }
 
     init {
-        premiumStatusStream.value = iab.isUserPremium()
+        premiumStatusLiveData.value = iab.isUserPremium()
         refreshDataForDate(selectedDate)
     }
 
@@ -62,9 +62,9 @@ class MainViewModel(private val db: DB,
                     db.deleteExpense(expense)
                 }
 
-                expenseDeletionSuccessStream.value = Pair(expense, getBalanceForDay(selectedDate))
+                expenseDeletionSuccessEventStream.value = ExpenseDeletionSuccessData(expense, getBalanceForDay(selectedDate))
             } catch (t: Throwable) {
-                expenseDeletionErrorStream.value = expense
+                expenseDeletionErrorEventStream.value = expense
             }
         }
     }
@@ -76,21 +76,21 @@ class MainViewModel(private val db: DB,
                     db.persistExpense(expense)
                 }
 
-                expenseRecoverySuccessStream.value = expensePersisted
+                expenseRecoverySuccessEventStream.value = expensePersisted
                 refreshDataForDate(selectedDate)
             } catch (t: Throwable) {
-                expenseRecoveryErrorStream.value = expense
+                expenseRecoveryErrorEventStream.value = expense
             }
         }
     }
 
     fun onDeleteRecurringExpenseClicked(expense: Expense, deleteType: RecurringExpenseDeleteType) {
         viewModelScope.launch {
-            recurringExpenseDeletionDeleteProgressStream.value = RecurringExpenseDeleteProgressState.Starting(expense)
+            recurringExpenseDeletionProgressEventStream.value = RecurringExpenseDeleteProgressState.Starting(expense)
 
             val associatedRecurringExpense = expense.associatedRecurringExpense
             if( associatedRecurringExpense == null ) {
-                recurringExpenseDeletionDeleteProgressStream.value = RecurringExpenseDeleteProgressState.ErrorRecurringExpenseDeleteNotAssociated(expense)
+                recurringExpenseDeletionProgressEventStream.value = RecurringExpenseDeleteProgressState.ErrorRecurringExpenseDeleteNotAssociated(expense)
                 return@launch
             }
 
@@ -99,7 +99,7 @@ class MainViewModel(private val db: DB,
             }
 
             if ( firstOccurrenceError ) {
-                recurringExpenseDeletionDeleteProgressStream.postValue(RecurringExpenseDeleteProgressState.ErrorCantDeleteBeforeFirstOccurrence(expense))
+                recurringExpenseDeletionProgressEventStream.postValue(RecurringExpenseDeleteProgressState.ErrorCantDeleteBeforeFirstOccurrence(expense))
                 return@launch
             }
 
@@ -159,11 +159,11 @@ class MainViewModel(private val db: DB,
             }
 
             if( expensesToRestore == null ) {
-                recurringExpenseDeletionDeleteProgressStream.value = RecurringExpenseDeleteProgressState.ErrorIO(expense)
+                recurringExpenseDeletionProgressEventStream.value = RecurringExpenseDeleteProgressState.ErrorIO(expense)
                 return@launch
             }
 
-            recurringExpenseDeletionDeleteProgressStream.value = RecurringExpenseDeleteProgressState.Deleted(associatedRecurringExpense, deleteType == RecurringExpenseDeleteType.ALL, expensesToRestore)
+            recurringExpenseDeletionProgressEventStream.value = RecurringExpenseDeleteProgressState.Deleted(associatedRecurringExpense, deleteType == RecurringExpenseDeleteType.ALL, expensesToRestore)
             refreshDataForDate(selectedDate)
         }
 
@@ -171,7 +171,7 @@ class MainViewModel(private val db: DB,
 
     fun onRestoreRecurringExpenseClicked(recurringExpense: RecurringExpense, restoreRecurring: Boolean, expensesToRestore: List<Expense>) {
         viewModelScope.launch {
-            recurringExpenseRestoreProgressStream.value = RecurringExpenseRestoreProgressState.Starting(recurringExpense, expensesToRestore)
+            recurringExpenseRestoreProgressEventStream.value = RecurringExpenseRestoreProgressState.Starting(recurringExpense, expensesToRestore)
 
             if( restoreRecurring ) {
                 try {
@@ -179,7 +179,7 @@ class MainViewModel(private val db: DB,
                         db.persistRecurringExpense(recurringExpense)
                     }
                 } catch (t: Throwable) {
-                    recurringExpenseRestoreProgressStream.postValue(RecurringExpenseRestoreProgressState.ErrorIO(recurringExpense, expensesToRestore))
+                    recurringExpenseRestoreProgressEventStream.postValue(RecurringExpenseRestoreProgressState.ErrorIO(recurringExpense, expensesToRestore))
                     return@launch
                 }
             }
@@ -197,11 +197,11 @@ class MainViewModel(private val db: DB,
             }
 
             if( !expensesAdd ) {
-                recurringExpenseRestoreProgressStream.value = RecurringExpenseRestoreProgressState.ErrorIO(recurringExpense, expensesToRestore)
+                recurringExpenseRestoreProgressEventStream.value = RecurringExpenseRestoreProgressState.ErrorIO(recurringExpense, expensesToRestore)
                 return@launch
             }
 
-            recurringExpenseRestoreProgressStream.value = RecurringExpenseRestoreProgressState.Restored(recurringExpense, expensesToRestore)
+            recurringExpenseRestoreProgressEventStream.value = RecurringExpenseRestoreProgressState.Restored(recurringExpense, expensesToRestore)
             refreshDataForDate(selectedDate)
         }
     }
@@ -216,7 +216,7 @@ class MainViewModel(private val db: DB,
                 -db.getBalanceForDay(Date())
             }
 
-            currentBalanceEditorStream.value = balance
+            startCurrentBalanceEditorEventStream.value = balance
         }
     }
 
@@ -246,7 +246,7 @@ class MainViewModel(private val db: DB,
                         db.persistExpense(newExpense)
                     }
 
-                    currentBalanceEditedStream.value = Triple(newExpense, diff, newBalance)
+                    currentBalanceEditedEventStream.value = BalanceAdjustedData(newExpense, diff, newBalance)
                     refreshDataForDate(selectedDate)
                 } else { // If no adjust balance yet, create a new one
                     val persistedExpense = Expense(balanceExpenseTitle, -diff, Date())
@@ -255,10 +255,10 @@ class MainViewModel(private val db: DB,
                         db.persistExpense(persistedExpense)
                     }
 
-                    currentBalanceEditedStream.value = Triple(persistedExpense, diff, newBalance)
+                    currentBalanceEditedEventStream.value = BalanceAdjustedData(persistedExpense, diff, newBalance)
                 }
             } catch (e: Exception) {
-                currentBalanceEditingErrorStream.value = e
+                currentBalanceEditingErrorEventStream.value = e
             }
         }
     }
@@ -276,16 +276,16 @@ class MainViewModel(private val db: DB,
                     db.persistExpense(newExpense)
                 }
 
-                currentBalanceRestoringStream.value = Unit
+                currentBalanceRestoringEventStream.value = Unit
                 refreshDataForDate(selectedDate)
             } catch (e: Exception) {
-                currentBalanceRestoringErrorStream.value = e
+                currentBalanceRestoringErrorEventStream.value = e
             }
         }
     }
 
     fun onIabStatusChanged() {
-        premiumStatusStream.value = iab.isUserPremium()
+        premiumStatusLiveData.value = iab.isUserPremium()
     }
 
     fun onSelectDate(date: Date) {
@@ -303,7 +303,7 @@ class MainViewModel(private val db: DB,
                 Pair(getBalanceForDay(date), db.getExpensesForDay(date))
             }
 
-            selectedDateChangeStream.value = Triple(date, balance, expenses)
+            selectedDateChangeLiveData.value = SelectedDateExpensesData(date, balance, expenses)
         }
     }
 
@@ -335,3 +335,7 @@ class MainViewModel(private val db: DB,
         super.onCleared()
     }
 }
+
+data class SelectedDateExpensesData(val date: Date, val balance: Double, val expenses: List<Expense>)
+data class ExpenseDeletionSuccessData(val deletedExpense: Expense, val newDayBalance: Double)
+data class BalanceAdjustedData(val balanceExpense: Expense, val diffWithOldBalance: Double, val newBalance: Double)

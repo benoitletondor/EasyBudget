@@ -152,7 +152,7 @@ class MainActivity : AppCompatActivity() {
             openAddRecurringExpenseIfNeeded(intent)
         }
 
-        viewModel.expenseDeletionSuccessStream.observe(this, Observer { (deletedExpense, newBalance) ->
+        viewModel.expenseDeletionSuccessEventStream.observe(this, Observer { (deletedExpense, newBalance) ->
 
             expensesViewAdapter.removeExpense(deletedExpense)
             updateBalanceDisplayForDay(expensesViewAdapter.getDate(), newBalance)
@@ -168,7 +168,7 @@ class MainActivity : AppCompatActivity() {
             snackbar.show()
         })
 
-        viewModel.expenseDeletionErrorStream.observe(this, Observer {
+        viewModel.expenseDeletionErrorEventStream.observe(this, Observer {
             AlertDialog.Builder(this@MainActivity)
                 .setTitle(R.string.expense_delete_error_title)
                 .setMessage(R.string.expense_delete_error_message)
@@ -176,16 +176,16 @@ class MainActivity : AppCompatActivity() {
                 .show()
         })
 
-        viewModel.expenseRecoverySuccessStream.observe(this, Observer {
+        viewModel.expenseRecoverySuccessEventStream.observe(this, Observer {
             // Nothing to do
         })
 
-        viewModel.expenseRecoveryErrorStream.observe(this, Observer { expense ->
+        viewModel.expenseRecoveryErrorEventStream.observe(this, Observer { expense ->
             Logger.error("Error restoring deleted expense: $expense")
         })
 
         var expenseDeletionDialog: ProgressDialog? = null
-        viewModel.recurringExpenseDeletionDeleteProgressStream.observe(this, Observer { status ->
+        viewModel.recurringExpenseDeletionProgressEventStream.observe(this, Observer { status ->
             when(status) {
                 is MainViewModel.RecurringExpenseDeleteProgressState.Starting -> {
                     val dialog = ProgressDialog(this@MainActivity)
@@ -234,7 +234,7 @@ class MainActivity : AppCompatActivity() {
         })
 
         var expenseRestoreDialog: Dialog? = null
-        viewModel.recurringExpenseRestoreProgressStream.observe(this, Observer { status ->
+        viewModel.recurringExpenseRestoreProgressEventStream.observe(this, Observer { status ->
             when(status) {
                 is MainViewModel.RecurringExpenseRestoreProgressState.Starting -> {
                     val dialog = ProgressDialog(this@MainActivity)
@@ -266,7 +266,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        viewModel.currentBalanceEditorStream.observe(this, Observer { currentBalance ->
+        viewModel.startCurrentBalanceEditorEventStream.observe(this, Observer { currentBalance ->
             val dialogView = layoutInflater.inflate(R.layout.dialog_adjust_balance, null)
             val amountEditText = dialogView.findViewById<EditText>(R.id.balance_amount)
             amountEditText.setText(if (currentBalance == 0.0) "0" else CurrencyHelper.getFormattedAmountValue(currentBalance))
@@ -298,7 +298,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        viewModel.currentBalanceEditingErrorStream.observe(this, Observer { exception ->
+        viewModel.currentBalanceEditingErrorEventStream.observe(this, Observer { exception ->
             Logger.error("Error while adjusting balance", exception)
 
             AlertDialog.Builder(this@MainActivity)
@@ -308,7 +308,7 @@ class MainActivity : AppCompatActivity() {
                 .show()
         })
 
-        viewModel.currentBalanceEditedStream.observe(this, Observer { (expense, diff, newBalance) ->
+        viewModel.currentBalanceEditedEventStream.observe(this, Observer { (expense, diff, newBalance) ->
             //Show snackbar
             val snackbar = Snackbar.make(coordinatorLayout, resources.getString(R.string.adjust_balance_snackbar_text, CurrencyHelper.getFormattedCurrencyString(parameters, newBalance)), Snackbar.LENGTH_LONG)
             snackbar.setAction(R.string.undo) {
@@ -320,11 +320,11 @@ class MainActivity : AppCompatActivity() {
             snackbar.show()
         })
 
-        viewModel.currentBalanceRestoringStream.observe(this, Observer {
+        viewModel.currentBalanceRestoringEventStream.observe(this, Observer {
             // Nothing to do
         })
 
-        viewModel.currentBalanceRestoringErrorStream.observe(this, Observer { exception ->
+        viewModel.currentBalanceRestoringErrorEventStream.observe(this, Observer { exception ->
             Logger.error("An error occurred during balance", exception)
 
             AlertDialog.Builder(this@MainActivity)
@@ -334,12 +334,12 @@ class MainActivity : AppCompatActivity() {
                 .show()
         })
 
-        viewModel.premiumStatusStream.observe(this, Observer { isPremium ->
+        viewModel.premiumStatusLiveData.observe(this, Observer { isPremium ->
             isUserPremium = isPremium
             invalidateOptionsMenu()
         })
 
-        viewModel.selectedDateChangeStream.observe(this, Observer { (date, balance, expenses) ->
+        viewModel.selectedDateChangeLiveData.observe(this, Observer { (date, balance, expenses) ->
             refreshAllForDate(date, balance, expenses)
         })
     }
