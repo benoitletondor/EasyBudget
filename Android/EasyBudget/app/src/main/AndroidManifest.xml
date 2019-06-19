@@ -87,7 +87,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppThemeNoActionBar"/>
         <activity
-            android:name=".view.SettingsActivity"
+            android:name=".view.settings.SettingsActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_settings"
             android:screenOrientation="portrait"/>

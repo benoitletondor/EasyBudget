@@ -62,10 +62,10 @@ import java.util.Locale
 import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.iab.INTENT_IAB_STATUS_CHANGED
 import com.benoitletondor.easybudgetapp.parameters.*
-import com.benoitletondor.easybudgetapp.view.*
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseAddActivity
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
+import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
 import com.benoitletondor.easybudgetapp.view.welcome.getOnboardingStep
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import org.koin.android.viewmodel.ext.android.viewModel

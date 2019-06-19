@@ -18,7 +18,6 @@ package com.benoitletondor.easybudgetapp.helper
 
 import android.os.Build
 
-import com.benoitletondor.easybudgetapp.BuildConfig
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 
 import java.text.NumberFormat
@@ -148,47 +147,6 @@ object CurrencyHelper {
         format.isGroupingUsed = false
 
         return format.format(amount)
-    }
-
-    /**
-     * Return the integer value of the double * 100 to store it as integer in DB. This is an ugly
-     * method that shouldn't be there but rounding on doubles are a pain :/
-     *
-     * @param value the double value
-     * @return the corresponding int value (double * 100)
-     */
-    fun getDBValueForDouble(value: Double): Long {
-        val stringValue = getFormattedAmountValue(value)
-        if (BuildConfig.DEBUG_LOG) {
-            Logger.debug("getDBValueForDouble: $stringValue")
-        }
-
-        val ceiledValue = Math.ceil(value * 100).toLong()
-        val ceiledDoubleValue = ceiledValue / 100.0
-
-        if (getFormattedAmountValue(ceiledDoubleValue) == stringValue) {
-            if (BuildConfig.DEBUG_LOG) {
-                Logger.debug("getDBValueForDouble, return ceiled value: $ceiledValue")
-            }
-            return ceiledValue
-        }
-
-        val normalValue = value.toLong() * 100
-        val normalDoubleValue = normalValue / 100.0
-
-        if (getFormattedAmountValue(normalDoubleValue) == stringValue) {
-            if (BuildConfig.DEBUG_LOG) {
-                Logger.debug("getDBValueForDouble, return normal value: $normalValue")
-            }
-            return normalValue
-        }
-
-        val flooredValue = Math.floor(value * 100).toLong()
-        if (BuildConfig.DEBUG_LOG) {
-            Logger.debug("getDBValueForDouble, return floored value: $flooredValue")
-        }
-
-        return flooredValue
     }
 }
 

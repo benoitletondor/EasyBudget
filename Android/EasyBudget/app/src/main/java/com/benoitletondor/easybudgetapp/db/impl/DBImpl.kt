@@ -1,11 +1,13 @@
 package com.benoitletondor.easybudgetapp.db.impl
 
+import com.benoitletondor.easybudgetapp.BuildConfig
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.db.impl.entity.ExpenseEntity
 import com.benoitletondor.easybudgetapp.db.impl.entity.RecurringExpenseEntity
+import com.benoitletondor.easybudgetapp.helper.Logger
 import java.util.*
 
 class DBImpl(private val roomDB: RoomDB) : DB {
@@ -44,9 +46,8 @@ class DBImpl(private val roomDB: RoomDB) : DB {
 
     override suspend fun getBalanceForDay(dayDate: Date): Double {
         val (_, endDate) = dayDate.getDayDatesRange()
-        val sum = roomDB.expenseDao().getBalanceForDay(endDate)
 
-        return if( sum != null ) sum / 100.0 else 0.0
+        return roomDB.expenseDao().getBalanceForDay(endDate).getRealValueFromDB()
     }
 
     override suspend fun persistRecurringExpense(recurringExpense: RecurringExpense): RecurringExpense {
@@ -130,7 +131,7 @@ private suspend fun ExpenseEntity.toExpense(db: DB): Expense {
 private fun Expense.toExpenseEntity() = ExpenseEntity(
     id,
     title,
-    CurrencyHelper.getDBValueForDouble(amount),
+    amount.getDBValue(),
     date,
     associatedRecurringExpense?.id
 )
@@ -138,7 +139,7 @@ private fun Expense.toExpenseEntity() = ExpenseEntity(
 private fun RecurringExpense.toRecurringExpenseEntity() = RecurringExpenseEntity (
     id,
     title,
-    CurrencyHelper.getDBValueForDouble(originalAmount),
+    originalAmount.getDBValue(),
     recurringDate,
     modified,
     type.name
@@ -163,3 +164,45 @@ private fun Date.getDayDatesRange(): DayDateRange {
 
     return DayDateRange(start, end)
 }
+
+/**
+ * Return the integer value of the double * 100 to store it as integer in DB. This is an ugly
+ * method that shouldn't be there but rounding on doubles are a pain :/
+ *
+ * @return the corresponding int value (double * 100)
+ */
+private fun Double.getDBValue(): Long {
+    val stringValue = CurrencyHelper.getFormattedAmountValue(this)
+    if (BuildConfig.DEBUG_LOG) {
+        Logger.debug("getDBValueForDouble: $stringValue")
+    }
+
+    val ceiledValue = Math.ceil(this * 100).toLong()
+    val ceiledDoubleValue = ceiledValue / 100.0
+
+    if (CurrencyHelper.getFormattedAmountValue(ceiledDoubleValue) == stringValue) {
+        if (BuildConfig.DEBUG_LOG) {
+            Logger.debug("getDBValueForDouble, return ceiled value: $ceiledValue")
+        }
+        return ceiledValue
+    }
+
+    val normalValue = this.toLong() * 100
+    val normalDoubleValue = normalValue / 100.0
+
+    if (CurrencyHelper.getFormattedAmountValue(normalDoubleValue) == stringValue) {
+        if (BuildConfig.DEBUG_LOG) {
+            Logger.debug("getDBValueForDouble, return normal value: $normalValue")
+        }
+        return normalValue
+    }
+
+    val flooredValue = Math.floor(this * 100).toLong()
+    if (BuildConfig.DEBUG_LOG) {
+        Logger.debug("getDBValueForDouble, return floored value: $flooredValue")
+    }
+
+    return flooredValue
+}
+
+private fun Long?.getRealValueFromDB(): Double = if( this != null ) this / 100.0 else 0.0

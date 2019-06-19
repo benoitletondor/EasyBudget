@@ -40,7 +40,7 @@ import com.benoitletondor.easybudgetapp.push.PushService.Companion.DAILY_REMINDE
 import com.benoitletondor.easybudgetapp.push.PushService.Companion.MONTHLY_REMINDER_KEY
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
 import com.benoitletondor.easybudgetapp.view.RatingPopup
-import com.benoitletondor.easybudgetapp.view.SettingsActivity
+import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
 import com.benoitletondor.easybudgetapp.view.getRatingPopupUserStep
 import com.crashlytics.android.Crashlytics
 import com.google.android.gms.analytics.GoogleAnalytics

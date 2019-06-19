@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp.view
+package com.benoitletondor.easybudgetapp.view.settings
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -37,7 +37,8 @@ import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.iab.INTENT_IAB_STATUS_CHANGED
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.parameters.*
-import com.benoitletondor.easybudgetapp.view.SettingsActivity.USER_GONE_PREMIUM_INTENT
+import com.benoitletondor.easybudgetapp.view.RatingPopup
+import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.USER_GONE_PREMIUM_INTENT
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
 import com.benoitletondor.easybudgetapp.view.premium.PremiumActivity
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment
