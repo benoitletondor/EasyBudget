@@ -91,7 +91,6 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.1'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.2.1'
 
-    implementation 'com.google.android.gms:play-services-analytics:16.0.8'
     implementation 'com.google.firebase:firebase-core:16.0.9'
     implementation 'com.google.firebase:firebase-messaging:18.0.0'
 

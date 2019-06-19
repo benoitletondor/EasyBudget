@@ -43,8 +43,6 @@ import com.benoitletondor.easybudgetapp.view.RatingPopup
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
 import com.benoitletondor.easybudgetapp.view.getRatingPopupUserStep
 import com.crashlytics.android.Crashlytics
-import com.google.android.gms.analytics.GoogleAnalytics
-import com.google.android.gms.analytics.Tracker
 import io.fabric.sdk.android.Fabric
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
@@ -52,16 +50,12 @@ import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import java.util.*
 
-const val DEFAULT_LOW_MONEY_WARNING_AMOUNT = 100
-
 /**
  * EasyBudget application. Implements GA tracking, Batch set-up, Crashlytics set-up && iab.
  *
  * @author Benoit LETONDOR
  */
 class EasyBudget : Application() {
-
-    private lateinit var analyticsTracker: Tracker
     private val iab: Iab by inject()
     private val parameters: Parameters by inject()
 
@@ -91,13 +85,6 @@ class EasyBudget : Application() {
 
         // Batch
         setUpBatchSDK()
-
-        // Analytics
-        val analytics = GoogleAnalytics.getInstance(this)
-        analytics.setDryRun(!BuildConfig.ANALYTICS_ACTIVATED)
-
-        analyticsTracker = analytics.newTracker(R.xml.analytics)
-        analyticsTracker.enableAdvertisingIdCollection(false)
     }
 
     /**

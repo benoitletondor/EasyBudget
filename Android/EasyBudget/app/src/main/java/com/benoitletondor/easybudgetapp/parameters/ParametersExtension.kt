@@ -16,9 +16,9 @@
 
 package com.benoitletondor.easybudgetapp.parameters
 
-import com.benoitletondor.easybudgetapp.DEFAULT_LOW_MONEY_WARNING_AMOUNT
 import com.roomorama.caldroid.CaldroidFragment
 
+private const val DEFAULT_LOW_MONEY_WARNING_AMOUNT = 100
 /**
  * Date of the base balance set-up (long)
  */
