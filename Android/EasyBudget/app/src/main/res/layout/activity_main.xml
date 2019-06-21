@@ -71,14 +71,11 @@
 
         </LinearLayout>
 
-
-
         <LinearLayout android:id="@+id/emptyExpensesRecyclerViewPlaceholder"
             android:layout_width="match_parent"
             android:layout_height="0dip"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:background="@color/placeholder_background"
             android:gravity="center_horizontal"
             android:visibility="gone"
             android:paddingTop="15dp">
@@ -108,7 +105,6 @@
             android:background="@android:color/white" />
 
     </LinearLayout>
-
 
     <View android:id="@+id/fab_choices_background"
         android:visibility="gone"

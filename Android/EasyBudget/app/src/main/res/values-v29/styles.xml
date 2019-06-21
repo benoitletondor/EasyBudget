@@ -3,7 +3,6 @@
     <!-- App theme -->
     <style name="AppTheme" parent="Base.AppTheme">
         <item name="android:forceDarkAllowed">true</item>
-
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
