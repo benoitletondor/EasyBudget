@@ -23,7 +23,6 @@ import android.content.IntentFilter
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
-import android.preference.*
 import android.view.View
 import android.view.WindowManager
 import android.widget.EditText
@@ -31,6 +30,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.preference.*
 import com.benoitletondor.easybudgetapp.BuildConfig
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.*
@@ -51,7 +51,8 @@ import java.net.URLEncoder
  *
  * @author Benoit LETONDOR
  */
-class PreferencesFragment : PreferenceFragment() {
+class PreferencesFragment : PreferenceFragmentCompat() {
+
     /**
      * The dialog to select a new currency (will be null if not shown)
      */
@@ -83,34 +84,37 @@ class PreferencesFragment : PreferenceFragment() {
 
 // ---------------------------------------->
 
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        setPreferencesFromResource(R.xml.preferences, rootKey)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Load the preferences from the XML resource
-        addPreferencesFromResource(R.xml.preferences)
 
         /*
          * Rating button
          */
-        findPreference(resources.getString(R.string.setting_category_rate_button_key)).setOnPreferenceClickListener { preference ->
-            RatingPopup(activity, parameters).show(true)
+        findPreference<Preference>(resources.getString(R.string.setting_category_rate_button_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            activity?.let { activity ->
+                RatingPopup(activity, parameters).show(true)
+            }
             false
         }
 
         /*
          * Start day of week
          */
-        val firstDayOfWeekPref = findPreference(getString(R.string.setting_category_start_day_of_week_key)) as SwitchPreference
-        firstDayOfWeekPref.isChecked = parameters.getCaldroidFirstDayOfWeek() == CaldroidFragment.SUNDAY
-        firstDayOfWeekPref.setOnPreferenceClickListener {
-            parameters.setCaldroidFirstDayOfWeek(if (firstDayOfWeekPref.isChecked) CaldroidFragment.SUNDAY else CaldroidFragment.MONDAY)
+        val firstDayOfWeekPref = findPreference<SwitchPreferenceCompat>(getString(R.string.setting_category_start_day_of_week_key))
+        firstDayOfWeekPref?.isChecked = parameters.getCaldroidFirstDayOfWeek() == CaldroidFragment.SUNDAY
+        firstDayOfWeekPref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            parameters.setCaldroidFirstDayOfWeek(if ((firstDayOfWeekPref?.isChecked) == true) CaldroidFragment.SUNDAY else CaldroidFragment.MONDAY)
             true
         }
 
         /*
          * Bind bug report button
          */
-        findPreference(resources.getString(R.string.setting_category_bug_report_send_button_key)).setOnPreferenceClickListener {
+        findPreference<Preference>(resources.getString(R.string.setting_category_bug_report_send_button_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
             val localId = parameters.getLocalId()
 
             val sendIntent = Intent()
@@ -120,7 +124,8 @@ class PreferencesFragment : PreferenceFragment() {
             sendIntent.putExtra(Intent.EXTRA_TEXT, resources.getString(R.string.setting_category_bug_report_send_text, localId))
             sendIntent.putExtra(Intent.EXTRA_SUBJECT, resources.getString(R.string.setting_category_bug_report_send_subject))
 
-            if (sendIntent.resolveActivity(activity.packageManager) != null) {
+            val packageManager = activity?.packageManager
+            if (packageManager != null && sendIntent.resolveActivity(packageManager) != null) {
                 startActivity(sendIntent)
             } else {
                 Toast.makeText(activity, resources.getString(R.string.setting_category_bug_report_send_error), Toast.LENGTH_SHORT).show()
@@ -132,7 +137,7 @@ class PreferencesFragment : PreferenceFragment() {
         /*
          * Share app
          */
-        findPreference(resources.getString(R.string.setting_category_share_app_key)).setOnPreferenceClickListener {
+        findPreference<Preference>(resources.getString(R.string.setting_category_share_app_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
             try {
                 val sendIntent = Intent()
                 sendIntent.action = Intent.ACTION_SEND
@@ -149,12 +154,12 @@ class PreferencesFragment : PreferenceFragment() {
         /*
          * App version
          */
-        val appVersionPreference = findPreference(resources.getString(R.string.setting_category_app_version_key))
-        appVersionPreference.title = resources.getString(R.string.setting_category_app_version_title, BuildConfig.VERSION_NAME)
-        appVersionPreference.setOnPreferenceClickListener {
+        val appVersionPreference = findPreference<Preference>(resources.getString(R.string.setting_category_app_version_key))
+        appVersionPreference?.title = resources.getString(R.string.setting_category_app_version_title, BuildConfig.VERSION_NAME)
+        appVersionPreference?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
             val i = Intent(Intent.ACTION_VIEW)
             i.data = Uri.parse("https://twitter.com/BenoitLetondor")
-            activity.startActivity(i)
+            activity?.startActivity(i)
 
             false
         }
@@ -162,108 +167,116 @@ class PreferencesFragment : PreferenceFragment() {
         /*
          * Currency change button
          */
-        val currencyPreference = findPreference(resources.getString(R.string.setting_category_currency_change_button_key))
-        currencyPreference.setOnPreferenceClickListener {
-            selectCurrencyDialog = SelectCurrencyFragment()
-            selectCurrencyDialog!!.show((activity as SettingsActivity).supportFragmentManager, "SelectCurrency")
+        findPreference<Preference>(resources.getString(R.string.setting_category_currency_change_button_key))?.let { currencyPreference ->
+            currencyPreference.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                selectCurrencyDialog = SelectCurrencyFragment()
+                selectCurrencyDialog!!.show((activity as SettingsActivity).supportFragmentManager, "SelectCurrency")
 
-            false
+                false
+            }
+
+            setCurrencyPreferenceTitle(currencyPreference)
         }
-        setCurrencyPreferenceTitle(currencyPreference)
+
 
         /*
          * Warning limit button
          */
-        val limitWarningPreference = findPreference(resources.getString(R.string.setting_category_limit_set_button_key))
-        limitWarningPreference.setOnPreferenceClickListener {
-            val dialogView = activity.layoutInflater.inflate(R.layout.dialog_set_warning_limit, null)
-            val limitEditText = dialogView.findViewById<View>(R.id.warning_limit) as EditText
-            limitEditText.setText(parameters.getLowMoneyWarningAmount().toString())
-            limitEditText.setSelection(limitEditText.text.length) // Put focus at the end of the text
+        findPreference<Preference>(resources.getString(R.string.setting_category_limit_set_button_key))?.let { limitWarningPreference ->
+            limitWarningPreference.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                val dialogView = activity?.layoutInflater?.inflate(R.layout.dialog_set_warning_limit, null)
+                val limitEditText = dialogView?.findViewById<View>(R.id.warning_limit) as EditText
+                limitEditText.setText(parameters.getLowMoneyWarningAmount().toString())
+                limitEditText.setSelection(limitEditText.text.length) // Put focus at the end of the text
 
-            val builder = AlertDialog.Builder(activity)
-            builder.setTitle(R.string.adjust_limit_warning_title)
-            builder.setMessage(R.string.adjust_limit_warning_message)
-            builder.setView(dialogView)
-            builder.setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
-            builder.setPositiveButton(R.string.ok) { _, _ ->
-                var limitString = limitEditText.text.toString()
-                if (limitString.trim { it <= ' ' }.isEmpty()) {
-                    limitString = "0" // Set a 0 value if no value is provided (will lead to an error displayed to the user)
-                }
+                context?.let { context ->
+                    val builder = AlertDialog.Builder(context)
+                    builder.setTitle(R.string.adjust_limit_warning_title)
+                    builder.setMessage(R.string.adjust_limit_warning_message)
+                    builder.setView(dialogView)
+                    builder.setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
+                    builder.setPositiveButton(R.string.ok) { _, _ ->
+                        var limitString = limitEditText.text.toString()
+                        if (limitString.trim { it <= ' ' }.isEmpty()) {
+                            limitString = "0" // Set a 0 value if no value is provided (will lead to an error displayed to the user)
+                        }
 
-                try {
-                    val newLimit = Integer.valueOf(limitString)
+                        try {
+                            val newLimit = Integer.valueOf(limitString)
 
-                    // Invalid value, alert the user
-                    if (newLimit <= 0) {
-                        throw IllegalArgumentException("limit should be > 0")
+                            // Invalid value, alert the user
+                            if (newLimit <= 0) {
+                                throw IllegalArgumentException("limit should be > 0")
+                            }
+
+                            parameters.setLowMoneyWarningAmount(newLimit)
+                            setLimitWarningPreferenceTitle(limitWarningPreference)
+                        } catch (e: Exception) {
+                            AlertDialog.Builder(context)
+                                .setTitle(R.string.adjust_limit_warning_error_title)
+                                .setMessage(resources.getString(R.string.adjust_limit_warning_error_message))
+                                .setPositiveButton(R.string.ok) { dialog1, _ -> dialog1.dismiss() }
+                                .show()
+                        }
                     }
 
-                    parameters.setLowMoneyWarningAmount(newLimit)
-                    setLimitWarningPreferenceTitle(limitWarningPreference)
-                } catch (e: Exception) {
-                    AlertDialog.Builder(activity)
-                        .setTitle(R.string.adjust_limit_warning_error_title)
-                        .setMessage(resources.getString(R.string.adjust_limit_warning_error_message))
-                        .setPositiveButton(R.string.ok) { dialog1, _ -> dialog1.dismiss() }
-                        .show()
+                    val dialog = builder.show()
+
+                    // Directly show keyboard when the dialog pops
+                    limitEditText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+                        // Check if the device doesn't have a physical keyboard
+                        if (hasFocus && resources.configuration.keyboard == Configuration.KEYBOARD_NOKEYS) {
+                            dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+                        }
+                    }
                 }
+
+                false
             }
 
-            val dialog = builder.show()
-
-            // Directly show keyboard when the dialog pops
-            limitEditText.setOnFocusChangeListener { _, hasFocus ->
-                // Check if the device doesn't have a physical keyboard
-                if (hasFocus && resources.configuration.keyboard == Configuration.KEYBOARD_NOKEYS)
-                {
-                    dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-                }
-            }
-
-            false
+            setLimitWarningPreferenceTitle(limitWarningPreference)
         }
-        setLimitWarningPreferenceTitle(limitWarningPreference)
 
         /*
          * Premium status
          */
-        premiumCategory = findPreference(resources.getString(R.string.setting_category_premium_key)) as PreferenceCategory
-        notPremiumCategory = findPreference(resources.getString(R.string.setting_category_not_premium_key)) as PreferenceCategory
+        premiumCategory = findPreference(resources.getString(R.string.setting_category_premium_key))!!
+        notPremiumCategory = findPreference(resources.getString(R.string.setting_category_not_premium_key))!!
         refreshPremiumPreference()
 
         /*
          * Notifications
          */
-        val updateNotifPref = findPreference(resources.getString(R.string.setting_category_notifications_update_key)) as CheckBoxPreference
-        updateNotifPref.setOnPreferenceClickListener {
-            parameters.setUserAllowUpdatePushes(updateNotifPref.isChecked)
+        val updateNotifPref = findPreference<CheckBoxPreference>(resources.getString(R.string.setting_category_notifications_update_key))
+        updateNotifPref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            parameters.setUserAllowUpdatePushes((it as CheckBoxPreference).isChecked)
             true
         }
-        updateNotifPref.isChecked = parameters.isUserAllowingUpdatePushes()
+        updateNotifPref?.isChecked = parameters.isUserAllowingUpdatePushes()
 
         /*
          * Hide dev preferences if needed
          */
-        val devCategory = findPreference(resources.getString(R.string.setting_category_dev_key)) as PreferenceCategory
+        val devCategory = findPreference<PreferenceCategory>(resources.getString(R.string.setting_category_dev_key))
         if (!BuildConfig.DEV_PREFERENCES) {
             preferenceScreen.removePreference(devCategory)
         } else {
             /*
              * Show welcome screen button
              */
-            findPreference(resources.getString(R.string.setting_category_show_welcome_screen_button_key)).setOnPreferenceClickListener {
-                LocalBroadcastManager.getInstance(activity).sendBroadcast(Intent(MainActivity.INTENT_SHOW_WELCOME_SCREEN))
+            findPreference<Preference>(resources.getString(R.string.setting_category_show_welcome_screen_button_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                context?.let { context ->
+                    LocalBroadcastManager.getInstance(context).sendBroadcast(Intent(MainActivity.INTENT_SHOW_WELCOME_SCREEN))
+                }
 
-                activity.finish()
+                activity?.finish()
                 false
             }
 
             /*
              * Show premium screen
              */
-            findPreference(resources.getString(R.string.setting_category_dev_show_premium_key)).setOnPreferenceClickListener {
+            findPreference<Preference>(resources.getString(R.string.setting_category_dev_show_premium_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                 showBecomePremiumDialog()
                 false
             }
@@ -278,7 +291,9 @@ class PreferencesFragment : PreferenceFragment() {
         receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 if (SelectCurrencyFragment.CURRENCY_SELECTED_INTENT == intent.action && selectCurrencyDialog != null) {
-                    setCurrencyPreferenceTitle(currencyPreference)
+                    findPreference<Preference>(resources.getString(R.string.setting_category_currency_change_button_key))?.let { currencyPreference ->
+                        setCurrencyPreferenceTitle(currencyPreference)
+                    }
 
                     selectCurrencyDialog!!.dismiss()
                     selectCurrencyDialog = null
@@ -290,7 +305,7 @@ class PreferencesFragment : PreferenceFragment() {
                     }
 
                 } else if (USER_GONE_PREMIUM_INTENT == intent.action) {
-                    AlertDialog.Builder(activity)
+                    AlertDialog.Builder(context)
                         .setTitle(R.string.iab_purchase_success_title)
                         .setMessage(R.string.iab_purchase_success_message)
                         .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
@@ -300,12 +315,15 @@ class PreferencesFragment : PreferenceFragment() {
                 }
             }
         }
-        LocalBroadcastManager.getInstance(activity).registerReceiver(receiver, filter)
+
+        context?.let { context ->
+            LocalBroadcastManager.getInstance(context).registerReceiver(receiver, filter)
+        }
 
         /*
          * Check if we should show premium popup
          */
-        if (activity.intent.getBooleanExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, false)) {
+        if (activity?.intent?.getBooleanExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, false) == true) {
             showBecomePremiumDialog()
         }
     }
@@ -346,31 +364,33 @@ class PreferencesFragment : PreferenceFragment() {
             }
 
             // Premium preference
-            findPreference(resources.getString(R.string.setting_category_premium_status_key)).setOnPreferenceClickListener {
-                AlertDialog.Builder(activity)
-                    .setTitle(R.string.premium_popup_premium_title)
-                    .setMessage(R.string.premium_popup_premium_message)
-                    .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
-                    .show()
+            findPreference<Preference>(resources.getString(R.string.setting_category_premium_status_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                context?.let {context ->
+                    AlertDialog.Builder(context)
+                        .setTitle(R.string.premium_popup_premium_title)
+                        .setMessage(R.string.premium_popup_premium_message)
+                        .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
+                        .show()
+                }
 
                 false
             }
 
             // Daily reminder notif preference
-            val dailyNotifPref = findPreference(resources.getString(R.string.setting_category_notifications_daily_key)) as CheckBoxPreference
-            dailyNotifPref.setOnPreferenceClickListener {
-                parameters.setUserAllowDailyReminderPushes(dailyNotifPref.isChecked)
+            val dailyNotifPref = findPreference<CheckBoxPreference>(resources.getString(R.string.setting_category_notifications_daily_key))
+            dailyNotifPref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                parameters.setUserAllowDailyReminderPushes((it as CheckBoxPreference).isChecked)
                 true
             }
-            dailyNotifPref.isChecked = parameters.isUserAllowingDailyReminderPushes()
+            dailyNotifPref?.isChecked = parameters.isUserAllowingDailyReminderPushes()
 
             // Monthly reminder for reports
-            val monthlyNotifPref = findPreference(resources.getString(R.string.setting_category_notifications_monthly_key)) as CheckBoxPreference
-            monthlyNotifPref.setOnPreferenceClickListener {
-                parameters.setUserAllowMonthlyReminderPushes(monthlyNotifPref.isChecked)
+            val monthlyNotifPref = findPreference<CheckBoxPreference>(resources.getString(R.string.setting_category_notifications_monthly_key))
+            monthlyNotifPref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                parameters.setUserAllowMonthlyReminderPushes((it as CheckBoxPreference).isChecked)
                 true
             }
-            monthlyNotifPref.isChecked = parameters.isUserAllowingMonthlyReminderPushes()
+            monthlyNotifPref?.isChecked = parameters.isUserAllowingMonthlyReminderPushes()
         } else {
             if (premiumShown) {
                 preferenceScreen.removePreference(premiumCategory)
@@ -383,50 +403,51 @@ class PreferencesFragment : PreferenceFragment() {
             }
 
             // Not premium preference
-            findPreference(resources.getString(R.string.setting_category_not_premium_status_key)).setOnPreferenceClickListener {
+            findPreference<Preference>(resources.getString(R.string.setting_category_not_premium_status_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                 showBecomePremiumDialog()
                 false
             }
 
             // Redeem promo code pref
-            findPreference(resources.getString(R.string.setting_category_premium_redeem_key)).setOnPreferenceClickListener {
-                val dialogView = activity.layoutInflater.inflate(R.layout.dialog_redeem_voucher, null)
-                val voucherEditText = dialogView.findViewById<View>(R.id.voucher) as EditText
+            findPreference<Preference>(resources.getString(R.string.setting_category_premium_redeem_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                activity?.let { activity ->
+                    val dialogView = activity.layoutInflater.inflate(R.layout.dialog_redeem_voucher, null)
+                    val voucherEditText = dialogView.findViewById<View>(R.id.voucher) as EditText
 
-                val builder = AlertDialog.Builder(activity)
-                    .setTitle(R.string.voucher_redeem_dialog_title)
-                    .setMessage(R.string.voucher_redeem_dialog_message)
-                    .setView(dialogView)
-                    .setPositiveButton(R.string.voucher_redeem_dialog_cta) { dialog, _ ->
-                        dialog.dismiss()
+                    val builder = AlertDialog.Builder(activity)
+                        .setTitle(R.string.voucher_redeem_dialog_title)
+                        .setMessage(R.string.voucher_redeem_dialog_message)
+                        .setView(dialogView)
+                        .setPositiveButton(R.string.voucher_redeem_dialog_cta) { dialog, _ ->
+                            dialog.dismiss()
 
-                        val promocode = voucherEditText.text.toString()
-                        if (promocode.trim { it <= ' ' }.isEmpty()) {
-                            AlertDialog.Builder(activity)
-                                .setTitle(R.string.voucher_redeem_error_dialog_title)
-                                .setMessage(R.string.voucher_redeem_error_code_invalid_dialog_message)
-                                .setPositiveButton(R.string.ok) { dialog12, _ -> dialog12.dismiss() }
-                                .show()
+                            val promocode = voucherEditText.text.toString()
+                            if (promocode.trim { it <= ' ' }.isEmpty()) {
+                                AlertDialog.Builder(activity)
+                                    .setTitle(R.string.voucher_redeem_error_dialog_title)
+                                    .setMessage(R.string.voucher_redeem_error_code_invalid_dialog_message)
+                                    .setPositiveButton(R.string.ok) { dialog12, _ -> dialog12.dismiss() }
+                                    .show()
+                            }
+
+                            if (!launchRedeemPromocodeFlow(promocode)) {
+                                AlertDialog.Builder(activity)
+                                    .setTitle(R.string.iab_purchase_error_title)
+                                    .setMessage(resources.getString(R.string.iab_purchase_error_message, "Error redeeming promo code"))
+                                    .setPositiveButton(R.string.ok) { dialog1, _ -> dialog1.dismiss() }
+                                    .show()
+                            }
                         }
+                        .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
 
-                        if (!launchRedeemPromocodeFlow(promocode)) {
-                            AlertDialog.Builder(activity)
-                                .setTitle(R.string.iab_purchase_error_title)
-                                .setMessage(resources.getString(R.string.iab_purchase_error_message, "Error redeeming promo code"))
-                                .setPositiveButton(R.string.ok) { dialog1, _ -> dialog1.dismiss() }
-                                .show()
+                    val dialog = builder.show()
+
+                    // Directly show keyboard when the dialog pops
+                    voucherEditText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+                        // Check if the device doesn't have a physical keyboard
+                        if (hasFocus && resources.configuration.keyboard == Configuration.KEYBOARD_NOKEYS) {
+                            dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
                         }
-                    }
-                    .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
-
-                val dialog = builder.show()
-
-                // Directly show keyboard when the dialog pops
-                voucherEditText.setOnFocusChangeListener { _, hasFocus ->
-                    // Check if the device doesn't have a physical keyboard
-                    if (hasFocus && resources.configuration.keyboard == Configuration.KEYBOARD_NOKEYS)
-                    {
-                        dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
                     }
                 }
 
@@ -436,8 +457,10 @@ class PreferencesFragment : PreferenceFragment() {
     }
 
     private fun showBecomePremiumDialog() {
-        val intent = Intent(activity, PremiumActivity::class.java)
-        ActivityCompat.startActivityForResult(activity, intent, SettingsActivity.PREMIUM_ACTIVITY, null)
+        activity?.let { activity ->
+            val intent = Intent(activity, PremiumActivity::class.java)
+            ActivityCompat.startActivityForResult(activity, intent, SettingsActivity.PREMIUM_ACTIVITY, null)
+        }
     }
 
     /**
@@ -448,7 +471,7 @@ class PreferencesFragment : PreferenceFragment() {
     private fun launchRedeemPromocodeFlow(promocode: String): Boolean {
         return try {
             val url = "https://play.google.com/redeem?code=" + URLEncoder.encode(promocode, "UTF-8")
-            activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+            activity?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
             true
         } catch (e: Exception) {
             Logger.error(false, "Error while redeeming promocode", e)
@@ -458,7 +481,9 @@ class PreferencesFragment : PreferenceFragment() {
     }
 
     override fun onDestroy() {
-        LocalBroadcastManager.getInstance(activity).unregisterReceiver(receiver)
+        context?.let {context ->
+            LocalBroadcastManager.getInstance(context).unregisterReceiver(receiver)
+        }
 
         super.onDestroy()
     }
