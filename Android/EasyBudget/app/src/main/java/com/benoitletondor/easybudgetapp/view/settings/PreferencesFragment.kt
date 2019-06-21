@@ -267,16 +267,6 @@ class PreferencesFragment : PreferenceFragment() {
                 showBecomePremiumDialog()
                 false
             }
-
-            /*
-             * Enable animations pref
-             */
-            val animationsPref = findPreference(resources.getString(R.string.setting_category_disable_animation_key)) as CheckBoxPreference
-            animationsPref.setOnPreferenceClickListener {
-                parameters.setAnimationsEnabled(animationsPref.isChecked)
-                true
-            }
-            animationsPref.isChecked = parameters.areAnimationsEnabled()
         }
 
         /*

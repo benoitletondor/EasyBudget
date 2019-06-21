@@ -16,27 +16,33 @@
 
 <resources>
 
-    <style name="Base.AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="Base.AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
         <item name="android:windowBackground">@android:color/white</item>
+        <item name="toolbarStyle">@style/ToolBarStyle</item>
+        <item name="android:actionBarStyle">@style/ToolBarStyle</item>
     </style>
 
-    <style name="Base.AppThemeNoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="colorAccent">@color/accent</item>
-        <item name="android:windowBackground">@android:color/white</item>
+    <style name="ToolBarStyle" parent="Widget.AppCompat.Toolbar">
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="android:titleTextStyle">@style/ToolbarTitleTextAppearance</item>
+        <item name="titleTextAppearance">@style/ToolbarTitleTextAppearance</item>
+    </style>
+
+    <style name="ToolbarTitleTextAppearance" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textColor">@color/action_bar_text_color</item>
+    </style>
+
+
+    <style name="ToolbarTheme" parent="ThemeOverlay.AppCompat.ActionBar">
+        <item name="colorControlNormal">@color/action_bar_text_color</item>
+        <item name="actionMenuTextColor">@color/action_bar_text_color</item>
     </style>
 
     <!-- App theme -->
     <style name="AppTheme" parent="Base.AppTheme">
-
-    </style>
-
-    <!-- App theme without ActionBar -->
-    <style name="AppThemeNoActionBar" parent="Base.AppThemeNoActionBar">
 
     </style>
 

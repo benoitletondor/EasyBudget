@@ -20,7 +20,7 @@
         <shape android:shape="oval" >
             <stroke
                 android:width="2dp"
-                android:color="@color/primary_dark" />
+                android:color="@color/calendar_today_stroke_color" />
 
             <solid android:color="@color/primary" />
         </shape>

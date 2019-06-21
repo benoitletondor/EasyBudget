@@ -25,6 +25,7 @@ import android.view.MenuItem
 
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.view.premium.PremiumActivity
+import kotlinx.android.synthetic.main.activity_settings.*
 
 /**
  * Activity that displays settings using the [PreferencesFragment]
@@ -37,6 +38,7 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
+        setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowHomeEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }

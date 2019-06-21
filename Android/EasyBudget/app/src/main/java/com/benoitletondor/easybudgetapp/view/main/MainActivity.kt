@@ -106,6 +106,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        setSupportActionBar(toolbar)
+
         initCalendarFragment(savedInstanceState)
         initRecyclerView()
 
@@ -602,15 +604,13 @@ class MainActivity : AppCompatActivity() {
                 val startIntent = Intent(this@MainActivity, ExpenseEditActivity::class.java)
                 startIntent.putExtra("date", date.time)
 
-                if ( parameters.areAnimationsEnabled() ) {
-                    // Get the absolute location on window for Y value
-                    val viewLocation = IntArray(2)
-                    view!!.getLocationInWindow(viewLocation)
+                // Get the absolute location on window for Y value
+                val viewLocation = IntArray(2)
+                view!!.getLocationInWindow(viewLocation)
 
-                    startIntent.putExtra(ANIMATE_TRANSITION_KEY, true)
-                    startIntent.putExtra(CENTER_X_KEY, view.x.toInt() + view.width / 2)
-                    startIntent.putExtra(CENTER_Y_KEY, viewLocation[1] + view.height / 2)
-                }
+                startIntent.putExtra(ANIMATE_TRANSITION_KEY, true)
+                startIntent.putExtra(CENTER_X_KEY, view.x.toInt() + view.width / 2)
+                startIntent.putExtra(CENTER_Y_KEY, viewLocation[1] + view.height / 2)
 
                 ActivityCompat.startActivityForResult(this@MainActivity, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null)
             }
@@ -643,19 +643,19 @@ class MainActivity : AppCompatActivity() {
                 rightButtonParams.setMargins(0, 0, this@MainActivity.resources.getDimensionPixelSize(R.dimen.calendar_month_buttons_margin), 0)
                 rightButton.layoutParams = rightButtonParams
 
-                textView.setTextColor(ContextCompat.getColor(this@MainActivity, android.R.color.white))
-                topLayout.setBackgroundColor(ContextCompat.getColor(this@MainActivity, R.color.primary_dark))
+                textView.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.calendar_header_month_color))
+                topLayout.setBackgroundColor(ContextCompat.getColor(this@MainActivity, R.color.calendar_header_background))
 
                 leftButton.text = "<"
                 leftButton.textSize = 25f
                 leftButton.gravity = Gravity.CENTER
-                leftButton.setTextColor(ContextCompat.getColor(this@MainActivity, android.R.color.white))
+                leftButton.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.calendar_month_button_color))
                 leftButton.setBackgroundResource(R.drawable.calendar_month_switcher_button_drawable)
 
                 rightButton.text = ">"
                 rightButton.textSize = 25f
                 rightButton.gravity = Gravity.CENTER
-                rightButton.setTextColor(ContextCompat.getColor(this@MainActivity, android.R.color.white))
+                rightButton.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.calendar_month_button_color))
                 rightButton.setBackgroundResource(R.drawable.calendar_month_switcher_button_drawable)
 
                 weekDayGreedView.setPadding(0, this@MainActivity.resources.getDimensionPixelSize(R.dimen.calendar_weekdays_padding_top), 0, this@MainActivity.resources.getDimensionPixelSize(R.dimen.calendar_weekdays_padding_bottom))
@@ -736,11 +736,9 @@ class MainActivity : AppCompatActivity() {
             val startIntent = Intent(this@MainActivity, ExpenseEditActivity::class.java)
             startIntent.putExtra("date", calendarFragment.getSelectedDate().time)
 
-            if ( parameters.areAnimationsEnabled() ) {
-                startIntent.putExtra(ANIMATE_TRANSITION_KEY, true)
-                startIntent.putExtra(CENTER_X_KEY, menu.x.toInt() + (menu.width.toFloat() / 1.2f).toInt())
-                startIntent.putExtra(CENTER_Y_KEY, menu.y.toInt() + (menu.height.toFloat() / 1.2f).toInt())
-            }
+            startIntent.putExtra(ANIMATE_TRANSITION_KEY, true)
+            startIntent.putExtra(CENTER_X_KEY, menu.x.toInt() + (menu.width.toFloat() / 1.2f).toInt())
+            startIntent.putExtra(CENTER_Y_KEY, menu.y.toInt() + (menu.height.toFloat() / 1.2f).toInt())
 
             ActivityCompat.startActivityForResult(this@MainActivity, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null)
 
@@ -752,11 +750,9 @@ class MainActivity : AppCompatActivity() {
             val startIntent = Intent(this@MainActivity, RecurringExpenseAddActivity::class.java)
             startIntent.putExtra("dateStart", calendarFragment.getSelectedDate().time)
 
-            if ( parameters.areAnimationsEnabled() ) {
-                startIntent.putExtra(ANIMATE_TRANSITION_KEY, true)
-                startIntent.putExtra(CENTER_X_KEY, menu.x.toInt() + (menu.width.toFloat() / 1.2f).toInt())
-                startIntent.putExtra(CENTER_Y_KEY, menu.y.toInt() + (menu.height.toFloat() / 1.2f).toInt())
-            }
+            startIntent.putExtra(ANIMATE_TRANSITION_KEY, true)
+            startIntent.putExtra(CENTER_X_KEY, menu.x.toInt() + (menu.width.toFloat() / 1.2f).toInt())
+            startIntent.putExtra(CENTER_Y_KEY, menu.y.toInt() + (menu.height.toFloat() / 1.2f).toInt())
 
             ActivityCompat.startActivityForResult(this@MainActivity, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null)
 

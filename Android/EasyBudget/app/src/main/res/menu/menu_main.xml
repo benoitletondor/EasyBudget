@@ -20,7 +20,7 @@
 
     <item android:id="@+id/action_monthly_report"
           android:title="@string/monthly_report_button_title"
-          android:icon="@drawable/ic_date_range_white_24dp"
+          android:icon="@drawable/ic_date_range_24dp"
           app:showAsAction="ifRoom" />
 
     <item android:id="@+id/action_balance"

@@ -48,6 +48,7 @@ class MonthlyReportBaseActivity : AppCompatActivity(), ViewPager.OnPageChangeLis
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_monthly_report)
 
+        setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowHomeEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 

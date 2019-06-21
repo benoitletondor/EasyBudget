@@ -34,7 +34,6 @@ import androidx.annotation.ColorRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
-import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
 import java.util.*
 import kotlin.math.max
@@ -130,23 +129,15 @@ object UIHelper {
     /**
      * Show the FAB, animating the appearance if activated (the FAB should be configured with scale & alpha to 0)
      */
-    fun showFAB(fab: View, parameters: Parameters) {
-        if ( parameters.areAnimationsEnabled() ) {
-            ViewCompat.animate(fab)
-                .scaleX(1.0f)
-                .scaleY(1.0f)
-                .alpha(1.0f)
-                .setInterpolator(AccelerateInterpolator())
-                .withLayer()
-                .start()
-        } else {
-            fab.scaleX = 1.0f
-            fab.scaleY = 1.0f
-            fab.alpha = 1.0f
-        }
+    fun showFAB(fab: View) {
+        ViewCompat.animate(fab)
+            .scaleX(1.0f)
+            .scaleY(1.0f)
+            .alpha(1.0f)
+            .setInterpolator(AccelerateInterpolator())
+            .withLayer()
+            .start()
     }
-
-
 
     /**
      * This helper prevents the user to add unsupported values into an EditText for decimal numbers
@@ -233,23 +224,4 @@ object UIHelper {
         }
 
     }
-}
-
-/**
- * Are animations enabled (boolean)
- */
-private const val ANIMATIONS_ENABLED_PARAMETERS_KEY = "animation_enabled"
-
-/**
- * Are animations enabled (can be disabled by user in settings)
- */
-fun Parameters.areAnimationsEnabled(): Boolean {
-    return getBoolean(ANIMATIONS_ENABLED_PARAMETERS_KEY, true)
-}
-
-/**
- * Set animation enabled value
- */
-fun Parameters.setAnimationsEnabled(enabled: Boolean) {
-    putBoolean(ANIMATIONS_ENABLED_PARAMETERS_KEY, enabled)
 }

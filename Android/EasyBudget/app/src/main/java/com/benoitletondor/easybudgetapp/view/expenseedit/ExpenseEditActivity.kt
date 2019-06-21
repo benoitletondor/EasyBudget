@@ -78,12 +78,12 @@ class ExpenseEditActivity : AppCompatActivity() {
             UIHelper.animateActivityEnter(this, object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
                     UIHelper.setFocus(description_edittext)
-                    UIHelper.showFAB(save_expense_fab, parameters)
+                    UIHelper.showFAB(save_expense_fab)
                 }
             })
         } else {
             UIHelper.setFocus(description_edittext)
-            UIHelper.showFAB(save_expense_fab, parameters)
+            UIHelper.showFAB(save_expense_fab)
         }
 
         UIHelper.removeButtonBorder(date_button) // Remove border on lollipop

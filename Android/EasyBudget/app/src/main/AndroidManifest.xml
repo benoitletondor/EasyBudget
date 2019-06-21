@@ -79,14 +79,12 @@
             android:name=".view.expenseedit.ExpenseEditActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_add_expense"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppThemeNoActionBar"/>
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".view.recurringexpenseadd.RecurringExpenseAddActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_recurring_expense_add"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppThemeNoActionBar"/>
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".view.settings.SettingsActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
@@ -96,14 +94,12 @@
             android:name=".view.welcome.WelcomeActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_welcome"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppThemeNoActionBar"/>
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".view.premium.PremiumActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_premium"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppThemeNoActionBar">
+            android:screenOrientation="portrait">
         </activity>
 
         <!-- Push -->

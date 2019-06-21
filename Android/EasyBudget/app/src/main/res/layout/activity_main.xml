@@ -27,16 +27,24 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appbar"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            app:elevation="0dp">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:theme="@style/ToolbarTheme"/>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
         <FrameLayout
             android:id="@+id/calendarView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="7dp"
-            android:background="@drawable/elevation_shadow"
-            android:layout_marginTop="-7dp" />
 
         <LinearLayout android:id="@+id/budgetLineContainer"
             android:layout_width="match_parent"
@@ -121,8 +129,8 @@
             android:layout_marginRight="10dp"
             android:layout_gravity="right|bottom"
             fab:fab_addButtonPlusIconColor="@android:color/white"
-            fab:fab_addButtonColorNormal="@color/primary"
-            fab:fab_addButtonColorPressed="@color/primary_dark"
+            fab:fab_addButtonColorNormal="@color/home_fab_button_color"
+            fab:fab_addButtonColorPressed="@color/home_fab_button_color_pressed"
             fab:fab_labelStyle="@style/fab_labels_style"
             app:layout_behavior="com.benoitletondor.easybudgetapp.view.main.FloatingActionButtonBehavior"
             tools:ignore="RtlHardcoded">

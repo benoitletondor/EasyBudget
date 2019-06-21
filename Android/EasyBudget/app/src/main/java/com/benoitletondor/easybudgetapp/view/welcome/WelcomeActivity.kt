@@ -79,7 +79,7 @@ class WelcomeActivity : AppCompatActivity() {
                     3 -> return Onboarding4Fragment()
                 }
 
-                throw IllegalStateException()
+                throw IllegalStateException("unknown position $position")
             }
 
             override fun getCount(): Int = 4
@@ -197,7 +197,7 @@ class WelcomeActivity : AppCompatActivity() {
 private const val ONBOARDING_STEP_PARAMETERS_KEY = "onboarding_step"
 
 fun Parameters.getOnboardingStep(): Int {
-    return getInt(ONBOARDING_STEP_PARAMETERS_KEY, -1)
+    return getInt(ONBOARDING_STEP_PARAMETERS_KEY, 0)
 }
 
 private fun Parameters.setOnboardingStep(step: Int) {
