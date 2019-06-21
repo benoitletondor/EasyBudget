@@ -88,6 +88,6 @@ class Onboarding2Fragment : OnboardingFragment() {
      * Set the next button text according to the selected currency
      */
     private fun setNextButtonText() {
-        onboarding_screen2_next_button?.text = resources.getString(R.string.onboarding_screen_2_cta, selectedCurrency!!.symbol)
+        onboarding_screen2_next_button?.text = resources.getString(R.string.onboarding_screen_2_cta, selectedCurrency.symbol)
     }
 }

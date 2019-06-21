@@ -90,7 +90,7 @@ class RecurringExpenseAddActivity : AppCompatActivity() {
         viewModel.savingIsRevenueEventStream.observe(this, Observer { isRevenue ->
             // Show a ProgressDialog
             val dialog = ProgressDialog(this)
-            dialog.setIndeterminate(true)
+            dialog.isIndeterminate = true
             dialog.setTitle(R.string.recurring_expense_add_loading_title)
             dialog.setMessage(getString(if (isRevenue ) R.string.recurring_income_add_loading_message else R.string.recurring_expense_add_loading_message))
             dialog.setCanceledOnTouchOutside(false)

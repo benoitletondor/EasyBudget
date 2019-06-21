@@ -67,7 +67,7 @@ class SelectCurrencyRecyclerViewAdapter(private val mainCurrencies: List<Currenc
         if (!holder.separator) {
             val currency = if (holder.type == TYPE_MAIN_CURRENCY) mainCurrencies[position] else secondaryCurrencies[position - 1 - mainCurrencies.size]
 
-            val userCurrency = parameters.getUserCurrency().equals(currency)
+            val userCurrency = parameters.getUserCurrency() == currency
 
             holder.selectedIndicator?.visibility = if (userCurrency) View.VISIBLE else View.INVISIBLE
             holder.currencyTitle?.text = CurrencyHelper.getCurrencyDisplayName(currency)

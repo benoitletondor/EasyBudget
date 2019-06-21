@@ -10,7 +10,7 @@ import com.benoitletondor.easybudgetapp.iab.PremiumPurchaseFlowResult
 import kotlinx.coroutines.launch
 
 class PremiumViewModel(private val iab: Iab) : ViewModel() {
-    val premiumFlowStatusLiveData = MutableLiveData<PremiumFlowStatus>(PremiumFlowStatus.NOT_STARTED)
+    val premiumFlowStatusLiveData = MutableLiveData(PremiumFlowStatus.NOT_STARTED)
     val premiumFlowErrorEventStream = SingleLiveEvent<PremiumPurchaseFlowResult>()
 
     fun onBuyPremiumClicked(activity: Activity) {

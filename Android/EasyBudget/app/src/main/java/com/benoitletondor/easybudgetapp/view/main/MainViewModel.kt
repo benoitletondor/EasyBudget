@@ -206,10 +206,6 @@ class MainViewModel(private val db: DB,
         }
     }
 
-    fun onChangeMonth(time: Date) {
-        // No-op
-    }
-
     fun onAdjustCurrentBalanceClicked() {
         viewModelScope.launch {
             val balance = withContext(Dispatchers.Default) {

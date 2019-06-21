@@ -23,12 +23,14 @@ import android.util.AttributeSet
 import android.view.View
 
 import com.getbase.floatingactionbutton.FloatingActionsMenu
+import kotlin.math.min
 
 /**
  * Behavior of FAB for [FloatingActionsMenu] reacting to Snackbar
  *
  * @author Benoit LETONDOR
  */
+@Suppress("UNUSED_PARAMETER")
 class FloatingActionButtonBehavior(context: Context, attrs: AttributeSet) : CoordinatorLayout.Behavior<FloatingActionsMenu>() {
 
     override fun layoutDependsOn(parent: CoordinatorLayout, child: FloatingActionsMenu, dependency: View): Boolean {
@@ -36,7 +38,7 @@ class FloatingActionButtonBehavior(context: Context, attrs: AttributeSet) : Coor
     }
 
     override fun onDependentViewChanged(parent: CoordinatorLayout, child: FloatingActionsMenu, dependency: View): Boolean {
-        val translationY = Math.min(0f, dependency.translationY - dependency.height)
+        val translationY = min(0f, dependency.translationY - dependency.height)
         child.translationY = translationY
         return true
     }

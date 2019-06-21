@@ -134,15 +134,11 @@ class Onboarding3Fragment : OnboardingFragment(), CoroutineScope by MainScope() 
         super.onDestroy()
     }
 
-    override fun setUserVisibleHint(isVisibleToUser: Boolean) {
-        super.setUserVisibleHint(isVisibleToUser)
+    override fun onResume() {
+        super.onResume()
 
-        if (isVisibleToUser)
-        // Update values on display
-        {
-            setCurrency()
-            setButtonText()
-        }
+        setCurrency()
+        setButtonText()
     }
 
 // -------------------------------------->

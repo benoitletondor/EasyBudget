@@ -37,6 +37,7 @@ import androidx.core.view.ViewCompat
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
 import java.util.*
+import kotlin.math.max
 
 /**
  * Helper to manage compat with 5+
@@ -44,11 +45,6 @@ import java.util.*
  * @author Benoit LETONDOR
  */
 object UIHelper {
-
-    /**
-     * Check if the os version is compatible with activity enter animations (Android 5+)
-     */
-    fun isCompatibleWithActivityEnterAnimation() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
 
     /**
      * Remove border of the button for Android 5+
@@ -63,15 +59,13 @@ object UIHelper {
      * Set the status bar color for Android 5+
      */
     fun setStatusBarColor(activity: Activity, @ColorRes colorRes: Int) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            val window = activity.window
+        val window = activity.window
 
-            if (window.attributes.flags and WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS == 0) {
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-            }
-
-            window.statusBarColor = ContextCompat.getColor(activity, colorRes)
+        if (window.attributes.flags and WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS == 0) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         }
+
+        window.statusBarColor = ContextCompat.getColor(activity, colorRes)
     }
 
     /**
@@ -79,7 +73,7 @@ object UIHelper {
      * activity contains the animation key
      */
     fun willAnimateActivityEnter(activity: Activity): Boolean {
-        return isCompatibleWithActivityEnterAnimation() && activity.intent.getBooleanExtra(MainActivity.ANIMATE_TRANSITION_KEY, false)
+        return activity.intent.getBooleanExtra(MainActivity.ANIMATE_TRANSITION_KEY, false)
     }
 
     /**
@@ -107,7 +101,7 @@ object UIHelper {
                     val cy = activity.intent.getIntExtra(MainActivity.CENTER_Y_KEY, rootView.height / 2)
 
                     // get the final radius for the clipping circle
-                    val finalRadius = Math.max(rootView.width, rootView.height)
+                    val finalRadius = max(rootView.width, rootView.height)
 
                     // create the animator for this view (the start radius is zero)
                     val anim = ViewAnimationUtils.createCircularReveal(rootView, cx, cy, 0f, finalRadius.toFloat())

@@ -37,6 +37,8 @@ import com.benoitletondor.easybudgetapp.parameters.Parameters
 import kotlinx.android.synthetic.main.activity_welcome.*
 
 import org.koin.android.ext.android.inject
+import java.lang.IllegalStateException
+import kotlin.math.max
 
 /**
  * Welcome screen activity
@@ -68,8 +70,8 @@ class WelcomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_welcome)
 
-        welcome_view_pager.adapter = object : FragmentStatePagerAdapter(supportFragmentManager) {
-            override fun getItem(position: Int): Fragment? {
+        welcome_view_pager.adapter = object : FragmentStatePagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+            override fun getItem(position: Int): Fragment {
                 when (position) {
                     0 -> return Onboarding1Fragment()
                     1 -> return Onboarding2Fragment()
@@ -77,17 +79,13 @@ class WelcomeActivity : AppCompatActivity() {
                     3 -> return Onboarding4Fragment()
                 }
 
-                return null
+                throw IllegalStateException()
             }
 
-            override fun getCount(): Int {
-                return 4
-            }
+            override fun getCount(): Int = 4
         }
         welcome_view_pager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-
-            }
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
 
             override fun onPageSelected(position: Int) {
                 ((welcome_view_pager?.adapter as? FragmentStatePagerAdapter)?.getItem(position) as? OnboardingFragment)?.let { fragment ->
@@ -97,9 +95,7 @@ class WelcomeActivity : AppCompatActivity() {
                 step = position
             }
 
-            override fun onPageScrollStateChanged(state: Int) {
-
-            }
+            override fun onPageScrollStateChanged(state: Int) {}
         })
         welcome_view_pager.offscreenPageLimit = welcome_view_pager.adapter?.count ?: 0 // preload all fragments for transitions smoothness
 
@@ -123,7 +119,7 @@ class WelcomeActivity : AppCompatActivity() {
                         val cy = intent.getIntExtra(CENTER_Y_KEY, pager.y.toInt() + pager.height / 2)
 
                         // get the final radius for the clipping circle
-                        val finalRadius = Math.max(pager.width, pager.height)
+                        val finalRadius = max(pager.width, pager.height)
 
                         // create the animator for this view (the start radius is zero)
                         val anim = ViewAnimationUtils.createCircularReveal(pager, cx, cy, 0f, finalRadius.toFloat())
@@ -174,9 +170,6 @@ class WelcomeActivity : AppCompatActivity() {
     }
 
     companion object {
-        /**
-         * Value used for the [com.benoitletondor.easybudgetapp.helper.ParameterKeys.ONBOARDING_STEP] when completed
-         */
         const val STEP_COMPLETED = Integer.MAX_VALUE
 
         const val ANIMATE_TRANSITION_KEY = "animate"

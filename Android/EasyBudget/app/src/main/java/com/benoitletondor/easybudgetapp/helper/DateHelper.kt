@@ -40,7 +40,6 @@ object DateHelper {
      *
      * @return a list of Date object set at the 1st day of the month 00:00:00:000
      */
-    @JvmStatic
     fun getListOfMonthsAvailableForUser(parameters: Parameters): List<Date> {
         val initDate = parameters.getInitTimestamp()
 
@@ -72,7 +71,6 @@ object DateHelper {
      * @param date date of the month
      * @return a formatted string like "January 2016"
      */
-    @JvmStatic
     fun getMonthTitle(context: Context, date: Date): String {
         val format = SimpleDateFormat(context.resources.getString(R.string.monthly_report_month_title_format), Locale.getDefault())
         return format.format(date)

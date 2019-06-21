@@ -107,7 +107,6 @@ class MonthlyReportFragment : Fragment() {
     }
 
     companion object {
-        @JvmStatic
         fun newInstance(date: Date): MonthlyReportFragment = MonthlyReportFragment().apply {
             arguments = Bundle().apply {
                 putSerializable(ARG_DATE, date)

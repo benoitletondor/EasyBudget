@@ -9,6 +9,8 @@ import com.benoitletondor.easybudgetapp.db.impl.entity.ExpenseEntity
 import com.benoitletondor.easybudgetapp.db.impl.entity.RecurringExpenseEntity
 import com.benoitletondor.easybudgetapp.helper.Logger
 import java.util.*
+import kotlin.math.ceil
+import kotlin.math.floor
 
 class DBImpl(private val roomDB: RoomDB) : DB {
 
@@ -177,7 +179,7 @@ private fun Double.getDBValue(): Long {
         Logger.debug("getDBValueForDouble: $stringValue")
     }
 
-    val ceiledValue = Math.ceil(this * 100).toLong()
+    val ceiledValue = ceil(this * 100).toLong()
     val ceiledDoubleValue = ceiledValue / 100.0
 
     if (CurrencyHelper.getFormattedAmountValue(ceiledDoubleValue) == stringValue) {
@@ -197,7 +199,7 @@ private fun Double.getDBValue(): Long {
         return normalValue
     }
 
-    val flooredValue = Math.floor(this * 100).toLong()
+    val flooredValue = floor(this * 100).toLong()
     if (BuildConfig.DEBUG_LOG) {
         Logger.debug("getDBValueForDouble, return floored value: $flooredValue")
     }

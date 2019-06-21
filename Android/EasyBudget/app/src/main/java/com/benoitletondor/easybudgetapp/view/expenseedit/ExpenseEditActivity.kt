@@ -36,6 +36,7 @@ import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.abs
 
 /**
  * Activity to add a new expense
@@ -201,7 +202,7 @@ class ExpenseEditActivity : AppCompatActivity() {
         UIHelper.preventUnsupportedInputForDecimals(amount_edittext)
 
         if (amount != null) {
-            amount_edittext.setText(CurrencyHelper.getFormattedAmountValue(Math.abs(amount)))
+            amount_edittext.setText(CurrencyHelper.getFormattedAmountValue(abs(amount)))
         }
     }
 

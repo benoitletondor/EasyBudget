@@ -123,7 +123,6 @@ object CurrencyHelper {
     /**
      * Helper to display an amount using the user currency
      */
-    @JvmStatic
     fun getFormattedCurrencyString(parameters: Parameters, amount: Double): String {
         val currencyFormat = NumberFormat.getCurrencyInstance()
 

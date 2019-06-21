@@ -29,6 +29,7 @@ import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.iab.PremiumPurchaseFlowResult
 import kotlinx.android.synthetic.main.activity_premium.*
 import org.koin.android.viewmodel.ext.android.viewModel
+import java.lang.IllegalStateException
 
 /**
  * Activity that contains the premium onboarding screen. This activity should return with a
@@ -47,20 +48,18 @@ class PremiumActivity : AppCompatActivity() {
         // Cancelled by default
         setResult(Activity.RESULT_CANCELED)
 
-        premium_view_pager.adapter = object : FragmentPagerAdapter(supportFragmentManager) {
-            override fun getItem(position: Int): Fragment? {
+        premium_view_pager.adapter = object : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+            override fun getItem(position: Int): Fragment {
                 when (position) {
                     0 -> return Premium1Fragment()
                     1 -> return Premium2Fragment()
                     2 -> return Premium3Fragment()
                 }
 
-                return null
+                throw IllegalStateException()
             }
 
-            override fun getCount(): Int {
-                return 3
-            }
+            override fun getCount(): Int = 3
         }
         premium_view_pager.offscreenPageLimit = premium_view_pager.adapter!!.count // preload all fragments for transitions smoothness
 

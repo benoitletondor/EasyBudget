@@ -619,8 +619,6 @@ class MainActivity : AppCompatActivity() {
                 val cal = Calendar.getInstance()
                 cal.set(Calendar.MONTH, month)
                 cal.set(Calendar.YEAR, year)
-
-                viewModel.onChangeMonth(cal.time)
             }
 
             override fun onCaldroidViewCreated() {

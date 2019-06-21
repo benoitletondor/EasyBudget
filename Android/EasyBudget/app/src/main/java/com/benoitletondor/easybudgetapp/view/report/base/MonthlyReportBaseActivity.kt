@@ -113,7 +113,7 @@ class MonthlyReportBaseActivity : AppCompatActivity(), ViewPager.OnPageChangeLis
      */
     private fun configureViewPager(dates: List<Date>) {
         monthly_report_view_pager.offscreenPageLimit = 0
-        monthly_report_view_pager.adapter = object : FragmentPagerAdapter(supportFragmentManager) {
+        monthly_report_view_pager.adapter = object : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
             override fun getItem(position: Int): Fragment {
                 return MonthlyReportFragment.newInstance(dates[position])
             }

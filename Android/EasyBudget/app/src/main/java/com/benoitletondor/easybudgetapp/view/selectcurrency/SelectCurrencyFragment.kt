@@ -38,8 +38,8 @@ import org.koin.android.viewmodel.ext.android.viewModel
  * the selected currency has changed. The newly selected currency ISO code is available in
  * the [.CURRENCY_ISO_EXTRA] string extra.<br></br>
  * <br></br>
- * NB: The [com.benoitletondor.easybudgetapp.helper.CurrencyHelper.setUserCurrency]
- * method is automaticaly called by the fragment on selection, you don't have to do it yourself.
+ * NB: The setUserCurrency method is automaticaly called by the fragment on selection, y
+ * ou don't have to do it yourself.
  *
  * @author Benoit LETONDOR
  */

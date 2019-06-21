@@ -63,16 +63,19 @@
                 android:layout_marginLeft="60dp"
                 android:layout_marginRight="60dp">
 
-                <EditText android:id="@+id/onboarding_screen3_initial_amount_et"
-                          android:layout_width="0dip"
-                          android:layout_weight="1.0"
-                          android:layout_height="wrap_content"
-                          android:background="@android:color/white"
-                          android:maxLines="1"
-                          android:textSize="30dp"
-                          android:padding="5dp"
-                          android:inputType="numberDecimal"
-                          android:digits="-0123456789.," />
+                <EditText
+                    android:id="@+id/onboarding_screen3_initial_amount_et"
+                    android:layout_width="0dip"
+                    android:layout_weight="1.0"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/white"
+                    android:maxLines="1"
+                    android:textSize="30dp"
+                    android:padding="5dp"
+                    android:inputType="numberDecimal"
+                    android:digits="-0123456789.,"
+                    android:importantForAutofill="no"
+                    tools:ignore="UnusedAttribute" />
 
                 <TextView android:id="@+id/onboarding_screen3_initial_amount_money_tv"
                     android:layout_width="wrap_content"
