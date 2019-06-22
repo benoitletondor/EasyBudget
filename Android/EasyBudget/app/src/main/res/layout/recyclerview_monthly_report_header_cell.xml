@@ -18,12 +18,6 @@
       android:layout_width="match_parent"
       android:layout_height="30dp">
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="7dp"
-        android:rotation="180"
-        android:background="@drawable/elevation_shadow"/>
-
     <TextView android:id="@+id/monthly_recycler_view_header_tv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
