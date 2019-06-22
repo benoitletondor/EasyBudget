@@ -21,12 +21,14 @@ import android.animation.AnimatorListenerAdapter
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
+import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.helper.UIHelper
 import com.benoitletondor.easybudgetapp.helper.getUserCurrency
@@ -46,6 +48,8 @@ import kotlin.math.abs
 class ExpenseEditActivity : AppCompatActivity() {
     private val parameters: Parameters by inject()
     private val viewModel: ExpenseEditViewModel by viewModel()
+
+    private var isContentScrollable = false
 
 // -------------------------------------->
 
@@ -100,17 +104,47 @@ class ExpenseEditActivity : AppCompatActivity() {
             setResult(Activity.RESULT_OK)
             finish()
         })
+
+
+        // Only show save toolbar item if save button is not fully visible
+        expense_scroll_view.viewTreeObserver.addOnGlobalLayoutListener {
+            val scrollView = expense_scroll_view ?: return@addOnGlobalLayoutListener
+            val childHeight = expense_scroll_content?.height ?: return@addOnGlobalLayoutListener
+            val contentScrollable = scrollView.height < childHeight + scrollView.paddingTop + scrollView.paddingBottom
+            if( isContentScrollable != contentScrollable ) {
+                isContentScrollable = contentScrollable
+                invalidateOptionsMenu()
+            }
+        }
     }
 
 // ----------------------------------->
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_edit_expense, menu)
 
-        if (id == android.R.id.home)
-        {
-            finish()
-            return true
+        if( !isContentScrollable ) {
+            menu.removeItem(R.id.action_save)
+        }
+
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                return true
+            }
+            R.id.action_save -> {
+                if (validateInputs()) {
+                    val value = java.lang.Double.parseDouble(amount_edittext.text.toString())
+
+                    viewModel.onSave(value, description_edittext.text.toString())
+                }
+
+                return true
+            }
         }
 
         return super.onOptionsItemSelected(item)

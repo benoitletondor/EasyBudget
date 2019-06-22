@@ -14,13 +14,14 @@
    limitations under the License.
 -->
 
-<resources>
-    <!-- App theme -->
-    <style name="AppTheme" parent="Base.AppTheme">
-        <item name="android:statusBarColor">@color/window_background</item>
-        <item name="android:windowLightStatusBar">@bool/light_system_bar</item>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-    </style>
+    <item
+        android:id="@+id/action_save"
+        android:title="@string/expense_add_button_cta"
+        android:icon="@drawable/ic_save_24dp"
+        app:showAsAction="always" />
 
-</resources>
+</menu>

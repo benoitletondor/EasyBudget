@@ -155,7 +155,7 @@
     <string name="setting_theme_platform">Por defecto</string>
 
     <string name="premium_popup_premium_title">¡Eres premium!</string>
-    <string name="premium_popup_premium_message">Tienes acceso a las funcionalidades premium:\n\n- Informe mensual: Recibe un recapitulativo de los gastos e ingresos del mes\n- Recordatorio diario si olvidaste entrar tus gastos durante el día\n… ¡y más funcionalidades premium que serán añadidas pronto!</string>
+    <string name="premium_popup_premium_message">Tienes acceso a las funcionalidades premium:\n\n- Informe mensual: Recibe un recapitulativo de los gastos e ingresos del mes\n- Recordatorio diario si olvidaste entrar tus gastos durante el día\n- Modo oscuro\n… ¡y más funcionalidades premium que serán añadidas pronto!</string>
     <string name="premium_popup_not_premium_title">Vuélvete premium</string>
     <string name="premium_popup_not_premium_message">¡Accede a las funcionalidades premium!</string>
     <string name="premium_popup_not_premium_feature1_title">2. Recordatorio diario</string>

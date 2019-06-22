@@ -156,12 +156,13 @@
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <LinearLayout android:id="@+id/monthly_report_hint"
+    <LinearLayout
+        android:id="@+id/monthly_report_hint"
         android:layout_width="220dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_gravity="top|right"
-        android:layout_marginTop="-30dp"
+        android:layout_marginTop="10dp"
         android:layout_marginRight="34dp"
         android:visibility="gone">
 

@@ -65,6 +65,10 @@ object UIHelper {
         }
 
         window.statusBarColor = ContextCompat.getColor(activity, colorRes)
+
+        if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ) {
+            window.navigationBarColor = ContextCompat.getColor(activity, colorRes)
+        }
     }
 
     /**

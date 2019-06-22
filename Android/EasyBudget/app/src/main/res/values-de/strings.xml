@@ -155,7 +155,7 @@
     <string name="setting_theme_platform">Systemfehler</string>
 
     <string name="premium_popup_premium_title">Sie sind Premium-Nutzer!</string>
-    <string name="premium_popup_premium_message">Sie haben Zugriff auf Premium-Features:\n\n- Monatliche Zusammenfassung: Erhalten Sie eine Zusammenfassung Ihrer monatl. Einnahmen und Ausgaben.\n- Tägliche Erinnerungen, wenn Sie vergessen Ihre Ausgaben einzutragen\n… und mehr Premium-Features, die in Kürze hinzugefügt werden!</string>
+    <string name="premium_popup_premium_message">Sie haben Zugriff auf Premium-Features:\n\n- Monatliche Zusammenfassung: Erhalten Sie eine Zusammenfassung Ihrer monatl. Einnahmen und Ausgaben.\n- Tägliche Erinnerungen, wenn Sie vergessen Ihre Ausgaben einzutragen\n- Dunkles Theme\n… und mehr Premium-Features, die in Kürze hinzugefügt werden!</string>
     <string name="premium_popup_not_premium_title">Premium-Nutzer werden</string>
     <string name="premium_popup_not_premium_message">Auf alle Premium-Features zugreifen!</string>
     <string name="premium_popup_not_premium_feature1_title">2. Tägliche Erinnerung</string>

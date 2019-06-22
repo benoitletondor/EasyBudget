@@ -27,6 +27,7 @@ import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.viewpager.widget.ViewPager
 import android.os.Bundle
+import android.view.View
 import android.view.ViewAnimationUtils
 import androidx.appcompat.app.AppCompatActivity
 
@@ -150,6 +151,13 @@ class WelcomeActivity : AppCompatActivity() {
         // Set status bar color
         (((welcome_view_pager.adapter) as? FragmentStatePagerAdapter)?.getItem(initialStep) as? OnboardingFragment)?.let { fragment ->
             UIHelper.setStatusBarColor(this, fragment.statusBarColor)
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            var flags = window.decorView.systemUiVisibility
+            flags = flags and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
+
+            window.decorView.systemUiVisibility = flags
         }
     }
 

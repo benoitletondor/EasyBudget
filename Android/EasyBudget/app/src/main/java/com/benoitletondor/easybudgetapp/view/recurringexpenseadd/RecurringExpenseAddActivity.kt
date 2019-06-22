@@ -22,6 +22,7 @@ import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.ProgressDialog
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
@@ -43,6 +44,8 @@ import java.util.*
 class RecurringExpenseAddActivity : AppCompatActivity() {
     private val parameters: Parameters by inject()
     private val viewModel: RecurringExpenseAddViewModel by viewModel()
+
+    private var isContentScrollable = false
 
 // ------------------------------------------->
 
@@ -118,14 +121,44 @@ class RecurringExpenseAddActivity : AppCompatActivity() {
                 .setNegativeButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
                 .show()
         })
+
+        // Only show save toolbar item if save button is not fully visible
+        expense_scroll_view.viewTreeObserver.addOnGlobalLayoutListener {
+            val scrollView = expense_scroll_view ?: return@addOnGlobalLayoutListener
+            val childHeight = expense_scroll_content?.height ?: return@addOnGlobalLayoutListener
+            val contentScrollable = scrollView.height < childHeight + scrollView.paddingTop + scrollView.paddingBottom
+            if( isContentScrollable != contentScrollable ) {
+                isContentScrollable = contentScrollable
+                invalidateOptionsMenu()
+            }
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_edit_expense, menu)
+
+        if( !isContentScrollable ) {
+            menu.removeItem(R.id.action_save)
+        }
+
+        return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
+        when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                return true
+            }
+            R.id.action_save -> {
+                if (validateInputs()) {
+                    val value = java.lang.Double.parseDouble(amount_edittext.text.toString())
 
-        if (id == android.R.id.home) {
-            finish()
-            return true
+                    viewModel.onSave(value, description_edittext.text.toString(), getRecurringTypeFromSpinnerSelection(expense_type_spinner.selectedItemPosition))
+                }
+
+                return true
+            }
         }
 
         return super.onOptionsItemSelected(item)

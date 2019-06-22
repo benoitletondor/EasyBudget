@@ -20,7 +20,6 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Observer
@@ -90,18 +89,14 @@ class MonthlyReportBaseActivity : AppCompatActivity(), ViewPager.OnPageChangeLis
             val isFirstMonth = position == 0
 
             monthly_report_next_month_button.isEnabled = !isLatestMonth
-            monthly_report_next_month_button.setTextColor(ContextCompat.getColor(this, if (isLatestMonth) R.color.monthly_report_disabled_month_button else android.R.color.white))
             monthly_report_previous_month_button.isEnabled = !isFirstMonth
-            monthly_report_previous_month_button.setTextColor(ContextCompat.getColor(this, if (isFirstMonth) R.color.monthly_report_disabled_month_button else android.R.color.white))
         })
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
 
-        if (id == android.R.id.home)
-        // Back button of the actionbar
-        {
+        if (id == android.R.id.home) {
             finish()
             return true
         }
