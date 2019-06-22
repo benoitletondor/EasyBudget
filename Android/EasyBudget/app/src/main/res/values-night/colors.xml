@@ -15,7 +15,7 @@
 -->
 
 <resources>
-    <color name="window_background">#000</color>
+    <color name="window_background">#1c2124</color>
 
     <color name="primary_light">#444</color>
 

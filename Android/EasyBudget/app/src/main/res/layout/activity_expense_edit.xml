@@ -182,6 +182,7 @@
                     android:paddingBottom="0dp"
                     android:paddingTop="0dp"
                     android:layout_marginTop="6dp"
+                    android:textAllCaps="false"
                     app:layout_constraintStart_toStartOf="@+id/expense_date_title"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/expense_date_title"/>
@@ -203,6 +204,7 @@
                 android:paddingTop="10dp"
                 android:paddingBottom="10dp"
                 android:insetBottom="16dp"
+                android:textAllCaps="false"
                 app:layout_constraintTop_toBottomOf="@+id/expense_edit_form"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
