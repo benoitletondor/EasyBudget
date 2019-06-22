@@ -101,35 +101,35 @@
         android:layout_marginBottom="15dp"
         android:clipChildren="false">
 
-        <Button android:id="@+id/premium_not_now_button"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/premium_not_now_button"
             android:layout_width="0dip"
             android:layout_weight="0.5"
             android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:theme="@style/Theme.MaterialComponents.NoActionBar"
             android:text="@string/premium_popup_become_not_now"
-            android:gravity="center"
-            android:textSize="20dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
+            android:layout_marginEnd="5dp"
             android:textAllCaps="false"
-            android:layout_marginRight="5dp"
             android:maxLines="1"
             android:ellipsize="end"
-            android:theme="@style/LightGreenButton"/>
+            style="@style/LightGreenButton"
+            app:backgroundTint="@color/easy_budget_green_light"/>
 
-        <Button android:id="@+id/premium_cta_button"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/premium_cta_button"
             android:layout_width="0dip"
             android:layout_weight="0.5"
             android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:theme="@style/Theme.MaterialComponents.NoActionBar"
             android:text="@string/premium_popup_not_premium_cta"
-            android:gravity="center"
-            android:textSize="20dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
+            android:layout_marginStart="5dp"
             android:textAllCaps="false"
-            android:layout_marginLeft="5dp"
             android:maxLines="1"
             android:ellipsize="end"
-            android:theme="@style/BlueButton"/>
+            style="@style/BlueButton"
+            app:backgroundTint="@color/secondary" />
 
     </LinearLayout>
 
