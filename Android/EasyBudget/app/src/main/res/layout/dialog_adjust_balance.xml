@@ -14,7 +14,9 @@
    limitations under the License.
 -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
@@ -28,6 +30,8 @@
         android:layout_marginTop="4dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="16dp"
+        android:importantForAutofill="no"
+        tools:ignore="UnusedAttribute" />
 
 </LinearLayout>

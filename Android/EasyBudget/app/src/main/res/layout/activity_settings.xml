@@ -14,15 +14,31 @@
    limitations under the License.
 -->
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.SettingsActivity">
+    android:orientation="vertical"
+    tools:context=".view.settings.SettingsActivity">
 
-    <fragment android:name="com.benoitletondor.easybudgetapp.view.PreferencesFragment"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:theme="@style/ToolbarTheme"/>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <fragment
         android:id="@+id/preferencesFragment"
+        android:name="com.benoitletondor.easybudgetapp.view.settings.PreferencesFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-</RelativeLayout>
+</LinearLayout>

@@ -15,9 +15,16 @@
 -->
 
 <resources>
-    <color name="primary">#00897B</color>
-    <color name="primary_dark">#00695C</color>
-    <color name="primary_light">#B2DFDB</color>
+    <color name="easy_budget_green">#00897B</color>
+    <color name="easy_budget_green_dark">#00695C</color>
+    <color name="easy_budget_green_light">#B2DFDB</color>
+    <color name="white">#FFF</color>
+
+    <color name="window_background">@color/white</color>
+    <color name="calendar_background">@color/window_background</color>
+    <color name="primary">@color/easy_budget_green</color>
+    <color name="primary_dark">@color/easy_budget_green_dark</color>
+    <color name="primary_light">@color/easy_budget_green_light</color>
     <color name="secondary">#2196F3</color>
     <color name="secondary_dark">#1976D2</color>
     <color name="secondary_light">#69a9e9</color>
@@ -27,6 +34,8 @@
     <color name="secondary_text">#727272</color>
     <color name="placeholder_text">#b5b5b5</color>
     <color name="divider">#eeeeee</color>
+    <color name="home_fab_button_color">@color/accent</color>
+    <color name="home_fab_button_color_pressed">#00695C</color>
     <color name="fab_add_expense">#F44336</color>
     <color name="fab_add_expense_pressed">#EF5350</color>
     <color name="fab_add_monthly_expense">@color/secondary</color>
@@ -40,10 +49,22 @@
     <color name="budget_orange">#FF9800</color>
     <color name="budget_red">#F44336</color>
     <color name="budget_red_out">#f17970</color>
+    <color name="recurring_icon_color">#4D4D4D</color>
 
     <color name="snackbar_action_undo">#4caf50</color>
     <color name="premium_background">@color/primary</color>
 
     <color name="monthly_report_disabled_month_button">@color/primary</color>
     <color name="monthly_report_hint_background">#DD000000</color>
+
+    <color name="action_bar_background">@color/easy_budget_green</color>
+    <color name="action_bar_text_color">@color/white</color>
+    <color name="calendar_header_background">@color/easy_budget_green_dark</color>
+    <color name="calendar_month_button_background_color">@color/white</color>
+    <color name="calendar_month_button_color">@color/white</color>
+    <color name="calendar_header_month_color">@color/white</color>
+    <color name="calendar_today_background_color">@color/white</color>
+    <color name="calendar_today_stroke_color">@color/easy_budget_green_dark</color>
+    <color name="monthly_report_header_background">@color/easy_budget_green_dark</color>
+    <color name="calendar_cell_background">@color/window_background</color>
 </resources>

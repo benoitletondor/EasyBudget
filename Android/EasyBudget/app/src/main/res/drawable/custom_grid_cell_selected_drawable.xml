@@ -14,8 +14,17 @@
    limitations under the License.
 -->
 
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/custom_grid_cell_selected_pressed" android:state_focused="true"/> <!-- focused -->
-    <item android:drawable="@drawable/custom_grid_cell_selected_pressed" android:state_pressed="true"/> <!-- pressed -->
-    <item android:drawable="@drawable/custom_grid_cell_selected_normal" /> <!-- normal -->
-</selector>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/primary">
+
+    <item android:id="@android:id/mask">
+
+        <shape android:shape="oval">
+            <solid android:color="@color/calendar_cell_background"/>
+        </shape>
+
+    </item>
+
+    <item android:drawable="@drawable/custom_grid_cell_selected_normal" />
+
+</ripple>

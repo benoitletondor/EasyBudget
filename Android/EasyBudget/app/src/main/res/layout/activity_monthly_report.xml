@@ -14,64 +14,82 @@
    limitations under the License.
 -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.MonthlyReportActivity">
+    android:orientation="vertical"
+    tools:context=".view.report.base.MonthlyReportBaseActivity">
 
-    <ProgressBar android:id="@+id/monthly_report_progress_bar"
-        android:layout_width="wrap_content"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:indeterminate="true" />
+        android:layout_width="match_parent">
 
-    <LinearLayout android:id="@+id/monthly_report_content"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <LinearLayout
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:layout_height="47dp"
-            android:orientation="horizontal"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:gravity="center_vertical"
-            android:background="@color/primary_dark">
+            android:theme="@style/ToolbarTheme"/>
 
-            <Button android:id="@+id/monthly_report_previous_month_button"
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:textColor="@android:color/white"
-                android:textSize="24dp"
-                android:background="@drawable/calendar_month_switcher_button_drawable" />
+    </com.google.android.material.appbar.AppBarLayout>
 
-            <TextView android:id="@+id/monthly_report_month_title_tv"
-                android:layout_width="0dip"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.0"
-                android:textSize="21dp"
-                android:textColor="@android:color/white"
-                android:textAllCaps="true"
-                android:gravity="center" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-            <Button android:id="@+id/monthly_report_next_month_button"
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:textColor="@android:color/white"
-                android:textSize="24dp"
-                android:background="@drawable/calendar_month_switcher_button_drawable" />
+        <ProgressBar android:id="@+id/monthly_report_progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminate="true" />
+
+        <LinearLayout android:id="@+id/monthly_report_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="47dp"
+                android:orientation="horizontal"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:gravity="center_vertical"
+                android:background="@color/monthly_report_header_background">
+
+                <Button android:id="@+id/monthly_report_previous_month_button"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"
+                    android:textSize="24dp"
+                    android:background="@drawable/calendar_month_switcher_button_drawable" />
+
+                <TextView android:id="@+id/monthly_report_month_title_tv"
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.0"
+                    android:textSize="21dp"
+                    android:textColor="@android:color/white"
+                    android:textAllCaps="true"
+                    android:gravity="center" />
+
+                <Button android:id="@+id/monthly_report_next_month_button"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"
+                    android:textSize="24dp"
+                    android:background="@drawable/calendar_month_switcher_button_drawable" />
+
+            </LinearLayout>
+
+            <androidx.viewpager.widget.ViewPager
+                android:id="@+id/monthly_report_view_pager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
 
         </LinearLayout>
+        
+    </FrameLayout>
 
-        <androidx.viewpager.widget.ViewPager
-            android:id="@+id/monthly_report_view_pager"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
-    </LinearLayout>
-
-
-
-</FrameLayout>
+</LinearLayout>

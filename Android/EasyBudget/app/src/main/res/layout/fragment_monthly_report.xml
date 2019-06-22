@@ -35,7 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@color/primary_dark"
+            android:background="@color/monthly_report_header_background"
             android:paddingBottom="15dp"
             android:paddingTop="15dp"
             android:paddingLeft="20dp"
@@ -158,7 +158,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dip"
             android:layout_weight="1"
-            android:background="@android:color/white" />
+            android:background="@color/window_background" />
 
     </LinearLayout>
 

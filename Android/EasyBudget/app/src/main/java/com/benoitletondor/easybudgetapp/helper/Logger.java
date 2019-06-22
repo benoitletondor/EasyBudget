@@ -37,9 +37,6 @@ public final class Logger
 	
 	/**
 	 * Return the default tag depending on the debug variable
-	 * 
-	 * @param debug
-	 * @return
 	 */
 	private static String getDefaultTag(boolean debug)
 	{
