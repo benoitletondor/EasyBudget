@@ -113,6 +113,7 @@
     <string name="recurring_expense_restore_error_message">An error occurred.</string>
     <string name="expense_delete_error_title">Oops</string>
     <string name="expense_delete_error_message">An error occurred.</string>
+    <string name="expense_add_button_cta">Save</string>
 
     <string name="recurring_expense_interval">Interval</string>
     <string name="recurring_interval_weekly">Every week</string>

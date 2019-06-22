@@ -27,6 +27,7 @@
     </style>
 
     <style name="ToolBarStyle" parent="Widget.AppCompat.Toolbar">
+        <item name="android:background">@color/action_bar_background</item>
         <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
         <item name="android:titleTextStyle">@style/ToolbarTitleTextAppearance</item>
         <item name="titleTextAppearance">@style/ToolbarTitleTextAppearance</item>
@@ -35,7 +36,6 @@
     <style name="ToolbarTitleTextAppearance" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textColor">@color/action_bar_text_color</item>
     </style>
-
 
     <style name="ToolbarTheme" parent="ThemeOverlay.AppCompat.ActionBar">
         <item name="colorControlNormal">@color/action_bar_text_color</item>
@@ -80,10 +80,10 @@
 
     <!-- Floating Label text -->
     <style name="TextLabelDark" parent="AppTheme">
-        <item name="android:textColorHint">@android:color/white</item>
-        <item name="colorAccent">@android:color/white</item>
-        <item name="colorControlNormal">@android:color/white</item>
-        <item name="colorControlActivated">@android:color/white</item>
+        <item name="android:textColorHint">@color/expense_edit_field_color</item>
+        <item name="colorAccent">@color/expense_edit_field_color</item>
+        <item name="colorControlNormal">@color/expense_edit_field_color</item>
+        <item name="colorControlActivated">@color/expense_edit_field_color</item>
     </style>
 
     <!-- Expense switch -->

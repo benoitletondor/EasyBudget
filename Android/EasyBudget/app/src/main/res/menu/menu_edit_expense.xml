@@ -14,13 +14,14 @@
    limitations under the License.
 -->
 
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@android:color/black" />
-    <padding
-        android:left="10dp"
-        android:top="5dp"
-        android:right="10dp"
-        android:bottom="5dp"/>
-    <corners
-        android:radius="6dp"/>
-</shape>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_save"
+        android:title="@string/expense_add_button_cta"
+        android:icon="@drawable/ic_save_24dp"
+        app:showAsAction="always" />
+
+</menu>

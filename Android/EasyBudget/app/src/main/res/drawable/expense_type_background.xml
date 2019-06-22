@@ -15,12 +15,7 @@
 -->
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@android:color/black" />
-    <padding
-        android:left="10dp"
-        android:top="5dp"
-        android:right="10dp"
-        android:bottom="5dp"/>
+    <solid android:color="@color/easy_budget_green_light" />
     <corners
-        android:radius="6dp"/>
+        android:radius="2dp" />
 </shape>
