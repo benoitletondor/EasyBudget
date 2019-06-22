@@ -1,5 +1,3 @@
-package com.benoitletondor.easybudgetapp.helper
-
 /*
  *  Copyright 2017 Google Inc.
  *
@@ -15,6 +13,8 @@ package com.benoitletondor.easybudgetapp.helper
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
+package com.benoitletondor.easybudgetapp.helper
 
 import androidx.annotation.MainThread
 import androidx.lifecycle.LifecycleOwner

@@ -1,5 +1,5 @@
 /*
- *   Copyright 2016 Benoit LETONDOR
+ *   Copyright 2019 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
