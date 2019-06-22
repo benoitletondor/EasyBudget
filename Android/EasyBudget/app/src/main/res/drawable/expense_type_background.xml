@@ -15,7 +15,7 @@
 -->
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/easy_budget_green_light" />
+    <solid android:color="@color/white" />
     <corners
-        android:radius="2dp" />
+        android:radius="10dp" />
 </shape>

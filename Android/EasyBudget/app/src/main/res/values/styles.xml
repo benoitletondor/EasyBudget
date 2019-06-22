@@ -85,7 +85,7 @@
 
 
     <!-- Floating Label text -->
-    <style name="TextLabelDark" parent="AppTheme">
+    <style name="TextLabelDark" parent="Theme.MaterialComponents">
         <item name="android:textColorHint">@color/expense_edit_field_color</item>
         <item name="colorAccent">@color/expense_edit_field_color</item>
         <item name="colorControlNormal">@color/expense_edit_field_color</item>

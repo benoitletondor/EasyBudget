@@ -192,6 +192,10 @@ class ExpenseEditActivity : AppCompatActivity() {
             viewModel.onExpenseRevenueValueChanged(isChecked)
         }
 
+        expense_type_tv.setOnClickListener {
+            viewModel.onExpenseRevenueValueChanged(!expense_type_switch.isChecked)
+        }
+
         save_expense_fab.setOnClickListener {
             if (validateInputs()) {
                 val value = java.lang.Double.parseDouble(amount_edittext.text.toString())
