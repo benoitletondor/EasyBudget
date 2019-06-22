@@ -230,10 +230,14 @@ class RecurringExpenseAddActivity : AppCompatActivity() {
             expense_type_tv.setText(R.string.income)
             expense_type_tv.setTextColor(ContextCompat.getColor(this, R.color.budget_green))
 
+            expense_type_switch.isChecked = true
+
             setTitle(R.string.title_activity_recurring_income_add)
         } else {
             expense_type_tv.setText(R.string.payment)
             expense_type_tv.setTextColor(ContextCompat.getColor(this, R.color.budget_red))
+
+            expense_type_switch.isChecked = false
 
             setTitle(R.string.title_activity_recurring_expense_add)
         }

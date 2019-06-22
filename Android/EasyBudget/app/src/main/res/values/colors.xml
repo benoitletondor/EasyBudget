@@ -19,6 +19,7 @@
     <color name="easy_budget_green_dark">#00695C</color>
     <color name="easy_budget_green_light">#B2DFDB</color>
     <color name="white">#FFF</color>
+    <color name="transparent">#00FFFFFF</color>
 
     <color name="window_background">@color/white</color>
     <color name="calendar_background">@color/window_background</color>

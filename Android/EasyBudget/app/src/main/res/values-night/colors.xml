@@ -23,7 +23,6 @@
     <color name="calendar_cell_disabled_text_color">#666</color>
     <color name="calendar_month_button_color_disabled">#555</color>
 
-    <color name="expense_form_background">@color/easy_budget_green_dark</color>
     <color name="recurring_icon_color">#BBB</color>
 
     <color name="primary_text">#DDD</color>
