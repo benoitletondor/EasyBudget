@@ -2,7 +2,7 @@
 <resources>
 
     <style name="LightGreenButton" parent="Base.Widget.AppCompat.Button.Colored">
-        <item name="android:textColor">@color/secondary_text</item>
+        <item name="android:textColor">@color/easy_budget_green_light</item>
         <item name="colorButtonNormal">@color/accent_ripple</item>
     </style>
 

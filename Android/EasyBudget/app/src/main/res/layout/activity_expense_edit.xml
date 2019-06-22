@@ -178,7 +178,7 @@
                     android:textColor="@color/expense_edit_field_text_color"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     app:strokeColor="@color/easy_budget_green_light"
-                    app:backgroundTint="@color/accent"
+                    app:backgroundTint="@color/expense_form_background"
                     app:rippleColor="@color/easy_budget_green_light"
                     android:paddingBottom="0dp"
                     android:paddingTop="0dp"

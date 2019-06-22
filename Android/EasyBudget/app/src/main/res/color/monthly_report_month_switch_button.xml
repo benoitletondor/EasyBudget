@@ -2,7 +2,7 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:state_enabled="false"
-        android:color="@color/easy_budget_green_light" />
+        android:color="@color/calendar_month_button_color_disabled" />
     <item
         android:color="@color/calendar_month_button_color" />
 </selector>

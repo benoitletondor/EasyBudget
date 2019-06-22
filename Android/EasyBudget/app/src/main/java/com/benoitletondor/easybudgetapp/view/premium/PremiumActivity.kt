@@ -19,13 +19,16 @@ package com.benoitletondor.easybudgetapp.view.premium
 
 import android.app.Activity
 import android.app.ProgressDialog
+import android.os.Build
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Observer
 import com.benoitletondor.easybudgetapp.R
+import com.benoitletondor.easybudgetapp.helper.UIHelper
 import com.benoitletondor.easybudgetapp.iab.PremiumPurchaseFlowResult
 import kotlinx.android.synthetic.main.activity_premium.*
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -118,6 +121,14 @@ class PremiumActivity : AppCompatActivity() {
                 null -> {}
             }
         })
+
+        UIHelper.setStatusBarColor(this, R.color.accent)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            var flags = window.decorView.systemUiVisibility
+            flags = flags and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
+
+            window.decorView.systemUiVisibility = flags
+        }
     }
 
     override fun onBackPressed() {
