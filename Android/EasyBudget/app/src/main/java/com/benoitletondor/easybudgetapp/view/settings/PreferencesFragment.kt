@@ -28,6 +28,7 @@ import android.view.WindowManager
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.preference.*
@@ -391,6 +392,24 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                 true
             }
             monthlyNotifPref?.isChecked = parameters.isUserAllowingMonthlyReminderPushes()
+
+            // Theme
+            findPreference<ListPreference>(getString(R.string.setting_category_app_theme_key))?.let { themePref ->
+                val currentTheme = parameters.getTheme()
+
+                themePref.value = currentTheme.value.toString()
+                themePref.summary = themePref.entries[themePref.findIndexOfValue(themePref.value)]
+                themePref.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+                    themePref.summary = themePref.entries[themePref.findIndexOfValue(newValue as String)]
+
+                    val newTheme = AppTheme.values().first { it.value == newValue.toInt() }
+
+                    parameters.setTheme(newTheme)
+                    AppCompatDelegate.setDefaultNightMode(newTheme.toPlatformValue())
+
+                    true
+                }
+            }
         } else {
             if (premiumShown) {
                 preferenceScreen.removePreference(premiumCategory)

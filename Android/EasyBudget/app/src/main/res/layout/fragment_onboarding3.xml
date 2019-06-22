@@ -68,7 +68,7 @@
                     android:layout_width="0dip"
                     android:layout_weight="1.0"
                     android:layout_height="wrap_content"
-                    android:background="@android:color/white"
+                    android:background="@color/window_background"
                     android:maxLines="1"
                     android:textSize="30dp"
                     android:padding="5dp"

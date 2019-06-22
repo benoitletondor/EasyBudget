@@ -102,15 +102,16 @@
             android:layout_width="match_parent"
             android:layout_height="0dip"
             android:layout_weight="1"
-            android:background="@android:color/white" />
+            android:background="@color/window_background" />
 
     </LinearLayout>
 
-    <View android:id="@+id/fab_choices_background"
+    <View
+        android:id="@+id/fab_choices_background"
         android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/white"/>
+        android:background="@color/window_background"/>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/coordinatorLayout"

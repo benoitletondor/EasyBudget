@@ -16,6 +16,7 @@
 
 package com.benoitletondor.easybudgetapp.parameters
 
+import com.benoitletondor.easybudgetapp.helper.AppTheme
 import com.roomorama.caldroid.CaldroidFragment
 
 private const val DEFAULT_LOW_MONEY_WARNING_AMOUNT = 100
@@ -83,6 +84,10 @@ private const val RATING_COMPLETED_PARAMETERS_KEY = "rating_completed"
  * Has the user saw the monthly report hint (bool)
  */
 private const val USER_SAW_MONTHLY_REPORT_HINT_PARAMETERS_KEY = "user_saw_monthly_report_hint"
+/**
+ * AppTheme
+ */
+private const val APP_THEME_PARAMETERS_KEY = "app_theme"
 
 fun Parameters.getInitTimestamp(): Long {
     return getLong(INIT_DATE_PARAMETERS_KEY, 0L)
@@ -269,4 +274,13 @@ fun Parameters.hasUserSawMonthlyReportHint(): Boolean {
  */
 fun Parameters.setUserSawMonthlyReportHint() {
     putBoolean(USER_SAW_MONTHLY_REPORT_HINT_PARAMETERS_KEY, true)
+}
+
+fun Parameters.getTheme(): AppTheme {
+    val value = getInt(APP_THEME_PARAMETERS_KEY, AppTheme.LIGHT.value)
+    return AppTheme.values().first { it.value == value }
+}
+
+fun Parameters.setTheme(theme: AppTheme) {
+    putInt(APP_THEME_PARAMETERS_KEY, theme.value)
 }

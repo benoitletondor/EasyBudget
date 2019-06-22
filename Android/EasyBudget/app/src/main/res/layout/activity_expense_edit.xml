@@ -63,7 +63,6 @@
                     android:layout_height="wrap_content"
                     android:theme="@style/TextLabelDark"
                     android:layout_marginBottom="15dp"
-                    android:forceDarkAllowed="false"
                     tools:ignore="UnusedAttribute">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -87,7 +86,6 @@
                         app:layout_widthPercent="50%"
                         android:layout_height="wrap_content"
                         android:theme="@style/TextLabelDark"
-                        android:forceDarkAllowed="false"
                         tools:ignore="UnusedAttribute">
 
                         <com.google.android.material.textfield.TextInputEditText

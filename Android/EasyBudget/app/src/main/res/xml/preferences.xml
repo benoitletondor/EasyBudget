@@ -46,6 +46,12 @@
             app:title="@string/setting_category_premium_status_title"
             app:summary="@string/setting_category_premium_status_message" />
 
+        <ListPreference
+            app:key="@string/setting_category_app_theme_key"
+            app:title="@string/setting_category_theme_title"
+            app:entries="@array/themes"
+            app:entryValues="@array/themesData" />
+
         <CheckBoxPreference
             app:title="@string/setting_category_notifications_daily_title"
             app:summaryOn="@string/setting_category_notifications_daily_message"

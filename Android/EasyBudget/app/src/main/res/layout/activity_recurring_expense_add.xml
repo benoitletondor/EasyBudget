@@ -63,7 +63,6 @@
                     android:layout_height="wrap_content"
                     android:theme="@style/TextLabelDark"
                     android:layout_marginBottom="15dp"
-                    android:forceDarkAllowed="false"
                     tools:ignore="UnusedAttribute">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -91,7 +90,6 @@
                         android:layout_marginRight="10dp"
                         android:layout_marginEnd="10dp"
                         android:theme="@style/TextLabelDark"
-                        android:forceDarkAllowed="false"
                         tools:ignore="UnusedAttribute">
 
                         <com.google.android.material.textfield.TextInputEditText
@@ -126,7 +124,6 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             app:backgroundTint="@android:color/white"
-                            android:forceDarkAllowed="false"
                             tools:ignore="UnusedAttribute"/>
 
                     </LinearLayout>

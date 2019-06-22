@@ -291,10 +291,9 @@ class MainActivity : AppCompatActivity() {
             val dialog = builder.show()
 
             // Directly show keyboard when the dialog pops
-            amountEditText.setOnFocusChangeListener { _, hasFocus ->
+            amountEditText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
                 // Check if the device doesn't have a physical keyboard
-                if (hasFocus && resources.configuration.keyboard == Configuration.KEYBOARD_NOKEYS)
-                {
+                if (hasFocus && resources.configuration.keyboard == Configuration.KEYBOARD_NOKEYS) {
                     dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
                 }
             }
@@ -622,6 +621,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onCaldroidViewCreated() {
+                val viewPager = calendarFragment.dateViewPager
                 val leftButton = calendarFragment.leftArrowButton
                 val rightButton = calendarFragment.rightArrowButton
                 val textView = calendarFragment.monthTitleTextView
@@ -659,6 +659,9 @@ class MainActivity : AppCompatActivity() {
                 rightButton.setBackgroundResource(R.drawable.calendar_month_switcher_button_drawable)
 
                 weekDayGreedView.setPadding(0, this@MainActivity.resources.getDimensionPixelSize(R.dimen.calendar_weekdays_padding_top), 0, this@MainActivity.resources.getDimensionPixelSize(R.dimen.calendar_weekdays_padding_bottom))
+
+                viewPager.setBackgroundColor(ContextCompat.getColor(this@MainActivity, R.color.calendar_background))
+                (viewPager.parent as View?)?.setBackgroundColor(ContextCompat.getColor(this@MainActivity, R.color.calendar_background))
 
                 // Remove border on lollipop
                 UIHelper.removeButtonBorder(leftButton)

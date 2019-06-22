@@ -65,7 +65,7 @@ class CalendarGridAdapter(context: Context,
             if (!viewData.isDisabled) {
                 tv1.setTextColor(ContextCompat.getColor(context, R.color.calendar_cell_disabled_text_color))
                 tv2.visibility = View.INVISIBLE
-                cellView.setBackgroundResource(android.R.color.white)
+                cellView.setBackgroundResource(R.color.calendar_cell_background)
 
                 viewData.isDisabled = true
             }

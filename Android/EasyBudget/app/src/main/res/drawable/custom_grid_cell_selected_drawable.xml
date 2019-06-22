@@ -20,7 +20,7 @@
     <item android:id="@android:id/mask">
 
         <shape android:shape="oval">
-            <solid android:color="@android:color/white"/>
+            <solid android:color="@color/calendar_cell_background"/>
         </shape>
 
     </item>

@@ -21,6 +21,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.batch.android.Batch
@@ -85,6 +86,9 @@ class EasyBudget : Application() {
 
         // Batch
         setUpBatchSDK()
+
+        // Setup theme
+        AppCompatDelegate.setDefaultNightMode(parameters.getTheme().toPlatformValue())
     }
 
     /**

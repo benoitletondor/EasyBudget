@@ -149,6 +149,10 @@
     <string name="setting_category_not_premium_status_message">Accédez aux fonctionnalités premium</string>
     <string name="setting_category_notifications_monthly_title">Notification de récapitulatif mensuel</string>
     <string name="setting_category_notifications_monthly_message">Recevez une notification quand un nouveau récapitulatif mensuel est complet</string>
+    <string name="setting_category_theme_title">Thème</string>
+    <string name="setting_theme_light">Clair</string>
+    <string name="setting_theme_dark">Sombre</string>
+    <string name="setting_theme_platform">Par défaut</string>
 
     <string name="premium_popup_premium_title">Vous êtes premium!</string>
     <string name="premium_popup_premium_message">Vous avez accès aux fonctionnalités premium:\n\n- Récapitulatif mensuel : Recevez un récapitulatif de vos dépenses et revenus du mois.\n- Rappel journalier si vous avez oublié d’entrer vos dépenses durant la journée\n… et plus de fonctionnalités premium qui seront ajoutées très bientôt !</string>
@@ -158,6 +162,7 @@
     <string name="premium_popup_not_premium_feature1_message">Recevez une notification à la fin de la journée si vous n’avez pas entré vos dépenses.</string>
     <string name="premium_popup_not_premium_feature2_title">1. Récapitulatif mensuel</string>
     <string name="premium_popup_not_premium_feature2_message">Accédez à un récapitulatif de vos dépenses et revenus du mois et voyez combien vous avez économisé.</string>
+    <string name="premium_popup_not_premium_feature_more_dark_theme">3. Gestion du mode sombre!</string>
     <string name="premium_popup_not_premium_feature_more_title">… et plus de fonctionnalités premium qui seront ajoutées très bientôt !</string>
     <string name="premium_popup_not_premium_cta">Acheter</string>
     <string name="premium_popup_become_title">Devenez utilisateur premium</string>

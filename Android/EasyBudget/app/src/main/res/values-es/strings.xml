@@ -149,6 +149,10 @@
     <string name="setting_category_not_premium_status_message">Accede a las funcionalidades premium</string>
     <string name="setting_category_notifications_monthly_title">Notificación de informe mensual</string>
     <string name="setting_category_notifications_monthly_message">Recibe una notificación cuando un nuevo informe mensual esté listo</string>
+    <string name="setting_category_theme_title">Tema</string>
+    <string name="setting_theme_light">Ligero</string>
+    <string name="setting_theme_dark">Oscuro</string>
+    <string name="setting_theme_platform">Por defecto</string>
 
     <string name="premium_popup_premium_title">¡Eres premium!</string>
     <string name="premium_popup_premium_message">Tienes acceso a las funcionalidades premium:\n\n- Informe mensual: Recibe un recapitulativo de los gastos e ingresos del mes\n- Recordatorio diario si olvidaste entrar tus gastos durante el día\n… ¡y más funcionalidades premium que serán añadidas pronto!</string>
@@ -158,6 +162,7 @@
     <string name="premium_popup_not_premium_feature1_message">Recibe una notificación al final del día si no has entrado tus gastos.</string>
     <string name="premium_popup_not_premium_feature2_title">1. Informe mensual</string>
     <string name="premium_popup_not_premium_feature2_message">Descubre cuánto has ahorrado a través de un recapitulativo mensual de tus gastos e ingresos.</string>
+    <string name="premium_popup_not_premium_feature_more_dark_theme">3. ¡Modo oscuro!</string>
     <string name="premium_popup_not_premium_feature_more_title">… ¡y más funcionalidades premium que serán añadidas pronto!</string>
     <string name="premium_popup_not_premium_cta">Comprar</string>
     <string name="premium_popup_become_title">Vuélvete premium</string>

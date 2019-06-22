@@ -149,6 +149,10 @@
     <string name="setting_category_not_premium_status_message">Accedi a tutte le funzionalità premium</string>
     <string name="setting_category_notifications_monthly_title">Notifica di rapporto mensile</string>
     <string name="setting_category_notifications_monthly_message">Ricevi una notifica quando un nuovo rapporto mensile è completo</string>
+    <string name="setting_category_theme_title">Tema</string>
+    <string name="setting_theme_light">Leggero</string>
+    <string name="setting_theme_dark">Scuro</string>
+    <string name="setting_theme_platform">Default del sistema</string>
 
     <string name="premium_popup_premium_title">Sei… premium!</string>
     <string name="premium_popup_premium_message">Hai ora accesso alle funzionalità premium:\n\n- Rapporto mensile: Ricevi un rapporto delle entrate e delle uscite del mese\n- Allerta quotidiana se hai dimenticato di inserire le uscite del giorno\n…moltissime altre funzioni che si aggiungeranno poco a poco!</string>
@@ -158,6 +162,7 @@
     <string name="premium_popup_not_premium_feature1_message">Ricevi una notifica alla fine della giornata se non hai inserito le tue spese.</string>
     <string name="premium_popup_not_premium_feature2_title">1. Rapporto mensile</string>
     <string name="premium_popup_not_premium_feature2_message">Ricevi un rapporto delle entrate e delle uscite del mese e scopri quanto hai risparmiato.</string>
+    <string name="premium_popup_not_premium_feature_more_dark_theme">3. Tema scuro!</string>
     <string name="premium_popup_not_premium_feature_more_title">…moltissime altre funzioni che si aggiungeranno poco a poco!</string>
     <string name="premium_popup_not_premium_cta">Acquista</string>
     <string name="premium_popup_become_title">Diventa premium</string>

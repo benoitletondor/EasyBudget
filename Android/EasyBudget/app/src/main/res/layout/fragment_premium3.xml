@@ -37,14 +37,25 @@
             android:gravity="center"
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
-            android:text="@string/premium_popup_not_premium_feature_more_title" />
+            android:text="@string/premium_popup_not_premium_feature_more_dark_theme" />
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             app:srcCompat="@drawable/ic_build_white_60dp"
-            android:layout_marginTop="20dp"/>
+            android:layout_marginTop="60dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18dp"
+            android:textColor="@android:color/white"
+            android:gravity="center"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/premium_popup_not_premium_feature_more_title" />
 
     </LinearLayout>
 

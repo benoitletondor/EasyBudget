@@ -16,13 +16,14 @@
 
 <resources>
 
-    <style name="Base.AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="Base.AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
-        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:windowBackground">@color/window_background</item>
         <item name="toolbarStyle">@style/ToolBarStyle</item>
         <item name="android:actionBarStyle">@style/ToolBarStyle</item>
+        <item name="alertDialogTheme">@style/AlertDialogTheme</item>
     </style>
 
     <style name="ToolBarStyle" parent="Widget.AppCompat.Toolbar">
@@ -62,6 +63,20 @@
         <item name="colorButtonNormal">@color/accent_ripple</item>
     </style>
 
+    <!-- AlertDialog -->
+    <style name="AlertDialogTheme" parent="ThemeOverlay.AppCompat.Dialog.Alert">
+        <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
+    </style>
+
+    <style name="NegativeButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/accent</item>
+    </style>
+
+    <style name="PositiveButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/accent</item>
+    </style>
+
 
     <!-- Floating Label text -->
     <style name="TextLabelDark" parent="AppTheme">
@@ -90,7 +105,7 @@
     </style>
 
     <style name="caldroid_gridview" parent="CaldroidDefaultGridView">
-        <item name="android:background">@android:color/white</item>
+        <item name="android:background">@color/calendar_background</item>
         <item name="android:horizontalSpacing">0dip</item>
         <item name="android:verticalSpacing">0dip</item>
         <item name="android:listSelector">@android:color/transparent</item>

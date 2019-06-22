@@ -22,7 +22,7 @@
                 android:width="@dimen/grid_cell_today_border_size"
                 android:color="@color/calendar_today_stroke_color" />
 
-            <solid android:color="@android:color/white" />
+            <solid android:color="@color/calendar_today_background_color" />
         </shape>
     </item>
 

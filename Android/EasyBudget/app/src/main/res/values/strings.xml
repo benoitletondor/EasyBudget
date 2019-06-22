@@ -157,15 +157,20 @@
     <string name="setting_category_not_premium_status_message">Access all the premium features</string>
     <string name="setting_category_notifications_monthly_title">Monthly report notification</string>
     <string name="setting_category_notifications_monthly_message">Receive a notification when a new monthly report is complete</string>
+    <string name="setting_category_theme_title">Theme</string>
+    <string name="setting_theme_light">Light</string>
+    <string name="setting_theme_dark">Dark</string>
+    <string name="setting_theme_platform">System default</string>
 
     <string name="premium_popup_premium_title">You are premium!</string>
-    <string name="premium_popup_premium_message">You have access to premium features:\n\n- Monthly report: Get a sum-up of your expenses and incomes of the month\n- Daily reminder if you forgot to enter your expenses during the day\n… and more premium features that will be added soon!</string>
+    <string name="premium_popup_premium_message">You have access to premium features:\n\n- Monthly report: Get a sum-up of your expenses and incomes of the month\n- Daily reminder if you forgot to enter your expenses during the day\n…- Dark Theme support\nand more premium features that will be added soon!</string>
     <string name="premium_popup_not_premium_title">Become a premium user</string>
     <string name="premium_popup_not_premium_message">Access all the premium features!</string>
     <string name="premium_popup_not_premium_feature1_title">2. Daily reminder</string>
     <string name="premium_popup_not_premium_feature1_message">Receive a notification at the end of the day if you didn\'t enter your expenses.</string>
     <string name="premium_popup_not_premium_feature2_title">1. Monthly report</string>
     <string name="premium_popup_not_premium_feature2_message">Get a sum-up of your expenses and incomes of the month and see how much you saved.</string>
+    <string name="premium_popup_not_premium_feature_more_dark_theme">3. Dark theme support!</string>
     <string name="premium_popup_not_premium_feature_more_title">… and more premium features that will be added soon!</string>
     <string name="premium_popup_not_premium_cta">Purchase</string>
     <string name="premium_popup_become_title">Become a premium user</string>
@@ -254,7 +259,20 @@
     <string name="setting_category_notifications_update_key" translatable="false">update_notifs</string>
     <string name="setting_category_notifications_daily_key" translatable="false">daily_notifs</string>
     <string name="setting_category_notifications_monthly_key" translatable="false">monthly_notifs</string>
+    <string name="setting_category_app_theme_key" translatable="false">app_theme</string>
     <string name="setting_category_not_premium_status_key" translatable="false">not_premium</string>
     <string name="setting_category_dev_show_premium_key" translatable="false">show_premium</string>
     <string name="setting_category_start_day_of_week_key" translatable="false">start_day_of_week</string>
+
+    <string-array name="themes">
+        <item>@string/setting_theme_light</item>
+        <item>@string/setting_theme_dark</item>
+        <item>@string/setting_theme_platform</item>
+    </string-array>
+
+    <string-array name="themesData">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
 </resources>

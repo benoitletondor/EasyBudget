@@ -149,6 +149,10 @@
     <string name="setting_category_not_premium_status_message">Auf alle Premium-Features zugreifen</string>
     <string name="setting_category_notifications_monthly_title">Monatliche Zusammenfassung</string>
     <string name="setting_category_notifications_monthly_message">Erhalten Sie eine Benachrichtigung, wenn eine neue monatl. Zusammenfassung vollständig ist</string>
+    <string name="setting_category_theme_title">Theme</string>
+    <string name="setting_theme_light">Licht</string>
+    <string name="setting_theme_dark">Dunkles</string>
+    <string name="setting_theme_platform">Systemfehler</string>
 
     <string name="premium_popup_premium_title">Sie sind Premium-Nutzer!</string>
     <string name="premium_popup_premium_message">Sie haben Zugriff auf Premium-Features:\n\n- Monatliche Zusammenfassung: Erhalten Sie eine Zusammenfassung Ihrer monatl. Einnahmen und Ausgaben.\n- Tägliche Erinnerungen, wenn Sie vergessen Ihre Ausgaben einzutragen\n… und mehr Premium-Features, die in Kürze hinzugefügt werden!</string>
@@ -158,6 +162,7 @@
     <string name="premium_popup_not_premium_feature1_message">Erhalten Sie eine Benachrichtigung am Ende des Tages, wenn Sie Ihre Ausgaben noch nicht eingetragen haben.</string>
     <string name="premium_popup_not_premium_feature2_title">1. Monatliche Zusammenfassung</string>
     <string name="premium_popup_not_premium_feature2_message">Greifen Sie auf eine monatliche Zusammenfassung Ihrer Ausgaben und Einnahmen zu, um zu sehen, wie viel Sie gespart haben.</string>
+    <string name="premium_popup_not_premium_feature_more_dark_theme">3. Dunkles Theme!</string>
     <string name="premium_popup_not_premium_feature_more_title">… und mehr Premium-Features, die in Kürze hinzugefügt werden!</string>
     <string name="premium_popup_not_premium_cta">Kaufen</string>
     <string name="premium_popup_become_title">Premium-Nutzer werden</string>

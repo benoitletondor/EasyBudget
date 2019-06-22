@@ -149,6 +149,10 @@
     <string name="setting_category_not_premium_status_message">Acesse todas as funções premium</string>
     <string name="setting_category_notifications_monthly_title">Notificação de relatório mensal</string>
     <string name="setting_category_notifications_monthly_message">Receba uma notificação quando um novo relatório mensal estiver completo</string>
+    <string name="setting_category_theme_title">Tema</string>
+    <string name="setting_theme_light">Leve</string>
+    <string name="setting_theme_dark">Escuro</string>
+    <string name="setting_theme_platform">Sistema padrão</string>
 
     <string name="premium_popup_premium_title">Você é premium!</string>
     <string name="premium_popup_premium_message">Você tem acesso às funções premium:\n\n- Relatórios mensais: Receba um relatório de suas despesas e receitas do mês\n- Lembrete diário se você esqueceu de inserir suas despesas durante o dia\n… e mais funções premium que virão em breve!</string>
@@ -158,6 +162,7 @@
     <string name="premium_popup_not_premium_feature1_message">Receba uma notificação no final do dia se você não inseriu suas despesas.</string>
     <string name="premium_popup_not_premium_feature2_title">1. Relatório mensal</string>
     <string name="premium_popup_not_premium_feature2_message">Receba o relatório de suas despesas e receitas do mês e veja quanto você economizou.</string>
+    <string name="premium_popup_not_premium_feature_more_dark_theme">3. Tema escuro!</string>
     <string name="premium_popup_not_premium_feature_more_title">… e mais funções premium que virão em breve!</string>
     <string name="premium_popup_not_premium_cta">Comprar</string>
     <string name="premium_popup_become_title">Torne-se premium</string>
