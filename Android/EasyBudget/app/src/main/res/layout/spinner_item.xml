@@ -19,4 +19,4 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:textSize="16dp"
-    android:textColor="@android:color/white"/>
+    android:textColor="@color/primary_text"/>
