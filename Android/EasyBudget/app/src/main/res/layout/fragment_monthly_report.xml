@@ -19,7 +19,8 @@
              android:layout_width="match_parent"
              android:layout_height="match_parent">
 
-    <ProgressBar android:id="@+id/monthly_report_fragment_progress_bar"
+    <ProgressBar
+        android:id="@+id/monthly_report_fragment_progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -35,7 +36,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@color/monthly_report_header_background"
             android:paddingBottom="15dp"
             android:paddingTop="15dp"
             android:paddingLeft="20dp"
@@ -53,8 +53,8 @@
                     android:layout_weight="0.5"
                     android:layout_marginRight="10dp"
                     android:layout_height="wrap_content"
-                    android:textColor="@android:color/white"
-                    android:textSize="18dp"
+                    android:textColor="@color/monthly_report_categories_title"
+                    android:textSize="18sp"
                     android:gravity="center"
                     android:layout_gravity="center_vertical"
                     android:text="@string/revenues_total"/>
@@ -62,10 +62,10 @@
                 <TextView
                     android:layout_width="0dip"
                     android:layout_weight="0.5"
-                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
                     android:layout_height="wrap_content"
-                    android:textColor="@android:color/white"
-                    android:textSize="18dp"
+                    android:textColor="@color/monthly_report_categories_title"
+                    android:textSize="18sp"
                     android:gravity="center"
                     android:layout_gravity="center_vertical"
                     android:text="@string/expenses_total"/>
@@ -82,20 +82,20 @@
                 <TextView android:id="@+id/monthly_report_fragment_revenues_total_tv"
                     android:layout_width="0dip"
                     android:layout_weight="0.5"
-                    android:layout_marginRight="10dp"
+                    android:layout_marginEnd="10dp"
                     android:layout_height="wrap_content"
-                    android:textColor="@android:color/white"
-                    android:textSize="22dp"
+                    android:textColor="@color/monthly_report_categories_value"
+                    android:textSize="22sp"
                     android:textStyle="bold"
                     android:gravity="center" />
 
                 <TextView android:id="@+id/monthly_report_fragment_expenses_total_tv"
                     android:layout_width="0dip"
                     android:layout_weight="0.5"
-                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
                     android:layout_height="wrap_content"
-                    android:textColor="@android:color/white"
-                    android:textSize="22dp"
+                    android:textColor="@color/monthly_report_categories_value"
+                    android:textSize="22sp"
                     android:textStyle="bold"
                     android:gravity="center" />
 
@@ -110,8 +110,8 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@android:color/white"
-                    android:textSize="18dp"
+                    android:textColor="@color/monthly_report_categories_title"
+                    android:textSize="18sp"
                     android:gravity="center"
                     android:textStyle="bold"
                     android:text="@string/balance"
@@ -120,7 +120,7 @@
                 <TextView android:id="@+id/monthly_report_fragment_balance_tv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="25dp"
+                    android:textSize="25sp"
                     android:textStyle="bold"
                     android:gravity="center" />
 
@@ -134,8 +134,7 @@
             android:layout_weight="1"
             android:orientation="vertical"
             android:visibility="gone"
-            android:gravity="center"
-            android:background="@color/window_background">
+            android:gravity="center">
 
             <ImageView
                 android:layout_width="wrap_content"

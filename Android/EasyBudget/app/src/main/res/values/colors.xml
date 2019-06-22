@@ -69,4 +69,6 @@
     <color name="calendar_cell_background">@color/window_background</color>
     <color name="expense_edit_field_color">@color/white</color>
     <color name="expense_edit_field_text_color">@color/white</color>
+    <color name="monthly_report_categories_title">@color/primary_text</color>
+    <color name="monthly_report_categories_value">@color/accent</color>
 </resources>
