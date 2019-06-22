@@ -135,7 +135,7 @@
             android:orientation="vertical"
             android:visibility="gone"
             android:gravity="center"
-            android:background="@color/placeholder_background">
+            android:background="@color/window_background">
 
             <ImageView
                 android:layout_width="wrap_content"
