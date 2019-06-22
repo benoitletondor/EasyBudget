@@ -10,6 +10,10 @@
         <item name="android:textColor">@color/easy_budget_green_light</item>
     </style>
 
+    <style name="NeutralButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/easy_budget_green_light</item>
+    </style>
+
     <style name="PositiveButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
         <item name="android:textColor">@color/easy_budget_green_light</item>
     </style>
