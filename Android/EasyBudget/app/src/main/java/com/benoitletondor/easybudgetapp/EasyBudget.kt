@@ -29,6 +29,7 @@ import com.batch.android.BatchActivityLifecycleHelper
 import com.batch.android.BatchNotificationChannelsManager.DEFAULT_CHANNEL_ID
 import com.batch.android.Config
 import com.batch.android.PushNotificationType
+import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.injection.appModule
@@ -59,6 +60,7 @@ import java.util.*
 class EasyBudget : Application() {
     private val iab: Iab by inject()
     private val parameters: Parameters by inject()
+    private val db: DB by inject()
 
 // ------------------------------------------>
 
@@ -89,6 +91,9 @@ class EasyBudget : Application() {
 
         // Setup theme
         AppCompatDelegate.setDefaultNightMode(parameters.getTheme().toPlatformValue())
+
+        // Ensure DB is created
+        db.ensureDBCreated()
     }
 
     /**

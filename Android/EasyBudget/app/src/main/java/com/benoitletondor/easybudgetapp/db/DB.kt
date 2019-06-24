@@ -22,6 +22,8 @@ import java.io.Closeable
 import java.util.*
 
 interface DB : Closeable {
+    fun ensureDBCreated()
+
     suspend fun persistExpense(expense: Expense): Expense
 
     suspend fun hasExpenseForDay(dayDate: Date): Boolean

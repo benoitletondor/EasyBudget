@@ -29,6 +29,9 @@ import kotlin.math.ceil
 import kotlin.math.floor
 
 class DBImpl(private val roomDB: RoomDB) : DB {
+    override fun ensureDBCreated() {
+        roomDB.openHelper.writableDatabase.close()
+    }
 
     override fun close() {
         roomDB.close()
