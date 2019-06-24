@@ -70,12 +70,9 @@
     <color name="calendar_today_stroke_color">@color/easy_budget_green_dark</color>
     <color name="monthly_report_header_background">@color/easy_budget_green_dark</color>
     <color name="calendar_cell_background">@color/window_background</color>
-    <color name="expense_edit_field_color">@color/accent</color>
+    <color name="expense_edit_field_accent_color">@color/accent</color>
     <color name="expense_edit_field_text_color">@color/primary_text</color>
-    <color name="expense_edit_title_text_color">@color/easy_budget_green</color>
+    <color name="expense_edit_title_text_color">@color/primary_text</color>
     <color name="monthly_report_categories_title">@color/primary_text</color>
     <color name="monthly_report_categories_value">@color/accent</color>
-
-    <!-- https://github.com/material-components/material-components-android/issues/112 -->
-    <color name="mtrl_textinput_default_box_stroke_color" tools:override="true">@color/expense_edit_field_color</color>
 </resources>

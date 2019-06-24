@@ -86,11 +86,15 @@
 
 
     <!-- Floating Label text -->
-    <style name="TextLabelDark" parent="AppTheme">
-        <item name="android:textColorHint">@color/expense_edit_field_color</item>
-        <item name="colorAccent">@color/expense_edit_field_color</item>
-        <item name="colorControlNormal">@color/expense_edit_field_color</item>
-        <item name="colorControlActivated">@color/expense_edit_field_color</item>
+    <style name="TextLabel" parent="AppTheme">
+        <item name="android:textColorHint">@color/expense_edit_field_text_color</item>
+        <item name="colorAccent">@color/expense_edit_field_accent_color</item>
+        <item name="colorControlNormal">@color/expense_edit_field_accent_color</item>
+        <item name="colorControlActivated">@color/expense_edit_field_accent_color</item>
+    </style>
+
+    <style name="TextLabelHintTextAppearance" parent="TextAppearance.Design.Hint">
+        <item name="android:textColor">@color/expense_edit_field_text_color</item>
     </style>
 
     <!-- Expense switch -->
