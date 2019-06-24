@@ -125,7 +125,7 @@
             android:layout_marginBottom="10dp"
             android:layout_marginRight="10dp"
             android:layout_gravity="right|bottom"
-            fab:fab_addButtonPlusIconColor="@android:color/white"
+            fab:fab_addButtonPlusIconColor="@color/main_fab_action_color"
             fab:fab_addButtonColorNormal="@color/home_fab_button_color"
             fab:fab_addButtonColorPressed="@color/home_fab_button_color_pressed"
             fab:fab_labelStyle="@style/fab_labels_style"

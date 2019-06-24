@@ -123,7 +123,7 @@ class PremiumActivity : AppCompatActivity() {
             }
         })
 
-        UIHelper.setStatusBarColor(this, R.color.accent)
+        UIHelper.setStatusBarColor(this, R.color.easy_budget_green)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             var flags = window.decorView.systemUiVisibility
             flags = flags and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()

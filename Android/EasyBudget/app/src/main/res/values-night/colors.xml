@@ -18,10 +18,15 @@
     <color name="window_background">#1c2124</color>
 
     <color name="primary_light">#444</color>
+    <color name="primary">@color/easy_budget_green_light</color>
+    <color name="action_bar_text_color">@color/easy_budget_green_light</color>
+    <color name="main_fab_action_color">@color/window_background</color>
+    <color name="home_fab_button_color_pressed">@color/easy_budget_green</color>
 
     <color name="calendar_today_background_color">@color/window_background</color>
     <color name="calendar_cell_disabled_text_color">#666</color>
     <color name="calendar_month_button_color_disabled">#555</color>
+    <color name="calendar_month_button_color">@color/easy_budget_green_light</color>
 
     <color name="recurring_icon_color">#BBB</color>
 
