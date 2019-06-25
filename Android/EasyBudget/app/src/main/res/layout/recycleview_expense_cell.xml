@@ -30,7 +30,8 @@
         android:paddingLeft="15dp"
         android:paddingRight="15dp" >
 
-        <ImageView android:id="@+id/positive_indicator"
+        <ImageView
+            android:id="@+id/positive_indicator"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_marginLeft="5dp"

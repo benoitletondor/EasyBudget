@@ -16,6 +16,7 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools">
     <color name="easy_budget_green">#00897B</color>
+    <color name="easy_budget_green_night">#4DB6AC</color>
     <color name="easy_budget_green_dark">#00695C</color>
     <color name="easy_budget_green_light">#B2DFDB</color>
     <color name="white">#FFF</color>
@@ -76,4 +77,5 @@
     <color name="expense_edit_title_text_color">@color/primary_text</color>
     <color name="monthly_report_categories_title">@color/primary_text</color>
     <color name="monthly_report_categories_value">@color/accent</color>
+    <color name="monthly_report_date_color">@color/primary</color>
 </resources>
