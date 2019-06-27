@@ -487,11 +487,11 @@ class MainActivity : AppCompatActivity() {
         budgetLine.text = formatted
         budgetLineAmount.text = CurrencyHelper.getFormattedCurrencyString(parameters, balance)
 
-        when {
-            balance <= 0 -> budgetLineContainer.setBackgroundResource(R.color.budget_red)
-            balance < parameters.getLowMoneyWarningAmount() -> budgetLineContainer.setBackgroundResource(R.color.budget_orange)
-            else -> budgetLineContainer.setBackgroundResource(R.color.budget_green)
-        }
+        budgetLineAmount.setTextColor(ContextCompat.getColor(this, when {
+            balance <= 0 -> R.color.budget_red
+            balance < parameters.getLowMoneyWarningAmount() -> R.color.budget_orange
+            else -> R.color.budget_green
+        }))
     }
 
     /**

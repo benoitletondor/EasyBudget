@@ -17,9 +17,6 @@
 <resources>
     <!-- App theme -->
     <style name="AppTheme" parent="Base.AppTheme">
-        <item name="android:statusBarColor">@color/window_background</item>
-        <item name="android:windowLightStatusBar">@bool/light_system_bar</item>
-
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 

@@ -30,8 +30,7 @@
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appbar"
             android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            app:elevation="0dp">
+            android:layout_width="match_parent">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -46,32 +45,36 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-        <LinearLayout android:id="@+id/budgetLineContainer"
+        <LinearLayout
+            android:id="@+id/budgetLineContainer"
             android:layout_width="match_parent"
-            android:layout_height="28dp"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:gravity="center_horizontal"
             android:paddingLeft="15dp"
             android:paddingRight="15dp"
-            android:background="@color/budget_green"
-            android:gravity="center">
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:layout_marginTop="4dp"
+            android:background="@color/divider">
 
             <TextView android:id="@+id/budgetLine"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/white"
-                android:textSize="14dp"/>
+                android:textColor="@color/primary_text"
+                android:textSize="14sp"/>
 
             <TextView android:id="@+id/budgetLineAmount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/white"
-                android:textSize="14dp"
+                android:textSize="14sp"
                 android:textStyle="bold"
-                android:layout_marginLeft="3dp"/>
+                android:layout_marginStart="4dp"/>
 
         </LinearLayout>
 
-        <LinearLayout android:id="@+id/emptyExpensesRecyclerViewPlaceholder"
+        <LinearLayout
+            android:id="@+id/emptyExpensesRecyclerViewPlaceholder"
             android:layout_width="match_parent"
             android:layout_height="0dip"
             android:layout_weight="1"
@@ -91,7 +94,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/secondary_text"
-                android:textSize="14dp"
+                android:textSize="14sp"
                 android:text="@string/no_expense_for_today" />
 
         </LinearLayout>
@@ -161,16 +164,16 @@
         android:layout_width="220dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_gravity="top|right"
+        android:layout_gravity="top|end"
         android:layout_marginTop="10dp"
-        android:layout_marginRight="34dp"
+        android:layout_marginEnd="34dp"
         android:visibility="gone">
 
         <View
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@drawable/triangle_drawable"
-            android:layout_gravity="right"/>
+            android:layout_gravity="end"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -185,9 +188,10 @@
                 android:layout_marginBottom="10dp"
                 android:text="@string/monthly_report_hint"
                 android:textColor="@android:color/white"
-                android:textSize="15dp"/>
+                android:textSize="15sp"/>
 
-            <Button android:id="@+id/monthly_report_hint_button"
+            <Button
+                android:id="@+id/monthly_report_hint_button"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:theme="@style/BlueButton"
