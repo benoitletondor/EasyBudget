@@ -30,7 +30,8 @@
         android:paddingLeft="10dp"
         android:paddingRight="10dp" >
 
-        <ImageView android:id="@+id/currency_cell_selected_indicator_iv"
+        <ImageView
+            android:id="@+id/currency_cell_selected_indicator_iv"
             android:visibility="invisible"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -41,7 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="10dp" />
+            android:layout_marginStart="10dp" />
 
     </LinearLayout>
 

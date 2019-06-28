@@ -54,7 +54,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="30dp"
+            android:textSize="30sp"
             android:textColor="@android:color/white"
             android:text="@string/onboarding_screen_2_title"
             android:gravity="center_horizontal" />
@@ -63,7 +63,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
-            android:textSize="20dp"
+            android:textSize="20sp"
             android:text="@string/onboarding_screen_2_message"
             android:textColor="@android:color/white"
             android:gravity="center_horizontal" />

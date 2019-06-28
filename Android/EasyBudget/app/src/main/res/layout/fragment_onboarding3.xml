@@ -42,7 +42,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="30dp"
+                android:textSize="30sp"
                 android:textColor="@android:color/white"
                 android:text="@string/onboarding_screen_3_title"
                 android:gravity="center_horizontal" />
@@ -51,7 +51,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"
-                android:textSize="18dp"
+                android:textSize="18sp"
                 android:text="@string/onboarding_screen_3_message"
                 android:textColor="@android:color/white"
                 android:gravity="center_horizontal" />
@@ -72,7 +72,7 @@
                     android:layout_height="wrap_content"
                     android:background="@color/window_background"
                     android:maxLines="1"
-                    android:textSize="30dp"
+                    android:textSize="30sp"
                     android:padding="5dp"
                     android:inputType="numberDecimal"
                     android:digits="-0123456789.,"
@@ -83,8 +83,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="10dp"
-                    android:textSize="30dp"
+                    android:layout_marginStart="10dp"
+                    android:textSize="30sp"
                     android:textColor="@android:color/white"/>
 
             </LinearLayout>

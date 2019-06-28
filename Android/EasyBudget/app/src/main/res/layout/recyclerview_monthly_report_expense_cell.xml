@@ -28,7 +28,8 @@
         android:paddingLeft="15dp"
         android:paddingRight="15dp" >
 
-        <TextView android:id="@+id/date_tv"
+        <TextView
+            android:id="@+id/date_tv"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:gravity="center_horizontal"
@@ -37,7 +38,7 @@
             android:backgroundTint="@color/monthly_report_date_color"
             android:layout_gravity="center_vertical"
             android:textColor="@color/monthly_report_date_color"
-            android:textSize="14dp"
+            android:textSize="14sp"
             android:textStyle="bold" />
 
         <LinearLayout
@@ -86,7 +87,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/secondary_text"
-                android:textSize="9dp"
+                android:textSize="9sp"
                 android:text="@string/monthly"
                 android:layout_marginTop="1dp"/>
 

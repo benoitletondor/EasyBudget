@@ -46,7 +46,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:textSize="30dp"
+                android:textSize="30sp"
                 android:textColor="@android:color/white"
                 android:text="@string/onboarding_screen_4_title"
                 android:gravity="center_horizontal" />
@@ -55,7 +55,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:textSize="18dp"
+                android:textSize="18sp"
                 android:text="@string/onboarding_screen_4_message"
                 android:textColor="@android:color/white"
                 android:gravity="center_horizontal" />
@@ -64,7 +64,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="50dp"
-                android:textSize="20dp"
+                android:textSize="20sp"
                 android:text="@string/onboarding_screen_4_message2"
                 android:textColor="@android:color/white"
                 android:gravity="center_horizontal" />
@@ -73,7 +73,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:textSize="18dp"
+                android:textSize="18sp"
                 android:text="@string/onboarding_screen_4_message3"
                 android:textColor="@android:color/white"/>
 
@@ -81,7 +81,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="50dp"
-                android:textSize="20dp"
+                android:textSize="20sp"
                 android:gravity="center"
                 android:text="@string/onboarding_screen_4_message4"
                 android:textColor="@android:color/white" />
