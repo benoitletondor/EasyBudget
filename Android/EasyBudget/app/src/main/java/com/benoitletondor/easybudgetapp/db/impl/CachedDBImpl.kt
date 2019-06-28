@@ -40,11 +40,7 @@ class CachedDBImpl(private val wrappedDB: DB,
     override suspend fun persistExpense(expense: Expense): Expense {
         val newExpense = wrappedDB.persistExpense(expense)
 
-        if( expense.id != null ) {
-            wipeCache()
-        } else {
-            executor.execute(CacheForDay(expense.date))
-        }
+        wipeCache()
 
         return newExpense
     }
@@ -109,7 +105,7 @@ class CachedDBImpl(private val wrappedDB: DB,
     override suspend fun deleteExpense(expense: Expense) {
         wrappedDB.deleteExpense(expense)
 
-        executor.execute(CacheForDay(expense.date))
+        wipeCache()
     }
 
     override suspend fun deleteAllExpenseForRecurringExpense(recurringExpense: RecurringExpense) {
@@ -157,26 +153,6 @@ class CachedDBImpl(private val wrappedDB: DB,
 
         synchronized(cacheStorage.expenses) {
             cacheStorage.expenses.clear()
-        }
-    }
-
-    private class CacheForDay(private val date: Date) : Runnable {
-        private val db: CachedDBImpl by inject(CachedDBImpl::class.java)
-        private val cacheStorage: CacheDBStorage by inject(CacheDBStorage::class.java)
-
-        override fun run() {
-            db.use { db ->
-                Logger.debug("DBCache: Refreshing for day: $date")
-
-                synchronized(cacheStorage.balances) {
-                    cacheStorage.balances.clear() // TODO be smarter than delete all ?
-                }
-
-                val loadedExpenses = runBlocking { db.getExpensesForDayWithoutCache(date) }
-                synchronized(cacheStorage.expenses) {
-                    cacheStorage.expenses.put(date.cleaned(), loadedExpenses)
-                }
-            }
         }
     }
 

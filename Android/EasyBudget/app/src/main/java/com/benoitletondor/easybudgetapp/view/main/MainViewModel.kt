@@ -252,23 +252,20 @@ class MainViewModel(private val db: DB,
                 }
 
                 if (existingExpense != null) { // If the adjust balance exists, just add the diff and persist it
-                    val newExpense = existingExpense.copy(amount = existingExpense.amount - diff)
-
-                    withContext(Dispatchers.Default) {
-                        db.persistExpense(newExpense)
+                    val newExpense = withContext(Dispatchers.Default) {
+                        db.persistExpense(existingExpense.copy(amount = existingExpense.amount - diff))
                     }
 
                     currentBalanceEditedEventStream.value = BalanceAdjustedData(newExpense, diff, newBalance)
-                    refreshDataForDate(selectedDate)
                 } else { // If no adjust balance yet, create a new one
-                    val persistedExpense = Expense(balanceExpenseTitle, -diff, Date())
-
-                    withContext(Dispatchers.Default) {
-                        db.persistExpense(persistedExpense)
+                    val persistedExpense = withContext(Dispatchers.Default) {
+                        db.persistExpense(Expense(balanceExpenseTitle, -diff, Date()))
                     }
 
                     currentBalanceEditedEventStream.value = BalanceAdjustedData(persistedExpense, diff, newBalance)
                 }
+
+                refreshDataForDate(selectedDate)
             } catch (e: Exception) {
                 currentBalanceEditingErrorEventStream.value = e
             }
@@ -281,11 +278,10 @@ class MainViewModel(private val db: DB,
                 withContext(Dispatchers.Default) {
                     if( expense.amount + diff == 0.0 ) {
                         db.deleteExpense(expense)
-                        return@withContext
+                    } else {
+                        val newExpense = expense.copy(amount = expense.amount + diff)
+                        db.persistExpense(newExpense)
                     }
-
-                    val newExpense = expense.copy(amount = expense.amount + diff)
-                    db.persistExpense(newExpense)
                 }
 
                 currentBalanceRestoringEventStream.value = Unit
