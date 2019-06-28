@@ -47,8 +47,8 @@ android {
         applicationId "com.benoitletondor.easybudgetapp"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 58
-        versionName "2.0.5"
+        versionCode 59
+        versionName "2.0.6"
         vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
