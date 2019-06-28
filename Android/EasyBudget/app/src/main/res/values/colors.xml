@@ -37,6 +37,7 @@
     <color name="secondary_text">#727272</color>
     <color name="placeholder_text">#b5b5b5</color>
     <color name="divider">#eeeeee</color>
+    <color name="budget_line_background_color">#f2f2f2</color>
     <color name="home_fab_button_color">@color/accent</color>
     <color name="home_fab_button_color_pressed">#00695C</color>
     <color name="fab_add_expense">#F44336</color>
