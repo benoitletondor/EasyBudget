@@ -22,8 +22,6 @@
     <dimen name="grid_cell_today_border_size">2dp</dimen>
     <dimen name="select_currency_dialog_padding_top">20dp</dimen>
 
-    <dimen name="fab_margin_top">-36dp</dimen>
-
     <dimen name="calendar_month_buttons_margin">10dp</dimen>
     <dimen name="calendar_month_padding_top">0dp</dimen>
     <dimen name="calendar_month_padding_bottom">3dp</dimen>

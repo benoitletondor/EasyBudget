@@ -19,7 +19,6 @@
     <color name="easy_budget_green_night">#4DB6AC</color>
     <color name="easy_budget_green_dark">#00695C</color>
     <color name="easy_budget_green_light">#B2DFDB</color>
-    <color name="black">#000</color>
     <color name="white">#FFF</color>
     <color name="transparent">#00FFFFFF</color>
 
@@ -46,7 +45,6 @@
     <color name="fab_add_monthly_expense_pressed">@color/secondary_light</color>
     <color name="main_fab_action_color">@color/white</color>
 
-    <color name="placeholder_background">#f0f0f0</color>
     <color name="calendar_cell_selected">@color/primary_light</color>
     <color name="calendar_cell_disabled_text_color">#eeeeee</color>
     <color name="budget_green">#4CAF50</color>
@@ -59,10 +57,8 @@
     <color name="snackbar_action_undo">#4caf50</color>
     <color name="premium_background">@color/easy_budget_green</color>
 
-    <color name="monthly_report_disabled_month_button">@color/primary</color>
     <color name="monthly_report_hint_background">#DD000000</color>
 
-    <color name="expense_form_background">@color/accent</color>
     <color name="status_bar_color">@color/easy_budget_green</color>
     <color name="action_bar_background">@color/status_bar_color</color>
     <color name="action_bar_text_color">@color/white</color>
@@ -73,11 +69,9 @@
     <color name="calendar_header_month_color">@color/primary_text</color>
     <color name="calendar_today_background_color">@color/white</color>
     <color name="calendar_today_stroke_color">@color/easy_budget_green_dark</color>
-    <color name="monthly_report_header_background">@color/easy_budget_green_dark</color>
     <color name="calendar_cell_background">@color/window_background</color>
     <color name="expense_edit_field_accent_color">@color/accent</color>
     <color name="expense_edit_field_accent_color_dark">@color/white</color>
-    <color name="expense_edit_field_text_color">@color/primary_text</color>
     <color name="expense_edit_field_text_color_dark">@color/white</color>
     <color name="expense_edit_title_text_color_dark">@color/white</color>
     <color name="expense_edit_title_text_color">@color/primary_text</color>

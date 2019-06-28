@@ -63,62 +63,21 @@ object CurrencyHelper {
     }
 
     /**
-     * Return a list of available currencies (using compat code) minus main ones
+     * Return a list of available currencies minus main ones
      *
      * @return a list of other available currencies
      */
     fun getOtherAvailableCurrencies(): List<Currency> {
         val mainCurrencies = getMainAvailableCurrencies()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            val currencies = ArrayList(Currency.getAvailableCurrencies())
-            val currencyIterator = currencies.iterator()
-            while (currencyIterator.hasNext()) {
-                val currency = currencyIterator.next()
-
-                if (mainCurrencies.contains(currency)) {
-                    currencyIterator.remove()
-                }
-            }
-
-            return currencies
-        } else {
-            val currencySet = HashSet<Currency>()
-
-            val locales = Locale.getAvailableLocales()
-            for (locale in locales) {
-                try {
-                    val currency = Currency.getInstance(locale)
-
-                    if (mainCurrencies.contains(currency)) {
-                        continue
-                    }
-
-                    currencySet.add(currency)
-                } catch (ignored: Exception) { }
-            }
-
-            val currencies = ArrayList(currencySet)
-            currencies.sortWith(Comparator { lhs, rhs -> lhs.currencyCode.compareTo(rhs.currencyCode) })
-
-            return currencies
-        }
+        return Currency.getAvailableCurrencies().filter { !mainCurrencies.contains(it) }
     }
 
     /**
-     * Get the currency display name (using compat)
+     * Get the currency display name
      */
-    fun getCurrencyDisplayName(currency: Currency): String {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            currency.symbol + " - " + currency.displayName
-        } else {
-            if (currency.symbol != currency.currencyCode) {
-                currency.symbol + " - " + currency.currencyCode
-            } else {
-                currency.symbol
-            }
-        }
-    }
+    fun getCurrencyDisplayName(currency: Currency): String
+        = currency.symbol + " - " + currency.displayName
 
     /**
      * Helper to display an amount using the user currency
