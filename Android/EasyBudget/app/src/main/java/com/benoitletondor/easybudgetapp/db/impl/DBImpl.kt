@@ -171,16 +171,17 @@ private data class DayDateRange(val dayStartDate: Date, val dayEndDate: Date)
 private fun Date.getDayDatesRange(): DayDateRange {
     val cal = Calendar.getInstance()
     cal.time = this
-    cal.timeZone = TimeZone.getTimeZone("GMT")
 
     cal.set(Calendar.MILLISECOND, 0)
     cal.set(Calendar.SECOND, 0)
     cal.set(Calendar.MINUTE, 0)
     cal.set(Calendar.HOUR_OF_DAY, 0)
 
-    cal.add(Calendar.HOUR_OF_DAY, -11)
     val start = cal.time
     cal.add(Calendar.HOUR_OF_DAY, 23)
+    cal.add(Calendar.MINUTE, 59)
+    cal.set(Calendar.SECOND, 59)
+    cal.set(Calendar.MILLISECOND, 999)
     val end = cal.time
 
     return DayDateRange(start, end)

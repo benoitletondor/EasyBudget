@@ -51,11 +51,11 @@ class CachedDBImpl(private val wrappedDB: DB,
 
     override suspend fun hasExpenseForDay(dayDate: Date): Boolean {
         val expensesForDay = synchronized(cacheStorage.expenses) {
-            cacheStorage.expenses[dayDate.cleanGMTDate()]
+            cacheStorage.expenses[dayDate.cleaned()]
         }
 
         return if (expensesForDay == null) {
-            executor.execute(CacheExpensesForMonthRunnable(dayDate.cleanGMTDate()))
+            executor.execute(CacheExpensesForMonthRunnable(dayDate))
             wrappedDB.hasExpenseForDay(dayDate)
         } else {
             expensesForDay.isNotEmpty()
@@ -64,13 +64,13 @@ class CachedDBImpl(private val wrappedDB: DB,
 
     override suspend fun getExpensesForDay(dayDate: Date): List<Expense> {
         val cached = synchronized(cacheStorage.expenses) {
-            cacheStorage.expenses[dayDate.cleanGMTDate()]
+            cacheStorage.expenses[dayDate.cleaned()]
         }
 
         if( cached != null ) {
             return cached
         } else {
-            executor.execute(CacheExpensesForMonthRunnable(dayDate.cleanGMTDate()))
+            executor.execute(CacheExpensesForMonthRunnable(dayDate))
         }
 
         return wrappedDB.getExpensesForDay(dayDate)
@@ -84,13 +84,13 @@ class CachedDBImpl(private val wrappedDB: DB,
 
     override suspend fun getBalanceForDay(dayDate: Date): Double {
         val cached = synchronized(cacheStorage.balances) {
-            cacheStorage.balances[dayDate.cleanGMTDate()]
+            cacheStorage.balances[dayDate.cleaned()]
         }
 
         if( cached != null ) {
             return cached
         } else {
-            executor.execute(CacheBalanceForMonthRunnable(dayDate.cleanGMTDate()))
+            executor.execute(CacheBalanceForMonthRunnable(dayDate))
         }
 
         return wrappedDB.getBalanceForDay(dayDate)
@@ -174,7 +174,7 @@ class CachedDBImpl(private val wrappedDB: DB,
 
                 val loadedExpenses = runBlocking { db.getExpensesForDayWithoutCache(date) }
                 synchronized(cacheStorage.expenses) {
-                    cacheStorage.expenses.put(date.cleanGMTDate(), loadedExpenses)
+                    cacheStorage.expenses.put(date.cleaned(), loadedExpenses)
                 }
             }
         }
@@ -188,11 +188,11 @@ class CachedDBImpl(private val wrappedDB: DB,
             db.use { db ->
                 // Init a calendar to the given date, setting the day of month to 1
                 val cal = Calendar.getInstance()
-                cal.time = monthDate.clean()
+                cal.time = monthDate.cleaned()
                 cal.set(Calendar.DAY_OF_MONTH, 1)
 
                 synchronized(cacheStorage.expenses) {
-                    if (cacheStorage.expenses.containsKey(cal.time.cleanGMTDate())) {
+                    if (cacheStorage.expenses.containsKey(cal.time)) {
                         return
                     }
                 }
@@ -208,7 +208,7 @@ class CachedDBImpl(private val wrappedDB: DB,
                     val expensesForDay = runBlocking { db.getExpensesForDayWithoutCache(date) }
 
                     synchronized(cacheStorage.expenses) {
-                        cacheStorage.expenses.put(date.cleanGMTDate(), expensesForDay)
+                        cacheStorage.expenses.put(date, expensesForDay)
                     }
 
                     cal.add(Calendar.DAY_OF_MONTH, 1)
@@ -228,11 +228,11 @@ class CachedDBImpl(private val wrappedDB: DB,
             db.use { db ->
                 // Init a calendar to the given date, setting the day of month to 1
                 val cal = Calendar.getInstance()
-                cal.time = monthDate.clean()
+                cal.time = monthDate.cleaned()
                 cal.set(Calendar.DAY_OF_MONTH, 1)
 
                 synchronized(cacheStorage.balances) {
-                    if (cacheStorage.balances.containsKey(cal.time.cleanGMTDate())) {
+                    if (cacheStorage.balances.containsKey(cal.time)) {
                         return
                     }
                 }
@@ -248,7 +248,7 @@ class CachedDBImpl(private val wrappedDB: DB,
                     val balanceForDay = runBlocking { db.getBalanceForDayWithoutCache(date) }
 
                     synchronized(cacheStorage.balances) {
-                        cacheStorage.balances.put(date.cleanGMTDate(), balanceForDay)
+                        cacheStorage.balances.put(date, balanceForDay)
                     }
 
                     cal.add(Calendar.DAY_OF_MONTH, 1)
@@ -265,20 +265,7 @@ interface CacheDBStorage {
     val balances: MutableMap<Date, Double>
 }
 
-private fun Date.cleanGMTDate(): Date {
-    val cal = Calendar.getInstance()
-    cal.time = this
-    cal.timeZone = TimeZone.getTimeZone("GMT")
-
-    cal.set(Calendar.MILLISECOND, 0)
-    cal.set(Calendar.SECOND, 0)
-    cal.set(Calendar.MINUTE, 0)
-    cal.set(Calendar.HOUR_OF_DAY, 0)
-
-    return cal.time
-}
-
-private fun Date.clean(): Date {
+private fun Date.cleaned(): Date {
     val cal = Calendar.getInstance()
     cal.time = this
 
