@@ -17,11 +17,11 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:state_pressed="true"
-          android:drawable="@drawable/add_expense_edittext_focused" /> <!-- pressed -->
+          android:drawable="@drawable/expense_date_focused" /> <!-- pressed -->
 
     <item android:state_focused="true"
-          android:drawable="@drawable/add_expense_edittext_focused" /> <!-- focused -->
+          android:drawable="@drawable/expense_date_focused" /> <!-- focused -->
 
-    <item android:drawable="@drawable/add_expense_edittext_normal" /> <!-- default -->
+    <item android:drawable="@drawable/expense_date_normal" /> <!-- default -->
 
 </selector>

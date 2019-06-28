@@ -76,7 +76,10 @@
     <color name="monthly_report_header_background">@color/easy_budget_green_dark</color>
     <color name="calendar_cell_background">@color/window_background</color>
     <color name="expense_edit_field_accent_color">@color/accent</color>
+    <color name="expense_edit_field_accent_color_dark">@color/white</color>
     <color name="expense_edit_field_text_color">@color/primary_text</color>
+    <color name="expense_edit_field_text_color_dark">@color/white</color>
+    <color name="expense_edit_title_text_color_dark">@color/white</color>
     <color name="expense_edit_title_text_color">@color/primary_text</color>
     <color name="monthly_report_categories_title">@color/primary_text</color>
     <color name="monthly_report_categories_value">@color/accent</color>
