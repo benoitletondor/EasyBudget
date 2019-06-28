@@ -145,7 +145,7 @@ object CurrencyHelper {
         format.minimumFractionDigits = 2
         format.isGroupingUsed = false
 
-        return format.format(amount)
+        return format.format(amount).replace(",", ".")
     }
 }
 
