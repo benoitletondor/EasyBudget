@@ -62,6 +62,8 @@ import java.util.*
 class EasyBudget : Application() {
     private val iab: Iab by inject()
     private val parameters: Parameters by inject()
+
+    // This is injected only to ensure it's created, it is closed right after onCreate
     private val db: DB by inject()
 
 // ------------------------------------------>
@@ -88,14 +90,16 @@ class EasyBudget : Application() {
             Crashlytics.setUserIdentifier(parameters.getLocalId())
         }
 
+        // Ensure DB is created
+        db.use {
+            it.ensureDBCreated()
+        }
+
         // Batch
         setUpBatchSDK()
 
         // Setup theme
         AppCompatDelegate.setDefaultNightMode(parameters.getTheme().toPlatformValue())
-
-        // Ensure DB is created
-        db.ensureDBCreated()
     }
 
     /**
