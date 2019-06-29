@@ -79,7 +79,7 @@ class DarkThemeNotif : IntentService("DarkThemeNotif") {
                     .setContentTitle(context.resources.getString(R.string.app_name))
                     .setContentText(context.resources.getString(R.string.dark_theme_notif_message))
                     .setStyle(NotificationCompat.BigTextStyle().bigText(context.resources.getString(R.string.dark_theme_notif_message)))
-                    .addAction(R.drawable.ic_settings, context.resources.getString(R.string.dark_theme_notif_cta), redirectPendingIntent)
+                    .addAction(R.drawable.ic_dark_theme_cta, context.resources.getString(R.string.dark_theme_notif_cta), redirectPendingIntent)
                     .setContentIntent(redirectPendingIntent)
                     .setColor(ContextCompat.getColor(context, R.color.accent))
 
