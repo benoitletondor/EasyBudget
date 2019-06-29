@@ -29,11 +29,13 @@ import com.batch.android.BatchActivityLifecycleHelper
 import com.batch.android.BatchNotificationChannelsManager.DEFAULT_CHANNEL_ID
 import com.batch.android.Config
 import com.batch.android.PushNotificationType
+import com.benoitletondor.easybudgetapp.BuildVersion.VERSION_2_0_8
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.injection.appModule
 import com.benoitletondor.easybudgetapp.injection.viewModelModule
+import com.benoitletondor.easybudgetapp.notif.DarkThemeNotif
 import com.benoitletondor.easybudgetapp.notif.NotificationsChannels.CHANNEL_DAILY_REMINDERS
 import com.benoitletondor.easybudgetapp.notif.NotificationsChannels.CHANNEL_MONTHLY_REMINDERS
 import com.benoitletondor.easybudgetapp.notif.NotificationsChannels.CHANNEL_NEW_FEATURES
@@ -368,6 +370,10 @@ class EasyBudget : Application() {
      */
     private fun onUpdate(previousVersion: Int, @Suppress("SameParameterValue") newVersion: Int) {
         Logger.debug("Update detected, from $previousVersion to $newVersion")
+
+        if( previousVersion < VERSION_2_0_8 && iab.isUserPremium() ) {
+            DarkThemeNotif.showDarkThemeNotif(this)
+        }
     }
 
 // -------------------------------------->

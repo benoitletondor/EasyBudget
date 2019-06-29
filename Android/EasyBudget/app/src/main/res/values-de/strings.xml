@@ -231,4 +231,6 @@
     <string name="balance">Kontostand</string>
     <string name="monthly_report_no_entries_placeholder">Nichts für diesen Monat.</string>
     <string name="monthly_report_hint">Psst: Von hier aus können Sie auf monatliche Zusammenfassungen zugreifen!</string>
+    <string name="dark_theme_notif_message">EasyBudget 2.0 ist mit Unterstützung für dunkle Themen für Premium-Benutzer verfügbar! Klicken zu entdecken</string>
+    <string name="dark_theme_notif_cta">Entdecken</string>
 </resources>

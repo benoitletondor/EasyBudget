@@ -144,6 +144,7 @@
     <string name="setting_category_dev_title" translatable="false">Dev</string>
     <string name="setting_category_show_welcome_screen_button_title" translatable="false">Show welcome screen</string>
     <string name="setting_category_show_premium" translatable="false">Show premium screen</string>
+    <string name="setting_category_show_dark_theme_notif" translatable="false">Show dark theme notif</string>
     <string name="setting_category_premium_title">Premium</string>
     <string name="setting_category_premium_status_title">You are premium!</string>
     <string name="setting_category_premium_status_message">You have access to premium features</string>
@@ -242,6 +243,8 @@
     <string name="balance">Balance</string>
     <string name="monthly_report_no_entries_placeholder">Nothing for this month.</string>
     <string name="monthly_report_hint">Psst: You can access monthly reports from this button!</string>
+    <string name="dark_theme_notif_message">EasyBudget 2.0 is out with dark theme support for premium users! Click to discover</string>
+    <string name="dark_theme_notif_cta">Discover</string>
 
     <!-- Keys, not for translations. -->
     <string name="setting_category_bug_report_send_button_key" translatable="false">send_bug_report</string>
@@ -262,6 +265,7 @@
     <string name="setting_category_app_theme_key" translatable="false">app_theme</string>
     <string name="setting_category_not_premium_status_key" translatable="false">not_premium</string>
     <string name="setting_category_dev_show_premium_key" translatable="false">show_premium</string>
+    <string name="setting_category_dev_show_dark_theme_notif_key" translatable="false">show_dark_theme</string>
     <string name="setting_category_start_day_of_week_key" translatable="false">start_day_of_week</string>
 
     <string-array name="themes">

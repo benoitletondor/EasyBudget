@@ -66,6 +66,7 @@ import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseAddActivity
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
+import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.SHOW_THEME_INTENT_KEY
 import com.benoitletondor.easybudgetapp.view.welcome.getOnboardingStep
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -152,6 +153,7 @@ class MainActivity : AppCompatActivity() {
             openPremiumIfNeeded(intent)
             openAddExpenseIfNeeded(intent)
             openAddRecurringExpenseIfNeeded(intent)
+            openSettingsForThemeIfNeeded(intent)
         }
 
         viewModel.expenseDeletionSuccessEventStream.observe(this, Observer { (deletedExpense, newBalance) ->
@@ -420,6 +422,7 @@ class MainActivity : AppCompatActivity() {
         openPremiumIfNeeded(intent)
         openAddExpenseIfNeeded(intent)
         openAddRecurringExpenseIfNeeded(intent)
+        openSettingsForThemeIfNeeded(intent)
     }
 
 // ------------------------------------------>
@@ -501,6 +504,19 @@ class MainActivity : AppCompatActivity() {
     private fun openSettingsIfNeeded(intent: Intent) {
         if (intent.getBooleanExtra(INTENT_REDIRECT_TO_SETTINGS_EXTRA, false)) {
             val startIntent = Intent(this, SettingsActivity::class.java)
+            ActivityCompat.startActivityForResult(this@MainActivity, startIntent, SETTINGS_SCREEN_ACTIVITY_CODE, null)
+        }
+    }
+
+    /**
+     * Open the settings activity to display theme options if the given intent contains the
+     * [.INTENT_REDIRECT_TO_SETTINGS_FOR_THEME_EXTRA] extra.
+     */
+    private fun openSettingsForThemeIfNeeded(intent: Intent) {
+        if( intent.getBooleanExtra(INTENT_REDIRECT_TO_SETTINGS_FOR_THEME_EXTRA, false) ) {
+            val startIntent = Intent(this, SettingsActivity::class.java).apply {
+                putExtra(SHOW_THEME_INTENT_KEY, true)
+            }
             ActivityCompat.startActivityForResult(this@MainActivity, startIntent, SETTINGS_SCREEN_ACTIVITY_CODE, null)
         }
     }
@@ -814,6 +830,7 @@ class MainActivity : AppCompatActivity() {
 
         const val INTENT_REDIRECT_TO_PREMIUM_EXTRA = "intent.extra.premiumshow"
         const val INTENT_REDIRECT_TO_SETTINGS_EXTRA = "intent.extra.redirecttosettings"
+        const val INTENT_REDIRECT_TO_SETTINGS_FOR_THEME_EXTRA = "intent.extra.redirecttosettingsfortheme"
 
         const val ANIMATE_TRANSITION_KEY = "animate"
         const val CENTER_X_KEY = "centerX"

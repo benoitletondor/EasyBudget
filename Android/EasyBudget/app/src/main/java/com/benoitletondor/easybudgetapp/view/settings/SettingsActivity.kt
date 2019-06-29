@@ -70,6 +70,10 @@ class SettingsActivity : AppCompatActivity() {
          */
         const val SHOW_PREMIUM_INTENT_KEY = "showPremium"
         /**
+         * Key to specify that the theme options should be shown to the user
+         */
+        const val SHOW_THEME_INTENT_KEY = "showTheme"
+        /**
          * Intent action broadcast when the user has successfully completed the [PremiumActivity]
          */
         const val USER_GONE_PREMIUM_INTENT = "user.ispremium"

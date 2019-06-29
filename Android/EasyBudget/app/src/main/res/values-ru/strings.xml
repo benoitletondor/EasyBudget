@@ -233,4 +233,6 @@
     <string name="balance">Баланс</string>
     <string name="monthly_report_no_entries_placeholder">Ничего за этот месяц.</string>
     <string name="monthly_report_hint">Тсс: Отсюда Вы можете получить доступ к месячным отчетам!</string>
+    <string name="dark_theme_notif_message">EasyBudget 2.0 вышел с поддержкой темных тем для премиум-пользователей! Нажмите, чтобы узнать</string>
+    <string name="dark_theme_notif_cta">Обнаружить</string>
 </resources>

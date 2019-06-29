@@ -77,4 +77,9 @@ object BuildVersion {
      * 21/05/2017
      */
     const val VERSION_1_5_2 = 45
+    /**
+     * First public release of 2.0
+     * 01/07/2019
+     */
+    const val VERSION_2_0_8 = 61
 }

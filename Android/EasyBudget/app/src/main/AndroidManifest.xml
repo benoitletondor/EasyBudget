@@ -102,6 +102,10 @@
             android:screenOrientation="portrait">
         </activity>
 
+        <service
+            android:name=".notif.DarkThemeNotif"
+            android:exported="false" />
+
         <!-- Push -->
         <service
             android:name=".push.PushService"

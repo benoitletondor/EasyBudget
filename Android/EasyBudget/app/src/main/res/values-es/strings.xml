@@ -231,4 +231,6 @@
     <string name="balance">Saldo</string>
     <string name="monthly_report_no_entries_placeholder">Nada para este mes.</string>
     <string name="monthly_report_hint">Pss: ¡Puedes ver tus informes mensuales pulsando este botón!</string>
+    <string name="dark_theme_notif_message">¡EasyBudget 2.0 está disponible con soporte para tema oscuro para usuarios premium! Clic para descubrir</string>
+    <string name="dark_theme_notif_cta">Descubrir</string>
 </resources>
