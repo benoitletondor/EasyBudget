@@ -84,6 +84,19 @@ class RecurringExpenseAddViewModel(private val db: DB) : ViewModel() {
         cal.time = date
 
         when (expense.type) {
+            RecurringExpenseType.DAILY -> {
+                // Add up to 5 years of expenses
+                for (i in 0 until 365*5) {
+                    try {
+                        db.persistExpense(Expense(expense.title, expense.originalAmount, cal.time, expense))
+                    } catch (t: Throwable) {
+                        Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false")
+                        return false
+                    }
+
+                    cal.add(Calendar.DAY_OF_YEAR, 1)
+                }
+            }
             RecurringExpenseType.WEEKLY -> {
                 // Add up to 5 years of expenses
                 for (i in 0 until 12*4*5) {
@@ -108,6 +121,32 @@ class RecurringExpenseAddViewModel(private val db: DB) : ViewModel() {
                     }
 
                     cal.add(Calendar.WEEK_OF_YEAR, 2)
+                }
+            }
+            RecurringExpenseType.TER_WEEKLY -> {
+                // Add up to 5 years of expenses
+                for (i in 0 until 12*4*5) {
+                    try {
+                        db.persistExpense(Expense(expense.title, expense.originalAmount, cal.time, expense))
+                    } catch (t: Throwable) {
+                        Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
+                        return false
+                    }
+
+                    cal.add(Calendar.WEEK_OF_YEAR, 3)
+                }
+            }
+            RecurringExpenseType.FOUR_WEEKLY -> {
+                // Add up to 5 years of expenses
+                for (i in 0 until 12*4*5) {
+                    try {
+                        db.persistExpense(Expense(expense.title, expense.originalAmount, cal.time, expense))
+                    } catch (t: Throwable) {
+                        Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
+                        return false
+                    }
+
+                    cal.add(Calendar.WEEK_OF_YEAR, 4)
                 }
             }
             RecurringExpenseType.MONTHLY -> {

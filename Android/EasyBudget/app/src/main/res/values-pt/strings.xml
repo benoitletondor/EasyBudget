@@ -90,9 +90,12 @@
     <string name="adjust_balance_error_title">Ops</string>
     <string name="adjust_balance_error_message">O valor inserido é inválido.</string>
 
+    <string name="daily">DIARIAMENTE</string>
     <string name="monthly">MENSAL</string>
     <string name="weekly">SEMANALMENTE</string>
-    <string name="bi_weekly">QUINZENALMENTE</string>
+    <string name="bi_weekly">2 SEMANAS</string>
+    <string name="ter_weekly">3 SEMANAS</string>
+    <string name="four_weekly">4 SEMANAS</string>
     <string name="yearly">ANUALMENTE</string>
     <string name="recurring_expense_add_loading_title">Carregando</string>
     <string name="recurring_expense_add_loading_message">Criando uma despesa recorrente…</string>
@@ -109,12 +112,17 @@
     <string name="recurring_expense_restored_success_message">Despesa recorrente restaurada com sucesso</string>
     <string name="recurring_expense_restore_error_title">Ops</string>
     <string name="recurring_expense_restore_error_message">Ocorreu um erro.</string>
+    <string name="recurring_expense_delete_first_error_title">Ops</string>
+    <string name="recurring_expense_delete_first_error_message">Não há nenhuma ocorrência antes desta.</string>
     <string name="expense_delete_error_title">Ops</string>
     <string name="expense_delete_error_message">Ocorreu um erro.</string>
 
     <string name="recurring_expense_interval">Intervalo</string>
+    <string name="recurring_interval_daily">Todo os dias</string>
     <string name="recurring_interval_weekly">Todas as semanas</string>
-    <string name="recurring_interval_bi_weekly">A cada duas semanas</string>
+    <string name="recurring_interval_bi_weekly">A cada 2 semanas</string>
+    <string name="recurring_interval_ter_weekly">A cada 3 semanas</string>
+    <string name="recurring_interval_four_weekly">A cada 4 semanas</string>
     <string name="recurring_interval_monthly">Todos os meses</string>
     <string name="recurring_interval_yearly">Todos os anos</string>
 

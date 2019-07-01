@@ -218,17 +218,20 @@ class RecurringExpenseAddActivity : AppCompatActivity() {
 
         UIHelper.preventUnsupportedInputForDecimals(amount_edittext)
 
-        val recurringTypesString = arrayOfNulls<String>(4)
-        recurringTypesString[0] = getString(R.string.recurring_interval_weekly)
-        recurringTypesString[1] = getString(R.string.recurring_interval_bi_weekly)
-        recurringTypesString[2] = getString(R.string.recurring_interval_monthly)
-        recurringTypesString[3] = getString(R.string.recurring_interval_yearly)
+        val recurringTypesString = arrayOfNulls<String>(7)
+        recurringTypesString[0] = getString(R.string.recurring_interval_daily)
+        recurringTypesString[1] = getString(R.string.recurring_interval_weekly)
+        recurringTypesString[2] = getString(R.string.recurring_interval_bi_weekly)
+        recurringTypesString[3] = getString(R.string.recurring_interval_ter_weekly)
+        recurringTypesString[4] = getString(R.string.recurring_interval_four_weekly)
+        recurringTypesString[5] = getString(R.string.recurring_interval_monthly)
+        recurringTypesString[6] = getString(R.string.recurring_interval_yearly)
 
         val adapter = ArrayAdapter<String>(this, R.layout.spinner_item, recurringTypesString)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         expense_type_spinner.adapter = adapter
 
-        expense_type_spinner.setSelection(2, false)
+        expense_type_spinner.setSelection(5, false)
     }
 
     /**
@@ -239,10 +242,13 @@ class RecurringExpenseAddActivity : AppCompatActivity() {
      */
     private fun getRecurringTypeFromSpinnerSelection(spinnerSelectedItem: Int): RecurringExpenseType {
         when (spinnerSelectedItem) {
-            0 -> return RecurringExpenseType.WEEKLY
-            1 -> return RecurringExpenseType.BI_WEEKLY
-            2 -> return RecurringExpenseType.MONTHLY
-            3 -> return RecurringExpenseType.YEARLY
+            0 -> return RecurringExpenseType.DAILY
+            1-> return RecurringExpenseType.WEEKLY
+            2 -> return RecurringExpenseType.BI_WEEKLY
+            3 -> return RecurringExpenseType.TER_WEEKLY
+            4 -> return RecurringExpenseType.FOUR_WEEKLY
+            5 -> return RecurringExpenseType.MONTHLY
+            6 -> return RecurringExpenseType.YEARLY
         }
 
         throw IllegalStateException("getRecurringTypeFromSpinnerSelection unable to get value for $spinnerSelectedItem")

@@ -203,10 +203,14 @@ class MainActivity : AppCompatActivity() {
                     expenseDeletionDialog = dialog
                 }
                 is MainViewModel.RecurringExpenseDeleteProgressState.ErrorCantDeleteBeforeFirstOccurrence -> {
-                    showGenericRecurringDeleteErrorDialog()
-
                     expenseDeletionDialog?.dismiss()
                     expenseDeletionDialog = null
+
+                    AlertDialog.Builder(this@MainActivity)
+                        .setTitle(R.string.recurring_expense_delete_first_error_title)
+                        .setMessage(R.string.recurring_expense_delete_first_error_message)
+                        .setNegativeButton(R.string.ok, null)
+                        .show()
                 }
                 is MainViewModel.RecurringExpenseDeleteProgressState.ErrorRecurringExpenseDeleteNotAssociated -> {
                     showGenericRecurringDeleteErrorDialog()

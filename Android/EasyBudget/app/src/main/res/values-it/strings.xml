@@ -90,9 +90,12 @@
     <string name="adjust_balance_error_title">OPS!</string>
     <string name="adjust_balance_error_message">Il valore che hai inserito non è valido.</string>
 
+    <string name="daily">QUOTIDIANA</string>
     <string name="monthly">MENSILE</string>
     <string name="weekly">SETTIMANALE</string>
-    <string name="bi_weekly">BISETTIMANALE</string>
+    <string name="bi_weekly">2 SETTIMANE</string>
+    <string name="ter_weekly">3 SETTIMANE</string>
+    <string name="four_weekly">4 SETTIMANE</string>
     <string name="yearly">ANNUALE</string>
     <string name="recurring_expense_add_loading_title">Carico</string>
     <string name="recurring_expense_add_loading_message">Creazione dell’uscita ricorrente…</string>
@@ -109,12 +112,17 @@
     <string name="recurring_expense_restored_success_message">Uscita ricorrente reinserita con successo</string>
     <string name="recurring_expense_restore_error_title">OPS!</string>
     <string name="recurring_expense_restore_error_message">Errore.</string>
+    <string name="recurring_expense_delete_first_error_title">OPS!</string>
+    <string name="recurring_expense_delete_first_error_message">Non ci sono occorrenze prima di questa.</string>
     <string name="expense_delete_error_title">OPS!</string>
     <string name="expense_delete_error_message">Errore.</string>
 
     <string name="recurring_expense_interval">Ripetizione</string>
+    <string name="recurring_interval_daily">Ogni giorno</string>
     <string name="recurring_interval_weekly">Ogni settimana</string>
     <string name="recurring_interval_bi_weekly">Ogni 2 settimane</string>
+    <string name="recurring_interval_ter_weekly">Ogni 3 settimane</string>
+    <string name="recurring_interval_four_weekly">Ogni 4 settimane</string>
     <string name="recurring_interval_monthly">Ogni mese</string>
     <string name="recurring_interval_yearly">Ogni anno</string>
 

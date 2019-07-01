@@ -90,9 +90,12 @@
     <string name="adjust_balance_error_title">Oups</string>
     <string name="adjust_balance_error_message">La valeur que vous avez entrée est invalide.</string>
 
+    <string name="daily">JOURNALIER</string>
     <string name="monthly">MENSUEL</string>
     <string name="weekly">HEBDOMADAIRE</string>
-    <string name="bi_weekly">BI-HEBDOMADAIRE</string>
+    <string name="bi_weekly">2 SEMAINES</string>
+    <string name="ter_weekly">3 SEMAINES</string>
+    <string name="four_weekly">4 SEMAINES</string>
     <string name="yearly">ANNUEL</string>
     <string name="recurring_expense_add_loading_title">Chargement</string>
     <string name="recurring_expense_add_loading_message">Création de la dépense récurrente…</string>
@@ -109,12 +112,17 @@
     <string name="recurring_expense_restored_success_message">Dépense récurrente restaurée avec succès</string>
     <string name="recurring_expense_restore_error_title">Oups</string>
     <string name="recurring_expense_restore_error_message">Une erreur est survenue.</string>
+    <string name="recurring_expense_delete_first_error_title">Oups</string>
+    <string name="recurring_expense_delete_first_error_message">Il n\'y a aucune occurrence avant celle-ci.</string>
     <string name="expense_delete_error_title">Oups</string>
     <string name="expense_delete_error_message">Une erreur est survenue.</string>
 
     <string name="recurring_expense_interval">Répétition</string>
+    <string name="recurring_interval_daily">Tous les jours</string>
     <string name="recurring_interval_weekly">Toutes les semaines</string>
     <string name="recurring_interval_bi_weekly">Toutes les 2 semaines</string>
+    <string name="recurring_interval_ter_weekly">Toutes les 3 semaines</string>
+    <string name="recurring_interval_four_weekly">Toutes les 4 semaines</string>
     <string name="recurring_interval_monthly">Tous les mois</string>
     <string name="recurring_interval_yearly">Tous les ans</string>
 

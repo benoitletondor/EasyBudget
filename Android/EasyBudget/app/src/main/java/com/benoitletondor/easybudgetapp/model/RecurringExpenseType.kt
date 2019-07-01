@@ -25,6 +25,11 @@ package com.benoitletondor.easybudgetapp.model
  */
 enum class RecurringExpenseType {
     /**
+     * An expense that occurs every day
+     */
+    DAILY,
+
+    /**
      * An expense that occurs every week
      */
     WEEKLY,
@@ -33,6 +38,16 @@ enum class RecurringExpenseType {
      * An expense that occurs every 2 weeks
      */
     BI_WEEKLY,
+
+    /**
+     * An expense that occurs every 3 weeks
+     */
+    TER_WEEKLY,
+
+    /**
+     * An expense that occurs every 4 weeks
+     */
+    FOUR_WEEKLY,
 
     /**
      * An expense that occurs every month

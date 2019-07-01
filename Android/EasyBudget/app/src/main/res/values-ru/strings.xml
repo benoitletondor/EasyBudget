@@ -87,12 +87,17 @@
     <string name="adjust_limit_warning_message">Установить пороговое значение (должно быть > 0)</string>
     <string name="adjust_limit_warning_error_title">Ой…</string>
     <string name="adjust_limit_warning_error_message">Введенное Вами значение не действительно. Это должно быть положительное число (больше 0)</string>
+    <string name="recurring_expense_delete_first_error_title">Ой…</string>
+    <string name="recurring_expense_delete_first_error_message">Предыдущей записи не существует.</string>
     <string name="adjust_balance_error_title">Ой…</string>
     <string name="adjust_balance_error_message">Введенное Вами значение не действительно.</string>
 
+    <string name="daily">ЕЖЕДНЕВНО</string>
     <string name="monthly">ЕЖЕМЕСЯЧНО</string>
     <string name="weekly">ЕЖЕНЕДЕЛЬНО</string>
-    <string name="bi_weekly">ДВА РАЗА В НЕДЕЛЮ</string>
+    <string name="bi_weekly">2 НЕДЕЛИ</string>
+    <string name="ter_weekly">3 НЕДЕЛИ</string>
+    <string name="four_weekly">4 НЕДЕЛИ</string>
     <string name="yearly">ЕЖЕГОДНО</string>
     <string name="recurring_expense_add_loading_title">Загрузка</string>
     <string name="recurring_expense_add_loading_message">Создание периодического расхода…</string>
@@ -113,8 +118,11 @@
     <string name="expense_delete_error_message">Произошла ошибка.</string>
 
     <string name="recurring_expense_interval">Периодичность</string>
+    <string name="recurring_interval_daily">Ежедневно</string>
     <string name="recurring_interval_weekly">Еженедельно</string>
-    <string name="recurring_interval_bi_weekly">Каждые две недели</string>
+    <string name="recurring_interval_bi_weekly">Каждые 2 недели</string>
+    <string name="recurring_interval_ter_weekly">Каждые 3 недели</string>
+    <string name="recurring_interval_four_weekly">Каждые 4 недели</string>
     <string name="recurring_interval_monthly">Ежемесячно</string>
     <string name="recurring_interval_yearly">Ежегодно</string>
 
