@@ -155,7 +155,7 @@
     <string name="setting_category_notifications_daily_message">Recevez une notification à la fin de la journée si vous n’avez pas entré vos dépenses</string>
     <string name="setting_category_not_premium_status_title">Devenez utilisateur premium</string>
     <string name="setting_category_not_premium_status_message">Accédez aux fonctionnalités premium</string>
-    <string name="setting_category_notifications_monthly_title">Notification de récapitulatif mensuel</string>
+    <string name="setting_category_notifications_monthly_title">Récapitulatif mensuel</string>
     <string name="setting_category_notifications_monthly_message">Recevez une notification quand un nouveau récapitulatif mensuel est complet</string>
     <string name="setting_category_theme_title">Thème</string>
     <string name="setting_theme_light">Clair</string>
