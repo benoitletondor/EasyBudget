@@ -36,9 +36,9 @@ import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.injection.appModule
 import com.benoitletondor.easybudgetapp.injection.viewModelModule
 import com.benoitletondor.easybudgetapp.notif.DarkThemeNotif
-import com.benoitletondor.easybudgetapp.notif.NotificationsChannels.CHANNEL_DAILY_REMINDERS
-import com.benoitletondor.easybudgetapp.notif.NotificationsChannels.CHANNEL_MONTHLY_REMINDERS
-import com.benoitletondor.easybudgetapp.notif.NotificationsChannels.CHANNEL_NEW_FEATURES
+import com.benoitletondor.easybudgetapp.notif.CHANNEL_DAILY_REMINDERS
+import com.benoitletondor.easybudgetapp.notif.CHANNEL_MONTHLY_REMINDERS
+import com.benoitletondor.easybudgetapp.notif.CHANNEL_NEW_FEATURES
 import com.benoitletondor.easybudgetapp.parameters.*
 import com.benoitletondor.easybudgetapp.push.PushService.Companion.DAILY_REMINDER_KEY
 import com.benoitletondor.easybudgetapp.push.PushService.Companion.MONTHLY_REMINDER_KEY
@@ -134,9 +134,7 @@ class EasyBudget : Application() {
         registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
             private var activityCounter = 0
 
-            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-
-            }
+            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
 
             override fun onActivityStarted(activity: Activity) {
                 if (activityCounter == 0) {
@@ -146,13 +144,9 @@ class EasyBudget : Application() {
                 activityCounter++
             }
 
-            override fun onActivityResumed(activity: Activity) {
+            override fun onActivityResumed(activity: Activity) {}
 
-            }
-
-            override fun onActivityPaused(activity: Activity) {
-
-            }
+            override fun onActivityPaused(activity: Activity) {}
 
             override fun onActivityStopped(activity: Activity) {
                 if (activityCounter == 1) {
@@ -162,13 +156,9 @@ class EasyBudget : Application() {
                 activityCounter--
             }
 
-            override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
+            override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
 
-            }
-
-            override fun onActivityDestroyed(activity: Activity) {
-
-            }
+            override fun onActivityDestroyed(activity: Activity) {}
         })
     }
 
@@ -220,10 +210,10 @@ class EasyBudget : Application() {
             if (currentStep == RatingPopup.RatingPopupStep.STEP_LIKE ||
                 currentStep == RatingPopup.RatingPopupStep.STEP_LIKE_NOT_RATED ||
                 currentStep == RatingPopup.RatingPopupStep.STEP_LIKE_RATED) {
-                if (!hasRatingPopupBeenShownToday() && shouldShowPremiumPopup()) {
+                if ( !hasRatingPopupBeenShownToday() && shouldShowPremiumPopup() ) {
                     parameters.setPremiumPopupLastAutoShowTimestamp(Date().time)
 
-                    val dialog = AlertDialog.Builder(activity)
+                    AlertDialog.Builder(activity)
                         .setTitle(R.string.premium_popup_become_title)
                         .setMessage(R.string.premium_popup_become_message)
                         .setPositiveButton(R.string.premium_popup_become_cta) { dialog13, _ ->
@@ -239,8 +229,7 @@ class EasyBudget : Application() {
                             dialog1.dismiss()
                         }
                         .show()
-
-                    UIHelper.centerDialogButtons(dialog)
+                        .centerButtons()
                 }
             }
         } catch (e: Exception) {

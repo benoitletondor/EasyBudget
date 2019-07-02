@@ -278,7 +278,7 @@ class MainActivity : AppCompatActivity() {
             val dialogView = layoutInflater.inflate(R.layout.dialog_adjust_balance, null)
             val amountEditText = dialogView.findViewById<EditText>(R.id.balance_amount)
             amountEditText.setText(if (currentBalance == 0.0) "0" else CurrencyHelper.getFormattedAmountValue(currentBalance))
-            UIHelper.preventUnsupportedInputForDecimals(amountEditText)
+            amountEditText.preventUnsupportedInputForDecimals()
             amountEditText.setSelection(amountEditText.text.length) // Put focus at the end of the text
 
             val builder = AlertDialog.Builder(this)
@@ -683,9 +683,9 @@ class MainActivity : AppCompatActivity() {
                 viewPager.setBackgroundColor(ContextCompat.getColor(this@MainActivity, R.color.calendar_background))
                 (viewPager.parent as View?)?.setBackgroundColor(ContextCompat.getColor(this@MainActivity, R.color.calendar_background))
 
-                // Remove border on lollipop
-                UIHelper.removeButtonBorder(leftButton)
-                UIHelper.removeButtonBorder(rightButton)
+                // Remove border
+                leftButton.removeButtonBorder()
+                rightButton.removeButtonBorder()
             }
         }
 

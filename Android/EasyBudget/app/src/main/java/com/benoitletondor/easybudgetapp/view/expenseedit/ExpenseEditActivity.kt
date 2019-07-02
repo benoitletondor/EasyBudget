@@ -26,10 +26,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.benoitletondor.easybudgetapp.R
-import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
+import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.parameters.Parameters
-import com.benoitletondor.easybudgetapp.helper.UIHelper
-import com.benoitletondor.easybudgetapp.helper.getUserCurrency
 import com.benoitletondor.easybudgetapp.view.DatePickerDialogFragment
 import kotlinx.android.synthetic.main.activity_expense_edit.*
 import org.koin.android.ext.android.inject
@@ -74,19 +72,19 @@ class ExpenseEditActivity : AppCompatActivity() {
 
         setResult(Activity.RESULT_CANCELED)
 
-        if (UIHelper.willAnimateActivityEnter(this)) {
-            UIHelper.animateActivityEnter(this, object : AnimatorListenerAdapter() {
+        if ( willAnimateActivityEnter() ) {
+            animateActivityEnter(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
-                    UIHelper.setFocus(description_edittext)
-                    UIHelper.showFAB(save_expense_fab)
+                    description_edittext.setFocus()
+                    save_expense_fab.animateFABAppearance()
                 }
             })
         } else {
-            UIHelper.setFocus(description_edittext)
-            UIHelper.showFAB(save_expense_fab)
+            description_edittext.setFocus()
+            save_expense_fab.animateFABAppearance()
         }
 
-        UIHelper.removeButtonBorder(date_button) // Remove border on lollipop
+        date_button.removeButtonBorder()
 
         viewModel.editTypeLiveData.observe(this, Observer { (isRevenue, isEdit) ->
             setExpenseTypeTextViewLayout(isRevenue, isEdit)
@@ -202,7 +200,7 @@ class ExpenseEditActivity : AppCompatActivity() {
             description_edittext.setSelection(description_edittext.text?.length ?: 0) // Put focus at the end of the text
         }
 
-        UIHelper.preventUnsupportedInputForDecimals(amount_edittext)
+        amount_edittext.preventUnsupportedInputForDecimals()
 
         if (amount != null) {
             amount_edittext.setText(CurrencyHelper.getFormattedAmountValue(abs(amount)))

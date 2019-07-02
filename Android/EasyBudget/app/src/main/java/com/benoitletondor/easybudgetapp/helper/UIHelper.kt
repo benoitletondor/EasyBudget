@@ -34,198 +34,180 @@ import androidx.annotation.ColorRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.updateLayoutParams
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
-import java.util.*
 import kotlin.math.max
 
 /**
- * Helper to manage compat with 5+
- *
- * @author Benoit LETONDOR
+ * This helper prevents the user to add unsupported values into an EditText for decimal numbers
  */
-object UIHelper {
+fun EditText.preventUnsupportedInputForDecimals() {
+    addTextChangedListener(object : TextWatcher {
+        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
 
-    /**
-     * Remove border of the button for Android 5+
-     */
-    fun removeButtonBorder(button: Button) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            button.outlineProvider = null
-        }
-    }
+        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
 
-    /**
-     * Set the status bar color for Android 5+
-     */
-    fun setStatusBarColor(activity: Activity, @ColorRes colorRes: Int) {
-        val window = activity.window
+        override fun afterTextChanged(s: Editable) {
+            val value = text.toString()
 
-        if (window.attributes.flags and WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS == 0) {
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        }
+            try {
+                // Remove - that is not at first char
+                val minusIndex = value.lastIndexOf("-")
+                if (minusIndex > 0) {
+                    s.delete(minusIndex, minusIndex + 1)
 
-        window.statusBarColor = ContextCompat.getColor(activity, colorRes)
-
-        if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ) {
-            window.navigationBarColor = ContextCompat.getColor(activity, colorRes)
-        }
-    }
-
-    /**
-     * Check if the os version is compatible with activity enter animations (Android 5+) && the
-     * activity contains the animation key
-     */
-    fun willAnimateActivityEnter(activity: Activity): Boolean {
-        return activity.intent.getBooleanExtra(MainActivity.ANIMATE_TRANSITION_KEY, false)
-    }
-
-    /**
-     * Animate activity enter if compatible
-     */
-    fun animateActivityEnter(activity: Activity, listener: Animator.AnimatorListener) {
-        if (!willAnimateActivityEnter(activity)) {
-            return
-        }
-
-        val rootView = activity.window.decorView.findViewById<View>(android.R.id.content)
-        rootView.alpha = 0.0f
-
-        activity.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-
-        val viewTreeObserver = rootView.viewTreeObserver
-        if (viewTreeObserver.isAlive) {
-            viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-                @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-                override fun onGlobalLayout() {
-                    rootView.viewTreeObserver.removeOnGlobalLayoutListener(this)
-
-                    // get the center for the clipping circle
-                    val cx = activity.intent.getIntExtra(MainActivity.CENTER_X_KEY, rootView.width / 2)
-                    val cy = activity.intent.getIntExtra(MainActivity.CENTER_Y_KEY, rootView.height / 2)
-
-                    // get the final radius for the clipping circle
-                    val finalRadius = max(rootView.width, rootView.height)
-
-                    // create the animator for this view (the start radius is zero)
-                    val anim = ViewAnimationUtils.createCircularReveal(rootView, cx, cy, 0f, finalRadius.toFloat())
-                    anim.addListener(listener)
-                    anim.addListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationStart(animation: Animator) {
-                            rootView.alpha = 1.0f
-                        }
-                    })
-                    anim.start()
-                }
-            })
-        }
-    }
-
-    /**
-     * Set the focus on the given text view
-     */
-    fun setFocus(editText: EditText) {
-        editText.requestFocus()
-
-        val imm = editText.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        Objects.requireNonNull(imm).showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT)
-    }
-
-    /**
-     * Show the FAB, animating the appearance if activated (the FAB should be configured with scale & alpha to 0)
-     */
-    fun showFAB(fab: View) {
-        ViewCompat.animate(fab)
-            .scaleX(1.0f)
-            .scaleY(1.0f)
-            .alpha(1.0f)
-            .setInterpolator(AccelerateInterpolator())
-            .withLayer()
-            .start()
-    }
-
-    /**
-     * This helper prevents the user to add unsupported values into an EditText for decimal numbers
-     */
-    fun preventUnsupportedInputForDecimals(editText: EditText) {
-        editText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-
-            override fun afterTextChanged(s: Editable) {
-                val value = editText.text.toString()
-
-                try {
-                    // Remove - that is not at first char
-                    val minusIndex = value.lastIndexOf("-")
-                    if (minusIndex > 0) {
-                        s.delete(minusIndex, minusIndex + 1)
-
-                        if (value.startsWith("-")) {
-                            s.delete(0, 1)
-                        } else {
-                            s.insert(0, "-")
-                        }
-
-                        return
+                    if (value.startsWith("-")) {
+                        s.delete(0, 1)
+                    } else {
+                        s.insert(0, "-")
                     }
 
-                    val comaIndex = value.indexOf(",")
-                    val dotIndex = value.indexOf(".")
-                    val lastDotIndex = value.lastIndexOf(".")
-
-                    // Remove ,
-                    if (comaIndex >= 0) {
-                        if (dotIndex >= 0) {
-                            s.delete(comaIndex, comaIndex + 1)
-                        } else {
-                            s.replace(comaIndex, comaIndex + 1, ".")
-                        }
-
-                        return
-                    }
-
-                    // Disallow double .
-                    if (dotIndex >= 0 && dotIndex != lastDotIndex) {
-                        s.delete(lastDotIndex, lastDotIndex + 1)
-                    } else if (dotIndex > 0) {
-                        val decimals = value.substring(dotIndex + 1)
-                        if (decimals.length > 2) {
-                            s.delete(dotIndex + 3, value.length)
-                        }
-                    }// No more than 2 decimals
-                } catch (e: Exception) {
-                    Logger.error("An error occurred during text changing watcher. Value: $value", e)
+                    return
                 }
 
+                val comaIndex = value.indexOf(",")
+                val dotIndex = value.indexOf(".")
+                val lastDotIndex = value.lastIndexOf(".")
+
+                // Remove ,
+                if (comaIndex >= 0) {
+                    if (dotIndex >= 0) {
+                        s.delete(comaIndex, comaIndex + 1)
+                    } else {
+                        s.replace(comaIndex, comaIndex + 1, ".")
+                    }
+
+                    return
+                }
+
+                // Disallow double .
+                if (dotIndex >= 0 && dotIndex != lastDotIndex) {
+                    s.delete(lastDotIndex, lastDotIndex + 1)
+                } else if (dotIndex > 0) {
+                    val decimals = value.substring(dotIndex + 1)
+                    if (decimals.length > 2) {
+                        s.delete(dotIndex + 3, value.length)
+                    }
+                }// No more than 2 decimals
+            } catch (e: Exception) {
+                Logger.error("An error occurred during text changing watcher. Value: $value", e)
+            }
+        }
+    })
+}
+
+/**
+ * Show the FAB, animating the appearance if activated (the FAB should be configured with scale & alpha to 0)
+ */
+fun View.animateFABAppearance() {
+    ViewCompat.animate(this)
+        .scaleX(1.0f)
+        .scaleY(1.0f)
+        .alpha(1.0f)
+        .setInterpolator(AccelerateInterpolator())
+        .withLayer()
+        .start()
+}
+
+/**
+ * Set the focus on the given text view
+ */
+fun EditText.setFocus() {
+    requestFocus()
+
+    val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
+}
+
+/**
+ * Animate activity enter if compatible
+ */
+fun Activity.animateActivityEnter(listener: Animator.AnimatorListener) {
+    if (!willAnimateActivityEnter()) {
+        return
+    }
+
+    val rootView = window.decorView.findViewById<View>(android.R.id.content)
+    rootView.alpha = 0.0f
+
+    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+
+    val viewTreeObserver = rootView.viewTreeObserver
+    if (viewTreeObserver.isAlive) {
+        viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+            override fun onGlobalLayout() {
+                rootView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+
+                // get the center for the clipping circle
+                val cx = intent?.getIntExtra(MainActivity.CENTER_X_KEY, rootView.width / 2) ?: rootView.width / 2
+                val cy = intent?.getIntExtra(MainActivity.CENTER_Y_KEY, rootView.height / 2) ?: rootView.height / 2
+
+                // get the final radius for the clipping circle
+                val finalRadius = max(rootView.width, rootView.height)
+
+                // create the animator for this view (the start radius is zero)
+                val anim = ViewAnimationUtils.createCircularReveal(rootView, cx, cy, 0f, finalRadius.toFloat())
+                anim.addListener(listener)
+                anim.addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationStart(animation: Animator) {
+                        rootView.alpha = 1.0f
+                    }
+                })
+                anim.start()
             }
         })
     }
+}
 
-    /**
-     * Center buttons of the given dialog (used to center when 3 choices are available).
-     *
-     * @param dialog the dialog
-     */
-    fun centerDialogButtons(dialog: AlertDialog) {
-        try {
-            val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-            val positiveButtonLL = positiveButton.layoutParams as LinearLayout.LayoutParams
-            positiveButtonLL.gravity = Gravity.CENTER
-            positiveButton.layoutParams = positiveButtonLL
+/**
+ * Check if the activity contains the animation key
+ */
+fun Activity.willAnimateActivityEnter(): Boolean {
+    return intent?.getBooleanExtra(MainActivity.ANIMATE_TRANSITION_KEY, false) ?: false
+}
 
-            val negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-            val negativeButtonL = negativeButton.layoutParams as LinearLayout.LayoutParams
-            negativeButtonL.gravity = Gravity.CENTER
-            negativeButton.layoutParams = negativeButtonL
+/**
+ * Set the status bar color
+ */
+fun Activity.setStatusBarColor(@ColorRes colorRes: Int) {
+    val window = window
 
-            val neutralButton = dialog.getButton(AlertDialog.BUTTON_NEUTRAL)
-            val neutralButtonL = neutralButton.layoutParams as LinearLayout.LayoutParams
-            neutralButtonL.gravity = Gravity.CENTER
-            neutralButton.layoutParams = neutralButtonL
-        } catch (e: Exception) {
-            Logger.error("Error while centering dialog buttons", e)
+    if (window.attributes.flags and WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS == 0) {
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+    }
+
+    window.statusBarColor = ContextCompat.getColor(this, colorRes)
+
+    if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ) {
+        window.navigationBarColor = ContextCompat.getColor(this, colorRes)
+    }
+}
+
+/**
+ * Remove border of the button
+ */
+fun Button.removeButtonBorder() {
+    outlineProvider = null
+}
+
+/**
+ * Center buttons of the given dialog (used to center when 3 choices are available).
+ */
+fun AlertDialog.centerButtons() {
+    try {
+        getButton(AlertDialog.BUTTON_POSITIVE)?.updateLayoutParams<LinearLayout.LayoutParams> {
+            gravity = Gravity.CENTER
         }
 
+        getButton(AlertDialog.BUTTON_NEGATIVE)?.updateLayoutParams<LinearLayout.LayoutParams> {
+            gravity = Gravity.CENTER
+        }
+
+        getButton(AlertDialog.BUTTON_NEUTRAL)?.updateLayoutParams<LinearLayout.LayoutParams> {
+            gravity = Gravity.CENTER
+        }
+    } catch (e: Exception) {
+        Logger.error("Error while centering dialog buttons", e)
     }
 }

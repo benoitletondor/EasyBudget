@@ -25,8 +25,8 @@ import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Observer
 import androidx.viewpager.widget.ViewPager
 import com.benoitletondor.easybudgetapp.R
-import com.benoitletondor.easybudgetapp.helper.DateHelper
-import com.benoitletondor.easybudgetapp.helper.UIHelper
+import com.benoitletondor.easybudgetapp.helper.getMonthTitle
+import com.benoitletondor.easybudgetapp.helper.removeButtonBorder
 import com.benoitletondor.easybudgetapp.view.report.MonthlyReportFragment
 import kotlinx.android.synthetic.main.activity_monthly_report.*
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -66,8 +66,8 @@ class MonthlyReportBaseActivity : AppCompatActivity(), ViewPager.OnPageChangeLis
             viewModel.onNextMonthButtonClicked()
         }
 
-        UIHelper.removeButtonBorder(monthly_report_previous_month_button)
-        UIHelper.removeButtonBorder(monthly_report_next_month_button)
+        monthly_report_previous_month_button.removeButtonBorder()
+        monthly_report_next_month_button.removeButtonBorder()
 
         viewModel.datesLiveData.observe(this, Observer { dates ->
             configureViewPager(dates)
@@ -83,7 +83,7 @@ class MonthlyReportBaseActivity : AppCompatActivity(), ViewPager.OnPageChangeLis
 
             ignoreNextPageSelectedEvent = false
 
-            monthly_report_month_title_tv.text = DateHelper.getMonthTitle(this, date)
+            monthly_report_month_title_tv.text = date.getMonthTitle(this)
 
             // Last and first available month
             val isFirstMonth = position == 0
@@ -123,9 +123,7 @@ class MonthlyReportBaseActivity : AppCompatActivity(), ViewPager.OnPageChangeLis
 
 // ------------------------------------------>
 
-    override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-
-    }
+    override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
 
     override fun onPageSelected(position: Int) {
         ignoreNextPageSelectedEvent = true
@@ -133,9 +131,7 @@ class MonthlyReportBaseActivity : AppCompatActivity(), ViewPager.OnPageChangeLis
         viewModel.onPageSelected(position)
     }
 
-    override fun onPageScrollStateChanged(state: Int) {
-
-    }
+    override fun onPageScrollStateChanged(state: Int) {}
 
     companion object {
         /**

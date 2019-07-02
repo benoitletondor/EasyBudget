@@ -28,7 +28,7 @@ import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
 
-import com.benoitletondor.easybudgetapp.notif.NotificationsChannels.CHANNEL_NEW_FEATURES
+import com.benoitletondor.easybudgetapp.notif.CHANNEL_NEW_FEATURES
 
 class DarkThemeNotif : IntentService("DarkThemeNotif") {
 

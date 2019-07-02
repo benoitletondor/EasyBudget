@@ -51,12 +51,12 @@ class RatingPopup(private val context: Context,
 
         parameters.setRatingPopupStep(RatingPopupStep.STEP_SHOWN)
 
-        val dialog = buildStep1(!forceShow)
+        val dialog = buildStep1(includeDontAskMeAgainButton = !forceShow)
         dialog.show()
 
         if (!forceShow) {
             // Center buttons
-            UIHelper.centerDialogButtons(dialog)
+            dialog.centerButtons()
         }
 
         return true

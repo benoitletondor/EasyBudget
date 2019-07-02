@@ -192,6 +192,7 @@ class IabImpl(context: Context,
     override fun onBillingServiceDisconnected() {
         Logger.debug("onBillingServiceDisconnected")
 
+        premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Error("Lost connection with Google Play")))
         setIabStatusAndNotify(PremiumCheckStatus.ERROR)
     }
 

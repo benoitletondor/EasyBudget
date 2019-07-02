@@ -32,7 +32,7 @@ import android.view.ViewAnimationUtils
 import androidx.appcompat.app.AppCompatActivity
 
 import com.benoitletondor.easybudgetapp.R
-import com.benoitletondor.easybudgetapp.helper.UIHelper
+import com.benoitletondor.easybudgetapp.helper.setStatusBarColor
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 
 import kotlinx.android.synthetic.main.activity_welcome.*
@@ -90,7 +90,7 @@ class WelcomeActivity : AppCompatActivity() {
 
             override fun onPageSelected(position: Int) {
                 ((welcome_view_pager?.adapter as? FragmentStatePagerAdapter)?.getItem(position) as? OnboardingFragment)?.let { fragment ->
-                    UIHelper.setStatusBarColor(this@WelcomeActivity, fragment.statusBarColor)
+                    setStatusBarColor(fragment.statusBarColor)
                 }
 
                 step = position
@@ -150,7 +150,7 @@ class WelcomeActivity : AppCompatActivity() {
 
         // Set status bar color
         (((welcome_view_pager.adapter) as? FragmentStatePagerAdapter)?.getItem(initialStep) as? OnboardingFragment)?.let { fragment ->
-            UIHelper.setStatusBarColor(this, fragment.statusBarColor)
+            setStatusBarColor(fragment.statusBarColor)
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

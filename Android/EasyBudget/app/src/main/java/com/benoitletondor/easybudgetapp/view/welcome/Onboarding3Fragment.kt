@@ -84,7 +84,7 @@ class Onboarding3Fragment : OnboardingFragment(), CoroutineScope by MainScope() 
 
         setCurrency()
 
-        UIHelper.preventUnsupportedInputForDecimals(onboarding_screen3_initial_amount_et)
+        onboarding_screen3_initial_amount_et.preventUnsupportedInputForDecimals()
         onboarding_screen3_initial_amount_et.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
 

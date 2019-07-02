@@ -29,50 +29,41 @@ import java.util.Date
 import java.util.Locale
 
 /**
- * Helper to work with dates
+ * Get the list of months available for the user for the monthly report view.
  *
- * @author Benoit LETONDOR
+ * @return a list of Date object set at the 1st day of the month 00:00:00:000
  */
-object DateHelper {
+fun Parameters.getListOfMonthsAvailableForUser(): List<Date> {
+    val initDate = getInitTimestamp()
 
-    /**
-     * Get the list of months available for the user for the monthly report view.
-     *
-     * @return a list of Date object set at the 1st day of the month 00:00:00:000
-     */
-    fun getListOfMonthsAvailableForUser(parameters: Parameters): List<Date> {
-        val initDate = parameters.getInitTimestamp()
+    val cal = Calendar.getInstance()
+    cal.timeInMillis = initDate
 
-        val cal = Calendar.getInstance()
-        cal.timeInMillis = initDate
+    cal.set(Calendar.MILLISECOND, 0)
+    cal.set(Calendar.SECOND, 0)
+    cal.set(Calendar.MINUTE, 0)
+    cal.set(Calendar.HOUR_OF_DAY, 0)
+    cal.set(Calendar.DAY_OF_MONTH, 1)
 
-        cal.set(Calendar.MILLISECOND, 0)
-        cal.set(Calendar.SECOND, 0)
-        cal.set(Calendar.MINUTE, 0)
-        cal.set(Calendar.HOUR_OF_DAY, 0)
-        cal.set(Calendar.DAY_OF_MONTH, 1)
+    val today = Date()
 
-        val today = Date()
+    val months = ArrayList<Date>()
 
-        val months = ArrayList<Date>()
-
-        while (cal.time.before(today)) {
-            months.add(cal.time)
-            cal.add(Calendar.MONTH, 1)
-        }
-
-        return months
+    while (cal.time.before(today)) {
+        months.add(cal.time)
+        cal.add(Calendar.MONTH, 1)
     }
 
-    /**
-     * Get the title of the month to display in the report view
-     *
-     * @param context non null context
-     * @param date date of the month
-     * @return a formatted string like "January 2016"
-     */
-    fun getMonthTitle(context: Context, date: Date): String {
-        val format = SimpleDateFormat(context.resources.getString(R.string.monthly_report_month_title_format), Locale.getDefault())
-        return format.format(date)
-    }
+    return months
+}
+
+/**
+ * Get the title of the month to display in the report view
+ *
+ * @param context non null context
+ * @return a formatted string like "January 2016"
+ */
+fun Date.getMonthTitle(context: Context): String {
+    val format = SimpleDateFormat(context.resources.getString(R.string.monthly_report_month_title_format), Locale.getDefault())
+    return format.format(this)
 }

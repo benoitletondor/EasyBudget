@@ -76,15 +76,13 @@ class PushService : FirebaseMessagingService() {
         try {
             // Check if it's a daily reminder
             if (remoteMessage.data.containsKey(DAILY_REMINDER_KEY) && "true" == remoteMessage.data[DAILY_REMINDER_KEY]) {
-                if (!iab.isUserPremium())
                 // Only for premium users
-                {
+                if ( !iab.isUserPremium() ) {
                     return false
                 }
 
-                if ( !parameters.isUserAllowingDailyReminderPushes() )
                 // Check user choice
-                {
+                if ( !parameters.isUserAllowingDailyReminderPushes() ) {
                     return false
                 }
 
@@ -139,7 +137,6 @@ class PushService : FirebaseMessagingService() {
             Logger.error("Error while checking app version for push", e)
             return false
         }
-
     }
 
     /**

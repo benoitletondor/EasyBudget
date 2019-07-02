@@ -19,7 +19,7 @@ package com.benoitletondor.easybudgetapp.view.report.base
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.benoitletondor.easybudgetapp.helper.DateHelper
+import com.benoitletondor.easybudgetapp.helper.getListOfMonthsAvailableForUser
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -36,7 +36,7 @@ class MonthlyReportBaseViewModel(private val parameters: Parameters) : ViewModel
     fun loadData(fromNotification: Boolean) {
         viewModelScope.launch {
             val dates = withContext(Dispatchers.IO) {
-                return@withContext DateHelper.getListOfMonthsAvailableForUser(parameters)
+                return@withContext parameters.getListOfMonthsAvailableForUser()
             }
 
             datesLiveData.value = dates

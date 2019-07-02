@@ -29,9 +29,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.benoitletondor.easybudgetapp.R
+import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.parameters.Parameters
-import com.benoitletondor.easybudgetapp.helper.UIHelper
-import com.benoitletondor.easybudgetapp.helper.getUserCurrency
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import com.benoitletondor.easybudgetapp.view.DatePickerDialogFragment
 import kotlinx.android.synthetic.main.activity_recurring_expense_add.*
@@ -64,19 +63,19 @@ class RecurringExpenseAddActivity : AppCompatActivity() {
 
         setResult(Activity.RESULT_CANCELED)
 
-        if (UIHelper.willAnimateActivityEnter(this)) {
-            UIHelper.animateActivityEnter(this, object : AnimatorListenerAdapter() {
+        if ( willAnimateActivityEnter() ) {
+            animateActivityEnter(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
-                    UIHelper.setFocus(description_edittext)
-                    UIHelper.showFAB(save_expense_fab)
+                    description_edittext.setFocus()
+                    save_expense_fab.animateFABAppearance()
                 }
             })
         } else {
-            UIHelper.setFocus(description_edittext)
-            UIHelper.showFAB(save_expense_fab)
+            description_edittext.setFocus()
+            save_expense_fab.animateFABAppearance()
         }
 
-        UIHelper.removeButtonBorder(date_button) // Remove border on lollipop
+        date_button.removeButtonBorder() // Remove border
 
         viewModel.editTypeIsRevenueLiveData.observe(this, Observer { isRevenue ->
             setExpenseTypeTextViewLayout(isRevenue)
@@ -216,7 +215,7 @@ class RecurringExpenseAddActivity : AppCompatActivity() {
     private fun setUpInputs() {
         amount_inputlayout.hint = resources.getString(R.string.amount, parameters.getUserCurrency().symbol)
 
-        UIHelper.preventUnsupportedInputForDecimals(amount_edittext)
+        amount_edittext.preventUnsupportedInputForDecimals()
 
         val recurringTypesString = arrayOfNulls<String>(7)
         recurringTypesString[0] = getString(R.string.recurring_interval_daily)
