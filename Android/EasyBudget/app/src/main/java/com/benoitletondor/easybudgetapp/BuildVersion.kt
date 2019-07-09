@@ -81,5 +81,5 @@ object BuildVersion {
      * First public release of 2.0
      * 01/07/2019
      */
-    const val VERSION_2_0_9 = 62
+    const val VERSION_2_0_10 = 63
 }
