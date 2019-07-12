@@ -22,6 +22,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.benoitletondor.easybudgetapp.db.impl.entity.ExpenseEntity
 import com.benoitletondor.easybudgetapp.db.impl.entity.RecurringExpenseEntity
+import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import java.util.*
 
 @Database(exportSchema = false,
@@ -38,7 +39,7 @@ abstract class RoomDB : RoomDatabase() {
     companion object {
         fun create(context: Context): RoomDB = Room
             .databaseBuilder(context, RoomDB::class.java, "easybudget.db")
-            .addMigrations(initialMigrationToRoom)
+            .addMigrations(migrationFrom1To2, migrationFrom2To3, migrationToRoom)
             .build()
     }
 }
@@ -55,8 +56,21 @@ private class TimestampConverters {
     }
 }
 
-private val initialMigrationToRoom = object : Migration(3, 4) {
+private val migrationToRoom = object : Migration(3, 4) {
     override fun migrate(database: SupportSQLiteDatabase) {
         // No-op, simple migration from SQLite to Room
+    }
+}
+
+private val migrationFrom2To3 = object : Migration(2, 3) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE monthlyexpense ADD COLUMN type text not null DEFAULT '"+ RecurringExpenseType.MONTHLY+"'")
+    }
+}
+
+private val migrationFrom1To2 = object : Migration(1, 2) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("UPDATE expense SET amount = amount * 100")
+        database.execSQL("UPDATE monthlyexpense SET amount = amount * 100")
     }
 }
