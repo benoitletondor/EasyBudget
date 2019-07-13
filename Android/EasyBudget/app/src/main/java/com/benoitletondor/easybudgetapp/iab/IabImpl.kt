@@ -45,7 +45,8 @@ private const val PREMIUM_PARAMETER_KEY = "premium"
 private const val BATCH_OFFER_REDEEMED_PARAMETER_KEY = "batch_offer_redeemed"
 
 class IabImpl(context: Context,
-              private val parameters: Parameters) : Iab, PurchasesUpdatedListener, BillingClientStateListener, PurchaseHistoryResponseListener {
+              private val parameters: Parameters) : Iab, PurchasesUpdatedListener, BillingClientStateListener, PurchaseHistoryResponseListener, AcknowledgePurchaseResponseListener {
+
     private val appContext = context.applicationContext
     private val billingClient = BillingClient.newBuilder(appContext)
         .setListener(this)
@@ -221,49 +222,56 @@ class IabImpl(context: Context,
     }
 
     override fun onPurchasesUpdated(billingResult: BillingResult, purchases: List<Purchase>?) {
-        try {
-            Logger.debug("Purchase finished: " + billingResult.responseCode)
+        Logger.debug("Purchase finished: " + billingResult.responseCode)
 
-            if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
-                Logger.error("Error while purchasing premium: " + billingResult.responseCode)
-                when {
-                    billingResult.responseCode == BillingClient.BillingResponseCode.USER_CANCELED -> premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Cancelled))
-                    billingResult.responseCode == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> {
-                        setIabStatusAndNotify(PremiumCheckStatus.PREMIUM)
-                        premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Success))
-                        return
-                    }
-                    else -> premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Error("An error occurred (status code: " + billingResult.responseCode + ")")))
+        if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
+            Logger.error("Error while purchasing premium: " + billingResult.responseCode)
+            when {
+                billingResult.responseCode == BillingClient.BillingResponseCode.USER_CANCELED -> premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Cancelled))
+                billingResult.responseCode == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> {
+                    setIabStatusAndNotify(PremiumCheckStatus.PREMIUM)
+                    premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Success))
+                    return
                 }
-
-                return
+                else -> premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Error("An error occurred (status code: " + billingResult.responseCode + ")")))
             }
 
-
-            if ( purchases.isNullOrEmpty() ) {
-                premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Error("No purchased item found")))
-                return
-            }
-
-            Logger.debug("Purchase successful.")
-
-            var premiumBought = false
-            for (purchase in purchases) {
-                if (SKU_PREMIUM == purchase.sku) {
-                    premiumBought = true
-                }
-            }
-
-            if (!premiumBought) {
-                premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Error("No purchased item found")))
-                return
-            }
-
-            setIabStatusAndNotify(PremiumCheckStatus.PREMIUM)
-            premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Success))
-        } finally {
             premiumFlowContinuation = null
+            return
         }
+
+
+        if ( purchases.isNullOrEmpty() ) {
+            premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Error("No purchased item found")))
+            premiumFlowContinuation = null
+            return
+        }
+
+        Logger.debug("Purchase successful.")
+
+        for (purchase in purchases) {
+            if (SKU_PREMIUM == purchase.sku) {
+                billingClient.acknowledgePurchase(AcknowledgePurchaseParams.newBuilder().setPurchaseToken(purchase.purchaseToken).build(), this)
+                return
+            }
+        }
+
+        premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Error("No purchased item found")))
+        premiumFlowContinuation = null
+    }
+
+    override fun onAcknowledgePurchaseResponse(billingResult: BillingResult) {
+        Logger.debug("Acknowledge successful.")
+
+        if( billingResult.responseCode != BillingClient.BillingResponseCode.OK ) {
+            premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Error("Error when acknowledging purchase with Google (${billingResult.responseCode}, ${billingResult.debugMessage}). Please try again")))
+            premiumFlowContinuation = null
+            return
+        }
+
+        setIabStatusAndNotify(PremiumCheckStatus.PREMIUM)
+        premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Success))
+        premiumFlowContinuation = null
     }
 }
 
