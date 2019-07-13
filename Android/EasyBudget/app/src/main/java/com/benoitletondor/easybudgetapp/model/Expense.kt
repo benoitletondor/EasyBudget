@@ -52,10 +52,6 @@ data class Expense(val id: Long?,
         if( title.isEmpty() ) {
             throw IllegalArgumentException("title is empty")
         }
-
-        if( amount == 0.0 ) {
-            throw IllegalArgumentException("amount should be != 0")
-        }
     }
 
     fun isRevenue() = amount < 0

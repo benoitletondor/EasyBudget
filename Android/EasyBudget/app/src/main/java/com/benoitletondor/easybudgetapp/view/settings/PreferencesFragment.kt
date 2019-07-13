@@ -300,7 +300,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
         filter.addAction(INTENT_IAB_STATUS_CHANGED)
         filter.addAction(USER_GONE_PREMIUM_INTENT)
         receiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
+            override fun onReceive(appContext: Context, intent: Intent) {
                 if (SelectCurrencyFragment.CURRENCY_SELECTED_INTENT == intent.action && selectCurrencyDialog != null) {
                     findPreference<Preference>(resources.getString(R.string.setting_category_currency_change_button_key))?.let { currencyPreference ->
                         setCurrencyPreferenceTitle(currencyPreference)
@@ -316,11 +316,13 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                     }
 
                 } else if (USER_GONE_PREMIUM_INTENT == intent.action) {
-                    AlertDialog.Builder(context)
-                        .setTitle(R.string.iab_purchase_success_title)
-                        .setMessage(R.string.iab_purchase_success_message)
-                        .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
-                        .show()
+                    context?.let { context ->
+                        AlertDialog.Builder(context)
+                            .setTitle(R.string.iab_purchase_success_title)
+                            .setMessage(R.string.iab_purchase_success_message)
+                            .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
+                            .show()
+                    }
 
                     refreshPremiumPreference()
                 }
