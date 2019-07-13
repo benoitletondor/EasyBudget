@@ -1,5 +1,5 @@
 <!--
-   Copyright 2015 Benoit LETONDOR
+   Copyright 2019 Benoit LETONDOR
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -14,9 +14,8 @@
    limitations under the License.
 -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<View
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="5dp"
-    android:background="@color/divider" >
-
-</FrameLayout>
+    android:background="@color/divider" />

@@ -1,5 +1,5 @@
 <!--
-   Copyright 2015 Benoit LETONDOR
+   Copyright 2019 Benoit LETONDOR
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -14,109 +14,122 @@
    limitations under the License.
 -->
 
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <PreferenceCategory
-        android:title="@string/setting_category_general_title">
+        app:title="@string/setting_category_general_title">
 
-        <Preference android:key="@string/setting_category_currency_change_button_key"
-            android:summary="@string/setting_category_currency_change_button_message"/>
+        <Preference
+            app:key="@string/setting_category_currency_change_button_key"
+            app:summary="@string/setting_category_currency_change_button_message"/>
 
-        <Preference android:key="@string/setting_category_limit_set_button_key"
-            android:title="@string/setting_category_limit_set_button_title"
-            android:summary="@string/setting_category_limit_set_button_message" />
+        <Preference
+            app:key="@string/setting_category_limit_set_button_key"
+            app:title="@string/setting_category_limit_set_button_title"
+            app:summary="@string/setting_category_limit_set_button_message" />
 
-        <SwitchPreference android:key="@string/setting_category_start_day_of_week_key"
-                    android:title="@string/setting_category_start_day_of_week_title"
-                    android:summaryOff="@string/setting_category_start_day_of_week_monday"
-                    android:summaryOn="@string/setting_category_start_day_of_week_sunday"/>
-
-    </PreferenceCategory>
-
-    <PreferenceCategory android:key="@string/setting_category_premium_key"
-        android:title="@string/setting_category_premium_title">
-
-        <Preference android:key="@string/setting_category_premium_status_key"
-            android:title="@string/setting_category_premium_status_title"
-            android:summary="@string/setting_category_premium_status_message" />
-
-        <CheckBoxPreference android:title="@string/setting_category_notifications_daily_title"
-            android:summaryOn="@string/setting_category_notifications_daily_message"
-            android:summaryOff="@string/setting_category_notifications_daily_message"
-            android:key="@string/setting_category_notifications_daily_key"
-            android:enabled="true"/>
-
-        <CheckBoxPreference android:title="@string/setting_category_notifications_monthly_title"
-            android:summaryOn="@string/setting_category_notifications_monthly_message"
-            android:summaryOff="@string/setting_category_notifications_monthly_message"
-            android:key="@string/setting_category_notifications_monthly_key"
-            android:enabled="true"/>
-
-    </PreferenceCategory>
-
-    <PreferenceCategory android:key="@string/setting_category_not_premium_key"
-        android:title="@string/setting_category_premium_title">
-
-        <Preference android:key="@string/setting_category_not_premium_status_key"
-                    android:title="@string/setting_category_not_premium_status_title"
-                    android:summary="@string/setting_category_not_premium_status_message" />
-
-        <Preference android:key="@string/setting_category_premium_redeem_key"
-                    android:title="@string/setting_category_premium_redeem_title"
-                    android:summary="@string/setting_category_premium_redeem_message" />
+        <SwitchPreferenceCompat
+            app:key="@string/setting_category_start_day_of_week_key"
+            app:title="@string/setting_category_start_day_of_week_title"
+            app:summaryOff="@string/setting_category_start_day_of_week_monday"
+            app:summaryOn="@string/setting_category_start_day_of_week_sunday"/>
 
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="@string/setting_category_app_title">
+        app:key="@string/setting_category_premium_key"
+        app:title="@string/setting_category_premium_title">
 
-        <Preference android:title="@string/setting_category_rate_button_title"
-            android:summary="@string/setting_category_rate_button_message"
-            android:key="@string/setting_category_rate_button_key" />
+        <Preference
+            app:key="@string/setting_category_premium_status_key"
+            app:title="@string/setting_category_premium_status_title"
+            app:summary="@string/setting_category_premium_status_message" />
 
-        <Preference android:title="@string/setting_category_share_app_title"
-            android:summary="@string/setting_category_share_app_message"
-            android:key="@string/setting_category_share_app_key" />
+        <ListPreference
+            app:key="@string/setting_category_app_theme_key"
+            app:title="@string/setting_category_theme_title"
+            app:entries="@array/themes"
+            app:entryValues="@array/themesData" />
 
-        <CheckBoxPreference android:title="@string/setting_category_notifications_update_title"
-            android:summaryOn="@string/setting_category_notifications_update_message"
-            android:summaryOff="@string/setting_category_notifications_update_message"
-            android:key="@string/setting_category_notifications_update_key"
-            android:enabled="true"/>
+        <CheckBoxPreference
+            app:title="@string/setting_category_notifications_daily_title"
+            app:summaryOn="@string/setting_category_notifications_daily_message"
+            app:summaryOff="@string/setting_category_notifications_daily_message"
+            app:key="@string/setting_category_notifications_daily_key"
+            app:enabled="true"/>
 
-        <Preference android:title="@string/setting_category_bug_report_send_button_title"
-            android:key="@string/setting_category_bug_report_send_button_key" />
-
-        <Preference android:key="@string/setting_category_app_version_key"
-            android:summary="@string/setting_category_app_version_message"/>
+        <CheckBoxPreference
+            app:title="@string/setting_category_notifications_monthly_title"
+            app:summaryOn="@string/setting_category_notifications_monthly_message"
+            app:summaryOff="@string/setting_category_notifications_monthly_message"
+            app:key="@string/setting_category_notifications_monthly_key"
+            app:enabled="true"/>
 
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="@string/setting_category_dev_title"
-        android:key="@string/setting_category_dev_key">
+        app:key="@string/setting_category_not_premium_key"
+        app:title="@string/setting_category_premium_title">
 
-        <Preference android:title="@string/setting_category_show_welcome_screen_button_title"
-            android:key="@string/setting_category_show_welcome_screen_button_key" />
+        <Preference
+            app:key="@string/setting_category_not_premium_status_key"
+            app:title="@string/setting_category_not_premium_status_title"
+            app:summary="@string/setting_category_not_premium_status_message" />
 
-        <Preference android:title="@string/setting_category_show_premium"
-            android:key="@string/setting_category_dev_show_premium_key" />
-
-        <Preference android:title="@string/setting_category_show_notif_daily_reminder"
-            android:key="@string/setting_category_show_notif_daily_reminder_key" />
-
-        <Preference android:title="@string/setting_category_show_notif_monthly_report_premium"
-            android:key="@string/setting_category_show_notif_monthly_premium_key" />
-
-        <Preference android:title="@string/setting_category_show_notif_monthly_report_notpremium"
-            android:key="@string/setting_category_show_notif_monthly_notpremium_key" />
-
-        <CheckBoxPreference android:title="@string/setting_category_disable_animation_title"
-            android:summaryOn="@string/setting_category_disable_animation_message"
-            android:summaryOff="@string/setting_category_disable_animation_message"
-            android:key="@string/setting_category_disable_animation_key"
-            android:enabled="false"/>
+        <Preference
+            app:key="@string/setting_category_premium_redeem_key"
+            app:title="@string/setting_category_premium_redeem_title"
+            app:summary="@string/setting_category_premium_redeem_message" />
 
     </PreferenceCategory>
 
+    <PreferenceCategory
+        app:title="@string/setting_category_app_title">
+
+        <Preference
+            app:title="@string/setting_category_rate_button_title"
+            app:summary="@string/setting_category_rate_button_message"
+            app:key="@string/setting_category_rate_button_key" />
+
+        <Preference
+            app:title="@string/setting_category_share_app_title"
+            app:summary="@string/setting_category_share_app_message"
+            app:key="@string/setting_category_share_app_key" />
+
+        <CheckBoxPreference
+            app:title="@string/setting_category_notifications_update_title"
+            app:summaryOn="@string/setting_category_notifications_update_message"
+            app:summaryOff="@string/setting_category_notifications_update_message"
+            app:key="@string/setting_category_notifications_update_key"
+            app:enabled="true"/>
+
+        <Preference
+            app:title="@string/setting_category_bug_report_send_button_title"
+            app:key="@string/setting_category_bug_report_send_button_key" />
+
+        <Preference
+            app:key="@string/setting_category_app_version_key"
+            app:summary="@string/setting_category_app_version_message"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="@string/setting_category_dev_title"
+        app:key="@string/setting_category_dev_key">
+
+        <Preference
+            app:title="@string/setting_category_show_welcome_screen_button_title"
+            app:key="@string/setting_category_show_welcome_screen_button_key" />
+
+        <Preference
+            app:title="@string/setting_category_show_premium"
+            app:key="@string/setting_category_dev_show_premium_key" />
+
+        <Preference
+            app:title="@string/setting_category_show_dark_theme_notif"
+            app:key="@string/setting_category_dev_show_dark_theme_notif_key" />
+
+    </PreferenceCategory>
 
 </PreferenceScreen>

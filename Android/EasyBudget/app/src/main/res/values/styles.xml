@@ -1,5 +1,5 @@
 <!--
-   Copyright 2015 Benoit LETONDOR
+   Copyright 2019 Benoit LETONDOR
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -16,18 +16,32 @@
 
 <resources>
 
-    <style name="Base.AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="Base.AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
-        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:windowBackground">@color/window_background</item>
+        <item name="toolbarStyle">@style/ToolBarStyle</item>
+        <item name="android:actionBarStyle">@style/ToolBarStyle</item>
+        <item name="alertDialogTheme">@style/AlertDialogTheme</item>
+        <item name="android:statusBarColor">@color/status_bar_color</item>
+        <item name="colorBackgroundFloating">@color/window_background</item>
     </style>
 
-    <style name="Base.AppThemeNoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="colorAccent">@color/accent</item>
-        <item name="android:windowBackground">@android:color/white</item>
+    <style name="ToolBarStyle" parent="Widget.AppCompat.Toolbar">
+        <item name="android:background">@color/action_bar_background</item>
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="android:titleTextStyle">@style/ToolbarTitleTextAppearance</item>
+        <item name="titleTextAppearance">@style/ToolbarTitleTextAppearance</item>
+    </style>
+
+    <style name="ToolbarTitleTextAppearance" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textColor">@color/action_bar_text_color</item>
+    </style>
+
+    <style name="ToolbarTheme" parent="ThemeOverlay.AppCompat.ActionBar">
+        <item name="colorControlNormal">@color/action_bar_text_color</item>
+        <item name="actionMenuTextColor">@color/action_bar_text_color</item>
     </style>
 
     <!-- App theme -->
@@ -35,19 +49,14 @@
 
     </style>
 
-    <!-- App theme without ActionBar -->
-    <style name="AppThemeNoActionBar" parent="Base.AppThemeNoActionBar">
-
-    </style>
-
     <!-- Buttons -->
     <style name="BlueButton" parent="Base.Widget.AppCompat.Button.Colored">
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColor">@color/white</item>
         <item name="colorButtonNormal">@color/secondary</item>
     </style>
 
     <style name="GreenButton" parent="Base.Widget.AppCompat.Button.Colored">
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColor">@color/white</item>
         <item name="colorButtonNormal">@color/accent</item>
     </style>
 
@@ -56,13 +65,37 @@
         <item name="colorButtonNormal">@color/accent_ripple</item>
     </style>
 
+    <!-- AlertDialog -->
+    <style name="AlertDialogTheme" parent="ThemeOverlay.AppCompat.Dialog.Alert">
+        <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
+        <item name="buttonBarNeutralButtonStyle">@style/NeutralButtonStyle</item>
+    </style>
+
+    <style name="NegativeButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/accent</item>
+    </style>
+
+    <style name="NeutralButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/accent</item>
+    </style>
+
+    <style name="PositiveButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/accent</item>
+    </style>
+
 
     <!-- Floating Label text -->
-    <style name="TextLabelDark" parent="AppTheme">
-        <item name="android:textColorHint">@android:color/white</item>
-        <item name="colorAccent">@android:color/white</item>
-        <item name="colorControlNormal">@android:color/white</item>
-        <item name="colorControlActivated">@android:color/white</item>
+    <style name="TextLabel" parent="AppTheme">
+        <item name="android:textColorHint">@color/expense_edit_field_text_color_dark</item>
+        <item name="colorAccent">@color/expense_edit_field_accent_color_dark</item>
+        <item name="colorControlNormal">@color/expense_edit_field_accent_color_dark</item>
+        <item name="colorControlActivated">@color/expense_edit_field_accent_color_dark</item>
+    </style>
+
+    <style name="TextLabelHintTextAppearance" parent="TextAppearance.Design.Hint">
+        <item name="android:textColor">@color/expense_edit_title_text_color_dark</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
     <!-- Expense switch -->
@@ -74,7 +107,7 @@
     <!-- FAB style -->
     <style name="fab_labels_style">
         <item name="android:background">@drawable/fab_action_label_background</item>
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColor">@color/white</item>
     </style>
 
     <!-- Caldroid -->
@@ -84,10 +117,10 @@
     </style>
 
     <style name="caldroid_gridview" parent="CaldroidDefaultGridView">
-        <item name="android:background">@android:color/white</item>
+        <item name="android:background">@color/calendar_background</item>
         <item name="android:horizontalSpacing">0dip</item>
         <item name="android:verticalSpacing">0dip</item>
-        <item name="android:listSelector">@android:color/transparent</item>
+        <item name="android:listSelector">@color/transparent</item>
     </style>
 
     <style name="caldroid_weekdayview" parent="CaldroidDefaultWeekday">

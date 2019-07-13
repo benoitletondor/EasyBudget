@@ -1,0 +1,286 @@
+/*
+ *   Copyright 2019 Benoit LETONDOR
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
+package com.benoitletondor.easybudgetapp.parameters
+
+import com.benoitletondor.easybudgetapp.helper.AppTheme
+import com.roomorama.caldroid.CaldroidFragment
+
+private const val DEFAULT_LOW_MONEY_WARNING_AMOUNT = 100
+/**
+ * Date of the base balance set-up (long)
+ */
+private const val INIT_DATE_PARAMETERS_KEY = "init_date"
+/**
+ * Local identifier of the device (generated on first launch) (string)
+ */
+private const val LOCAL_ID_PARAMETERS_KEY = "local_id"
+/**
+ * Number of time different day has been open (int)
+ */
+private const val NUMBER_OF_DAILY_OPEN_PARAMETERS_KEY = "number_of_daily_open"
+/**
+ * Timestamp that indicates the last time user was presented the rating popup (long)
+ */
+private const val RATING_POPUP_LAST_AUTO_SHOW_PARAMETERS_KEY = "rating_popup_last_auto_show"
+/**
+ * Has the user complete the premium popup = should we show it again or not (bool)
+ */
+private const val PREMIUM_POPUP_COMPLETE_PARAMETERS_KEY = "premium_popup_complete"
+/**
+ * Timestamp that indicates the last time user was presented the become premium popup (long)
+ */
+private const val PREMIUM_POPUP_LAST_AUTO_SHOW_PARAMETERS_KEY = "premium_popup_last_auto_show"
+/**
+ * App version stored to detect updates (int)
+ */
+private const val APP_VERSION_PARAMETERS_KEY = "appversion"
+/**
+ * Number of time the app has been opened (int)
+ */
+private const val NUMBER_OF_OPEN_PARAMETERS_KEY = "number_of_open"
+/**
+ * Timestamp of the last open (long)
+ */
+private const val LAST_OPEN_DATE_PARAMETERS_KEY = "last_open_date"
+/**
+ * Warning limit for low money on account (int)
+ */
+private const val LOW_MONEY_WARNING_AMOUNT_PARAMETERS_KEY = "low_money_warning_amount"
+/**
+ * First day of week to show (int)
+ */
+private const val FIRST_DAY_OF_WEEK_PARAMETERS_KEY = "first_day_of_week"
+/**
+ * The user wants to receive notifications for updates (bool)
+ */
+private const val USER_ALLOW_UPDATE_PUSH_PARAMETERS_KEY = "user_allow_update_push"
+/**
+ * The user wants to receive a daily reminder notification (bool)
+ */
+private const val USER_ALLOW_DAILY_PUSH_PARAMETERS_KEY = "user_allow_daily_push"
+/**
+ * The user wants to receive a monthly reminder notification when report is available (bool)
+ */
+private const val USER_ALLOW_MONTHLY_PUSH_PARAMETERS_KEY = "user_allow_monthly_push"
+/**
+ * Indicate if the rating has been completed by the user (finished or not ask me again) (bool)
+ */
+private const val RATING_COMPLETED_PARAMETERS_KEY = "rating_completed"
+/**
+ * Has the user saw the monthly report hint (bool)
+ */
+private const val USER_SAW_MONTHLY_REPORT_HINT_PARAMETERS_KEY = "user_saw_monthly_report_hint"
+/**
+ * AppTheme
+ */
+private const val APP_THEME_PARAMETERS_KEY = "app_theme"
+
+fun Parameters.getInitTimestamp(): Long {
+    return getLong(INIT_DATE_PARAMETERS_KEY, 0L)
+}
+
+fun Parameters.setInitTimestamp(value: Long) {
+    putLong(INIT_DATE_PARAMETERS_KEY, value)
+}
+
+fun Parameters.getLocalId(): String? {
+    return getString(LOCAL_ID_PARAMETERS_KEY)
+}
+
+fun Parameters.setLocalId(localId: String) {
+    putString(LOCAL_ID_PARAMETERS_KEY, localId)
+}
+
+fun Parameters.getNumberOfDailyOpen(): Int {
+    return getInt(NUMBER_OF_DAILY_OPEN_PARAMETERS_KEY, 0)
+}
+
+fun Parameters.setNumberOfDailyOpen(numberOfDailyOpen: Int) {
+    putInt(NUMBER_OF_DAILY_OPEN_PARAMETERS_KEY, numberOfDailyOpen)
+}
+
+fun Parameters.getRatingPopupLastAutoShowTimestamp(): Long {
+    return getLong(RATING_POPUP_LAST_AUTO_SHOW_PARAMETERS_KEY, 0)
+}
+
+fun Parameters.setRatingPopupLastAutoShowTimestamp(timestamp: Long) {
+    putLong(RATING_POPUP_LAST_AUTO_SHOW_PARAMETERS_KEY, timestamp)
+}
+
+fun Parameters.hasPremiumPopupBeenShow(): Boolean {
+    return getBoolean(PREMIUM_POPUP_COMPLETE_PARAMETERS_KEY, false)
+}
+
+fun Parameters.setPremiumPopupShown() {
+    putBoolean(PREMIUM_POPUP_COMPLETE_PARAMETERS_KEY, true)
+}
+
+fun Parameters.getPremiumPopupLastAutoShowTimestamp(): Long {
+    return getLong(PREMIUM_POPUP_LAST_AUTO_SHOW_PARAMETERS_KEY, 0)
+}
+
+fun Parameters.setPremiumPopupLastAutoShowTimestamp(timestamp: Long) {
+    putLong(PREMIUM_POPUP_LAST_AUTO_SHOW_PARAMETERS_KEY, timestamp)
+}
+
+fun Parameters.getCurrentAppVersion(): Int {
+    return getInt(APP_VERSION_PARAMETERS_KEY, 0)
+}
+
+fun Parameters.setCurrentAppVersion(appVersion: Int) {
+    putInt(APP_VERSION_PARAMETERS_KEY, appVersion)
+}
+
+fun Parameters.getNumberOfOpen(): Int {
+    return getInt(NUMBER_OF_OPEN_PARAMETERS_KEY, 0)
+}
+
+fun Parameters.setNumberOfOpen(numberOfOpen: Int) {
+    putInt(NUMBER_OF_OPEN_PARAMETERS_KEY, numberOfOpen)
+}
+
+fun Parameters.getLastOpenTimestamp(): Long {
+    return getLong(LAST_OPEN_DATE_PARAMETERS_KEY, 0)
+}
+
+fun Parameters.setLastOpenTimestamp(timestamp: Long) {
+    putLong(LAST_OPEN_DATE_PARAMETERS_KEY, timestamp)
+}
+
+fun Parameters.getLowMoneyWarningAmount(): Int {
+    return getInt(LOW_MONEY_WARNING_AMOUNT_PARAMETERS_KEY, DEFAULT_LOW_MONEY_WARNING_AMOUNT)
+}
+
+fun Parameters.setLowMoneyWarningAmount(amount: Int) {
+    putInt(LOW_MONEY_WARNING_AMOUNT_PARAMETERS_KEY, amount)
+}
+
+/**
+ * Get the first day of the week to display to the user
+ *
+ * @return the id of the first day of week to display
+ */
+fun Parameters.getCaldroidFirstDayOfWeek(): Int {
+    val currentValue = getInt(FIRST_DAY_OF_WEEK_PARAMETERS_KEY, -1)
+    return if (currentValue < 1 || currentValue > 7) {
+        CaldroidFragment.MONDAY
+    } else currentValue
+}
+
+/**
+ * Set the first day of week to display to the user
+ *
+ * @param firstDayOfWeek the id of the first day of week to display
+ */
+fun Parameters.setCaldroidFirstDayOfWeek(firstDayOfWeek: Int) {
+    putInt(FIRST_DAY_OF_WEEK_PARAMETERS_KEY, firstDayOfWeek)
+}
+
+/**
+ * The user wants or not to receive notification about updates
+ *
+ * @return true if we can display update notifications, false otherwise
+ */
+fun Parameters.isUserAllowingUpdatePushes(): Boolean {
+    return getBoolean(USER_ALLOW_UPDATE_PUSH_PARAMETERS_KEY, true)
+}
+
+/**
+ * Set the user choice about update notifications
+ *
+ * @param value if the user wants or not to receive notifications about updates
+ */
+fun Parameters.setUserAllowUpdatePushes(value: Boolean) {
+    putBoolean(USER_ALLOW_UPDATE_PUSH_PARAMETERS_KEY, value)
+}
+
+/**
+ * The user wants or not to receive a daily reminder notification
+ *
+ * @return true if we can display daily notifications, false otherwise
+ */
+fun Parameters.isUserAllowingDailyReminderPushes(): Boolean {
+    return getBoolean(USER_ALLOW_DAILY_PUSH_PARAMETERS_KEY, true)
+}
+
+/**
+ * Set the user choice about daily reminder notifications
+ *
+ * @param value if the user wants or not to receive daily notifications
+ */
+fun Parameters.setUserAllowDailyReminderPushes(value: Boolean) {
+    putBoolean(USER_ALLOW_DAILY_PUSH_PARAMETERS_KEY, value)
+}
+
+/**
+ * The user wants or not to receive a daily monthly notification when report is available
+ *
+ * @return true if we can display monthly notifications, false otherwise
+ */
+fun Parameters.isUserAllowingMonthlyReminderPushes(): Boolean {
+    return getBoolean(USER_ALLOW_MONTHLY_PUSH_PARAMETERS_KEY, true)
+}
+
+/**
+ * Set the user choice about monthly reminder notifications
+ *
+ * @param value if the user wants or not to receive monthly notifications
+ */
+fun Parameters.setUserAllowMonthlyReminderPushes(value: Boolean) {
+    putBoolean(USER_ALLOW_MONTHLY_PUSH_PARAMETERS_KEY, value)
+}
+
+/**
+ * Has the user complete the rating popup
+ *
+ * @return true if the user has already answered, false otherwise
+ */
+fun Parameters.hasUserCompleteRating(): Boolean {
+    return getBoolean(RATING_COMPLETED_PARAMETERS_KEY, false)
+}
+
+/**
+ * Set that the user has complete the rating popup process
+ */
+fun Parameters.setUserHasCompleteRating() {
+    putBoolean(RATING_COMPLETED_PARAMETERS_KEY, true)
+}
+
+/**
+ * Has the user saw the monthly report hint so far
+ *
+ * @return true if the user saw it, false otherwise
+ */
+fun Parameters.hasUserSawMonthlyReportHint(): Boolean {
+    return getBoolean(USER_SAW_MONTHLY_REPORT_HINT_PARAMETERS_KEY, false)
+}
+
+/**
+ * Set that the user saw the monthly report hint
+ */
+fun Parameters.setUserSawMonthlyReportHint() {
+    putBoolean(USER_SAW_MONTHLY_REPORT_HINT_PARAMETERS_KEY, true)
+}
+
+fun Parameters.getTheme(): AppTheme {
+    val value = getInt(APP_THEME_PARAMETERS_KEY, AppTheme.LIGHT.value)
+    return AppTheme.values().first { it.value == value }
+}
+
+fun Parameters.setTheme(theme: AppTheme) {
+    putInt(APP_THEME_PARAMETERS_KEY, theme.value)
+}

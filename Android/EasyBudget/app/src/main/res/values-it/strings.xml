@@ -1,5 +1,5 @@
 <!--
-   Copyright 2015 Benoit LETONDOR
+   Copyright 2019 Benoit LETONDOR
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -26,8 +26,6 @@
     <string name="title_activity_edit_income">Modifica l’entrata</string>
     <string name="title_activity_recurring_expense_add">Aggiungi un’uscita ricorrente</string>
     <string name="title_activity_recurring_income_add">Aggiungi un’entrata ricorrente</string>
-    <string name="title_activity_recurring_expense_edit">Modifica l’uscita ricorrente</string>
-    <string name="title_activity_monthly_income_edit">Modifica l’entrata ricorrente</string>
     <string name="title_activity_settings">Impostazioni</string>
     <string name="title_activity_welcome">EasyBudget</string>
     <string name="title_activity_premium">Premium</string>
@@ -92,9 +90,12 @@
     <string name="adjust_balance_error_title">OPS!</string>
     <string name="adjust_balance_error_message">Il valore che hai inserito non è valido.</string>
 
+    <string name="daily">QUOTIDIANA</string>
     <string name="monthly">MENSILE</string>
     <string name="weekly">SETTIMANALE</string>
-    <string name="bi_weekly">BISETTIMANALE</string>
+    <string name="bi_weekly">2 SETTIMANE</string>
+    <string name="ter_weekly">3 SETTIMANE</string>
+    <string name="four_weekly">4 SETTIMANE</string>
     <string name="yearly">ANNUALE</string>
     <string name="recurring_expense_add_loading_title">Carico</string>
     <string name="recurring_expense_add_loading_message">Creazione dell’uscita ricorrente…</string>
@@ -117,11 +118,13 @@
     <string name="expense_delete_error_message">Errore.</string>
 
     <string name="recurring_expense_interval">Ripetizione</string>
+    <string name="recurring_interval_daily">Ogni giorno</string>
     <string name="recurring_interval_weekly">Ogni settimana</string>
     <string name="recurring_interval_bi_weekly">Ogni 2 settimane</string>
+    <string name="recurring_interval_ter_weekly">Ogni 3 settimane</string>
+    <string name="recurring_interval_four_weekly">Ogni 4 settimane</string>
     <string name="recurring_interval_monthly">Ogni mese</string>
     <string name="recurring_interval_yearly">Ogni anno</string>
-    <string name="recurring_update_notification">Nuova funzionalità: Come richiesto da molti di voi, ormai è possibile aggiungere le uscite settimanali, bisettimanali e annuali</string>
 
     <string name="setting_category_app_title">App</string>
     <string name="setting_category_rate_button_title">L’app ti piace?</string>
@@ -154,15 +157,20 @@
     <string name="setting_category_not_premium_status_message">Accedi a tutte le funzionalità premium</string>
     <string name="setting_category_notifications_monthly_title">Notifica di rapporto mensile</string>
     <string name="setting_category_notifications_monthly_message">Ricevi una notifica quando un nuovo rapporto mensile è completo</string>
+    <string name="setting_category_theme_title">Tema</string>
+    <string name="setting_theme_light">Leggero</string>
+    <string name="setting_theme_dark">Scuro</string>
+    <string name="setting_theme_platform">Default del sistema</string>
 
     <string name="premium_popup_premium_title">Sei… premium!</string>
-    <string name="premium_popup_premium_message">Hai ora accesso alle funzionalità premium:\n\n- Rapporto mensile: Ricevi un rapporto delle entrate e delle uscite del mese\n- Allerta quotidiana se hai dimenticato di inserire le uscite del giorno\n…moltissime altre funzioni che si aggiungeranno poco a poco!</string>
+    <string name="premium_popup_premium_message">Hai ora accesso alle funzionalità premium:\n\n- Rapporto mensile: Ricevi un rapporto delle entrate e delle uscite del mese\n- Allerta quotidiana se hai dimenticato di inserire le uscite del giorno\n- Tema scuro\n…moltissime altre funzioni che si aggiungeranno poco a poco!</string>
     <string name="premium_popup_not_premium_title">Diventa premium</string>
     <string name="premium_popup_not_premium_message">Accedi a tutte le funzionalità premium!</string>
     <string name="premium_popup_not_premium_feature1_title">2. Allerta quotidiana</string>
     <string name="premium_popup_not_premium_feature1_message">Ricevi una notifica alla fine della giornata se non hai inserito le tue spese.</string>
     <string name="premium_popup_not_premium_feature2_title">1. Rapporto mensile</string>
     <string name="premium_popup_not_premium_feature2_message">Ricevi un rapporto delle entrate e delle uscite del mese e scopri quanto hai risparmiato.</string>
+    <string name="premium_popup_not_premium_feature_more_dark_theme">3. Tema scuro!</string>
     <string name="premium_popup_not_premium_feature_more_title">…moltissime altre funzioni che si aggiungeranno poco a poco!</string>
     <string name="premium_popup_not_premium_cta">Acquista</string>
     <string name="premium_popup_become_title">Diventa premium</string>
@@ -170,9 +178,6 @@
     <string name="premium_popup_become_cta">Scopri</string>
     <string name="premium_popup_become_not_now">Non ora</string>
     <string name="premium_popup_become_not_ask_again">Non chiedermelo più</string>
-    <string name="premium_notif_optin_message">Nuova funzionalità premium: le notifiche quotidiane!\nRicevi una notifica se hai dimenticato di aggiungere le tue spese del giorno. Ti interessa?\n(Potrai cambiare più tardi nelle Impostazioni).</string>
-    <string name="premium_notif_optin_message_ok">Ok</string>
-    <string name="premium_notif_optin_message_not_ok">No, grazie</string>
 
     <string name="iab_purchase_success_title">Grazie</string>
     <string name="iab_purchase_success_message">Grazie mille per il tuo sostegno! Puoi ora goderti le funzionalità premium.</string>
@@ -184,12 +189,8 @@
     <string name="voucher_redeem_dialog_title">Codice promozionale</string>
     <string name="voucher_redeem_dialog_message">Inserisci il tuo codice promozionale</string>
     <string name="voucher_redeem_dialog_cta">Utilizza</string>
-    <string name="voucher_redeem_dialog_loading_title">Convalida</string>
-    <string name="voucher_redeem_dialog_loading_message">Attendi, prego</string>
     <string name="voucher_redeem_error_dialog_title">OPS!</string>
     <string name="voucher_redeem_error_code_invalid_dialog_message">Il tuo codice non è valido.</string>
-    <string name="voucher_redeem_error_no_internet_dialog_message">Errore di rete. Controlla la tua connessione e prova ancora.</string>
-    <string name="voucher_redeem_error_generic_dialog_message">C’è stato un errore, prova di nuovo più tardi.</string>
 
     <string name="rating_popup_question_title">Cosa pensi di EasyBudget?</string>
     <string name="rating_popup_question_message">Lavoro a questa applicazione nel tempo libero e la propongo gratuitamente. Ci sono sicuramente cose da migliorare e la tua opinione conta molto per me! </string>
@@ -227,11 +228,7 @@
     <string name="onboarding_screen_4_message4">Grazie di aver scelto EasyBudget, e benvenuto! :)</string>
     <string name="onboarding_screen_4_cta">Avanti</string>
 
-    <string name="app_invite_title">Condividi con i tuoi amici</string>
     <string name="app_invite_message">Ehy, dovresti provare EasyBudget, un’app semplicissima per gestire il tuo budget!</string> <!-- 100 chars or less -->
-    <string name="app_invite_welcome_title">Benvenuto su EasyBudget</string>
-    <string name="app_invite_welcome_message">Si direbbe che un buon amico ti ha raccomandato quest’app! Benvenuto! E non dimenticare di ringraziare il tuo amico per l’ottimo consiglio! :)</string>
-    <string name="app_invite_welcome_cta">Via!</string>
 
     <string name="monthly_report_button_title">Rapporto mensile</string>
     <string name="monthly_report_month_title_format">MMMM yyyy</string>
@@ -241,7 +238,7 @@
     <string name="revenues_total">Totale delle entrate</string>
     <string name="balance">Saldo</string>
     <string name="monthly_report_no_entries_placeholder">Niente per questo mese.</string>
-    <string name="monthly_report_notif_notpremium_text">Nuova funzionalità PREMIUM: rapporto mensile.\nRicevi un rapporto delle entrate e uscite del mese. Vuoi scoprire la modalità premium?</string>
-    <string name="monthly_report_notif_premium_text">Nuova funzionalità disponibile: il rapporto mensile.\nRicevi un rapporto delle entrate e delle uscite del mese. Clicca per provare</string>
     <string name="monthly_report_hint">Pssss: Puoi accedere ai rapporti da questo tasto</string>
+    <string name="dark_theme_notif_message">EasyBudget 2.0 è disponibile con supporto per il tema scuro per gli utenti premium! Clicca per scoprire</string>
+    <string name="dark_theme_notif_cta">Scoprire</string>
 </resources>

@@ -1,5 +1,5 @@
 /*
- *   Copyright 2015 Benoit LETONDOR
+ *   Copyright 2019 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -37,9 +37,6 @@ public final class Logger
 	
 	/**
 	 * Return the default tag depending on the debug variable
-	 * 
-	 * @param debug
-	 * @return
 	 */
 	private static String getDefaultTag(boolean debug)
 	{

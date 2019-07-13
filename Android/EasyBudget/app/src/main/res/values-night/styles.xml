@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="LightGreenButton" parent="Base.Widget.AppCompat.Button.Colored">
+        <item name="android:textColor">@color/window_background</item>
+        <item name="colorButtonNormal">@color/accent_ripple</item>
+    </style>
+
+</resources>

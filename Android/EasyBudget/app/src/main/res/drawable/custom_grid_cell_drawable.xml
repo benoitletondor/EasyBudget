@@ -1,5 +1,5 @@
 <!--
-   Copyright 2015 Benoit LETONDOR
+   Copyright 2019 Benoit LETONDOR
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -14,8 +14,17 @@
    limitations under the License.
 -->
 
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/custom_grid_cell_pressed" android:state_focused="true"/> <!-- focused -->
-    <item android:drawable="@drawable/custom_grid_cell_pressed" android:state_pressed="true"/> <!-- pressed -->
-    <item android:drawable="@drawable/custom_grid_cell_normal" /> <!-- normal -->
-</selector>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/primary_light">
+
+    <item android:id="@android:id/mask">
+
+        <shape android:shape="oval">
+            <solid android:color="@color/calendar_cell_background"/>
+        </shape>
+
+    </item>
+
+    <item android:drawable="@drawable/custom_grid_cell_normal" />
+
+</ripple>

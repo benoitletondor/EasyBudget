@@ -1,5 +1,5 @@
 <!--
-   Copyright 2015 Benoit LETONDOR
+   Copyright 2019 Benoit LETONDOR
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 
     <item>
         <shape android:shape="oval" >
-            <solid android:color="@android:color/white" />
+            <solid android:color="@color/calendar_cell_background" />
         </shape>
     </item>
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-   Copyright 2015 Benoit LETONDOR
+   Copyright 2019 Benoit LETONDOR
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -36,9 +36,10 @@
         android:supportsRtl="false"
         tools:ignore="UnusedAttribute">
 
-        <!-- Disable advertising ID for GA & FCM -->
+        <!-- Disable advertising ID and SSAID for GA & FCM -->
         <meta-data android:name="google_analytics_adid_collection_enabled" android:value="false" />
         <meta-data android:name="firebase_analytics_adid_collection_enabled" android:value="false" />
+        <meta-data android:name="google_analytics_ssaid_collection_enabled" android:value="false" />
 
         <!-- Fabric.io -->
         <meta-data
@@ -46,7 +47,7 @@
             android:value="4f073b46e47c18a4636da5e93128e7c7d9f1600c"/>
 
         <activity
-            android:name=".view.MainActivity"
+            android:name=".view.main.MainActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/app_name"
             android:launchMode="singleTask"
@@ -70,40 +71,40 @@
                 android:resource="@xml/shortcuts" />
         </activity>
         <activity
-            android:name=".view.MonthlyReportActivity"
+            android:name=".view.report.base.MonthlyReportBaseActivity"
             android:label="@string/title_activity_monthly_report"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".view.ExpenseEditActivity"
+            android:name=".view.expenseedit.ExpenseEditActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_add_expense"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppThemeNoActionBar"/>
+            android:screenOrientation="portrait"/>
         <activity
-            android:name=".view.RecurringExpenseEditActivity"
+            android:name=".view.recurringexpenseadd.RecurringExpenseAddActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_recurring_expense_add"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppThemeNoActionBar"/>
+            android:screenOrientation="portrait"/>
         <activity
-            android:name=".view.SettingsActivity"
+            android:name=".view.settings.SettingsActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_settings"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".view.WelcomeActivity"
+            android:name=".view.welcome.WelcomeActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_welcome"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppThemeNoActionBar"/>
+            android:screenOrientation="portrait"/>
         <activity
-            android:name=".view.PremiumActivity"
+            android:name=".view.premium.PremiumActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_premium"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppThemeNoActionBar">
+            android:screenOrientation="portrait">
         </activity>
+
+        <service
+            android:name=".notif.DarkThemeNotif"
+            android:exported="false" />
 
         <!-- Push -->
         <service
@@ -116,37 +117,9 @@
         </service>
 
         <!-- Notif services -->
-        <service android:name=".notif.DailyNotifOptinService"/>
-        <service android:name=".notif.MonthlyReportNotifService"/>
-
         <receiver android:name=".notif.AppUpdateBroadcastReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
-            </intent-filter>
-        </receiver>
-
-        <!-- Analytics -->
-        <service
-            android:name="com.google.android.gms.analytics.AnalyticsService"
-            android:enabled="true"
-            android:exported="false"/>
-
-        <receiver
-            android:name="com.google.android.gms.analytics.AnalyticsReceiver"
-            android:enabled="true"
-            tools:ignore="ExportedReceiver">
-            <intent-filter>
-                <action android:name="com.google.android.gms.analytics.ANALYTICS_DISPATCH"/>
-            </intent-filter>
-        </receiver>
-
-        <!-- Referrer -->
-        <receiver
-            android:name=".ReferrerReceiver"
-            android:exported="true"
-            tools:ignore="ExportedReceiver">
-            <intent-filter>
-                <action android:name="com.android.vending.INSTALL_REFERRER"/>
             </intent-filter>
         </receiver>
     </application>

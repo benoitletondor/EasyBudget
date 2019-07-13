@@ -1,5 +1,5 @@
 <!--
-   Copyright 2015 Benoit LETONDOR
+   Copyright 2019 Benoit LETONDOR
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -26,8 +26,6 @@
     <string name="title_activity_edit_income">Einnahme bearbeiten</string>
     <string name="title_activity_recurring_expense_add">Wiederkehrende Ausgabe hinzufügen</string>
     <string name="title_activity_recurring_income_add">Wiederkehrende Einnahme hinzufügen</string>
-    <string name="title_activity_recurring_expense_edit">Wiederkehrende Ausgabe bearbeiten</string>
-    <string name="title_activity_monthly_income_edit">Wiederkehrende Einnahme bearbeiten</string>
     <string name="title_activity_settings">Einstellungen</string>
     <string name="title_activity_welcome">EasyBudget</string>
     <string name="title_activity_premium">Premium</string>
@@ -92,9 +90,12 @@
     <string name="adjust_balance_error_title">Oops</string>
     <string name="adjust_balance_error_message">Der Betrag, den Sie eingegeben haben, ist ungültig.</string>
 
+    <string name="daily">TÄGLICH</string>
     <string name="monthly">MONATLICH</string>
     <string name="weekly">WÖCHENTLICH</string>
-    <string name="bi_weekly">VIERZEHNTÄGIG</string>
+    <string name="bi_weekly">2 WOCHEN</string>
+    <string name="ter_weekly">3 WOCHEN</string>
+    <string name="four_weekly">4 WOCHEN</string>
     <string name="yearly">JÄHRLICH</string>
     <string name="recurring_expense_add_loading_title">Lädt</string>
     <string name="recurring_expense_add_loading_message">Wiederkehrenden Ausgabe wird erstellt…</string>
@@ -117,11 +118,13 @@
     <string name="expense_delete_error_message">Ein Fehler ist aufgetreten.</string>
 
     <string name="recurring_expense_interval">Wiederholung</string>
+    <string name="recurring_interval_daily">Jede Tag</string>
     <string name="recurring_interval_weekly">Jede Woche</string>
     <string name="recurring_interval_bi_weekly">Alle 2 Wochen</string>
+    <string name="recurring_interval_ter_weekly">Alle 3 Wochen</string>
+    <string name="recurring_interval_four_weekly">Alle 4 Wochen</string>
     <string name="recurring_interval_monthly">Jeden Monat</string>
     <string name="recurring_interval_yearly">Jedes Jahr</string>
-    <string name="recurring_update_notification">Neues Feature: Aufgrund der großen Nachfrage, können Sie nun wöchentliche, zweiwöchentliche und jährliche Ausgaben hinzufügen!</string>
 
     <string name="setting_category_app_title">App</string>
     <string name="setting_category_rate_button_title">Ihnen gefällt diese App?</string>
@@ -154,15 +157,20 @@
     <string name="setting_category_not_premium_status_message">Auf alle Premium-Features zugreifen</string>
     <string name="setting_category_notifications_monthly_title">Monatliche Zusammenfassung</string>
     <string name="setting_category_notifications_monthly_message">Erhalten Sie eine Benachrichtigung, wenn eine neue monatl. Zusammenfassung vollständig ist</string>
+    <string name="setting_category_theme_title">Theme</string>
+    <string name="setting_theme_light">Licht</string>
+    <string name="setting_theme_dark">Dunkles</string>
+    <string name="setting_theme_platform">Systemfehler</string>
 
     <string name="premium_popup_premium_title">Sie sind Premium-Nutzer!</string>
-    <string name="premium_popup_premium_message">Sie haben Zugriff auf Premium-Features:\n\n- Monatliche Zusammenfassung: Erhalten Sie eine Zusammenfassung Ihrer monatl. Einnahmen und Ausgaben.\n- Tägliche Erinnerungen, wenn Sie vergessen Ihre Ausgaben einzutragen\n… und mehr Premium-Features, die in Kürze hinzugefügt werden!</string>
+    <string name="premium_popup_premium_message">Sie haben Zugriff auf Premium-Features:\n\n- Monatliche Zusammenfassung: Erhalten Sie eine Zusammenfassung Ihrer monatl. Einnahmen und Ausgaben.\n- Tägliche Erinnerungen, wenn Sie vergessen Ihre Ausgaben einzutragen\n- Dunkles Theme\n… und mehr Premium-Features, die in Kürze hinzugefügt werden!</string>
     <string name="premium_popup_not_premium_title">Premium-Nutzer werden</string>
     <string name="premium_popup_not_premium_message">Auf alle Premium-Features zugreifen!</string>
     <string name="premium_popup_not_premium_feature1_title">2. Tägliche Erinnerung</string>
     <string name="premium_popup_not_premium_feature1_message">Erhalten Sie eine Benachrichtigung am Ende des Tages, wenn Sie Ihre Ausgaben noch nicht eingetragen haben.</string>
     <string name="premium_popup_not_premium_feature2_title">1. Monatliche Zusammenfassung</string>
     <string name="premium_popup_not_premium_feature2_message">Greifen Sie auf eine monatliche Zusammenfassung Ihrer Ausgaben und Einnahmen zu, um zu sehen, wie viel Sie gespart haben.</string>
+    <string name="premium_popup_not_premium_feature_more_dark_theme">3. Dunkles Theme!</string>
     <string name="premium_popup_not_premium_feature_more_title">… und mehr Premium-Features, die in Kürze hinzugefügt werden!</string>
     <string name="premium_popup_not_premium_cta">Kaufen</string>
     <string name="premium_popup_become_title">Premium-Nutzer werden</string>
@@ -170,9 +178,6 @@
     <string name="premium_popup_become_cta">Entdecken</string>
     <string name="premium_popup_become_not_now">Nicht jetzt</string>
     <string name="premium_popup_become_not_ask_again">Nicht wieder fragen</string>
-    <string name="premium_notif_optin_message">Neues Premium-Feature: Tägliche Erinnerung.\nErhalten Sie eine Erinnerung, wenn Sie vergessen Ausgaben im Laufe des Tages einzutragen. Sagt Ihnen das zu?\n(Sie können das später in den Einstellungen ändern)</string>
-    <string name="premium_notif_optin_message_ok">Ja</string>
-    <string name="premium_notif_optin_message_not_ok">Nein danke</string>
 
     <string name="iab_purchase_success_title">Danke</string>
     <string name="iab_purchase_success_message">Vielen Dank für Ihre Unterstützung! Sie haben von nun an Zugriff auf.</string>
@@ -184,12 +189,8 @@
     <string name="voucher_redeem_dialog_title">Promocode</string>
     <string name="voucher_redeem_dialog_message">Einen Promocode eingeben</string>
     <string name="voucher_redeem_dialog_cta">Einlösen</string>
-    <string name="voucher_redeem_dialog_loading_title">Wird eingelöst</string>
-    <string name="voucher_redeem_dialog_loading_message">Bitte warten</string>
     <string name="voucher_redeem_error_dialog_title">Oops</string>
     <string name="voucher_redeem_error_code_invalid_dialog_message">Ihr Promocode ist ungültig.</string>
-    <string name="voucher_redeem_error_no_internet_dialog_message">Netzwerkfehler. Bitte überprüfen Sie Ihre Internetverbindung.</string>
-    <string name="voucher_redeem_error_generic_dialog_message">Ein Fehler ist aufgetreten. Versuchen Sie es später erneut.</string>
 
     <string name="rating_popup_question_title">Was denken Sie über EasyBudget?</string>
     <string name="rating_popup_question_message">Ich entwickle diese App in meiner Freizeit und biete sie gratis an. Es gibt sicher noch Dinge zu verbessern und Ihre Meinung ist mir wichtig.</string>
@@ -227,11 +228,7 @@
     <string name="onboarding_screen_4_message4">Danke für das Verwenden von EasyBudget und willkommen :)</string>
     <string name="onboarding_screen_4_cta">Los geht\'s!</string>
 
-    <string name="app_invite_title">Mit Freunden teilen</string>
     <string name="app_invite_message">Du solltest EasyBudget ausprobieren: Eine super einfache App, um deine Finanzen zu verwalten!</string> <!-- 100 chars or less -->
-    <string name="app_invite_welcome_title">Willkommen bei EasyBudget</string>
-    <string name="app_invite_welcome_message">Es sieht aus, als hätte Ihnen ein Freund diese App empfohlen. Willkommen an Bord und vergessen Sie nicht Ihrem Freund für diesen super Tipp zu danken ;)</string>
-    <string name="app_invite_welcome_cta">Los geht\'s!</string>
 
     <string name="monthly_report_button_title">Monatliche Zusammenfassung</string>
     <string name="monthly_report_month_title_format">MMMM yyyy</string>
@@ -241,7 +238,7 @@
     <string name="revenues_total">Gesamte Einnahmen</string>
     <string name="balance">Kontostand</string>
     <string name="monthly_report_no_entries_placeholder">Nichts für diesen Monat.</string>
-    <string name="monthly_report_notif_notpremium_text">Neues Feature für Premium-Nutzer: Monatliche Zusammenfassung.\nErhalten Sie eine Zusammenfassung Ihrer monatlichen Einnahmen und Ausgaben. Premium entdecken?</string>
-    <string name="monthly_report_notif_premium_text">Neues Feature: Monatliche Zusammenfassung.\nErhalten Sie eine Zusammenfassung Ihrer monatl. Einnahmen und Ausgaben. Antippen und ausprobieren</string>
     <string name="monthly_report_hint">Psst: Von hier aus können Sie auf monatliche Zusammenfassungen zugreifen!</string>
+    <string name="dark_theme_notif_message">EasyBudget 2.0 ist mit Unterstützung für dunkle Themen für Premium-Benutzer verfügbar! Klicken zu entdecken</string>
+    <string name="dark_theme_notif_cta">Entdecken</string>
 </resources>

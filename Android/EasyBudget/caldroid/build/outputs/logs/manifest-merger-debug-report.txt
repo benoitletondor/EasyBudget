@@ -1,0 +1,25 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/benoit/projects/EasyBudget/Android/EasyBudget/caldroid/src/main/AndroidManifest.xml:1:1-36
+INJECTED from /Users/benoit/projects/EasyBudget/Android/EasyBudget/caldroid/src/main/AndroidManifest.xml:1:1-36
+INJECTED from /Users/benoit/projects/EasyBudget/Android/EasyBudget/caldroid/src/main/AndroidManifest.xml:1:1-36
+	package
+		ADDED from /Users/benoit/projects/EasyBudget/Android/EasyBudget/caldroid/src/main/AndroidManifest.xml:1:11-33
+		INJECTED from /Users/benoit/projects/EasyBudget/Android/EasyBudget/caldroid/src/main/AndroidManifest.xml
+		INJECTED from /Users/benoit/projects/EasyBudget/Android/EasyBudget/caldroid/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /Users/benoit/projects/EasyBudget/Android/EasyBudget/caldroid/src/main/AndroidManifest.xml:1:1-36
+uses-sdk
+INJECTED from /Users/benoit/projects/EasyBudget/Android/EasyBudget/caldroid/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/benoit/projects/EasyBudget/Android/EasyBudget/caldroid/src/main/AndroidManifest.xml
+INJECTED from /Users/benoit/projects/EasyBudget/Android/EasyBudget/caldroid/src/main/AndroidManifest.xml
+INJECTED from /Users/benoit/projects/EasyBudget/Android/EasyBudget/caldroid/src/main/AndroidManifest.xml
+INJECTED from /Users/benoit/projects/EasyBudget/Android/EasyBudget/caldroid/src/main/AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from /Users/benoit/projects/EasyBudget/Android/EasyBudget/caldroid/src/main/AndroidManifest.xml
+		ADDED from /Users/benoit/projects/EasyBudget/Android/EasyBudget/caldroid/src/main/AndroidManifest.xml
+		INJECTED from /Users/benoit/projects/EasyBudget/Android/EasyBudget/caldroid/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /Users/benoit/projects/EasyBudget/Android/EasyBudget/caldroid/src/main/AndroidManifest.xml
+		ADDED from /Users/benoit/projects/EasyBudget/Android/EasyBudget/caldroid/src/main/AndroidManifest.xml
+		INJECTED from /Users/benoit/projects/EasyBudget/Android/EasyBudget/caldroid/src/main/AndroidManifest.xml
