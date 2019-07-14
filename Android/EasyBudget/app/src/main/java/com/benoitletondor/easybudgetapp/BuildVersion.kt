@@ -92,4 +92,9 @@ object BuildVersion {
      * 13/07/2019
      */
     const val VERSION_2_0_12 = 65
+    /**
+     * Bug fix for new balance parsing
+     * 13/07/2019
+     */
+    const val VERSION_2_0_13 = 66
 }
