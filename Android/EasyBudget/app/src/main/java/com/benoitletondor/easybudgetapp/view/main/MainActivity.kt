@@ -70,9 +70,9 @@ import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion
 import com.benoitletondor.easybudgetapp.view.welcome.getOnboardingStep
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import org.koin.android.viewmodel.ext.android.viewModel
-import org.koin.java.KoinJavaComponent.get
 
 import kotlinx.android.synthetic.main.activity_main.*
+import org.koin.android.ext.android.inject
 
 /**
  * Main activity containing Calendar and List of expenses
@@ -93,7 +93,7 @@ class MainActivity : AppCompatActivity() {
     private var lastStopDate: Date? = null
 
     private val viewModel: MainViewModel by viewModel()
-    private val parameters = get(Parameters::class.java)
+    private val parameters: Parameters by inject()
 
 // ------------------------------------------>
 
@@ -287,9 +287,12 @@ class MainActivity : AppCompatActivity() {
             builder.setView(dialogView)
             builder.setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
             builder.setPositiveButton(R.string.ok) { dialog, _ ->
-                val newBalance = java.lang.Double.valueOf(amountEditText.text.toString())
-
-                viewModel.onNewBalanceSelected(newBalance, getString(R.string.adjust_balance_expense_title))
+                try {
+                    val newBalance = java.lang.Double.valueOf(amountEditText.text.toString())
+                    viewModel.onNewBalanceSelected(newBalance, getString(R.string.adjust_balance_expense_title))
+                } catch (e: Exception) {
+                    Logger.error("Error parsing new balance", e)
+                }
 
                 dialog.dismiss()
             }
