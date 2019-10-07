@@ -98,6 +98,7 @@ class MainActivity : AppCompatActivity() {
 // ------------------------------------------>
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.AppTheme) // revert the loading theme
         // Launch welcome screen if needed
         if (parameters.getOnboardingStep() != WelcomeActivity.STEP_COMPLETED) {
             val startIntent = Intent(this, WelcomeActivity::class.java)

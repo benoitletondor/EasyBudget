@@ -78,4 +78,6 @@
     <color name="monthly_report_categories_title">@color/primary_text</color>
     <color name="monthly_report_categories_value">@color/accent</color>
     <color name="monthly_report_date_color">@color/primary</color>
+
+    <color name="startup_color">#000</color>
 </resources>
