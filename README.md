@@ -40,6 +40,7 @@ You can contact me regarding EasyBudget using this email: [easybudget@benoitleto
 - [Aline Tissot](https://fr.linkedin.com/in/alinetissot): portuguese translations
 - [Julie Goaziou](https://fr.linkedin.com/in/julie-goaziou-163a6b76): spanish translations
 - [Nataliia Privezentseva](https://github.com/NataliiaPrivezentseva): russian translations
+- [Nikita Pavlov](https://github.com/Nik-Pavlov): dark splash screen contribution
 
 ### Copyright
 
