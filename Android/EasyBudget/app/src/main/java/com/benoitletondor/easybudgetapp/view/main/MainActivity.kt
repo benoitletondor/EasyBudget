@@ -41,7 +41,6 @@ import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.widget.EditText
 import android.widget.LinearLayout
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 
 import com.benoitletondor.easybudgetapp.R
@@ -79,7 +78,7 @@ import org.koin.android.ext.android.inject
  *
  * @author Benoit LETONDOR
  */
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
 
     private lateinit var receiver: BroadcastReceiver
 

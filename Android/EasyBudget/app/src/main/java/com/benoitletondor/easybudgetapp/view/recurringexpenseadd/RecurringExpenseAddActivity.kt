@@ -25,7 +25,6 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.benoitletondor.easybudgetapp.R
@@ -39,7 +38,7 @@ import org.koin.android.viewmodel.ext.android.viewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
-class RecurringExpenseAddActivity : AppCompatActivity() {
+class RecurringExpenseAddActivity : BaseActivity() {
     private val parameters: Parameters by inject()
     private val viewModel: RecurringExpenseAddViewModel by viewModel()
 

@@ -15,11 +15,11 @@
 -->
 
 <resources>
-    <color name="window_background">#191e1d</color>
+    <color name="window_background">@color/easy_budget_dark_background</color>
 
     <color name="primary_light">#444</color>
     <color name="primary">@color/easy_budget_green_night</color>
-    <color name="status_bar_color">#222928</color>
+    <color name="status_bar_color">@color/easy_budget_dark_status_bar</color>
     <color name="action_bar_text_color">@color/easy_budget_green_night</color>
     <color name="main_fab_action_color">@color/window_background</color>
     <color name="home_fab_button_color">@color/easy_budget_green_night</color>

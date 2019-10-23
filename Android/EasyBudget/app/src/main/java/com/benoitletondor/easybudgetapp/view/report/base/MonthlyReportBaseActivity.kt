@@ -19,12 +19,12 @@ package com.benoitletondor.easybudgetapp.view.report.base
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Observer
 import androidx.viewpager.widget.ViewPager
 import com.benoitletondor.easybudgetapp.R
+import com.benoitletondor.easybudgetapp.helper.BaseActivity
 import com.benoitletondor.easybudgetapp.helper.getMonthTitle
 import com.benoitletondor.easybudgetapp.helper.removeButtonBorder
 import com.benoitletondor.easybudgetapp.view.report.MonthlyReportFragment
@@ -37,7 +37,7 @@ import java.util.*
  *
  * @author Benoit LETONDOR
  */
-class MonthlyReportBaseActivity : AppCompatActivity(), ViewPager.OnPageChangeListener {
+class MonthlyReportBaseActivity : BaseActivity(), ViewPager.OnPageChangeListener {
 
     private val viewModel: MonthlyReportBaseViewModel by viewModel()
 

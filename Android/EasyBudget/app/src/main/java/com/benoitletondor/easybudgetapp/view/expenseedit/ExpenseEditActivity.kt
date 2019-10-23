@@ -22,7 +22,6 @@ import android.app.Activity
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.MenuItem
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.benoitletondor.easybudgetapp.R
@@ -41,7 +40,7 @@ import kotlin.math.abs
  *
  * @author Benoit LETONDOR
  */
-class ExpenseEditActivity : AppCompatActivity() {
+class ExpenseEditActivity : BaseActivity() {
     private val parameters: Parameters by inject()
     private val viewModel: ExpenseEditViewModel by viewModel()
 

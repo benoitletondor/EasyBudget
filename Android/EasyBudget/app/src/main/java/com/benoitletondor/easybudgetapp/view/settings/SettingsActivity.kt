@@ -20,10 +20,10 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.appcompat.app.AppCompatActivity
 import android.view.MenuItem
 
 import com.benoitletondor.easybudgetapp.R
+import com.benoitletondor.easybudgetapp.helper.BaseActivity
 import com.benoitletondor.easybudgetapp.view.premium.PremiumActivity
 import kotlinx.android.synthetic.main.activity_settings.*
 
@@ -32,7 +32,7 @@ import kotlinx.android.synthetic.main.activity_settings.*
  *
  * @author Benoit LETONDOR
  */
-class SettingsActivity : AppCompatActivity() {
+class SettingsActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
