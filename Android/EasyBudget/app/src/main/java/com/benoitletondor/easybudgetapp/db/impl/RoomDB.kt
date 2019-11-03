@@ -25,6 +25,8 @@ import com.benoitletondor.easybudgetapp.db.impl.entity.RecurringExpenseEntity
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import java.util.*
 
+const val DB_NAME = "easybudget.db"
+
 @Database(exportSchema = false,
           version = 4,
           entities = [
@@ -38,7 +40,7 @@ abstract class RoomDB : RoomDatabase() {
 
     companion object {
         fun create(context: Context): RoomDB = Room
-            .databaseBuilder(context, RoomDB::class.java, "easybudget.db")
+            .databaseBuilder(context, RoomDB::class.java, DB_NAME)
             .addMigrations(migrationFrom1To2, migrationFrom2To3, migrationToRoom)
             .build()
     }
