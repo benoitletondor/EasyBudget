@@ -23,6 +23,7 @@ import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpens
 import com.benoitletondor.easybudgetapp.view.report.MonthlyReportViewModel
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseViewModel
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyViewModel
+import com.benoitletondor.easybudgetapp.view.settings.backup.BackupSettingsViewModel
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -34,4 +35,5 @@ val viewModelModule = module {
     viewModel { ExpenseEditViewModel(get()) }
     viewModel { RecurringExpenseAddViewModel(get()) }
     viewModel { PremiumViewModel(get()) }
+    viewModel { BackupSettingsViewModel() }
 }

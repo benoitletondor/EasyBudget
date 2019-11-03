@@ -1,50 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-   Copyright 2019 Benoit LETONDOR
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.benoitletondor.easybudgetapp">
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
--->
-<manifest package="com.benoitletondor.easybudgetapp"
-          xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools">
-
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="com.android.vending.BILLING"/>
-
-    <!-- Push -->
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="com.android.vending.BILLING" /> <!-- Push -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:name=".EasyBudget"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
-        android:theme="@style/LoadingTheme"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="false"
+        android:theme="@style/LoadingTheme"
         tools:ignore="UnusedAttribute">
-
+        <activity android:name="com.benoitletondor.easybudgetapp.view.settings.backup.BackupSettingsActivity"></activity>
         <!-- Disable advertising ID and SSAID for GA & FCM -->
-        <meta-data android:name="google_analytics_adid_collection_enabled" android:value="false" />
-        <meta-data android:name="firebase_analytics_adid_collection_enabled" android:value="false" />
-        <meta-data android:name="google_analytics_ssaid_collection_enabled" android:value="false" />
-
-        <!-- Fabric.io -->
+        <meta-data
+            android:name="google_analytics_adid_collection_enabled"
+            android:value="false" />
+        <meta-data
+            android:name="firebase_analytics_adid_collection_enabled"
+            android:value="false" />
+        <meta-data
+            android:name="google_analytics_ssaid_collection_enabled"
+            android:value="false" /> <!-- Fabric.io -->
         <meta-data
             android:name="io.fabric.ApiKey"
-            android:value="4f073b46e47c18a4636da5e93128e7c7d9f1600c"/>
+            android:value="4f073b46e47c18a4636da5e93128e7c7d9f1600c" />
 
         <activity
             android:name=".view.main.MainActivity"
@@ -53,17 +40,17 @@
             android:launchMode="singleTask"
             android:screenOrientation="portrait">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
+                <action android:name="android.intent.action.VIEW" />
 
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="easybudget"/>
+                <data android:scheme="easybudget" />
             </intent-filter>
 
             <meta-data
@@ -72,54 +59,48 @@
         </activity>
         <activity
             android:name=".view.report.base.MonthlyReportBaseActivity"
-            android:label="@string/title_activity_monthly_report"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_monthly_report"
             android:screenOrientation="portrait" />
         <activity
             android:name=".view.expenseedit.ExpenseEditActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_add_expense"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".view.recurringexpenseadd.RecurringExpenseAddActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_recurring_expense_add"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".view.settings.SettingsActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_settings"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".view.welcome.WelcomeActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_welcome"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".view.premium.PremiumActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_premium"
-            android:screenOrientation="portrait">
-        </activity>
+            android:screenOrientation="portrait"></activity>
 
         <service
             android:name=".notif.DarkThemeNotif"
-            android:exported="false" />
-
-        <!-- Push -->
+            android:exported="false" /> <!-- Push -->
         <service
             android:name=".push.PushService"
             tools:ignore="ExportedService">
-            <intent-filter
-                android:priority="999">
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            <intent-filter android:priority="999">
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
-        </service>
-
-        <!-- Notif services -->
+        </service> <!-- Notif services -->
         <receiver android:name=".notif.AppUpdateBroadcastReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
     </application>
