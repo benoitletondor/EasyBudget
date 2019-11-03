@@ -18,7 +18,7 @@
         android:supportsRtl="false"
         android:theme="@style/LoadingTheme"
         tools:ignore="UnusedAttribute">
-        <activity android:name="com.benoitletondor.easybudgetapp.view.settings.backup.BackupSettingsActivity"></activity>
+
         <!-- Disable advertising ID and SSAID for GA & FCM -->
         <meta-data
             android:name="google_analytics_adid_collection_enabled"
@@ -86,7 +86,10 @@
             android:name=".view.premium.PremiumActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_premium"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.settings.backup.BackupSettingsActivity"
+            android:label="@string/backup_settings_activity_title" />
 
         <service
             android:name=".notif.DarkThemeNotif"

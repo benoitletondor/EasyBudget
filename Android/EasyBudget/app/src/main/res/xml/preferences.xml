@@ -35,6 +35,10 @@
             app:summaryOff="@string/setting_category_start_day_of_week_monday"
             app:summaryOn="@string/setting_category_start_day_of_week_sunday"/>
 
+        <Preference
+            app:key="@string/setting_category_backup"
+            app:title="@string/backup_settings_activity_title" />
+
     </PreferenceCategory>
 
     <PreferenceCategory

@@ -45,6 +45,7 @@ import com.benoitletondor.easybudgetapp.view.main.MainActivity
 import com.benoitletondor.easybudgetapp.view.premium.PremiumActivity
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.SHOW_THEME_INTENT_KEY
+import com.benoitletondor.easybudgetapp.view.settings.backup.BackupSettingsActivity
 import com.roomorama.caldroid.CaldroidFragment
 import org.koin.android.ext.android.inject
 import java.net.URLEncoder
@@ -112,6 +113,14 @@ class PreferencesFragment : PreferenceFragmentCompat() {
         firstDayOfWeekPref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
             parameters.setCaldroidFirstDayOfWeek(if ((firstDayOfWeekPref?.isChecked) == true) CaldroidFragment.SUNDAY else CaldroidFragment.MONDAY)
             true
+        }
+
+        /*
+         * Backup
+         */
+        findPreference<Preference>(getString(R.string.setting_category_backup))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            startActivity(Intent(context, BackupSettingsActivity::class.java))
+            false
         }
 
         /*
