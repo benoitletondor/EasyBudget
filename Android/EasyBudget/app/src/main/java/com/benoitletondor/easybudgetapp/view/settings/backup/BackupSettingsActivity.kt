@@ -24,18 +24,28 @@ class BackupSettingsActivity : BaseActivity() {
             when(cloudBackupState) {
                 BackupCloudStorageState.NotAuthenticated -> {
                     backup_settings_cloud_storage_not_authenticated_state.visibility = View.VISIBLE
+                    backup_settings_cloud_storage_authenticating_state.visibility = View.GONE
+                    backup_settings_cloud_storage_not_activated_state.visibility = View.GONE
                 }
                 BackupCloudStorageState.Authenticating -> {
                     backup_settings_cloud_storage_not_authenticated_state.visibility = View.GONE
+                    backup_settings_cloud_storage_authenticating_state.visibility = View.VISIBLE
+                    backup_settings_cloud_storage_not_activated_state.visibility = View.GONE
                 }
                 is BackupCloudStorageState.NotActivated -> {
                     backup_settings_cloud_storage_not_authenticated_state.visibility = View.GONE
+                    backup_settings_cloud_storage_authenticating_state.visibility = View.GONE
+                    backup_settings_cloud_storage_not_activated_state.visibility = View.VISIBLE
                 }
             }
         })
 
         backup_settings_cloud_storage_authenticate_button.setOnClickListener {
             viewModel.onAuthenticateButtonPressed(this)
+        }
+
+        backup_settings_cloud_storage_logout_button.setOnClickListener {
+            viewModel.onLogoutButtonPressed()
         }
     }
 

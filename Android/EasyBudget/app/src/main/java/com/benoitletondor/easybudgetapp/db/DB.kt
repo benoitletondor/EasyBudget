@@ -23,6 +23,7 @@ import java.util.*
 
 interface DB : Closeable {
     fun ensureDBCreated()
+    suspend fun triggerForceWriteToDisk()
 
     suspend fun persistExpense(expense: Expense): Expense
 

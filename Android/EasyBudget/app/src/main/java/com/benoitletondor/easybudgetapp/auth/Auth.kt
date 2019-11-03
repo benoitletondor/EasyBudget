@@ -9,6 +9,7 @@ interface Auth {
 
     fun startAuthentication(activity: Activity)
     fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
+    fun logout()
 }
 
 sealed class AuthState {

@@ -26,6 +26,18 @@ class BackupSettingsViewModel(private val auth: Auth) : ViewModel(), Observer<Au
         cloudBackupStateStream.value = getBackupCloudStorageState(authState)
     }
 
+    fun onAuthenticateButtonPressed(activity: Activity) {
+        auth.startAuthentication(activity)
+    }
+
+    fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        auth.handleActivityResult(requestCode, resultCode, data)
+    }
+
+    fun onLogoutButtonPressed() {
+        auth.logout()
+    }
+
     private fun getBackupCloudStorageState(authState: AuthState?): BackupCloudStorageState {
         return when(authState) {
             AuthState.NotAuthenticated -> BackupCloudStorageState.NotAuthenticated
@@ -33,14 +45,6 @@ class BackupSettingsViewModel(private val auth: Auth) : ViewModel(), Observer<Au
             is AuthState.Authenticated -> BackupCloudStorageState.NotActivated(authState.currentUser)
             null -> BackupCloudStorageState.NotAuthenticated
         }
-    }
-
-    fun onAuthenticateButtonPressed(activity: Activity) {
-        auth.startAuthentication(activity)
-    }
-
-    fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        auth.handleActivityResult(requestCode, resultCode, data)
     }
 }
 

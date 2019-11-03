@@ -18,6 +18,12 @@ class FirebaseAuth(private val auth: com.google.firebase.auth.FirebaseAuth) : Au
     override val state: LiveData<AuthState>
         get() = currentState
 
+    init {
+        auth.addAuthStateListener {
+            currentState.postValue(getAuthState())
+        }
+    }
+
     override fun startAuthentication(activity: Activity) {
         currentState.postValue(AuthState.Authenticating)
 
@@ -52,6 +58,11 @@ class FirebaseAuth(private val auth: com.google.firebase.auth.FirebaseAuth) : Au
 
             currentState.postValue(getAuthState())
         }
+    }
+
+    override fun logout() {
+        auth.signOut()
+        currentState.postValue(getAuthState())
     }
 
     private fun getAuthState(): AuthState {
