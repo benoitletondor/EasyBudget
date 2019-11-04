@@ -19,6 +19,8 @@ package com.benoitletondor.easybudgetapp.injection
 import androidx.collection.ArrayMap
 import com.benoitletondor.easybudgetapp.auth.Auth
 import com.benoitletondor.easybudgetapp.auth.FirebaseAuth
+import com.benoitletondor.easybudgetapp.cloudstorage.CloudStorage
+import com.benoitletondor.easybudgetapp.cloudstorage.FirebaseStorage
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.iab.IabImpl
@@ -46,6 +48,8 @@ val appModule = module {
     single<Executor> { Executors.newSingleThreadExecutor() }
 
     single<Auth> { FirebaseAuth(com.google.firebase.auth.FirebaseAuth.getInstance()) }
+
+    single<CloudStorage> { FirebaseStorage(com.google.firebase.storage.FirebaseStorage.getInstance()) }
 
     factory<DB> { CachedDBImpl(DBImpl(RoomDB.create(get())), get(), get()) }
 
