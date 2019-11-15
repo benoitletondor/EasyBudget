@@ -35,5 +35,5 @@ val viewModelModule = module {
     viewModel { ExpenseEditViewModel(get()) }
     viewModel { RecurringExpenseAddViewModel(get()) }
     viewModel { PremiumViewModel(get()) }
-    viewModel { BackupSettingsViewModel(get()) }
+    viewModel { BackupSettingsViewModel(get(), get(), get()) }
 }
