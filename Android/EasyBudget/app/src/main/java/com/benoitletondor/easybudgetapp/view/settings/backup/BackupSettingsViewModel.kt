@@ -31,14 +31,18 @@ class BackupSettingsViewModel(private val auth: Auth,
 
     val cloudBackupStateStream: MutableLiveData<BackupCloudStorageState> = MutableLiveData()
     val backupNowErrorEvent = SingleLiveEvent<Throwable>()
-    var backupInProgress = false
-    var previousAuthState: AuthState? = null
+    val restorationErrorEvent = SingleLiveEvent<Throwable>()
+    val previousBackupAvailableEvent = SingleLiveEvent<Date>()
+    val appRestartEvent = SingleLiveEvent<Unit>()
+    
+    private var backupInProgress = false
+    private var restorationInProgress = false
 
     private val backupJobObserver = Observer<List<WorkInfo>> {
         cloudBackupStateStream.value = computeBackupCloudStorageState(auth.state.value)
     }
     private val authStateObserver = Observer<AuthState> {
-        if( it is AuthState.Authenticated && (previousAuthState == null || previousAuthState !is AuthState.Authenticated) ) {
+        if( it is AuthState.Authenticated ) {
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
                     try {
@@ -100,7 +104,7 @@ class BackupSettingsViewModel(private val auth: Auth,
                         val lastBackupDate = parameters.getLastBackupDate()
                         val backupNowAvailable = lastBackupDate == null || lastBackupDate.isOlderThanADay()
 
-                        BackupCloudStorageState.Activated(authState.currentUser, parameters.getLastBackupDate(), backupNowAvailable)
+                        BackupCloudStorageState.Activated(authState.currentUser, lastBackupDate, backupNowAvailable)
                     } else {
                         BackupCloudStorageState.NotActivated(authState.currentUser)
                     }
@@ -113,7 +117,15 @@ class BackupSettingsViewModel(private val auth: Auth,
 
     fun onBackupActivated() {
         parameters.setBackupEnabled(true)
-        cloudBackupStateStream.value = computeBackupCloudStorageState(auth.state.value)
+        val newBackupState = computeBackupCloudStorageState(auth.state.value)
+        cloudBackupStateStream.value = newBackupState
+
+        if( newBackupState is BackupCloudStorageState.Activated ) {
+            val lastBackupDate = newBackupState.lastBackupDate
+            if( lastBackupDate != null ) {
+                previousBackupAvailableEvent.value = lastBackupDate
+            }
+        }
 
         scheduleBackup(appContext)
     }
@@ -140,10 +152,39 @@ class BackupSettingsViewModel(private val auth: Auth,
             } catch (error: Throwable) {
                 Log.e("BackupSettingsViewModel", "Error while backup now", error)
                 backupNowErrorEvent.value = error
+            } finally {
+                backupInProgress = false
+                cloudBackupStateStream.value = computeBackupCloudStorageState(auth.state.value)
             }
+        }
+    }
 
-            backupInProgress = false
+    fun onRestorePreviousBackupButtonPressed() {
+        restoreBackup()
+    }
+
+    fun onIgnorePreviousBackupButtonPressed() {
+        // No-op
+    }
+
+    private fun restoreBackup() {
+        viewModelScope.launch {
+            restorationInProgress = true
             cloudBackupStateStream.value = computeBackupCloudStorageState(auth.state.value)
+
+            try {
+                withContext(Dispatchers.IO) {
+                    restoreLatestDBBackup(appContext, auth, get(CloudStorage::class.java))
+                }
+
+                appRestartEvent.postValue(Unit)
+            } catch (error: Throwable) {
+                Log.e("BackupSettingsViewModel", "Error while restoring", error)
+                restorationErrorEvent.value = error
+            } finally {
+                restorationInProgress = false
+                cloudBackupStateStream.value = computeBackupCloudStorageState(auth.state.value)
+            }
         }
     }
 
@@ -161,4 +202,5 @@ sealed class BackupCloudStorageState {
     data class NotActivated(val currentUser: CurrentUser) : BackupCloudStorageState()
     data class Activated(val currentUser: CurrentUser, val lastBackupDate: Date?, val backupNowAvailable: Boolean): BackupCloudStorageState()
     data class BackupInProgress(val currentUser: CurrentUser): BackupCloudStorageState()
+    data class RestorationInProgress(val currentUser: CurrentUser): BackupCloudStorageState()
 }

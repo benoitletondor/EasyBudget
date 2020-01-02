@@ -12,6 +12,7 @@ import com.benoitletondor.easybudgetapp.helper.BaseActivity
 import kotlinx.android.synthetic.main.activity_backup_settings.*
 import org.koin.android.viewmodel.ext.android.viewModel
 import java.util.*
+import kotlin.system.exitProcess
 
 class BackupSettingsActivity : BaseActivity() {
 
@@ -80,14 +81,57 @@ class BackupSettingsActivity : BaseActivity() {
                     backup_settings_cloud_backup_cta.visibility = View.GONE
                     backup_settings_cloud_backup_loading_progress.visibility = View.VISIBLE
                 }
+                is BackupCloudStorageState.RestorationInProgress -> {
+                    backup_settings_cloud_storage_not_authenticated_state.visibility = View.GONE
+                    backup_settings_cloud_storage_authenticating_state.visibility = View.GONE
+                    backup_settings_cloud_storage_not_activated_state.visibility = View.VISIBLE
+
+                    backup_settings_cloud_storage_email.text = cloudBackupState.currentUser.email
+                    backup_settings_cloud_storage_logout_button.visibility = View.GONE
+                    backup_settings_cloud_storage_backup_switch.visibility = View.GONE
+                    backup_settings_cloud_last_update.visibility = View.GONE
+                    backup_settings_cloud_backup_cta.visibility = View.GONE
+                    backup_settings_cloud_backup_loading_progress.visibility = View.VISIBLE
+                }
             }
         })
 
-        viewModel.backupNowErrorEvent.observe(this, Observer { backupError ->
+        viewModel.backupNowErrorEvent.observe(this, Observer {
             AlertDialog.Builder(this)
                 .setTitle(R.string.backup_now_error_title)
                 .setMessage(R.string.backup_now_error_message)
                 .setPositiveButton(android.R.string.ok, null)
+        })
+
+        viewModel.previousBackupAvailableEvent.observe(this, Observer { lastBackupDate ->
+            AlertDialog.Builder(this)
+                .setTitle(R.string.backup_already_exist_title)
+                .setMessage(getString(R.string.backup_already_exist_message, DateUtils.formatDateTime(
+                    this,
+                    lastBackupDate.time,
+                    DateUtils.FORMAT_SHOW_TIME or DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR
+                )))
+                .setPositiveButton(R.string.backup_already_exist_positive_cta) { _, _ ->
+                    viewModel.onRestorePreviousBackupButtonPressed()
+                }
+                .setNegativeButton(R.string.backup_already_exist_negative_cta) { _, _ ->
+                    viewModel.onIgnorePreviousBackupButtonPressed()
+                }
+                .show()
+        })
+
+        viewModel.restorationErrorEvent.observe(this, Observer {
+            AlertDialog.Builder(this)
+                .setTitle(R.string.backup_restore_error_title)
+                .setMessage(R.string.backup_restore_error_message)
+                .setPositiveButton(android.R.string.ok, null)
+        })
+
+        viewModel.appRestartEvent.observe(this, Observer {
+            val intent = packageManager.getLaunchIntentForPackage(packageName)
+            finishAffinity()
+            startActivity(intent)
+            exitProcess(0)
         })
 
         backup_settings_cloud_storage_authenticate_button.setOnClickListener {

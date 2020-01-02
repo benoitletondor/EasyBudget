@@ -35,4 +35,14 @@ class FirebaseStorage(private val storage: com.google.firebase.storage.FirebaseS
         }
     }
 
+    override suspend fun downloadFile(path: String, toFile: File) = suspendCancellableCoroutine<Unit> { continuation ->
+        val reference = storage.reference.child(path)
+
+        reference.getFile(toFile).addOnSuccessListener {
+            continuation.resume(Unit)
+        }.addOnFailureListener { error ->
+            continuation.resumeWithException(error)
+        }
+    }
+
 }

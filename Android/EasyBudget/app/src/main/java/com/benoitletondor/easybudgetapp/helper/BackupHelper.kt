@@ -64,7 +64,7 @@ suspend fun backupDB(context: Context,
     }
 
     try {
-        cloudStorage.uploadFile(copyFile, getDBPath(currentUser.id))
+        cloudStorage.uploadFile(copyFile, getRemoteDBPath(currentUser.id))
         parameters.saveLastBackupDate(Date())
     } catch (error: Throwable) {
         Log.e(
@@ -94,10 +94,35 @@ suspend fun getBackupDBMetaData(cloudStorage: CloudStorage,
     val currentUser = (auth.state.value as? AuthState.Authenticated)?.currentUser
         ?: throw IllegalStateException("Not authenticated")
 
-    return cloudStorage.getFileMetaData(getDBPath(currentUser.id))
+    return cloudStorage.getFileMetaData(getRemoteDBPath(currentUser.id))
 }
 
-private fun getDBPath(userId: String): String {
+suspend fun restoreLatestDBBackup(context: Context,
+                                   auth: Auth,
+                                   cloudStorage: CloudStorage) {
+
+    val currentUser = (auth.state.value as? AuthState.Authenticated)?.currentUser
+        ?: throw IllegalStateException("Not authenticated")
+
+    val backupFile = File(context.cacheDir, "db_backup_download")
+
+    try {
+        cloudStorage.downloadFile(getRemoteDBPath(currentUser.id), backupFile)
+        backupFile.copyTo(context.getDatabasePath(DB_NAME), overwrite = true)
+    } finally {
+        try {
+            backupFile.delete()
+        } catch (error: Throwable) {
+            Log.e(
+                "DB restore",
+                "Error deleting temp file",
+                error
+            )
+        }
+    }
+}
+
+private fun getRemoteDBPath(userId: String): String {
     return "user/$userId/db.backup"
 }
 
