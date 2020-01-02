@@ -6,6 +6,7 @@ import android.text.format.DateUtils
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.SwitchCompat
 import androidx.lifecycle.Observer
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.BaseActivity
@@ -17,6 +18,7 @@ import kotlin.system.exitProcess
 class BackupSettingsActivity : BaseActivity() {
 
     private val viewModel: BackupSettingsViewModel by viewModel()
+    private var ignoreNextSwitchEvent = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +47,7 @@ class BackupSettingsActivity : BaseActivity() {
                     backup_settings_cloud_storage_email.text = cloudBackupState.currentUser.email
                     backup_settings_cloud_storage_logout_button.visibility = View.VISIBLE
                     backup_settings_cloud_storage_backup_switch.visibility = View.VISIBLE
-                    backup_settings_cloud_storage_backup_switch.isChecked = false
+                    backup_settings_cloud_storage_backup_switch.setCheckedWithoutEvent(false)
                     backup_settings_cloud_last_update.visibility = View.GONE
                     backup_settings_cloud_backup_cta.visibility = View.GONE
                     backup_settings_cloud_backup_loading_progress.visibility = View.GONE
@@ -58,7 +60,7 @@ class BackupSettingsActivity : BaseActivity() {
                     backup_settings_cloud_storage_email.text = cloudBackupState.currentUser.email
                     backup_settings_cloud_storage_logout_button.visibility = View.VISIBLE
                     backup_settings_cloud_storage_backup_switch.visibility = View.VISIBLE
-                    backup_settings_cloud_storage_backup_switch.isChecked = true
+                    backup_settings_cloud_storage_backup_switch.setCheckedWithoutEvent(true)
                     showLastUpdateDate(cloudBackupState.lastBackupDate)
                     backup_settings_cloud_last_update.visibility = View.VISIBLE
 
@@ -143,6 +145,11 @@ class BackupSettingsActivity : BaseActivity() {
         }
 
         backup_settings_cloud_storage_backup_switch.setOnCheckedChangeListener { _, checked ->
+            if( ignoreNextSwitchEvent ) {
+                ignoreNextSwitchEvent = false
+                return@setOnCheckedChangeListener
+            }
+
             if( checked ) {
                 viewModel.onBackupActivated()
             } else {
@@ -186,5 +193,10 @@ class BackupSettingsActivity : BaseActivity() {
         super.onActivityResult(requestCode, resultCode, data)
 
         viewModel.handleActivityResult(requestCode, resultCode, data)
+    }
+
+    private fun SwitchCompat.setCheckedWithoutEvent(checked: Boolean) {
+        ignoreNextSwitchEvent = true
+        isChecked = checked
     }
 }

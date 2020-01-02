@@ -99,6 +99,8 @@ class BackupSettingsViewModel(private val auth: Auth,
             is AuthState.Authenticated -> {
                 if( backupInProgress ) {
                     BackupCloudStorageState.BackupInProgress(authState.currentUser)
+                } else if ( restorationInProgress ) {
+                    BackupCloudStorageState.RestorationInProgress(authState.currentUser)
                 } else {
                     if( parameters.isBackupEnabled() ) {
                         val lastBackupDate = parameters.getLastBackupDate()

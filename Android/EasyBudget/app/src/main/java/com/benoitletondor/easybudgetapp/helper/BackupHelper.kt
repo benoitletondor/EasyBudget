@@ -98,8 +98,8 @@ suspend fun getBackupDBMetaData(cloudStorage: CloudStorage,
 }
 
 suspend fun restoreLatestDBBackup(context: Context,
-                                   auth: Auth,
-                                   cloudStorage: CloudStorage) {
+                                  auth: Auth,
+                                  cloudStorage: CloudStorage) {
 
     val currentUser = (auth.state.value as? AuthState.Authenticated)?.currentUser
         ?: throw IllegalStateException("Not authenticated")
@@ -108,6 +108,7 @@ suspend fun restoreLatestDBBackup(context: Context,
 
     try {
         cloudStorage.downloadFile(getRemoteDBPath(currentUser.id), backupFile)
+        context.deleteDatabase(DB_NAME)
         backupFile.copyTo(context.getDatabasePath(DB_NAME), overwrite = true)
     } finally {
         try {
