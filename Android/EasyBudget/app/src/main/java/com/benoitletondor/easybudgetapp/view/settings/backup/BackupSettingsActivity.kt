@@ -49,6 +49,7 @@ class BackupSettingsActivity : BaseActivity() {
                     backup_settings_cloud_storage_backup_switch.isChecked = false
                     backup_settings_cloud_last_update.visibility = View.GONE
                     backup_settings_cloud_backup_cta.visibility = View.GONE
+                    backup_settings_cloud_restore_cta.visibility = View.GONE
                     backup_settings_cloud_backup_loading_progress.visibility = View.GONE
                 }
                 is BackupCloudStorageState.Activated -> {
@@ -68,6 +69,13 @@ class BackupSettingsActivity : BaseActivity() {
                     } else {
                         backup_settings_cloud_backup_cta.visibility = View.GONE
                     }
+
+                    if( cloudBackupState.restoreAvailable ) {
+                        backup_settings_cloud_restore_cta.visibility = View.VISIBLE
+                    } else {
+                        backup_settings_cloud_restore_cta.visibility = View.GONE
+                    }
+
                     backup_settings_cloud_backup_loading_progress.visibility = View.GONE
                 }
                 is BackupCloudStorageState.BackupInProgress -> {
@@ -80,6 +88,7 @@ class BackupSettingsActivity : BaseActivity() {
                     backup_settings_cloud_storage_backup_switch.visibility = View.GONE
                     backup_settings_cloud_last_update.visibility = View.GONE
                     backup_settings_cloud_backup_cta.visibility = View.GONE
+                    backup_settings_cloud_restore_cta.visibility = View.GONE
                     backup_settings_cloud_backup_loading_progress.visibility = View.VISIBLE
                 }
                 is BackupCloudStorageState.RestorationInProgress -> {
@@ -92,6 +101,7 @@ class BackupSettingsActivity : BaseActivity() {
                     backup_settings_cloud_storage_backup_switch.visibility = View.GONE
                     backup_settings_cloud_last_update.visibility = View.GONE
                     backup_settings_cloud_backup_cta.visibility = View.GONE
+                    backup_settings_cloud_restore_cta.visibility = View.GONE
                     backup_settings_cloud_backup_loading_progress.visibility = View.VISIBLE
                 }
             }
@@ -107,11 +117,7 @@ class BackupSettingsActivity : BaseActivity() {
         viewModel.previousBackupAvailableEvent.observe(this, Observer { lastBackupDate ->
             AlertDialog.Builder(this)
                 .setTitle(R.string.backup_already_exist_title)
-                .setMessage(getString(R.string.backup_already_exist_message, DateUtils.formatDateTime(
-                    this,
-                    lastBackupDate.time,
-                    DateUtils.FORMAT_SHOW_TIME or DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR
-                )))
+                .setMessage(getString(R.string.backup_already_exist_message, lastBackupDate.formatLastBackupDate()))
                 .setPositiveButton(R.string.backup_already_exist_positive_cta) { _, _ ->
                     viewModel.onRestorePreviousBackupButtonPressed()
                 }
@@ -135,6 +141,19 @@ class BackupSettingsActivity : BaseActivity() {
             exitProcess(0)
         })
 
+        viewModel.restoreConfirmationDisplayEvent.observe(this, Observer { lastBackupDate ->
+            AlertDialog.Builder(this)
+                .setTitle(R.string.backup_restore_confirmation_title)
+                .setMessage(getString(R.string.backup_restore_confirmation_message, lastBackupDate.formatLastBackupDate()))
+                .setPositiveButton(R.string.backup_restore_confirmation_positive_cta) { _, _ ->
+                    viewModel.onRestoreBackupConfirmationConfirmed()
+                }
+                .setNegativeButton(R.string.backup_restore_confirmation_negative_cta) { _, _ ->
+                    viewModel.onRestoreBackupConfirmationCancelled()
+                }
+                .show()
+        })
+
         backup_settings_cloud_storage_authenticate_button.setOnClickListener {
             viewModel.onAuthenticateButtonPressed(this)
         }
@@ -153,6 +172,10 @@ class BackupSettingsActivity : BaseActivity() {
 
         backup_settings_cloud_backup_cta.setOnClickListener {
             viewModel.onBackupNowButtonPressed()
+        }
+
+        backup_settings_cloud_restore_cta.setOnClickListener {
+            viewModel.onRestoreButtonPressed()
         }
     }
 
@@ -187,5 +210,13 @@ class BackupSettingsActivity : BaseActivity() {
         super.onActivityResult(requestCode, resultCode, data)
 
         viewModel.handleActivityResult(requestCode, resultCode, data)
+    }
+
+    private fun Date.formatLastBackupDate(): String {
+        return DateUtils.formatDateTime(
+            this@BackupSettingsActivity,
+            this.time,
+            DateUtils.FORMAT_SHOW_TIME or DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR
+        )
     }
 }

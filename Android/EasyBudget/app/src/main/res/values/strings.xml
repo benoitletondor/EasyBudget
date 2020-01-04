@@ -263,6 +263,7 @@
     <string name="backup_last_update_date">Last backup: %s</string>
     <string name="backup_last_update_date_never">Never</string>
     <string name="backup_now_cta">Backup now</string>
+    <string name="backup_restore_cta">Restore data from last backup</string>
     <string name="backup_now_error_title">Unable to backup</string>
     <string name="backup_now_error_message">Backup not completed due to an error. You can check your connexion and try again or let the app retry automatically later.</string>
     <string name="backup_already_exist_title">Backup found</string>
@@ -271,6 +272,11 @@
     <string name="backup_already_exist_negative_cta">Ignore</string>
     <string name="backup_restore_error_title">Error restoring data</string>
     <string name="backup_restore_error_message">An error occurred while restoration. Please check your network and try again later.</string>
+    <string name="backup_restore_confirmation_title">Restore data</string>
+    <string name="backup_restore_confirmation_message">Are you sure you want to restore data from %s backup?\nIt will replace your current data in an irreversible way</string>
+    <string name="backup_restore_confirmation_positive_cta">Restore</string>
+    <string name="backup_restore_confirmation_negative_cta">Cancel</string>
+
 
     <!-- Keys, not for translations. -->
     <string name="setting_category_bug_report_send_button_key" translatable="false">send_bug_report</string>

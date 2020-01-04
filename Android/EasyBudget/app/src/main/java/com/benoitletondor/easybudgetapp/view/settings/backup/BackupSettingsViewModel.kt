@@ -23,7 +23,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 import org.koin.java.KoinJavaComponent.get
-import java.lang.Exception
 import java.lang.RuntimeException
 
 class BackupSettingsViewModel(private val auth: Auth,
@@ -35,6 +34,7 @@ class BackupSettingsViewModel(private val auth: Auth,
     val restorationErrorEvent = SingleLiveEvent<Throwable>()
     val previousBackupAvailableEvent = SingleLiveEvent<Date>()
     val appRestartEvent = SingleLiveEvent<Unit>()
+    val restoreConfirmationDisplayEvent = SingleLiveEvent<Date>()
     
     private var backupInProgress = false
     private var restorationInProgress = false
@@ -176,14 +176,36 @@ class BackupSettingsViewModel(private val auth: Auth,
     }
 
     fun onRestorePreviousBackupButtonPressed() {
-        restoreBackup()
+        startRestoreFlow()
     }
 
     fun onIgnorePreviousBackupButtonPressed() {
         // No-op
     }
 
-    private fun restoreBackup() {
+    fun onRestoreButtonPressed() {
+        startRestoreFlow()
+    }
+
+    fun onRestoreBackupConfirmationConfirmed() {
+        restoreData()
+    }
+
+    fun onRestoreBackupConfirmationCancelled() {
+        // No-op
+    }
+
+    private fun startRestoreFlow() {
+        val lastBackupDate = (cloudBackupStateStream.value as? BackupCloudStorageState.Activated)?.lastBackupDate
+        if( lastBackupDate == null ) {
+            Logger.error("Starting restore with no last backup date")
+            return
+        }
+
+        restoreConfirmationDisplayEvent.value = lastBackupDate
+    }
+
+    private fun restoreData() {
         viewModelScope.launch {
             restorationInProgress = true
             cloudBackupStateStream.value = computeBackupCloudStorageState(auth.state.value)
