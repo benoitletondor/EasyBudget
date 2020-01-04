@@ -46,10 +46,14 @@ class BackupSettingsActivity : BaseActivity() {
                     backup_settings_cloud_storage_email.text = cloudBackupState.currentUser.email
                     backup_settings_cloud_storage_logout_button.visibility = View.VISIBLE
                     backup_settings_cloud_storage_backup_switch.visibility = View.VISIBLE
+                    backup_settings_cloud_storage_backup_switch_description.visibility = View.VISIBLE
+                    backup_settings_cloud_storage_backup_switch_description.text = getString(R.string.backup_settings_cloud_backup_status, getString(R.string.backup_settings_cloud_backup_status_disabled))
                     backup_settings_cloud_storage_backup_switch.isChecked = false
+                    backup_settings_cloud_storage_activated_description.visibility = View.GONE
                     backup_settings_cloud_last_update.visibility = View.GONE
                     backup_settings_cloud_backup_cta.visibility = View.GONE
                     backup_settings_cloud_restore_cta.visibility = View.GONE
+                    backup_settings_cloud_storage_restore_description.visibility = View.GONE
                     backup_settings_cloud_backup_loading_progress.visibility = View.GONE
                 }
                 is BackupCloudStorageState.Activated -> {
@@ -59,8 +63,11 @@ class BackupSettingsActivity : BaseActivity() {
 
                     backup_settings_cloud_storage_email.text = cloudBackupState.currentUser.email
                     backup_settings_cloud_storage_logout_button.visibility = View.VISIBLE
+                    backup_settings_cloud_storage_backup_switch_description.visibility = View.VISIBLE
+                    backup_settings_cloud_storage_backup_switch_description.text = getString(R.string.backup_settings_cloud_backup_status, getString(R.string.backup_settings_cloud_backup_status_activated))
                     backup_settings_cloud_storage_backup_switch.visibility = View.VISIBLE
                     backup_settings_cloud_storage_backup_switch.isChecked = true
+                    backup_settings_cloud_storage_activated_description.visibility = View.VISIBLE
                     showLastUpdateDate(cloudBackupState.lastBackupDate)
                     backup_settings_cloud_last_update.visibility = View.VISIBLE
 
@@ -71,9 +78,13 @@ class BackupSettingsActivity : BaseActivity() {
                     }
 
                     if( cloudBackupState.restoreAvailable ) {
+                        backup_settings_cloud_storage_restore_description.visibility = View.VISIBLE
+                        backup_settings_cloud_storage_restore_explanation.visibility = View.VISIBLE
                         backup_settings_cloud_restore_cta.visibility = View.VISIBLE
                     } else {
                         backup_settings_cloud_restore_cta.visibility = View.GONE
+                        backup_settings_cloud_storage_restore_description.visibility = View.GONE
+                        backup_settings_cloud_storage_restore_explanation.visibility = View.GONE
                     }
 
                     backup_settings_cloud_backup_loading_progress.visibility = View.GONE
@@ -86,9 +97,13 @@ class BackupSettingsActivity : BaseActivity() {
                     backup_settings_cloud_storage_email.text = cloudBackupState.currentUser.email
                     backup_settings_cloud_storage_logout_button.visibility = View.GONE
                     backup_settings_cloud_storage_backup_switch.visibility = View.GONE
+                    backup_settings_cloud_storage_backup_switch_description.visibility = View.GONE
+                    backup_settings_cloud_storage_activated_description.visibility = View.GONE
                     backup_settings_cloud_last_update.visibility = View.GONE
                     backup_settings_cloud_backup_cta.visibility = View.GONE
                     backup_settings_cloud_restore_cta.visibility = View.GONE
+                    backup_settings_cloud_storage_restore_description.visibility = View.GONE
+                    backup_settings_cloud_storage_restore_explanation.visibility = View.GONE
                     backup_settings_cloud_backup_loading_progress.visibility = View.VISIBLE
                 }
                 is BackupCloudStorageState.RestorationInProgress -> {
@@ -99,9 +114,13 @@ class BackupSettingsActivity : BaseActivity() {
                     backup_settings_cloud_storage_email.text = cloudBackupState.currentUser.email
                     backup_settings_cloud_storage_logout_button.visibility = View.GONE
                     backup_settings_cloud_storage_backup_switch.visibility = View.GONE
+                    backup_settings_cloud_storage_backup_switch_description.visibility = View.GONE
+                    backup_settings_cloud_storage_activated_description.visibility = View.GONE
                     backup_settings_cloud_last_update.visibility = View.GONE
                     backup_settings_cloud_backup_cta.visibility = View.GONE
                     backup_settings_cloud_restore_cta.visibility = View.GONE
+                    backup_settings_cloud_storage_restore_description.visibility = View.GONE
+                    backup_settings_cloud_storage_restore_explanation.visibility = View.GONE
                     backup_settings_cloud_backup_loading_progress.visibility = View.VISIBLE
                 }
             }
