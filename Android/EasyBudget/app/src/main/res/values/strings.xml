@@ -172,7 +172,7 @@
     <string name="setting_theme_platform">System default</string>
 
     <string name="premium_popup_premium_title">You are premium!</string>
-    <string name="premium_popup_premium_message">You have access to premium features:\n\n- Monthly report: Get a sum-up of your expenses and incomes of the month\n- Daily reminder if you forgot to enter your expenses during the day\n- Dark Theme support\n…and more premium features that will be added soon!</string>
+    <string name="premium_popup_premium_message">You have access to premium features:\n\n- Monthly report: Get a sum-up of your expenses and incomes of the month\n- Daily reminder if you forgot to enter your expenses during the day\n- Dark Theme support\n- Data backup\n…and more premium features that will be added soon!</string>
     <string name="premium_popup_not_premium_title">Become a premium user</string>
     <string name="premium_popup_not_premium_message">Access all the premium features!</string>
     <string name="premium_popup_not_premium_feature1_title">2. Daily reminder</string>
@@ -180,6 +180,8 @@
     <string name="premium_popup_not_premium_feature2_title">1. Monthly report</string>
     <string name="premium_popup_not_premium_feature2_message">Get a sum-up of your expenses and incomes of the month and see how much you saved.</string>
     <string name="premium_popup_not_premium_feature_more_dark_theme">3. Dark theme support!</string>
+    <string name="premium_popup_not_premium_feature_more_backup_title">4. Backup</string>
+    <string name="premium_popup_not_premium_feature_more_backup_message">Automatic backup of your data in the cloud! No need to worry about losing your budget anymore.</string>
     <string name="premium_popup_not_premium_feature_more_title">… and more premium features that will be added soon!</string>
     <string name="premium_popup_not_premium_cta">Purchase</string>
     <string name="premium_popup_become_title">Become a premium user</string>
@@ -254,7 +256,7 @@
     <string name="dark_theme_notif_message">EasyBudget 2.0 is out with dark theme support for premium users! Click to discover</string>
     <string name="dark_theme_notif_cta">Discover</string>
 
-    <string name="backup_settings_activity_title">Backup settings</string>
+    <string name="backup_settings_activity_title">Backup</string>
     <string name="backup_settings_cloud_backup">Cloud backup</string>
     <string name="backup_settings_not_authenticated_description">To enable cloud backup, please login to your Google account</string>
     <string name="backup_settings_not_authenticated_description_2">Your account will serve to identify your backup. Later, you\'ll be able to restore your data on a new phone (or after a data wipe) using this account.</string>
