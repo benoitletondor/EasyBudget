@@ -256,6 +256,8 @@
 
     <string name="backup_settings_activity_title">Backup settings</string>
     <string name="backup_settings_cloud_backup">Cloud backup</string>
+    <string name="backup_settings_backups_activated">Cloud backup activated</string>
+    <string name="backup_settings_backups_deactivated">Cloud backup deactivated</string>
     <string name="backup_settings_authenticate_cta">Sign-in with Google</string>
     <string name="backup_settings_logout_cta">Logout</string>
     <string name="backup_last_update_date">Last backup: %s</string>

@@ -122,6 +122,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             startActivity(Intent(context, BackupSettingsActivity::class.java))
             false
         }
+        updateBackupPreferences()
 
         /*
          * Bind bug report button
@@ -357,6 +358,20 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             activity?.intent?.putExtra(SHOW_THEME_INTENT_KEY, false)
             onDisplayPreferenceDialog(findPreference<ListPreference>(getString(R.string.setting_category_app_theme_key)))
         }
+    }
+
+    private fun updateBackupPreferences() {
+        findPreference<Preference>(getString(R.string.setting_category_backup))?.setSummary(if( parameters.isBackupEnabled() ) {
+            R.string.backup_settings_backups_activated
+        } else {
+            R.string.backup_settings_backups_deactivated
+        })
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        updateBackupPreferences()
     }
 
     /**

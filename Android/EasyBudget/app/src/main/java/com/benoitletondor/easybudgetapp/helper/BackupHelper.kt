@@ -10,6 +10,7 @@ import com.benoitletondor.easybudgetapp.cloudstorage.CloudStorage
 import com.benoitletondor.easybudgetapp.cloudstorage.FileMetaData
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.db.impl.DB_NAME
+import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.job.BackupJob
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.saveLastBackupDate
@@ -24,12 +25,22 @@ suspend fun backupDB(context: Context,
                      db: DB,
                      cloudStorage: CloudStorage,
                      auth: Auth,
-                     parameters: Parameters): ListenableWorker.Result {
+                     parameters: Parameters,
+                     iab: Iab): ListenableWorker.Result {
     val currentUser = (auth.state.value as? AuthState.Authenticated)?.currentUser
     if( currentUser == null ) {
         Log.e(
             "BackupJob",
             "Not authenticated"
+        )
+
+        return ListenableWorker.Result.failure()
+    }
+
+    if( !iab.isUserPremium() ) {
+        Log.e(
+            "BackupJob",
+            "Not premium"
         )
 
         return ListenableWorker.Result.failure()
@@ -99,10 +110,15 @@ suspend fun getBackupDBMetaData(cloudStorage: CloudStorage,
 
 suspend fun restoreLatestDBBackup(context: Context,
                                   auth: Auth,
-                                  cloudStorage: CloudStorage) {
+                                  cloudStorage: CloudStorage,
+                                  iab: Iab) {
 
     val currentUser = (auth.state.value as? AuthState.Authenticated)?.currentUser
         ?: throw IllegalStateException("Not authenticated")
+
+    if( !iab.isUserPremium() ) {
+        throw IllegalStateException("User not premium")
+    }
 
     val backupFile = File(context.cacheDir, "db_backup_download")
 

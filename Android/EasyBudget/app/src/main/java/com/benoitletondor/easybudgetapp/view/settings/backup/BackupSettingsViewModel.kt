@@ -16,6 +16,7 @@ import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.benoitletondor.easybudgetapp.cloudstorage.CloudStorage
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.*
+import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.parameters.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -105,8 +106,9 @@ class BackupSettingsViewModel(private val auth: Auth,
                     if( parameters.isBackupEnabled() ) {
                         val lastBackupDate = parameters.getLastBackupDate()
                         val backupNowAvailable = lastBackupDate == null || lastBackupDate.isOlderThanADay()
+                        val restoreAvailable = lastBackupDate != null
 
-                        BackupCloudStorageState.Activated(authState.currentUser, lastBackupDate, backupNowAvailable)
+                        BackupCloudStorageState.Activated(authState.currentUser, lastBackupDate, backupNowAvailable, restoreAvailable)
                     } else {
                         BackupCloudStorageState.NotActivated(authState.currentUser)
                     }
@@ -118,25 +120,29 @@ class BackupSettingsViewModel(private val auth: Auth,
     }
 
     fun onBackupActivated() {
-        parameters.setBackupEnabled(true)
-        val newBackupState = computeBackupCloudStorageState(auth.state.value)
-        cloudBackupStateStream.value = newBackupState
+        if( !parameters.isBackupEnabled() ) {
+            parameters.setBackupEnabled(true)
+            val newBackupState = computeBackupCloudStorageState(auth.state.value)
+            cloudBackupStateStream.value = newBackupState
 
-        if( newBackupState is BackupCloudStorageState.Activated ) {
-            val lastBackupDate = newBackupState.lastBackupDate
-            if( lastBackupDate != null ) {
-                previousBackupAvailableEvent.value = lastBackupDate
+            if( newBackupState is BackupCloudStorageState.Activated ) {
+                val lastBackupDate = newBackupState.lastBackupDate
+                if( lastBackupDate != null ) {
+                    previousBackupAvailableEvent.value = lastBackupDate
+                }
             }
-        }
 
-        scheduleBackup(appContext)
+            scheduleBackup(appContext)
+        }
     }
 
     fun onBackupDeactivated() {
-        parameters.setBackupEnabled(false)
-        cloudBackupStateStream.value = computeBackupCloudStorageState(auth.state.value)
+        if( parameters.isBackupEnabled() ) {
+            parameters.setBackupEnabled(false)
+            cloudBackupStateStream.value = computeBackupCloudStorageState(auth.state.value)
 
-        unscheduleBackup(appContext)
+            unscheduleBackup(appContext)
+        }
     }
 
     fun onBackupNowButtonPressed() {
@@ -146,7 +152,15 @@ class BackupSettingsViewModel(private val auth: Auth,
 
             try {
                 withContext(Dispatchers.IO) {
-                    val result = backupDB(appContext, get(DB::class.java), get(CloudStorage::class.java), auth, parameters)
+                    val result = backupDB(
+                        appContext,
+                        get(DB::class.java),
+                        get(CloudStorage::class.java),
+                        auth,
+                        parameters,
+                        get(Iab::class.java)
+                    )
+
                     if( result !is ListenableWorker.Result.Success ) {
                         throw RuntimeException(result.toString())
                     }
@@ -176,7 +190,7 @@ class BackupSettingsViewModel(private val auth: Auth,
 
             try {
                 withContext(Dispatchers.IO) {
-                    restoreLatestDBBackup(appContext, auth, get(CloudStorage::class.java))
+                    restoreLatestDBBackup(appContext, auth, get(CloudStorage::class.java), get(Iab::class.java))
                 }
 
                 appRestartEvent.postValue(Unit)
@@ -202,7 +216,7 @@ sealed class BackupCloudStorageState {
     object NotAuthenticated : BackupCloudStorageState()
     object Authenticating : BackupCloudStorageState()
     data class NotActivated(val currentUser: CurrentUser) : BackupCloudStorageState()
-    data class Activated(val currentUser: CurrentUser, val lastBackupDate: Date?, val backupNowAvailable: Boolean): BackupCloudStorageState()
+    data class Activated(val currentUser: CurrentUser, val lastBackupDate: Date?, val backupNowAvailable: Boolean, val restoreAvailable: Boolean): BackupCloudStorageState()
     data class BackupInProgress(val currentUser: CurrentUser): BackupCloudStorageState()
     data class RestorationInProgress(val currentUser: CurrentUser): BackupCloudStorageState()
 }
