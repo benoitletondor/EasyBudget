@@ -256,6 +256,11 @@
 
     <string name="backup_settings_activity_title">Backup settings</string>
     <string name="backup_settings_cloud_backup">Cloud backup</string>
+    <string name="backup_settings_not_authenticated_description">To enable cloud backup, please login to your Google account. The data will be then associated to your account.</string>
+    <string name="backup_settings_not_authenticated_privacy_title">EasyBudget takes your privacy seriously</string>
+    <string name="backup_settings_not_authenticated_privacy_message">By authenticating to your Google account, you accept that your data will be securely uploaded to Firebase and linked to your Google account.\n\nYour EasyBudget data will never be read by anyone, used or sell to anyone.\n\nDo you want to continue?</string>
+    <string name="backup_settings_not_authenticated_privacy_positive_cta">Continue</string>
+    <string name="backup_settings_not_authenticated_privacy_negative_cta">Cancel</string>
     <string name="backup_settings_backups_activated">Cloud backup activated</string>
     <string name="backup_settings_backups_deactivated">Cloud backup deactivated</string>
     <string name="backup_settings_authenticate_cta">Sign-in with Google</string>

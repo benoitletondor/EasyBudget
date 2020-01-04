@@ -30,6 +30,7 @@ class BackupSettingsViewModel(private val auth: Auth,
                               private val appContext: Context) : ViewModel() {
 
     val cloudBackupStateStream: MutableLiveData<BackupCloudStorageState> = MutableLiveData()
+    val authenticationConfirmationDisplayEvent = SingleLiveEvent<Unit>()
     val backupNowErrorEvent = SingleLiveEvent<Throwable>()
     val restorationErrorEvent = SingleLiveEvent<Throwable>()
     val previousBackupAvailableEvent = SingleLiveEvent<Date>()
@@ -76,9 +77,16 @@ class BackupSettingsViewModel(private val auth: Auth,
         super.onCleared()
     }
 
+    fun onAuthenticateButtonPressed() {
+        authenticationConfirmationDisplayEvent.value = Unit
+    }
 
-    fun onAuthenticateButtonPressed(activity: Activity) {
+    fun onAuthenticationConfirmationConfirmed(activity: Activity) {
         auth.startAuthentication(activity)
+    }
+
+    fun onAuthenticationConfirmationCancelled() {
+        // No-op
     }
 
     fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -238,7 +246,10 @@ sealed class BackupCloudStorageState {
     object NotAuthenticated : BackupCloudStorageState()
     object Authenticating : BackupCloudStorageState()
     data class NotActivated(val currentUser: CurrentUser) : BackupCloudStorageState()
-    data class Activated(val currentUser: CurrentUser, val lastBackupDate: Date?, val backupNowAvailable: Boolean, val restoreAvailable: Boolean): BackupCloudStorageState()
+    data class Activated(val currentUser: CurrentUser,
+                         val lastBackupDate: Date?,
+                         val backupNowAvailable: Boolean,
+                         val restoreAvailable: Boolean): BackupCloudStorageState()
     data class BackupInProgress(val currentUser: CurrentUser): BackupCloudStorageState()
     data class RestorationInProgress(val currentUser: CurrentUser): BackupCloudStorageState()
 }

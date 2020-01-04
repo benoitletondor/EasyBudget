@@ -60,12 +60,22 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 
-                <Button
+                <TextView
+                    android:id="@+id/backup_settings_cloud_storage_not_authenticated_description"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/backup_settings_not_authenticated_description"
+                    android:textColor="@color/primary_text"
+                    android:textSize="15sp" />
+
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/backup_settings_cloud_storage_authenticate_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/backup_settings_authenticate_cta"
-                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_marginTop="20dp"
+                    style="@style/GreenButton"
+                    app:layout_constraintTop_toBottomOf="@+id/backup_settings_cloud_storage_not_authenticated_description"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"/>
 

@@ -154,8 +154,21 @@ class BackupSettingsActivity : BaseActivity() {
                 .show()
         })
 
+        viewModel.authenticationConfirmationDisplayEvent.observe(this, Observer {
+            AlertDialog.Builder(this)
+                .setTitle(R.string.backup_settings_not_authenticated_privacy_title)
+                .setMessage(R.string.backup_settings_not_authenticated_privacy_message)
+                .setPositiveButton(R.string.backup_settings_not_authenticated_privacy_positive_cta) { _, _ ->
+                    viewModel.onAuthenticationConfirmationConfirmed(this)
+                }
+                .setNegativeButton(R.string.backup_settings_not_authenticated_privacy_negative_cta) { _, _ ->
+                    viewModel.onAuthenticationConfirmationCancelled()
+                }
+                .show()
+        })
+
         backup_settings_cloud_storage_authenticate_button.setOnClickListener {
-            viewModel.onAuthenticateButtonPressed(this)
+            viewModel.onAuthenticateButtonPressed()
         }
 
         backup_settings_cloud_storage_logout_button.setOnClickListener {
