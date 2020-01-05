@@ -31,15 +31,13 @@ import com.batch.android.Config
 import com.batch.android.PushNotificationType
 import com.benoitletondor.easybudgetapp.BuildVersion.VERSION_2_0_10
 import com.benoitletondor.easybudgetapp.BuildVersion.VERSION_2_0_13
+import com.benoitletondor.easybudgetapp.BuildVersion.VERSION_2_1_0
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.injection.appModule
 import com.benoitletondor.easybudgetapp.injection.viewModelModule
-import com.benoitletondor.easybudgetapp.notif.DarkThemeNotif
-import com.benoitletondor.easybudgetapp.notif.CHANNEL_DAILY_REMINDERS
-import com.benoitletondor.easybudgetapp.notif.CHANNEL_MONTHLY_REMINDERS
-import com.benoitletondor.easybudgetapp.notif.CHANNEL_NEW_FEATURES
+import com.benoitletondor.easybudgetapp.notif.*
 import com.benoitletondor.easybudgetapp.parameters.*
 import com.benoitletondor.easybudgetapp.push.PushService.Companion.DAILY_REMINDER_KEY
 import com.benoitletondor.easybudgetapp.push.PushService.Companion.MONTHLY_REMINDER_KEY
@@ -367,6 +365,10 @@ class EasyBudget : Application() {
 
         if( previousVersion < VERSION_2_0_10 && newVersion <= VERSION_2_0_13 && iab.isUserPremium() ) {
             DarkThemeNotif.showDarkThemeNotif(this)
+        }
+
+        if( newVersion == VERSION_2_1_0 && iab.isUserPremium() ) {
+            BackupNotif.showBackupNotif(this)
         }
     }
 

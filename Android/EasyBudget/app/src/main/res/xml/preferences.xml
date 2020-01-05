@@ -52,6 +52,10 @@
             app:entries="@array/themes"
             app:entryValues="@array/themesData" />
 
+        <Preference
+            app:key="@string/setting_category_backup"
+            app:title="@string/backup_settings_activity_title" />
+
         <CheckBoxPreference
             app:title="@string/setting_category_notifications_daily_title"
             app:summaryOn="@string/setting_category_notifications_daily_message"
@@ -129,6 +133,10 @@
         <Preference
             app:title="@string/setting_category_show_dark_theme_notif"
             app:key="@string/setting_category_dev_show_dark_theme_notif_key" />
+
+        <Preference
+            app:title="@string/setting_category_show_backup_notif"
+            app:key="@string/setting_category_dev_show_backup_notif_key" />
 
     </PreferenceCategory>
 

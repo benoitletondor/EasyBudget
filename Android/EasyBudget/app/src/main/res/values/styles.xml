@@ -78,19 +78,32 @@
     </style>
 
     <!-- Buttons -->
-    <style name="BlueButton" parent="Base.Widget.AppCompat.Button.Colored">
+    <style name="BlueButton" parent="Widget.AppCompat.Button.Colored">
         <item name="android:textColor">@color/white</item>
         <item name="colorButtonNormal">@color/secondary</item>
     </style>
 
-    <style name="GreenButton" parent="Base.Widget.AppCompat.Button.Colored">
+    <style name="GreenButton" parent="Widget.AppCompat.Button.Colored">
         <item name="android:textColor">@color/white</item>
         <item name="colorButtonNormal">@color/accent</item>
     </style>
 
-    <style name="LightGreenButton" parent="Base.Widget.AppCompat.Button.Colored">
+    <style name="LightGreenButton" parent="Widget.AppCompat.Button.Colored">
         <item name="android:textColor">@color/accent</item>
         <item name="colorButtonNormal">@color/accent_ripple</item>
+    </style>
+
+    <style name="LightGreenButton.Borderless" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:textColor">@color/accent</item>
+    </style>
+
+    <style name="RedButton" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:textColor">@color/white</item>
+        <item name="colorButtonNormal">@color/budget_red</item>
+    </style>
+
+    <style name="RedButton.Borderless" parent="Widget.AppCompat.Button.Borderless.Colored">
+        <item name="android:textColor">@color/budget_red</item>
     </style>
 
     <!-- AlertDialog -->

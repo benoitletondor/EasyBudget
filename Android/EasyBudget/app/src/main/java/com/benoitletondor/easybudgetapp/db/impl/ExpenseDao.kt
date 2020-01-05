@@ -20,6 +20,10 @@ import androidx.room.*
 import com.benoitletondor.easybudgetapp.db.impl.entity.ExpenseEntity
 import com.benoitletondor.easybudgetapp.db.impl.entity.RecurringExpenseEntity
 import java.util.*
+import androidx.sqlite.db.SupportSQLiteQuery
+import androidx.room.RawQuery
+
+
 
 @Dao
 interface ExpenseDao {
@@ -71,4 +75,7 @@ interface ExpenseDao {
 
     @Query("SELECT * FROM monthlyexpense WHERE _expense_id = :recurringExpenseId LIMIT 1")
     suspend fun findRecurringExpenseForId(recurringExpenseId: Long): RecurringExpenseEntity?
+
+    @RawQuery
+    suspend fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

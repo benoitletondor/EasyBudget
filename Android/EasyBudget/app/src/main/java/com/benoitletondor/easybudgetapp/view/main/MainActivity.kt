@@ -65,6 +65,7 @@ import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseAddActivity
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
+import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.SHOW_BACKUP_INTENT_KEY
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.SHOW_THEME_INTENT_KEY
 import com.benoitletondor.easybudgetapp.view.welcome.getOnboardingStep
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -153,6 +154,7 @@ class MainActivity : BaseActivity() {
             openAddExpenseIfNeeded(intent)
             openAddRecurringExpenseIfNeeded(intent)
             openSettingsForThemeIfNeeded(intent)
+            openSettingsForBackupIfNeeded(intent)
         }
 
         viewModel.expenseDeletionSuccessEventStream.observe(this, Observer { (deletedExpense, newBalance) ->
@@ -432,6 +434,7 @@ class MainActivity : BaseActivity() {
         openAddExpenseIfNeeded(intent)
         openAddRecurringExpenseIfNeeded(intent)
         openSettingsForThemeIfNeeded(intent)
+        openSettingsForBackupIfNeeded(intent)
     }
 
 // ------------------------------------------>
@@ -525,6 +528,19 @@ class MainActivity : BaseActivity() {
         if( intent.getBooleanExtra(INTENT_REDIRECT_TO_SETTINGS_FOR_THEME_EXTRA, false) ) {
             val startIntent = Intent(this, SettingsActivity::class.java).apply {
                 putExtra(SHOW_THEME_INTENT_KEY, true)
+            }
+            ActivityCompat.startActivityForResult(this@MainActivity, startIntent, SETTINGS_SCREEN_ACTIVITY_CODE, null)
+        }
+    }
+
+    /**
+     * Open the settings activity to display backup options if the given intent contains the
+     * [.INTENT_REDIRECT_TO_SETTINGS_FOR_BACKUP_EXTRA] extra.
+     */
+    private fun openSettingsForBackupIfNeeded(intent: Intent) {
+        if( intent.getBooleanExtra(INTENT_REDIRECT_TO_SETTINGS_FOR_BACKUP_EXTRA, false) ) {
+            val startIntent = Intent(this, SettingsActivity::class.java).apply {
+                putExtra(SHOW_BACKUP_INTENT_KEY, true)
             }
             ActivityCompat.startActivityForResult(this@MainActivity, startIntent, SETTINGS_SCREEN_ACTIVITY_CODE, null)
         }
@@ -840,6 +856,7 @@ class MainActivity : BaseActivity() {
         const val INTENT_REDIRECT_TO_PREMIUM_EXTRA = "intent.extra.premiumshow"
         const val INTENT_REDIRECT_TO_SETTINGS_EXTRA = "intent.extra.redirecttosettings"
         const val INTENT_REDIRECT_TO_SETTINGS_FOR_THEME_EXTRA = "intent.extra.redirecttosettingsfortheme"
+        const val INTENT_REDIRECT_TO_SETTINGS_FOR_BACKUP_EXTRA = "intent.extra.redirecttosettingsforbackup"
 
         const val ANIMATE_TRANSITION_KEY = "animate"
         const val CENTER_X_KEY = "centerX"

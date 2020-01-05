@@ -37,6 +37,7 @@ import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.iab.INTENT_IAB_STATUS_CHANGED
 import com.benoitletondor.easybudgetapp.iab.Iab
+import com.benoitletondor.easybudgetapp.notif.BackupNotif
 import com.benoitletondor.easybudgetapp.notif.DarkThemeNotif
 import com.benoitletondor.easybudgetapp.parameters.*
 import com.benoitletondor.easybudgetapp.view.RatingPopup
@@ -44,7 +45,9 @@ import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
 import com.benoitletondor.easybudgetapp.view.premium.PremiumActivity
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment
+import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.SHOW_BACKUP_INTENT_KEY
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.SHOW_THEME_INTENT_KEY
+import com.benoitletondor.easybudgetapp.view.settings.backup.BackupSettingsActivity
 import com.roomorama.caldroid.CaldroidFragment
 import org.koin.android.ext.android.inject
 import java.net.URLEncoder
@@ -113,6 +116,15 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             parameters.setCaldroidFirstDayOfWeek(if ((firstDayOfWeekPref?.isChecked) == true) CaldroidFragment.SUNDAY else CaldroidFragment.MONDAY)
             true
         }
+
+        /*
+         * Backup
+         */
+        findPreference<Preference>(getString(R.string.setting_category_backup))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            startActivity(Intent(context, BackupSettingsActivity::class.java))
+            false
+        }
+        updateBackupPreferences()
 
         /*
          * Bind bug report button
@@ -291,6 +303,14 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                 DarkThemeNotif.showDarkThemeNotif(context!!)
                 false
             }
+
+            /*
+             * Show backup notif
+             */
+            findPreference<Preference>(getString(R.string.setting_category_dev_show_backup_notif_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                BackupNotif.showBackupNotif(context!!)
+                false
+            }
         }
 
         /*
@@ -348,6 +368,28 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             activity?.intent?.putExtra(SHOW_THEME_INTENT_KEY, false)
             onDisplayPreferenceDialog(findPreference<ListPreference>(getString(R.string.setting_category_app_theme_key)))
         }
+
+        /*
+         * Check if we should show backup options
+         */
+        if( activity?.intent?.getBooleanExtra(SHOW_BACKUP_INTENT_KEY, false) == true ) {
+            activity?.intent?.putExtra(SHOW_BACKUP_INTENT_KEY, false)
+            startActivity(Intent(context, BackupSettingsActivity::class.java))
+        }
+    }
+
+    private fun updateBackupPreferences() {
+        findPreference<Preference>(getString(R.string.setting_category_backup))?.setSummary(if( parameters.isBackupEnabled() ) {
+            R.string.backup_settings_backups_activated
+        } else {
+            R.string.backup_settings_backups_deactivated
+        })
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        updateBackupPreferences()
     }
 
     /**

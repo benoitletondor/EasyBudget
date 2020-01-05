@@ -18,6 +18,7 @@ package com.benoitletondor.easybudgetapp.parameters
 
 import com.benoitletondor.easybudgetapp.helper.AppTheme
 import com.roomorama.caldroid.CaldroidFragment
+import java.util.*
 
 private const val DEFAULT_LOW_MONEY_WARNING_AMOUNT = 100
 /**
@@ -88,6 +89,14 @@ private const val USER_SAW_MONTHLY_REPORT_HINT_PARAMETERS_KEY = "user_saw_monthl
  * AppTheme
  */
 private const val APP_THEME_PARAMETERS_KEY = "app_theme"
+/**
+ * Backup enabled
+ */
+private const val BACKUP_ENABLED_PARAMETERS_KEY = "backup_enabled"
+/**
+ * Last successful backup timestamp
+ */
+private const val LAST_BACKUP_TIMESTAMP = "last_backup_ts"
 
 fun Parameters.getInitTimestamp(): Long {
     return getLong(INIT_DATE_PARAMETERS_KEY, 0L)
@@ -283,4 +292,29 @@ fun Parameters.getTheme(): AppTheme {
 
 fun Parameters.setTheme(theme: AppTheme) {
     putInt(APP_THEME_PARAMETERS_KEY, theme.value)
+}
+
+fun Parameters.isBackupEnabled(): Boolean {
+    return getBoolean(BACKUP_ENABLED_PARAMETERS_KEY, false)
+}
+
+fun Parameters.setBackupEnabled(enabled: Boolean) {
+    putBoolean(BACKUP_ENABLED_PARAMETERS_KEY, enabled)
+}
+
+fun Parameters.getLastBackupDate(): Date? {
+    val lastTimestamp = getLong(LAST_BACKUP_TIMESTAMP, -1)
+    if( lastTimestamp > 0 ) {
+        return Date(lastTimestamp)
+    }
+
+    return null
+}
+
+fun Parameters.saveLastBackupDate(date: Date?) {
+    if( date != null ) {
+        putLong(LAST_BACKUP_TIMESTAMP, date.time)
+    } else {
+        putLong(LAST_BACKUP_TIMESTAMP, -1)
+    }
 }

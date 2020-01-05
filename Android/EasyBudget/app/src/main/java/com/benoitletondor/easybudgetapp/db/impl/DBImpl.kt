@@ -16,6 +16,7 @@
 
 package com.benoitletondor.easybudgetapp.db.impl
 
+import androidx.sqlite.db.SimpleSQLiteQuery
 import com.benoitletondor.easybudgetapp.BuildConfig
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
 import com.benoitletondor.easybudgetapp.model.Expense
@@ -29,8 +30,13 @@ import kotlin.math.ceil
 import kotlin.math.floor
 
 class DBImpl(private val roomDB: RoomDB) : DB {
+
     override fun ensureDBCreated() {
         roomDB.openHelper.writableDatabase.close()
+    }
+
+    override suspend fun triggerForceWriteToDisk() {
+        roomDB.expenseDao().checkpoint(SimpleSQLiteQuery("pragma wal_checkpoint(full)"))
     }
 
     override fun close() {

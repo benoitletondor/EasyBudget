@@ -17,6 +17,10 @@
 package com.benoitletondor.easybudgetapp.injection
 
 import androidx.collection.ArrayMap
+import com.benoitletondor.easybudgetapp.auth.Auth
+import com.benoitletondor.easybudgetapp.auth.FirebaseAuth
+import com.benoitletondor.easybudgetapp.cloudstorage.CloudStorage
+import com.benoitletondor.easybudgetapp.cloudstorage.FirebaseStorage
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.iab.IabImpl
@@ -30,6 +34,7 @@ import org.koin.dsl.module
 import java.util.*
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 val appModule = module {
     single { Parameters(get()) }
@@ -42,6 +47,14 @@ val appModule = module {
     } }
 
     single<Executor> { Executors.newSingleThreadExecutor() }
+
+    single<Auth> { FirebaseAuth(com.google.firebase.auth.FirebaseAuth.getInstance()) }
+
+    single<CloudStorage> { FirebaseStorage(com.google.firebase.storage.FirebaseStorage.getInstance().apply {
+        maxOperationRetryTimeMillis = TimeUnit.SECONDS.toMillis(10)
+        maxDownloadRetryTimeMillis = TimeUnit.SECONDS.toMillis(10)
+        maxUploadRetryTimeMillis = TimeUnit.SECONDS.toMillis(10)
+    }) }
 
     factory<DB> { CachedDBImpl(DBImpl(RoomDB.create(get())), get(), get()) }
 

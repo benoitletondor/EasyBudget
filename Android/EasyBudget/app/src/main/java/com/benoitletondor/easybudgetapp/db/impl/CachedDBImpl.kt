@@ -29,8 +29,13 @@ import java.util.concurrent.Executor
 class CachedDBImpl(private val wrappedDB: DB,
                    private val cacheStorage: CacheDBStorage,
                    private val executor: Executor) : DB {
+
     override fun ensureDBCreated() {
         wrappedDB.ensureDBCreated()
+    }
+
+    override suspend fun triggerForceWriteToDisk() {
+        wrappedDB.triggerForceWriteToDisk()
     }
 
     override fun close() {

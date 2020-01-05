@@ -14,17 +14,27 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp.helper
+package com.benoitletondor.easybudgetapp.auth
 
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import com.benoitletondor.easybudgetapp.R
+import android.app.Activity
+import android.content.Intent
+import androidx.lifecycle.LiveData
 
-abstract class BaseActivity : AppCompatActivity() {
+interface Auth {
+    val state: LiveData<AuthState>
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(R.style.AppTheme)
+    fun startAuthentication(activity: Activity)
+    fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
+    fun logout()
+}
 
-        super.onCreate(savedInstanceState)
-    }
+sealed class AuthState {
+    object NotAuthenticated : AuthState()
+    object Authenticating : AuthState()
+    data class Authenticated(val currentUser: CurrentUser) : AuthState()
+}
+
+interface CurrentUser {
+    val id: String
+    val email: String
 }

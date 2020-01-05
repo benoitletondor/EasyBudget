@@ -14,17 +14,23 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp.helper
+package com.benoitletondor.easybudgetapp.view.premium
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+
 import com.benoitletondor.easybudgetapp.R
 
-abstract class BaseActivity : AppCompatActivity() {
+/**
+ * Fragment 5 of the premium onboarding screen
+ *
+ * @author Benoit LETONDOR
+ */
+class Premium5Fragment : PremiumFragment() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(R.style.AppTheme)
-
-        super.onCreate(savedInstanceState)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.fragment_premium5, container, false)
     }
 }
