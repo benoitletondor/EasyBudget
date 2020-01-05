@@ -287,8 +287,11 @@ class MainActivity : BaseActivity() {
             builder.setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
             builder.setPositiveButton(R.string.ok) { dialog, _ ->
                 try {
-                    val newBalance = java.lang.Double.valueOf(amountEditText.text.toString())
-                    viewModel.onNewBalanceSelected(newBalance, getString(R.string.adjust_balance_expense_title))
+                    val stringValue = amountEditText.text.toString()
+                    if( stringValue.isNotBlank() ) {
+                        val newBalance = java.lang.Double.valueOf(stringValue)
+                        viewModel.onNewBalanceSelected(newBalance, getString(R.string.adjust_balance_expense_title))
+                    }
                 } catch (e: Exception) {
                     Logger.error("Error parsing new balance", e)
                 }
