@@ -54,6 +54,7 @@ class BackupSettingsActivity : BaseActivity() {
                     backup_settings_cloud_backup_cta.visibility = View.GONE
                     backup_settings_cloud_restore_cta.visibility = View.GONE
                     backup_settings_cloud_storage_restore_description.visibility = View.GONE
+                    backup_settings_cloud_storage_restore_explanation.visibility = View.GONE
                     backup_settings_cloud_backup_loading_progress.visibility = View.GONE
                 }
                 is BackupCloudStorageState.Activated -> {

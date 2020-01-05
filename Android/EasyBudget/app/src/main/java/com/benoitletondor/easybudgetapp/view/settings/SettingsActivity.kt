@@ -74,6 +74,10 @@ class SettingsActivity : BaseActivity() {
          */
         const val SHOW_THEME_INTENT_KEY = "showTheme"
         /**
+         * Key to specify that the backup options should be shown to the user
+         */
+        const val SHOW_BACKUP_INTENT_KEY = "showBackup"
+        /**
          * Intent action broadcast when the user has successfully completed the [PremiumActivity]
          */
         const val USER_GONE_PREMIUM_INTENT = "user.ispremium"

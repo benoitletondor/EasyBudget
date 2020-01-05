@@ -93,7 +93,12 @@
 
         <service
             android:name=".notif.DarkThemeNotif"
-            android:exported="false" /> <!-- Push -->
+            android:exported="false" />
+        <service
+            android:name=".notif.BackupNotif"
+            android:exported="false" />
+
+        <!-- Push -->
         <service
             android:name=".push.PushService"
             tools:ignore="ExportedService">

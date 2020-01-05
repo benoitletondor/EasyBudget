@@ -153,6 +153,7 @@
     <string name="setting_category_show_welcome_screen_button_title" translatable="false">Show welcome screen</string>
     <string name="setting_category_show_premium" translatable="false">Show premium screen</string>
     <string name="setting_category_show_dark_theme_notif" translatable="false">Show dark theme notif</string>
+    <string name="setting_category_show_backup_notif" translatable="false">Show backup notif</string>
     <string name="setting_category_premium_title">Premium</string>
     <string name="setting_category_premium_status_title">You are premium!</string>
     <string name="setting_category_premium_status_message">You have access to premium features</string>
@@ -257,12 +258,12 @@
     <string name="dark_theme_notif_cta">Discover</string>
 
     <string name="backup_settings_activity_title">Backup</string>
-    <string name="backup_settings_cloud_backup">Cloud backup</string>
-    <string name="backup_settings_not_authenticated_description">To enable cloud backup, please login to your Google account</string>
-    <string name="backup_settings_not_authenticated_description_2">Your account will serve to identify your backup. Later, you\'ll be able to restore your data on a new phone (or after a data wipe) using this account.</string>
+    <string name="backup_settings_cloud_backup">EasyBudget cloud backup</string>
+    <string name="backup_settings_not_authenticated_description">EasyBudget cloud backup is available for premium users at no additional cost.\nTo enable EasyBudget cloud backup, login to your Google account</string>
+    <string name="backup_settings_not_authenticated_description_2">Your Google account will be used to identify your backup. Later, you\'ll be able to restore your data on a new phone (or after a data wipe) using this account.\n\nYour account will not be used for anything else.</string>
     <string name="backup_settings_not_authenticated_privacy_title">EasyBudget takes your privacy seriously</string>
-    <string name="backup_settings_not_authenticated_privacy_message">By authenticating to your Google account, you accept that your EasyBudget entries will be securely uploaded to Firebase and linked to your Google account.\n\nYour EasyBudget data will never be used or sell to anyone.\n\nDo you want to continue?</string>
-    <string name="backup_settings_not_authenticated_privacy_positive_cta">Continue</string>
+    <string name="backup_settings_not_authenticated_privacy_message">By authenticating with your Google account, you accept that your EasyBudget entries will be securely uploaded to the cloud and linked to your Google account.\n\nYour EasyBudget data will never be used or sell to anyone.\n\nDo you want to continue?</string>
+    <string name="backup_settings_not_authenticated_privacy_positive_cta">Accept</string>
     <string name="backup_settings_not_authenticated_privacy_negative_cta">Cancel</string>
     <string name="backup_settings_backups_activated">Cloud backup activated</string>
     <string name="backup_settings_backups_deactivated">Cloud backup deactivated</string>
@@ -291,6 +292,8 @@
     <string name="backup_restore_confirmation_message">Are you sure you want to restore data from %s backup?\n\nIt will replace your current data in an irreversible way!\n\nThe app will restart after the process.</string>
     <string name="backup_restore_confirmation_positive_cta">Restore</string>
     <string name="backup_restore_confirmation_negative_cta">Cancel</string>
+    <string name="backup_notif_message">New for premium users: backup your data in the cloud! Click to setup</string>
+    <string name="backup_notif_cta">Setup</string>
 
 
     <!-- Keys, not for translations. -->
@@ -313,6 +316,7 @@
     <string name="setting_category_not_premium_status_key" translatable="false">not_premium</string>
     <string name="setting_category_dev_show_premium_key" translatable="false">show_premium</string>
     <string name="setting_category_dev_show_dark_theme_notif_key" translatable="false">show_dark_theme</string>
+    <string name="setting_category_dev_show_backup_notif_key" translatable="false">show_backup</string>
     <string name="setting_category_start_day_of_week_key" translatable="false">start_day_of_week</string>
     <string name="setting_category_backup" translatable="false">backup</string>
 
