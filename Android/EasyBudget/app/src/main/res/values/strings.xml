@@ -271,7 +271,7 @@
     <string name="backup_settings_your_google_account">Your Google account</string>
     <string name="backup_settings_cloud_backup_status">Cloud backup: %s</string>
     <string name="backup_settings_cloud_backup_status_activated">enabled</string>
-    <string name="backup_settings_cloud_backup_status_disabled">disabled</string>
+    <string name="backup_settings_cloud_backup_status_disabled">deactivated</string>
     <string name="backup_settings_logout_cta">Logout</string>
     <string name="backup_activated_description">Your data will be automatically backed up every week. If you ever change your phone or wipe your data, you can restore a backup from here.</string>
     <string name="backup_last_update_date">Last backup: %s</string>
