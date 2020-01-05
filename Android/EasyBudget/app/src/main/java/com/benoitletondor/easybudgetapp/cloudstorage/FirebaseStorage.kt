@@ -68,4 +68,4 @@ class FirebaseStorage(private val storage: com.google.firebase.storage.FirebaseS
 }
 
 private fun Throwable.isFileNotFoundError(): Boolean
-    = this is StorageException && this.httpResultCode == 404
+    = this is StorageException && this.errorCode == StorageException.ERROR_OBJECT_NOT_FOUND

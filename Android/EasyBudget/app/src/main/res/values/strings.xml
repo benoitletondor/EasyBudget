@@ -283,11 +283,11 @@
     <string name="backup_now_error_title">Unable to backup</string>
     <string name="backup_now_error_message">Backup not completed due to an error. You can check your connexion and try again or let the app retry automatically later.</string>
     <string name="backup_already_exist_title">Previous backup found</string>
-    <string name="backup_already_exist_message">A previous EasyBudget backup from %s has been found on your account.\n\nWould you like to restore it?\n\n(You can still do it later, before next backup)</string>
+    <string name="backup_already_exist_message">A previous EasyBudget backup from %s has been found on your account.\n\nWould you like to restore it now?\n\n(You can still do it later, before next backup)</string>
     <string name="backup_already_exist_positive_cta">Restore</string>
     <string name="backup_already_exist_negative_cta">Ignore</string>
     <string name="backup_restore_error_title">Error restoring data</string>
-    <string name="backup_restore_error_message">An error occurred while restoration. Please check your network and try again later.</string>
+    <string name="backup_restore_error_message">An error occurred while restoring data. Please check your connexion and try again later.</string>
     <string name="backup_restore_confirmation_title">Restore backup</string>
     <string name="backup_restore_confirmation_message">Are you sure you want to restore data from %s backup?\n\nIt will replace your current data in an irreversible way!\n\nThe app will restart after the process.</string>
     <string name="backup_restore_confirmation_positive_cta">Restore</string>
@@ -296,11 +296,11 @@
     <string name="backup_wipe_data_description">EasyBudget lets you in control of your data: Click here if you want to delete all your backup data from the cloud</string>
     <string name="backup_wipe_data_cta">Delete backup</string>
     <string name="backup_wipe_data_confirmation_title">Delete cloud backup</string>
-    <string name="backup_wipe_data_confirmation_message">Are you sure you want to delete all your backup data from the cloud?\n\nThis operation is irreversible and you\'ll lose access to your backup data.</string>
+    <string name="backup_wipe_data_confirmation_message">Are you sure you want to delete all your backup data from the cloud?\n\nThis operation is irreversible and you\'ll lose access to your backup data (Current local app data won\'t be affected).</string>
     <string name="backup_wipe_data_confirmation_positive_cta">Delete</string>
     <string name="backup_wipe_data_confirmation_negative_cta">Cancel</string>
     <string name="backup_wipe_data_error_title">Unable to delete cloud backup</string>
-    <string name="backup_wipe_data_error_message">An error occurred while deleting your backup data. Please check your network and try again later.</string>
+    <string name="backup_wipe_data_error_message">An error occurred while deleting your backup data. Please check your connexion and try again later.</string>
     <string name="backup_notif_message">New for premium users: backup your data in the cloud! Click to setup</string>
     <string name="backup_notif_cta">Setup</string>
 
