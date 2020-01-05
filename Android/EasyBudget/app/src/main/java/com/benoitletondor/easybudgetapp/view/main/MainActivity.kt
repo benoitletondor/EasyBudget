@@ -66,7 +66,6 @@ import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpens
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.SHOW_BACKUP_INTENT_KEY
-import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.SHOW_THEME_INTENT_KEY
 import com.benoitletondor.easybudgetapp.view.welcome.getOnboardingStep
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -123,24 +122,24 @@ class MainActivity : BaseActivity() {
 
         receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-                when {
-                    INTENT_EXPENSE_DELETED == intent.action -> {
+                when (intent.action) {
+                    INTENT_EXPENSE_DELETED -> {
                         val expense = intent.getParcelableExtra<Expense>("expense")!!
 
                         viewModel.onDeleteExpenseClicked(expense)
                     }
-                    INTENT_RECURRING_EXPENSE_DELETED == intent.action -> {
+                    INTENT_RECURRING_EXPENSE_DELETED -> {
                         val expense = intent.getParcelableExtra<Expense>("expense")!!
                         val deleteType = RecurringExpenseDeleteType.fromValue(intent.getIntExtra("deleteType", RecurringExpenseDeleteType.ALL.value))!!
 
                         viewModel.onDeleteRecurringExpenseClicked(expense, deleteType)
                     }
-                    SelectCurrencyFragment.CURRENCY_SELECTED_INTENT == intent.action -> viewModel.onCurrencySelected()
-                    INTENT_SHOW_WELCOME_SCREEN == intent.action -> {
+                    SelectCurrencyFragment.CURRENCY_SELECTED_INTENT -> viewModel.onCurrencySelected()
+                    INTENT_SHOW_WELCOME_SCREEN -> {
                         val startIntent = Intent(this@MainActivity, WelcomeActivity::class.java)
                         ActivityCompat.startActivityForResult(this@MainActivity, startIntent, WELCOME_SCREEN_ACTIVITY_CODE, null)
                     }
-                    INTENT_IAB_STATUS_CHANGED == intent.action -> viewModel.onIabStatusChanged()
+                    INTENT_IAB_STATUS_CHANGED -> viewModel.onIabStatusChanged()
                 }
             }
         }
@@ -153,7 +152,6 @@ class MainActivity : BaseActivity() {
             openPremiumIfNeeded(intent)
             openAddExpenseIfNeeded(intent)
             openAddRecurringExpenseIfNeeded(intent)
-            openSettingsForThemeIfNeeded(intent)
             openSettingsForBackupIfNeeded(intent)
         }
 
@@ -433,7 +431,6 @@ class MainActivity : BaseActivity() {
         openPremiumIfNeeded(intent)
         openAddExpenseIfNeeded(intent)
         openAddRecurringExpenseIfNeeded(intent)
-        openSettingsForThemeIfNeeded(intent)
         openSettingsForBackupIfNeeded(intent)
     }
 
@@ -516,19 +513,6 @@ class MainActivity : BaseActivity() {
     private fun openSettingsIfNeeded(intent: Intent) {
         if (intent.getBooleanExtra(INTENT_REDIRECT_TO_SETTINGS_EXTRA, false)) {
             val startIntent = Intent(this, SettingsActivity::class.java)
-            ActivityCompat.startActivityForResult(this@MainActivity, startIntent, SETTINGS_SCREEN_ACTIVITY_CODE, null)
-        }
-    }
-
-    /**
-     * Open the settings activity to display theme options if the given intent contains the
-     * [.INTENT_REDIRECT_TO_SETTINGS_FOR_THEME_EXTRA] extra.
-     */
-    private fun openSettingsForThemeIfNeeded(intent: Intent) {
-        if( intent.getBooleanExtra(INTENT_REDIRECT_TO_SETTINGS_FOR_THEME_EXTRA, false) ) {
-            val startIntent = Intent(this, SettingsActivity::class.java).apply {
-                putExtra(SHOW_THEME_INTENT_KEY, true)
-            }
             ActivityCompat.startActivityForResult(this@MainActivity, startIntent, SETTINGS_SCREEN_ACTIVITY_CODE, null)
         }
     }
@@ -855,7 +839,6 @@ class MainActivity : BaseActivity() {
 
         const val INTENT_REDIRECT_TO_PREMIUM_EXTRA = "intent.extra.premiumshow"
         const val INTENT_REDIRECT_TO_SETTINGS_EXTRA = "intent.extra.redirecttosettings"
-        const val INTENT_REDIRECT_TO_SETTINGS_FOR_THEME_EXTRA = "intent.extra.redirecttosettingsfortheme"
         const val INTENT_REDIRECT_TO_SETTINGS_FOR_BACKUP_EXTRA = "intent.extra.redirecttosettingsforbackup"
 
         const val ANIMATE_TRANSITION_KEY = "animate"

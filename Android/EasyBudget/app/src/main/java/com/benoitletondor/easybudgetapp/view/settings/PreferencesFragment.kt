@@ -38,7 +38,6 @@ import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.iab.INTENT_IAB_STATUS_CHANGED
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.notif.BackupNotif
-import com.benoitletondor.easybudgetapp.notif.DarkThemeNotif
 import com.benoitletondor.easybudgetapp.parameters.*
 import com.benoitletondor.easybudgetapp.view.RatingPopup
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.USER_GONE_PREMIUM_INTENT
@@ -46,7 +45,6 @@ import com.benoitletondor.easybudgetapp.view.main.MainActivity
 import com.benoitletondor.easybudgetapp.view.premium.PremiumActivity
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.SHOW_BACKUP_INTENT_KEY
-import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.SHOW_THEME_INTENT_KEY
 import com.benoitletondor.easybudgetapp.view.settings.backup.BackupSettingsActivity
 import com.roomorama.caldroid.CaldroidFragment
 import org.koin.android.ext.android.inject
@@ -297,14 +295,6 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             }
 
             /*
-             * Show dark theme notif
-             */
-            findPreference<Preference>(getString(R.string.setting_category_dev_show_dark_theme_notif_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                DarkThemeNotif.showDarkThemeNotif(context!!)
-                false
-            }
-
-            /*
              * Show backup notif
              */
             findPreference<Preference>(getString(R.string.setting_category_dev_show_backup_notif_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
@@ -359,14 +349,6 @@ class PreferencesFragment : PreferenceFragmentCompat() {
         if (activity?.intent?.getBooleanExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, false) == true) {
             activity?.intent?.putExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, false)
             showBecomePremiumDialog()
-        }
-
-        /*
-         * Check if we should show theme options
-         */
-        if( activity?.intent?.getBooleanExtra(SHOW_THEME_INTENT_KEY, false) == true ) {
-            activity?.intent?.putExtra(SHOW_THEME_INTENT_KEY, false)
-            onDisplayPreferenceDialog(findPreference<ListPreference>(getString(R.string.setting_category_app_theme_key)))
         }
 
         /*

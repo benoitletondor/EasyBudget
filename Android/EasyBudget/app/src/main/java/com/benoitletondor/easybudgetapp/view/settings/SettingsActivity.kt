@@ -70,10 +70,6 @@ class SettingsActivity : BaseActivity() {
          */
         const val SHOW_PREMIUM_INTENT_KEY = "showPremium"
         /**
-         * Key to specify that the theme options should be shown to the user
-         */
-        const val SHOW_THEME_INTENT_KEY = "showTheme"
-        /**
          * Key to specify that the backup options should be shown to the user
          */
         const val SHOW_BACKUP_INTENT_KEY = "showBackup"

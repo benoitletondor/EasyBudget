@@ -92,9 +92,6 @@
             android:label="@string/backup_settings_activity_title" />
 
         <service
-            android:name=".notif.DarkThemeNotif"
-            android:exported="false" />
-        <service
             android:name=".notif.BackupNotif"
             android:exported="false" />
 

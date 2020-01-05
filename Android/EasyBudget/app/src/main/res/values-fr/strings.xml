@@ -241,8 +241,6 @@
     <string name="balance">Solde</string>
     <string name="monthly_report_no_entries_placeholder">Rien pour ce mois.</string>
     <string name="monthly_report_hint">Psst : Vous pouvez accéder aux récapitulatifs mensuel depuis ce bouton !</string>
-    <string name="dark_theme_notif_message">EasyBudget 2.0 est disponible avec gestion du thème sombre pour les utilisateurs premium! Cliquez pour découvrir</string>
-    <string name="dark_theme_notif_cta">Découvrir</string>
 
     <string name="backup_settings_activity_title">Sauvegarde</string>
     <string name="backup_settings_cloud_backup">Sauvegarde cloud EasyBudget</string>

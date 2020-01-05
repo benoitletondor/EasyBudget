@@ -241,8 +241,6 @@
     <string name="balance">Saldo</string>
     <string name="monthly_report_no_entries_placeholder">Nada para este mês.</string>
     <string name="monthly_report_hint">Psiu: Você pode acessar os relatórios mensais com este botão!</string>
-    <string name="dark_theme_notif_message">EasyBudget 2.0 está disponível com suporte a tema escuro para usuários premium! Clique para descobrir</string>
-    <string name="dark_theme_notif_cta">Descobrir</string>
 
     <string name="backup_settings_activity_title">Cópia de segurança</string>
     <string name="backup_settings_cloud_backup">Cópia de segurança na nuvem do EasyBudget</string>
