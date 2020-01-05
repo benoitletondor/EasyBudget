@@ -121,6 +121,8 @@ dependencies {
     kapt "androidx.room:room-compiler:2.2.3"
     implementation "androidx.room:room-runtime:2.2.3"
     implementation "androidx.room:room-ktx:2.2.3"
+
+    implementation 'net.lingala.zip4j:zip4j:2.2.8'
 }
 
 apply plugin: 'com.google.gms.google-services'

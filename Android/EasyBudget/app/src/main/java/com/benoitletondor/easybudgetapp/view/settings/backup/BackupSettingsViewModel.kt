@@ -43,12 +43,15 @@ class BackupSettingsViewModel(private val auth: Auth,
     private val backupJobObserver = Observer<List<WorkInfo>> {
         cloudBackupStateStream.value = computeBackupCloudStorageState(auth.state.value)
     }
-    private val authStateObserver = Observer<AuthState> {
-        if( it is AuthState.Authenticated ) {
+    private val authStateObserver = Observer<AuthState> { authState ->
+        if( authState is AuthState.Authenticated ) {
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
                     try {
-                        parameters.saveLastBackupDate(getBackupDBMetaData(get(CloudStorage::class.java), auth).lastUpdateDate)
+                        val backupMetaData = getBackupDBMetaData(get(CloudStorage::class.java), auth)
+                        if( backupMetaData != null ) {
+                            parameters.saveLastBackupDate(backupMetaData.lastUpdateDate)
+                        }
                     } catch (e: Throwable) {
                         Log.e(
                             "BackupSettingsViewModel",
@@ -56,12 +59,14 @@ class BackupSettingsViewModel(private val auth: Auth,
                             e
                         )
                     }
+
+                    null // ?! not sure why it's needed
                 }
 
-                cloudBackupStateStream.value = computeBackupCloudStorageState(it)
+                cloudBackupStateStream.value = computeBackupCloudStorageState(authState)
             }
         } else {
-            cloudBackupStateStream.value = computeBackupCloudStorageState(it)
+            cloudBackupStateStream.value = computeBackupCloudStorageState(authState)
         }
     }
 

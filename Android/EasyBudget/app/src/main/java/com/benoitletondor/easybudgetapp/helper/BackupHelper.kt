@@ -14,12 +14,18 @@ import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.job.BackupJob
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.saveLastBackupDate
+import net.lingala.zip4j.ZipFile
 import java.io.File
-import java.lang.IllegalStateException
+import java.io.FileReader
+import java.io.FileWriter
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 private const val BACKUP_JOB_REQUEST_TAG = "backuptag"
+
+private const val BACKUP_VERSION = 1
+private const val BACKUP_VERSION_FILENAME = "version"
+private const val BACKUP_DB_FILENAME = "db_backup"
 
 suspend fun backupDB(context: Context,
                      db: DB,
@@ -60,10 +66,10 @@ suspend fun backupDB(context: Context,
         return ListenableWorker.Result.failure()
     }
 
-    val copyFile = File(context.cacheDir, "db_backup_copy")
+    val dbFileCopy = File(context.cacheDir, BACKUP_DB_FILENAME)
     try {
         context.getDatabasePath(DB_NAME)
-            .copyTo(copyFile, overwrite = true)
+            .copyTo(dbFileCopy, overwrite = true)
     } catch (error: Throwable) {
         Log.e(
             "BackupJob",
@@ -74,20 +80,31 @@ suspend fun backupDB(context: Context,
         return ListenableWorker.Result.failure()
     }
 
+    val archiveVersionFile = File(context.cacheDir, BACKUP_VERSION_FILENAME)
+    val archiveFile = File(context.cacheDir, "backup.zip")
+
     try {
-        cloudStorage.uploadFile(copyFile, getRemoteDBPath(currentUser.id))
+        archiveVersionFile.writeBackupVersion()
+
+        val archive = ZipFile(archiveFile)
+        archive.addFile(dbFileCopy)
+        archive.addFile(archiveVersionFile)
+
+        cloudStorage.uploadFile(archiveFile, getRemoteBackupPath(currentUser.id))
         parameters.saveLastBackupDate(Date())
     } catch (error: Throwable) {
         Log.e(
             "BackupJob",
-            "Error uploading",
+            "Error backuping",
             error
         )
 
         return ListenableWorker.Result.retry()
     } finally {
         try {
-            copyFile.delete()
+            dbFileCopy.delete()
+            archiveVersionFile.delete()
+            archiveFile.delete()
         } catch (error: Throwable) {
             Log.e(
                 "BackupJob",
@@ -101,11 +118,11 @@ suspend fun backupDB(context: Context,
 }
 
 suspend fun getBackupDBMetaData(cloudStorage: CloudStorage,
-                                auth: Auth): FileMetaData {
+                                auth: Auth): FileMetaData? {
     val currentUser = (auth.state.value as? AuthState.Authenticated)?.currentUser
         ?: throw IllegalStateException("Not authenticated")
 
-    return cloudStorage.getFileMetaData(getRemoteDBPath(currentUser.id))
+    return cloudStorage.getFileMetaData(getRemoteBackupPath(currentUser.id))
 }
 
 suspend fun restoreLatestDBBackup(context: Context,
@@ -120,15 +137,25 @@ suspend fun restoreLatestDBBackup(context: Context,
         throw IllegalStateException("User not premium")
     }
 
-    val backupFile = File(context.cacheDir, "db_backup_download")
+    val backupFile = File(context.cacheDir, "backup_download.zip")
+    val backupFolder = File(context.cacheDir, "backup_download")
 
     try {
-        cloudStorage.downloadFile(getRemoteDBPath(currentUser.id), backupFile)
-        context.deleteDatabase(DB_NAME)
-        backupFile.copyTo(context.getDatabasePath(DB_NAME), overwrite = true)
+        cloudStorage.downloadFile(getRemoteBackupPath(currentUser.id), backupFile)
+
+        val archive = ZipFile(backupFile)
+
+        backupFolder.mkdir()
+        archive.extractAll(backupFolder.absolutePath)
+
+        val versionFile = File(backupFolder, BACKUP_VERSION_FILENAME)
+        val dbBackupFile = File(backupFolder, BACKUP_DB_FILENAME)
+
+        restoreDBBackup(versionFile.readBackupVersion(), dbBackupFile, context)
     } finally {
         try {
             backupFile.delete()
+            backupFolder.deleteRecursively()
         } catch (error: Throwable) {
             Log.e(
                 "DB restore",
@@ -139,8 +166,29 @@ suspend fun restoreLatestDBBackup(context: Context,
     }
 }
 
-private fun getRemoteDBPath(userId: String): String {
-    return "user/$userId/db.backup"
+private fun restoreDBBackup(backupVersion: Int, dbBackupFile: File, context: Context) {
+    context.deleteDatabase(DB_NAME)
+    dbBackupFile.copyTo(context.getDatabasePath(DB_NAME), overwrite = true)
+}
+
+private fun File.writeBackupVersion() {
+    val writer = FileWriter(this)
+    writer.append(BACKUP_VERSION.toString())
+    writer.flush()
+    writer.close()
+}
+
+private fun File.readBackupVersion(): Int {
+    val reader = FileReader(this)
+
+    val version = reader.readText().toInt()
+    reader.close()
+
+    return version
+}
+
+private fun getRemoteBackupPath(userId: String): String {
+    return "user/$userId/backup.zip"
 }
 
 fun scheduleBackup(context: Context) {
