@@ -34,6 +34,7 @@ import org.koin.dsl.module
 import java.util.*
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 val appModule = module {
     single { Parameters(get()) }
@@ -49,7 +50,11 @@ val appModule = module {
 
     single<Auth> { FirebaseAuth(com.google.firebase.auth.FirebaseAuth.getInstance()) }
 
-    single<CloudStorage> { FirebaseStorage(com.google.firebase.storage.FirebaseStorage.getInstance()) }
+    single<CloudStorage> { FirebaseStorage(com.google.firebase.storage.FirebaseStorage.getInstance().apply {
+        maxOperationRetryTimeMillis = TimeUnit.SECONDS.toMillis(10)
+        maxDownloadRetryTimeMillis = TimeUnit.SECONDS.toMillis(10)
+        maxUploadRetryTimeMillis = TimeUnit.SECONDS.toMillis(10)
+    }) }
 
     factory<DB> { CachedDBImpl(DBImpl(RoomDB.create(get())), get(), get()) }
 

@@ -33,7 +33,7 @@ class FirebaseStorage(private val storage: com.google.firebase.storage.FirebaseS
         reference.metadata.addOnSuccessListener { metadata ->
             continuation.resume(FileMetaData(path, Date(metadata.updatedTimeMillis)))
         }.addOnFailureListener { error ->
-            if( error is StorageException && error.httpResultCode == 404 ) {
+            if( error.isFileNotFoundError() ) {
                 continuation.resume(null)
             } else {
                 continuation.resumeWithException(error)
@@ -51,4 +51,21 @@ class FirebaseStorage(private val storage: com.google.firebase.storage.FirebaseS
         }
     }
 
+    override suspend fun deleteFile(path: String): Boolean = suspendCancellableCoroutine { continuation ->
+        val reference = storage.reference.child(path)
+
+        reference.delete().addOnSuccessListener {
+            continuation.resume(true)
+        }.addOnFailureListener { error ->
+            if( error.isFileNotFoundError() ) {
+                continuation.resume(false)
+            } else {
+                continuation.resumeWithException(error)
+            }
+        }
+    }
+
 }
+
+private fun Throwable.isFileNotFoundError(): Boolean
+    = this is StorageException && this.httpResultCode == 404

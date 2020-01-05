@@ -36,9 +36,12 @@ class BackupSettingsViewModel(private val auth: Auth,
     val previousBackupAvailableEvent = SingleLiveEvent<Date>()
     val appRestartEvent = SingleLiveEvent<Unit>()
     val restoreConfirmationDisplayEvent = SingleLiveEvent<Date>()
+    val deleteConfirmationDisplayEvent = SingleLiveEvent<Unit>()
+    val backupDeletionErrorEvent = SingleLiveEvent<Throwable>()
     
     private var backupInProgress = false
     private var restorationInProgress = false
+    private var deletionInProgress = false
 
     private val backupJobObserver = Observer<List<WorkInfo>> {
         cloudBackupStateStream.value = computeBackupCloudStorageState(auth.state.value)
@@ -116,6 +119,8 @@ class BackupSettingsViewModel(private val auth: Auth,
                     BackupCloudStorageState.BackupInProgress(authState.currentUser)
                 } else if ( restorationInProgress ) {
                     BackupCloudStorageState.RestorationInProgress(authState.currentUser)
+                } else if ( deletionInProgress ) {
+                    BackupCloudStorageState.DeletionInProgress(authState.currentUser)
                 } else {
                     if( parameters.isBackupEnabled() ) {
                         val lastBackupDate = parameters.getLastBackupDate()
@@ -209,6 +214,34 @@ class BackupSettingsViewModel(private val auth: Auth,
         // No-op
     }
 
+    fun onDeleteBackupButtonPressed() {
+        deleteConfirmationDisplayEvent.value = Unit
+    }
+
+    fun onDeleteBackupConfirmationConfirmed() {
+        viewModelScope.launch {
+            deletionInProgress = true
+            cloudBackupStateStream.value = computeBackupCloudStorageState(auth.state.value)
+
+            try {
+                withContext(Dispatchers.IO) {
+                    deleteBackup(auth, get(CloudStorage::class.java), get(Iab::class.java))
+                    parameters.saveLastBackupDate(null)
+                }
+            } catch (error: Throwable) {
+                Log.e("BackupSettingsViewModel", "Error while deleting backup", error)
+                backupDeletionErrorEvent.value = error
+            } finally {
+                deletionInProgress = false
+                cloudBackupStateStream.value = computeBackupCloudStorageState(auth.state.value)
+            }
+        }
+    }
+
+    fun onDeleteBackupConfirmationCancelled() {
+        // No-op
+    }
+
     private fun startRestoreFlow() {
         val lastBackupDate = (cloudBackupStateStream.value as? BackupCloudStorageState.Activated)?.lastBackupDate
         if( lastBackupDate == null ) {
@@ -258,4 +291,5 @@ sealed class BackupCloudStorageState {
                          val restoreAvailable: Boolean): BackupCloudStorageState()
     data class BackupInProgress(val currentUser: CurrentUser): BackupCloudStorageState()
     data class RestorationInProgress(val currentUser: CurrentUser): BackupCloudStorageState()
+    data class DeletionInProgress(val currentUser: CurrentUser): BackupCloudStorageState()
 }

@@ -166,6 +166,19 @@ suspend fun restoreLatestDBBackup(context: Context,
     }
 }
 
+suspend fun deleteBackup(auth: Auth,
+                         cloudStorage: CloudStorage,
+                         iab: Iab): Boolean {
+    val currentUser = (auth.state.value as? AuthState.Authenticated)?.currentUser
+        ?: throw IllegalStateException("Not authenticated")
+
+    if( !iab.isUserPremium() ) {
+        throw IllegalStateException("User not premium")
+    }
+
+    return cloudStorage.deleteFile(getRemoteBackupPath(currentUser.id))
+}
+
 private fun restoreDBBackup(backupVersion: Int, dbBackupFile: File, context: Context) {
     context.deleteDatabase(DB_NAME)
     dbBackupFile.copyTo(context.getDatabasePath(DB_NAME), overwrite = true)

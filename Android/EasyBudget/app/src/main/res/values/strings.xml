@@ -277,7 +277,7 @@
     <string name="backup_last_update_date">Last backup: %s</string>
     <string name="backup_last_update_date_never">Never</string>
     <string name="backup_now_cta">Backup now</string>
-    <string name="backup_restore_description">Restore data</string>
+    <string name="backup_restore_description">Restore backup data</string>
     <string name="backup_restore_explanation">Restoring your data means that current EasyBudget entries (if you have any) will be removed and replaced by the ones of the latest backup. This is an irreversible operation.</string>
     <string name="backup_restore_cta">Restore data from last backup</string>
     <string name="backup_now_error_title">Unable to backup</string>
@@ -288,10 +288,19 @@
     <string name="backup_already_exist_negative_cta">Ignore</string>
     <string name="backup_restore_error_title">Error restoring data</string>
     <string name="backup_restore_error_message">An error occurred while restoration. Please check your network and try again later.</string>
-    <string name="backup_restore_confirmation_title">Restore data</string>
+    <string name="backup_restore_confirmation_title">Restore backup</string>
     <string name="backup_restore_confirmation_message">Are you sure you want to restore data from %s backup?\n\nIt will replace your current data in an irreversible way!\n\nThe app will restart after the process.</string>
     <string name="backup_restore_confirmation_positive_cta">Restore</string>
     <string name="backup_restore_confirmation_negative_cta">Cancel</string>
+    <string name="backup_wipe_data_title">Delete cloud backup</string>
+    <string name="backup_wipe_data_description">EasyBudget lets you in control of your data: Click here if you want to delete all your backup data from the cloud</string>
+    <string name="backup_wipe_data_cta">Delete backup</string>
+    <string name="backup_wipe_data_confirmation_title">Delete cloud backup</string>
+    <string name="backup_wipe_data_confirmation_message">Are you sure you want to delete all your backup data from the cloud?\n\nThis operation is irreversible and you\'ll lose access to your backup data.</string>
+    <string name="backup_wipe_data_confirmation_positive_cta">Delete</string>
+    <string name="backup_wipe_data_confirmation_negative_cta">Cancel</string>
+    <string name="backup_wipe_data_error_title">Unable to delete cloud backup</string>
+    <string name="backup_wipe_data_error_message">An error occurred while deleting your backup data. Please check your network and try again later.</string>
     <string name="backup_notif_message">New for premium users: backup your data in the cloud! Click to setup</string>
     <string name="backup_notif_cta">Setup</string>
 

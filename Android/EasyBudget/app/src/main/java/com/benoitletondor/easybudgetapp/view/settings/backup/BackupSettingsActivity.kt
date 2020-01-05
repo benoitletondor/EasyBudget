@@ -55,6 +55,9 @@ class BackupSettingsActivity : BaseActivity() {
                     backup_settings_cloud_restore_cta.visibility = View.GONE
                     backup_settings_cloud_storage_restore_description.visibility = View.GONE
                     backup_settings_cloud_storage_restore_explanation.visibility = View.GONE
+                    backup_settings_cloud_storage_delete_title.visibility = View.GONE
+                    backup_settings_cloud_storage_delete_explanation.visibility = View.GONE
+                    backup_settings_cloud_delete_cta.visibility = View.GONE
                     backup_settings_cloud_backup_loading_progress.visibility = View.GONE
                 }
                 is BackupCloudStorageState.Activated -> {
@@ -82,10 +85,18 @@ class BackupSettingsActivity : BaseActivity() {
                         backup_settings_cloud_storage_restore_description.visibility = View.VISIBLE
                         backup_settings_cloud_storage_restore_explanation.visibility = View.VISIBLE
                         backup_settings_cloud_restore_cta.visibility = View.VISIBLE
+
+                        backup_settings_cloud_storage_delete_title.visibility = View.VISIBLE
+                        backup_settings_cloud_storage_delete_explanation.visibility = View.VISIBLE
+                        backup_settings_cloud_delete_cta.visibility = View.VISIBLE
                     } else {
                         backup_settings_cloud_restore_cta.visibility = View.GONE
                         backup_settings_cloud_storage_restore_description.visibility = View.GONE
                         backup_settings_cloud_storage_restore_explanation.visibility = View.GONE
+
+                        backup_settings_cloud_storage_delete_title.visibility = View.GONE
+                        backup_settings_cloud_storage_delete_explanation.visibility = View.GONE
+                        backup_settings_cloud_delete_cta.visibility = View.GONE
                     }
 
                     backup_settings_cloud_backup_loading_progress.visibility = View.GONE
@@ -105,6 +116,9 @@ class BackupSettingsActivity : BaseActivity() {
                     backup_settings_cloud_restore_cta.visibility = View.GONE
                     backup_settings_cloud_storage_restore_description.visibility = View.GONE
                     backup_settings_cloud_storage_restore_explanation.visibility = View.GONE
+                    backup_settings_cloud_storage_delete_title.visibility = View.GONE
+                    backup_settings_cloud_storage_delete_explanation.visibility = View.GONE
+                    backup_settings_cloud_delete_cta.visibility = View.GONE
                     backup_settings_cloud_backup_loading_progress.visibility = View.VISIBLE
                 }
                 is BackupCloudStorageState.RestorationInProgress -> {
@@ -122,6 +136,29 @@ class BackupSettingsActivity : BaseActivity() {
                     backup_settings_cloud_restore_cta.visibility = View.GONE
                     backup_settings_cloud_storage_restore_description.visibility = View.GONE
                     backup_settings_cloud_storage_restore_explanation.visibility = View.GONE
+                    backup_settings_cloud_storage_delete_title.visibility = View.GONE
+                    backup_settings_cloud_storage_delete_explanation.visibility = View.GONE
+                    backup_settings_cloud_delete_cta.visibility = View.GONE
+                    backup_settings_cloud_backup_loading_progress.visibility = View.VISIBLE
+                }
+                is BackupCloudStorageState.DeletionInProgress -> {
+                    backup_settings_cloud_storage_not_authenticated_state.visibility = View.GONE
+                    backup_settings_cloud_storage_authenticating_state.visibility = View.GONE
+                    backup_settings_cloud_storage_not_activated_state.visibility = View.VISIBLE
+
+                    backup_settings_cloud_storage_email.text = cloudBackupState.currentUser.email
+                    backup_settings_cloud_storage_logout_button.visibility = View.GONE
+                    backup_settings_cloud_storage_backup_switch.visibility = View.GONE
+                    backup_settings_cloud_storage_backup_switch_description.visibility = View.GONE
+                    backup_settings_cloud_storage_activated_description.visibility = View.GONE
+                    backup_settings_cloud_last_update.visibility = View.GONE
+                    backup_settings_cloud_backup_cta.visibility = View.GONE
+                    backup_settings_cloud_restore_cta.visibility = View.GONE
+                    backup_settings_cloud_storage_restore_description.visibility = View.GONE
+                    backup_settings_cloud_storage_restore_explanation.visibility = View.GONE
+                    backup_settings_cloud_storage_delete_title.visibility = View.GONE
+                    backup_settings_cloud_storage_delete_explanation.visibility = View.GONE
+                    backup_settings_cloud_delete_cta.visibility = View.GONE
                     backup_settings_cloud_backup_loading_progress.visibility = View.VISIBLE
                 }
             }
@@ -187,6 +224,27 @@ class BackupSettingsActivity : BaseActivity() {
                 .show()
         })
 
+        viewModel.deleteConfirmationDisplayEvent.observe(this, Observer {
+            AlertDialog.Builder(this)
+                .setTitle(R.string.backup_wipe_data_confirmation_title)
+                .setMessage(R.string.backup_wipe_data_confirmation_message)
+                .setPositiveButton(R.string.backup_wipe_data_confirmation_positive_cta) { _, _ ->
+                    viewModel.onDeleteBackupConfirmationConfirmed()
+                }
+                .setNegativeButton(R.string.backup_wipe_data_confirmation_negative_cta) { _, _ ->
+                    viewModel.onDeleteBackupConfirmationCancelled()
+                }
+                .show()
+        })
+
+        viewModel.backupDeletionErrorEvent.observe(this, Observer { error ->
+            AlertDialog.Builder(this)
+                .setTitle(R.string.backup_wipe_data_error_title)
+                .setMessage(R.string.backup_wipe_data_error_message)
+                .setPositiveButton(android.R.string.ok, null)
+                .show()
+        })
+
         backup_settings_cloud_storage_authenticate_button.setOnClickListener {
             viewModel.onAuthenticateButtonPressed()
         }
@@ -209,6 +267,10 @@ class BackupSettingsActivity : BaseActivity() {
 
         backup_settings_cloud_restore_cta.setOnClickListener {
             viewModel.onRestoreButtonPressed()
+        }
+
+        backup_settings_cloud_delete_cta.setOnClickListener {
+            viewModel.onDeleteBackupButtonPressed()
         }
     }
 

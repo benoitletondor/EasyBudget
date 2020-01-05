@@ -97,6 +97,15 @@
         <item name="android:textColor">@color/accent</item>
     </style>
 
+    <style name="RedButton" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:textColor">@color/white</item>
+        <item name="colorButtonNormal">@color/budget_red</item>
+    </style>
+
+    <style name="RedButton.Borderless" parent="Widget.AppCompat.Button.Borderless.Colored">
+        <item name="android:textColor">@color/budget_red</item>
+    </style>
+
     <!-- AlertDialog -->
     <style name="AlertDialogTheme" parent="ThemeOverlay.AppCompat.Dialog.Alert">
         <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
