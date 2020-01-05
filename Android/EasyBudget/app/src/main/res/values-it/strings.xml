@@ -247,7 +247,7 @@
     <string name="backup_settings_activity_title">Backup</string>
     <string name="backup_settings_cloud_backup">EasyBudget backup su cloud</string>
     <string name="backup_settings_not_authenticated_description">Il backup su cloud EasyBudget è disponibile per gli utenti premium senza costi aggiuntivi.\nPer abilitare il backup su cloud EasyBudget, accedi al tuo account Google</string>
-    <string name="backup_settings_not_authenticated_description_2">Il tuo account Google verrà utilizzato per identificare il tuo backup. Successivamente, sarai in grado di ripristinare i tuoi dati su un nuovo telefono utilizzando questo account.\n\nIl tuo account non verrà utilizzato per nient'altro.</string>
+    <string name="backup_settings_not_authenticated_description_2">Il tuo account Google verrà utilizzato per identificare il tuo backup. Successivamente, sarai in grado di ripristinare i tuoi dati su un nuovo telefono utilizzando questo account.\n\nIl tuo account non verrà utilizzato per nient\'altro.</string>
     <string name="backup_settings_not_authenticated_privacy_title">EasyBudget prende sul serio la tua privacy</string>
     <string name="backup_settings_not_authenticated_privacy_message">Effettuando l\'autenticazione con il tuo account Google, accetti che i tuoi dati EasyBudget vengano caricati in modo sicuro sul cloud e collegati al tuo account Google.\n\nI tuoi dati EasyBudget non verranno mai utilizzati o venduti a nessuno.\n\nVuoi continuare?</string>
     <string name="backup_settings_not_authenticated_privacy_positive_cta">Accettare</string>
@@ -276,7 +276,7 @@
     <string name="backup_restore_error_title">Errore durante il ripristino dei dati</string>
     <string name="backup_restore_error_message">Si è verificato un errore durante il ripristino dei dati. Verifica la connessione e riprova più tardi.</string>
     <string name="backup_restore_confirmation_title">Ripristinare il backup</string>
-    <string name="backup_restore_confirmation_message">Sei sicuro di voler ripristinare i dati dal backup de %s?\n\nSostituirà i tuoi dati attuali in modo irreversibile!\n\nL'app verrà riavviata dopo il processo.</string>
+    <string name="backup_restore_confirmation_message">Sei sicuro di voler ripristinare i dati dal backup de %s?\n\nSostituirà i tuoi dati attuali in modo irreversibile!\n\nL\'app verrà riavviata dopo il processo.</string>
     <string name="backup_restore_confirmation_positive_cta">Ristabilire</string>
     <string name="backup_restore_confirmation_negative_cta">Annulla</string>
     <string name="backup_wipe_data_title">Elimina il backup su cloud</string>

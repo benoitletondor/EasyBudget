@@ -183,7 +183,7 @@
                     android:text="@string/backup_activated_description"
                     android:textSize="14sp"
                     android:textColor="@color/secondary_text"
-                    app:layout_constraintTop_toBottomOf="@+id/backup_settings_cloud_storage_backup_switch"
+                    app:layout_constraintTop_toBottomOf="@+id/backup_settings_cloud_storage_backup_switch_description"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
 

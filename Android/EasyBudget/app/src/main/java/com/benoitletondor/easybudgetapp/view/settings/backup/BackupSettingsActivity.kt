@@ -253,7 +253,7 @@ class BackupSettingsActivity : BaseActivity() {
                 .show()
         })
 
-        viewModel.backupDeletionErrorEvent.observe(this, Observer { error ->
+        viewModel.backupDeletionErrorEvent.observe(this, Observer { _ ->
             AlertDialog.Builder(this)
                 .setTitle(R.string.backup_wipe_data_error_title)
                 .setMessage(R.string.backup_wipe_data_error_message)
