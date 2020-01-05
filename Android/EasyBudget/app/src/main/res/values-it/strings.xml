@@ -163,7 +163,7 @@
     <string name="setting_theme_platform">Default del sistema</string>
 
     <string name="premium_popup_premium_title">Sei… premium!</string>
-    <string name="premium_popup_premium_message">Hai ora accesso alle funzionalità premium:\n\n- Rapporto mensile: Ricevi un rapporto delle entrate e delle uscite del mese\n- Allerta quotidiana se hai dimenticato di inserire le uscite del giorno\n- Tema scuro\n…moltissime altre funzioni che si aggiungeranno poco a poco!</string>
+    <string name="premium_popup_premium_message">Hai ora accesso alle funzionalità premium:\n\n- Rapporto mensile: Ricevi un rapporto delle entrate e delle uscite del mese\n- Allerta quotidiana se hai dimenticato di inserire le uscite del giorno\n- Tema scuro\n- Backup su cloud\n…moltissime altre funzioni che si aggiungeranno poco a poco!</string>
     <string name="premium_popup_not_premium_title">Diventa premium</string>
     <string name="premium_popup_not_premium_message">Accedi a tutte le funzionalità premium!</string>
     <string name="premium_popup_not_premium_feature1_title">2. Allerta quotidiana</string>
@@ -171,6 +171,8 @@
     <string name="premium_popup_not_premium_feature2_title">1. Rapporto mensile</string>
     <string name="premium_popup_not_premium_feature2_message">Ricevi un rapporto delle entrate e delle uscite del mese e scopri quanto hai risparmiato.</string>
     <string name="premium_popup_not_premium_feature_more_dark_theme">3. Tema scuro!</string>
+    <string name="premium_popup_not_premium_feature_more_backup_title">4. Backup</string>
+    <string name="premium_popup_not_premium_feature_more_backup_message">Backup automatico dei tuoi dati nel cloud! Non devi più preoccuparti di perdere il budget.</string>
     <string name="premium_popup_not_premium_feature_more_title">…moltissime altre funzioni che si aggiungeranno poco a poco!</string>
     <string name="premium_popup_not_premium_cta">Acquista</string>
     <string name="premium_popup_become_title">Diventa premium</string>
@@ -193,7 +195,7 @@
     <string name="voucher_redeem_error_code_invalid_dialog_message">Il tuo codice non è valido.</string>
 
     <string name="rating_popup_question_title">Cosa pensi di EasyBudget?</string>
-    <string name="rating_popup_question_message">Lavoro a questa applicazione nel tempo libero e la propongo gratuitamente. Ci sono sicuramente cose da migliorare e la tua opinione conta molto per me! </string>
+    <string name="rating_popup_question_message">Lavoro a questa applicazione nel tempo libero e la propongo gratuitamente. Ci sono sicuramente cose da migliorare e la tua opinione conta molto per me!</string>
     <string name="rating_popup_question_cta_negative">Non mi piace</string>
     <string name="rating_popup_question_cta_positive">Mi piace</string>
     <string name="rating_popup_negative_title">:(</string>
@@ -241,4 +243,51 @@
     <string name="monthly_report_hint">Pssss: Puoi accedere ai rapporti da questo tasto</string>
     <string name="dark_theme_notif_message">EasyBudget 2.0 è disponibile con supporto per il tema scuro per gli utenti premium! Clicca per scoprire</string>
     <string name="dark_theme_notif_cta">Scoprire</string>
+
+    <string name="backup_settings_activity_title">Backup</string>
+    <string name="backup_settings_cloud_backup">EasyBudget backup su cloud</string>
+    <string name="backup_settings_not_authenticated_description">Il backup su cloud EasyBudget è disponibile per gli utenti premium senza costi aggiuntivi.\nPer abilitare il backup su cloud EasyBudget, accedi al tuo account Google</string>
+    <string name="backup_settings_not_authenticated_description_2">Il tuo account Google verrà utilizzato per identificare il tuo backup. Successivamente, sarai in grado di ripristinare i tuoi dati su un nuovo telefono utilizzando questo account.\n\nIl tuo account non verrà utilizzato per nient'altro.</string>
+    <string name="backup_settings_not_authenticated_privacy_title">EasyBudget prende sul serio la tua privacy</string>
+    <string name="backup_settings_not_authenticated_privacy_message">Effettuando l\'autenticazione con il tuo account Google, accetti che i tuoi dati EasyBudget vengano caricati in modo sicuro sul cloud e collegati al tuo account Google.\n\nI tuoi dati EasyBudget non verranno mai utilizzati o venduti a nessuno.\n\nVuoi continuare?</string>
+    <string name="backup_settings_not_authenticated_privacy_positive_cta">Accettare</string>
+    <string name="backup_settings_not_authenticated_privacy_negative_cta">Annulla</string>
+    <string name="backup_settings_backups_activated">Backup su cloud attivato</string>
+    <string name="backup_settings_backups_deactivated">Backup su cloud disattivato</string>
+    <string name="backup_settings_authenticate_cta">Accedi con Google</string>
+    <string name="backup_settings_your_google_account">Il tuo account Google</string>
+    <string name="backup_settings_cloud_backup_status">Backup su cloud: %s</string>
+    <string name="backup_settings_cloud_backup_status_activated">attivato</string>
+    <string name="backup_settings_cloud_backup_status_disabled">disattivato</string>
+    <string name="backup_settings_logout_cta">Disconnettersi</string>
+    <string name="backup_activated_description">Il backup dei tuoi dati verrà eseguito automaticamente ogni settimana. Se si cambia il telefono o si cancellano i dati, è possibile ripristinare un backup da qui.</string>
+    <string name="backup_last_update_date">Ultimo backup: %s</string>
+    <string name="backup_last_update_date_never">Mai</string>
+    <string name="backup_now_cta">Esegui il backup ora</string>
+    <string name="backup_restore_description">Ripristina i dati di backup</string>
+    <string name="backup_restore_explanation">Il ripristino dei dati significa che le voci correnti di EasyBudget verranno rimosse e sostituite da quelle dell\'ultimo backup. Questa è un\'operazione irreversibile.</string>
+    <string name="backup_restore_cta">Ripristina i dati dall\'ultimo backup</string>
+    <string name="backup_now_error_title">Impossibile eseguire il backup</string>
+    <string name="backup_now_error_message">Backup non completato a causa di un errore. Puoi verificare la tua connessione e riprovare o consentire all\'app di riprovare automaticamente in un secondo momento.</string>
+    <string name="backup_already_exist_title">Trovato backup precedente</string>
+    <string name="backup_already_exist_message">Nel tuo account è stato trovato un backup EasyBudget precedente di %s.\n\nVuoi ripristinarlo adesso?\n\n(Puoi farlo in seguito, prima del prossimo backup)</string>
+    <string name="backup_already_exist_positive_cta">Ristabilire</string>
+    <string name="backup_already_exist_negative_cta">Ignorare</string>
+    <string name="backup_restore_error_title">Errore durante il ripristino dei dati</string>
+    <string name="backup_restore_error_message">Si è verificato un errore durante il ripristino dei dati. Verifica la connessione e riprova più tardi.</string>
+    <string name="backup_restore_confirmation_title">Ripristinare il backup</string>
+    <string name="backup_restore_confirmation_message">Sei sicuro di voler ripristinare i dati dal backup de %s?\n\nSostituirà i tuoi dati attuali in modo irreversibile!\n\nL'app verrà riavviata dopo il processo.</string>
+    <string name="backup_restore_confirmation_positive_cta">Ristabilire</string>
+    <string name="backup_restore_confirmation_negative_cta">Annulla</string>
+    <string name="backup_wipe_data_title">Elimina il backup su cloud</string>
+    <string name="backup_wipe_data_description">EasyBudget ti consente di controllare i tuoi dati: fai clic qui se desideri eliminare tutti i dati di backup su cloud</string>
+    <string name="backup_wipe_data_cta">Elimina backup</string>
+    <string name="backup_wipe_data_confirmation_title">Elimina il backup su cloud</string>
+    <string name="backup_wipe_data_confirmation_message">Sei sicuro di voler eliminare tutti i tuoi dati di backup su cloud?\n\nQuesta operazione è irreversibile e perderai l\'accesso ai tuoi dati di backup (i dati locali attuali delle app non saranno interessati).</string>
+    <string name="backup_wipe_data_confirmation_positive_cta">Elimina</string>
+    <string name="backup_wipe_data_confirmation_negative_cta">Annulla</string>
+    <string name="backup_wipe_data_error_title">Impossibile eliminare il backup su cloud</string>
+    <string name="backup_wipe_data_error_message">Si è verificato un errore durante l\'eliminazione dei dati di backup. Verifica la connessione e riprova più tardi.</string>
+    <string name="backup_notif_message">Novità per utenti premium: backup dei dati nel cloud! Clic per configurare</string>
+    <string name="backup_notif_cta">Configurare</string>
 </resources>
