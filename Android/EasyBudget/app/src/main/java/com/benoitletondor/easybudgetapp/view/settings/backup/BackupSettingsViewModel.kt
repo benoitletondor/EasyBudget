@@ -48,9 +48,10 @@ class BackupSettingsViewModel(private val auth: Auth,
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
                     try {
-                        val backupMetaData = getBackupDBMetaData(get(CloudStorage::class.java), auth)
-                        if( backupMetaData != null ) {
-                            parameters.saveLastBackupDate(backupMetaData.lastUpdateDate)
+                        if( parameters.getLastBackupDate() == null ) {
+                            getBackupDBMetaData(get(CloudStorage::class.java), auth)?.let {
+                                parameters.saveLastBackupDate(it.lastUpdateDate)
+                            }
                         }
                     } catch (e: Throwable) {
                         Log.e(
