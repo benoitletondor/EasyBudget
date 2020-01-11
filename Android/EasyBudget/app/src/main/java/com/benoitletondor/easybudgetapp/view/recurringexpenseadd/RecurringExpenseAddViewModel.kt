@@ -162,6 +162,32 @@ class RecurringExpenseAddViewModel(private val db: DB) : ViewModel() {
                     cal.add(Calendar.MONTH, 1)
                 }
             }
+            RecurringExpenseType.TER_MONTHLY -> {
+                // Add up to 25 years of expenses
+                for (i in 0 until 4*25) {
+                    try {
+                        db.persistExpense(Expense(expense.title, expense.originalAmount, cal.time, expense))
+                    } catch (t: Throwable) {
+                        Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
+                        return false
+                    }
+
+                    cal.add(Calendar.MONTH, 3)
+                }
+            }
+            RecurringExpenseType.SIX_MONTHLY -> {
+                // Add up to 25 years of expenses
+                for (i in 0 until 2*25) {
+                    try {
+                        db.persistExpense(Expense(expense.title, expense.originalAmount, cal.time, expense))
+                    } catch (t: Throwable) {
+                        Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
+                        return false
+                    }
+
+                    cal.add(Calendar.MONTH, 6)
+                }
+            }
             RecurringExpenseType.YEARLY -> {
                 // Add up to 100 years of expenses
                 for (i in 0 until 100) {

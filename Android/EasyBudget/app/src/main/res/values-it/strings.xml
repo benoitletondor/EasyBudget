@@ -96,6 +96,8 @@
     <string name="bi_weekly">2 SETTIMANE</string>
     <string name="ter_weekly">3 SETTIMANE</string>
     <string name="four_weekly">4 SETTIMANE</string>
+    <string name="ter_monthly">3 MESI</string>
+    <string name="six_monthly">6 MESI</string>
     <string name="yearly">ANNUALE</string>
     <string name="recurring_expense_add_loading_title">Carico</string>
     <string name="recurring_expense_add_loading_message">Creazione dell’uscita ricorrente…</string>
@@ -124,6 +126,8 @@
     <string name="recurring_interval_ter_weekly">Ogni 3 settimane</string>
     <string name="recurring_interval_four_weekly">Ogni 4 settimane</string>
     <string name="recurring_interval_monthly">Ogni mese</string>
+    <string name="recurring_interval_ter_monthly">Ogni 3 mesi</string>
+    <string name="recurring_interval_six_monthly">Ogni 6 mesi</string>
     <string name="recurring_interval_yearly">Ogni anno</string>
 
     <string name="setting_category_app_title">App</string>
@@ -166,12 +170,12 @@
     <string name="premium_popup_premium_message">Hai ora accesso alle funzionalità premium:\n\n- Rapporto mensile: Ricevi un rapporto delle entrate e delle uscite del mese\n- Allerta quotidiana se hai dimenticato di inserire le uscite del giorno\n- Tema scuro\n- Backup su cloud\n…moltissime altre funzioni che si aggiungeranno poco a poco!</string>
     <string name="premium_popup_not_premium_title">Diventa premium</string>
     <string name="premium_popup_not_premium_message">Accedi a tutte le funzionalità premium!</string>
-    <string name="premium_popup_not_premium_feature1_title">2. Allerta quotidiana</string>
+    <string name="premium_popup_not_premium_feature1_title">3. Allerta quotidiana</string>
     <string name="premium_popup_not_premium_feature1_message">Ricevi una notifica alla fine della giornata se non hai inserito le tue spese.</string>
     <string name="premium_popup_not_premium_feature2_title">1. Rapporto mensile</string>
     <string name="premium_popup_not_premium_feature2_message">Ricevi un rapporto delle entrate e delle uscite del mese e scopri quanto hai risparmiato.</string>
-    <string name="premium_popup_not_premium_feature_more_dark_theme">3. Tema scuro!</string>
-    <string name="premium_popup_not_premium_feature_more_backup_title">4. Backup</string>
+    <string name="premium_popup_not_premium_feature_more_dark_theme">4. Tema scuro!</string>
+    <string name="premium_popup_not_premium_feature_more_backup_title">2. Backup</string>
     <string name="premium_popup_not_premium_feature_more_backup_message">Backup automatico dei tuoi dati nel cloud! Non devi più preoccuparti di perdere il budget.</string>
     <string name="premium_popup_not_premium_feature_more_title">…moltissime altre funzioni che si aggiungeranno poco a poco!</string>
     <string name="premium_popup_not_premium_cta">Acquista</string>

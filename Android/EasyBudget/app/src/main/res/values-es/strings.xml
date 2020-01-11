@@ -96,6 +96,8 @@
     <string name="bi_weekly">2 SEMANAS</string>
     <string name="ter_weekly">3 SEMANAS</string>
     <string name="four_weekly">4 SEMANAS</string>
+    <string name="ter_monthly">3 MESES</string>
+    <string name="six_monthly">6 MESES</string>
     <string name="yearly">ANUAL</string>
     <string name="recurring_expense_add_loading_title">Cargando</string>
     <string name="recurring_expense_add_loading_message">Creando un gasto recurrente…</string>
@@ -124,6 +126,8 @@
     <string name="recurring_interval_ter_weekly">Cada 3 semanas</string>
     <string name="recurring_interval_four_weekly">Cada 4 semanas</string>
     <string name="recurring_interval_monthly">Cada mes</string>
+    <string name="recurring_interval_ter_monthly">Cada 3 meses</string>
+    <string name="recurring_interval_six_monthly">Cada 6 meses</string>
     <string name="recurring_interval_yearly">Cada año</string>
 
     <string name="setting_category_app_title">App</string>
@@ -166,12 +170,12 @@
     <string name="premium_popup_premium_message">Tienes acceso a las funcionalidades premium:\n\n- Informe mensual: Recibe un recapitulativo de los gastos e ingresos del mes\n- Recordatorio diario si olvidaste entrar tus gastos durante el día\n- Modo oscuro\n- Copia de seguridad\n… ¡y más funcionalidades premium que serán añadidas pronto!</string>
     <string name="premium_popup_not_premium_title">Vuélvete premium</string>
     <string name="premium_popup_not_premium_message">¡Accede a las funcionalidades premium!</string>
-    <string name="premium_popup_not_premium_feature1_title">2. Recordatorio diario</string>
+    <string name="premium_popup_not_premium_feature1_title">3. Recordatorio diario</string>
     <string name="premium_popup_not_premium_feature1_message">Recibe una notificación al final del día si no has entrado tus gastos.</string>
     <string name="premium_popup_not_premium_feature2_title">1. Informe mensual</string>
     <string name="premium_popup_not_premium_feature2_message">Descubre cuánto has ahorrado a través de un recapitulativo mensual de tus gastos e ingresos.</string>
-    <string name="premium_popup_not_premium_feature_more_dark_theme">3. ¡Modo oscuro!</string>
-    <string name="premium_popup_not_premium_feature_more_backup_title">4. Copia de seguridad</string>
+    <string name="premium_popup_not_premium_feature_more_dark_theme">4. ¡Modo oscuro!</string>
+    <string name="premium_popup_not_premium_feature_more_backup_title">2. Copia de seguridad</string>
     <string name="premium_popup_not_premium_feature_more_backup_message">Copia de seguridad automática de sus datos en la nube! Ya no necesita preocuparse por perder su presupuesto.</string>
     <string name="premium_popup_not_premium_feature_more_title">… ¡y más funcionalidades premium que serán añadidas pronto!</string>
     <string name="premium_popup_not_premium_cta">Comprar</string>

@@ -216,14 +216,17 @@ class RecurringExpenseAddActivity : BaseActivity() {
 
         amount_edittext.preventUnsupportedInputForDecimals()
 
-        val recurringTypesString = arrayOfNulls<String>(7)
-        recurringTypesString[0] = getString(R.string.recurring_interval_daily)
-        recurringTypesString[1] = getString(R.string.recurring_interval_weekly)
-        recurringTypesString[2] = getString(R.string.recurring_interval_bi_weekly)
-        recurringTypesString[3] = getString(R.string.recurring_interval_ter_weekly)
-        recurringTypesString[4] = getString(R.string.recurring_interval_four_weekly)
-        recurringTypesString[5] = getString(R.string.recurring_interval_monthly)
-        recurringTypesString[6] = getString(R.string.recurring_interval_yearly)
+        val recurringTypesString = arrayOf(
+            getString(R.string.recurring_interval_daily),
+            getString(R.string.recurring_interval_weekly),
+            getString(R.string.recurring_interval_bi_weekly),
+            getString(R.string.recurring_interval_ter_weekly),
+            getString(R.string.recurring_interval_four_weekly),
+            getString(R.string.recurring_interval_monthly),
+            getString(R.string.recurring_interval_ter_monthly),
+            getString(R.string.recurring_interval_six_monthly),
+            getString(R.string.recurring_interval_yearly)
+        )
 
         val adapter = ArrayAdapter<String>(this, R.layout.spinner_item, recurringTypesString)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -246,7 +249,9 @@ class RecurringExpenseAddActivity : BaseActivity() {
             3 -> return RecurringExpenseType.TER_WEEKLY
             4 -> return RecurringExpenseType.FOUR_WEEKLY
             5 -> return RecurringExpenseType.MONTHLY
-            6 -> return RecurringExpenseType.YEARLY
+            6 -> return RecurringExpenseType.TER_MONTHLY
+            7 -> return RecurringExpenseType.SIX_MONTHLY
+            8 -> return RecurringExpenseType.YEARLY
         }
 
         throw IllegalStateException("getRecurringTypeFromSpinnerSelection unable to get value for $spinnerSelectedItem")

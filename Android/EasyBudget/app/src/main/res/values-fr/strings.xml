@@ -96,6 +96,8 @@
     <string name="bi_weekly">2 SEMAINES</string>
     <string name="ter_weekly">3 SEMAINES</string>
     <string name="four_weekly">4 SEMAINES</string>
+    <string name="ter_monthly">3 MOIS</string>
+    <string name="six_monthly">6 MOIS</string>
     <string name="yearly">ANNUEL</string>
     <string name="recurring_expense_add_loading_title">Chargement</string>
     <string name="recurring_expense_add_loading_message">Création de la dépense récurrente…</string>
@@ -124,6 +126,8 @@
     <string name="recurring_interval_ter_weekly">Toutes les 3 semaines</string>
     <string name="recurring_interval_four_weekly">Toutes les 4 semaines</string>
     <string name="recurring_interval_monthly">Tous les mois</string>
+    <string name="recurring_interval_ter_monthly">Tous les 3 mois</string>
+    <string name="recurring_interval_six_monthly">Tous les 6 mois</string>
     <string name="recurring_interval_yearly">Tous les ans</string>
 
     <string name="setting_category_app_title">App</string>
@@ -166,12 +170,12 @@
     <string name="premium_popup_premium_message">Vous avez accès aux fonctionnalités premium:\n\n- Récapitulatif mensuel : Recevez un récapitulatif de vos dépenses et revenus du mois.\n- Rappel journalier si vous avez oublié d’entrer vos dépenses durant la journée\n- Mode sombre\n- Sauvegarde dans le cloud\n… et plus de fonctionnalités premium qui seront ajoutées très bientôt !</string>
     <string name="premium_popup_not_premium_title">Devenez utilisateur premium</string>
     <string name="premium_popup_not_premium_message">Accédez aux fonctionnalités premium !</string>
-    <string name="premium_popup_not_premium_feature1_title">2. Rappel journalier</string>
+    <string name="premium_popup_not_premium_feature1_title">3. Rappel journalier</string>
     <string name="premium_popup_not_premium_feature1_message">Recevez une notification à la fin de la journée si vous n’avez pas entré vos dépenses.</string>
     <string name="premium_popup_not_premium_feature2_title">1. Récapitulatif mensuel</string>
     <string name="premium_popup_not_premium_feature2_message">Accédez à un récapitulatif de vos dépenses et revenus du mois et voyez combien vous avez économisé.</string>
-    <string name="premium_popup_not_premium_feature_more_dark_theme">3. Gestion du thème sombre!</string>
-    <string name="premium_popup_not_premium_feature_more_backup_title">4. Sauvegarde</string>
+    <string name="premium_popup_not_premium_feature_more_dark_theme">4. Gestion du thème sombre!</string>
+    <string name="premium_popup_not_premium_feature_more_backup_title">2. Sauvegarde</string>
     <string name="premium_popup_not_premium_feature_more_backup_message">Sauvegarde automatique de vos données dans le cloud ! Fini la peur de perdre le détail de votre budget.</string>
     <string name="premium_popup_not_premium_feature_more_title">… et plus de fonctionnalités premium qui seront ajoutées très bientôt !</string>
     <string name="premium_popup_not_premium_cta">Acheter</string>
