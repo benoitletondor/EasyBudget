@@ -361,7 +361,7 @@ class EasyBudget : Application() {
     private fun onUpdate(previousVersion: Int, @Suppress("SameParameterValue") newVersion: Int) {
         Logger.debug("Update detected, from $previousVersion to $newVersion")
 
-        if( newVersion == VERSION_2_1_0 && iab.isUserPremium() ) {
+        if( previousVersion < VERSION_2_1_0 && newVersion == VERSION_2_1_0 && iab.isUserPremium() && !parameters.isBackupEnabled() ) {
             BackupNotif.showBackupNotif(this)
         }
     }
