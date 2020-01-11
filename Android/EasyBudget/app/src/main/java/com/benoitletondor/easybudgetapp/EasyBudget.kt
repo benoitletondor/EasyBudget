@@ -30,7 +30,7 @@ import com.batch.android.BatchNotificationChannelsManager.DEFAULT_CHANNEL_ID
 import com.batch.android.Config
 import com.batch.android.PushNotificationType
 import com.benoitletondor.easybudgetapp.BuildVersion.VERSION_2_1_0
-import com.benoitletondor.easybudgetapp.BuildVersion.VERSION_2_1_1
+import com.benoitletondor.easybudgetapp.BuildVersion.VERSION_2_1_2
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.iab.Iab
@@ -75,15 +75,15 @@ class EasyBudget : Application() {
             modules(listOf(appModule, viewModelModule))
         }
 
+        // Init actions
+        init()
+
         // Crashlytics
         if ( BuildConfig.CRASHLYTICS_ACTIVATED ) {
             Fabric.with(this, Crashlytics())
 
             Crashlytics.setUserIdentifier(parameters.getLocalId())
         }
-
-        // Init actions
-        init()
 
         // Check if an update occurred and perform action if needed
         checkUpdateAction()
@@ -102,6 +102,8 @@ class EasyBudget : Application() {
 
     /**
      * Init app const and parameters
+     *
+     * DO NOT USE LOGGER HERE
      */
     private fun init() {
         /*
@@ -109,8 +111,6 @@ class EasyBudget : Application() {
          */
         val initDate = parameters.getInitTimestamp()
         if (initDate <= 0) {
-            Logger.debug("Registering first launch date")
-
             parameters.setInitTimestamp(Date().time)
             parameters.setUserCurrency(Currency.getInstance(Locale.getDefault())) // Set a default currency before onboarding
         }
@@ -121,11 +121,7 @@ class EasyBudget : Application() {
         var localId = parameters.getLocalId()
         if (localId == null) {
             localId = UUID.randomUUID().toString()
-            Logger.debug("Generating local id : $localId")
-
             parameters.setLocalId(localId)
-        } else {
-            Logger.debug("Local id : $localId")
         }
 
         // Activity counter for app foreground & background
@@ -362,7 +358,7 @@ class EasyBudget : Application() {
     private fun onUpdate(previousVersion: Int, @Suppress("SameParameterValue") newVersion: Int) {
         Logger.debug("Update detected, from $previousVersion to $newVersion")
 
-        if( previousVersion < VERSION_2_1_0 && newVersion == VERSION_2_1_1 && iab.isUserPremium() && !parameters.isBackupEnabled() ) {
+        if( previousVersion < VERSION_2_1_0 && newVersion == VERSION_2_1_2 && iab.isUserPremium() && !parameters.isBackupEnabled() ) {
             BackupNotif.showBackupNotif(this)
         }
     }
