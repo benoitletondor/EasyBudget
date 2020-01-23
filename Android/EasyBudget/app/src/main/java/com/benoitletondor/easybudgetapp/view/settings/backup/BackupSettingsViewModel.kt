@@ -275,7 +275,7 @@ class BackupSettingsViewModel(private val auth: Auth,
 
             try {
                 withContext(Dispatchers.IO) {
-                    restoreLatestDBBackup(appContext, auth, get(CloudStorage::class.java), get(Iab::class.java))
+                    restoreLatestDBBackup(appContext, auth, get(CloudStorage::class.java), get(Iab::class.java), parameters)
                 }
 
                 appRestartEvent.postValue(Unit)

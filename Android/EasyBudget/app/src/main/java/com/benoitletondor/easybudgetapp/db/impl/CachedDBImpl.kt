@@ -146,6 +146,9 @@ class CachedDBImpl(private val wrappedDB: DB,
     override suspend fun findRecurringExpenseForId(recurringExpenseId: Long): RecurringExpense?
         = wrappedDB.findRecurringExpenseForId(recurringExpenseId)
 
+    override suspend fun getOldestExpense(): Expense?
+        = wrappedDB.getOldestExpense()
+
     /**
      * Instantly wipe all cached data
      */

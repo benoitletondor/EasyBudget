@@ -23,8 +23,6 @@ import java.util.*
 import androidx.sqlite.db.SupportSQLiteQuery
 import androidx.room.RawQuery
 
-
-
 @Dao
 interface ExpenseDao {
 
@@ -78,4 +76,7 @@ interface ExpenseDao {
 
     @RawQuery
     suspend fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
+
+    @Query("SELECT * FROM expense ORDER BY date LIMIT 1")
+    suspend fun getOldestExpense(): ExpenseEntity?
 }

@@ -97,6 +97,10 @@ private const val BACKUP_ENABLED_PARAMETERS_KEY = "backup_enabled"
  * Last successful backup timestamp
  */
 private const val LAST_BACKUP_TIMESTAMP = "last_backup_ts"
+/**
+ * Should reset init date at next app launch after backup restore
+ */
+private const val SHOULD_RESET_INIT_DATE = "should_reset_init_date"
 
 fun Parameters.getInitTimestamp(): Long {
     return getLong(INIT_DATE_PARAMETERS_KEY, 0L)
@@ -317,4 +321,12 @@ fun Parameters.saveLastBackupDate(date: Date?) {
     } else {
         putLong(LAST_BACKUP_TIMESTAMP, -1)
     }
+}
+
+fun Parameters.setShouldResetInitDate(shouldResetInitDate: Boolean) {
+    putBoolean(SHOULD_RESET_INIT_DATE, shouldResetInitDate, forceCommit = true)
+}
+
+fun Parameters.getShouldResetInitDate(): Boolean {
+    return getBoolean(SHOULD_RESET_INIT_DATE, false)
 }

@@ -46,10 +46,12 @@ import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
 import com.benoitletondor.easybudgetapp.view.getRatingPopupUserStep
 import com.crashlytics.android.Crashlytics
 import io.fabric.sdk.android.Fabric
+import kotlinx.coroutines.runBlocking
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
+import org.koin.java.KoinJavaComponent.get
 import java.util.*
 
 /**
@@ -60,9 +62,6 @@ import java.util.*
 class EasyBudget : Application() {
     private val iab: Iab by inject()
     private val parameters: Parameters by inject()
-
-    // This is injected only to ensure it's created, it is closed right after onCreate
-    private val db: DB by inject()
 
 // ------------------------------------------>
 
@@ -88,9 +87,18 @@ class EasyBudget : Application() {
         // Check if an update occurred and perform action if needed
         checkUpdateAction()
 
-        // Ensure DB is created
-        db.use {
+        // Ensure DB is created and reset init date if needed
+        get(DB::class.java).use {
             it.ensureDBCreated()
+
+            // FIXME this should be done on restore, change that for the whole parameters restoration
+            if( parameters.getShouldResetInitDate() ) {
+                runBlocking { it.getOldestExpense() }?.let { expense ->
+                    parameters.setInitTimestamp(expense.date.time)
+                }
+
+                parameters.setShouldResetInitDate(false)
+            }
         }
 
         // Batch

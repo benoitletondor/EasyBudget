@@ -30,6 +30,7 @@ import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.job.BackupJob
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.saveLastBackupDate
+import com.benoitletondor.easybudgetapp.parameters.setShouldResetInitDate
 import net.lingala.zip4j.ZipFile
 import java.io.File
 import java.io.FileReader
@@ -144,7 +145,8 @@ suspend fun getBackupDBMetaData(cloudStorage: CloudStorage,
 suspend fun restoreLatestDBBackup(context: Context,
                                   auth: Auth,
                                   cloudStorage: CloudStorage,
-                                  iab: Iab) {
+                                  iab: Iab,
+                                  parameters: Parameters) {
 
     val currentUser = (auth.state.value as? AuthState.Authenticated)?.currentUser
         ?: throw IllegalStateException("Not authenticated")
@@ -168,6 +170,7 @@ suspend fun restoreLatestDBBackup(context: Context,
         val dbBackupFile = File(backupFolder, BACKUP_DB_FILENAME)
 
         restoreDBBackup(versionFile.readBackupVersion(), dbBackupFile, context)
+        parameters.setShouldResetInitDate(true)
     } finally {
         try {
             backupFile.delete()

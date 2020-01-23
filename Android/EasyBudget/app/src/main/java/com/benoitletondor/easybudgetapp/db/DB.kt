@@ -56,4 +56,6 @@ interface DB : Closeable {
     suspend fun hasExpensesForRecurringExpenseBeforeDate(recurringExpense: RecurringExpense, beforeDate: Date): Boolean
 
     suspend fun findRecurringExpenseForId(recurringExpenseId: Long): RecurringExpense?
+
+    suspend fun getOldestExpense(): Expense?
 }
