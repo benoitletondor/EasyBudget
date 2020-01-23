@@ -48,6 +48,10 @@
     <string name="no_amount_error">Enter an amount</string>
     <string name="negative_amount_error">Amount should be greater than 0</string>
     <string name="invalid_amount">Not a valid amount</string>
+    <string name="expense_add_before_init_date_dialog_title">Warning</string>
+    <string name="expense_add_before_init_date_dialog_description">The date of the entry you want to add is before the app setup date.\n\nIt means that the balance you entered when setting up the app will be affected by this entry.\n\nDo you want to continue?\n(You can still change the balance in the menu if you need.)</string>
+    <string name="expense_add_before_init_date_dialog_positive_cta">Confirm</string>
+    <string name="expense_add_before_init_date_dialog_negative_cta">Cancel</string>
 
     <string name="dialog_edit_expense_title">What do you want to do?</string>
     <string name="dialog_edit_income_title">What do you want to do?</string>

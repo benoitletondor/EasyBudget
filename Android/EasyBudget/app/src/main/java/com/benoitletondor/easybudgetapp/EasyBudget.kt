@@ -30,7 +30,7 @@ import com.batch.android.BatchNotificationChannelsManager.DEFAULT_CHANNEL_ID
 import com.batch.android.Config
 import com.batch.android.PushNotificationType
 import com.benoitletondor.easybudgetapp.BuildVersion.VERSION_2_1_0
-import com.benoitletondor.easybudgetapp.BuildVersion.VERSION_2_1_2
+import com.benoitletondor.easybudgetapp.BuildVersion.VERSION_2_1_3
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.iab.Iab
@@ -358,7 +358,7 @@ class EasyBudget : Application() {
     private fun onUpdate(previousVersion: Int, @Suppress("SameParameterValue") newVersion: Int) {
         Logger.debug("Update detected, from $previousVersion to $newVersion")
 
-        if( previousVersion < VERSION_2_1_0 && newVersion == VERSION_2_1_2 && iab.isUserPremium() && !parameters.isBackupEnabled() ) {
+        if( previousVersion < VERSION_2_1_0 && newVersion == VERSION_2_1_3 && iab.isUserPremium() && !parameters.isBackupEnabled() ) {
             BackupNotif.showBackupNotif(this)
         }
     }

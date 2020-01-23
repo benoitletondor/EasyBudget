@@ -46,6 +46,10 @@
     <string name="no_amount_error">Введите количество</string>
     <string name="negative_amount_error">Сумма должна быть больше 0</string>
     <string name="invalid_amount">Недопустимая сумма</string>
+    <string name="expense_add_before_init_date_dialog_title">Предупреждение</string>
+    <string name="expense_add_before_init_date_dialog_description">Дата записи, которую вы хотите добавить, предшествует дате установки приложения.\n\nЭто означает, что эта запись повлияет на баланс, который вы ввели при настройке приложения.\n\nВы хотите продолжить?\n(Вы все еще можете изменить баланс в меню, если вам нужно.)</string>
+    <string name="expense_add_before_init_date_dialog_positive_cta">Подтверждение</string>
+    <string name="expense_add_before_init_date_dialog_negative_cta">Отмена</string>
 
     <string name="dialog_edit_expense_title">Что Вы хотите сделать?</string>
     <string name="dialog_edit_income_title">Что Вы хотите сделать?</string>

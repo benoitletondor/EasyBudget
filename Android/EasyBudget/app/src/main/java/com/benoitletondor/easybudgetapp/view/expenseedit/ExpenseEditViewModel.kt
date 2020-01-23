@@ -22,12 +22,15 @@ import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.helper.SingleLiveEvent
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.db.DB
+import com.benoitletondor.easybudgetapp.parameters.Parameters
+import com.benoitletondor.easybudgetapp.parameters.getInitTimestamp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 
-class ExpenseEditViewModel(private val db: DB) : ViewModel() {
+class ExpenseEditViewModel(private val db: DB,
+                           private val parameters: Parameters) : ViewModel() {
     /**
      * Expense that is being edited (will be null if it's a new one)
      */
@@ -36,6 +39,7 @@ class ExpenseEditViewModel(private val db: DB) : ViewModel() {
     val expenseDateLiveData = MutableLiveData<Date>()
     val editTypeLiveData = MutableLiveData<ExpenseEditType>()
     val existingExpenseEventStream = SingleLiveEvent<ExistingExpenseData?>()
+    val expenseAddBeforeInitDateEventStream = SingleLiveEvent<Unit>()
     val finishEventStream = MutableLiveData<Unit>()
 
     fun initWithDateAndExpense(date: Date, expense: Expense?) {
@@ -54,6 +58,26 @@ class ExpenseEditViewModel(private val db: DB) : ViewModel() {
         val isRevenue = editTypeLiveData.value?.isRevenue ?: return
         val date = expenseDateLiveData.value ?: return
 
+        if( date.before(Date(parameters.getInitTimestamp())) ) {
+            expenseAddBeforeInitDateEventStream.value = Unit
+            return
+        }
+
+        doSaveExpense(value, description, isRevenue, date)
+    }
+
+    fun onAddExpenseBeforeInitDateConfirmed(value: Double, description: String) {
+        val isRevenue = editTypeLiveData.value?.isRevenue ?: return
+        val date = expenseDateLiveData.value ?: return
+
+        doSaveExpense(value, description, isRevenue, date)
+    }
+
+    fun onAddExpenseBeforeInitDateCancelled() {
+        // No-op
+    }
+
+    private fun doSaveExpense(value: Double, description: String, isRevenue: Boolean, date: Date) {
         viewModelScope.launch {
             withContext(Dispatchers.Default) {
                 val expense = expense?.copy(

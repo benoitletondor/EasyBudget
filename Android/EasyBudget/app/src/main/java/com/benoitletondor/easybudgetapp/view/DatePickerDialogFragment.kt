@@ -20,6 +20,7 @@ import android.app.DatePickerDialog
 import android.app.Dialog
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
+import com.benoitletondor.easybudgetapp.helper.computeCalendarMinDateFromInitDate
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.getInitTimestamp
 import org.koin.android.ext.android.inject
@@ -46,7 +47,7 @@ class DatePickerDialogFragment(private val originalDate: Date, private val liste
 
         // Create a new instance of DatePickerDialog and return it
         val dialog = DatePickerDialog(context!!, listener, year, month, day)
-        dialog.datePicker.minDate = parameters.getInitTimestamp()
+        dialog.datePicker.minDate = Date(parameters.getInitTimestamp()).computeCalendarMinDateFromInitDate().time
         return dialog
     }
 }
