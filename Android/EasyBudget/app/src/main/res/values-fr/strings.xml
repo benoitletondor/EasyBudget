@@ -46,6 +46,10 @@
     <string name="no_amount_error">Entrez un montant</string>
     <string name="negative_amount_error">Le montant doit être supérieur à 0</string>
     <string name="invalid_amount">Montant invalide</string>
+    <string name="expense_add_before_init_date_dialog_title">Attention</string>
+    <string name="expense_add_before_init_date_dialog_description">La date de cette entrée est avant la date de premier lancement de l\'application.\n\nLe solde que vous avez entré lorsque vous avez configuré l\'application sera affecté par cette entrée.\n\nVoulez vous continuer ? (Vous pouvez toujours changer le solde depuis le menu au besoin.)</string>
+    <string name="expense_add_before_init_date_dialog_positive_cta">Confirmer</string>
+    <string name="expense_add_before_init_date_dialog_negative_cta">Annuler</string>
 
     <string name="dialog_edit_expense_title">Que voulez-vous faire ?</string>
     <string name="dialog_edit_income_title">Que voulez-vous faire ?</string>

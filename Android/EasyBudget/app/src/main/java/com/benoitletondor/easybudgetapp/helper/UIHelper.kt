@@ -36,6 +36,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.updateLayoutParams
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
+import java.util.*
 import kotlin.math.max
 
 /**
@@ -210,4 +211,11 @@ fun AlertDialog.centerButtons() {
     } catch (e: Exception) {
         Logger.error("Error while centering dialog buttons", e)
     }
+}
+
+fun Date.computeCalendarMinDateFromInitDate(): Date {
+    val minDateCalendar = Calendar.getInstance()
+    minDateCalendar.time = this
+    minDateCalendar.add(Calendar.YEAR, -1)
+    return minDateCalendar.time
 }

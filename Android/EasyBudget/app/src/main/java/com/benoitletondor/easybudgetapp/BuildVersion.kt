@@ -98,8 +98,23 @@ object BuildVersion {
      */
     const val VERSION_2_0_13 = 66
     /**
-     * Cloud backup release
-     * TDB
+     * Cloud backup beta
+     * 11/01/2020
      */
     const val VERSION_2_1_0 = 67
+    /**
+     * Cloud backup beta 2
+     * 11/01/2020
+     */
+    const val VERSION_2_1_1 = 68
+    /**
+     * Cloud backup beta 3
+     * 11/01/2020
+     */
+    const val VERSION_2_1_2 = 69
+    /**
+     * Cloud backup release
+     * 23/01/2020
+     */
+    const val VERSION_2_1_3 = 70
 }

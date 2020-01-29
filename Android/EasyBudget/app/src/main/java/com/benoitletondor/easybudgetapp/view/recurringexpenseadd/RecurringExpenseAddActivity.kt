@@ -116,6 +116,19 @@ class RecurringExpenseAddActivity : BaseActivity() {
                 .setNegativeButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
                 .show()
         })
+
+        viewModel.expenseAddBeforeInitDateEventStream.observe(this, Observer {
+            AlertDialog.Builder(this)
+                .setTitle(R.string.expense_add_before_init_date_dialog_title)
+                .setMessage(R.string.expense_add_before_init_date_dialog_description)
+                .setPositiveButton(R.string.expense_add_before_init_date_dialog_positive_cta) { _, _ ->
+                    viewModel.onAddExpenseBeforeInitDateConfirmed(getCurrentAmount(), description_edittext.text.toString(), getRecurringTypeFromSpinnerSelection(expense_type_spinner.selectedItemPosition))
+                }
+                .setNegativeButton(R.string.expense_add_before_init_date_dialog_negative_cta) { _, _ ->
+                    viewModel.onAddExpenseBeforeInitDateCancelled()
+                }
+                .show()
+        })
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -180,9 +193,7 @@ class RecurringExpenseAddActivity : BaseActivity() {
 
         save_expense_fab.setOnClickListener {
             if (validateInputs()) {
-                val value = java.lang.Double.parseDouble(amount_edittext.text.toString())
-
-                viewModel.onSave(value, description_edittext.text.toString(), getRecurringTypeFromSpinnerSelection(expense_type_spinner.selectedItemPosition))
+                viewModel.onSave(getCurrentAmount(), description_edittext.text.toString(), getRecurringTypeFromSpinnerSelection(expense_type_spinner.selectedItemPosition))
             }
         }
     }
@@ -277,6 +288,10 @@ class RecurringExpenseAddActivity : BaseActivity() {
 
             fragment.show(supportFragmentManager, "datePicker")
         }
+    }
+
+    private fun getCurrentAmount(): Double {
+        return java.lang.Double.parseDouble(amount_edittext.text.toString())
     }
 
 }

@@ -613,9 +613,7 @@ class MainActivity : BaseActivity() {
             args.putInt(CaldroidFragment.THEME_RESOURCE, R.style.caldroid_style)
 
             calendarFragment.arguments = args
-
-            val minDate = Date(parameters.getInitTimestamp())
-            calendarFragment.setMinDate(minDate)
+            calendarFragment.setMinDate(Date(parameters.getInitTimestamp()).computeCalendarMinDateFromInitDate())
         }
 
         val listener = object : CaldroidListener() {

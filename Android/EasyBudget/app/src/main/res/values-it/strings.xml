@@ -46,6 +46,10 @@
     <string name="no_amount_error">Inserisci un montante</string>
     <string name="negative_amount_error">Il montante deve essere superiore a 0</string>
     <string name="invalid_amount">Montante non valido</string>
+    <string name="expense_add_before_init_date_dialog_title">Avvertimento</string>
+    <string name="expense_add_before_init_date_dialog_description">La data della voce che desideri aggiungere è precedente alla data di configurazione dell\'app.\n\nSignifica che il saldo inserito durante la configurazione dell\'app sarà interessato da questa voce.\n\nVuoi continuare?\n(È comunque possibile modificare il saldo nel menu, se necessario.)</string>
+    <string name="expense_add_before_init_date_dialog_positive_cta">Confermare</string>
+    <string name="expense_add_before_init_date_dialog_negative_cta">Annulla</string>
 
     <string name="dialog_edit_expense_title">Cosa vuoi fare?</string>
     <string name="dialog_edit_income_title">Cosa vuoi fare?</string>

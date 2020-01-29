@@ -16,6 +16,7 @@
 
 package com.benoitletondor.easybudgetapp.parameters
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 
@@ -75,8 +76,15 @@ class Parameters(context: Context) {
      * @param key
      * @param value
      */
-    fun putBoolean(key: String, value: Boolean) {
-        preferences.edit().putBoolean(key, value).apply()
+    @SuppressLint("ApplySharedPref")
+    fun putBoolean(key: String, value: Boolean, forceCommit: Boolean = false) {
+        val edit = preferences.edit()
+        edit.putBoolean(key, value)
+        if( forceCommit ) {
+            edit.commit()
+        } else {
+            edit.apply()
+        }
     }
 
     /**

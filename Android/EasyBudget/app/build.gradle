@@ -47,8 +47,8 @@ android {
         applicationId "com.benoitletondor.easybudgetapp"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 66
-        versionName "2.0.13"
+        versionCode 70
+        versionName "2.1.3"
         vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
@@ -92,15 +92,15 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'androidx.preference:preference-ktx:1.1.0'
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.1.0'
-    implementation 'androidx.work:work-runtime-ktx:2.2.0'
-    implementation 'androidx.work:work-gcm:2.2.0'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
+    implementation 'androidx.work:work-runtime-ktx:2.3.0'
+    implementation 'androidx.work:work-gcm:2.3.0'
 
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.3'
 
-    implementation 'com.google.firebase:firebase-core:17.2.1'
+    implementation 'com.google.firebase:firebase-core:17.2.2'
     implementation 'com.google.firebase:firebase-messaging:20.1.0'
     implementation 'com.google.firebase:firebase-storage:19.1.0'
     implementation 'com.firebaseui:firebase-ui-auth:6.2.0'

@@ -32,8 +32,8 @@ val viewModelModule = module {
     viewModel { SelectCurrencyViewModel() }
     viewModel { MonthlyReportViewModel(get()) }
     viewModel { MonthlyReportBaseViewModel(get()) }
-    viewModel { ExpenseEditViewModel(get()) }
-    viewModel { RecurringExpenseAddViewModel(get()) }
+    viewModel { ExpenseEditViewModel(get(), get()) }
+    viewModel { RecurringExpenseAddViewModel(get(), get()) }
     viewModel { PremiumViewModel(get()) }
     viewModel { BackupSettingsViewModel(get(), get(), get()) }
 }

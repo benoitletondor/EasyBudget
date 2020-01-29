@@ -46,6 +46,10 @@
     <string name="no_amount_error">Escribe un monto</string>
     <string name="negative_amount_error">El monto debe ser superior a 0</string>
     <string name="invalid_amount">Monto inválido</string>
+    <string name="expense_add_before_init_date_dialog_title">Advertencia</string>
+    <string name="expense_add_before_init_date_dialog_description">La fecha de la entrada que desea agregar es anterior a la fecha de configuración de la aplicación.\n\nSignifica que el saldo que ingresó al configurar la aplicación se verá afectado por esta entrada.\n\n¿Quieres continuar?\n(Aún puede cambiar el saldo en el menú si lo necesita.)</string>
+    <string name="expense_add_before_init_date_dialog_positive_cta">Confirmar</string>
+    <string name="expense_add_before_init_date_dialog_negative_cta">Cancelar</string>
 
     <string name="dialog_edit_expense_title">¿Qué quieres hacer?</string>
     <string name="dialog_edit_income_title">¿Qué quieres hacer?</string>

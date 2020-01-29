@@ -144,6 +144,10 @@ class DBImpl(private val roomDB: RoomDB) : DB {
         return roomDB.expenseDao().findRecurringExpenseForId(recurringExpenseId)?.toRecurringExpense()
     }
 
+    override suspend fun getOldestExpense(): Expense? {
+        return roomDB.expenseDao().getOldestExpense()?.toExpense(this)
+    }
+
 }
 
 private suspend fun List<ExpenseEntity>.toExpenses(db: DB): List<Expense> {
