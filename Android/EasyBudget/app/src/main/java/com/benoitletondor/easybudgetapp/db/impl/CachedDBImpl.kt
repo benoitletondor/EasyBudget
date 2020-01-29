@@ -1,5 +1,5 @@
 /*
- *   Copyright 2019 Benoit LETONDOR
+ *   Copyright 2020 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -29,8 +29,13 @@ import java.util.concurrent.Executor
 class CachedDBImpl(private val wrappedDB: DB,
                    private val cacheStorage: CacheDBStorage,
                    private val executor: Executor) : DB {
+
     override fun ensureDBCreated() {
         wrappedDB.ensureDBCreated()
+    }
+
+    override suspend fun triggerForceWriteToDisk() {
+        wrappedDB.triggerForceWriteToDisk()
     }
 
     override fun close() {
@@ -140,6 +145,9 @@ class CachedDBImpl(private val wrappedDB: DB,
 
     override suspend fun findRecurringExpenseForId(recurringExpenseId: Long): RecurringExpense?
         = wrappedDB.findRecurringExpenseForId(recurringExpenseId)
+
+    override suspend fun getOldestExpense(): Expense?
+        = wrappedDB.getOldestExpense()
 
     /**
      * Instantly wipe all cached data

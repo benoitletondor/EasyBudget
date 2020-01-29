@@ -1,5 +1,5 @@
 /*
- *   Copyright 2019 Benoit LETONDOR
+ *   Copyright 2020 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -107,6 +107,8 @@ class ExpensesRecyclerViewAdapter(private val activity: Activity,
                 RecurringExpenseType.TER_WEEKLY -> viewHolder.recurringIndicatorTextview.text = viewHolder.view.context.getString(R.string.ter_weekly)
                 RecurringExpenseType.FOUR_WEEKLY -> viewHolder.recurringIndicatorTextview.text = viewHolder.view.context.getString(R.string.four_weekly)
                 RecurringExpenseType.MONTHLY -> viewHolder.recurringIndicatorTextview.text = viewHolder.view.context.getString(R.string.monthly)
+                RecurringExpenseType.TER_MONTHLY -> viewHolder.recurringIndicatorTextview.text = viewHolder.view.context.getString(R.string.ter_monthly)
+                RecurringExpenseType.SIX_MONTHLY -> viewHolder.recurringIndicatorTextview.text = viewHolder.view.context.getString(R.string.six_monthly)
                 RecurringExpenseType.YEARLY -> viewHolder.recurringIndicatorTextview.text = viewHolder.view.context.getString(R.string.yearly)
             }
         }

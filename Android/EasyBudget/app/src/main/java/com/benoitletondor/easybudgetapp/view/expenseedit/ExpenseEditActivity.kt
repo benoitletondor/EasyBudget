@@ -1,5 +1,5 @@
 /*
- *   Copyright 2019 Benoit LETONDOR
+ *   Copyright 2020 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import android.app.Activity
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.MenuItem
-import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.benoitletondor.easybudgetapp.R
@@ -41,7 +41,7 @@ import kotlin.math.abs
  *
  * @author Benoit LETONDOR
  */
-class ExpenseEditActivity : AppCompatActivity() {
+class ExpenseEditActivity : BaseActivity() {
     private val parameters: Parameters by inject()
     private val viewModel: ExpenseEditViewModel by viewModel()
 
@@ -97,6 +97,19 @@ class ExpenseEditActivity : AppCompatActivity() {
         viewModel.finishEventStream.observe(this, Observer {
             setResult(Activity.RESULT_OK)
             finish()
+        })
+
+        viewModel.expenseAddBeforeInitDateEventStream.observe(this, Observer {
+            AlertDialog.Builder(this)
+                .setTitle(R.string.expense_add_before_init_date_dialog_title)
+                .setMessage(R.string.expense_add_before_init_date_dialog_description)
+                .setPositiveButton(R.string.expense_add_before_init_date_dialog_positive_cta) { _, _ ->
+                    viewModel.onAddExpenseBeforeInitDateConfirmed(getCurrentAmount(), description_edittext.text.toString())
+                }
+                .setNegativeButton(R.string.expense_add_before_init_date_dialog_negative_cta) { _, _ ->
+                    viewModel.onAddExpenseBeforeInitDateCancelled()
+                }
+                .show()
         })
     }
 
@@ -161,9 +174,7 @@ class ExpenseEditActivity : AppCompatActivity() {
 
         save_expense_fab.setOnClickListener {
             if (validateInputs()) {
-                val value = java.lang.Double.parseDouble(amount_edittext.text.toString())
-
-                viewModel.onSave(value, description_edittext.text.toString())
+                viewModel.onSave(getCurrentAmount(), description_edittext.text.toString())
             }
         }
     }
@@ -227,5 +238,9 @@ class ExpenseEditActivity : AppCompatActivity() {
 
             fragment.show(supportFragmentManager, "datePicker")
         }
+    }
+
+    private fun getCurrentAmount(): Double {
+        return java.lang.Double.parseDouble(amount_edittext.text.toString())
     }
 }

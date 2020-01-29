@@ -1,5 +1,5 @@
 <!--
-   Copyright 2019 Benoit LETONDOR
+   Copyright 2020 Benoit LETONDOR
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -48,6 +48,10 @@
     <string name="no_amount_error">Enter an amount</string>
     <string name="negative_amount_error">Amount should be greater than 0</string>
     <string name="invalid_amount">Not a valid amount</string>
+    <string name="expense_add_before_init_date_dialog_title">Warning</string>
+    <string name="expense_add_before_init_date_dialog_description">The date of the entry you want to add is before the app setup date.\n\nIt means that the balance you entered when setting up the app will be affected by this entry.\n\nDo you want to continue?\n(You can still change the balance in the menu if you need.)</string>
+    <string name="expense_add_before_init_date_dialog_positive_cta">Confirm</string>
+    <string name="expense_add_before_init_date_dialog_negative_cta">Cancel</string>
 
     <string name="dialog_edit_expense_title">What do you want to do?</string>
     <string name="dialog_edit_income_title">What do you want to do?</string>
@@ -98,6 +102,8 @@
     <string name="bi_weekly">2 WEEKS</string>
     <string name="ter_weekly">3 WEEKS</string>
     <string name="four_weekly">4 WEEKS</string>
+    <string name="ter_monthly">3 MONTHS</string>
+    <string name="six_monthly">6 MONTHS</string>
     <string name="yearly">YEARLY</string>
     <string name="recurring_expense_add_loading_title">Loading</string>
     <string name="recurring_expense_add_loading_message">Creating recurring expense…</string>
@@ -126,6 +132,8 @@
     <string name="recurring_interval_ter_weekly">Every 3 weeks</string>
     <string name="recurring_interval_four_weekly">Every 4 weeks</string>
     <string name="recurring_interval_monthly">Every month</string>
+    <string name="recurring_interval_ter_monthly">Every 3 months</string>
+    <string name="recurring_interval_six_monthly">Every 6 months</string>
     <string name="recurring_interval_yearly">Every year</string>
 
     <string name="setting_category_app_title">App</string>
@@ -152,7 +160,7 @@
     <string name="setting_category_dev_title" translatable="false">Dev</string>
     <string name="setting_category_show_welcome_screen_button_title" translatable="false">Show welcome screen</string>
     <string name="setting_category_show_premium" translatable="false">Show premium screen</string>
-    <string name="setting_category_show_dark_theme_notif" translatable="false">Show dark theme notif</string>
+    <string name="setting_category_show_backup_notif" translatable="false">Show backup notif</string>
     <string name="setting_category_premium_title">Premium</string>
     <string name="setting_category_premium_status_title">You are premium!</string>
     <string name="setting_category_premium_status_message">You have access to premium features</string>
@@ -172,14 +180,16 @@
     <string name="setting_theme_platform">System default</string>
 
     <string name="premium_popup_premium_title">You are premium!</string>
-    <string name="premium_popup_premium_message">You have access to premium features:\n\n- Monthly report: Get a sum-up of your expenses and incomes of the month\n- Daily reminder if you forgot to enter your expenses during the day\n- Dark Theme support\n…and more premium features that will be added soon!</string>
+    <string name="premium_popup_premium_message">You have access to premium features:\n\n- Monthly report: Get a sum-up of your expenses and incomes of the month\n- Daily reminder if you forgot to enter your expenses during the day\n- Dark Theme support\n- Data backup\n…and more premium features that will be added soon!</string>
     <string name="premium_popup_not_premium_title">Become a premium user</string>
     <string name="premium_popup_not_premium_message">Access all the premium features!</string>
-    <string name="premium_popup_not_premium_feature1_title">2. Daily reminder</string>
+    <string name="premium_popup_not_premium_feature1_title">3. Daily reminder</string>
     <string name="premium_popup_not_premium_feature1_message">Receive a notification at the end of the day if you didn\'t enter your expenses.</string>
     <string name="premium_popup_not_premium_feature2_title">1. Monthly report</string>
     <string name="premium_popup_not_premium_feature2_message">Get a sum-up of your expenses and incomes of the month and see how much you saved.</string>
-    <string name="premium_popup_not_premium_feature_more_dark_theme">3. Dark theme support!</string>
+    <string name="premium_popup_not_premium_feature_more_dark_theme">4. Dark theme support!</string>
+    <string name="premium_popup_not_premium_feature_more_backup_title">2. Backup</string>
+    <string name="premium_popup_not_premium_feature_more_backup_message">Automatic backup of your data in the cloud! No need to worry about losing your budget anymore.</string>
     <string name="premium_popup_not_premium_feature_more_title">… and more premium features that will be added soon!</string>
     <string name="premium_popup_not_premium_cta">Purchase</string>
     <string name="premium_popup_become_title">Become a premium user</string>
@@ -251,8 +261,54 @@
     <string name="balance">Balance</string>
     <string name="monthly_report_no_entries_placeholder">Nothing for this month.</string>
     <string name="monthly_report_hint">Psst: You can access monthly reports from this button!</string>
-    <string name="dark_theme_notif_message">EasyBudget 2.0 is out with dark theme support for premium users! Click to discover</string>
-    <string name="dark_theme_notif_cta">Discover</string>
+
+    <string name="backup_settings_activity_title">Backup</string>
+    <string name="backup_settings_cloud_backup">EasyBudget cloud backup</string>
+    <string name="backup_settings_not_authenticated_description">EasyBudget cloud backup is available for premium users at no additional cost.\nTo enable EasyBudget cloud backup, login to your Google account</string>
+    <string name="backup_settings_not_authenticated_description_2">Your Google account will be used to identify your backup. Later, you\'ll be able to restore your data on a new phone (or after a data wipe) using this account.\n\nYour account will not be used for anything else.</string>
+    <string name="backup_settings_not_authenticated_privacy_title">EasyBudget takes your privacy seriously</string>
+    <string name="backup_settings_not_authenticated_privacy_message">By authenticating with your Google account, you accept that your EasyBudget entries will be securely uploaded to the cloud and linked to your Google account.\n\nYour EasyBudget data will never be used or sell to anyone.\n\nDo you want to continue?</string>
+    <string name="backup_settings_not_authenticated_privacy_positive_cta">Accept</string>
+    <string name="backup_settings_not_authenticated_privacy_negative_cta">Cancel</string>
+    <string name="backup_settings_backups_activated">Cloud backup activated</string>
+    <string name="backup_settings_backups_deactivated">Cloud backup deactivated</string>
+    <string name="backup_settings_authenticate_cta">Sign-in with Google</string>
+    <string name="backup_settings_your_google_account">Your Google account</string>
+    <string name="backup_settings_cloud_backup_status">Cloud backup: %s</string>
+    <string name="backup_settings_cloud_backup_status_activated">enabled</string>
+    <string name="backup_settings_cloud_backup_status_disabled">deactivated</string>
+    <string name="backup_settings_logout_cta">Logout</string>
+    <string name="backup_activated_description">Your data will be automatically backed up every week. If you ever change your phone or wipe your data, you can restore a backup from here.</string>
+    <string name="backup_last_update_date">Last backup: %s</string>
+    <string name="backup_last_update_date_never">Never</string>
+    <string name="backup_now_cta">Backup now</string>
+    <string name="backup_restore_description">Restore backup data</string>
+    <string name="backup_restore_explanation">Restoring your data means that current EasyBudget entries (if you have any) will be removed and replaced by the ones of the latest backup. This is an irreversible operation.</string>
+    <string name="backup_restore_cta">Restore data from last backup</string>
+    <string name="backup_now_error_title">Unable to backup</string>
+    <string name="backup_now_error_message">Backup not completed due to an error. You can check your connexion and try again or let the app retry automatically later.</string>
+    <string name="backup_already_exist_title">Previous backup found</string>
+    <string name="backup_already_exist_message">A previous EasyBudget backup from %s has been found on your account.\n\nWould you like to restore it now?\n\n(You can still do it later, before next backup)</string>
+    <string name="backup_already_exist_positive_cta">Restore</string>
+    <string name="backup_already_exist_negative_cta">Ignore</string>
+    <string name="backup_restore_error_title">Error restoring data</string>
+    <string name="backup_restore_error_message">An error occurred while restoring data. Please check your connexion and try again later.</string>
+    <string name="backup_restore_confirmation_title">Restore backup</string>
+    <string name="backup_restore_confirmation_message">Are you sure you want to restore data from %s backup?\n\nIt will replace your current data in an irreversible way!\n\nThe app will restart after the process.</string>
+    <string name="backup_restore_confirmation_positive_cta">Restore</string>
+    <string name="backup_restore_confirmation_negative_cta">Cancel</string>
+    <string name="backup_wipe_data_title">Delete cloud backup</string>
+    <string name="backup_wipe_data_description">EasyBudget lets you in control of your data: Click here if you want to delete all your backup data from the cloud</string>
+    <string name="backup_wipe_data_cta">Delete backup</string>
+    <string name="backup_wipe_data_confirmation_title">Delete cloud backup</string>
+    <string name="backup_wipe_data_confirmation_message">Are you sure you want to delete all your backup data from the cloud?\n\nThis operation is irreversible and you\'ll lose access to your backup data (Current local app data won\'t be affected).</string>
+    <string name="backup_wipe_data_confirmation_positive_cta">Delete</string>
+    <string name="backup_wipe_data_confirmation_negative_cta">Cancel</string>
+    <string name="backup_wipe_data_error_title">Unable to delete cloud backup</string>
+    <string name="backup_wipe_data_error_message">An error occurred while deleting your backup data. Please check your connexion and try again later.</string>
+    <string name="backup_notif_message">New for premium users: backup your data in the cloud! Click to setup</string>
+    <string name="backup_notif_cta">Setup</string>
+
 
     <!-- Keys, not for translations. -->
     <string name="setting_category_bug_report_send_button_key" translatable="false">send_bug_report</string>
@@ -273,8 +329,9 @@
     <string name="setting_category_app_theme_key" translatable="false">app_theme</string>
     <string name="setting_category_not_premium_status_key" translatable="false">not_premium</string>
     <string name="setting_category_dev_show_premium_key" translatable="false">show_premium</string>
-    <string name="setting_category_dev_show_dark_theme_notif_key" translatable="false">show_dark_theme</string>
+    <string name="setting_category_dev_show_backup_notif_key" translatable="false">show_backup</string>
     <string name="setting_category_start_day_of_week_key" translatable="false">start_day_of_week</string>
+    <string name="setting_category_backup" translatable="false">backup</string>
 
     <string-array name="themes">
         <item>@string/setting_theme_light</item>

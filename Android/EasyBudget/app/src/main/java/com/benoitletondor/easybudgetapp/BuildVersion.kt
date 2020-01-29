@@ -1,5 +1,5 @@
 /*
- *   Copyright 2019 Benoit LETONDOR
+ *   Copyright 2020 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -97,4 +97,24 @@ object BuildVersion {
      * 13/07/2019
      */
     const val VERSION_2_0_13 = 66
+    /**
+     * Cloud backup beta
+     * 11/01/2020
+     */
+    const val VERSION_2_1_0 = 67
+    /**
+     * Cloud backup beta 2
+     * 11/01/2020
+     */
+    const val VERSION_2_1_1 = 68
+    /**
+     * Cloud backup beta 3
+     * 11/01/2020
+     */
+    const val VERSION_2_1_2 = 69
+    /**
+     * Cloud backup release
+     * 23/01/2020
+     */
+    const val VERSION_2_1_3 = 70
 }

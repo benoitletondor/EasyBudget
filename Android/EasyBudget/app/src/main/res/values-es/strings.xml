@@ -1,5 +1,5 @@
 <!--
-   Copyright 2019 Benoit LETONDOR
+   Copyright 2020 Benoit LETONDOR
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -46,6 +46,10 @@
     <string name="no_amount_error">Escribe un monto</string>
     <string name="negative_amount_error">El monto debe ser superior a 0</string>
     <string name="invalid_amount">Monto inválido</string>
+    <string name="expense_add_before_init_date_dialog_title">Advertencia</string>
+    <string name="expense_add_before_init_date_dialog_description">La fecha de la entrada que desea agregar es anterior a la fecha de configuración de la aplicación.\n\nSignifica que el saldo que ingresó al configurar la aplicación se verá afectado por esta entrada.\n\n¿Quieres continuar?\n(Aún puede cambiar el saldo en el menú si lo necesita.)</string>
+    <string name="expense_add_before_init_date_dialog_positive_cta">Confirmar</string>
+    <string name="expense_add_before_init_date_dialog_negative_cta">Cancelar</string>
 
     <string name="dialog_edit_expense_title">¿Qué quieres hacer?</string>
     <string name="dialog_edit_income_title">¿Qué quieres hacer?</string>
@@ -96,6 +100,8 @@
     <string name="bi_weekly">2 SEMANAS</string>
     <string name="ter_weekly">3 SEMANAS</string>
     <string name="four_weekly">4 SEMANAS</string>
+    <string name="ter_monthly">3 MESES</string>
+    <string name="six_monthly">6 MESES</string>
     <string name="yearly">ANUAL</string>
     <string name="recurring_expense_add_loading_title">Cargando</string>
     <string name="recurring_expense_add_loading_message">Creando un gasto recurrente…</string>
@@ -124,6 +130,8 @@
     <string name="recurring_interval_ter_weekly">Cada 3 semanas</string>
     <string name="recurring_interval_four_weekly">Cada 4 semanas</string>
     <string name="recurring_interval_monthly">Cada mes</string>
+    <string name="recurring_interval_ter_monthly">Cada 3 meses</string>
+    <string name="recurring_interval_six_monthly">Cada 6 meses</string>
     <string name="recurring_interval_yearly">Cada año</string>
 
     <string name="setting_category_app_title">App</string>
@@ -163,14 +171,16 @@
     <string name="setting_theme_platform">Por defecto</string>
 
     <string name="premium_popup_premium_title">¡Eres premium!</string>
-    <string name="premium_popup_premium_message">Tienes acceso a las funcionalidades premium:\n\n- Informe mensual: Recibe un recapitulativo de los gastos e ingresos del mes\n- Recordatorio diario si olvidaste entrar tus gastos durante el día\n- Modo oscuro\n… ¡y más funcionalidades premium que serán añadidas pronto!</string>
+    <string name="premium_popup_premium_message">Tienes acceso a las funcionalidades premium:\n\n- Informe mensual: Recibe un recapitulativo de los gastos e ingresos del mes\n- Recordatorio diario si olvidaste entrar tus gastos durante el día\n- Modo oscuro\n- Copia de seguridad\n… ¡y más funcionalidades premium que serán añadidas pronto!</string>
     <string name="premium_popup_not_premium_title">Vuélvete premium</string>
     <string name="premium_popup_not_premium_message">¡Accede a las funcionalidades premium!</string>
-    <string name="premium_popup_not_premium_feature1_title">2. Recordatorio diario</string>
+    <string name="premium_popup_not_premium_feature1_title">3. Recordatorio diario</string>
     <string name="premium_popup_not_premium_feature1_message">Recibe una notificación al final del día si no has entrado tus gastos.</string>
     <string name="premium_popup_not_premium_feature2_title">1. Informe mensual</string>
     <string name="premium_popup_not_premium_feature2_message">Descubre cuánto has ahorrado a través de un recapitulativo mensual de tus gastos e ingresos.</string>
-    <string name="premium_popup_not_premium_feature_more_dark_theme">3. ¡Modo oscuro!</string>
+    <string name="premium_popup_not_premium_feature_more_dark_theme">4. ¡Modo oscuro!</string>
+    <string name="premium_popup_not_premium_feature_more_backup_title">2. Copia de seguridad</string>
+    <string name="premium_popup_not_premium_feature_more_backup_message">Copia de seguridad automática de sus datos en la nube! Ya no necesita preocuparse por perder su presupuesto.</string>
     <string name="premium_popup_not_premium_feature_more_title">… ¡y más funcionalidades premium que serán añadidas pronto!</string>
     <string name="premium_popup_not_premium_cta">Comprar</string>
     <string name="premium_popup_become_title">Vuélvete premium</string>
@@ -239,6 +249,51 @@
     <string name="balance">Saldo</string>
     <string name="monthly_report_no_entries_placeholder">Nada para este mes.</string>
     <string name="monthly_report_hint">Pss: ¡Puedes ver tus informes mensuales pulsando este botón!</string>
-    <string name="dark_theme_notif_message">¡EasyBudget 2.0 está disponible con soporte para tema oscuro para usuarios premium! Clic para descubrir</string>
-    <string name="dark_theme_notif_cta">Descubrir</string>
+
+    <string name="backup_settings_activity_title">Copia de seguridad</string>
+    <string name="backup_settings_cloud_backup">EasyBudget copia de seguridad en la nube</string>
+    <string name="backup_settings_not_authenticated_description">La copia de seguridad en la nube EasyBudget está disponible para usuarios premium sin costo adicional.\nPara habilitar la copia de seguridad en la nube de EasyBudget, inicie sesión en su cuenta de Google</string>
+    <string name="backup_settings_not_authenticated_description_2">Su cuenta de Google se utilizará para identificar su copia de seguridad. Más tarde, podrá restaurar sus datos en un nuevo teléfono con esta cuenta.\n\nSu cuenta no será utilizada para nada más.</string>
+    <string name="backup_settings_not_authenticated_privacy_title">EasyBudget toma en serio su privacidad</string>
+    <string name="backup_settings_not_authenticated_privacy_message">Al autenticarse con su cuenta de Google, acepta que sus entradas de EasyBudget se cargarán de forma segura en la nube y se vincularán a su cuenta de Google.\n\nSus datos de EasyBudget nunca serán utilizados o vendidos a nadie.\n\n¿Quieres continuar?</string>
+    <string name="backup_settings_not_authenticated_privacy_positive_cta">Aceptar</string>
+    <string name="backup_settings_not_authenticated_privacy_negative_cta">Cancelar</string>
+    <string name="backup_settings_backups_activated">Copia de seguridad en la nube activada</string>
+    <string name="backup_settings_backups_deactivated">Copia de seguridad en la nube desactivada</string>
+    <string name="backup_settings_authenticate_cta">Conexión con Google</string>
+    <string name="backup_settings_your_google_account">Tu cuenta de Google</string>
+    <string name="backup_settings_cloud_backup_status">Copia de seguridad en la nube : %s</string>
+    <string name="backup_settings_cloud_backup_status_activated">habilitada</string>
+    <string name="backup_settings_cloud_backup_status_disabled">inhabilitada</string>
+    <string name="backup_settings_logout_cta">Quitar cuenta</string>
+    <string name="backup_activated_description">Sus datos serán respaldados automáticamente cada semana. Si cambia su teléfono o borra sus datos, puede restaurar una copia de seguridad desde aquí.</string>
+    <string name="backup_last_update_date">Última copia de seguridad : %s</string>
+    <string name="backup_last_update_date_never">Nunca</string>
+    <string name="backup_now_cta">Respaldar ahora</string>
+    <string name="backup_restore_description">Restaurar la copia de seguridad</string>
+    <string name="backup_restore_explanation">Restaurar sus datos significa que las entradas actuales de EasyBudget (si tiene alguna) serán eliminadas y reemplazadas por las de la última copia de seguridad. Esta es una operación irreversible.</string>
+    <string name="backup_restore_cta">Restaurar la copia de seguridad</string>
+    <string name="backup_now_error_title">No se puede hacer una copia de seguridad</string>
+    <string name="backup_now_error_message">La copia de seguridad no se completó debido a un error. Puede verificar su conexión e intentar nuevamente o dejar que la aplicación vuelva a intentarlo automáticamente más tarde.</string>
+    <string name="backup_already_exist_title">Copia de seguridad anterior encontrada</string>
+    <string name="backup_already_exist_message">Se encontró una copia de seguridad anterior de EasyBudget de %s en su cuenta.\n\n¿Desea restaurarlo ahora?\n\n(Puede hacerlo más tarde, antes de la próxima copia de seguridad.)</string>
+    <string name="backup_already_exist_positive_cta">Restaurar</string>
+    <string name="backup_already_exist_negative_cta">Ignorar</string>
+    <string name="backup_restore_error_title">Error al restaurar datos</string>
+    <string name="backup_restore_error_message">Se produjo un error al restaurar los datos. Verifique su conexión e intente nuevamente más tarde.</string>
+    <string name="backup_restore_confirmation_title">Restaurar la copia de seguridad</string>
+    <string name="backup_restore_confirmation_message">¿Está seguro de que desea restaurar los datos de la copia de seguridad de %s?\n\n¡Reemplazará sus datos actuales de una manera irreversible!\n\nLa aplicación se reiniciará después del proceso.</string>
+    <string name="backup_restore_confirmation_positive_cta">Restaurar</string>
+    <string name="backup_restore_confirmation_negative_cta">Cancelar</string>
+    <string name="backup_wipe_data_title">Eliminar la copia de seguridad en la nube</string>
+    <string name="backup_wipe_data_description">EasyBudget le permite controlar sus datos: Clic aquí si desea eliminar todos sus datos de copia de seguridad en la nube</string>
+    <string name="backup_wipe_data_cta">Eliminar la copia de seguridad</string>
+    <string name="backup_wipe_data_confirmation_title">Eliminar la copia de seguridad en la nube</string>
+    <string name="backup_wipe_data_confirmation_message">¿Está seguro de que desea eliminar todos sus datos de la copia de seguridad en la nube?\n\nEsta operación es irreversible y perderá el acceso a sus datos de la copia de seguridad (los datos actuales local de la aplicación no se verán afectados).</string>
+    <string name="backup_wipe_data_confirmation_positive_cta">Eliminar</string>
+    <string name="backup_wipe_data_confirmation_negative_cta">Cancelar</string>
+    <string name="backup_wipe_data_error_title">No se puede eliminar la copia de seguridad en la nube</string>
+    <string name="backup_wipe_data_error_message">Se produjo un error al eliminar sus datos de la copia de seguridad. Verifique su conexión e intente nuevamente más tarde.</string>
+    <string name="backup_notif_message">Nuevo para usuarios premium : ¡copia de seguridad en la nube! Clic para configurar</string>
+    <string name="backup_notif_cta">Configurar</string>
 </resources>

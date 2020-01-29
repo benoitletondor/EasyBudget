@@ -1,5 +1,5 @@
 /*
- *   Copyright 2019 Benoit LETONDOR
+ *   Copyright 2020 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -29,9 +29,9 @@ import androidx.viewpager.widget.ViewPager
 import android.os.Bundle
 import android.view.View
 import android.view.ViewAnimationUtils
-import androidx.appcompat.app.AppCompatActivity
 
 import com.benoitletondor.easybudgetapp.R
+import com.benoitletondor.easybudgetapp.helper.BaseActivity
 import com.benoitletondor.easybudgetapp.helper.setStatusBarColor
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 
@@ -46,7 +46,7 @@ import kotlin.math.max
  *
  * @author Benoit LETONDOR
  */
-class WelcomeActivity : AppCompatActivity() {
+class WelcomeActivity : BaseActivity() {
     /**
      * Broadcast receiver for intent sent by fragments
      */

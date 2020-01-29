@@ -1,5 +1,5 @@
 /*
- *   Copyright 2019 Benoit LETONDOR
+ *   Copyright 2020 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.util.*
 
 interface DB : Closeable {
     fun ensureDBCreated()
+    suspend fun triggerForceWriteToDisk()
 
     suspend fun persistExpense(expense: Expense): Expense
 
@@ -55,4 +56,6 @@ interface DB : Closeable {
     suspend fun hasExpensesForRecurringExpenseBeforeDate(recurringExpense: RecurringExpense, beforeDate: Date): Boolean
 
     suspend fun findRecurringExpenseForId(recurringExpenseId: Long): RecurringExpense?
+
+    suspend fun getOldestExpense(): Expense?
 }

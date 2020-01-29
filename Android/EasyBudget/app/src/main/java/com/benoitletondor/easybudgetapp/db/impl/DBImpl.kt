@@ -1,5 +1,5 @@
 /*
- *   Copyright 2019 Benoit LETONDOR
+ *   Copyright 2020 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package com.benoitletondor.easybudgetapp.db.impl
 
+import androidx.sqlite.db.SimpleSQLiteQuery
 import com.benoitletondor.easybudgetapp.BuildConfig
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
 import com.benoitletondor.easybudgetapp.model.Expense
@@ -29,8 +30,13 @@ import kotlin.math.ceil
 import kotlin.math.floor
 
 class DBImpl(private val roomDB: RoomDB) : DB {
+
     override fun ensureDBCreated() {
         roomDB.openHelper.writableDatabase.close()
+    }
+
+    override suspend fun triggerForceWriteToDisk() {
+        roomDB.expenseDao().checkpoint(SimpleSQLiteQuery("pragma wal_checkpoint(full)"))
     }
 
     override fun close() {
@@ -136,6 +142,10 @@ class DBImpl(private val roomDB: RoomDB) : DB {
 
     override suspend fun findRecurringExpenseForId(recurringExpenseId: Long): RecurringExpense? {
         return roomDB.expenseDao().findRecurringExpenseForId(recurringExpenseId)?.toRecurringExpense()
+    }
+
+    override suspend fun getOldestExpense(): Expense? {
+        return roomDB.expenseDao().getOldestExpense()?.toExpense(this)
     }
 
 }

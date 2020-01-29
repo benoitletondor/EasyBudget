@@ -1,5 +1,5 @@
 /*
- *   Copyright 2019 Benoit LETONDOR
+ *   Copyright 2020 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ public final class Logger
 	/**
 	 * Default logger tag.
 	 */
-	public static final String DEFAULT_TAG	= "EasyBudget";
+	private static final String DEFAULT_TAG	= "EasyBudget";
 	
 // ----------------------------------------->
 	
@@ -65,9 +65,13 @@ public final class Logger
 			Log.e(tag, msg, t);
 		}
 
-		if( BuildConfig.CRASHLYTICS_ACTIVATED && t != null )
+		if( BuildConfig.CRASHLYTICS_ACTIVATED )
 		{
-			Crashlytics.logException(new Throwable(msg, t));
+			if( t != null ) {
+				Crashlytics.logException(new Throwable(msg, t));
+			} else {
+				Crashlytics.log(Log.ERROR, tag, msg);
+			}
 		}
 	}
 	
@@ -154,6 +158,15 @@ public final class Logger
 		{
 			Log.w(tag, msg, t);
 		}
+
+		if( BuildConfig.CRASHLYTICS_ACTIVATED )
+		{
+			if( t != null ) {
+				Crashlytics.logException(new Throwable(msg, t));
+			} else {
+				Crashlytics.log(Log.WARN, tag, msg);
+			}
+		}
 	}
 	
 	/**
@@ -238,7 +251,16 @@ public final class Logger
 		if( !debug || BuildConfig.DEBUG_LOG )
 		{
 			Log.d(tag, msg, t);
-		}	
+		}
+
+		if( BuildConfig.CRASHLYTICS_ACTIVATED )
+		{
+			if( t != null ) {
+				Crashlytics.logException(new Throwable(msg, t));
+			} else {
+				Crashlytics.log(Log.DEBUG, tag, msg);
+			}
+		}
 	}
 	
 	/**

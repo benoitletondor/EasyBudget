@@ -1,5 +1,5 @@
 /*
- *   Copyright 2019 Benoit LETONDOR
+ *   Copyright 2020 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.benoitletondor.easybudgetapp.R
@@ -39,7 +38,7 @@ import org.koin.android.viewmodel.ext.android.viewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
-class RecurringExpenseAddActivity : AppCompatActivity() {
+class RecurringExpenseAddActivity : BaseActivity() {
     private val parameters: Parameters by inject()
     private val viewModel: RecurringExpenseAddViewModel by viewModel()
 
@@ -117,6 +116,19 @@ class RecurringExpenseAddActivity : AppCompatActivity() {
                 .setNegativeButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
                 .show()
         })
+
+        viewModel.expenseAddBeforeInitDateEventStream.observe(this, Observer {
+            AlertDialog.Builder(this)
+                .setTitle(R.string.expense_add_before_init_date_dialog_title)
+                .setMessage(R.string.expense_add_before_init_date_dialog_description)
+                .setPositiveButton(R.string.expense_add_before_init_date_dialog_positive_cta) { _, _ ->
+                    viewModel.onAddExpenseBeforeInitDateConfirmed(getCurrentAmount(), description_edittext.text.toString(), getRecurringTypeFromSpinnerSelection(expense_type_spinner.selectedItemPosition))
+                }
+                .setNegativeButton(R.string.expense_add_before_init_date_dialog_negative_cta) { _, _ ->
+                    viewModel.onAddExpenseBeforeInitDateCancelled()
+                }
+                .show()
+        })
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -181,9 +193,7 @@ class RecurringExpenseAddActivity : AppCompatActivity() {
 
         save_expense_fab.setOnClickListener {
             if (validateInputs()) {
-                val value = java.lang.Double.parseDouble(amount_edittext.text.toString())
-
-                viewModel.onSave(value, description_edittext.text.toString(), getRecurringTypeFromSpinnerSelection(expense_type_spinner.selectedItemPosition))
+                viewModel.onSave(getCurrentAmount(), description_edittext.text.toString(), getRecurringTypeFromSpinnerSelection(expense_type_spinner.selectedItemPosition))
             }
         }
     }
@@ -217,14 +227,17 @@ class RecurringExpenseAddActivity : AppCompatActivity() {
 
         amount_edittext.preventUnsupportedInputForDecimals()
 
-        val recurringTypesString = arrayOfNulls<String>(7)
-        recurringTypesString[0] = getString(R.string.recurring_interval_daily)
-        recurringTypesString[1] = getString(R.string.recurring_interval_weekly)
-        recurringTypesString[2] = getString(R.string.recurring_interval_bi_weekly)
-        recurringTypesString[3] = getString(R.string.recurring_interval_ter_weekly)
-        recurringTypesString[4] = getString(R.string.recurring_interval_four_weekly)
-        recurringTypesString[5] = getString(R.string.recurring_interval_monthly)
-        recurringTypesString[6] = getString(R.string.recurring_interval_yearly)
+        val recurringTypesString = arrayOf(
+            getString(R.string.recurring_interval_daily),
+            getString(R.string.recurring_interval_weekly),
+            getString(R.string.recurring_interval_bi_weekly),
+            getString(R.string.recurring_interval_ter_weekly),
+            getString(R.string.recurring_interval_four_weekly),
+            getString(R.string.recurring_interval_monthly),
+            getString(R.string.recurring_interval_ter_monthly),
+            getString(R.string.recurring_interval_six_monthly),
+            getString(R.string.recurring_interval_yearly)
+        )
 
         val adapter = ArrayAdapter<String>(this, R.layout.spinner_item, recurringTypesString)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -247,7 +260,9 @@ class RecurringExpenseAddActivity : AppCompatActivity() {
             3 -> return RecurringExpenseType.TER_WEEKLY
             4 -> return RecurringExpenseType.FOUR_WEEKLY
             5 -> return RecurringExpenseType.MONTHLY
-            6 -> return RecurringExpenseType.YEARLY
+            6 -> return RecurringExpenseType.TER_MONTHLY
+            7 -> return RecurringExpenseType.SIX_MONTHLY
+            8 -> return RecurringExpenseType.YEARLY
         }
 
         throw IllegalStateException("getRecurringTypeFromSpinnerSelection unable to get value for $spinnerSelectedItem")
@@ -273,6 +288,10 @@ class RecurringExpenseAddActivity : AppCompatActivity() {
 
             fragment.show(supportFragmentManager, "datePicker")
         }
+    }
+
+    private fun getCurrentAmount(): Double {
+        return java.lang.Double.parseDouble(amount_edittext.text.toString())
     }
 
 }

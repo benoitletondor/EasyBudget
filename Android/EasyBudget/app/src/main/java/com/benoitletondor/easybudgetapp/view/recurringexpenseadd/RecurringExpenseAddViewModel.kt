@@ -1,5 +1,5 @@
 /*
- *   Copyright 2019 Benoit LETONDOR
+ *   Copyright 2020 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -27,15 +27,19 @@ import com.benoitletondor.easybudgetapp.db.DB
 import kotlinx.coroutines.launch
 import java.util.*
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
+import com.benoitletondor.easybudgetapp.parameters.Parameters
+import com.benoitletondor.easybudgetapp.parameters.getInitTimestamp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 
-class RecurringExpenseAddViewModel(private val db: DB) : ViewModel() {
+class RecurringExpenseAddViewModel(private val db: DB,
+                                   private val parameters: Parameters) : ViewModel() {
     val expenseDateLiveData = MutableLiveData<Date>()
     val editTypeIsRevenueLiveData = MutableLiveData<Boolean>()
     val savingIsRevenueEventStream = SingleLiveEvent<Boolean>()
     val finishLiveData = MutableLiveData<Unit>()
+    val expenseAddBeforeInitDateEventStream = SingleLiveEvent<Unit>()
     val errorEventStream = SingleLiveEvent<Unit>()
 
     fun initWithDateAndExpense(date: Date) {
@@ -51,6 +55,26 @@ class RecurringExpenseAddViewModel(private val db: DB) : ViewModel() {
         val isRevenue = editTypeIsRevenueLiveData.value ?: return
         val date = expenseDateLiveData.value ?: return
 
+        if( date.before(Date(parameters.getInitTimestamp())) ) {
+            expenseAddBeforeInitDateEventStream.value = Unit
+            return
+        }
+
+        doSaveExpense(value, description, recurringExpenseType, isRevenue, date)
+    }
+
+    fun onAddExpenseBeforeInitDateConfirmed(value: Double, description: String, recurringExpenseType: RecurringExpenseType) {
+        val isRevenue = editTypeIsRevenueLiveData.value ?: return
+        val date = expenseDateLiveData.value ?: return
+
+        doSaveExpense(value, description, recurringExpenseType, isRevenue, date)
+    }
+
+    fun onAddExpenseBeforeInitDateCancelled() {
+        // No-op
+    }
+
+    private fun doSaveExpense(value: Double, description: String, recurringExpenseType: RecurringExpenseType, isRevenue: Boolean, date: Date) {
         savingIsRevenueEventStream.value = isRevenue
 
         viewModelScope.launch {
@@ -160,6 +184,32 @@ class RecurringExpenseAddViewModel(private val db: DB) : ViewModel() {
                     }
 
                     cal.add(Calendar.MONTH, 1)
+                }
+            }
+            RecurringExpenseType.TER_MONTHLY -> {
+                // Add up to 25 years of expenses
+                for (i in 0 until 4*25) {
+                    try {
+                        db.persistExpense(Expense(expense.title, expense.originalAmount, cal.time, expense))
+                    } catch (t: Throwable) {
+                        Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
+                        return false
+                    }
+
+                    cal.add(Calendar.MONTH, 3)
+                }
+            }
+            RecurringExpenseType.SIX_MONTHLY -> {
+                // Add up to 25 years of expenses
+                for (i in 0 until 2*25) {
+                    try {
+                        db.persistExpense(Expense(expense.title, expense.originalAmount, cal.time, expense))
+                    } catch (t: Throwable) {
+                        Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
+                        return false
+                    }
+
+                    cal.add(Calendar.MONTH, 6)
                 }
             }
             RecurringExpenseType.YEARLY -> {

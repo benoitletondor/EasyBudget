@@ -1,5 +1,5 @@
 <!--
-   Copyright 2019 Benoit LETONDOR
+   Copyright 2020 Benoit LETONDOR
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -51,6 +51,10 @@
             app:title="@string/setting_category_theme_title"
             app:entries="@array/themes"
             app:entryValues="@array/themesData" />
+
+        <Preference
+            app:key="@string/setting_category_backup"
+            app:title="@string/backup_settings_activity_title" />
 
         <CheckBoxPreference
             app:title="@string/setting_category_notifications_daily_title"
@@ -127,8 +131,8 @@
             app:key="@string/setting_category_dev_show_premium_key" />
 
         <Preference
-            app:title="@string/setting_category_show_dark_theme_notif"
-            app:key="@string/setting_category_dev_show_dark_theme_notif_key" />
+            app:title="@string/setting_category_show_backup_notif"
+            app:key="@string/setting_category_dev_show_backup_notif_key" />
 
     </PreferenceCategory>
 

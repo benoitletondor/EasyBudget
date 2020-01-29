@@ -1,5 +1,5 @@
 /*
- *   Copyright 2019 Benoit LETONDOR
+ *   Copyright 2020 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -22,11 +22,11 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Observer
 import com.benoitletondor.easybudgetapp.R
+import com.benoitletondor.easybudgetapp.helper.BaseActivity
 import com.benoitletondor.easybudgetapp.helper.setStatusBarColor
 import com.benoitletondor.easybudgetapp.iab.PremiumPurchaseFlowResult
 import kotlinx.android.synthetic.main.activity_premium.*
@@ -39,7 +39,7 @@ import java.lang.IllegalStateException
  *
  * @author Benoit LETONDOR
  */
-class PremiumActivity : AppCompatActivity() {
+class PremiumActivity : BaseActivity() {
 
     private val viewModel: PremiumViewModel by viewModel()
 
@@ -57,12 +57,13 @@ class PremiumActivity : AppCompatActivity() {
                     1 -> return Premium2Fragment()
                     2 -> return Premium3Fragment()
                     3 -> return Premium4Fragment()
+                    4 -> return Premium5Fragment()
                 }
 
                 throw IllegalStateException()
             }
 
-            override fun getCount(): Int = 4
+            override fun getCount(): Int = 5
         }
         premium_view_pager.offscreenPageLimit = premium_view_pager.adapter!!.count // preload all fragments for transitions smoothness
 

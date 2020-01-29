@@ -1,5 +1,5 @@
 <!--
-   Copyright 2019 Benoit LETONDOR
+   Copyright 2020 Benoit LETONDOR
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -46,6 +46,10 @@
     <string name="no_amount_error">Entrez un montant</string>
     <string name="negative_amount_error">Le montant doit être supérieur à 0</string>
     <string name="invalid_amount">Montant invalide</string>
+    <string name="expense_add_before_init_date_dialog_title">Attention</string>
+    <string name="expense_add_before_init_date_dialog_description">La date de cette entrée est avant la date de premier lancement de l\'application.\n\nLe solde que vous avez entré lorsque vous avez configuré l\'application sera affecté par cette entrée.\n\nVoulez vous continuer ? (Vous pouvez toujours changer le solde depuis le menu au besoin.)</string>
+    <string name="expense_add_before_init_date_dialog_positive_cta">Confirmer</string>
+    <string name="expense_add_before_init_date_dialog_negative_cta">Annuler</string>
 
     <string name="dialog_edit_expense_title">Que voulez-vous faire ?</string>
     <string name="dialog_edit_income_title">Que voulez-vous faire ?</string>
@@ -96,6 +100,8 @@
     <string name="bi_weekly">2 SEMAINES</string>
     <string name="ter_weekly">3 SEMAINES</string>
     <string name="four_weekly">4 SEMAINES</string>
+    <string name="ter_monthly">3 MOIS</string>
+    <string name="six_monthly">6 MOIS</string>
     <string name="yearly">ANNUEL</string>
     <string name="recurring_expense_add_loading_title">Chargement</string>
     <string name="recurring_expense_add_loading_message">Création de la dépense récurrente…</string>
@@ -124,6 +130,8 @@
     <string name="recurring_interval_ter_weekly">Toutes les 3 semaines</string>
     <string name="recurring_interval_four_weekly">Toutes les 4 semaines</string>
     <string name="recurring_interval_monthly">Tous les mois</string>
+    <string name="recurring_interval_ter_monthly">Tous les 3 mois</string>
+    <string name="recurring_interval_six_monthly">Tous les 6 mois</string>
     <string name="recurring_interval_yearly">Tous les ans</string>
 
     <string name="setting_category_app_title">App</string>
@@ -163,14 +171,16 @@
     <string name="setting_theme_platform">Par défaut</string>
 
     <string name="premium_popup_premium_title">Vous êtes premium!</string>
-    <string name="premium_popup_premium_message">Vous avez accès aux fonctionnalités premium:\n\n- Récapitulatif mensuel : Recevez un récapitulatif de vos dépenses et revenus du mois.\n- Rappel journalier si vous avez oublié d’entrer vos dépenses durant la journée\n- Mode sombre\n… et plus de fonctionnalités premium qui seront ajoutées très bientôt !</string>
+    <string name="premium_popup_premium_message">Vous avez accès aux fonctionnalités premium:\n\n- Récapitulatif mensuel : Recevez un récapitulatif de vos dépenses et revenus du mois.\n- Rappel journalier si vous avez oublié d’entrer vos dépenses durant la journée\n- Mode sombre\n- Sauvegarde dans le cloud\n… et plus de fonctionnalités premium qui seront ajoutées très bientôt !</string>
     <string name="premium_popup_not_premium_title">Devenez utilisateur premium</string>
     <string name="premium_popup_not_premium_message">Accédez aux fonctionnalités premium !</string>
-    <string name="premium_popup_not_premium_feature1_title">2. Rappel journalier</string>
+    <string name="premium_popup_not_premium_feature1_title">3. Rappel journalier</string>
     <string name="premium_popup_not_premium_feature1_message">Recevez une notification à la fin de la journée si vous n’avez pas entré vos dépenses.</string>
     <string name="premium_popup_not_premium_feature2_title">1. Récapitulatif mensuel</string>
     <string name="premium_popup_not_premium_feature2_message">Accédez à un récapitulatif de vos dépenses et revenus du mois et voyez combien vous avez économisé.</string>
-    <string name="premium_popup_not_premium_feature_more_dark_theme">3. Gestion du thème sombre!</string>
+    <string name="premium_popup_not_premium_feature_more_dark_theme">4. Gestion du thème sombre!</string>
+    <string name="premium_popup_not_premium_feature_more_backup_title">2. Sauvegarde</string>
+    <string name="premium_popup_not_premium_feature_more_backup_message">Sauvegarde automatique de vos données dans le cloud ! Fini la peur de perdre le détail de votre budget.</string>
     <string name="premium_popup_not_premium_feature_more_title">… et plus de fonctionnalités premium qui seront ajoutées très bientôt !</string>
     <string name="premium_popup_not_premium_cta">Acheter</string>
     <string name="premium_popup_become_title">Devenez utilisateur premium</string>
@@ -239,6 +249,51 @@
     <string name="balance">Solde</string>
     <string name="monthly_report_no_entries_placeholder">Rien pour ce mois.</string>
     <string name="monthly_report_hint">Psst : Vous pouvez accéder aux récapitulatifs mensuel depuis ce bouton !</string>
-    <string name="dark_theme_notif_message">EasyBudget 2.0 est disponible avec gestion du thème sombre pour les utilisateurs premium! Cliquez pour découvrir</string>
-    <string name="dark_theme_notif_cta">Découvrir</string>
+
+    <string name="backup_settings_activity_title">Sauvegarde</string>
+    <string name="backup_settings_cloud_backup">Sauvegarde cloud EasyBudget</string>
+    <string name="backup_settings_not_authenticated_description">La sauvegarde cloud EasyBudget est disponible pour les utilisateurs premium sans coûts additionnels.\nPour activer la sauvegarde cloud EasyBudget, connectez vous à votre compte Google</string>
+    <string name="backup_settings_not_authenticated_description_2">Votre compte Google sera utilisé pour identifier votre sauvegarde. Plus tard, vous pourrez restaurer vos données sur un nouveau téléphone en utilisant ce même compte.\n\nVotre compte sera utilisé uniquement pour cela, et rien d\'autre.</string>
+    <string name="backup_settings_not_authenticated_privacy_title">EasyBudget respecte votre vie privée</string>
+    <string name="backup_settings_not_authenticated_privacy_message">En vous connectant à votre compte Google, vous acceptez que vos données EasyBudget soient sauvegardées de manière sécurisée dans le cloud et liées à votre compte Google.\n\nVos données EasyBudget ne seront jamais utilisées ou vendues à qui que ce soit.\n\nVoulez vous continuer ?</string>
+    <string name="backup_settings_not_authenticated_privacy_positive_cta">Accepter</string>
+    <string name="backup_settings_not_authenticated_privacy_negative_cta">Annuler</string>
+    <string name="backup_settings_backups_activated">Sauvegarde cloud activée</string>
+    <string name="backup_settings_backups_deactivated">Sauvegarde cloud désactivée</string>
+    <string name="backup_settings_authenticate_cta">Connexion avec Google</string>
+    <string name="backup_settings_your_google_account">Votre compte Google</string>
+    <string name="backup_settings_cloud_backup_status">Sauvegarde cloud : %s</string>
+    <string name="backup_settings_cloud_backup_status_activated">activée</string>
+    <string name="backup_settings_cloud_backup_status_disabled">désactivée</string>
+    <string name="backup_settings_logout_cta">Déconnexion</string>
+    <string name="backup_activated_description">Vos données seront automatiquement sauvegardées toutes les semaines. Si vous changez de téléphone ou perdez vos données, vous pourrez restaurer votre sauvegarde ici.</string>
+    <string name="backup_last_update_date">Dernière sauvegarde : %s</string>
+    <string name="backup_last_update_date_never">Jamais</string>
+    <string name="backup_now_cta">Sauvegarder maintenant</string>
+    <string name="backup_restore_description">Restaurer la sauvegarde</string>
+    <string name="backup_restore_explanation">Restaurer la sauvegarde signifie que vos données EasyBudget actuelles (si vous en avez) seront supprimées et remplacées par celles de votre dernière sauvegarde cloud. C\'est une opération irréversible.</string>
+    <string name="backup_restore_cta">Restaurer la sauvegarde</string>
+    <string name="backup_now_error_title">Impossible de sauvegarder</string>
+    <string name="backup_now_error_message">La sauvegarde a échouée en raison d\'une erreur. Vérifiez votre connexion internet et réessayez ou l\'application réessaiera automatiquement plus tard.</string>
+    <string name="backup_already_exist_title">Ancienne sauvegarde trouvée</string>
+    <string name="backup_already_exist_message">Une ancienne sauvegarde datant du %s a été trouvée sur votre compte.\n\nVoulez vous la restaurer maintenant ?\n\n(Vous pouvez le faire plus tard, avant la prochaine sauvegarde)</string>
+    <string name="backup_already_exist_positive_cta">Restaurer</string>
+    <string name="backup_already_exist_negative_cta">Ignorer</string>
+    <string name="backup_restore_error_title">Impossible de restaurer les données</string>
+    <string name="backup_restore_error_message">Une erreur est survenue pendant la restauration. Vérifiez votre connexion internet et réessayez plus tard.</string>
+    <string name="backup_restore_confirmation_title">Restaurer la sauvegarde</string>
+    <string name="backup_restore_confirmation_message">Êtes vous sur de vouloir restaurer les données de la sauvegarde du %s ?\n\nVos données actuelles seront remplacées par celles de la sauvegarde de manière irréversible!\n\nL\'application redémarrera une fois terminé.</string>
+    <string name="backup_restore_confirmation_positive_cta">Restaurer</string>
+    <string name="backup_restore_confirmation_negative_cta">Annuler</string>
+    <string name="backup_wipe_data_title">Supprimer votre sauvegarde cloud</string>
+    <string name="backup_wipe_data_description">EasyBudget vous donne le contrôle sur vos données : Cliquez ici si vous souhaitez supprimer votre sauvegarde du cloud</string>
+    <string name="backup_wipe_data_cta">Supprimer la sauvegarde</string>
+    <string name="backup_wipe_data_confirmation_title">Supprimer la sauvegarde cloud</string>
+    <string name="backup_wipe_data_confirmation_message">Êtes vous sur de vouloir supprimer vos données de sauvegarde du cloud ?\n\nCette opération est irréversible et vous perdrez accès à votre sauvegarde (les données actuelles locales de l\'application ne seront pas affectées).</string>
+    <string name="backup_wipe_data_confirmation_positive_cta">Supprimer</string>
+    <string name="backup_wipe_data_confirmation_negative_cta">Annuler</string>
+    <string name="backup_wipe_data_error_title">Impossible de supprimer la sauvegarde cloud</string>
+    <string name="backup_wipe_data_error_message">Une erreur est survenue lors de la suppression de votre sauvegarde cloud. Vérifiez votre connexion internet et réessayez.</string>
+    <string name="backup_notif_message">Nouveau pour les utilisateurs premium : Sauvegardez vos données dans le cloud ! Cliquez pour configurer</string>
+    <string name="backup_notif_cta">Configurer</string>
 </resources>

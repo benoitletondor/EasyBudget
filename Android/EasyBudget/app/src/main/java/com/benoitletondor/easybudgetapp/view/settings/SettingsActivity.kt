@@ -1,5 +1,5 @@
 /*
- *   Copyright 2019 Benoit LETONDOR
+ *   Copyright 2020 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -20,10 +20,10 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.appcompat.app.AppCompatActivity
 import android.view.MenuItem
 
 import com.benoitletondor.easybudgetapp.R
+import com.benoitletondor.easybudgetapp.helper.BaseActivity
 import com.benoitletondor.easybudgetapp.view.premium.PremiumActivity
 import kotlinx.android.synthetic.main.activity_settings.*
 
@@ -32,7 +32,7 @@ import kotlinx.android.synthetic.main.activity_settings.*
  *
  * @author Benoit LETONDOR
  */
-class SettingsActivity : AppCompatActivity() {
+class SettingsActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,9 +70,9 @@ class SettingsActivity : AppCompatActivity() {
          */
         const val SHOW_PREMIUM_INTENT_KEY = "showPremium"
         /**
-         * Key to specify that the theme options should be shown to the user
+         * Key to specify that the backup options should be shown to the user
          */
-        const val SHOW_THEME_INTENT_KEY = "showTheme"
+        const val SHOW_BACKUP_INTENT_KEY = "showBackup"
         /**
          * Intent action broadcast when the user has successfully completed the [PremiumActivity]
          */

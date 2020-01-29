@@ -1,5 +1,5 @@
 /*
- *   Copyright 2019 Benoit LETONDOR
+ *   Copyright 2020 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpens
 import com.benoitletondor.easybudgetapp.view.report.MonthlyReportViewModel
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseViewModel
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyViewModel
+import com.benoitletondor.easybudgetapp.view.settings.backup.BackupSettingsViewModel
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -31,7 +32,8 @@ val viewModelModule = module {
     viewModel { SelectCurrencyViewModel() }
     viewModel { MonthlyReportViewModel(get()) }
     viewModel { MonthlyReportBaseViewModel(get()) }
-    viewModel { ExpenseEditViewModel(get()) }
-    viewModel { RecurringExpenseAddViewModel(get()) }
+    viewModel { ExpenseEditViewModel(get(), get()) }
+    viewModel { RecurringExpenseAddViewModel(get(), get()) }
     viewModel { PremiumViewModel(get()) }
+    viewModel { BackupSettingsViewModel(get(), get(), get()) }
 }

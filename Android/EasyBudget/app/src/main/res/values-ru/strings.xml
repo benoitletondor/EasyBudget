@@ -1,5 +1,5 @@
 <!--
-   Copyright 2019 Benoit LETONDOR
+   Copyright 2020 Benoit LETONDOR
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -46,6 +46,10 @@
     <string name="no_amount_error">Введите количество</string>
     <string name="negative_amount_error">Сумма должна быть больше 0</string>
     <string name="invalid_amount">Недопустимая сумма</string>
+    <string name="expense_add_before_init_date_dialog_title">Предупреждение</string>
+    <string name="expense_add_before_init_date_dialog_description">Дата записи, которую вы хотите добавить, предшествует дате установки приложения.\n\nЭто означает, что эта запись повлияет на баланс, который вы ввели при настройке приложения.\n\nВы хотите продолжить?\n(Вы все еще можете изменить баланс в меню, если вам нужно.)</string>
+    <string name="expense_add_before_init_date_dialog_positive_cta">Подтверждение</string>
+    <string name="expense_add_before_init_date_dialog_negative_cta">Отмена</string>
 
     <string name="dialog_edit_expense_title">Что Вы хотите сделать?</string>
     <string name="dialog_edit_income_title">Что Вы хотите сделать?</string>
@@ -98,6 +102,8 @@
     <string name="bi_weekly">2 НЕДЕЛИ</string>
     <string name="ter_weekly">3 НЕДЕЛИ</string>
     <string name="four_weekly">4 НЕДЕЛИ</string>
+    <string name="ter_monthly">3 МЕСЯЦЫ</string>
+    <string name="six_monthly">6 МЕСЯЦЫ</string>
     <string name="yearly">ЕЖЕГОДНО</string>
     <string name="recurring_expense_add_loading_title">Загрузка</string>
     <string name="recurring_expense_add_loading_message">Создание периодического расхода…</string>
@@ -124,6 +130,8 @@
     <string name="recurring_interval_ter_weekly">Каждые 3 недели</string>
     <string name="recurring_interval_four_weekly">Каждые 4 недели</string>
     <string name="recurring_interval_monthly">Ежемесячно</string>
+    <string name="recurring_interval_ter_monthly">Каждые 3 месяца</string>
+    <string name="recurring_interval_six_monthly">Каждые 6 месяца</string>
     <string name="recurring_interval_yearly">Ежегодно</string>
 
     <string name="setting_category_app_title">Приложение</string>
@@ -164,14 +172,16 @@
     <string name="setting_theme_platform">Системные установки по умолчанию</string>
 
     <string name="premium_popup_premium_title">Вы премиум-пользователь!</string>
-    <string name="premium_popup_premium_message">У Вас есть доступ к премиум-функциям:\n\n- Ежемесячный отчет: Подбейте итог Ваших расходов и доходов за месяц\n- Ежедневное напоминание, если Вы забыли внести свои расходы в течение дня\n… больше премиум-функций будут добавлены в ближайшее время!</string>
+    <string name="premium_popup_premium_message">У Вас есть доступ к премиум-функциям:\n\n- Ежемесячный отчет: Подбейте итог Ваших расходов и доходов за месяц\n- Ежедневное напоминание, если Вы забыли внести свои расходы в течение дня\n- Облачное резервное копирование\n… больше премиум-функций будут добавлены в ближайшее время!</string>
     <string name="premium_popup_not_premium_title">Стать премиум-пользователем</string>
     <string name="premium_popup_not_premium_message">Получить доступ ко всем премиум-функциям!</string>
-    <string name="premium_popup_not_premium_feature1_title">2. Ежедневное напоминание</string>
+    <string name="premium_popup_not_premium_feature1_title">3. Ежедневное напоминание</string>
     <string name="premium_popup_not_premium_feature1_message">Получите уведомление в конце дня, если Вы не указали свои расходы.</string>
     <string name="premium_popup_not_premium_feature2_title">1. Месячный отчет</string>
     <string name="premium_popup_not_premium_feature2_message">Получить итог Ваших доходов и расходов за месяц и увидеть, сколько Вы съэкономили.</string>
-    <string name="premium_popup_not_premium_feature_more_dark_theme">3. Темная поддержка тем!</string>
+    <string name="premium_popup_not_premium_feature_more_dark_theme">4. Темная поддержка тем!</string>
+    <string name="premium_popup_not_premium_feature_more_backup_title">2. Резервный</string>
+    <string name="premium_popup_not_premium_feature_more_backup_message">Автоматическое резервное копирование ваших данных в облаке! Не нужно больше беспокоиться о потере бюджета.</string>
     <string name="premium_popup_not_premium_feature_more_title">…больше премиум-функций в ближайшее время!</string>
     <string name="premium_popup_not_premium_cta">Купить</string>
     <string name="premium_popup_become_title">Стать премиум-пользователем</string>
@@ -241,6 +251,51 @@
     <string name="balance">Баланс</string>
     <string name="monthly_report_no_entries_placeholder">Ничего за этот месяц.</string>
     <string name="monthly_report_hint">Тсс: Отсюда Вы можете получить доступ к месячным отчетам!</string>
-    <string name="dark_theme_notif_message">EasyBudget 2.0 вышел с поддержкой темных тем для премиум-пользователей! Нажмите, чтобы узнать</string>
-    <string name="dark_theme_notif_cta">Обнаружить</string>
+
+    <string name="backup_settings_activity_title">Резервный</string>
+    <string name="backup_settings_cloud_backup">EasyBudget облачное резервное копирование</string>
+    <string name="backup_settings_not_authenticated_description">Облачное резервное копирование EasyBudget доступно для премиум-пользователей без дополнительной оплаты.\nЧтобы включить облачное резервное копирование EasyBudget, войдите в свою учетную запись Google</string>
+    <string name="backup_settings_not_authenticated_description_2">Ваша учетная запись Google будет использоваться для идентификации вашей резервной копии. Позже вы сможете восстановить данные на новом телефоне, используя эту учетную запись.\n\nВаш аккаунт не будет использоваться ни для чего другого.</string>
+    <string name="backup_settings_not_authenticated_privacy_title">EasyBudget серьезно относится к вашей конфиденциальности</string>
+    <string name="backup_settings_not_authenticated_privacy_message">Проходя аутентификацию в своей учетной записи Google, вы соглашаетесь с тем, что ваши записи EasyBudget будут безопасно загружены в облако и связаны с вашей учетной записью Google.\n\nВаши данные EasyBudget никогда не будут использованы или проданы кому-либо.\n\nВы хотите продолжить?</string>
+    <string name="backup_settings_not_authenticated_privacy_positive_cta">принимать</string>
+    <string name="backup_settings_not_authenticated_privacy_negative_cta">Отмена</string>
+    <string name="backup_settings_backups_activated">Облачное резервное копирование активировано</string>
+    <string name="backup_settings_backups_deactivated">Облачное резервное копирование отключено</string>
+    <string name="backup_settings_authenticate_cta">Войти через Google</string>
+    <string name="backup_settings_your_google_account">Ваш аккаунт Google</string>
+    <string name="backup_settings_cloud_backup_status">Облачное резервное копирование: %s</string>
+    <string name="backup_settings_cloud_backup_status_activated">включен</string>
+    <string name="backup_settings_cloud_backup_status_disabled">отключенной</string>
+    <string name="backup_settings_logout_cta">Выйти</string>
+    <string name="backup_activated_description">Ваши данные будут автоматически копироваться каждую неделю. Если вы когда-нибудь поменяете телефон или сотрете свои данные, вы можете восстановить резервную копию отсюда.</string>
+    <string name="backup_last_update_date">Последнее резервное копирование: %s</string>
+    <string name="backup_last_update_date_never">Никогда</string>
+    <string name="backup_now_cta">Резервное копирование сейчас</string>
+    <string name="backup_restore_description">Восстановить резервные данные</string>
+    <string name="backup_restore_explanation">Восстановление ваших данных означает, что текущие записи EasyBudget будут удалены и заменены записями последней резервной копии. Это необратимая операция.</string>
+    <string name="backup_restore_cta">Восстановить данные из последней резервной копии</string>
+    <string name="backup_now_error_title">Невозможно сделать резервную копию</string>
+    <string name="backup_now_error_message">Резервное копирование не завершено из-за ошибки. Вы можете проверить свою связь и попробовать еще раз, или позже приложение автоматически повторится.</string>
+    <string name="backup_already_exist_title">Предыдущая резервная копия найдена</string>
+    <string name="backup_already_exist_message">Предыдущая резервная копия EasyBudget от %s была найдена в вашей учетной записи.\n\nВы хотите восстановить его сейчас?\n\n(Вы все еще можете сделать это позже, до следующего резервного копирования)</string>
+    <string name="backup_already_exist_positive_cta">Восстановить</string>
+    <string name="backup_already_exist_negative_cta">игнорировать</string>
+    <string name="backup_restore_error_title">Ошибка восстановления данных</string>
+    <string name="backup_restore_error_message">Произошла ошибка при восстановлении данных. Пожалуйста, проверьте вашу связь и повторите попытку позже.</string>
+    <string name="backup_restore_confirmation_title">Восстановление резервной копии</string>
+    <string name="backup_restore_confirmation_message">Вы уверены, что хотите восстановить данные из резервной копии %s?\n\nЭто заменит ваши текущие данные необратимым способом!\n\nПриложение перезапустится после процесса.</string>
+    <string name="backup_restore_confirmation_positive_cta">Восстановить</string>
+    <string name="backup_restore_confirmation_negative_cta">Отмена</string>
+    <string name="backup_wipe_data_title">Удалить облачную резервную копию</string>
+    <string name="backup_wipe_data_description">EasyBudget позволяет вам контролировать ваши данные: нажмите здесь, если вы хотите удалить все ваши резервные данные из облака</string>
+    <string name="backup_wipe_data_cta">Удалить резервную копию</string>
+    <string name="backup_wipe_data_confirmation_title">Удалить облачную резервную копию</string>
+    <string name="backup_wipe_data_confirmation_message">Вы уверены, что хотите удалить все свои резервные данные из облака?\n\nЭта операция необратима, и вы потеряете доступ к своим резервным данным (данные текущего локального приложения не будут затронуты).</string>
+    <string name="backup_wipe_data_confirmation_positive_cta">удалять</string>
+    <string name="backup_wipe_data_confirmation_negative_cta">Отмена</string>
+    <string name="backup_wipe_data_error_title">Невозможно удалить облачную резервную копию</string>
+    <string name="backup_wipe_data_error_message">Произошла ошибка при удалении ваших резервных данных. Пожалуйста, проверьте вашу связь и повторите попытку позже.</string>
+    <string name="backup_notif_message">Новое для премиум-пользователей: резервное копирование данных в облаке! Нажмите, чтобы настроить</string>
+    <string name="backup_notif_cta">Настроить</string>
 </resources>

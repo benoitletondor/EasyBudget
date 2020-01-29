@@ -1,5 +1,5 @@
 /*
- *   Copyright 2019 Benoit LETONDOR
+ *   Copyright 2020 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -53,6 +53,16 @@ enum class RecurringExpenseType {
      * An expense that occurs every month
      */
     MONTHLY,
+
+    /**
+     * An expense that occurs every 3 months
+     */
+    TER_MONTHLY,
+
+    /**
+     * An expense that occurs every 6 months
+     */
+    SIX_MONTHLY,
 
     /**
      * An expense that occurs once a year

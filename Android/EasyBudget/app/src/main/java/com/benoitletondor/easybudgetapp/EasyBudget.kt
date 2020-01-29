@@ -1,5 +1,5 @@
 /*
- *   Copyright 2019 Benoit LETONDOR
+ *   Copyright 2020 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -29,17 +29,14 @@ import com.batch.android.BatchActivityLifecycleHelper
 import com.batch.android.BatchNotificationChannelsManager.DEFAULT_CHANNEL_ID
 import com.batch.android.Config
 import com.batch.android.PushNotificationType
-import com.benoitletondor.easybudgetapp.BuildVersion.VERSION_2_0_10
-import com.benoitletondor.easybudgetapp.BuildVersion.VERSION_2_0_13
+import com.benoitletondor.easybudgetapp.BuildVersion.VERSION_2_1_0
+import com.benoitletondor.easybudgetapp.BuildVersion.VERSION_2_1_3
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.injection.appModule
 import com.benoitletondor.easybudgetapp.injection.viewModelModule
-import com.benoitletondor.easybudgetapp.notif.DarkThemeNotif
-import com.benoitletondor.easybudgetapp.notif.CHANNEL_DAILY_REMINDERS
-import com.benoitletondor.easybudgetapp.notif.CHANNEL_MONTHLY_REMINDERS
-import com.benoitletondor.easybudgetapp.notif.CHANNEL_NEW_FEATURES
+import com.benoitletondor.easybudgetapp.notif.*
 import com.benoitletondor.easybudgetapp.parameters.*
 import com.benoitletondor.easybudgetapp.push.PushService.Companion.DAILY_REMINDER_KEY
 import com.benoitletondor.easybudgetapp.push.PushService.Companion.MONTHLY_REMINDER_KEY
@@ -49,10 +46,12 @@ import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
 import com.benoitletondor.easybudgetapp.view.getRatingPopupUserStep
 import com.crashlytics.android.Crashlytics
 import io.fabric.sdk.android.Fabric
+import kotlinx.coroutines.runBlocking
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
+import org.koin.java.KoinJavaComponent.get
 import java.util.*
 
 /**
@@ -63,9 +62,6 @@ import java.util.*
 class EasyBudget : Application() {
     private val iab: Iab by inject()
     private val parameters: Parameters by inject()
-
-    // This is injected only to ensure it's created, it is closed right after onCreate
-    private val db: DB by inject()
 
 // ------------------------------------------>
 
@@ -81,9 +77,6 @@ class EasyBudget : Application() {
         // Init actions
         init()
 
-        // Check if an update occurred and perform action if needed
-        checkUpdateAction()
-
         // Crashlytics
         if ( BuildConfig.CRASHLYTICS_ACTIVATED ) {
             Fabric.with(this, Crashlytics())
@@ -91,9 +84,21 @@ class EasyBudget : Application() {
             Crashlytics.setUserIdentifier(parameters.getLocalId())
         }
 
-        // Ensure DB is created
-        db.use {
+        // Check if an update occurred and perform action if needed
+        checkUpdateAction()
+
+        // Ensure DB is created and reset init date if needed
+        get(DB::class.java).use {
             it.ensureDBCreated()
+
+            // FIXME this should be done on restore, change that for the whole parameters restoration
+            if( parameters.getShouldResetInitDate() ) {
+                runBlocking { it.getOldestExpense() }?.let { expense ->
+                    parameters.setInitTimestamp(expense.date.time)
+                }
+
+                parameters.setShouldResetInitDate(false)
+            }
         }
 
         // Batch
@@ -105,6 +110,8 @@ class EasyBudget : Application() {
 
     /**
      * Init app const and parameters
+     *
+     * DO NOT USE LOGGER HERE
      */
     private fun init() {
         /*
@@ -112,8 +119,6 @@ class EasyBudget : Application() {
          */
         val initDate = parameters.getInitTimestamp()
         if (initDate <= 0) {
-            Logger.debug("Registering first launch date")
-
             parameters.setInitTimestamp(Date().time)
             parameters.setUserCurrency(Currency.getInstance(Locale.getDefault())) // Set a default currency before onboarding
         }
@@ -124,11 +129,7 @@ class EasyBudget : Application() {
         var localId = parameters.getLocalId()
         if (localId == null) {
             localId = UUID.randomUUID().toString()
-            Logger.debug("Generating local id : $localId")
-
             parameters.setLocalId(localId)
-        } else {
-            Logger.debug("Local id : $localId")
         }
 
         // Activity counter for app foreground & background
@@ -365,8 +366,8 @@ class EasyBudget : Application() {
     private fun onUpdate(previousVersion: Int, @Suppress("SameParameterValue") newVersion: Int) {
         Logger.debug("Update detected, from $previousVersion to $newVersion")
 
-        if( previousVersion < VERSION_2_0_10 && newVersion <= VERSION_2_0_13 && iab.isUserPremium() ) {
-            DarkThemeNotif.showDarkThemeNotif(this)
+        if( previousVersion < VERSION_2_1_0 && newVersion == VERSION_2_1_3 && iab.isUserPremium() && !parameters.isBackupEnabled() ) {
+            BackupNotif.showBackupNotif(this)
         }
     }
 

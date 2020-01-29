@@ -1,5 +1,5 @@
 /*
- *   Copyright 2019 Benoit LETONDOR
+ *   Copyright 2020 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import androidx.room.*
 import com.benoitletondor.easybudgetapp.db.impl.entity.ExpenseEntity
 import com.benoitletondor.easybudgetapp.db.impl.entity.RecurringExpenseEntity
 import java.util.*
+import androidx.sqlite.db.SupportSQLiteQuery
+import androidx.room.RawQuery
 
 @Dao
 interface ExpenseDao {
@@ -71,4 +73,10 @@ interface ExpenseDao {
 
     @Query("SELECT * FROM monthlyexpense WHERE _expense_id = :recurringExpenseId LIMIT 1")
     suspend fun findRecurringExpenseForId(recurringExpenseId: Long): RecurringExpenseEntity?
+
+    @RawQuery
+    suspend fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
+
+    @Query("SELECT * FROM expense ORDER BY date LIMIT 1")
+    suspend fun getOldestExpense(): ExpenseEntity?
 }

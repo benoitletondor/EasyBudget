@@ -1,5 +1,5 @@
 /*
- *   Copyright 2019 Benoit LETONDOR
+ *   Copyright 2020 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -41,7 +41,6 @@ import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.widget.EditText
 import android.widget.LinearLayout
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 
 import com.benoitletondor.easybudgetapp.R
@@ -66,7 +65,7 @@ import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseAddActivity
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
-import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.SHOW_THEME_INTENT_KEY
+import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.SHOW_BACKUP_INTENT_KEY
 import com.benoitletondor.easybudgetapp.view.welcome.getOnboardingStep
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -79,7 +78,7 @@ import org.koin.android.ext.android.inject
  *
  * @author Benoit LETONDOR
  */
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
 
     private lateinit var receiver: BroadcastReceiver
 
@@ -123,24 +122,24 @@ class MainActivity : AppCompatActivity() {
 
         receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-                when {
-                    INTENT_EXPENSE_DELETED == intent.action -> {
+                when (intent.action) {
+                    INTENT_EXPENSE_DELETED -> {
                         val expense = intent.getParcelableExtra<Expense>("expense")!!
 
                         viewModel.onDeleteExpenseClicked(expense)
                     }
-                    INTENT_RECURRING_EXPENSE_DELETED == intent.action -> {
+                    INTENT_RECURRING_EXPENSE_DELETED -> {
                         val expense = intent.getParcelableExtra<Expense>("expense")!!
                         val deleteType = RecurringExpenseDeleteType.fromValue(intent.getIntExtra("deleteType", RecurringExpenseDeleteType.ALL.value))!!
 
                         viewModel.onDeleteRecurringExpenseClicked(expense, deleteType)
                     }
-                    SelectCurrencyFragment.CURRENCY_SELECTED_INTENT == intent.action -> viewModel.onCurrencySelected()
-                    INTENT_SHOW_WELCOME_SCREEN == intent.action -> {
+                    SelectCurrencyFragment.CURRENCY_SELECTED_INTENT -> viewModel.onCurrencySelected()
+                    INTENT_SHOW_WELCOME_SCREEN -> {
                         val startIntent = Intent(this@MainActivity, WelcomeActivity::class.java)
                         ActivityCompat.startActivityForResult(this@MainActivity, startIntent, WELCOME_SCREEN_ACTIVITY_CODE, null)
                     }
-                    INTENT_IAB_STATUS_CHANGED == intent.action -> viewModel.onIabStatusChanged()
+                    INTENT_IAB_STATUS_CHANGED -> viewModel.onIabStatusChanged()
                 }
             }
         }
@@ -153,7 +152,7 @@ class MainActivity : AppCompatActivity() {
             openPremiumIfNeeded(intent)
             openAddExpenseIfNeeded(intent)
             openAddRecurringExpenseIfNeeded(intent)
-            openSettingsForThemeIfNeeded(intent)
+            openSettingsForBackupIfNeeded(intent)
         }
 
         viewModel.expenseDeletionSuccessEventStream.observe(this, Observer { (deletedExpense, newBalance) ->
@@ -288,8 +287,11 @@ class MainActivity : AppCompatActivity() {
             builder.setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
             builder.setPositiveButton(R.string.ok) { dialog, _ ->
                 try {
-                    val newBalance = java.lang.Double.valueOf(amountEditText.text.toString())
-                    viewModel.onNewBalanceSelected(newBalance, getString(R.string.adjust_balance_expense_title))
+                    val stringValue = amountEditText.text.toString()
+                    if( stringValue.isNotBlank() ) {
+                        val newBalance = java.lang.Double.valueOf(stringValue)
+                        viewModel.onNewBalanceSelected(newBalance, getString(R.string.adjust_balance_expense_title))
+                    }
                 } catch (e: Exception) {
                     Logger.error("Error parsing new balance", e)
                 }
@@ -429,7 +431,7 @@ class MainActivity : AppCompatActivity() {
         openPremiumIfNeeded(intent)
         openAddExpenseIfNeeded(intent)
         openAddRecurringExpenseIfNeeded(intent)
-        openSettingsForThemeIfNeeded(intent)
+        openSettingsForBackupIfNeeded(intent)
     }
 
 // ------------------------------------------>
@@ -516,13 +518,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Open the settings activity to display theme options if the given intent contains the
-     * [.INTENT_REDIRECT_TO_SETTINGS_FOR_THEME_EXTRA] extra.
+     * Open the settings activity to display backup options if the given intent contains the
+     * [.INTENT_REDIRECT_TO_SETTINGS_FOR_BACKUP_EXTRA] extra.
      */
-    private fun openSettingsForThemeIfNeeded(intent: Intent) {
-        if( intent.getBooleanExtra(INTENT_REDIRECT_TO_SETTINGS_FOR_THEME_EXTRA, false) ) {
+    private fun openSettingsForBackupIfNeeded(intent: Intent) {
+        if( intent.getBooleanExtra(INTENT_REDIRECT_TO_SETTINGS_FOR_BACKUP_EXTRA, false) ) {
             val startIntent = Intent(this, SettingsActivity::class.java).apply {
-                putExtra(SHOW_THEME_INTENT_KEY, true)
+                putExtra(SHOW_BACKUP_INTENT_KEY, true)
             }
             ActivityCompat.startActivityForResult(this@MainActivity, startIntent, SETTINGS_SCREEN_ACTIVITY_CODE, null)
         }
@@ -611,9 +613,7 @@ class MainActivity : AppCompatActivity() {
             args.putInt(CaldroidFragment.THEME_RESOURCE, R.style.caldroid_style)
 
             calendarFragment.arguments = args
-
-            val minDate = Date(parameters.getInitTimestamp())
-            calendarFragment.setMinDate(minDate)
+            calendarFragment.setMinDate(Date(parameters.getInitTimestamp()).computeCalendarMinDateFromInitDate())
         }
 
         val listener = object : CaldroidListener() {
@@ -837,7 +837,7 @@ class MainActivity : AppCompatActivity() {
 
         const val INTENT_REDIRECT_TO_PREMIUM_EXTRA = "intent.extra.premiumshow"
         const val INTENT_REDIRECT_TO_SETTINGS_EXTRA = "intent.extra.redirecttosettings"
-        const val INTENT_REDIRECT_TO_SETTINGS_FOR_THEME_EXTRA = "intent.extra.redirecttosettingsfortheme"
+        const val INTENT_REDIRECT_TO_SETTINGS_FOR_BACKUP_EXTRA = "intent.extra.redirecttosettingsforbackup"
 
         const val ANIMATE_TRANSITION_KEY = "animate"
         const val CENTER_X_KEY = "centerX"
