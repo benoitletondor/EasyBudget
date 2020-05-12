@@ -47,6 +47,9 @@ android {
             buildConfigField "boolean", "ANALYTICS_ACTIVATED", "false"
             buildConfigField "boolean", "DEV_PREFERENCES", "true"
             buildConfigField "String", "LICENCE_KEY", licence_key
+            firebaseCrashlytics {
+                mappingFileUploadEnabled false
+            }
         }
         release {
             buildConfigField "boolean", "DEBUG_LOG", "false"
