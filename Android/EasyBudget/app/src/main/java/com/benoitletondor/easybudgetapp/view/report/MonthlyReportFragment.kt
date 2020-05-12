@@ -53,7 +53,7 @@ class MonthlyReportFragment : Fragment() {
 // ---------------------------------->
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        date = arguments!!.getSerializable(ARG_DATE) as Date
+        date = requireArguments().getSerializable(ARG_DATE) as Date
 
         // Inflate the layout for this fragment
         val v = inflater.inflate(R.layout.fragment_monthly_report, container, false)
@@ -66,7 +66,7 @@ class MonthlyReportFragment : Fragment() {
         val expensesAmountTextView = v.findViewById<TextView>(R.id.monthly_report_fragment_expenses_total_tv)
         val balanceTextView = v.findViewById<TextView>(R.id.monthly_report_fragment_balance_tv)
 
-        viewModel.monthlyReportDataLiveData.observe(this, Observer { result ->
+        viewModel.monthlyReportDataLiveData.observe(viewLifecycleOwner, Observer { result ->
             progressBar.visibility = View.GONE
             content.visibility = View.VISIBLE
 

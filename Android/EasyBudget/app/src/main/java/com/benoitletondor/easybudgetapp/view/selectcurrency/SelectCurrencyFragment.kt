@@ -69,7 +69,7 @@ class SelectCurrencyFragment : DialogFragment() {
         // Put some padding between title and content
         v.setPadding(0, resources.getDimensionPixelSize(R.dimen.select_currency_dialog_padding_top), 0, 0)
 
-        val builder = AlertDialog.Builder(activity!!)
+        val builder = AlertDialog.Builder(requireActivity())
 
         builder.setView(v)
         builder.setTitle(R.string.setting_category_currency_change_dialog_title)
