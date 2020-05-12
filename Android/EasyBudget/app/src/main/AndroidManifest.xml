@@ -29,9 +29,6 @@
         <meta-data
             android:name="google_analytics_ssaid_collection_enabled"
             android:value="false" /> <!-- Fabric.io -->
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="4f073b46e47c18a4636da5e93128e7c7d9f1600c" />
 
         <activity
             android:name=".view.main.MainActivity"

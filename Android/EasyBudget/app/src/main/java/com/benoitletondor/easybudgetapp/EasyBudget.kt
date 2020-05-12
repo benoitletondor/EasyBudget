@@ -44,8 +44,7 @@ import com.benoitletondor.easybudgetapp.view.main.MainActivity
 import com.benoitletondor.easybudgetapp.view.RatingPopup
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
 import com.benoitletondor.easybudgetapp.view.getRatingPopupUserStep
-import com.crashlytics.android.Crashlytics
-import io.fabric.sdk.android.Fabric
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.runBlocking
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
@@ -79,9 +78,13 @@ class EasyBudget : Application() {
 
         // Crashlytics
         if ( BuildConfig.CRASHLYTICS_ACTIVATED ) {
-            Fabric.with(this, Crashlytics())
+            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true)
 
-            Crashlytics.setUserIdentifier(parameters.getLocalId())
+            parameters.getLocalId()?.let {
+                FirebaseCrashlytics.getInstance().setUserId(it)
+            }
+        } else {
+            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(false)
         }
 
         // Check if an update occurred and perform action if needed

@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/EasyBudget.iml" filepath="$PROJECT_DIR$/EasyBudget.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/caldroid/caldroid.iml" filepath="$PROJECT_DIR$/caldroid/caldroid.iml" />
+      <module fileurl="file://$PROJECT_DIR$/EasyBudget.iml" filepath="$PROJECT_DIR$/EasyBudget.iml" group="EasyBudget" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="EasyBudget/app" />
+      <module fileurl="file://$PROJECT_DIR$/caldroid/caldroid.iml" filepath="$PROJECT_DIR$/caldroid/caldroid.iml" group="EasyBudget/caldroid" />
     </modules>
   </component>
 </project>

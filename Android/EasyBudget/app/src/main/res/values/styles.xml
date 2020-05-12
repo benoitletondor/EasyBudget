@@ -16,7 +16,7 @@
 
 <resources>
 
-    <style name="Base.AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+    <style name="Base.AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar.Bridge">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
