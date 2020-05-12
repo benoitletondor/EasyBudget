@@ -26,6 +26,8 @@
     <string name="title_activity_edit_income">Редактировать доход</string>
     <string name="title_activity_recurring_expense_add">Добавить периодический расход</string>
     <string name="title_activity_recurring_income_add">Добавить периодический доход</string>
+    <string name="title_activity_recurring_expense_edit">Редактировать периодический расход</string>
+    <string name="title_activity_recurring_income_edit">Редактировать периодический доход</string>
     <string name="title_activity_settings">Настройки</string>
     <string name="title_activity_welcome">EasyBudget</string>
     <string name="title_activity_premium">Премиум</string>
@@ -65,6 +67,7 @@
     <string name="dialog_edit_recurring_income_title">Периодический доход: Что Вы хотите сделать?</string>
     <string-array name="dialog_edit_recurring_expense_choices">
         <item>Редактировать данную запись</item>
+        <item>Редактировать эту запись и следующие</item>
         <item>Удалить только данную запись</item>
         <item>Удалить все следующие записи</item>
         <item>Удалить все предыдущие записи</item>
@@ -72,6 +75,7 @@
     </string-array>
     <string-array name="dialog_edit_recurring_income_choices">
         <item>Редактировать данную запись</item>
+        <item>Редактировать эту запись и следующие</item>
         <item>Удалить только данную запись</item>
         <item>Удалить все следующие записи</item>
         <item>Удалить все предыдущие записи</item>

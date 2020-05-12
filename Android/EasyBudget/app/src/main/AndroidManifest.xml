@@ -65,7 +65,7 @@
             android:label="@string/title_activity_add_expense"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".view.recurringexpenseadd.RecurringExpenseAddActivity"
+            android:name=".view.recurringexpenseadd.RecurringExpenseEditActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_recurring_expense_add"
             android:screenOrientation="portrait" />

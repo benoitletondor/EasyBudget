@@ -22,9 +22,9 @@ import java.util.*
 
 data class RecurringExpense(val id: Long?,
                             val title: String,
-                            val originalAmount: Double,
+                            val amount: Double,
                             val recurringDate: Date,
-                            val modified: Boolean, // Not implemented yet
+                            val modified: Boolean,
                             val type: RecurringExpenseType) : Parcelable {
     
     private constructor(parcel: Parcel) : this(
@@ -44,7 +44,7 @@ data class RecurringExpense(val id: Long?,
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeValue(id)
         parcel.writeString(title)
-        parcel.writeDouble(originalAmount)
+        parcel.writeDouble(amount)
         parcel.writeLong(recurringDate.time)
         parcel.writeByte(if (modified) 1 else 0)
         parcel.writeInt(type.ordinal)

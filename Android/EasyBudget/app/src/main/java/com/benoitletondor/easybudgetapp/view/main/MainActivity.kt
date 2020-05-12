@@ -62,7 +62,7 @@ import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.iab.INTENT_IAB_STATUS_CHANGED
 import com.benoitletondor.easybudgetapp.parameters.*
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
-import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseAddActivity
+import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.SHOW_BACKUP_INTENT_KEY
@@ -587,7 +587,7 @@ class MainActivity : BaseActivity() {
      */
     private fun openAddRecurringExpenseIfNeeded(intent: Intent) {
         if (intent.getBooleanExtra(INTENT_SHOW_ADD_RECURRING_EXPENSE, false)) {
-            val startIntent = Intent(this, RecurringExpenseAddActivity::class.java)
+            val startIntent = Intent(this, RecurringExpenseEditActivity::class.java)
             startIntent.putExtra("dateStart", Date().time)
 
             ActivityCompat.startActivityForResult(this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null)
@@ -773,7 +773,7 @@ class MainActivity : BaseActivity() {
 
         val fabNewRecurringExpense = findViewById<FloatingActionButton>(R.id.fab_new_recurring_expense)
         fabNewRecurringExpense.setOnClickListener {
-            val startIntent = Intent(this@MainActivity, RecurringExpenseAddActivity::class.java)
+            val startIntent = Intent(this@MainActivity, RecurringExpenseEditActivity::class.java)
             startIntent.putExtra("dateStart", calendarFragment.getSelectedDate().time)
 
             startIntent.putExtra(ANIMATE_TRANSITION_KEY, true)

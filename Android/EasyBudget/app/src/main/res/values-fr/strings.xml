@@ -26,6 +26,8 @@
     <string name="title_activity_edit_income">Modifier le revenu</string>
     <string name="title_activity_recurring_expense_add">Ajouter une dépense récurrente</string>
     <string name="title_activity_recurring_income_add">Ajouter un revenu récurrent</string>
+    <string name="title_activity_recurring_expense_edit">Modifier une dépense récurrente</string>
+    <string name="title_activity_recurring_income_edit">Modifier un revenu récurrent</string>
     <string name="title_activity_settings">Préférences</string>
     <string name="title_activity_welcome">EasyBudget</string>
     <string name="title_activity_premium">Premium</string>
@@ -65,6 +67,7 @@
     <string name="dialog_edit_recurring_income_title">Revenu récurrent : que voulez-vous faire ?</string>
     <string-array name="dialog_edit_recurring_expense_choices">
         <item>Modifier cette occurrence</item>
+        <item>Modifier cette occurrence et toutes les suivantes</item>
         <item>Supprimer cette occurrence uniquement</item>
         <item>Supprimer toutes les suivantes</item>
         <item>Supprimer toutes les précédentes</item>
@@ -72,6 +75,7 @@
     </string-array>
     <string-array name="dialog_edit_recurring_income_choices">
         <item>Modifier cette occurrence</item>
+        <item>Modifier cette occurrence et toutes les suivantes</item>
         <item>Supprimer cette occurrence uniquement</item>
         <item>Supprimer toutes les suivantes</item>
         <item>Supprimer toutes les précédentes</item>

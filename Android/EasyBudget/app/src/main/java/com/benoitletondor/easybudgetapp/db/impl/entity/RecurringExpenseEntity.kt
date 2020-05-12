@@ -34,7 +34,7 @@ class RecurringExpenseEntity(@PrimaryKey
                              @ColumnInfo(name = "recurringDate")
                              val recurringDate: Date,
                              @ColumnInfo(name = "modified")
-                             val modified: Boolean, // Not implemented yet
+                             val modified: Boolean,
                              @ColumnInfo(name = "type")
                              val type: String) {
 

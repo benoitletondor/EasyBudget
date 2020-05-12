@@ -35,6 +35,7 @@ import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
+import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
 import java.util.*
 
 /**
@@ -127,8 +128,16 @@ class ExpensesRecyclerViewAdapter(private val activity: Activity,
 
                             ActivityCompat.startActivityForResult(activity, startIntent, MainActivity.ADD_EXPENSE_ACTIVITY_CODE, null)
                         }
-                        // Delete this one
+                        // Edit this one and following ones
                         1 -> {
+                            val startIntent = Intent(viewHolder.view.context, RecurringExpenseEditActivity::class.java)
+                            startIntent.putExtra("dateStart", expense.date.time)
+                            startIntent.putExtra("expense", expense)
+
+                            ActivityCompat.startActivityForResult(activity, startIntent, MainActivity.MANAGE_RECURRING_EXPENSE_ACTIVITY_CODE, null)
+                        }
+                        // Delete this one
+                        2 -> {
                             // Send notification to inform views that this expense has been deleted
                             val intent = Intent(MainActivity.INTENT_RECURRING_EXPENSE_DELETED)
                             intent.putExtra("expense", expense)
@@ -136,7 +145,7 @@ class ExpensesRecyclerViewAdapter(private val activity: Activity,
                             LocalBroadcastManager.getInstance(activity.applicationContext).sendBroadcast(intent)
                         }
                         // Delete from
-                        2 -> {
+                        3 -> {
                             // Send notification to inform views that this expense has been deleted
                             val intent = Intent(MainActivity.INTENT_RECURRING_EXPENSE_DELETED)
                             intent.putExtra("expense", expense)
@@ -144,7 +153,7 @@ class ExpensesRecyclerViewAdapter(private val activity: Activity,
                             LocalBroadcastManager.getInstance(activity.applicationContext).sendBroadcast(intent)
                         }
                         // Delete up to
-                        3 -> {
+                        4 -> {
                             // Send notification to inform views that this expense has been deleted
                             val intent = Intent(MainActivity.INTENT_RECURRING_EXPENSE_DELETED)
                             intent.putExtra("expense", expense)
@@ -152,7 +161,7 @@ class ExpensesRecyclerViewAdapter(private val activity: Activity,
                             LocalBroadcastManager.getInstance(activity.applicationContext).sendBroadcast(intent)
                         }
                         // Delete all
-                        4 -> {
+                        5 -> {
                             // Send notification to inform views that this expense has been deleted
                             val intent = Intent(MainActivity.INTENT_RECURRING_EXPENSE_DELETED)
                             intent.putExtra("expense", expense)

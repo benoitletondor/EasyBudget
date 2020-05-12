@@ -26,6 +26,8 @@
     <string name="title_activity_edit_income">Modificar receita</string>
     <string name="title_activity_recurring_expense_add">Adicionar despesa recorrente</string>
     <string name="title_activity_recurring_income_add">Adicionar receita recorrente</string>
+    <string name="title_activity_recurring_expense_edit">Modificar despesa recorrente</string>
+    <string name="title_activity_recurring_income_edit">Modificar receita recorrente</string>
     <string name="title_activity_settings">Preferências</string>
     <string name="title_activity_welcome">EasyBudget</string>
     <string name="title_activity_premium">Premium</string>
@@ -65,6 +67,7 @@
     <string name="dialog_edit_recurring_income_title">Receita recorrente: O que você quer fazer?</string>
     <string-array name="dialog_edit_recurring_expense_choices">
         <item>Modificar esta ocorrência</item>
+        <item>Modificar esta e as próximas ocorrências</item>
         <item>Excluir apenas esta ocorrência</item>
         <item>Excluir as próximas ocorrências</item>
         <item>Excluir as ocorrências anteriores</item>
@@ -72,6 +75,7 @@
     </string-array>
     <string-array name="dialog_edit_recurring_income_choices">
         <item>Modificar esta ocorrência</item>
+        <item>Modificar esta e as próximas ocorrências</item>
         <item>Excluir apenas esta ocorrência</item>
         <item>Excluir as próximas ocorrências</item>
         <item>Excluir as ocorrências anteriores</item>

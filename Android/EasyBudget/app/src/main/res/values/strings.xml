@@ -28,6 +28,8 @@
     <string name="title_activity_edit_income">Edit income</string>
     <string name="title_activity_recurring_expense_add">Add recurring expense</string>
     <string name="title_activity_recurring_income_add">Add recurring income</string>
+    <string name="title_activity_recurring_expense_edit">Edit recurring expense</string>
+    <string name="title_activity_recurring_income_edit">Edit recurring income</string>
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_welcome">EasyBudget</string>
     <string name="title_activity_premium">Premium</string>
@@ -67,6 +69,7 @@
     <string name="dialog_edit_recurring_income_title">Recurring income: What do you want to do?</string>
     <string-array name="dialog_edit_recurring_expense_choices">
         <item>Edit this instance</item>
+        <item>Edit this instance and all following</item>
         <item>Delete this instance only</item>
         <item>Delete all following</item>
         <item>Delete all before</item>
@@ -74,6 +77,7 @@
     </string-array>
     <string-array name="dialog_edit_recurring_income_choices">
         <item>Edit this instance</item>
+        <item>Edit this instance and all following</item>
         <item>Delete this instance only</item>
         <item>Delete all following</item>
         <item>Delete all before</item>
