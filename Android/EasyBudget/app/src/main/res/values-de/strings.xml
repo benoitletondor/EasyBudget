@@ -294,6 +294,4 @@
     <string name="backup_wipe_data_confirmation_negative_cta">Stornieren</string>
     <string name="backup_wipe_data_error_title">Cloud-Sicherung kann nicht gelöscht werden</string>
     <string name="backup_wipe_data_error_message">Beim Löschen Ihrer Sicherungsdaten ist ein Fehler aufgetreten. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es später erneut.</string>
-    <string name="backup_notif_message">Neu für Premium-Nutzer: Sichern Sie Ihre Daten in der Cloud! Klicken Sie zum Einrichten auf</string>
-    <string name="backup_notif_cta">Installieren</string>
 </resources>

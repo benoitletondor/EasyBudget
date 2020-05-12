@@ -296,6 +296,4 @@
     <string name="backup_wipe_data_confirmation_negative_cta">Отмена</string>
     <string name="backup_wipe_data_error_title">Невозможно удалить облачную резервную копию</string>
     <string name="backup_wipe_data_error_message">Произошла ошибка при удалении ваших резервных данных. Пожалуйста, проверьте вашу связь и повторите попытку позже.</string>
-    <string name="backup_notif_message">Новое для премиум-пользователей: резервное копирование данных в облаке! Нажмите, чтобы настроить</string>
-    <string name="backup_notif_cta">Настроить</string>
 </resources>

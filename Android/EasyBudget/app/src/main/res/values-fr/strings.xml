@@ -294,6 +294,4 @@
     <string name="backup_wipe_data_confirmation_negative_cta">Annuler</string>
     <string name="backup_wipe_data_error_title">Impossible de supprimer la sauvegarde cloud</string>
     <string name="backup_wipe_data_error_message">Une erreur est survenue lors de la suppression de votre sauvegarde cloud. Vérifiez votre connexion internet et réessayez.</string>
-    <string name="backup_notif_message">Nouveau pour les utilisateurs premium : Sauvegardez vos données dans le cloud ! Cliquez pour configurer</string>
-    <string name="backup_notif_cta">Configurer</string>
 </resources>

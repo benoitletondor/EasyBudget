@@ -294,6 +294,4 @@
     <string name="backup_wipe_data_confirmation_negative_cta">Cancelar</string>
     <string name="backup_wipe_data_error_title">No se puede eliminar la copia de seguridad en la nube</string>
     <string name="backup_wipe_data_error_message">Se produjo un error al eliminar sus datos de la copia de seguridad. Verifique su conexión e intente nuevamente más tarde.</string>
-    <string name="backup_notif_message">Nuevo para usuarios premium : ¡copia de seguridad en la nube! Clic para configurar</string>
-    <string name="backup_notif_cta">Configurar</string>
 </resources>

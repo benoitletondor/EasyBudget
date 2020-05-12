@@ -130,10 +130,6 @@
             app:title="@string/setting_category_show_premium"
             app:key="@string/setting_category_dev_show_premium_key" />
 
-        <Preference
-            app:title="@string/setting_category_show_backup_notif"
-            app:key="@string/setting_category_dev_show_backup_notif_key" />
-
     </PreferenceCategory>
 
 </PreferenceScreen>

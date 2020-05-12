@@ -294,6 +294,4 @@
     <string name="backup_wipe_data_confirmation_negative_cta">Annulla</string>
     <string name="backup_wipe_data_error_title">Impossibile eliminare il backup su cloud</string>
     <string name="backup_wipe_data_error_message">Si è verificato un errore durante l\'eliminazione dei dati di backup. Verifica la connessione e riprova più tardi.</string>
-    <string name="backup_notif_message">Novità per utenti premium: backup dei dati nel cloud! Clic per configurare</string>
-    <string name="backup_notif_cta">Configurare</string>
 </resources>

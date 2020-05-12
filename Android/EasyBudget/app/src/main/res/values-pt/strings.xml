@@ -294,7 +294,4 @@
     <string name="backup_wipe_data_confirmation_negative_cta">Cancelar</string>
     <string name="backup_wipe_data_error_title">Não foi possível excluir la cópia de segurança na nuvem</string>
     <string name="backup_wipe_data_error_message">Ocorreu um erro ao excluir seus dados de cópia de segurança. Verifique sua conexão e tente novamente mais tarde.</string>
-    <string name="backup_notif_message">Novo para usuários premium: cópia de segurança de seus dados na nuvem! Clique para configurar</string>
-    <string name="backup_notif_cta">Configurar</string>
-
 </resources>
