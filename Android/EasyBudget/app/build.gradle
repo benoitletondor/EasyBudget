@@ -13,29 +13,17 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-
-buildscript {
-    repositories {
-        maven { url 'https://maven.fabric.io/public' }
-    }
-
-    dependencies {
-        classpath 'io.fabric.tools:gradle:1.31.2'
-    }
-}
-
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'io.fabric'
+apply plugin: 'com.google.firebase.crashlytics'
 
 apply from: 'batch.gradle'
 apply from: 'iap.gradle'
 
 repositories {
     google()
-    maven { url 'https://maven.fabric.io/public' }
     maven { url "http://maven.batch.com/release" }
     mavenCentral()
 }
@@ -47,8 +35,8 @@ android {
         applicationId "com.benoitletondor.easybudgetapp"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 70
-        versionName "2.1.3"
+        versionCode 72
+        versionName "2.2.0"
         vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
@@ -59,6 +47,9 @@ android {
             buildConfigField "boolean", "ANALYTICS_ACTIVATED", "false"
             buildConfigField "boolean", "DEV_PREFERENCES", "true"
             buildConfigField "String", "LICENCE_KEY", licence_key
+            firebaseCrashlytics {
+                mappingFileUploadEnabled false
+            }
         }
         release {
             buildConfigField "boolean", "DEBUG_LOG", "false"
@@ -87,42 +78,41 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.core:core-ktx:1.1.0'
-    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'androidx.core:core-ktx:1.2.0'
+    implementation 'com.google.android.material:material:1.1.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation 'androidx.preference:preference-ktx:1.1.0'
+    implementation 'androidx.preference:preference-ktx:1.1.1'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
-    implementation 'androidx.work:work-runtime-ktx:2.3.0'
-    implementation 'androidx.work:work-gcm:2.3.0'
+    implementation 'androidx.work:work-runtime-ktx:2.3.4'
+    implementation 'androidx.work:work-gcm:2.3.4'
 
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.3'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.6'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.6'
 
-    implementation 'com.google.firebase:firebase-core:17.2.2'
-    implementation 'com.google.firebase:firebase-messaging:20.1.0'
-    implementation 'com.google.firebase:firebase-storage:19.1.0'
+    implementation 'com.google.firebase:firebase-core:17.4.1'
+    implementation 'com.google.firebase:firebase-messaging:20.1.7'
+    implementation 'com.google.firebase:firebase-storage:19.1.1'
+    implementation 'com.google.firebase:firebase-crashlytics:17.0.0'
     implementation 'com.firebaseui:firebase-ui-auth:6.2.0'
 
-    implementation 'com.android.billingclient:billing:2.1.0'
+    implementation 'com.android.billingclient:billing:2.2.0'
 
     implementation project(':caldroid')
     implementation 'com.getbase:floatingactionbutton:1.10.1'
     implementation 'me.relex:circleindicator:2.1.4@aar'
-    implementation('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') { transitive = true }
-    implementation 'com.batch.android:batch-sdk:1.14.4'
+    implementation 'com.batch.android:batch-sdk:1.15.1'
 
-    implementation 'org.koin:koin-core:2.0.1'
-    implementation 'org.koin:koin-android:2.0.1'
-    implementation 'org.koin:koin-android-viewmodel:2.0.1'
-    implementation 'org.koin:koin-java:2.0.1'
+    implementation 'org.koin:koin-core:2.1.5'
+    implementation 'org.koin:koin-android:2.1.5'
+    implementation 'org.koin:koin-android-viewmodel:2.1.5'
 
-    kapt "androidx.room:room-compiler:2.2.3"
-    implementation "androidx.room:room-runtime:2.2.3"
-    implementation "androidx.room:room-ktx:2.2.3"
+    kapt "androidx.room:room-compiler:2.2.5"
+    implementation "androidx.room:room-runtime:2.2.5"
+    implementation "androidx.room:room-ktx:2.2.5"
 
-    implementation 'net.lingala.zip4j:zip4j:2.2.8'
+    implementation 'net.lingala.zip4j:zip4j:2.5.2'
 }
 
 apply plugin: 'com.google.gms.google-services'

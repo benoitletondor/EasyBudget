@@ -19,7 +19,7 @@ package com.benoitletondor.easybudgetapp.helper;
 import android.util.Log;
 
 import com.benoitletondor.easybudgetapp.BuildConfig;
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 /**
  * Helper to easily log into the application.
@@ -68,9 +68,9 @@ public final class Logger
 		if( BuildConfig.CRASHLYTICS_ACTIVATED )
 		{
 			if( t != null ) {
-				Crashlytics.logException(new Throwable(msg, t));
+				FirebaseCrashlytics.getInstance().recordException(new Throwable(msg, t));
 			} else {
-				Crashlytics.log(Log.ERROR, tag, msg);
+				FirebaseCrashlytics.getInstance().log("E/"+tag+": "+msg);
 			}
 		}
 	}
@@ -162,9 +162,9 @@ public final class Logger
 		if( BuildConfig.CRASHLYTICS_ACTIVATED )
 		{
 			if( t != null ) {
-				Crashlytics.logException(new Throwable(msg, t));
+				FirebaseCrashlytics.getInstance().recordException(new Throwable(msg, t));
 			} else {
-				Crashlytics.log(Log.WARN, tag, msg);
+				FirebaseCrashlytics.getInstance().log("W/"+tag+": "+msg);
 			}
 		}
 	}
@@ -256,9 +256,9 @@ public final class Logger
 		if( BuildConfig.CRASHLYTICS_ACTIVATED )
 		{
 			if( t != null ) {
-				Crashlytics.logException(new Throwable(msg, t));
+				FirebaseCrashlytics.getInstance().recordException(new Throwable(msg, t));
 			} else {
-				Crashlytics.log(Log.DEBUG, tag, msg);
+				FirebaseCrashlytics.getInstance().log("D/"+tag+": "+msg);
 			}
 		}
 	}

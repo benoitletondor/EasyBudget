@@ -29,8 +29,6 @@ import com.batch.android.BatchActivityLifecycleHelper
 import com.batch.android.BatchNotificationChannelsManager.DEFAULT_CHANNEL_ID
 import com.batch.android.Config
 import com.batch.android.PushNotificationType
-import com.benoitletondor.easybudgetapp.BuildVersion.VERSION_2_1_0
-import com.benoitletondor.easybudgetapp.BuildVersion.VERSION_2_1_3
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.iab.Iab
@@ -44,8 +42,7 @@ import com.benoitletondor.easybudgetapp.view.main.MainActivity
 import com.benoitletondor.easybudgetapp.view.RatingPopup
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
 import com.benoitletondor.easybudgetapp.view.getRatingPopupUserStep
-import com.crashlytics.android.Crashlytics
-import io.fabric.sdk.android.Fabric
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.runBlocking
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
@@ -79,9 +76,13 @@ class EasyBudget : Application() {
 
         // Crashlytics
         if ( BuildConfig.CRASHLYTICS_ACTIVATED ) {
-            Fabric.with(this, Crashlytics())
+            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true)
 
-            Crashlytics.setUserIdentifier(parameters.getLocalId())
+            parameters.getLocalId()?.let {
+                FirebaseCrashlytics.getInstance().setUserId(it)
+            }
+        } else {
+            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(false)
         }
 
         // Check if an update occurred and perform action if needed
@@ -365,10 +366,6 @@ class EasyBudget : Application() {
      */
     private fun onUpdate(previousVersion: Int, @Suppress("SameParameterValue") newVersion: Int) {
         Logger.debug("Update detected, from $previousVersion to $newVersion")
-
-        if( previousVersion < VERSION_2_1_0 && newVersion == VERSION_2_1_3 && iab.isUserPremium() && !parameters.isBackupEnabled() ) {
-            BackupNotif.showBackupNotif(this)
-        }
     }
 
 // -------------------------------------->

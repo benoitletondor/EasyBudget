@@ -36,7 +36,7 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <fragment
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/preferencesFragment"
         android:name="com.benoitletondor.easybudgetapp.view.settings.PreferencesFragment"
         android:layout_width="match_parent"

@@ -26,6 +26,8 @@
     <string name="title_activity_edit_income">Einnahme bearbeiten</string>
     <string name="title_activity_recurring_expense_add">Wiederkehrende Ausgabe hinzufügen</string>
     <string name="title_activity_recurring_income_add">Wiederkehrende Einnahme hinzufügen</string>
+    <string name="title_activity_recurring_expense_edit">Wiederkehrende Ausgabe bearbeiten</string>
+    <string name="title_activity_recurring_income_edit">Wiederkehrende Einnahme bearbeiten</string>
     <string name="title_activity_settings">Einstellungen</string>
     <string name="title_activity_welcome">EasyBudget</string>
     <string name="title_activity_premium">Premium</string>
@@ -65,6 +67,7 @@
     <string name="dialog_edit_recurring_income_title">Wiederkehrende Einnahme: Was möchten Sie tun?</string>
     <string-array name="dialog_edit_recurring_expense_choices">
         <item>Dieses Ereignis bearbeiten</item>
+        <item>Dieses Ereignis und Alle Nachfolgenden bearbeiten</item>
         <item>Nur dieses Ereignis löschen</item>
         <item>Alle Nachfolgenden löschen</item>
         <item>Alle Vorherigen löschen</item>
@@ -72,6 +75,7 @@
     </string-array>
     <string-array name="dialog_edit_recurring_income_choices">
         <item>Dieses Ereignis bearbeiten</item>
+        <item>Dieses Ereignis und Alle Nachfolgenden bearbeiten</item>
         <item>Nur dieses Ereignis löschen</item>
         <item>Alle Nachfolgenden löschen</item>
         <item>Alle Vorherigen löschen</item>
@@ -294,6 +298,4 @@
     <string name="backup_wipe_data_confirmation_negative_cta">Stornieren</string>
     <string name="backup_wipe_data_error_title">Cloud-Sicherung kann nicht gelöscht werden</string>
     <string name="backup_wipe_data_error_message">Beim Löschen Ihrer Sicherungsdaten ist ein Fehler aufgetreten. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es später erneut.</string>
-    <string name="backup_notif_message">Neu für Premium-Nutzer: Sichern Sie Ihre Daten in der Cloud! Klicken Sie zum Einrichten auf</string>
-    <string name="backup_notif_cta">Installieren</string>
 </resources>

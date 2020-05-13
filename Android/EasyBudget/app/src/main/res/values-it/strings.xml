@@ -26,6 +26,8 @@
     <string name="title_activity_edit_income">Modifica l’entrata</string>
     <string name="title_activity_recurring_expense_add">Aggiungi un’uscita ricorrente</string>
     <string name="title_activity_recurring_income_add">Aggiungi un’entrata ricorrente</string>
+    <string name="title_activity_recurring_expense_edit">Modifica un’uscita ricorrente</string>
+    <string name="title_activity_recurring_income_edit">Modifica un’entrata ricorrente</string>
     <string name="title_activity_settings">Impostazioni</string>
     <string name="title_activity_welcome">EasyBudget</string>
     <string name="title_activity_premium">Premium</string>
@@ -65,6 +67,7 @@
     <string name="dialog_edit_recurring_income_title">Entrate ricorrente: Cosa vuoi fare?</string>
     <string-array name="dialog_edit_recurring_expense_choices">
         <item>Modifica questo elemento</item>
+        <item>Modifica questo e tutti gli elementi seguenti</item>
         <item>Modifica soltanto questo elemento</item>
         <item>Elimina tutti gli elementi seguenti</item>
         <item>Elimina tutti gli elementi precedenti</item>
@@ -72,6 +75,7 @@
     </string-array>
     <string-array name="dialog_edit_recurring_income_choices">
         <item>Modifica questo elemento</item>
+        <item>Modifica questo e tutti gli elementi seguenti</item>
         <item>Modifica soltanto questo elemento</item>
         <item>Elimina tutti gli elementi seguenti</item>
         <item>Elimina tutti gli elementi precedenti</item>
@@ -294,6 +298,4 @@
     <string name="backup_wipe_data_confirmation_negative_cta">Annulla</string>
     <string name="backup_wipe_data_error_title">Impossibile eliminare il backup su cloud</string>
     <string name="backup_wipe_data_error_message">Si è verificato un errore durante l\'eliminazione dei dati di backup. Verifica la connessione e riprova più tardi.</string>
-    <string name="backup_notif_message">Novità per utenti premium: backup dei dati nel cloud! Clic per configurare</string>
-    <string name="backup_notif_cta">Configurare</string>
 </resources>

@@ -22,7 +22,7 @@
     android:layout_height="match_parent"
     android:focusable="true"
     android:focusableInTouchMode="true"
-    tools:context=".view.recurringexpenseadd.RecurringExpenseAddActivity">
+    tools:context=".view.recurringexpenseadd.RecurringExpenseEditActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"

@@ -19,7 +19,7 @@ package com.benoitletondor.easybudgetapp.injection
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditViewModel
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import com.benoitletondor.easybudgetapp.view.premium.PremiumViewModel
-import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseAddViewModel
+import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditViewModel
 import com.benoitletondor.easybudgetapp.view.report.MonthlyReportViewModel
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseViewModel
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyViewModel
@@ -33,7 +33,7 @@ val viewModelModule = module {
     viewModel { MonthlyReportViewModel(get()) }
     viewModel { MonthlyReportBaseViewModel(get()) }
     viewModel { ExpenseEditViewModel(get(), get()) }
-    viewModel { RecurringExpenseAddViewModel(get(), get()) }
+    viewModel { RecurringExpenseEditViewModel(get(), get()) }
     viewModel { PremiumViewModel(get()) }
     viewModel { BackupSettingsViewModel(get(), get(), get()) }
 }

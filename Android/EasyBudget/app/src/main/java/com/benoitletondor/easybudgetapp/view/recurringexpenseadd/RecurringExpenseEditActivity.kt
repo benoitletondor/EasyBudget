@@ -32,15 +32,25 @@ import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import com.benoitletondor.easybudgetapp.view.DatePickerDialogFragment
+import kotlinx.android.synthetic.main.activity_expense_edit.*
 import kotlinx.android.synthetic.main.activity_recurring_expense_add.*
+import kotlinx.android.synthetic.main.activity_recurring_expense_add.amount_edittext
+import kotlinx.android.synthetic.main.activity_recurring_expense_add.amount_inputlayout
+import kotlinx.android.synthetic.main.activity_recurring_expense_add.date_button
+import kotlinx.android.synthetic.main.activity_recurring_expense_add.description_edittext
+import kotlinx.android.synthetic.main.activity_recurring_expense_add.expense_type_switch
+import kotlinx.android.synthetic.main.activity_recurring_expense_add.expense_type_tv
+import kotlinx.android.synthetic.main.activity_recurring_expense_add.save_expense_fab
+import kotlinx.android.synthetic.main.activity_recurring_expense_add.toolbar
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.abs
 
-class RecurringExpenseAddActivity : BaseActivity() {
+class RecurringExpenseEditActivity : BaseActivity() {
     private val parameters: Parameters by inject()
-    private val viewModel: RecurringExpenseAddViewModel by viewModel()
+    private val viewModel: RecurringExpenseEditViewModel by viewModel()
 
 // ------------------------------------------->
 
@@ -54,8 +64,7 @@ class RecurringExpenseAddActivity : BaseActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         if (savedInstanceState == null) {
-            viewModel.initWithDateAndExpense(Date(intent.getLongExtra("dateStart", 0)))
-            setUpInputs()
+            viewModel.initWithDateAndExpense(Date(intent.getLongExtra("dateStart", 0)), intent.getParcelableExtra("expense"))
         }
 
         setUpButtons()
@@ -76,8 +85,16 @@ class RecurringExpenseAddActivity : BaseActivity() {
 
         date_button.removeButtonBorder() // Remove border
 
-        viewModel.editTypeIsRevenueLiveData.observe(this, Observer { isRevenue ->
-            setExpenseTypeTextViewLayout(isRevenue)
+        viewModel.editTypeLiveData.observe(this, Observer { (isRevenue, isEditing) ->
+            setExpenseTypeTextViewLayout(isRevenue, isEditing)
+        })
+
+        viewModel.existingExpenseEventStream.observe(this, Observer { existingValues ->
+            if( existingValues != null ) {
+                setUpTextFields(existingValues.title, existingValues.amount, type = existingValues.type)
+            } else {
+                setUpTextFields(description = null, amount = null, type = null)
+            }
         })
 
         viewModel.expenseDateLiveData.observe(this, Observer { date ->
@@ -201,31 +218,37 @@ class RecurringExpenseAddActivity : BaseActivity() {
     /**
      * Set revenue text view layout
      */
-    private fun setExpenseTypeTextViewLayout(isRevenue: Boolean) {
+    private fun setExpenseTypeTextViewLayout(isRevenue: Boolean, isEditing: Boolean) {
         if (isRevenue) {
             expense_type_tv.setText(R.string.income)
             expense_type_tv.setTextColor(ContextCompat.getColor(this, R.color.budget_green))
 
             expense_type_switch.isChecked = true
 
-            setTitle(R.string.title_activity_recurring_income_add)
+            if( isEditing ) {
+                setTitle(R.string.title_activity_recurring_income_edit)
+            } else {
+                setTitle(R.string.title_activity_recurring_income_add)
+            }
         } else {
             expense_type_tv.setText(R.string.payment)
             expense_type_tv.setTextColor(ContextCompat.getColor(this, R.color.budget_red))
 
             expense_type_switch.isChecked = false
 
-            setTitle(R.string.title_activity_recurring_expense_add)
+            if( isEditing ) {
+                setTitle(R.string.title_activity_recurring_expense_edit)
+            } else {
+                setTitle(R.string.title_activity_recurring_expense_add)
+            }
         }
     }
 
     /**
-     * Set up text fields, spinner and focus behavior
+     * Set up text field focus behavior
      */
-    private fun setUpInputs() {
+    private fun setUpTextFields(description: String?, amount: Double?, type: RecurringExpenseType?) {
         amount_inputlayout.hint = resources.getString(R.string.amount, parameters.getUserCurrency().symbol)
-
-        amount_edittext.preventUnsupportedInputForDecimals()
 
         val recurringTypesString = arrayOf(
             getString(R.string.recurring_interval_daily),
@@ -239,11 +262,26 @@ class RecurringExpenseAddActivity : BaseActivity() {
             getString(R.string.recurring_interval_yearly)
         )
 
-        val adapter = ArrayAdapter<String>(this, R.layout.spinner_item, recurringTypesString)
+        val adapter = ArrayAdapter(this, R.layout.spinner_item, recurringTypesString)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         expense_type_spinner.adapter = adapter
 
-        expense_type_spinner.setSelection(5, false)
+        if( type != null ) {
+            setSpinnerSelectionFromRecurringType(type)
+        } else {
+            setSpinnerSelectionFromRecurringType(RecurringExpenseType.MONTHLY)
+        }
+
+        if (description != null) {
+            description_edittext.setText(description)
+            description_edittext.setSelection(description_edittext.text?.length ?: 0) // Put focus at the end of the text
+        }
+
+        amount_edittext.preventUnsupportedInputForDecimals()
+
+        if (amount != null) {
+            amount_edittext.setText(CurrencyHelper.getFormattedAmountValue(abs(amount)))
+        }
     }
 
     /**
@@ -266,6 +304,22 @@ class RecurringExpenseAddActivity : BaseActivity() {
         }
 
         throw IllegalStateException("getRecurringTypeFromSpinnerSelection unable to get value for $spinnerSelectedItem")
+    }
+
+    private fun setSpinnerSelectionFromRecurringType(type: RecurringExpenseType) {
+        val selectionIndex = when (type) {
+            RecurringExpenseType.DAILY -> 0
+            RecurringExpenseType.WEEKLY -> 1
+            RecurringExpenseType.BI_WEEKLY -> 2
+            RecurringExpenseType.TER_WEEKLY -> 3
+            RecurringExpenseType.FOUR_WEEKLY -> 4
+            RecurringExpenseType.MONTHLY -> 5
+            RecurringExpenseType.TER_MONTHLY -> 6
+            RecurringExpenseType.SIX_MONTHLY -> 7
+            RecurringExpenseType.YEARLY -> 8
+        }
+
+        expense_type_spinner.setSelection(selectionIndex, false)
     }
 
     /**

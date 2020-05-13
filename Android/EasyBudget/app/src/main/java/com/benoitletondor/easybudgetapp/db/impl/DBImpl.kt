@@ -170,7 +170,7 @@ private fun Expense.toExpenseEntity() = ExpenseEntity(
 private fun RecurringExpense.toRecurringExpenseEntity() = RecurringExpenseEntity (
     id,
     title,
-    originalAmount.getDBValue(),
+    amount.getDBValue(),
     recurringDate,
     modified,
     type.name

@@ -16,16 +16,4 @@
 #   public *;
 #}
 
-# Batch specific
--keep class com.batch.** {
-    *;
-}
-
--keep class com.google.android.gms.** {
-    *;
-}
-
--dontwarn com.batch.android.mediation.**
--dontwarn com.batch.android.BatchPushService
-
--keep class com.android.vending.billing.**
+-keep class * extends androidx.fragment.app.Fragment {}

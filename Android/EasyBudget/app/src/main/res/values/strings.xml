@@ -28,6 +28,8 @@
     <string name="title_activity_edit_income">Edit income</string>
     <string name="title_activity_recurring_expense_add">Add recurring expense</string>
     <string name="title_activity_recurring_income_add">Add recurring income</string>
+    <string name="title_activity_recurring_expense_edit">Edit recurring expense</string>
+    <string name="title_activity_recurring_income_edit">Edit recurring income</string>
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_welcome">EasyBudget</string>
     <string name="title_activity_premium">Premium</string>
@@ -67,6 +69,7 @@
     <string name="dialog_edit_recurring_income_title">Recurring income: What do you want to do?</string>
     <string-array name="dialog_edit_recurring_expense_choices">
         <item>Edit this instance</item>
+        <item>Edit this instance and all following</item>
         <item>Delete this instance only</item>
         <item>Delete all following</item>
         <item>Delete all before</item>
@@ -74,6 +77,7 @@
     </string-array>
     <string-array name="dialog_edit_recurring_income_choices">
         <item>Edit this instance</item>
+        <item>Edit this instance and all following</item>
         <item>Delete this instance only</item>
         <item>Delete all following</item>
         <item>Delete all before</item>
@@ -160,7 +164,6 @@
     <string name="setting_category_dev_title" translatable="false">Dev</string>
     <string name="setting_category_show_welcome_screen_button_title" translatable="false">Show welcome screen</string>
     <string name="setting_category_show_premium" translatable="false">Show premium screen</string>
-    <string name="setting_category_show_backup_notif" translatable="false">Show backup notif</string>
     <string name="setting_category_premium_title">Premium</string>
     <string name="setting_category_premium_status_title">You are premium!</string>
     <string name="setting_category_premium_status_message">You have access to premium features</string>
@@ -306,8 +309,6 @@
     <string name="backup_wipe_data_confirmation_negative_cta">Cancel</string>
     <string name="backup_wipe_data_error_title">Unable to delete cloud backup</string>
     <string name="backup_wipe_data_error_message">An error occurred while deleting your backup data. Please check your connexion and try again later.</string>
-    <string name="backup_notif_message">New for premium users: backup your data in the cloud! Click to setup</string>
-    <string name="backup_notif_cta">Setup</string>
 
 
     <!-- Keys, not for translations. -->
@@ -329,7 +330,6 @@
     <string name="setting_category_app_theme_key" translatable="false">app_theme</string>
     <string name="setting_category_not_premium_status_key" translatable="false">not_premium</string>
     <string name="setting_category_dev_show_premium_key" translatable="false">show_premium</string>
-    <string name="setting_category_dev_show_backup_notif_key" translatable="false">show_backup</string>
     <string name="setting_category_start_day_of_week_key" translatable="false">start_day_of_week</string>
     <string name="setting_category_backup" translatable="false">backup</string>
 

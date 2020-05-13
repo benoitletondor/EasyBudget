@@ -37,7 +37,6 @@ import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.iab.INTENT_IAB_STATUS_CHANGED
 import com.benoitletondor.easybudgetapp.iab.Iab
-import com.benoitletondor.easybudgetapp.notif.BackupNotif
 import com.benoitletondor.easybudgetapp.parameters.*
 import com.benoitletondor.easybudgetapp.view.RatingPopup
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.USER_GONE_PREMIUM_INTENT
@@ -291,14 +290,6 @@ class PreferencesFragment : PreferenceFragmentCompat() {
              */
             findPreference<Preference>(resources.getString(R.string.setting_category_dev_show_premium_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                 showBecomePremiumDialog()
-                false
-            }
-
-            /*
-             * Show backup notif
-             */
-            findPreference<Preference>(getString(R.string.setting_category_dev_show_backup_notif_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                BackupNotif.showBackupNotif(context!!)
                 false
             }
         }

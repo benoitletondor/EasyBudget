@@ -46,7 +46,7 @@ class DatePickerDialogFragment(private val originalDate: Date, private val liste
         val day = c.get(Calendar.DAY_OF_MONTH)
 
         // Create a new instance of DatePickerDialog and return it
-        val dialog = DatePickerDialog(context!!, listener, year, month, day)
+        val dialog = DatePickerDialog(requireContext(), listener, year, month, day)
         dialog.datePicker.minDate = Date(parameters.getInitTimestamp()).computeCalendarMinDateFromInitDate().time
         return dialog
     }
