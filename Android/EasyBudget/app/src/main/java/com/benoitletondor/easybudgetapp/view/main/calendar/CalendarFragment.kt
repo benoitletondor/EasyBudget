@@ -34,7 +34,7 @@ class CalendarFragment : CaldroidFragment() {
 // --------------------------------------->
 
     override fun getNewDatesGridAdapter(month: Int, year: Int): CaldroidGridAdapter {
-        return CalendarGridAdapter(context!!, db, month, year, getCaldroidData(), extraData)
+        return CalendarGridAdapter(requireContext(), db, month, year, getCaldroidData(), extraData)
     }
 
     override fun onDestroy() {

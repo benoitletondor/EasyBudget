@@ -65,7 +65,8 @@
                     android:layout_height="wrap_content"
                     android:textSize="24dp"
                     android:textColor="@color/monthly_report_month_switch_button"
-                    android:background="@drawable/calendar_month_switcher_button_drawable" />
+                    android:background="@drawable/calendar_month_switcher_button_drawable"
+                    tools:ignore="SpUsage" />
 
                 <TextView
                     android:id="@+id/monthly_report_month_title_tv"
@@ -83,7 +84,8 @@
                     android:layout_height="wrap_content"
                     android:textSize="24dp"
                     android:textColor="@color/monthly_report_month_switch_button"
-                    android:background="@drawable/calendar_month_switcher_button_drawable" />
+                    android:background="@drawable/calendar_month_switcher_button_drawable"
+                    tools:ignore="SpUsage" />
 
             </LinearLayout>
 

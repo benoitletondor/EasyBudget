@@ -53,7 +53,7 @@ abstract class OnboardingFragment : Fragment() {
      */
     protected operator fun next() {
         val intent = Intent(WelcomeActivity.PAGER_NEXT_INTENT)
-        LocalBroadcastManager.getInstance(context!!).sendBroadcast(intent)
+        LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
     }
 
     /**
@@ -66,7 +66,7 @@ abstract class OnboardingFragment : Fragment() {
         intent.putExtra(WelcomeActivity.ANIMATE_TRANSITION_KEY, true)
         intent.putExtra(WelcomeActivity.CENTER_X_KEY, animationCenter.x.toInt() + animationCenter.width / 2)
         intent.putExtra(WelcomeActivity.CENTER_Y_KEY, animationCenter.y.toInt() + animationCenter.height / 2)
-        LocalBroadcastManager.getInstance(context!!).sendBroadcast(intent)
+        LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
     }
 
     /**
@@ -74,6 +74,6 @@ abstract class OnboardingFragment : Fragment() {
      */
     protected fun done() {
         val intent = Intent(WelcomeActivity.PAGER_DONE_INTENT)
-        LocalBroadcastManager.getInstance(context!!).sendBroadcast(intent)
+        LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
     }
 }

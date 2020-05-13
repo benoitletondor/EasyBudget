@@ -79,7 +79,7 @@ class Onboarding2Fragment : OnboardingFragment() {
     }
 
     override fun onDestroyView() {
-        LocalBroadcastManager.getInstance(context!!).unregisterReceiver(receiver)
+        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(receiver)
 
         super.onDestroyView()
     }
