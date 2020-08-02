@@ -52,6 +52,8 @@
     <string name="expense_add_before_init_date_dialog_description">La data della voce che desideri aggiungere è precedente alla data di configurazione dell\'app.\n\nSignifica che il saldo inserito durante la configurazione dell\'app sarà interessato da questa voce.\n\nVuoi continuare?\n(È comunque possibile modificare il saldo nel menu, se necessario.)</string>
     <string name="expense_add_before_init_date_dialog_positive_cta">Confermare</string>
     <string name="expense_add_before_init_date_dialog_negative_cta">Annulla</string>
+    <string name="expense_check_error_title">OPS!</string>
+    <string name="expense_check_error_message">Errore (%s)</string>
 
     <string name="dialog_edit_expense_title">Cosa vuoi fare?</string>
     <string name="dialog_edit_income_title">Cosa vuoi fare?</string>

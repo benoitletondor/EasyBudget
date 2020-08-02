@@ -54,6 +54,8 @@
     <string name="expense_add_before_init_date_dialog_description">The date of the entry you want to add is before the app setup date.\n\nIt means that the balance you entered when setting up the app will be affected by this entry.\n\nDo you want to continue?\n(You can still change the balance in the menu if you need.)</string>
     <string name="expense_add_before_init_date_dialog_positive_cta">Confirm</string>
     <string name="expense_add_before_init_date_dialog_negative_cta">Cancel</string>
+    <string name="expense_check_error_title">Oops</string>
+    <string name="expense_check_error_message">An error occurred while checking the expense, please try again (%s)</string>
 
     <string name="dialog_edit_expense_title">What do you want to do?</string>
     <string name="dialog_edit_income_title">What do you want to do?</string>

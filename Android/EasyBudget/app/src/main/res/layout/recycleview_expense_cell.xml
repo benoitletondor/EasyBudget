@@ -27,8 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:paddingLeft="15dp"
-        android:paddingRight="15dp" >
+        android:paddingLeft="15dp">
 
         <ImageView
             android:id="@+id/positive_indicator"
@@ -72,6 +71,7 @@
             android:layout_width="60dp"
             android:layout_height="match_parent"
             android:orientation="vertical"
+            android:layout_marginRight="15dp"
             android:gravity="center">
 
             <ImageView
@@ -89,6 +89,13 @@
                 android:layout_marginTop="1dp"/>
 
         </LinearLayout>
+
+        <CheckBox
+            android:id="@+id/expense_checked"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:paddingRight="15dp" />
 
     </LinearLayout>
 

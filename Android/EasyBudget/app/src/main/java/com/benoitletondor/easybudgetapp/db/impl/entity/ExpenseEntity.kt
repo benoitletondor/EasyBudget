@@ -35,6 +35,8 @@ class ExpenseEntity(@PrimaryKey(autoGenerate = true)
                     val amount: Long,
                     @ColumnInfo(name = "date")
                     val date: Date,
+                    @ColumnInfo(name = "checked")
+                    val checked: Boolean,
                     @ColumnInfo(name = "monthly_id")
                     val associatedRecurringExpenseId: Long?) {
 
@@ -43,6 +45,7 @@ class ExpenseEntity(@PrimaryKey(autoGenerate = true)
         title,
         amount / 100.0,
         date,
+        checked,
         associatedRecurringExpense
     )
 }

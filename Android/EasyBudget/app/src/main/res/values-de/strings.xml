@@ -52,6 +52,8 @@
     <string name="expense_add_before_init_date_dialog_description">Das Datum des Eintrags, den Sie hinzufügen möchten, liegt vor dem Einrichtungsdatum der App.\n\nDies bedeutet, dass der Kontostand, den Sie beim Einrichten der App eingegeben haben, von diesem Eintrag betroffen ist.\n\nMöchtest du weiter machen ?\n(Sie können den Kontostand im Menü bei Bedarf noch ändern.)</string>
     <string name="expense_add_before_init_date_dialog_positive_cta">Bestätigen</string>
     <string name="expense_add_before_init_date_dialog_negative_cta">Stornieren</string>
+    <string name="expense_check_error_title">Oops</string>
+    <string name="expense_check_error_message">Ein Fehler ist aufgetreten (%s)</string>
 
     <string name="dialog_edit_expense_title">Was möchten Sie tun?</string>
     <string name="dialog_edit_income_title">Was möchten Sie tun?</string>

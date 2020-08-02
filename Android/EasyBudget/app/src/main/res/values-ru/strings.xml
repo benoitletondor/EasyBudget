@@ -52,6 +52,8 @@
     <string name="expense_add_before_init_date_dialog_description">Дата записи, которую вы хотите добавить, предшествует дате установки приложения.\n\nЭто означает, что эта запись повлияет на баланс, который вы ввели при настройке приложения.\n\nВы хотите продолжить?\n(Вы все еще можете изменить баланс в меню, если вам нужно.)</string>
     <string name="expense_add_before_init_date_dialog_positive_cta">Подтверждение</string>
     <string name="expense_add_before_init_date_dialog_negative_cta">Отмена</string>
+    <string name="expense_check_error_title">Ой…</string>
+    <string name="expense_check_error_message">Произошла ошибка (%s)</string>
 
     <string name="dialog_edit_expense_title">Что Вы хотите сделать?</string>
     <string name="dialog_edit_income_title">Что Вы хотите сделать?</string>

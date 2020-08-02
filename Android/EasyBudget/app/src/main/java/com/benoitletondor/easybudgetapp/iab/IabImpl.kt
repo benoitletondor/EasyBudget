@@ -171,7 +171,7 @@ class IabImpl(context: Context,
 
     private suspend fun querySkuDetails(params: SkuDetailsParams): SkuDetailsResponse = suspendCoroutine { continuation ->
         billingClient.querySkuDetailsAsync(params) { billingResult, skuDetailsList ->
-            continuation.resumeWith(Result.success(SkuDetailsResponse(billingResult, skuDetailsList)))
+            continuation.resumeWith(Result.success(SkuDetailsResponse(billingResult, skuDetailsList ?: emptyList())))
         }
     }
 

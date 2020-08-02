@@ -52,6 +52,8 @@
     <string name="expense_add_before_init_date_dialog_description">La date de cette entrée est avant la date de premier lancement de l\'application.\n\nLe solde que vous avez entré lorsque vous avez configuré l\'application sera affecté par cette entrée.\n\nVoulez vous continuer ? (Vous pouvez toujours changer le solde depuis le menu au besoin.)</string>
     <string name="expense_add_before_init_date_dialog_positive_cta">Confirmer</string>
     <string name="expense_add_before_init_date_dialog_negative_cta">Annuler</string>
+    <string name="expense_check_error_title">Oups</string>
+    <string name="expense_check_error_message">Une erreur est survenue, veuillez réessayer (%s)</string>
 
     <string name="dialog_edit_expense_title">Que voulez-vous faire ?</string>
     <string name="dialog_edit_income_title">Que voulez-vous faire ?</string>
