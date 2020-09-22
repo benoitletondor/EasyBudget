@@ -29,12 +29,12 @@ repositories {
 }
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     defaultConfig {
         applicationId "com.benoitletondor.easybudgetapp"
         minSdkVersion 21
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 72
         versionName "2.2.0"
         vectorDrawables.useSupportLibrary = true
