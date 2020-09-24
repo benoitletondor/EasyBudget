@@ -49,6 +49,7 @@ class MainViewModel(private val db: DB,
     val currentBalanceEditedEventStream = SingleLiveEvent<BalanceAdjustedData>()
     val currentBalanceRestoringEventStream = SingleLiveEvent<Unit>()
     val currentBalanceRestoringErrorEventStream = SingleLiveEvent<Exception>()
+    val expenseCheckedErrorEventStream = SingleLiveEvent<Exception>()
 
     sealed class RecurringExpenseDeleteProgressState {
         class Starting(val expense: Expense): RecurringExpenseDeleteProgressState()
@@ -259,7 +260,7 @@ class MainViewModel(private val db: DB,
                     currentBalanceEditedEventStream.value = BalanceAdjustedData(newExpense, diff, newBalance)
                 } else { // If no adjust balance yet, create a new one
                     val persistedExpense = withContext(Dispatchers.Default) {
-                        db.persistExpense(Expense(balanceExpenseTitle, -diff, Date()))
+                        db.persistExpense(Expense(balanceExpenseTitle, -diff, Date(), true))
                     }
 
                     currentBalanceEditedEventStream.value = BalanceAdjustedData(persistedExpense, diff, newBalance)
@@ -294,6 +295,7 @@ class MainViewModel(private val db: DB,
 
     fun onIabStatusChanged() {
         premiumStatusLiveData.value = iab.isUserPremium()
+        refreshDataForDate(selectedDate)
     }
 
     fun onSelectDate(date: Date) {
@@ -333,6 +335,20 @@ class MainViewModel(private val db: DB,
 
     fun onWelcomeScreenFinished() {
         refreshDataForDate(selectedDate)
+    }
+
+    fun onExpenseChecked(expense: Expense, checked: Boolean) {
+        viewModelScope.launch {
+            try {
+                withContext(Dispatchers.Default) {
+                    db.persistExpense(expense.copy(checked = checked))
+                }
+
+                refreshDataForDate(selectedDate)
+            } catch (e: Exception) {
+                expenseCheckedErrorEventStream.value = e
+            }
+        }
     }
 
 // ----------------------------------------->

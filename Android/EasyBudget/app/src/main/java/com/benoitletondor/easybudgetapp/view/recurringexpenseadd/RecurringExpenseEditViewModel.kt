@@ -146,7 +146,7 @@ class RecurringExpenseEditViewModel(private val db: DB,
                 // Add up to 5 years of expenses
                 for (i in 0 until 365*5) {
                     try {
-                        db.persistExpense(Expense(expense.title, expense.amount, cal.time, expense))
+                        db.persistExpense(Expense(expense.title, expense.amount, cal.time, false, expense))
                     } catch (t: Throwable) {
                         Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false")
                         return false
@@ -159,7 +159,7 @@ class RecurringExpenseEditViewModel(private val db: DB,
                 // Add up to 5 years of expenses
                 for (i in 0 until 12*4*5) {
                     try {
-                        db.persistExpense(Expense(expense.title, expense.amount, cal.time, expense))
+                        db.persistExpense(Expense(expense.title, expense.amount, cal.time, false, expense))
                     } catch (t: Throwable) {
                         Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
                         return false
@@ -172,7 +172,7 @@ class RecurringExpenseEditViewModel(private val db: DB,
                 // Add up to 5 years of expenses
                 for (i in 0 until 12*4*5) {
                     try {
-                        db.persistExpense(Expense(expense.title, expense.amount, cal.time, expense))
+                        db.persistExpense(Expense(expense.title, expense.amount, cal.time, false, expense))
                     } catch (t: Throwable) {
                         Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
                         return false
@@ -185,7 +185,7 @@ class RecurringExpenseEditViewModel(private val db: DB,
                 // Add up to 5 years of expenses
                 for (i in 0 until 12*4*5) {
                     try {
-                        db.persistExpense(Expense(expense.title, expense.amount, cal.time, expense))
+                        db.persistExpense(Expense(expense.title, expense.amount, cal.time, false, expense))
                     } catch (t: Throwable) {
                         Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
                         return false
@@ -198,7 +198,7 @@ class RecurringExpenseEditViewModel(private val db: DB,
                 // Add up to 5 years of expenses
                 for (i in 0 until 12*4*5) {
                     try {
-                        db.persistExpense(Expense(expense.title, expense.amount, cal.time, expense))
+                        db.persistExpense(Expense(expense.title, expense.amount, cal.time, false, expense))
                     } catch (t: Throwable) {
                         Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
                         return false
@@ -211,7 +211,7 @@ class RecurringExpenseEditViewModel(private val db: DB,
                 // Add up to 10 years of expenses
                 for (i in 0 until 12*10) {
                     try {
-                        db.persistExpense(Expense(expense.title, expense.amount, cal.time, expense))
+                        db.persistExpense(Expense(expense.title, expense.amount, cal.time, false, expense))
                     } catch (t: Throwable) {
                         Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
                         return false
@@ -224,7 +224,7 @@ class RecurringExpenseEditViewModel(private val db: DB,
                 // Add up to 25 years of expenses
                 for (i in 0 until 4*25) {
                     try {
-                        db.persistExpense(Expense(expense.title, expense.amount, cal.time, expense))
+                        db.persistExpense(Expense(expense.title, expense.amount, cal.time, false, expense))
                     } catch (t: Throwable) {
                         Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
                         return false
@@ -237,7 +237,7 @@ class RecurringExpenseEditViewModel(private val db: DB,
                 // Add up to 25 years of expenses
                 for (i in 0 until 2*25) {
                     try {
-                        db.persistExpense(Expense(expense.title, expense.amount, cal.time, expense))
+                        db.persistExpense(Expense(expense.title, expense.amount, cal.time, false, expense))
                     } catch (t: Throwable) {
                         Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
                         return false
@@ -250,7 +250,7 @@ class RecurringExpenseEditViewModel(private val db: DB,
                 // Add up to 100 years of expenses
                 for (i in 0 until 100) {
                     try {
-                        db.persistExpense(Expense(expense.title, expense.amount, cal.time, expense))
+                        db.persistExpense(Expense(expense.title, expense.amount, cal.time, false, expense))
                     } catch (t: Throwable) {
                         Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false")
                         return false

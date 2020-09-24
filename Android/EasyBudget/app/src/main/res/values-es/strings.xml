@@ -52,6 +52,8 @@
     <string name="expense_add_before_init_date_dialog_description">La fecha de la entrada que desea agregar es anterior a la fecha de configuración de la aplicación.\n\nSignifica que el saldo que ingresó al configurar la aplicación se verá afectado por esta entrada.\n\n¿Quieres continuar?\n(Aún puede cambiar el saldo en el menú si lo necesita.)</string>
     <string name="expense_add_before_init_date_dialog_positive_cta">Confirmar</string>
     <string name="expense_add_before_init_date_dialog_negative_cta">Cancelar</string>
+    <string name="expense_check_error_title">¡Ups</string>
+    <string name="expense_check_error_message">Ocurrió un problema (%s)</string>
 
     <string name="dialog_edit_expense_title">¿Qué quieres hacer?</string>
     <string name="dialog_edit_income_title">¿Qué quieres hacer?</string>
@@ -175,14 +177,16 @@
     <string name="setting_theme_platform">Por defecto</string>
 
     <string name="premium_popup_premium_title">¡Eres premium!</string>
-    <string name="premium_popup_premium_message">Tienes acceso a las funcionalidades premium:\n\n- Informe mensual: Recibe un recapitulativo de los gastos e ingresos del mes\n- Recordatorio diario si olvidaste entrar tus gastos durante el día\n- Modo oscuro\n- Copia de seguridad\n… ¡y más funcionalidades premium que serán añadidas pronto!</string>
+    <string name="premium_popup_premium_message">Tienes acceso a las funcionalidades premium:\n\n- Informe mensual: Recibe un recapitulativo de los gastos e ingresos del mes\n- Recordatorio diario si olvidaste entrar tus gastos durante el día\n- Modo oscuro\n- Copia de seguridad\n- Marcar entradas\n… ¡y más funcionalidades premium que serán añadidas pronto!</string>
     <string name="premium_popup_not_premium_title">Vuélvete premium</string>
     <string name="premium_popup_not_premium_message">¡Accede a las funcionalidades premium!</string>
     <string name="premium_popup_not_premium_feature1_title">3. Recordatorio diario</string>
     <string name="premium_popup_not_premium_feature1_message">Recibe una notificación al final del día si no has entrado tus gastos.</string>
     <string name="premium_popup_not_premium_feature2_title">1. Informe mensual</string>
     <string name="premium_popup_not_premium_feature2_message">Descubre cuánto has ahorrado a través de un recapitulativo mensual de tus gastos e ingresos.</string>
-    <string name="premium_popup_not_premium_feature_more_dark_theme">4. ¡Modo oscuro!</string>
+    <string name="premium_popup_not_premium_feature_more_expense_check">4. Marcar entradas</string>
+    <string name="premium_popup_not_premium_feature_more_expense_check_desc">Posibilidad de marcar una entrada cuando ha llegado a su cuenta bancaria para realizar un seguimiento de lo que está sucediendo</string>
+    <string name="premium_popup_not_premium_feature_more_dark_theme">5. ¡Modo oscuro!</string>
     <string name="premium_popup_not_premium_feature_more_backup_title">2. Copia de seguridad</string>
     <string name="premium_popup_not_premium_feature_more_backup_message">Copia de seguridad automática de sus datos en la nube! Ya no necesita preocuparse por perder su presupuesto.</string>
     <string name="premium_popup_not_premium_feature_more_title">… ¡y más funcionalidades premium que serán añadidas pronto!</string>

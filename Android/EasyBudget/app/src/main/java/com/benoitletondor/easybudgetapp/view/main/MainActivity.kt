@@ -60,6 +60,7 @@ import java.util.Locale
 
 import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.iab.INTENT_IAB_STATUS_CHANGED
+import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.parameters.*
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
@@ -93,6 +94,7 @@ class MainActivity : BaseActivity() {
 
     private val viewModel: MainViewModel by viewModel()
     private val parameters: Parameters by inject()
+    private val iab: Iab by inject()
 
 // ------------------------------------------>
 
@@ -353,6 +355,16 @@ class MainActivity : BaseActivity() {
 
         viewModel.selectedDateChangeLiveData.observe(this, Observer { (date, balance, expenses) ->
             refreshAllForDate(date, balance, expenses)
+        })
+
+        viewModel.expenseCheckedErrorEventStream.observe(this, Observer { exception ->
+            Logger.error("Error while checking expense", exception)
+
+            AlertDialog.Builder(this@MainActivity)
+                .setTitle(R.string.expense_check_error_title)
+                .setMessage(getString(R.string.expense_check_error_message, exception.localizedMessage))
+                .setNegativeButton(R.string.ok) { dialog2, _ ->  dialog2.dismiss() }
+                .show()
         })
     }
 
@@ -790,7 +802,9 @@ class MainActivity : BaseActivity() {
          */
         expensesRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        expensesViewAdapter = ExpensesRecyclerViewAdapter(this, parameters, Date())
+        expensesViewAdapter = ExpensesRecyclerViewAdapter(this, parameters, iab, Date()) { expense, checked ->
+            viewModel.onExpenseChecked(expense, checked)
+        }
         expensesRecyclerView.adapter = expensesViewAdapter
     }
 

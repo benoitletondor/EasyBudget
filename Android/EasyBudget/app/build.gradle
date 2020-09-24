@@ -29,15 +29,23 @@ repositories {
 }
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     defaultConfig {
         applicationId "com.benoitletondor.easybudgetapp"
         minSdkVersion 21
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 72
         versionName "2.2.0"
         vectorDrawables.useSupportLibrary = true
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += [
+                    "room.incremental":"true"
+                ]
+            }
+        }
     }
     buildTypes {
         debug {
@@ -104,9 +112,9 @@ dependencies {
     implementation 'me.relex:circleindicator:2.1.4@aar'
     implementation 'com.batch.android:batch-sdk:1.15.1'
 
-    implementation 'org.koin:koin-core:2.1.6'
-    implementation 'org.koin:koin-android:2.1.6'
-    implementation 'org.koin:koin-android-viewmodel:2.1.6'
+    implementation 'org.koin:koin-core:2.2.0-beta-1'
+    implementation 'org.koin:koin-android:2.2.0-beta-1'
+    implementation 'org.koin:koin-android-viewmodel:2.2.0-beta-1'
 
     kapt "androidx.room:room-compiler:2.2.5"
     implementation "androidx.room:room-runtime:2.2.5"

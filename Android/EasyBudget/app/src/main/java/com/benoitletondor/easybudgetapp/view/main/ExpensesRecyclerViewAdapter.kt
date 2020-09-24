@@ -21,6 +21,7 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -29,7 +30,9 @@ import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import com.benoitletondor.easybudgetapp.R
+import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
+import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
@@ -45,7 +48,9 @@ import java.util.*
  */
 class ExpensesRecyclerViewAdapter(private val activity: Activity,
                                   private val parameters: Parameters,
-                                  private var date: Date) : RecyclerView.Adapter<ExpensesRecyclerViewAdapter.ViewHolder>() {
+                                  private val iab: Iab,
+                                  private var date: Date,
+                                  private val onExpenseCheckedListener: (Expense, Boolean) -> Unit) : RecyclerView.Adapter<ExpensesRecyclerViewAdapter.ViewHolder>() {
 
     private var expenses = mutableListOf<Expense>()
 
@@ -99,6 +104,13 @@ class ExpensesRecyclerViewAdapter(private val activity: Activity,
         viewHolder.expenseAmountTextView.setTextColor(ContextCompat.getColor(viewHolder.view.context, if (expense.isRevenue()) R.color.budget_green else R.color.budget_red))
         viewHolder.recurringIndicator.visibility = if (expense.isRecurring()) View.VISIBLE else View.GONE
         viewHolder.positiveIndicator.setImageResource(if (expense.isRevenue()) R.drawable.ic_label_green else R.drawable.ic_label_red)
+        viewHolder.checkedCheckBox.visibility = if( iab.isUserPremium() ) { View.VISIBLE } else { View.GONE }
+        viewHolder.checkedCheckBox.setOnCheckedChangeListener { _, checked ->
+            if( checked != expense.checked ) {
+                onExpenseCheckedListener(expense, checked)
+            }
+        }
+        viewHolder.checkedCheckBox.isChecked = expense.checked
 
         if (expense.isRecurring()) {
             when (expense.associatedRecurringExpense!!.type) {
@@ -216,5 +228,6 @@ class ExpensesRecyclerViewAdapter(private val activity: Activity,
         val recurringIndicator: ViewGroup = view.findViewById(R.id.recurring_indicator)
         val recurringIndicatorTextview: TextView = view.findViewById(R.id.recurring_indicator_textview)
         val positiveIndicator: ImageView = view.findViewById(R.id.positive_indicator)
+        val checkedCheckBox: CheckBox = view.findViewById(R.id.expense_checked)
     }
 }

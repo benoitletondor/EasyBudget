@@ -52,6 +52,8 @@
     <string name="expense_add_before_init_date_dialog_description">Дата записи, которую вы хотите добавить, предшествует дате установки приложения.\n\nЭто означает, что эта запись повлияет на баланс, который вы ввели при настройке приложения.\n\nВы хотите продолжить?\n(Вы все еще можете изменить баланс в меню, если вам нужно.)</string>
     <string name="expense_add_before_init_date_dialog_positive_cta">Подтверждение</string>
     <string name="expense_add_before_init_date_dialog_negative_cta">Отмена</string>
+    <string name="expense_check_error_title">Ой…</string>
+    <string name="expense_check_error_message">Произошла ошибка (%s)</string>
 
     <string name="dialog_edit_expense_title">Что Вы хотите сделать?</string>
     <string name="dialog_edit_income_title">Что Вы хотите сделать?</string>
@@ -176,14 +178,16 @@
     <string name="setting_theme_platform">Системные установки по умолчанию</string>
 
     <string name="premium_popup_premium_title">Вы премиум-пользователь!</string>
-    <string name="premium_popup_premium_message">У Вас есть доступ к премиум-функциям:\n\n- Ежемесячный отчет: Подбейте итог Ваших расходов и доходов за месяц\n- Ежедневное напоминание, если Вы забыли внести свои расходы в течение дня\n- Облачное резервное копирование\n… больше премиум-функций будут добавлены в ближайшее время!</string>
+    <string name="premium_popup_premium_message">У Вас есть доступ к премиум-функциям:\n\n- Ежемесячный отчет: Подбейте итог Ваших расходов и доходов за месяц\n- Ежедневное напоминание, если Вы забыли внести свои расходы в течение дня\n- Облачное резервное копирование\n- Отметить записи\n… больше премиум-функций будут добавлены в ближайшее время!</string>
     <string name="premium_popup_not_premium_title">Стать премиум-пользователем</string>
     <string name="premium_popup_not_premium_message">Получить доступ ко всем премиум-функциям!</string>
     <string name="premium_popup_not_premium_feature1_title">3. Ежедневное напоминание</string>
     <string name="premium_popup_not_premium_feature1_message">Получите уведомление в конце дня, если Вы не указали свои расходы.</string>
     <string name="premium_popup_not_premium_feature2_title">1. Месячный отчет</string>
     <string name="premium_popup_not_premium_feature2_message">Получить итог Ваших доходов и расходов за месяц и увидеть, сколько Вы съэкономили.</string>
-    <string name="premium_popup_not_premium_feature_more_dark_theme">4. Темная поддержка тем!</string>
+    <string name="premium_popup_not_premium_feature_more_expense_check">4. Отметить записи</string>
+    <string name="premium_popup_not_premium_feature_more_expense_check_desc">Возможность отмечать запись, когда она поступает на ваш банковский счет, чтобы отслеживать, что происходит</string>
+    <string name="premium_popup_not_premium_feature_more_dark_theme">5. Темная поддержка тем!</string>
     <string name="premium_popup_not_premium_feature_more_backup_title">2. Резервный</string>
     <string name="premium_popup_not_premium_feature_more_backup_message">Автоматическое резервное копирование ваших данных в облаке! Не нужно больше беспокоиться о потере бюджета.</string>
     <string name="premium_popup_not_premium_feature_more_title">…больше премиум-функций в ближайшее время!</string>

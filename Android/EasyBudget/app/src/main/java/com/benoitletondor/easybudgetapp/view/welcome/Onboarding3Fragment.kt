@@ -108,7 +108,7 @@ class Onboarding3Fragment : OnboardingFragment(), CoroutineScope by MainScope() 
                     if (newBalance != currentBalance) {
                         val diff = newBalance - currentBalance
 
-                        val expense = Expense(resources.getString(R.string.adjust_balance_expense_title), -diff, Date())
+                        val expense = Expense(resources.getString(R.string.adjust_balance_expense_title), -diff, Date(), true)
                         db.persistExpense(expense)
                     }
                 }

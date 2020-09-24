@@ -58,12 +58,13 @@ class PremiumActivity : BaseActivity() {
                     2 -> return Premium3Fragment()
                     3 -> return Premium4Fragment()
                     4 -> return Premium5Fragment()
+                    5 -> return Premium6Fragment()
                 }
 
                 throw IllegalStateException()
             }
 
-            override fun getCount(): Int = 5
+            override fun getCount(): Int = 6
         }
         premium_view_pager.offscreenPageLimit = premium_view_pager.adapter!!.count // preload all fragments for transitions smoothness
 
