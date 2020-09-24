@@ -16,6 +16,7 @@
 
 package com.benoitletondor.easybudgetapp.view
 
+import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -27,14 +28,17 @@ import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.hasUserCompleteRating
 import com.benoitletondor.easybudgetapp.parameters.setUserHasCompleteRating
+import com.google.android.play.core.review.ReviewManagerFactory
 
 /**
  * Rating popup that ask user for feedback and redirect them to the PlayStore
  *
  * @author Benoit LETONDOR
  */
-class RatingPopup(private val context: Context,
+class RatingPopup(private val activity: Activity,
                   private val parameters: Parameters) {
+
+    private val reviewManager = ReviewManagerFactory.create(activity.applicationContext)
 
     /**
      * Show the rating popup to the user
@@ -70,7 +74,7 @@ class RatingPopup(private val context: Context,
      * @return A ready to be shown [AlertDialog]
      */
     private fun buildStep1(includeDontAskMeAgainButton: Boolean): AlertDialog {
-        val builder = AlertDialog.Builder(context)
+        val builder = AlertDialog.Builder(activity)
             .setTitle(R.string.rating_popup_question_title)
             .setMessage(R.string.rating_popup_question_message)
             .setNegativeButton(R.string.rating_popup_question_cta_negative) { _, _ ->
@@ -99,7 +103,7 @@ class RatingPopup(private val context: Context,
      * @return A ready to be shown [AlertDialog]
      */
     private fun buildNegativeStep(): AlertDialog {
-        return AlertDialog.Builder(context)
+        return AlertDialog.Builder(activity)
             .setTitle(R.string.rating_popup_negative_title)
             .setMessage(R.string.rating_popup_negative_message)
             .setNegativeButton(R.string.rating_popup_negative_cta_negative) { _, _ ->
@@ -113,14 +117,14 @@ class RatingPopup(private val context: Context,
                 val sendIntent = Intent()
                 sendIntent.action = Intent.ACTION_SENDTO
                 sendIntent.data = Uri.parse("mailto:") // only email apps should handle this
-                sendIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(context.resources.getString(R.string.rating_feedback_email)))
-                sendIntent.putExtra(Intent.EXTRA_TEXT, context.resources.getString(R.string.rating_feedback_send_text))
-                sendIntent.putExtra(Intent.EXTRA_SUBJECT, context.resources.getString(R.string.rating_feedback_send_subject))
+                sendIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(activity.resources.getString(R.string.rating_feedback_email)))
+                sendIntent.putExtra(Intent.EXTRA_TEXT, activity.resources.getString(R.string.rating_feedback_send_text))
+                sendIntent.putExtra(Intent.EXTRA_SUBJECT, activity.resources.getString(R.string.rating_feedback_send_subject))
 
-                if (sendIntent.resolveActivity(context.packageManager) != null) {
-                    context.startActivity(sendIntent)
+                if (sendIntent.resolveActivity(activity.packageManager) != null) {
+                    activity.startActivity(sendIntent)
                 } else {
-                    Toast.makeText(context, context.resources.getString(R.string.rating_feedback_send_error), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity, activity.resources.getString(R.string.rating_feedback_send_error), Toast.LENGTH_SHORT).show()
                 }
             }
             .create()
@@ -132,7 +136,7 @@ class RatingPopup(private val context: Context,
      * @return A ready to be shown [AlertDialog]
      */
     private fun buildPositiveStep(): AlertDialog {
-        return AlertDialog.Builder(context)
+        return AlertDialog.Builder(activity)
             .setTitle(R.string.rating_popup_positive_title)
             .setMessage(R.string.rating_popup_positive_message)
             .setNegativeButton(R.string.rating_popup_positive_cta_negative) { _, _ ->
@@ -143,19 +147,36 @@ class RatingPopup(private val context: Context,
                 parameters.setRatingPopupStep(RatingPopupStep.STEP_LIKE_RATED)
                 parameters.setUserHasCompleteRating()
 
-                val appPackageName = context.packageName
-
-                try {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$appPackageName"))
-
-                    context.startActivity(intent)
-                } catch (e: ActivityNotFoundException) {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName"))
-
-                    context.startActivity(intent)
-                }
+                reviewManager.requestReviewFlow()
+                    .addOnCompleteListener { request ->
+                        if (request.isSuccessful) {
+                            val reviewInfo = request.result
+                            reviewManager.launchReviewFlow(activity, reviewInfo)
+                                .addOnCompleteListener { result ->
+                                    if( !result.isSuccessful ) {
+                                        redirectToPlayStoreForRating()
+                                    }
+                                }
+                        } else {
+                            redirectToPlayStoreForRating()
+                        }
+                    }
             }
             .create()
+    }
+
+    private fun redirectToPlayStoreForRating() {
+        val appPackageName = activity.packageName
+
+        try {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$appPackageName"))
+
+            activity.startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName"))
+
+            activity.startActivity(intent)
+        }
     }
 
     /**
