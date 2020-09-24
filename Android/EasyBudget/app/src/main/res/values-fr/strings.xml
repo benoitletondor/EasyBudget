@@ -177,14 +177,16 @@
     <string name="setting_theme_platform">Par défaut</string>
 
     <string name="premium_popup_premium_title">Vous êtes premium!</string>
-    <string name="premium_popup_premium_message">Vous avez accès aux fonctionnalités premium:\n\n- Récapitulatif mensuel : Recevez un récapitulatif de vos dépenses et revenus du mois.\n- Rappel journalier si vous avez oublié d’entrer vos dépenses durant la journée\n- Mode sombre\n- Sauvegarde dans le cloud\n… et plus de fonctionnalités premium qui seront ajoutées très bientôt !</string>
+    <string name="premium_popup_premium_message">Vous avez accès aux fonctionnalités premium:\n\n- Récapitulatif mensuel : Recevez un récapitulatif de vos dépenses et revenus du mois.\n- Rappel journalier si vous avez oublié d’entrer vos dépenses durant la journée\n- Mode sombre\n- Sauvegarde dans le cloud\n- Marquer les dépenses/revenus\n… et plus de fonctionnalités premium qui seront ajoutées très bientôt !</string>
     <string name="premium_popup_not_premium_title">Devenez utilisateur premium</string>
     <string name="premium_popup_not_premium_message">Accédez aux fonctionnalités premium !</string>
     <string name="premium_popup_not_premium_feature1_title">3. Rappel journalier</string>
     <string name="premium_popup_not_premium_feature1_message">Recevez une notification à la fin de la journée si vous n’avez pas entré vos dépenses.</string>
     <string name="premium_popup_not_premium_feature2_title">1. Récapitulatif mensuel</string>
     <string name="premium_popup_not_premium_feature2_message">Accédez à un récapitulatif de vos dépenses et revenus du mois et voyez combien vous avez économisé.</string>
-    <string name="premium_popup_not_premium_feature_more_dark_theme">4. Gestion du thème sombre!</string>
+    <string name="premium_popup_not_premium_feature_more_expense_check">4. Marquer les dépenses/revenus</string>
+    <string name="premium_popup_not_premium_feature_more_expense_check_desc">Possibilité de marquer les dépenses et revenus lorsqu\'ils ont été débités de votre compte en banque pour une parfaite synchronisation</string>
+    <string name="premium_popup_not_premium_feature_more_dark_theme">5. Gestion du thème sombre!</string>
     <string name="premium_popup_not_premium_feature_more_backup_title">2. Sauvegarde</string>
     <string name="premium_popup_not_premium_feature_more_backup_message">Sauvegarde automatique de vos données dans le cloud ! Fini la peur de perdre le détail de votre budget.</string>
     <string name="premium_popup_not_premium_feature_more_title">… et plus de fonctionnalités premium qui seront ajoutées très bientôt !</string>

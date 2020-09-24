@@ -177,14 +177,16 @@
     <string name="setting_theme_platform">Sistema padrão</string>
 
     <string name="premium_popup_premium_title">Você é premium!</string>
-    <string name="premium_popup_premium_message">Você tem acesso às funções premium:\n\n- Relatórios mensais: Receba um relatório de suas despesas e receitas do mês\n- Lembrete diário se você esqueceu de inserir suas despesas durante o dia\nTema escuro\n- Cópia de segurança\n… e mais funções premium que virão em breve!</string>
+    <string name="premium_popup_premium_message">Você tem acesso às funções premium:\n\n- Relatórios mensais: Receba um relatório de suas despesas e receitas do mês\n- Lembrete diário se você esqueceu de inserir suas despesas durante o dia\nTema escuro\n- Cópia de segurança\n- Marcar entradas\n… e mais funções premium que virão em breve!</string>
     <string name="premium_popup_not_premium_title">Torne-se premium</string>
     <string name="premium_popup_not_premium_message">Acesse todas as funções premium!</string>
     <string name="premium_popup_not_premium_feature1_title">3. Lembrete diário</string>
     <string name="premium_popup_not_premium_feature1_message">Receba uma notificação no final do dia se você não inseriu suas despesas.</string>
     <string name="premium_popup_not_premium_feature2_title">1. Relatório mensal</string>
     <string name="premium_popup_not_premium_feature2_message">Receba o relatório de suas despesas e receitas do mês e veja quanto você economizou.</string>
-    <string name="premium_popup_not_premium_feature_more_dark_theme">4. Tema escuro!</string>
+    <string name="premium_popup_not_premium_feature_more_expense_check">4. Marcar entradas</string>
+    <string name="premium_popup_not_premium_feature_more_expense_check_desc">Capacidade de marcar uma entrada quando ela atinge sua conta bancária para acompanhar o que está acontecendo</string>
+    <string name="premium_popup_not_premium_feature_more_dark_theme">5. Tema escuro!</string>
     <string name="premium_popup_not_premium_feature_more_backup_title">2. Cópia de segurança</string>
     <string name="premium_popup_not_premium_feature_more_backup_message">Cópia de segurança automática de seus dados na nuvem! Não precisa mais se preocupar em perder seu orçamento.</string>
     <string name="premium_popup_not_premium_feature_more_title">… e mais funções premium que virão em breve!</string>

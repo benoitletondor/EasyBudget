@@ -177,14 +177,16 @@
     <string name="setting_theme_platform">Systemfehler</string>
 
     <string name="premium_popup_premium_title">Sie sind Premium-Nutzer!</string>
-    <string name="premium_popup_premium_message">Sie haben Zugriff auf Premium-Features:\n\n- Monatliche Zusammenfassung: Erhalten Sie eine Zusammenfassung Ihrer monatl. Einnahmen und Ausgaben.\n- Tägliche Erinnerungen, wenn Sie vergessen Ihre Ausgaben einzutragen\n- Dunkles Theme\n- Cloud-Sicherung\n… und mehr Premium-Features, die in Kürze hinzugefügt werden!</string>
+    <string name="premium_popup_premium_message">Sie haben Zugriff auf Premium-Features:\n\n- Monatliche Zusammenfassung: Erhalten Sie eine Zusammenfassung Ihrer monatl. Einnahmen und Ausgaben.\n- Tägliche Erinnerungen, wenn Sie vergessen Ihre Ausgaben einzutragen\n- Dunkles Theme\n- Cloud-Sicherung\n- Einträge markieren\n… und mehr Premium-Features, die in Kürze hinzugefügt werden!</string>
     <string name="premium_popup_not_premium_title">Premium-Nutzer werden</string>
     <string name="premium_popup_not_premium_message">Auf alle Premium-Features zugreifen!</string>
     <string name="premium_popup_not_premium_feature1_title">3. Tägliche Erinnerung</string>
     <string name="premium_popup_not_premium_feature1_message">Erhalten Sie eine Benachrichtigung am Ende des Tages, wenn Sie Ihre Ausgaben noch nicht eingetragen haben.</string>
     <string name="premium_popup_not_premium_feature2_title">1. Monatliche Zusammenfassung</string>
     <string name="premium_popup_not_premium_feature2_message">Greifen Sie auf eine monatliche Zusammenfassung Ihrer Ausgaben und Einnahmen zu, um zu sehen, wie viel Sie gespart haben.</string>
-    <string name="premium_popup_not_premium_feature_more_dark_theme">4. Dunkles Theme!</string>
+    <string name="premium_popup_not_premium_feature_more_expense_check">4. Einträge markieren</string>
+    <string name="premium_popup_not_premium_feature_more_expense_check_desc">Möglichkeit, einen Eintrag zu markieren, wenn er Ihr Bankkonto erreicht hat, um zu verfolgen, was gerade passiert</string>
+    <string name="premium_popup_not_premium_feature_more_dark_theme">5. Dunkles Theme!</string>
     <string name="premium_popup_not_premium_feature_more_backup_title">2. Sicherung</string>
     <string name="premium_popup_not_premium_feature_more_backup_message">Automatische Sicherung Ihrer Daten in der Cloud! Sie müssen sich keine Sorgen mehr machen, dass Sie Ihr Budget verlieren.</string>
     <string name="premium_popup_not_premium_feature_more_title">… und mehr Premium-Features, die in Kürze hinzugefügt werden!</string>
