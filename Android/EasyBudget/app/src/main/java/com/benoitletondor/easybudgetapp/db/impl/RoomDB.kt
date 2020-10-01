@@ -28,7 +28,7 @@ import java.util.*
 const val DB_NAME = "easybudget.db"
 
 @Database(exportSchema = false,
-          version = 4,
+          version = 5,
           entities = [
               ExpenseEntity::class,
               RecurringExpenseEntity::class
@@ -41,7 +41,7 @@ abstract class RoomDB : RoomDatabase() {
     companion object {
         fun create(context: Context): RoomDB = Room
             .databaseBuilder(context, RoomDB::class.java, DB_NAME)
-            .addMigrations(migrationFrom1To2, migrationFrom2To3, migrationToRoom)
+            .addMigrations(migrationFrom1To2, migrationFrom2To3, migrationToRoom, addCheckedField)
             .build()
     }
 }
@@ -55,6 +55,12 @@ private class TimestampConverters {
     @TypeConverter
     fun dateToTimestamp(date: Date?): Long? {
         return date?.time
+    }
+}
+
+private val addCheckedField = object : Migration(4, 5) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE expense ADD COLUMN checked INTEGER NOT NULL DEFAULT 0")
     }
 }
 

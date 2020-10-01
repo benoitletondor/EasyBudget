@@ -24,27 +24,32 @@ data class Expense(val id: Long?,
                    val title: String,
                    val amount: Double,
                    val date: Date,
+                   val checked: Boolean,
                    val associatedRecurringExpense: RecurringExpense?) : Parcelable {
 
     constructor(title: String,
                 amount: Double,
-                date: Date) : this(null, title, amount, date, null)
+                date: Date,
+                checked: Boolean) : this(null, title, amount, date, checked, null)
 
     constructor(id: Long,
                 title: String,
                 amount: Double,
-                date: Date) : this(id, title, amount, date, null)
+                date: Date,
+                checked: Boolean) : this(id, title, amount, date, checked, null)
 
     constructor(title: String,
                 amount: Double,
                 date: Date,
-                associatedRecurringExpense: RecurringExpense) : this(null, title, amount, date, associatedRecurringExpense)
+                checked: Boolean,
+                associatedRecurringExpense: RecurringExpense) : this(null, title, amount, date, checked, associatedRecurringExpense)
 
     private constructor(parcel: Parcel) : this(
         parcel.readValue(Long::class.java.classLoader) as? Long,
         parcel.readString()!!,
         parcel.readDouble(),
         Date(parcel.readLong()),
+        parcel.readInt() == 1,
         parcel.readParcelable(RecurringExpense::class.java.classLoader)
     )
 
@@ -63,6 +68,7 @@ data class Expense(val id: Long?,
         parcel.writeString(title)
         parcel.writeDouble(amount)
         parcel.writeLong(date.time)
+        parcel.writeInt(if( checked ) { 1 } else { 0 })
         parcel.writeParcelable(associatedRecurringExpense, flags)
     }
 

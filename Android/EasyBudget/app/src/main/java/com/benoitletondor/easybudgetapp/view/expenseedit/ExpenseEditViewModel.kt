@@ -84,7 +84,7 @@ class ExpenseEditViewModel(private val db: DB,
                     title = description,
                     amount = if (isRevenue) -value else value,
                     date = date
-                ) ?: Expense(description, if (isRevenue) -value else value, date)
+                ) ?: Expense(description, if (isRevenue) -value else value, date, false)
 
                 db.persistExpense(expense)
             }

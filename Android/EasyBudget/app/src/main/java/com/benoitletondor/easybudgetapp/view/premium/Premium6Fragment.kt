@@ -14,27 +14,23 @@
  *   limitations under the License.
  */
 
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+package com.benoitletondor.easybudgetapp.view.premium
 
-buildscript {
-    ext.kotlin_version = '1.4.10'
-    repositories {
-        google()
-        jcenter()
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.1'
-        classpath 'com.google.gms:google-services:4.3.3'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.3.0'
-    }
-}
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 
-allprojects {
-    repositories {
-        google()
-        jcenter()
-        mavenCentral()
+import com.benoitletondor.easybudgetapp.R
+
+/**
+ * Fragment 6 of the premium onboarding screen
+ *
+ * @author Benoit LETONDOR
+ */
+class Premium6Fragment : PremiumFragment() {
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.fragment_premium6, container, false)
     }
 }
