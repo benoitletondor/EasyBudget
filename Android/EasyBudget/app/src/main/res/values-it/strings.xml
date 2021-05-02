@@ -106,6 +106,7 @@
     <string name="bi_weekly">2 SETTIMANE</string>
     <string name="ter_weekly">3 SETTIMANE</string>
     <string name="four_weekly">4 SETTIMANE</string>
+    <string name="bi_monthly">2 MESI</string>
     <string name="ter_monthly">3 MESI</string>
     <string name="six_monthly">6 MESI</string>
     <string name="yearly">ANNUALE</string>
@@ -136,6 +137,7 @@
     <string name="recurring_interval_ter_weekly">Ogni 3 settimane</string>
     <string name="recurring_interval_four_weekly">Ogni 4 settimane</string>
     <string name="recurring_interval_monthly">Ogni mese</string>
+    <string name="recurring_interval_bi_monthly">Ogni 2 mesi</string>
     <string name="recurring_interval_ter_monthly">Ogni 3 mesi</string>
     <string name="recurring_interval_six_monthly">Ogni 6 mesi</string>
     <string name="recurring_interval_yearly">Ogni anno</string>

@@ -55,6 +55,11 @@ enum class RecurringExpenseType {
     MONTHLY,
 
     /**
+     * An expense that occurs every 2 months
+     */
+    BI_MONTHLY,
+
+    /**
      * An expense that occurs every 3 months
      */
     TER_MONTHLY,

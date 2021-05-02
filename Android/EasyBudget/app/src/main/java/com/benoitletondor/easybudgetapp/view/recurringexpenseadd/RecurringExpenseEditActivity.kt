@@ -259,6 +259,7 @@ class RecurringExpenseEditActivity : BaseActivity() {
             getString(R.string.recurring_interval_ter_weekly),
             getString(R.string.recurring_interval_four_weekly),
             getString(R.string.recurring_interval_monthly),
+            getString(R.string.recurring_interval_bi_monthly),
             getString(R.string.recurring_interval_ter_monthly),
             getString(R.string.recurring_interval_six_monthly),
             getString(R.string.recurring_interval_yearly)
@@ -300,9 +301,10 @@ class RecurringExpenseEditActivity : BaseActivity() {
             3 -> return RecurringExpenseType.TER_WEEKLY
             4 -> return RecurringExpenseType.FOUR_WEEKLY
             5 -> return RecurringExpenseType.MONTHLY
-            6 -> return RecurringExpenseType.TER_MONTHLY
-            7 -> return RecurringExpenseType.SIX_MONTHLY
-            8 -> return RecurringExpenseType.YEARLY
+            6 -> return RecurringExpenseType.BI_MONTHLY
+            7 -> return RecurringExpenseType.TER_MONTHLY
+            8 -> return RecurringExpenseType.SIX_MONTHLY
+            9 -> return RecurringExpenseType.YEARLY
         }
 
         throw IllegalStateException("getRecurringTypeFromSpinnerSelection unable to get value for $spinnerSelectedItem")
@@ -316,9 +318,10 @@ class RecurringExpenseEditActivity : BaseActivity() {
             RecurringExpenseType.TER_WEEKLY -> 3
             RecurringExpenseType.FOUR_WEEKLY -> 4
             RecurringExpenseType.MONTHLY -> 5
-            RecurringExpenseType.TER_MONTHLY -> 6
-            RecurringExpenseType.SIX_MONTHLY -> 7
-            RecurringExpenseType.YEARLY -> 8
+            RecurringExpenseType.BI_MONTHLY -> 6
+            RecurringExpenseType.TER_MONTHLY -> 7
+            RecurringExpenseType.SIX_MONTHLY -> 8
+            RecurringExpenseType.YEARLY -> 9
         }
 
         expense_type_spinner.setSelection(selectionIndex, false)

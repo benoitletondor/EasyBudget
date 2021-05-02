@@ -108,6 +108,7 @@
     <string name="bi_weekly">2 НЕДЕЛИ</string>
     <string name="ter_weekly">3 НЕДЕЛИ</string>
     <string name="four_weekly">4 НЕДЕЛИ</string>
+    <string name="bi_monthly">2 МЕСЯЦЫ</string>
     <string name="ter_monthly">3 МЕСЯЦЫ</string>
     <string name="six_monthly">6 МЕСЯЦЫ</string>
     <string name="yearly">ЕЖЕГОДНО</string>
@@ -136,6 +137,7 @@
     <string name="recurring_interval_ter_weekly">Каждые 3 недели</string>
     <string name="recurring_interval_four_weekly">Каждые 4 недели</string>
     <string name="recurring_interval_monthly">Ежемесячно</string>
+    <string name="recurring_interval_bi_monthly">Каждые 2 месяца</string>
     <string name="recurring_interval_ter_monthly">Каждые 3 месяца</string>
     <string name="recurring_interval_six_monthly">Каждые 6 месяца</string>
     <string name="recurring_interval_yearly">Ежегодно</string>

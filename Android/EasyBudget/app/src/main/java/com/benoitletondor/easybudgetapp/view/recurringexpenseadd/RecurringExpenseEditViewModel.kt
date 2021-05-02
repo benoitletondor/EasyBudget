@@ -232,6 +232,19 @@ class RecurringExpenseEditViewModel @Inject constructor(
                     cal.add(Calendar.MONTH, 1)
                 }
             }
+            RecurringExpenseType.BI_MONTHLY -> {
+                // Add up to 25 years of expenses
+                for (i in 0 until 6*25) {
+                    try {
+                        db.persistExpense(Expense(expense.title, expense.amount, cal.time, false, expense))
+                    } catch (t: Throwable) {
+                        Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
+                        return false
+                    }
+
+                    cal.add(Calendar.MONTH, 2)
+                }
+            }
             RecurringExpenseType.TER_MONTHLY -> {
                 // Add up to 25 years of expenses
                 for (i in 0 until 4*25) {
