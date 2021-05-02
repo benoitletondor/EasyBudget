@@ -24,6 +24,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
 import com.batch.android.Batch
 import com.batch.android.BatchActivityLifecycleHelper
 import com.batch.android.BatchNotificationChannelsManager.DEFAULT_CHANNEL_ID
@@ -32,8 +34,6 @@ import com.batch.android.PushNotificationType
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.iab.Iab
-import com.benoitletondor.easybudgetapp.injection.appModule
-import com.benoitletondor.easybudgetapp.injection.viewModelModule
 import com.benoitletondor.easybudgetapp.notif.*
 import com.benoitletondor.easybudgetapp.parameters.*
 import com.benoitletondor.easybudgetapp.push.PushService.Companion.DAILY_REMINDER_KEY
@@ -43,33 +43,28 @@ import com.benoitletondor.easybudgetapp.view.RatingPopup
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
 import com.benoitletondor.easybudgetapp.view.getRatingPopupUserStep
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.runBlocking
-import org.koin.android.ext.android.inject
-import org.koin.android.ext.koin.androidContext
-import org.koin.android.ext.koin.androidLogger
-import org.koin.core.context.startKoin
-import org.koin.java.KoinJavaComponent.get
 import java.util.*
+import javax.inject.Inject
 
 /**
  * EasyBudget application. Implements GA tracking, Batch set-up, Crashlytics set-up && iab.
  *
  * @author Benoit LETONDOR
  */
-class EasyBudget : Application() {
-    private val iab: Iab by inject()
-    private val parameters: Parameters by inject()
+@HiltAndroidApp
+class EasyBudget : Application(), Configuration.Provider {
+    @Inject lateinit var iab: Iab
+    @Inject lateinit var parameters: Parameters
+    @Inject lateinit var db: DB
+
+    @Inject lateinit var workerFactory: HiltWorkerFactory
 
 // ------------------------------------------>
 
     override fun onCreate() {
         super.onCreate()
-
-        startKoin {
-            androidLogger()
-            androidContext(this@EasyBudget)
-            modules(listOf(appModule, viewModelModule))
-        }
 
         // Init actions
         init()
@@ -89,12 +84,12 @@ class EasyBudget : Application() {
         checkUpdateAction()
 
         // Ensure DB is created and reset init date if needed
-        get(DB::class.java).use {
-            it.ensureDBCreated()
+        db.run {
+            ensureDBCreated()
 
             // FIXME this should be done on restore, change that for the whole parameters restoration
             if( parameters.getShouldResetInitDate() ) {
-                runBlocking { it.getOldestExpense() }?.let { expense ->
+                runBlocking { getOldestExpense() }?.let { expense ->
                     parameters.setInitTimestamp(expense.date.time)
                 }
 
@@ -108,6 +103,11 @@ class EasyBudget : Application() {
         // Setup theme
         AppCompatDelegate.setDefaultNightMode(parameters.getTheme().toPlatformValue())
     }
+
+    override fun getWorkManagerConfiguration() =
+        Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
 
     /**
      * Init app const and parameters

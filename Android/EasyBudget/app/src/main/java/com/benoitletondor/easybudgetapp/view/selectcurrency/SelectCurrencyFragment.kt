@@ -25,12 +25,13 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.parameters.Parameters
-import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.viewModel
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * Fragment that contains UI for user to chose its currency.<br></br>
@@ -43,10 +44,11 @@ import org.koin.android.viewmodel.ext.android.viewModel
  *
  * @author Benoit LETONDOR
  */
+@AndroidEntryPoint
 class SelectCurrencyFragment : DialogFragment() {
+    private val viewModel: SelectCurrencyViewModel by viewModels()
 
-    private val parameters: Parameters by inject()
-    private val viewModel: SelectCurrencyViewModel by viewModel()
+    @Inject lateinit var parameters: Parameters
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         if (showsDialog) {

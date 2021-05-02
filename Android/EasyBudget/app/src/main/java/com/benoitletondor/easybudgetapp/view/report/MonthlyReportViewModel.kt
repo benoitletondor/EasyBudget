@@ -21,12 +21,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.db.DB
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
+import javax.inject.Inject
 
-class MonthlyReportViewModel(private val db: DB) : ViewModel() {
+@HiltViewModel
+class MonthlyReportViewModel @Inject constructor(private val db: DB) : ViewModel() {
     val monthlyReportDataLiveData = MutableLiveData<MonthlyReportData>()
 
     sealed class MonthlyReportData {
@@ -63,11 +66,5 @@ class MonthlyReportViewModel(private val db: DB) : ViewModel() {
 
             monthlyReportDataLiveData.value = MonthlyReportData.Data(expenses, revenues, expensesAmount, revenuesAmount)
         }
-    }
-
-    override fun onCleared() {
-        db.close()
-
-        super.onCleared()
     }
 }

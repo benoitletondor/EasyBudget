@@ -25,14 +25,19 @@ import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType
 import com.benoitletondor.easybudgetapp.db.DB
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Exception
 import java.util.*
+import javax.inject.Inject
 
-class MainViewModel(private val db: DB,
-                    private val iab: Iab) : ViewModel() {
+@HiltViewModel
+class MainViewModel @Inject constructor(
+    private val db: DB,
+    private val iab: Iab,
+) : ViewModel() {
     private var selectedDate: Date = Date()
 
     val premiumStatusLiveData = MutableLiveData<Boolean>()
@@ -349,14 +354,6 @@ class MainViewModel(private val db: DB,
                 expenseCheckedErrorEventStream.value = e
             }
         }
-    }
-
-// ----------------------------------------->
-
-    override fun onCleared() {
-        db.close()
-
-        super.onCleared()
     }
 }
 

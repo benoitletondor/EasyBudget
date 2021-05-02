@@ -22,6 +22,7 @@ import android.view.View
 import android.view.ViewGroup
 
 import com.benoitletondor.easybudgetapp.R
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_onboarding4.*
 
 /**
@@ -29,6 +30,7 @@ import kotlinx.android.synthetic.main.fragment_onboarding4.*
  *
  * @author Benoit LETONDOR
  */
+@AndroidEntryPoint
 class Onboarding4Fragment : OnboardingFragment() {
 
     override val statusBarColor: Int

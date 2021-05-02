@@ -24,13 +24,18 @@ import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.getInitTimestamp
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
+import javax.inject.Inject
 
-class ExpenseEditViewModel(private val db: DB,
-                           private val parameters: Parameters) : ViewModel() {
+@HiltViewModel
+class ExpenseEditViewModel @Inject constructor(
+    private val db: DB,
+    private val parameters: Parameters,
+) : ViewModel() {
     /**
      * Expense that is being edited (will be null if it's a new one)
      */
@@ -58,7 +63,14 @@ class ExpenseEditViewModel(private val db: DB,
         val isRevenue = editTypeLiveData.value?.isRevenue ?: return
         val date = expenseDateLiveData.value ?: return
 
-        if( date.before(Date(parameters.getInitTimestamp())) ) {
+        val dateOfInstallationCalendar = Calendar.getInstance()
+        dateOfInstallationCalendar.time = Date(parameters.getInitTimestamp())
+        dateOfInstallationCalendar.set(Calendar.HOUR_OF_DAY, 0)
+        dateOfInstallationCalendar.set(Calendar.MINUTE, 0)
+        dateOfInstallationCalendar.set(Calendar.SECOND, 0)
+        dateOfInstallationCalendar.set(Calendar.MILLISECOND, 0)
+
+        if( date.before(dateOfInstallationCalendar.time) ) {
             expenseAddBeforeInitDateEventStream.value = Unit
             return
         }
@@ -95,12 +107,6 @@ class ExpenseEditViewModel(private val db: DB,
 
     fun onDateChanged(date: Date) {
         this.expenseDateLiveData.value = date
-    }
-
-    override fun onCleared() {
-        db.close()
-
-        super.onCleared()
     }
 }
 

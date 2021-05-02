@@ -29,11 +29,16 @@ import java.util.*
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.getInitTimestamp
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class RecurringExpenseEditViewModel(private val db: DB,
-                                    private val parameters: Parameters) : ViewModel() {
+@HiltViewModel
+class RecurringExpenseEditViewModel @Inject constructor(
+    private val db: DB,
+    private val parameters: Parameters,
+) : ViewModel() {
     private var editedExpense: Expense? = null
     val expenseDateLiveData = MutableLiveData<Date>()
     val editTypeLiveData = MutableLiveData<ExpenseEditType>()
@@ -62,7 +67,14 @@ class RecurringExpenseEditViewModel(private val db: DB,
         val isRevenue = editTypeLiveData.value?.isRevenue ?: return
         val date = expenseDateLiveData.value ?: return
 
-        if( date.before(Date(parameters.getInitTimestamp())) ) {
+        val dateOfInstallationCalendar = Calendar.getInstance()
+        dateOfInstallationCalendar.time = Date(parameters.getInitTimestamp())
+        dateOfInstallationCalendar.set(Calendar.HOUR_OF_DAY, 0)
+        dateOfInstallationCalendar.set(Calendar.MINUTE, 0)
+        dateOfInstallationCalendar.set(Calendar.SECOND, 0)
+        dateOfInstallationCalendar.set(Calendar.MILLISECOND, 0)
+
+        if( date.before(dateOfInstallationCalendar.time) ) {
             expenseAddBeforeInitDateEventStream.value = Unit
             return
         }
@@ -266,12 +278,6 @@ class RecurringExpenseEditViewModel(private val db: DB,
 
     fun onDateChanged(date: Date) {
         this.expenseDateLiveData.value = date
-    }
-
-    override fun onCleared() {
-        db.close()
-
-        super.onCleared()
     }
 }
 

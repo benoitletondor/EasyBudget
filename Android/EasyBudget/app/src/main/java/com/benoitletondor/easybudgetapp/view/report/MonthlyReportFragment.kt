@@ -24,15 +24,16 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
 import com.benoitletondor.easybudgetapp.parameters.Parameters
-import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.viewModel
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
+import javax.inject.Inject
 
 private const val ARG_DATE = "arg_date"
 
@@ -41,14 +42,15 @@ private const val ARG_DATE = "arg_date"
  *
  * @author Benoit LETONDOR
  */
+@AndroidEntryPoint
 class MonthlyReportFragment : Fragment() {
     /**
      * The first date of the month at 00:00:00
      */
     private lateinit var date: Date
 
-    private val parameters: Parameters by inject()
-    private val viewModel: MonthlyReportViewModel by viewModel()
+    private val viewModel: MonthlyReportViewModel by viewModels()
+    @Inject lateinit var parameters: Parameters
 
 // ---------------------------------->
 

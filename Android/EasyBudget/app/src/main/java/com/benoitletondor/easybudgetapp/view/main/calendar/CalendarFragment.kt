@@ -19,28 +19,24 @@ package com.benoitletondor.easybudgetapp.view.main.calendar
 import com.benoitletondor.easybudgetapp.db.DB
 import com.roomorama.caldroid.CaldroidFragment
 import com.roomorama.caldroid.CaldroidGridAdapter
-import org.koin.android.ext.android.inject
+import dagger.hilt.android.AndroidEntryPoint
 
 import java.util.Date
+import javax.inject.Inject
 
 /**
  * @author Benoit LETONDOR
  */
+@AndroidEntryPoint
 class CalendarFragment : CaldroidFragment() {
     private var mSelectedDate = Date()
 
-    private val db: DB by inject()
+    @Inject lateinit var db: DB
 
 // --------------------------------------->
 
     override fun getNewDatesGridAdapter(month: Int, year: Int): CaldroidGridAdapter {
         return CalendarGridAdapter(requireContext(), db, month, year, getCaldroidData(), extraData)
-    }
-
-    override fun onDestroy() {
-        db.close()
-
-        super.onDestroy()
     }
 
     override fun setSelectedDates(fromDate: Date, toDate: Date) {

@@ -44,8 +44,10 @@ private const val PREMIUM_PARAMETER_KEY = "premium"
  */
 private const val BATCH_OFFER_REDEEMED_PARAMETER_KEY = "batch_offer_redeemed"
 
-class IabImpl(context: Context,
-              private val parameters: Parameters) : Iab, PurchasesUpdatedListener, BillingClientStateListener, PurchaseHistoryResponseListener, AcknowledgePurchaseResponseListener {
+class IabImpl(
+    context: Context,
+    private val parameters: Parameters,
+) : Iab, PurchasesUpdatedListener, BillingClientStateListener, PurchaseHistoryResponseListener, AcknowledgePurchaseResponseListener {
 
     private val appContext = context.applicationContext
     private val billingClient = BillingClient.newBuilder(appContext)

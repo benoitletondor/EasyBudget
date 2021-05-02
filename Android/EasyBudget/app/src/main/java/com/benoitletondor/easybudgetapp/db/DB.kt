@@ -21,7 +21,7 @@ import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import java.io.Closeable
 import java.util.*
 
-interface DB : Closeable {
+interface DB {
     fun ensureDBCreated()
     suspend fun triggerForceWriteToDisk()
 

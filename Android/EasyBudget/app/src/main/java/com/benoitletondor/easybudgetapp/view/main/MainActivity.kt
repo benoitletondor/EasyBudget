@@ -41,6 +41,7 @@ import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.widget.EditText
 import android.widget.LinearLayout
+import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 
 import com.benoitletondor.easybudgetapp.R
@@ -69,16 +70,17 @@ import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.SHOW_BACKUP_INTENT_KEY
 import com.benoitletondor.easybudgetapp.view.welcome.getOnboardingStep
 import com.google.android.material.snackbar.BaseTransientBottomBar
-import org.koin.android.viewmodel.ext.android.viewModel
+import dagger.hilt.android.AndroidEntryPoint
 
 import kotlinx.android.synthetic.main.activity_main.*
-import org.koin.android.ext.android.inject
+import javax.inject.Inject
 
 /**
  * Main activity containing Calendar and List of expenses
  *
  * @author Benoit LETONDOR
  */
+@AndroidEntryPoint
 class MainActivity : BaseActivity() {
 
     private lateinit var receiver: BroadcastReceiver
@@ -92,21 +94,22 @@ class MainActivity : BaseActivity() {
 
     private var lastStopDate: Date? = null
 
-    private val viewModel: MainViewModel by viewModel()
-    private val parameters: Parameters by inject()
-    private val iab: Iab by inject()
+    private val viewModel: MainViewModel by viewModels()
+
+    @Inject lateinit var parameters: Parameters
+    @Inject lateinit var iab: Iab
 
 // ------------------------------------------>
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
         // Launch welcome screen if needed
         if (parameters.getOnboardingStep() != WelcomeActivity.STEP_COMPLETED) {
             val startIntent = Intent(this, WelcomeActivity::class.java)
             ActivityCompat.startActivityForResult(this, startIntent, WELCOME_SCREEN_ACTIVITY_CODE, null)
         }
-
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
         setSupportActionBar(toolbar)
 

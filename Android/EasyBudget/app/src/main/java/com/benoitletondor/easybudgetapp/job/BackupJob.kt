@@ -17,6 +17,7 @@
 package com.benoitletondor.easybudgetapp.job
 
 import android.content.Context
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.benoitletondor.easybudgetapp.auth.Auth
@@ -25,19 +26,21 @@ import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.backupDB
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.parameters.Parameters
-import org.koin.java.KoinJavaComponent.get
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 
-class BackupJob(private val context: Context,
-                workerParameters: WorkerParameters) : CoroutineWorker(context, workerParameters) {
-
-    private val db: DB = get(DB::class.java)
-    private val cloudStorage: CloudStorage = get(CloudStorage::class.java)
-    private val auth: Auth = get(Auth::class.java)
-    private val parameters: Parameters = get(Parameters::class.java)
-    private val iab: Iab = get(Iab::class.java)
+@HiltWorker
+class BackupJob @AssistedInject constructor(
+    @Assisted private val context: Context,
+    @Assisted workerParameters: WorkerParameters,
+    private val cloudStorage: CloudStorage,
+    private val auth: Auth,
+    private val parameters: Parameters,
+    private val iab: Iab,
+) : CoroutineWorker(context, workerParameters) {
 
     override suspend fun doWork(): Result {
-        return backupDB(context, db, cloudStorage, auth, parameters, iab)
+        return backupDB(context, cloudStorage, auth, parameters, iab)
     }
 
 }

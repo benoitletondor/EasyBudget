@@ -19,6 +19,7 @@ package com.benoitletondor.easybudgetapp.view.report.base
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Observer
@@ -28,8 +29,8 @@ import com.benoitletondor.easybudgetapp.helper.BaseActivity
 import com.benoitletondor.easybudgetapp.helper.getMonthTitle
 import com.benoitletondor.easybudgetapp.helper.removeButtonBorder
 import com.benoitletondor.easybudgetapp.view.report.MonthlyReportFragment
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_monthly_report.*
-import org.koin.android.viewmodel.ext.android.viewModel
 import java.util.*
 
 /**
@@ -37,9 +38,9 @@ import java.util.*
  *
  * @author Benoit LETONDOR
  */
+@AndroidEntryPoint
 class MonthlyReportBaseActivity : BaseActivity(), ViewPager.OnPageChangeListener {
-
-    private val viewModel: MonthlyReportBaseViewModel by viewModel()
+    private val viewModel: MonthlyReportBaseViewModel by viewModels()
 
     private var ignoreNextPageSelectedEvent: Boolean = false
 

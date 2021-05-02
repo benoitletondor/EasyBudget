@@ -24,6 +24,7 @@ import android.app.ProgressDialog
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.ArrayAdapter
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -32,7 +33,7 @@ import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import com.benoitletondor.easybudgetapp.view.DatePickerDialogFragment
-import kotlinx.android.synthetic.main.activity_expense_edit.*
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_recurring_expense_add.*
 import kotlinx.android.synthetic.main.activity_recurring_expense_add.amount_edittext
 import kotlinx.android.synthetic.main.activity_recurring_expense_add.amount_inputlayout
@@ -42,15 +43,16 @@ import kotlinx.android.synthetic.main.activity_recurring_expense_add.expense_typ
 import kotlinx.android.synthetic.main.activity_recurring_expense_add.expense_type_tv
 import kotlinx.android.synthetic.main.activity_recurring_expense_add.save_expense_fab
 import kotlinx.android.synthetic.main.activity_recurring_expense_add.toolbar
-import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.viewModel
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 import kotlin.math.abs
 
+@AndroidEntryPoint
 class RecurringExpenseEditActivity : BaseActivity() {
-    private val parameters: Parameters by inject()
-    private val viewModel: RecurringExpenseEditViewModel by viewModel()
+    private val viewModel: RecurringExpenseEditViewModel by viewModels()
+
+    @Inject lateinit var parameters: Parameters
 
 // ------------------------------------------->
 

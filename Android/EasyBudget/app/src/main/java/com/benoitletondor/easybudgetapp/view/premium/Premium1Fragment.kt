@@ -22,12 +22,14 @@ import android.view.View
 import android.view.ViewGroup
 
 import com.benoitletondor.easybudgetapp.R
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * Fragment 1 of the premium onboarding screen
  *
  * @author Benoit LETONDOR
  */
+@AndroidEntryPoint
 class Premium1Fragment : PremiumFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

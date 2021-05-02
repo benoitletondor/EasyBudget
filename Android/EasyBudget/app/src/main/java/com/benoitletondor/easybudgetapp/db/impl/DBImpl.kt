@@ -32,15 +32,11 @@ import kotlin.math.floor
 class DBImpl(private val roomDB: RoomDB) : DB {
 
     override fun ensureDBCreated() {
-        roomDB.openHelper.writableDatabase.close()
+        roomDB.openHelper.writableDatabase
     }
 
     override suspend fun triggerForceWriteToDisk() {
         roomDB.expenseDao().checkpoint(SimpleSQLiteQuery("pragma wal_checkpoint(full)"))
-    }
-
-    override fun close() {
-        roomDB.close()
     }
 
     override suspend fun persistExpense(expense: Expense): Expense {

@@ -25,6 +25,7 @@ import android.view.MenuItem
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.BaseActivity
 import com.benoitletondor.easybudgetapp.view.premium.PremiumActivity
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_settings.*
 
 /**
@@ -32,6 +33,7 @@ import kotlinx.android.synthetic.main.activity_settings.*
  *
  * @author Benoit LETONDOR
  */
+@AndroidEntryPoint
 class SettingsActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -20,12 +20,15 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
+import javax.inject.Inject
 
-class SelectCurrencyViewModel : ViewModel() {
+@HiltViewModel
+class SelectCurrencyViewModel @Inject constructor() : ViewModel() {
     val currenciesLiveData = MutableLiveData<Pair<List<Currency>, List<Currency>>>()
 
     init {

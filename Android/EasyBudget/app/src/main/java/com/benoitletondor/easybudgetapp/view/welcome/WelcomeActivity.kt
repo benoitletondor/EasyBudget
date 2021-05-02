@@ -34,11 +34,12 @@ import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.BaseActivity
 import com.benoitletondor.easybudgetapp.helper.setStatusBarColor
 import com.benoitletondor.easybudgetapp.parameters.Parameters
+import dagger.hilt.android.AndroidEntryPoint
 
 import kotlinx.android.synthetic.main.activity_welcome.*
 
-import org.koin.android.ext.android.inject
 import java.lang.IllegalStateException
+import javax.inject.Inject
 import kotlin.math.max
 
 /**
@@ -46,13 +47,14 @@ import kotlin.math.max
  *
  * @author Benoit LETONDOR
  */
+@AndroidEntryPoint
 class WelcomeActivity : BaseActivity() {
     /**
      * Broadcast receiver for intent sent by fragments
      */
     private lateinit var receiver: BroadcastReceiver
 
-    private val parameters: Parameters by inject()
+    @Inject lateinit var parameters: Parameters
 
 // ------------------------------------>
 
@@ -63,13 +65,13 @@ class WelcomeActivity : BaseActivity() {
 // ------------------------------------------>
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_welcome)
+
         // Reinit step to 0 if already completed
         if (step == STEP_COMPLETED) {
             step = 0
         }
-
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_welcome)
 
         welcome_view_pager.adapter = object : FragmentStatePagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
             override fun getItem(position: Int): Fragment {

@@ -22,6 +22,7 @@ import android.app.Activity
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -29,11 +30,11 @@ import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.view.DatePickerDialogFragment
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_expense_edit.*
-import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.viewModel
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 import kotlin.math.abs
 
 /**
@@ -41,9 +42,11 @@ import kotlin.math.abs
  *
  * @author Benoit LETONDOR
  */
+@AndroidEntryPoint
 class ExpenseEditActivity : BaseActivity() {
-    private val parameters: Parameters by inject()
-    private val viewModel: ExpenseEditViewModel by viewModel()
+    private val viewModel: ExpenseEditViewModel by viewModels()
+
+    @Inject lateinit var parameters: Parameters
 
 // -------------------------------------->
 

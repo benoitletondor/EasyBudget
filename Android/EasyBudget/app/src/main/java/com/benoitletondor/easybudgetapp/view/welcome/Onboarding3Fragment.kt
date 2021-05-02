@@ -26,21 +26,25 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AlertDialog
 import com.benoitletondor.easybudgetapp.R
+import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.parameters.Parameters
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_onboarding3.*
 import kotlinx.coroutines.*
-import org.koin.android.ext.android.inject
 import java.util.*
+import javax.inject.Inject
 
 /**
  * Onboarding step 3 fragment
  *
  * @author Benoit LETONDOR
  */
+@AndroidEntryPoint
 class Onboarding3Fragment : OnboardingFragment(), CoroutineScope by MainScope() {
-    private val parameters: Parameters by inject()
+    @Inject lateinit var parameters: Parameters
+    @Inject lateinit var db: DB
 
     override val statusBarColor: Int
         get() = R.color.secondary_dark

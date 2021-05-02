@@ -23,14 +23,16 @@ import androidx.fragment.app.DialogFragment
 import com.benoitletondor.easybudgetapp.helper.computeCalendarMinDateFromInitDate
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.getInitTimestamp
-import org.koin.android.ext.android.inject
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
+import javax.inject.Inject
 
 /**
  * @author Benoit LETONDOR
  */
+@AndroidEntryPoint
 class DatePickerDialogFragment(private val originalDate: Date, private val listener: DatePickerDialog.OnDateSetListener) : DialogFragment() {
-    private val parameters: Parameters by inject()
+    @Inject lateinit var parameters: Parameters
 
     constructor() : this(Date(), DatePickerDialog.OnDateSetListener { _, _, _, _ -> }) {
         throw RuntimeException("DatePickerDialogFragment is supposed to be instanciated with the date+listener constructor")

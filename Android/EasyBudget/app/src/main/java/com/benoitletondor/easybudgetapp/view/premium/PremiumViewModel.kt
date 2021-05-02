@@ -23,9 +23,12 @@ import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.helper.SingleLiveEvent
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.iab.PremiumPurchaseFlowResult
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class PremiumViewModel(private val iab: Iab) : ViewModel() {
+@HiltViewModel
+class PremiumViewModel @Inject constructor(private val iab: Iab) : ViewModel() {
     val premiumFlowStatusLiveData = MutableLiveData(PremiumFlowStatus.NOT_STARTED)
     val premiumFlowErrorEventStream = SingleLiveEvent<PremiumPurchaseFlowResult>()
 

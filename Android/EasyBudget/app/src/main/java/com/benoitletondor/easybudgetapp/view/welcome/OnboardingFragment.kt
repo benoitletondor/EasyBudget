@@ -22,24 +22,12 @@ import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import android.view.View
 
-import com.benoitletondor.easybudgetapp.db.DB
-import org.koin.android.ext.android.inject
-
 /**
  * Abstract fragment that contains common methods of all onboarding fragments
  *
  * @author Benoit LETONDOR
  */
 abstract class OnboardingFragment : Fragment() {
-
-    protected val db: DB by inject()
-
-    override fun onDestroy() {
-        db.close()
-
-        super.onDestroy()
-    }
-
     /**
      * Get the status bar color that should be used for this fragment
      *

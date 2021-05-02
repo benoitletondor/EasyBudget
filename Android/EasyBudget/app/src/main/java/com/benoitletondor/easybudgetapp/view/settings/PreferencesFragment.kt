@@ -46,14 +46,16 @@ import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragme
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.SHOW_BACKUP_INTENT_KEY
 import com.benoitletondor.easybudgetapp.view.settings.backup.BackupSettingsActivity
 import com.roomorama.caldroid.CaldroidFragment
-import org.koin.android.ext.android.inject
+import dagger.hilt.android.AndroidEntryPoint
 import java.net.URLEncoder
+import javax.inject.Inject
 
 /**
  * Fragment to display preferences
  *
  * @author Benoit LETONDOR
  */
+@AndroidEntryPoint
 class PreferencesFragment : PreferenceFragmentCompat() {
 
     /**
@@ -82,8 +84,8 @@ class PreferencesFragment : PreferenceFragmentCompat() {
      */
     private var notPremiumShown = true
 
-    private val iab: Iab by inject()
-    private val parameters: Parameters by inject()
+    @Inject lateinit var iab: Iab
+    @Inject lateinit var parameters: Parameters
 
 // ---------------------------------------->
 

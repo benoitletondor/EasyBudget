@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * Simple Broadcast receiver that is just here to receive events when a package is updated. This is
@@ -28,6 +29,7 @@ import android.content.Intent
  *
  * @author Benoit LETONDOR
  */
+@AndroidEntryPoint
 class AppUpdateBroadcastReceiver : BroadcastReceiver() {
 
     @SuppressLint("UnsafeProtectedBroadcastReceiver")
