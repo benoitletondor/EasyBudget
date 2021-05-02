@@ -19,6 +19,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".view.main.MainActivity">
 
+    <item android:id="@+id/action_go_to_current_month"
+        android:title="@string/action_go_to_current_month"
+        android:icon="@drawable/ic_calendar_today"
+        app:showAsAction="always" />
+
     <item android:id="@+id/action_monthly_report"
           android:title="@string/monthly_report_button_title"
           android:icon="@drawable/ic_date_range_24dp"

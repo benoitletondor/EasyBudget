@@ -18,6 +18,7 @@
 
     <string name="action_settings">Impostazioni</string>
     <string name="action_balance">Correggi il saldo</string>
+    <string name="action_go_to_current_month">Torna al mese corrente</string>
     <string name="fab_add_expense">Aggiungi un’entrata/uscita</string>
     <string name="fab_add_monthly_expense">Aggiungi un’entrata/uscita ricorrente</string>
     <string name="title_activity_add_expense">Aggiungi un’uscita</string>

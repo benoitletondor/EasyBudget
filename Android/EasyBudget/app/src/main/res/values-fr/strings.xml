@@ -18,6 +18,7 @@
 
     <string name="action_settings">Préférences</string>
     <string name="action_balance">Ajuster le solde</string>
+    <string name="action_go_to_current_month">Retourner au mois courant</string>
     <string name="fab_add_expense">Ajouter une dépense/revenu</string>
     <string name="fab_add_monthly_expense">Ajouter une dépense/revenu récurrent</string>
     <string name="title_activity_add_expense">Ajouter une dépense</string>

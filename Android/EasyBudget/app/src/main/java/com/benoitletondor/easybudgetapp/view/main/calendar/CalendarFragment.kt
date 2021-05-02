@@ -60,4 +60,11 @@ class CalendarFragment : CaldroidFragment() {
             prevMonth()
         }
     }
+
+    fun goToCurrentMonth() {
+        try {
+            // Exception that occurs if we call this code before the calendar being initialized
+            super.moveToDate(Date())
+        } catch (ignored: Exception) { }
+    }
 }

@@ -42,7 +42,6 @@ import android.view.animation.Animation
 import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.activity.viewModels
-import androidx.lifecycle.Observer
 
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.model.Expense
@@ -160,7 +159,7 @@ class MainActivity : BaseActivity() {
             openSettingsForBackupIfNeeded(intent)
         }
 
-        viewModel.expenseDeletionSuccessEventStream.observe(this, Observer { (deletedExpense, newBalance) ->
+        viewModel.expenseDeletionSuccessEventStream.observe(this, { (deletedExpense, newBalance) ->
 
             expensesViewAdapter.removeExpense(deletedExpense)
             updateBalanceDisplayForDay(expensesViewAdapter.getDate(), newBalance)
@@ -176,7 +175,7 @@ class MainActivity : BaseActivity() {
             snackbar.show()
         })
 
-        viewModel.expenseDeletionErrorEventStream.observe(this, Observer {
+        viewModel.expenseDeletionErrorEventStream.observe(this, {
             AlertDialog.Builder(this@MainActivity)
                 .setTitle(R.string.expense_delete_error_title)
                 .setMessage(R.string.expense_delete_error_message)
@@ -184,16 +183,16 @@ class MainActivity : BaseActivity() {
                 .show()
         })
 
-        viewModel.expenseRecoverySuccessEventStream.observe(this, Observer {
+        viewModel.expenseRecoverySuccessEventStream.observe(this, {
             // Nothing to do
         })
 
-        viewModel.expenseRecoveryErrorEventStream.observe(this, Observer { expense ->
+        viewModel.expenseRecoveryErrorEventStream.observe(this, { expense ->
             Logger.error("Error restoring deleted expense: $expense")
         })
 
         var expenseDeletionDialog: ProgressDialog? = null
-        viewModel.recurringExpenseDeletionProgressEventStream.observe(this, Observer { status ->
+        viewModel.recurringExpenseDeletionProgressEventStream.observe(this, { status ->
             when(status) {
                 is MainViewModel.RecurringExpenseDeleteProgressState.Starting -> {
                     val dialog = ProgressDialog(this@MainActivity)
@@ -246,7 +245,7 @@ class MainActivity : BaseActivity() {
         })
 
         var expenseRestoreDialog: Dialog? = null
-        viewModel.recurringExpenseRestoreProgressEventStream.observe(this, Observer { status ->
+        viewModel.recurringExpenseRestoreProgressEventStream.observe(this, { status ->
             when(status) {
                 is MainViewModel.RecurringExpenseRestoreProgressState.Starting -> {
                     val dialog = ProgressDialog(this@MainActivity)
@@ -278,7 +277,7 @@ class MainActivity : BaseActivity() {
             }
         })
 
-        viewModel.startCurrentBalanceEditorEventStream.observe(this, Observer { currentBalance ->
+        viewModel.startCurrentBalanceEditorEventStream.observe(this, { currentBalance ->
             val dialogView = layoutInflater.inflate(R.layout.dialog_adjust_balance, null)
             val amountEditText = dialogView.findViewById<EditText>(R.id.balance_amount)
             amountEditText.setText(if (currentBalance == 0.0) "0" else CurrencyHelper.getFormattedAmountValue(currentBalance))
@@ -315,7 +314,7 @@ class MainActivity : BaseActivity() {
             }
         })
 
-        viewModel.currentBalanceEditingErrorEventStream.observe(this, Observer { exception ->
+        viewModel.currentBalanceEditingErrorEventStream.observe(this, { exception ->
             Logger.error("Error while adjusting balance", exception)
 
             AlertDialog.Builder(this@MainActivity)
@@ -325,7 +324,7 @@ class MainActivity : BaseActivity() {
                 .show()
         })
 
-        viewModel.currentBalanceEditedEventStream.observe(this, Observer { (expense, diff, newBalance) ->
+        viewModel.currentBalanceEditedEventStream.observe(this, { (expense, diff, newBalance) ->
             //Show snackbar
             val snackbar = Snackbar.make(coordinatorLayout, resources.getString(R.string.adjust_balance_snackbar_text, CurrencyHelper.getFormattedCurrencyString(parameters, newBalance)), Snackbar.LENGTH_LONG)
             snackbar.setAction(R.string.undo) {
@@ -337,11 +336,11 @@ class MainActivity : BaseActivity() {
             snackbar.show()
         })
 
-        viewModel.currentBalanceRestoringEventStream.observe(this, Observer {
+        viewModel.currentBalanceRestoringEventStream.observe(this, {
             // Nothing to do
         })
 
-        viewModel.currentBalanceRestoringErrorEventStream.observe(this, Observer { exception ->
+        viewModel.currentBalanceRestoringErrorEventStream.observe(this, { exception ->
             Logger.error("An error occurred during balance", exception)
 
             AlertDialog.Builder(this@MainActivity)
@@ -351,16 +350,16 @@ class MainActivity : BaseActivity() {
                 .show()
         })
 
-        viewModel.premiumStatusLiveData.observe(this, Observer { isPremium ->
+        viewModel.premiumStatusLiveData.observe(this, { isPremium ->
             isUserPremium = isPremium
             invalidateOptionsMenu()
         })
 
-        viewModel.selectedDateChangeLiveData.observe(this, Observer { (date, balance, expenses) ->
+        viewModel.selectedDateChangeLiveData.observe(this, { (date, balance, expenses) ->
             refreshAllForDate(date, balance, expenses)
         })
 
-        viewModel.expenseCheckedErrorEventStream.observe(this, Observer { exception ->
+        viewModel.expenseCheckedErrorEventStream.observe(this, { exception ->
             Logger.error("Error while checking expense", exception)
 
             AlertDialog.Builder(this@MainActivity)
@@ -368,6 +367,14 @@ class MainActivity : BaseActivity() {
                 .setMessage(getString(R.string.expense_check_error_message, exception.localizedMessage))
                 .setNegativeButton(R.string.ok) { dialog2, _ ->  dialog2.dismiss() }
                 .show()
+        })
+
+        viewModel.showGoToCurrentMonthButtonLiveData.observe(this, { _ ->
+            invalidateOptionsMenu()
+        })
+
+        viewModel.goBackToCurrentMonthEventStream.observe(this, {
+            calendarFragment.goToCurrentMonth()
         })
     }
 
@@ -467,6 +474,11 @@ class MainActivity : BaseActivity() {
             }
         }
 
+        // Remove back to today button if needed
+        if ( viewModel.showGoToCurrentMonthButtonLiveData.value != true ) {
+            menu.removeItem(R.id.action_go_to_current_month)
+        }
+
         return true
     }
 
@@ -486,6 +498,11 @@ class MainActivity : BaseActivity() {
             R.id.action_monthly_report -> {
                 val startIntent = Intent(this, MonthlyReportBaseActivity::class.java)
                 ActivityCompat.startActivity(this@MainActivity, startIntent, null)
+
+                return true
+            }
+            R.id.action_go_to_current_month -> {
+                viewModel.onGoBackToCurrentMonthButtonPressed()
 
                 return true
             }
@@ -653,9 +670,7 @@ class MainActivity : BaseActivity() {
             }
 
             override fun onChangeMonth(month: Int, year: Int) {
-                val cal = Calendar.getInstance()
-                cal.set(Calendar.MONTH, month)
-                cal.set(Calendar.YEAR, year)
+                viewModel.onMonthChanged(month - 1)
             }
 
             override fun onCaldroidViewCreated() {

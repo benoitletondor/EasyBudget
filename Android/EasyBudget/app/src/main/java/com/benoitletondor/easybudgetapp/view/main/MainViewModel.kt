@@ -42,6 +42,7 @@ class MainViewModel @Inject constructor(
 
     val premiumStatusLiveData = MutableLiveData<Boolean>()
     val selectedDateChangeLiveData = MutableLiveData<SelectedDateExpensesData>()
+    val showGoToCurrentMonthButtonLiveData = MutableLiveData(false)
 
     val expenseDeletionSuccessEventStream = SingleLiveEvent<ExpenseDeletionSuccessData>()
     val expenseDeletionErrorEventStream = SingleLiveEvent<Expense>()
@@ -55,6 +56,7 @@ class MainViewModel @Inject constructor(
     val currentBalanceRestoringEventStream = SingleLiveEvent<Unit>()
     val currentBalanceRestoringErrorEventStream = SingleLiveEvent<Exception>()
     val expenseCheckedErrorEventStream = SingleLiveEvent<Exception>()
+    val goBackToCurrentMonthEventStream = SingleLiveEvent<Unit>()
 
     sealed class RecurringExpenseDeleteProgressState {
         class Starting(val expense: Expense): RecurringExpenseDeleteProgressState()
@@ -354,6 +356,15 @@ class MainViewModel @Inject constructor(
                 expenseCheckedErrorEventStream.value = e
             }
         }
+    }
+
+    fun onMonthChanged(month: Int) {
+        val cal = Calendar.getInstance()
+        showGoToCurrentMonthButtonLiveData.value = cal.get(Calendar.MONTH) != month
+    }
+
+    fun onGoBackToCurrentMonthButtonPressed() {
+        goBackToCurrentMonthEventStream.value = Unit
     }
 }
 

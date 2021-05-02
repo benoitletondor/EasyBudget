@@ -18,6 +18,7 @@
 
     <string name="action_settings">Einstellungen</string>
     <string name="action_balance">Kontostand anpassen</string>
+    <string name="action_go_to_current_month">Zurück zum aktuellen Monat</string>
     <string name="fab_add_expense">Neue Ausgabe/Einnahme</string>
     <string name="fab_add_monthly_expense">Wiederkehrende Einnahme/Ausgabe hinzufügen</string>
     <string name="title_activity_add_expense">Ausgabe hinzufügen</string>
