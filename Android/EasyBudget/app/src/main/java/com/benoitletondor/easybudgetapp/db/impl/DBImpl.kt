@@ -73,6 +73,12 @@ class DBImpl(private val roomDB: RoomDB) : DB {
         return roomDB.expenseDao().getBalanceForDay(endDate).getRealValueFromDB()
     }
 
+    override suspend fun getCheckedBalanceForDay(dayDate: Date): Double {
+        val (_, endDate) = dayDate.getDayDatesRange()
+
+        return roomDB.expenseDao().getCheckedBalanceForDay(endDate).getRealValueFromDB()
+    }
+
     override suspend fun persistRecurringExpense(recurringExpense: RecurringExpense): RecurringExpense {
         val newId = roomDB.expenseDao().persistRecurringExpense(recurringExpense.toRecurringExpenseEntity())
         return recurringExpense.copy(id = newId)
@@ -142,6 +148,12 @@ class DBImpl(private val roomDB: RoomDB) : DB {
 
     override suspend fun getOldestExpense(): Expense? {
         return roomDB.expenseDao().getOldestExpense()?.toExpense(this)
+    }
+
+    override suspend fun markAllEntriesAsChecked(beforeDate: Date) {
+        val (startDate, _) = beforeDate.getDayDatesRange()
+
+        roomDB.expenseDao().markAllEntriesAsChecked(startDate)
     }
 
 }

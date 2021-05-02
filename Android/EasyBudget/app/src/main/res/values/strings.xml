@@ -21,6 +21,7 @@
     <string name="action_settings">Settings</string>
     <string name="action_balance">Adjust current balance</string>
     <string name="action_go_to_current_month">Go back to current month</string>
+    <string name="action_mark_all_past_entries_as_checked">Tick all past entries</string>
     <string name="fab_add_expense">Add expense/income</string>
     <string name="fab_add_monthly_expense">Add recurring expense/income</string>
     <string name="title_activity_add_expense">Add expense</string>
@@ -58,6 +59,12 @@
     <string name="expense_check_error_title">Oops</string>
     <string name="expense_check_error_message">An error occurred while checking the expense, please try again (%s)</string>
 
+    <string name="check_all_past_expences_title">Tick all past entries</string>
+    <string name="check_all_past_expences_message">Do you want to tick all entries before today?\nYou can\'t cancel this action.</string>
+    <string name="check_all_past_expences_confirm_cta">Yes</string>
+    <string name="check_all_past_expences_error_title">Oops</string>
+    <string name="check_all_past_expences_error_message">An error occurred while ticking all past entries, please try again (%s)</string>
+
     <string name="dialog_edit_expense_title">What do you want to do?</string>
     <string name="dialog_edit_income_title">What do you want to do?</string>
     <string-array name="dialog_edit_expense_choices">
@@ -94,6 +101,7 @@
     <string name="adjust_balance_expense_title">Balance</string>
     <string name="adjust_balance_snackbar_text">Balance adjusted to %s</string>
     <string name="account_balance_format">Balance on %s:</string>
+    <string name="account_balance_checked_format" translatable="false">%1$s (✓ %2$s)</string>
     <string name="account_balance_date_format">MMM dd</string>
     <string name="add_expense_date_format">MMM dd yyyy</string>
     <string name="adjust_limit_warning_title">Change warning threshold for low balance</string>
@@ -176,6 +184,8 @@
     <string name="setting_category_premium_redeem_message">Redeem a promo code</string>
     <string name="setting_category_notifications_update_title">Updates</string>
     <string name="setting_category_notifications_update_message">Get notified of new features of the app. Won\'t spam you, I promise!</string>
+    <string name="setting_category_show_checked_balance_title">Show ticked (✓) entries balance</string>
+    <string name="setting_category_show_checked_balance_message">Also display the balance of entries you ✓ to mark as paid after normal balance</string>
     <string name="setting_category_notifications_daily_title">Daily reminder</string>
     <string name="setting_category_notifications_daily_message">Receive a notification at the end of the day if you didn\'t enter your expenses</string>
     <string name="setting_category_not_premium_status_title">Become a premium user</string>
@@ -332,6 +342,7 @@
     <string name="setting_category_premium_status_key" translatable="false">premium</string>
     <string name="setting_category_premium_redeem_key" translatable="false">redeem</string>
     <string name="setting_category_notifications_update_key" translatable="false">update_notifs</string>
+    <string name="setting_category_show_checked_balance_key" translatable="false">show_checked_balance</string>
     <string name="setting_category_notifications_daily_key" translatable="false">daily_notifs</string>
     <string name="setting_category_notifications_monthly_key" translatable="false">monthly_notifs</string>
     <string name="setting_category_app_theme_key" translatable="false">app_theme</string>

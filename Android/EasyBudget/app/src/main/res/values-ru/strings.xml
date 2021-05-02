@@ -19,6 +19,7 @@
     <string name="action_settings">Настройки</string>
     <string name="action_balance">Отрегулировать текущий баланс</string>
     <string name="action_go_to_current_month">Вернуться к текущему месяцу</string>
+    <string name="action_mark_all_past_entries_as_checked">Отметить все прошлые записи</string>
     <string name="fab_add_expense">Добавить расход/доход</string>
     <string name="fab_add_monthly_expense">Добавить периодический расход/доход</string>
     <string name="title_activity_add_expense">Добавить расход</string>
@@ -55,6 +56,12 @@
     <string name="expense_add_before_init_date_dialog_negative_cta">Отмена</string>
     <string name="expense_check_error_title">Ой…</string>
     <string name="expense_check_error_message">Произошла ошибка (%s)</string>
+
+    <string name="check_all_past_expences_title">Отметить все прошлые записи</string>
+    <string name="check_all_past_expences_message">Вы хотите отметить все записи до сегодняшнего дня?\nВы не можете отменить это действие.</string>
+    <string name="check_all_past_expences_confirm_cta">да</string>
+    <string name="check_all_past_expences_error_title">Ой…</string>
+    <string name="check_all_past_expences_error_message">Произошла ошибка при пометке всех прошлых записей. Повторите попытку. (%s)</string>
 
     <string name="dialog_edit_expense_title">Что Вы хотите сделать?</string>
     <string name="dialog_edit_income_title">Что Вы хотите сделать?</string>
@@ -169,6 +176,8 @@
     <string name="setting_category_premium_redeem_message">Использовать промокод</string>
     <string name="setting_category_notifications_update_title">Обновления</string>
     <string name="setting_category_notifications_update_message">Получать уведомления о новых возможностях приложения. Я не буду Вас спамить, я обещаю!</string>
+    <string name="setting_category_show_checked_balance_title">Показать баланс отмеченных (✓) записей</string>
+    <string name="setting_category_show_checked_balance_message">Также отобразите баланс записей, которые вы ✓ отметите как оплаченные после нормального баланса</string>
     <string name="setting_category_notifications_daily_title">Ежедневное напоминание</string>
     <string name="setting_category_notifications_daily_message">Получите уведомление в конце дня, если Вы не указали свои расходы</string>
     <string name="setting_category_not_premium_status_title">Стать премиум-пользователем</string>

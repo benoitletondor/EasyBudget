@@ -72,6 +72,7 @@ object AppModule {
         object : CacheDBStorage {
             override val expenses: MutableMap<Date, List<Expense>> = ArrayMap()
             override val balances: MutableMap<Date, Double> = ArrayMap()
+            override val checkedBalances: MutableMap<Date, Double> = ArrayMap()
         },
         Executors.newSingleThreadExecutor(),
     )

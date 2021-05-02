@@ -123,6 +123,7 @@ class MainActivity : BaseActivity() {
         filter.addAction(INTENT_SHOW_WELCOME_SCREEN)
         filter.addAction(Intent.ACTION_VIEW)
         filter.addAction(INTENT_IAB_STATUS_CHANGED)
+        filter.addAction(INTENT_SHOW_CHECKED_BALANCE_CHANGED)
 
         receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
@@ -144,6 +145,7 @@ class MainActivity : BaseActivity() {
                         ActivityCompat.startActivityForResult(this@MainActivity, startIntent, WELCOME_SCREEN_ACTIVITY_CODE, null)
                     }
                     INTENT_IAB_STATUS_CHANGED -> viewModel.onIabStatusChanged()
+                    INTENT_SHOW_CHECKED_BALANCE_CHANGED -> viewModel.onShowCheckedBalanceChanged()
                 }
             }
         }
@@ -159,10 +161,10 @@ class MainActivity : BaseActivity() {
             openSettingsForBackupIfNeeded(intent)
         }
 
-        viewModel.expenseDeletionSuccessEventStream.observe(this, { (deletedExpense, newBalance) ->
+        viewModel.expenseDeletionSuccessEventStream.observe(this, { (deletedExpense, newBalance, maybeNewCheckecBalance) ->
 
             expensesViewAdapter.removeExpense(deletedExpense)
-            updateBalanceDisplayForDay(expensesViewAdapter.getDate(), newBalance)
+            updateBalanceDisplayForDay(expensesViewAdapter.getDate(), newBalance, maybeNewCheckecBalance)
             calendarFragment.refreshView()
 
             val snackbar = Snackbar.make(coordinatorLayout, if (deletedExpense.isRevenue()) R.string.income_delete_snackbar_text else R.string.expense_delete_snackbar_text, Snackbar.LENGTH_LONG)
@@ -355,8 +357,8 @@ class MainActivity : BaseActivity() {
             invalidateOptionsMenu()
         })
 
-        viewModel.selectedDateChangeLiveData.observe(this, { (date, balance, expenses) ->
-            refreshAllForDate(date, balance, expenses)
+        viewModel.selectedDateChangeLiveData.observe(this, { (date, balance, maybeCheckedBalance, expenses) ->
+            refreshAllForDate(date, balance, maybeCheckedBalance, expenses)
         })
 
         viewModel.expenseCheckedErrorEventStream.observe(this, { exception ->
@@ -375,6 +377,26 @@ class MainActivity : BaseActivity() {
 
         viewModel.goBackToCurrentMonthEventStream.observe(this, {
             calendarFragment.goToCurrentMonth()
+        })
+
+        viewModel.confirmCheckAllPastEntriesEventStream.observe(this, {
+            AlertDialog.Builder(this@MainActivity)
+                .setTitle(R.string.check_all_past_expences_title)
+                .setMessage(getString(R.string.check_all_past_expences_message))
+                .setPositiveButton(R.string.check_all_past_expences_confirm_cta) { dialog2, _ ->
+                    viewModel.onCheckAllPastEntriesConfirmPressed()
+                    dialog2.dismiss()
+                }
+                .setNegativeButton(android.R.string.cancel) { dialog2, _ ->  dialog2.dismiss() }
+                .show()
+        })
+
+        viewModel.checkAllPastEntriesErrorEventStream.observe(this, { error ->
+            AlertDialog.Builder(this@MainActivity)
+                .setTitle(R.string.check_all_past_expences_error_title)
+                .setMessage(getString(R.string.check_all_past_expences_error_message, error.localizedMessage))
+                .setNegativeButton(R.string.ok) { dialog2, _ ->  dialog2.dismiss() }
+                .show()
         })
     }
 
@@ -465,6 +487,7 @@ class MainActivity : BaseActivity() {
         // Remove monthly report for non premium users
         if ( !isUserPremium ) {
             menu.removeItem(R.id.action_monthly_report)
+            menu.removeItem(R.id.action_check_all_past_entries)
         } else if ( !parameters.hasUserSawMonthlyReportHint() ) {
             monthly_report_hint.visibility = View.VISIBLE
 
@@ -506,6 +529,11 @@ class MainActivity : BaseActivity() {
 
                 return true
             }
+            R.id.action_check_all_past_entries -> {
+                viewModel.onCheckAllPastEntriesPressed()
+
+                return true
+            }
             else -> return super.onOptionsItemSelected(item)
         }
     }
@@ -516,12 +544,12 @@ class MainActivity : BaseActivity() {
      * Update the balance for the given day
      * TODO optimization
      */
-    private fun updateBalanceDisplayForDay(day: Date, balance: Double) {
+    private fun updateBalanceDisplayForDay(day: Date, balance: Double, maybeCheckedBalance: Double?) {
         val format = SimpleDateFormat(resources.getString(R.string.account_balance_date_format), Locale.getDefault())
 
         var formatted = resources.getString(R.string.account_balance_format, format.format(day))
 
-        //FIXME it's ugly!!
+        // FIXME it's ugly!!
         if (formatted.endsWith(".:")) {
             formatted = formatted.substring(0, formatted.length - 2) + ":" // Remove . at the end of the month (ex: nov.: -> nov:)
         } else if (formatted.endsWith(". :")) {
@@ -529,7 +557,15 @@ class MainActivity : BaseActivity() {
         }
 
         budgetLine.text = formatted
-        budgetLineAmount.text = CurrencyHelper.getFormattedCurrencyString(parameters, balance)
+        budgetLineAmount.text = if (maybeCheckedBalance != null ) {
+            resources.getString(
+                R.string.account_balance_checked_format,
+                CurrencyHelper.getFormattedCurrencyString(parameters, balance),
+                CurrencyHelper.getFormattedCurrencyString(parameters, maybeCheckedBalance),
+            )
+        } else {
+            CurrencyHelper.getFormattedCurrencyString(parameters, balance)
+        }
 
         budgetLineAmount.setTextColor(ContextCompat.getColor(this, when {
             balance <= 0 -> R.color.budget_red
@@ -838,9 +874,9 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun refreshAllForDate(date: Date, balance: Double, expenses: List<Expense>) {
+    private fun refreshAllForDate(date: Date, balance: Double, maybeCheckedBalance: Double?, expenses: List<Expense>) {
         refreshRecyclerViewForDate(date, expenses)
-        updateBalanceDisplayForDay(date, balance)
+        updateBalanceDisplayForDay(date, balance, maybeCheckedBalance)
         calendarFragment.setSelectedDates(date, date)
         calendarFragment.refreshView()
     }
@@ -866,6 +902,7 @@ class MainActivity : BaseActivity() {
         const val INTENT_SHOW_WELCOME_SCREEN = "intent.welcomscreen.show"
         const val INTENT_SHOW_ADD_EXPENSE = "intent.addexpense.show"
         const val INTENT_SHOW_ADD_RECURRING_EXPENSE = "intent.addrecurringexpense.show"
+        const val INTENT_SHOW_CHECKED_BALANCE_CHANGED = "intent.showcheckedbalance.changed"
 
         const val INTENT_REDIRECT_TO_PREMIUM_EXTRA = "intent.extra.premiumshow"
         const val INTENT_REDIRECT_TO_SETTINGS_EXTRA = "intent.extra.redirecttosettings"

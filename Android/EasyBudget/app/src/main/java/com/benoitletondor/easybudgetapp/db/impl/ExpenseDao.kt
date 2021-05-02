@@ -41,6 +41,9 @@ interface ExpenseDao {
     @Query("SELECT SUM(amount) FROM expense WHERE date <= :dayEndDate")
     suspend fun getBalanceForDay(dayEndDate: Date): Long?
 
+    @Query("SELECT SUM(amount) FROM expense WHERE date <= :dayEndDate AND checked")
+    suspend fun getCheckedBalanceForDay(dayEndDate: Date): Long?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun persistRecurringExpense(recurringExpenseEntity: RecurringExpenseEntity): Long
 
@@ -79,4 +82,7 @@ interface ExpenseDao {
 
     @Query("SELECT * FROM expense ORDER BY date LIMIT 1")
     suspend fun getOldestExpense(): ExpenseEntity?
+
+    @Query("UPDATE expense SET checked = 1 WHERE date < :beforeDate")
+    suspend fun markAllEntriesAsChecked(beforeDate: Date)
 }

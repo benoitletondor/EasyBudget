@@ -259,6 +259,21 @@ class PreferencesFragment : PreferenceFragmentCompat() {
         refreshPremiumPreference()
 
         /*
+         * Show checked balance
+         */
+        val showCheckedBalancePref = findPreference<CheckBoxPreference>(resources.getString(R.string.setting_category_notifications_daily_key))
+        showCheckedBalancePref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            parameters.setShouldShowCheckedBalance((it as CheckBoxPreference).isChecked)
+
+            context?.let { context ->
+                LocalBroadcastManager.getInstance(context).sendBroadcast(Intent(MainActivity.INTENT_SHOW_CHECKED_BALANCE_CHANGED))
+            }
+
+            true
+        }
+        showCheckedBalancePref?.isChecked = parameters.getShouldShowCheckedBalance()
+
+        /*
          * Notifications
          */
         val updateNotifPref = findPreference<CheckBoxPreference>(resources.getString(R.string.setting_category_notifications_update_key))

@@ -35,6 +35,8 @@ interface DB {
 
     suspend fun getBalanceForDay(dayDate: Date): Double
 
+    suspend fun getCheckedBalanceForDay(dayDate: Date): Double
+
     suspend fun persistRecurringExpense(recurringExpense: RecurringExpense): RecurringExpense
 
     suspend fun deleteRecurringExpense(recurringExpense: RecurringExpense)
@@ -58,4 +60,6 @@ interface DB {
     suspend fun findRecurringExpenseForId(recurringExpenseId: Long): RecurringExpense?
 
     suspend fun getOldestExpense(): Expense?
+
+    suspend fun markAllEntriesAsChecked(beforeDate: Date)
 }

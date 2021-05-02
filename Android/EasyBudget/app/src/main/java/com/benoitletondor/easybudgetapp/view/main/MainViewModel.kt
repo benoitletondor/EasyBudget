@@ -25,6 +25,8 @@ import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType
 import com.benoitletondor.easybudgetapp.db.DB
+import com.benoitletondor.easybudgetapp.parameters.Parameters
+import com.benoitletondor.easybudgetapp.parameters.getShouldShowCheckedBalance
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,6 +39,7 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val db: DB,
     private val iab: Iab,
+    private val parameters: Parameters,
 ) : ViewModel() {
     private var selectedDate: Date = Date()
 
@@ -57,6 +60,8 @@ class MainViewModel @Inject constructor(
     val currentBalanceRestoringErrorEventStream = SingleLiveEvent<Exception>()
     val expenseCheckedErrorEventStream = SingleLiveEvent<Exception>()
     val goBackToCurrentMonthEventStream = SingleLiveEvent<Unit>()
+    val confirmCheckAllPastEntriesEventStream = SingleLiveEvent<Unit>()
+    val checkAllPastEntriesErrorEventStream = SingleLiveEvent<Throwable>()
 
     sealed class RecurringExpenseDeleteProgressState {
         class Starting(val expense: Expense): RecurringExpenseDeleteProgressState()
@@ -86,7 +91,11 @@ class MainViewModel @Inject constructor(
                     db.deleteExpense(expense)
                 }
 
-                expenseDeletionSuccessEventStream.value = ExpenseDeletionSuccessData(expense, getBalanceForDay(selectedDate))
+                expenseDeletionSuccessEventStream.value = ExpenseDeletionSuccessData(
+                    expense,
+                    getBalanceForDay(selectedDate),
+                    if (parameters.getShouldShowCheckedBalance()) { db.getCheckedBalanceForDay(selectedDate) } else { null },
+                )
             } catch (t: Throwable) {
                 expenseDeletionErrorEventStream.value = expense
             }
@@ -316,17 +325,28 @@ class MainViewModel @Inject constructor(
 
     private fun refreshDataForDate(date: Date) {
         viewModelScope.launch {
-            val (balance, expenses) = withContext(Dispatchers.Default) {
-                Pair(getBalanceForDay(date), db.getExpensesForDay(date))
+            val (balance, expenses, checkedBalance) = withContext(Dispatchers.Default) {
+                Triple(
+                    getBalanceForDay(date),
+                    db.getExpensesForDay(date),
+                    if (parameters.getShouldShowCheckedBalance()) { getCheckedBalanceForDay(date) } else { null },
+                )
             }
 
-            selectedDateChangeLiveData.value = SelectedDateExpensesData(date, balance, expenses)
+            selectedDateChangeLiveData.value = SelectedDateExpensesData(date, balance, checkedBalance, expenses)
         }
     }
 
     private suspend fun getBalanceForDay(date: Date): Double {
         var balance = 0.0 // Just to keep a positive number if balance == 0
         balance -= db.getBalanceForDay(date)
+
+        return balance
+    }
+
+    private suspend fun getCheckedBalanceForDay(date: Date): Double {
+        var balance = 0.0 // Just to keep a positive number if balance == 0
+        balance -= db.getCheckedBalanceForDay(date)
 
         return balance
     }
@@ -366,8 +386,30 @@ class MainViewModel @Inject constructor(
     fun onGoBackToCurrentMonthButtonPressed() {
         goBackToCurrentMonthEventStream.value = Unit
     }
+
+    fun onShowCheckedBalanceChanged() {
+        refreshDataForDate(selectedDate)
+    }
+
+    fun onCheckAllPastEntriesPressed() {
+        confirmCheckAllPastEntriesEventStream.value = Unit
+    }
+
+    fun onCheckAllPastEntriesConfirmPressed() {
+        viewModelScope.launch {
+            try {
+                withContext(Dispatchers.Default) {
+                    db.markAllEntriesAsChecked(Date())
+                }
+
+                refreshDataForDate(selectedDate)
+            } catch (e: Exception) {
+                checkAllPastEntriesErrorEventStream.value = e
+            }
+        }
+    }
 }
 
-data class SelectedDateExpensesData(val date: Date, val balance: Double, val expenses: List<Expense>)
-data class ExpenseDeletionSuccessData(val deletedExpense: Expense, val newDayBalance: Double)
+data class SelectedDateExpensesData(val date: Date, val balance: Double, val checkedBalance: Double?, val expenses: List<Expense>)
+data class ExpenseDeletionSuccessData(val deletedExpense: Expense, val newDayBalance: Double, val newCheckedBalance: Double?)
 data class BalanceAdjustedData(val balanceExpense: Expense, val diffWithOldBalance: Double, val newBalance: Double)

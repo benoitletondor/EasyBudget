@@ -52,6 +52,12 @@
             app:entries="@array/themes"
             app:entryValues="@array/themesData" />
 
+        <CheckBoxPreference
+            app:title="@string/setting_category_show_checked_balance_title"
+            app:summaryOn="@string/setting_category_show_checked_balance_message"
+            app:summaryOff="@string/setting_category_show_checked_balance_message"
+            app:key="@string/setting_category_notifications_daily_key" />
+
         <Preference
             app:key="@string/setting_category_backup"
             app:title="@string/backup_settings_activity_title" />
