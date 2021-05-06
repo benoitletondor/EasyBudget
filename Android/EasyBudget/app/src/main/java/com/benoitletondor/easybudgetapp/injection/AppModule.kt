@@ -1,5 +1,5 @@
 /*
- *   Copyright 2020 Benoit LETONDOR
+ *   Copyright 2021 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package com.benoitletondor.easybudgetapp.injection
 
+import android.content.Context
 import androidx.collection.ArrayMap
 import com.benoitletondor.easybudgetapp.auth.Auth
 import com.benoitletondor.easybudgetapp.auth.FirebaseAuth
@@ -30,33 +31,49 @@ import com.benoitletondor.easybudgetapp.db.impl.CachedDBImpl
 import com.benoitletondor.easybudgetapp.db.impl.CacheDBStorage
 import com.benoitletondor.easybudgetapp.db.impl.DBImpl
 import com.benoitletondor.easybudgetapp.db.impl.RoomDB
-import org.koin.dsl.module
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import java.util.*
-import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import javax.inject.Singleton
 
-val appModule = module {
-    single { Parameters(get()) }
+@Module
+@InstallIn(SingletonComponent::class)
+object AppModule {
+    @Provides
+    @Singleton
+    fun provideIab(
+        @ApplicationContext context: Context,
+        parameters: Parameters,
+    ): Iab = IabImpl(context, parameters)
 
-    single<Iab> { IabImpl(get(), get()) }
+    @Provides
+    @Singleton
+    fun provideFirebaseAuth(): Auth = FirebaseAuth(com.google.firebase.auth.FirebaseAuth.getInstance())
 
-    single<CacheDBStorage> { object : CacheDBStorage {
-        override val expenses: MutableMap<Date, List<Expense>> = ArrayMap()
-        override val balances: MutableMap<Date, Double> = ArrayMap()
-    } }
-
-    single<Executor> { Executors.newSingleThreadExecutor() }
-
-    single<Auth> { FirebaseAuth(com.google.firebase.auth.FirebaseAuth.getInstance()) }
-
-    single<CloudStorage> { FirebaseStorage(com.google.firebase.storage.FirebaseStorage.getInstance().apply {
+    @Provides
+    @Singleton
+    fun provideCloudStorage(): CloudStorage = FirebaseStorage(com.google.firebase.storage.FirebaseStorage.getInstance().apply {
         maxOperationRetryTimeMillis = TimeUnit.SECONDS.toMillis(10)
         maxDownloadRetryTimeMillis = TimeUnit.SECONDS.toMillis(10)
         maxUploadRetryTimeMillis = TimeUnit.SECONDS.toMillis(10)
-    }) }
+    })
 
-    factory<DB> { CachedDBImpl(DBImpl(RoomDB.create(get())), get(), get()) }
-
-    factory { CachedDBImpl(DBImpl(RoomDB.create(get())), get(), get()) }
+    @Provides
+    @Singleton
+    fun provideDB(
+        @ApplicationContext context: Context,
+    ): DB = CachedDBImpl(
+        DBImpl(RoomDB.create(context)),
+        object : CacheDBStorage {
+            override val expenses: MutableMap<Date, List<Expense>> = ArrayMap()
+            override val balances: MutableMap<Date, Double> = ArrayMap()
+            override val checkedBalances: MutableMap<Date, Double> = ArrayMap()
+        },
+        Executors.newSingleThreadExecutor(),
+    )
 }

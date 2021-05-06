@@ -1,5 +1,5 @@
 /*
- *   Copyright 2020 Benoit LETONDOR
+ *   Copyright 2021 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -32,15 +32,11 @@ import kotlin.math.floor
 class DBImpl(private val roomDB: RoomDB) : DB {
 
     override fun ensureDBCreated() {
-        roomDB.openHelper.writableDatabase.close()
+        roomDB.openHelper.writableDatabase
     }
 
     override suspend fun triggerForceWriteToDisk() {
         roomDB.expenseDao().checkpoint(SimpleSQLiteQuery("pragma wal_checkpoint(full)"))
-    }
-
-    override fun close() {
-        roomDB.close()
     }
 
     override suspend fun persistExpense(expense: Expense): Expense {
@@ -75,6 +71,12 @@ class DBImpl(private val roomDB: RoomDB) : DB {
         val (_, endDate) = dayDate.getDayDatesRange()
 
         return roomDB.expenseDao().getBalanceForDay(endDate).getRealValueFromDB()
+    }
+
+    override suspend fun getCheckedBalanceForDay(dayDate: Date): Double {
+        val (_, endDate) = dayDate.getDayDatesRange()
+
+        return roomDB.expenseDao().getCheckedBalanceForDay(endDate).getRealValueFromDB()
     }
 
     override suspend fun persistRecurringExpense(recurringExpense: RecurringExpense): RecurringExpense {
@@ -146,6 +148,12 @@ class DBImpl(private val roomDB: RoomDB) : DB {
 
     override suspend fun getOldestExpense(): Expense? {
         return roomDB.expenseDao().getOldestExpense()?.toExpense(this)
+    }
+
+    override suspend fun markAllEntriesAsChecked(beforeDate: Date) {
+        val (startDate, _) = beforeDate.getDayDatesRange()
+
+        roomDB.expenseDao().markAllEntriesAsChecked(startDate)
     }
 
 }

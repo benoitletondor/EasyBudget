@@ -1,5 +1,5 @@
 /*
- *   Copyright 2020 Benoit LETONDOR
+ *   Copyright 2021 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -21,19 +21,19 @@ import android.os.Bundle
 import android.text.format.DateUtils
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.SwitchCompat
 import androidx.lifecycle.Observer
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.BaseActivity
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_backup_settings.*
-import org.koin.android.viewmodel.ext.android.viewModel
 import java.util.*
 import kotlin.system.exitProcess
 
+@AndroidEntryPoint
 class BackupSettingsActivity : BaseActivity() {
-
-    private val viewModel: BackupSettingsViewModel by viewModel()
+    private val viewModel: BackupSettingsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

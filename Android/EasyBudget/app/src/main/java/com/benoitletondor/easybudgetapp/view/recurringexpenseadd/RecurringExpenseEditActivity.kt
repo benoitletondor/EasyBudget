@@ -1,5 +1,5 @@
 /*
- *   Copyright 2020 Benoit LETONDOR
+ *   Copyright 2021 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import android.app.ProgressDialog
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.ArrayAdapter
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -32,7 +33,7 @@ import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import com.benoitletondor.easybudgetapp.view.DatePickerDialogFragment
-import kotlinx.android.synthetic.main.activity_expense_edit.*
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_recurring_expense_add.*
 import kotlinx.android.synthetic.main.activity_recurring_expense_add.amount_edittext
 import kotlinx.android.synthetic.main.activity_recurring_expense_add.amount_inputlayout
@@ -42,15 +43,16 @@ import kotlinx.android.synthetic.main.activity_recurring_expense_add.expense_typ
 import kotlinx.android.synthetic.main.activity_recurring_expense_add.expense_type_tv
 import kotlinx.android.synthetic.main.activity_recurring_expense_add.save_expense_fab
 import kotlinx.android.synthetic.main.activity_recurring_expense_add.toolbar
-import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.viewModel
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 import kotlin.math.abs
 
+@AndroidEntryPoint
 class RecurringExpenseEditActivity : BaseActivity() {
-    private val parameters: Parameters by inject()
-    private val viewModel: RecurringExpenseEditViewModel by viewModel()
+    private val viewModel: RecurringExpenseEditViewModel by viewModels()
+
+    @Inject lateinit var parameters: Parameters
 
 // ------------------------------------------->
 
@@ -257,6 +259,7 @@ class RecurringExpenseEditActivity : BaseActivity() {
             getString(R.string.recurring_interval_ter_weekly),
             getString(R.string.recurring_interval_four_weekly),
             getString(R.string.recurring_interval_monthly),
+            getString(R.string.recurring_interval_bi_monthly),
             getString(R.string.recurring_interval_ter_monthly),
             getString(R.string.recurring_interval_six_monthly),
             getString(R.string.recurring_interval_yearly)
@@ -298,9 +301,10 @@ class RecurringExpenseEditActivity : BaseActivity() {
             3 -> return RecurringExpenseType.TER_WEEKLY
             4 -> return RecurringExpenseType.FOUR_WEEKLY
             5 -> return RecurringExpenseType.MONTHLY
-            6 -> return RecurringExpenseType.TER_MONTHLY
-            7 -> return RecurringExpenseType.SIX_MONTHLY
-            8 -> return RecurringExpenseType.YEARLY
+            6 -> return RecurringExpenseType.BI_MONTHLY
+            7 -> return RecurringExpenseType.TER_MONTHLY
+            8 -> return RecurringExpenseType.SIX_MONTHLY
+            9 -> return RecurringExpenseType.YEARLY
         }
 
         throw IllegalStateException("getRecurringTypeFromSpinnerSelection unable to get value for $spinnerSelectedItem")
@@ -314,9 +318,10 @@ class RecurringExpenseEditActivity : BaseActivity() {
             RecurringExpenseType.TER_WEEKLY -> 3
             RecurringExpenseType.FOUR_WEEKLY -> 4
             RecurringExpenseType.MONTHLY -> 5
-            RecurringExpenseType.TER_MONTHLY -> 6
-            RecurringExpenseType.SIX_MONTHLY -> 7
-            RecurringExpenseType.YEARLY -> 8
+            RecurringExpenseType.BI_MONTHLY -> 6
+            RecurringExpenseType.TER_MONTHLY -> 7
+            RecurringExpenseType.SIX_MONTHLY -> 8
+            RecurringExpenseType.YEARLY -> 9
         }
 
         expense_type_spinner.setSelection(selectionIndex, false)

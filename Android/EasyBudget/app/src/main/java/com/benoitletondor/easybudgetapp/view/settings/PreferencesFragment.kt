@@ -1,5 +1,5 @@
 /*
- *   Copyright 2020 Benoit LETONDOR
+ *   Copyright 2021 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -46,14 +46,16 @@ import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragme
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.SHOW_BACKUP_INTENT_KEY
 import com.benoitletondor.easybudgetapp.view.settings.backup.BackupSettingsActivity
 import com.roomorama.caldroid.CaldroidFragment
-import org.koin.android.ext.android.inject
+import dagger.hilt.android.AndroidEntryPoint
 import java.net.URLEncoder
+import javax.inject.Inject
 
 /**
  * Fragment to display preferences
  *
  * @author Benoit LETONDOR
  */
+@AndroidEntryPoint
 class PreferencesFragment : PreferenceFragmentCompat() {
 
     /**
@@ -82,8 +84,8 @@ class PreferencesFragment : PreferenceFragmentCompat() {
      */
     private var notPremiumShown = true
 
-    private val iab: Iab by inject()
-    private val parameters: Parameters by inject()
+    @Inject lateinit var iab: Iab
+    @Inject lateinit var parameters: Parameters
 
 // ---------------------------------------->
 
@@ -255,6 +257,21 @@ class PreferencesFragment : PreferenceFragmentCompat() {
         premiumCategory = findPreference(resources.getString(R.string.setting_category_premium_key))!!
         notPremiumCategory = findPreference(resources.getString(R.string.setting_category_not_premium_key))!!
         refreshPremiumPreference()
+
+        /*
+         * Show checked balance
+         */
+        val showCheckedBalancePref = findPreference<CheckBoxPreference>(resources.getString(R.string.setting_category_notifications_daily_key))
+        showCheckedBalancePref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            parameters.setShouldShowCheckedBalance((it as CheckBoxPreference).isChecked)
+
+            context?.let { context ->
+                LocalBroadcastManager.getInstance(context).sendBroadcast(Intent(MainActivity.INTENT_SHOW_CHECKED_BALANCE_CHANGED))
+            }
+
+            true
+        }
+        showCheckedBalancePref?.isChecked = parameters.getShouldShowCheckedBalance()
 
         /*
          * Notifications

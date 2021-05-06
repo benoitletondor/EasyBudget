@@ -1,5 +1,5 @@
 <!--
-   Copyright 2020 Benoit LETONDOR
+   Copyright 2021 Benoit LETONDOR
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -19,19 +19,35 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".view.main.MainActivity">
 
-    <item android:id="@+id/action_monthly_report"
-          android:title="@string/monthly_report_button_title"
-          android:icon="@drawable/ic_date_range_24dp"
-          app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_go_to_current_month"
+        android:title="@string/action_go_to_current_month"
+        android:icon="@drawable/ic_calendar_today"
+        app:showAsAction="always" />
 
-    <item android:id="@+id/action_balance"
-          android:title="@string/action_balance"
-          android:orderInCategory="100"
-          app:showAsAction="never" />
+    <item
+        android:id="@+id/action_monthly_report"
+        android:title="@string/monthly_report_button_title"
+        android:icon="@drawable/ic_list_alt_24"
+        app:showAsAction="ifRoom" />
 
-    <item android:id="@+id/action_settings"
-          android:title="@string/action_settings"
-          android:orderInCategory="100"
-          app:showAsAction="never" />
+    <item
+        android:id="@+id/action_balance"
+        android:title="@string/action_balance"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_check_all_past_entries"
+        android:title="@string/action_mark_all_past_entries_as_checked"
+        android:icon="@drawable/ic_check_24dp"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
 
 </menu>

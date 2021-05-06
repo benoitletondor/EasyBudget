@@ -1,5 +1,5 @@
 <!--
-   Copyright 2020 Benoit LETONDOR
+   Copyright 2021 Benoit LETONDOR
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@
 
     <string name="action_settings">Préférences</string>
     <string name="action_balance">Ajuster le solde</string>
+    <string name="action_go_to_current_month">Retourner au mois courant</string>
+    <string name="action_mark_all_past_entries_as_checked">Marquer toutes les entrées passées</string>
     <string name="fab_add_expense">Ajouter une dépense/revenu</string>
     <string name="fab_add_monthly_expense">Ajouter une dépense/revenu récurrent</string>
     <string name="title_activity_add_expense">Ajouter une dépense</string>
@@ -54,6 +56,12 @@
     <string name="expense_add_before_init_date_dialog_negative_cta">Annuler</string>
     <string name="expense_check_error_title">Oups</string>
     <string name="expense_check_error_message">Une erreur est survenue, veuillez réessayer (%s)</string>
+
+    <string name="check_all_past_expences_title">Marquer toutes les entrées passées</string>
+    <string name="check_all_past_expences_message">Voulez-vous marquer toutes les entrées avant aujourd\'hui?\nVous ne pourrez pas annuler cette action</string>
+    <string name="check_all_past_expences_confirm_cta">Oui</string>
+    <string name="check_all_past_expences_error_title">Oups</string>
+    <string name="check_all_past_expences_error_message">Une erreur est survenue lors de l\'opération, veuillez réesayer (%s)</string>
 
     <string name="dialog_edit_expense_title">Que voulez-vous faire ?</string>
     <string name="dialog_edit_income_title">Que voulez-vous faire ?</string>
@@ -106,6 +114,7 @@
     <string name="bi_weekly">2 SEMAINES</string>
     <string name="ter_weekly">3 SEMAINES</string>
     <string name="four_weekly">4 SEMAINES</string>
+    <string name="bi_monthly">2 MOIS</string>
     <string name="ter_monthly">3 MOIS</string>
     <string name="six_monthly">6 MOIS</string>
     <string name="yearly">ANNUEL</string>
@@ -136,6 +145,7 @@
     <string name="recurring_interval_ter_weekly">Toutes les 3 semaines</string>
     <string name="recurring_interval_four_weekly">Toutes les 4 semaines</string>
     <string name="recurring_interval_monthly">Tous les mois</string>
+    <string name="recurring_interval_bi_monthly">Tous les 2 mois</string>
     <string name="recurring_interval_ter_monthly">Tous les 3 mois</string>
     <string name="recurring_interval_six_monthly">Tous les 6 mois</string>
     <string name="recurring_interval_yearly">Tous les ans</string>
@@ -165,6 +175,8 @@
     <string name="setting_category_premium_redeem_message">Utiliser un code promo</string>
     <string name="setting_category_notifications_update_title">Mises à jour</string>
     <string name="setting_category_notifications_update_message">Être notifié des nouveautés de l\'application. Pas de spam, promis !</string>
+    <string name="setting_category_show_checked_balance_title">Afficher le solde des entrées marquées (✓)</string>
+    <string name="setting_category_show_checked_balance_message">Afficher également le solde des entrées marquées ✓ comme payées après le solde normal</string>
     <string name="setting_category_notifications_daily_title">Rappel journalier</string>
     <string name="setting_category_notifications_daily_message">Recevez une notification à la fin de la journée si vous n’avez pas entré vos dépenses</string>
     <string name="setting_category_not_premium_status_title">Devenez utilisateur premium</string>

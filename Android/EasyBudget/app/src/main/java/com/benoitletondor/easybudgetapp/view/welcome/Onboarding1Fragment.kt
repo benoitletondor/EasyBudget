@@ -1,5 +1,5 @@
 /*
- *   Copyright 2020 Benoit LETONDOR
+ *   Copyright 2021 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import android.view.View
 import android.view.ViewGroup
 
 import com.benoitletondor.easybudgetapp.R
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_onboarding1.*
 
 /**
@@ -29,6 +30,7 @@ import kotlinx.android.synthetic.main.fragment_onboarding1.*
  *
  * @author Benoit LETONDOR
  */
+@AndroidEntryPoint
 class Onboarding1Fragment : OnboardingFragment() {
 
     override val statusBarColor: Int

@@ -1,5 +1,5 @@
 /*
- *   Copyright 2020 Benoit LETONDOR
+ *   Copyright 2021 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -19,6 +19,9 @@ package com.benoitletondor.easybudgetapp.parameters
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Name of the shared preferences file
@@ -30,7 +33,8 @@ private const val SHARED_PREFERENCES_FILE_NAME = "easybudget_sp"
  *
  * @author Benoit LETONDOR
  */
-class Parameters(context: Context) {
+@Singleton
+class Parameters @Inject constructor(@ApplicationContext context: Context) {
 
     /**
      * Instance of shared preferences

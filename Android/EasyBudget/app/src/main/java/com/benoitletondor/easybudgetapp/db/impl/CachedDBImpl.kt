@@ -1,5 +1,5 @@
 /*
- *   Copyright 2020 Benoit LETONDOR
+ *   Copyright 2021 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.Logger
 import kotlinx.coroutines.runBlocking
-import org.koin.java.KoinJavaComponent.inject
 import java.util.*
 import java.util.concurrent.Executor
 
@@ -38,10 +37,6 @@ class CachedDBImpl(private val wrappedDB: DB,
         wrappedDB.triggerForceWriteToDisk()
     }
 
-    override fun close() {
-        wrappedDB.close()
-    }
-
     override suspend fun persistExpense(expense: Expense): Expense {
         val newExpense = wrappedDB.persistExpense(expense)
 
@@ -56,7 +51,7 @@ class CachedDBImpl(private val wrappedDB: DB,
         }
 
         return if (expensesForDay == null) {
-            executor.execute(CacheExpensesForMonthRunnable(dayDate))
+            executor.execute(CacheExpensesForMonthRunnable(dayDate, this, cacheStorage))
             wrappedDB.hasExpenseForDay(dayDate)
         } else {
             expensesForDay.isNotEmpty()
@@ -71,7 +66,7 @@ class CachedDBImpl(private val wrappedDB: DB,
         if( cached != null ) {
             return cached
         } else {
-            executor.execute(CacheExpensesForMonthRunnable(dayDate))
+            executor.execute(CacheExpensesForMonthRunnable(dayDate, this, cacheStorage))
         }
 
         return wrappedDB.getExpensesForDay(dayDate)
@@ -91,14 +86,31 @@ class CachedDBImpl(private val wrappedDB: DB,
         if( cached != null ) {
             return cached
         } else {
-            executor.execute(CacheBalanceForMonthRunnable(dayDate))
+            executor.execute(CacheBalanceForMonthRunnable(dayDate, this, cacheStorage))
         }
 
         return wrappedDB.getBalanceForDay(dayDate)
     }
 
+    override suspend fun getCheckedBalanceForDay(dayDate: Date): Double {
+        val cached = synchronized(cacheStorage.checkedBalances) {
+            cacheStorage.checkedBalances[dayDate.cleaned()]
+        }
+
+        if( cached != null ) {
+            return cached
+        } else {
+            executor.execute(CacheCheckedBalanceForMonthRunnable(dayDate, this, cacheStorage))
+        }
+
+        return wrappedDB.getCheckedBalanceForDay(dayDate)
+    }
+
     private suspend fun getBalanceForDayWithoutCache(dayDate: Date): Double
         = wrappedDB.getBalanceForDay(dayDate)
+
+    private suspend fun getCheckedBalanceForDayWithoutCache(dayDate: Date): Double
+        = wrappedDB.getCheckedBalanceForDay(dayDate)
 
     override suspend fun persistRecurringExpense(recurringExpense: RecurringExpense): RecurringExpense
         = wrappedDB.persistRecurringExpense(recurringExpense)
@@ -149,6 +161,12 @@ class CachedDBImpl(private val wrappedDB: DB,
     override suspend fun getOldestExpense(): Expense?
         = wrappedDB.getOldestExpense()
 
+    override suspend fun markAllEntriesAsChecked(beforeDate: Date) {
+        wrappedDB.markAllEntriesAsChecked(beforeDate)
+
+        wipeCache()
+    }
+
     /**
      * Instantly wipe all cached data
      */
@@ -162,84 +180,127 @@ class CachedDBImpl(private val wrappedDB: DB,
         synchronized(cacheStorage.expenses) {
             cacheStorage.expenses.clear()
         }
+
+        synchronized(cacheStorage.checkedBalances) {
+            cacheStorage.checkedBalances.clear()
+        }
     }
 
-    private class CacheExpensesForMonthRunnable(private val monthDate: Date) : Runnable {
-        private val db: CachedDBImpl by inject(CachedDBImpl::class.java)
-        private val cacheStorage: CacheDBStorage by inject(CacheDBStorage::class.java)
+    private class CacheExpensesForMonthRunnable(
+        private val monthDate: Date,
+        private val db: CachedDBImpl,
+        private val cacheStorage: CacheDBStorage,
+    ) : Runnable {
 
         override fun run() {
-            db.use { db ->
-                // Init a calendar to the given date, setting the day of month to 1
-                val cal = Calendar.getInstance()
-                cal.time = monthDate.cleaned()
-                cal.set(Calendar.DAY_OF_MONTH, 1)
+            // Init a calendar to the given date, setting the day of month to 1
+            val cal = Calendar.getInstance()
+            cal.time = monthDate.cleaned()
+            cal.set(Calendar.DAY_OF_MONTH, 1)
+
+            synchronized(cacheStorage.expenses) {
+                if (cacheStorage.expenses.containsKey(cal.time)) {
+                    return
+                }
+            }
+
+            // Save the month we wanna load cache for
+            val month = cal.get(Calendar.MONTH)
+
+            Logger.debug("DBCache: Caching expenses for month: $month")
+
+            // Iterate over day of month (while are still on that month)
+            while (cal.get(Calendar.MONTH) == month) {
+                val date = cal.time
+                val expensesForDay = runBlocking { db.getExpensesForDayWithoutCache(date) }
 
                 synchronized(cacheStorage.expenses) {
-                    if (cacheStorage.expenses.containsKey(cal.time)) {
-                        return
-                    }
+                    cacheStorage.expenses.put(date, expensesForDay)
                 }
 
-                // Save the month we wanna load cache for
-                val month = cal.get(Calendar.MONTH)
-
-                Logger.debug("DBCache: Caching expenses for month: $month")
-
-                // Iterate over day of month (while are still on that month)
-                while (cal.get(Calendar.MONTH) == month) {
-                    val date = cal.time
-                    val expensesForDay = runBlocking { db.getExpensesForDayWithoutCache(date) }
-
-                    synchronized(cacheStorage.expenses) {
-                        cacheStorage.expenses.put(date, expensesForDay)
-                    }
-
-                    cal.add(Calendar.DAY_OF_MONTH, 1)
-                }
-
-                Logger.debug("DBCache: Expenses cached for month: $month")
+                cal.add(Calendar.DAY_OF_MONTH, 1)
             }
+
+            Logger.debug("DBCache: Expenses cached for month: $month")
         }
 
     }
 
-    private class CacheBalanceForMonthRunnable(private val monthDate: Date) : Runnable {
-        private val db: CachedDBImpl by inject(CachedDBImpl::class.java)
-        private val cacheStorage: CacheDBStorage by inject(CacheDBStorage::class.java)
+    private class CacheBalanceForMonthRunnable(
+        private val monthDate: Date,
+        private val db: CachedDBImpl,
+        private val cacheStorage: CacheDBStorage,
+    ) : Runnable {
 
         override fun run() {
-            db.use { db ->
-                // Init a calendar to the given date, setting the day of month to 1
-                val cal = Calendar.getInstance()
-                cal.time = monthDate.cleaned()
-                cal.set(Calendar.DAY_OF_MONTH, 1)
+            // Init a calendar to the given date, setting the day of month to 1
+            val cal = Calendar.getInstance()
+            cal.time = monthDate.cleaned()
+            cal.set(Calendar.DAY_OF_MONTH, 1)
+
+            synchronized(cacheStorage.balances) {
+                if (cacheStorage.balances.containsKey(cal.time)) {
+                    return
+                }
+            }
+
+            // Save the month we wanna load cache for
+            val month = cal.get(Calendar.MONTH)
+
+            Logger.debug("DBCache: Caching balance for month: $month")
+
+            // Iterate over day of month (while are still on that month)
+            while (cal.get(Calendar.MONTH) == month) {
+                val date = cal.time
+                val balanceForDay = runBlocking { db.getBalanceForDayWithoutCache(date) }
 
                 synchronized(cacheStorage.balances) {
-                    if (cacheStorage.balances.containsKey(cal.time)) {
-                        return
-                    }
+                    cacheStorage.balances.put(date, balanceForDay)
                 }
 
-                // Save the month we wanna load cache for
-                val month = cal.get(Calendar.MONTH)
-
-                Logger.debug("DBCache: Caching balance for month: $month")
-
-                // Iterate over day of month (while are still on that month)
-                while (cal.get(Calendar.MONTH) == month) {
-                    val date = cal.time
-                    val balanceForDay = runBlocking { db.getBalanceForDayWithoutCache(date) }
-
-                    synchronized(cacheStorage.balances) {
-                        cacheStorage.balances.put(date, balanceForDay)
-                    }
-
-                    cal.add(Calendar.DAY_OF_MONTH, 1)
-                }
-
-                Logger.debug("DBCache: Balance cached for month: $month")
+                cal.add(Calendar.DAY_OF_MONTH, 1)
             }
+
+            Logger.debug("DBCache: Balance cached for month: $month")
+        }
+    }
+
+    private class CacheCheckedBalanceForMonthRunnable(
+        private val monthDate: Date,
+        private val db: CachedDBImpl,
+        private val cacheStorage: CacheDBStorage,
+    ) : Runnable {
+
+        override fun run() {
+            // Init a calendar to the given date, setting the day of month to 1
+            val cal = Calendar.getInstance()
+            cal.time = monthDate.cleaned()
+            cal.set(Calendar.DAY_OF_MONTH, 1)
+
+            synchronized(cacheStorage.checkedBalances) {
+                if (cacheStorage.checkedBalances.containsKey(cal.time)) {
+                    return
+                }
+            }
+
+            // Save the month we wanna load cache for
+            val month = cal.get(Calendar.MONTH)
+
+            Logger.debug("DBCache: Caching checked balance for month: $month")
+
+            // Iterate over day of month (while are still on that month)
+            while (cal.get(Calendar.MONTH) == month) {
+                val date = cal.time
+                val balanceForDay = runBlocking { db.getCheckedBalanceForDayWithoutCache(date) }
+
+                synchronized(cacheStorage.checkedBalances) {
+                    cacheStorage.checkedBalances.put(date, balanceForDay)
+                }
+
+                cal.add(Calendar.DAY_OF_MONTH, 1)
+            }
+
+            Logger.debug("DBCache: Checked balance cached for month: $month")
         }
     }
 }
@@ -247,6 +308,7 @@ class CachedDBImpl(private val wrappedDB: DB,
 interface CacheDBStorage {
     val expenses: MutableMap<Date, List<Expense>>
     val balances: MutableMap<Date, Double>
+    val checkedBalances: MutableMap<Date, Double>
 }
 
 private fun Date.cleaned(): Date {

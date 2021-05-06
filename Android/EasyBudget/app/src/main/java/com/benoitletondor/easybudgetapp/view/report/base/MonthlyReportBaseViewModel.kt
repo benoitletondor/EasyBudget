@@ -1,5 +1,5 @@
 /*
- *   Copyright 2020 Benoit LETONDOR
+ *   Copyright 2021 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -21,12 +21,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.helper.getListOfMonthsAvailableForUser
 import com.benoitletondor.easybudgetapp.parameters.Parameters
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
+import javax.inject.Inject
 
-class MonthlyReportBaseViewModel(private val parameters: Parameters) : ViewModel() {
+@HiltViewModel
+class MonthlyReportBaseViewModel @Inject constructor(private val parameters: Parameters) : ViewModel() {
     /**
      * The current selected position
      */

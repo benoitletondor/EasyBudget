@@ -1,5 +1,5 @@
 <!--
-   Copyright 2020 Benoit LETONDOR
+   Copyright 2021 Benoit LETONDOR
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -51,6 +51,12 @@
             app:title="@string/setting_category_theme_title"
             app:entries="@array/themes"
             app:entryValues="@array/themesData" />
+
+        <CheckBoxPreference
+            app:title="@string/setting_category_show_checked_balance_title"
+            app:summaryOn="@string/setting_category_show_checked_balance_message"
+            app:summaryOff="@string/setting_category_show_checked_balance_message"
+            app:key="@string/setting_category_notifications_daily_key" />
 
         <Preference
             app:key="@string/setting_category_backup"

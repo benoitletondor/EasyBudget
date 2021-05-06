@@ -1,5 +1,5 @@
 /*
- *   Copyright 2020 Benoit LETONDOR
+ *   Copyright 2021 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import java.io.Closeable
 import java.util.*
 
-interface DB : Closeable {
+interface DB {
     fun ensureDBCreated()
     suspend fun triggerForceWriteToDisk()
 
@@ -34,6 +34,8 @@ interface DB : Closeable {
     suspend fun getExpensesForMonth(monthStartDate: Date): List<Expense>
 
     suspend fun getBalanceForDay(dayDate: Date): Double
+
+    suspend fun getCheckedBalanceForDay(dayDate: Date): Double
 
     suspend fun persistRecurringExpense(recurringExpense: RecurringExpense): RecurringExpense
 
@@ -58,4 +60,6 @@ interface DB : Closeable {
     suspend fun findRecurringExpenseForId(recurringExpenseId: Long): RecurringExpense?
 
     suspend fun getOldestExpense(): Expense?
+
+    suspend fun markAllEntriesAsChecked(beforeDate: Date)
 }

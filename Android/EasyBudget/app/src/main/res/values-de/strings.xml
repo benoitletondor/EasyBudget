@@ -1,5 +1,5 @@
 <!--
-   Copyright 2020 Benoit LETONDOR
+   Copyright 2021 Benoit LETONDOR
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@
 
     <string name="action_settings">Einstellungen</string>
     <string name="action_balance">Kontostand anpassen</string>
+    <string name="action_go_to_current_month">Zurück zum aktuellen Monat</string>
+    <string name="action_mark_all_past_entries_as_checked">Markieren Sie alle vergangenen Einträge</string>
     <string name="fab_add_expense">Neue Ausgabe/Einnahme</string>
     <string name="fab_add_monthly_expense">Wiederkehrende Einnahme/Ausgabe hinzufügen</string>
     <string name="title_activity_add_expense">Ausgabe hinzufügen</string>
@@ -54,6 +56,12 @@
     <string name="expense_add_before_init_date_dialog_negative_cta">Stornieren</string>
     <string name="expense_check_error_title">Oops</string>
     <string name="expense_check_error_message">Ein Fehler ist aufgetreten (%s)</string>
+
+    <string name="check_all_past_expences_title">Markieren Sie alle vergangenen Einträge</string>
+    <string name="check_all_past_expences_message">Möchten Sie alle Einträge vor heute markieren?\nSie können diese Aktion nicht abbrechen.</string>
+    <string name="check_all_past_expences_confirm_cta">Ja</string>
+    <string name="check_all_past_expences_error_title">Oops</string>
+    <string name="check_all_past_expences_error_message">Beim Markieren aller früheren Einträge ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut (% s).</string>
 
     <string name="dialog_edit_expense_title">Was möchten Sie tun?</string>
     <string name="dialog_edit_income_title">Was möchten Sie tun?</string>
@@ -106,6 +114,7 @@
     <string name="bi_weekly">2 WOCHEN</string>
     <string name="ter_weekly">3 WOCHEN</string>
     <string name="four_weekly">4 WOCHEN</string>
+    <string name="bi_monthly">2 MONATE</string>
     <string name="ter_monthly">3 MONATE</string>
     <string name="six_monthly">6 MONATE</string>
     <string name="yearly">JÄHRLICH</string>
@@ -136,6 +145,7 @@
     <string name="recurring_interval_ter_weekly">Alle 3 Wochen</string>
     <string name="recurring_interval_four_weekly">Alle 4 Wochen</string>
     <string name="recurring_interval_monthly">Jeden Monat</string>
+    <string name="recurring_interval_bi_monthly">Alle 2 Monate</string>
     <string name="recurring_interval_ter_monthly">Alle 3 Monate</string>
     <string name="recurring_interval_six_monthly">Alle 6 Monate</string>
     <string name="recurring_interval_yearly">Jedes Jahr</string>
@@ -165,6 +175,8 @@
     <string name="setting_category_premium_redeem_message">Einen Promocode verwenden</string>
     <string name="setting_category_notifications_update_title">Updates</string>
     <string name="setting_category_notifications_update_message">Benachrichtigungen über neue Features erhalten. Kein Spam, versprochen! </string>
+    <string name="setting_category_show_checked_balance_title">Markierte (✓) Eintragsbilanz anzeigen</string>
+    <string name="setting_category_show_checked_balance_message">Zeigen Sie auch den Saldo der Einträge an, die Sie ✓ als nach dem normalen Saldo bezahlt markieren möchten</string>
     <string name="setting_category_notifications_daily_title">Tägliche Erinnerung</string>
     <string name="setting_category_notifications_daily_message">Erhalten Sie eine Benachrichtigung am Ende des Tages, wenn Sie Ihre Ausgaben noch nicht eingetragen haben</string>
     <string name="setting_category_not_premium_status_title">Premium-Nutzer werden</string>

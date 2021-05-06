@@ -1,5 +1,5 @@
 /*
- *   Copyright 2020 Benoit LETONDOR
+ *   Copyright 2021 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -34,16 +34,24 @@ import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.parameters.*
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
-import org.koin.java.KoinJavaComponent.get
 import java.lang.RuntimeException
+import javax.inject.Inject
 
-class BackupSettingsViewModel(private val auth: Auth,
-                              private val parameters: Parameters,
-                              private val appContext: Context) : ViewModel() {
+@HiltViewModel
+class BackupSettingsViewModel @Inject constructor(
+    private val auth: Auth,
+    private val parameters: Parameters,
+    private val cloudStorage: CloudStorage,
+    private val iab: Iab,
+    private val db: DB,
+    @ApplicationContext private val appContext: Context,
+) : ViewModel() {
 
     val cloudBackupStateStream: MutableLiveData<BackupCloudStorageState> = MutableLiveData()
     val authenticationConfirmationDisplayEvent = SingleLiveEvent<Unit>()
@@ -68,7 +76,7 @@ class BackupSettingsViewModel(private val auth: Auth,
                 withContext(Dispatchers.IO) {
                     try {
                         if( parameters.getLastBackupDate() == null ) {
-                            getBackupDBMetaData(get(CloudStorage::class.java), auth)?.let {
+                            getBackupDBMetaData(cloudStorage, auth)?.let {
                                 parameters.saveLastBackupDate(it.lastUpdateDate)
                             }
                         }
@@ -189,11 +197,10 @@ class BackupSettingsViewModel(private val auth: Auth,
                 withContext(Dispatchers.IO) {
                     val result = backupDB(
                         appContext,
-                        get(DB::class.java),
-                        get(CloudStorage::class.java),
+                        cloudStorage,
                         auth,
                         parameters,
-                        get(Iab::class.java)
+                        iab,
                     )
 
                     if( result !is ListenableWorker.Result.Success ) {
@@ -241,7 +248,7 @@ class BackupSettingsViewModel(private val auth: Auth,
 
             try {
                 withContext(Dispatchers.IO) {
-                    deleteBackup(auth, get(CloudStorage::class.java), get(Iab::class.java))
+                    deleteBackup(auth, cloudStorage, iab)
                     parameters.saveLastBackupDate(null)
                 }
             } catch (error: Throwable) {
@@ -275,7 +282,7 @@ class BackupSettingsViewModel(private val auth: Auth,
 
             try {
                 withContext(Dispatchers.IO) {
-                    restoreLatestDBBackup(appContext, auth, get(CloudStorage::class.java), get(Iab::class.java), parameters)
+                    restoreLatestDBBackup(appContext, auth, cloudStorage, iab, parameters)
                 }
 
                 appRestartEvent.postValue(Unit)

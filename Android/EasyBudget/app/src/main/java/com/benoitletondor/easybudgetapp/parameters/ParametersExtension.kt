@@ -1,5 +1,5 @@
 /*
- *   Copyright 2020 Benoit LETONDOR
+ *   Copyright 2021 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -101,6 +101,10 @@ private const val LAST_BACKUP_TIMESTAMP = "last_backup_ts"
  * Should reset init date at next app launch after backup restore
  */
 private const val SHOULD_RESET_INIT_DATE = "should_reset_init_date"
+/**
+ * Should show the checked balance in main screen
+ */
+private const val SHOULD_SHOW_CHECKED_BALANCE = "should_show_checked_balance"
 
 fun Parameters.getInitTimestamp(): Long {
     return getLong(INIT_DATE_PARAMETERS_KEY, 0L)
@@ -329,4 +333,12 @@ fun Parameters.setShouldResetInitDate(shouldResetInitDate: Boolean) {
 
 fun Parameters.getShouldResetInitDate(): Boolean {
     return getBoolean(SHOULD_RESET_INIT_DATE, false)
+}
+
+fun Parameters.getShouldShowCheckedBalance(): Boolean {
+    return getBoolean(SHOULD_SHOW_CHECKED_BALANCE, false)
+}
+
+fun Parameters.setShouldShowCheckedBalance(shouldShow: Boolean) {
+    putBoolean(SHOULD_SHOW_CHECKED_BALANCE, shouldShow)
 }

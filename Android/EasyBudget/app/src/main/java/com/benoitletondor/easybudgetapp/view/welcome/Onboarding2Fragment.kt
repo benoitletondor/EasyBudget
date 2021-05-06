@@ -1,5 +1,5 @@
 /*
- *   Copyright 2020 Benoit LETONDOR
+ *   Copyright 2021 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -29,20 +29,22 @@ import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.helper.getUserCurrency
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_onboarding2.*
-import org.koin.android.ext.android.inject
 import java.util.*
+import javax.inject.Inject
 
 /**
  * Onboarding step 2 fragment
  *
  * @author Benoit LETONDOR
  */
+@AndroidEntryPoint
 class Onboarding2Fragment : OnboardingFragment() {
     private lateinit var selectedCurrency: Currency
     private lateinit var receiver: BroadcastReceiver
 
-    private val parameters: Parameters by inject()
+    @Inject lateinit var parameters: Parameters
 
     override val statusBarColor: Int
         get() = R.color.secondary_dark

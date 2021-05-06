@@ -1,5 +1,5 @@
 /*
- *   Copyright 2020 Benoit LETONDOR
+ *   Copyright 2021 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -18,13 +18,14 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'dagger.hilt.android.plugin'
 
 apply from: 'batch.gradle'
 apply from: 'iap.gradle'
 
 repositories {
     google()
-    maven { url "http://maven.batch.com/release" }
+    maven { url "https://maven.batch.com/release" }
     mavenCentral()
 }
 
@@ -35,8 +36,8 @@ android {
         applicationId "com.benoitletondor.easybudgetapp"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 74
-        versionName "2.3.1"
+        versionCode 76
+        versionName "2.3.2"
         vectorDrawables.useSupportLibrary = true
 
         javaCompileOptions {
@@ -58,6 +59,7 @@ android {
             firebaseCrashlytics {
                 mappingFileUploadEnabled false
             }
+            signingConfig signingConfigs.debug
         }
         release {
             buildConfigField "boolean", "DEBUG_LOG", "false"
@@ -70,6 +72,14 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    signingConfigs {
+        debug {
+            storeFile file('../key/debug.jks')
+            storePassword 'uFdRPMWz69R28t6m9zV53jmw9hJVK3'
+            keyAlias 'easybudget'
+            keyPassword 'uFdRPMWz69R28t6m9zV53jmw9hJVK3'
         }
     }
     compileOptions {
@@ -86,40 +96,42 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'androidx.core:core-ktx:1.3.1'
-    implementation 'com.google.android.material:material:1.2.1'
-    implementation 'androidx.recyclerview:recyclerview:1.1.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
+    implementation 'androidx.core:core-ktx:1.3.2'
+    implementation 'com.google.android.material:material:1.3.0'
+    implementation 'androidx.recyclerview:recyclerview:1.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'androidx.preference:preference-ktx:1.1.1'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
-    implementation 'androidx.work:work-runtime-ktx:2.4.0'
-    implementation 'androidx.work:work-gcm:2.4.0'
-    implementation 'com.google.android.play:core:1.8.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1'
+    implementation 'androidx.work:work-runtime-ktx:2.5.0'
+    implementation 'androidx.work:work-gcm:2.5.0'
+    implementation 'com.google.android.play:core:1.10.0'
 
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3'
 
-    implementation 'com.google.firebase:firebase-core:17.5.0'
-    implementation 'com.google.firebase:firebase-messaging:20.2.4'
-    implementation 'com.google.firebase:firebase-storage:19.2.0'
-    implementation 'com.google.firebase:firebase-crashlytics:17.2.1'
-    implementation 'com.firebaseui:firebase-ui-auth:6.2.0'
+    implementation platform("com.google.firebase:firebase-bom:27.1.0")
+    implementation "com.google.firebase:firebase-messaging-ktx"
+    implementation 'com.google.firebase:firebase-core'
+    implementation 'com.google.firebase:firebase-storage'
+    implementation 'com.google.firebase:firebase-crashlytics'
+    implementation 'com.firebaseui:firebase-ui-auth:7.1.1'
 
-    implementation 'com.android.billingclient:billing:3.0.0'
+    implementation 'com.android.billingclient:billing:3.0.3'
 
     implementation project(':caldroid')
     implementation 'com.getbase:floatingactionbutton:1.10.1'
-    implementation 'me.relex:circleindicator:2.1.4@aar'
-    implementation 'com.batch.android:batch-sdk:1.15.1'
+    implementation 'me.relex:circleindicator:2.1.6@aar'
+    implementation 'com.batch.android:batch-sdk:1.17.1'
 
-    implementation 'org.koin:koin-core:2.2.0-beta-1'
-    implementation 'org.koin:koin-android:2.2.0-beta-1'
-    implementation 'org.koin:koin-android-viewmodel:2.2.0-beta-1'
+    implementation "com.google.dagger:hilt-android:$hilt_version"
+    implementation 'androidx.hilt:hilt-work:1.0.0-beta01'
+    kapt 'androidx.hilt:hilt-compiler:1.0.0-beta01'
+    kapt "com.google.dagger:hilt-compiler:$hilt_version"
 
-    kapt "androidx.room:room-compiler:2.2.5"
-    implementation "androidx.room:room-runtime:2.2.5"
-    implementation "androidx.room:room-ktx:2.2.5"
+    kapt "androidx.room:room-compiler:2.3.0"
+    implementation "androidx.room:room-runtime:2.3.0"
+    implementation "androidx.room:room-ktx:2.3.0"
 
     implementation 'net.lingala.zip4j:zip4j:2.5.2'
 }

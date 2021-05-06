@@ -1,5 +1,5 @@
 /*
- *   Copyright 2020 Benoit LETONDOR
+ *   Copyright 2021 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -23,9 +23,12 @@ import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.helper.SingleLiveEvent
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.iab.PremiumPurchaseFlowResult
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class PremiumViewModel(private val iab: Iab) : ViewModel() {
+@HiltViewModel
+class PremiumViewModel @Inject constructor(private val iab: Iab) : ViewModel() {
     val premiumFlowStatusLiveData = MutableLiveData(PremiumFlowStatus.NOT_STARTED)
     val premiumFlowErrorEventStream = SingleLiveEvent<PremiumPurchaseFlowResult>()
 

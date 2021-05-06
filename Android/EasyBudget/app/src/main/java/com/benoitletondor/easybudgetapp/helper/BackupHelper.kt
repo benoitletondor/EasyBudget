@@ -1,5 +1,5 @@
 /*
- *   Copyright 2020 Benoit LETONDOR
+ *   Copyright 2021 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -24,8 +24,9 @@ import com.benoitletondor.easybudgetapp.auth.Auth
 import com.benoitletondor.easybudgetapp.auth.AuthState
 import com.benoitletondor.easybudgetapp.cloudstorage.CloudStorage
 import com.benoitletondor.easybudgetapp.cloudstorage.FileMetaData
-import com.benoitletondor.easybudgetapp.db.DB
+import com.benoitletondor.easybudgetapp.db.impl.DBImpl
 import com.benoitletondor.easybudgetapp.db.impl.DB_NAME
+import com.benoitletondor.easybudgetapp.db.impl.RoomDB
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.job.BackupJob
 import com.benoitletondor.easybudgetapp.parameters.Parameters
@@ -45,7 +46,6 @@ private const val BACKUP_VERSION_FILENAME = "version"
 private const val BACKUP_DB_FILENAME = "db_backup"
 
 suspend fun backupDB(context: Context,
-                     db: DB,
                      cloudStorage: CloudStorage,
                      auth: Auth,
                      parameters: Parameters,
@@ -70,9 +70,9 @@ suspend fun backupDB(context: Context,
     }
 
     try {
-        db.use { openedDB ->
-            openedDB.triggerForceWriteToDisk()
-        }
+        val roomDb = RoomDB.create(context)
+        DBImpl(roomDb).triggerForceWriteToDisk()
+        roomDb.close()
     } catch (error: Throwable) {
         Log.e(
             "BackupJob",

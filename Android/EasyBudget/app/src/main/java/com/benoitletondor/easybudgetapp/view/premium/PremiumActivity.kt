@@ -1,5 +1,5 @@
 /*
- *   Copyright 2020 Benoit LETONDOR
+ *   Copyright 2021 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import android.app.ProgressDialog
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
@@ -29,8 +30,8 @@ import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.BaseActivity
 import com.benoitletondor.easybudgetapp.helper.setStatusBarColor
 import com.benoitletondor.easybudgetapp.iab.PremiumPurchaseFlowResult
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_premium.*
-import org.koin.android.viewmodel.ext.android.viewModel
 import java.lang.IllegalStateException
 
 /**
@@ -39,9 +40,9 @@ import java.lang.IllegalStateException
  *
  * @author Benoit LETONDOR
  */
+@AndroidEntryPoint
 class PremiumActivity : BaseActivity() {
-
-    private val viewModel: PremiumViewModel by viewModel()
+    private val viewModel: PremiumViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

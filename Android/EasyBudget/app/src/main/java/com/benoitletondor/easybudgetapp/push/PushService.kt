@@ -1,5 +1,5 @@
 /*
- *   Copyright 2020 Benoit LETONDOR
+ *   Copyright 2021 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -23,21 +23,22 @@ import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.parameters.*
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import dagger.hilt.android.AndroidEntryPoint
 
 import java.util.Calendar
 import java.util.Date
-
-import org.koin.java.KoinJavaComponent.get
+import javax.inject.Inject
 
 /**
  * Service that handles Batch pushes
  *
  * @author Benoit LETONDOR
  */
+@AndroidEntryPoint
 class PushService : FirebaseMessagingService() {
 
-    private val iab = get(Iab::class.java)
-    private val parameters = get(Parameters::class.java)
+    @Inject lateinit var iab: Iab
+    @Inject lateinit var parameters: Parameters
 
 // ----------------------------------->
 
