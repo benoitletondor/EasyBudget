@@ -17,14 +17,24 @@
 package com.benoitletondor.easybudgetapp.helper
 
 import android.os.Bundle
+import androidx.annotation.CallSuper
 import androidx.appcompat.app.AppCompatActivity
+import androidx.viewbinding.ViewBinding
 import com.benoitletondor.easybudgetapp.R
 
-abstract class BaseActivity : AppCompatActivity() {
+abstract class BaseActivity<V: ViewBinding> : AppCompatActivity() {
+    protected lateinit var binding: V
 
+    @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
 
         super.onCreate(savedInstanceState)
+
+        val binding = createBinding()
+        this.binding = binding
+        setContentView(binding.root)
     }
+
+    abstract fun createBinding(): V
 }

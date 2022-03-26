@@ -22,11 +22,10 @@ import android.os.Bundle
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import android.view.MenuItem
 
-import com.benoitletondor.easybudgetapp.R
+import com.benoitletondor.easybudgetapp.databinding.ActivitySettingsBinding
 import com.benoitletondor.easybudgetapp.helper.BaseActivity
 import com.benoitletondor.easybudgetapp.view.premium.PremiumActivity
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.activity_settings.*
 
 /**
  * Activity that displays settings using the [PreferencesFragment]
@@ -34,13 +33,14 @@ import kotlinx.android.synthetic.main.activity_settings.*
  * @author Benoit LETONDOR
  */
 @AndroidEntryPoint
-class SettingsActivity : BaseActivity() {
+class SettingsActivity : BaseActivity<ActivitySettingsBinding>() {
+
+    override fun createBinding(): ActivitySettingsBinding = ActivitySettingsBinding.inflate(layoutInflater)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_settings)
 
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowHomeEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }

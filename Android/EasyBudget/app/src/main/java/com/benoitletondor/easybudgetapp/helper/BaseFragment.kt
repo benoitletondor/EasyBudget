@@ -13,40 +13,34 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-
-package com.benoitletondor.easybudgetapp.view.welcome
+package com.benoitletondor.easybudgetapp.helper
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.CallSuper
+import androidx.fragment.app.Fragment
+import androidx.viewbinding.ViewBinding
 
-import com.benoitletondor.easybudgetapp.R
-import com.benoitletondor.easybudgetapp.databinding.FragmentOnboarding4Binding
-import dagger.hilt.android.AndroidEntryPoint
+abstract class BaseFragment<V: ViewBinding> : Fragment() {
+    protected var binding: V? = null
 
-/**
- * Onboarding step 4 fragment
- *
- * @author Benoit LETONDOR
- */
-@AndroidEntryPoint
-class Onboarding4Fragment : OnboardingFragment<FragmentOnboarding4Binding>() {
-
-    override val statusBarColor: Int
-        get() = R.color.primary_dark
-
-    override fun onCreateBinding(
+    override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): FragmentOnboarding4Binding = FragmentOnboarding4Binding.inflate(inflater, container, false)
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        binding?.onboardingScreen4NextButton?.setOnClickListener {
-            done()
-        }
+    ): View? {
+        val binding = onCreateBinding(inflater, container, savedInstanceState)
+        this.binding = binding
+        return binding.root
     }
+
+    @CallSuper
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding = null
+    }
+
+    abstract fun onCreateBinding(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): V
 }

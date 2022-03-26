@@ -288,7 +288,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
          */
         val devCategory = findPreference<PreferenceCategory>(resources.getString(R.string.setting_category_dev_key))
         if (!BuildConfig.DEV_PREFERENCES) {
-            preferenceScreen.removePreference(devCategory)
+            devCategory?.let { preferenceScreen.removePreference(it) }
         } else {
             /*
              * Show welcome screen button

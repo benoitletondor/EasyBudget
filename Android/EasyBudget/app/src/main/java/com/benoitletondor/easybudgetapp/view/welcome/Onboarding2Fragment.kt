@@ -26,11 +26,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.benoitletondor.easybudgetapp.R
+import com.benoitletondor.easybudgetapp.databinding.FragmentOnboarding2Binding
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.helper.getUserCurrency
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_onboarding2.*
 import java.util.*
 import javax.inject.Inject
 
@@ -40,7 +40,7 @@ import javax.inject.Inject
  * @author Benoit LETONDOR
  */
 @AndroidEntryPoint
-class Onboarding2Fragment : OnboardingFragment() {
+class Onboarding2Fragment : OnboardingFragment<FragmentOnboarding2Binding>() {
     private lateinit var selectedCurrency: Currency
     private lateinit var receiver: BroadcastReceiver
 
@@ -51,9 +51,11 @@ class Onboarding2Fragment : OnboardingFragment() {
 
 // ------------------------------------->
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_onboarding2, container, false)
-    }
+    override fun onCreateBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): FragmentOnboarding2Binding = FragmentOnboarding2Binding.inflate(inflater, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -75,7 +77,7 @@ class Onboarding2Fragment : OnboardingFragment() {
 
         LocalBroadcastManager.getInstance(view.context).registerReceiver(receiver, filter)
 
-        onboarding_screen2_next_button.setOnClickListener {
+        binding?.onboardingScreen2NextButton?.setOnClickListener {
             next()
         }
     }
@@ -90,6 +92,6 @@ class Onboarding2Fragment : OnboardingFragment() {
      * Set the next button text according to the selected currency
      */
     private fun setNextButtonText() {
-        onboarding_screen2_next_button?.text = resources.getString(R.string.onboarding_screen_2_cta, selectedCurrency.symbol)
+        binding?.onboardingScreen2NextButton?.text = resources.getString(R.string.onboarding_screen_2_cta, selectedCurrency.symbol)
     }
 }

@@ -30,13 +30,11 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewAnimationUtils
 
-import com.benoitletondor.easybudgetapp.R
+import com.benoitletondor.easybudgetapp.databinding.ActivityWelcomeBinding
 import com.benoitletondor.easybudgetapp.helper.BaseActivity
 import com.benoitletondor.easybudgetapp.helper.setStatusBarColor
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import dagger.hilt.android.AndroidEntryPoint
-
-import kotlinx.android.synthetic.main.activity_welcome.*
 
 import java.lang.IllegalStateException
 import javax.inject.Inject
@@ -48,7 +46,7 @@ import kotlin.math.max
  * @author Benoit LETONDOR
  */
 @AndroidEntryPoint
-class WelcomeActivity : BaseActivity() {
+class WelcomeActivity : BaseActivity<ActivityWelcomeBinding>() {
     /**
      * Broadcast receiver for intent sent by fragments
      */
@@ -64,16 +62,17 @@ class WelcomeActivity : BaseActivity() {
 
 // ------------------------------------------>
 
+    override fun createBinding(): ActivityWelcomeBinding = ActivityWelcomeBinding.inflate(layoutInflater)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_welcome)
 
         // Reinit step to 0 if already completed
         if (step == STEP_COMPLETED) {
             step = 0
         }
 
-        welcome_view_pager.adapter = object : FragmentStatePagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+        binding.welcomeViewPager.adapter = object : FragmentStatePagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
             override fun getItem(position: Int): Fragment {
                 when (position) {
                     0 -> return Onboarding1Fragment()
@@ -87,11 +86,11 @@ class WelcomeActivity : BaseActivity() {
 
             override fun getCount(): Int = 4
         }
-        welcome_view_pager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+        binding.welcomeViewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
 
             override fun onPageSelected(position: Int) {
-                ((welcome_view_pager?.adapter as? FragmentStatePagerAdapter)?.getItem(position) as? OnboardingFragment)?.let { fragment ->
+                ((binding.welcomeViewPager.adapter as? FragmentStatePagerAdapter)?.getItem(position) as? OnboardingFragment<*>)?.let { fragment ->
                     setStatusBarColor(fragment.statusBarColor)
                 }
 
@@ -100,10 +99,10 @@ class WelcomeActivity : BaseActivity() {
 
             override fun onPageScrollStateChanged(state: Int) {}
         })
-        welcome_view_pager.offscreenPageLimit = welcome_view_pager.adapter?.count ?: 0 // preload all fragments for transitions smoothness
+        binding.welcomeViewPager.offscreenPageLimit = binding.welcomeViewPager.adapter?.count ?: 0 // preload all fragments for transitions smoothness
 
         // Circle indicator
-        welcome_view_pager_indicator.setViewPager(welcome_view_pager)
+        binding.welcomeViewPagerIndicator.setViewPager(binding.welcomeViewPager)
 
         val filter = IntentFilter()
         filter.addAction(PAGER_NEXT_INTENT)
@@ -112,11 +111,11 @@ class WelcomeActivity : BaseActivity() {
 
         receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-                val pager = welcome_view_pager ?: return
+                val pager = binding.welcomeViewPager
                 val pagerAdapter = pager.adapter ?: return
 
                 if (PAGER_NEXT_INTENT == intent.action && pager.currentItem < pagerAdapter.count - 1) {
-                    if (intent.getBooleanExtra(ANIMATE_TRANSITION_KEY, false) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    if (intent.getBooleanExtra(ANIMATE_TRANSITION_KEY, false)) {
                         // get the center for the clipping circle
                         val cx = intent.getIntExtra(CENTER_X_KEY, pager.x.toInt() + pager.width / 2)
                         val cy = intent.getIntExtra(CENTER_Y_KEY, pager.y.toInt() + pager.height / 2)
@@ -148,10 +147,10 @@ class WelcomeActivity : BaseActivity() {
         val initialStep = step
 
         // Init pager at the current step
-        welcome_view_pager.setCurrentItem(initialStep, false)
+        binding.welcomeViewPager.setCurrentItem(initialStep, false)
 
         // Set status bar color
-        (((welcome_view_pager.adapter) as? FragmentStatePagerAdapter)?.getItem(initialStep) as? OnboardingFragment)?.let { fragment ->
+        (((binding.welcomeViewPager.adapter) as? FragmentStatePagerAdapter)?.getItem(initialStep) as? OnboardingFragment<*>)?.let { fragment ->
             setStatusBarColor(fragment.statusBarColor)
         }
 
@@ -170,8 +169,8 @@ class WelcomeActivity : BaseActivity() {
     }
 
     override fun onBackPressed() {
-        if (welcome_view_pager.currentItem > 0) {
-            welcome_view_pager.setCurrentItem(welcome_view_pager.currentItem - 1, true)
+        if (binding.welcomeViewPager.currentItem > 0) {
+            binding.welcomeViewPager.setCurrentItem(binding.welcomeViewPager.currentItem - 1, true)
             return
         }
 
