@@ -13,28 +13,10 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
+package com.benoitletondor.easybudgetapp.helper
 
-package com.benoitletondor.easybudgetapp.auth
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.coroutineScope
+import kotlinx.coroutines.CoroutineScope
 
-import android.app.Activity
-import android.content.Intent
-import kotlinx.coroutines.flow.StateFlow
-
-interface Auth {
-    val state: StateFlow<AuthState>
-
-    fun startAuthentication(activity: Activity)
-    fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
-    fun logout()
-}
-
-sealed class AuthState {
-    object NotAuthenticated : AuthState()
-    object Authenticating : AuthState()
-    data class Authenticated(val currentUser: CurrentUser) : AuthState()
-}
-
-interface CurrentUser {
-    val id: String
-    val email: String
-}
+val Fragment.viewLifecycleScope: CoroutineScope get() = this.viewLifecycleOwner.lifecycle.coroutineScope

@@ -26,6 +26,7 @@ import android.widget.ArrayAdapter
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.databinding.ActivityRecurringExpenseAddBinding
 import com.benoitletondor.easybudgetapp.helper.*
@@ -56,10 +57,6 @@ class RecurringExpenseEditActivity : BaseActivity<ActivityRecurringExpenseAddBin
         supportActionBar?.setDisplayShowHomeEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        if (savedInstanceState == null) {
-            viewModel.initWithDateAndExpense(Date(intent.getLongExtra("dateStart", 0)), intent.getParcelableExtra("expense"))
-        }
-
         setUpButtons()
 
         setResult(Activity.RESULT_CANCELED)
@@ -78,41 +75,52 @@ class RecurringExpenseEditActivity : BaseActivity<ActivityRecurringExpenseAddBin
 
         binding.dateButton.removeButtonBorder() // Remove border
 
-        viewModel.editTypeLiveData.observe(this) { (isRevenue, isEditing) ->
+        lifecycleScope.launchCollect(viewModel.editTypeFlow) { (isRevenue, isEditing) ->
             setExpenseTypeTextViewLayout(isRevenue, isEditing)
         }
 
-        viewModel.existingExpenseEventStream.observe(this) { existingValues ->
-            if (existingValues != null) {
-                setUpTextFields(
-                    existingValues.title,
-                    existingValues.amount,
-                    type = existingValues.type
-                )
-            } else {
-                setUpTextFields(description = null, amount = null, type = null)
-            }
+        val existingExpenseData = viewModel.existingExpenseData
+        if (existingExpenseData != null) {
+            setUpTextFields(
+                existingExpenseData.title,
+                existingExpenseData.amount,
+                type = existingExpenseData.type
+            )
+        } else {
+            setUpTextFields(description = null, amount = null, type = null)
         }
 
-        viewModel.expenseDateLiveData.observe(this) { date ->
+        lifecycleScope.launchCollect(viewModel.expenseDateFlow) { date ->
             setUpDateButton(date)
         }
 
         var progressDialog: ProgressDialog? = null
-        viewModel.savingIsRevenueEventStream.observe(this) { isRevenue ->
-            // Show a ProgressDialog
-            val dialog = ProgressDialog(this)
-            dialog.isIndeterminate = true
-            dialog.setTitle(R.string.recurring_expense_add_loading_title)
-            dialog.setMessage(getString(if (isRevenue) R.string.recurring_income_add_loading_message else R.string.recurring_expense_add_loading_message))
-            dialog.setCanceledOnTouchOutside(false)
-            dialog.setCancelable(false)
-            dialog.show()
+        lifecycleScope.launchCollect(viewModel.savingStateFlow) { savingState ->
+            when(savingState) {
+                RecurringExpenseEditViewModel.SavingState.Idle -> {
+                    progressDialog?.dismiss()
+                    progressDialog = null
+                }
+                is RecurringExpenseEditViewModel.SavingState.Saving -> {
+                    progressDialog?.dismiss()
+                    progressDialog = null
 
-            progressDialog = dialog
+                    // Show a ProgressDialog
+                    val dialog = ProgressDialog(this)
+                    dialog.isIndeterminate = true
+                    dialog.setTitle(R.string.recurring_expense_add_loading_title)
+                    dialog.setMessage(getString(if (savingState.isRevenue) R.string.recurring_income_add_loading_message else R.string.recurring_expense_add_loading_message))
+                    dialog.setCanceledOnTouchOutside(false)
+                    dialog.setCancelable(false)
+                    dialog.show()
+
+                    progressDialog = dialog
+                }
+            }
+
         }
 
-        viewModel.finishLiveData.observe(this) {
+        lifecycleScope.launchCollect(viewModel.finishFlow) {
             progressDialog?.dismiss()
             progressDialog = null
 
@@ -120,10 +128,7 @@ class RecurringExpenseEditActivity : BaseActivity<ActivityRecurringExpenseAddBin
             finish()
         }
 
-        viewModel.errorEventStream.observe(this) {
-            progressDialog?.dismiss()
-            progressDialog = null
-
+        lifecycleScope.launchCollect(viewModel.errorFlow) {
             AlertDialog.Builder(this)
                 .setTitle(R.string.recurring_expense_add_error_title)
                 .setMessage(getString(R.string.recurring_expense_add_error_message))
@@ -131,7 +136,7 @@ class RecurringExpenseEditActivity : BaseActivity<ActivityRecurringExpenseAddBin
                 .show()
         }
 
-        viewModel.expenseAddBeforeInitDateEventStream.observe(this) {
+        lifecycleScope.launchCollect(viewModel.expenseAddBeforeInitDateEventFlow) {
             AlertDialog.Builder(this)
                 .setTitle(R.string.expense_add_before_init_date_dialog_title)
                 .setMessage(R.string.expense_add_before_init_date_dialog_description)

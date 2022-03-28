@@ -24,6 +24,7 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.databinding.ActivityExpenseEditBinding
 import com.benoitletondor.easybudgetapp.helper.*
@@ -58,16 +59,11 @@ class ExpenseEditActivity : BaseActivity<ActivityExpenseEditBinding>() {
         supportActionBar?.setDisplayShowHomeEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        viewModel.existingExpenseEventStream.observe(this) { existingValues ->
-            if (existingValues != null) {
-                setUpTextFields(existingValues.title, existingValues.amount)
-            } else {
-                setUpTextFields(description = null, amount = null)
-            }
-        }
-
-        if( savedInstanceState == null ) {
-            viewModel.initWithDateAndExpense(Date(intent.getLongExtra("date", 0)), intent.getParcelableExtra("expense"))
+        val existingExpenseData = viewModel.existingExpenseData
+        if (existingExpenseData != null) {
+            setUpTextFields(existingExpenseData.title, existingExpenseData.amount)
+        } else {
+            setUpTextFields(description = null, amount = null)
         }
 
         setUpButtons()
@@ -88,20 +84,20 @@ class ExpenseEditActivity : BaseActivity<ActivityExpenseEditBinding>() {
 
         binding.dateButton.removeButtonBorder()
 
-        viewModel.editTypeLiveData.observe(this) { (isRevenue, isEdit) ->
+        lifecycleScope.launchCollect(viewModel.editTypeFlow) { (isRevenue, isEdit) ->
             setExpenseTypeTextViewLayout(isRevenue, isEdit)
         }
 
-        viewModel.expenseDateLiveData.observe(this) { date ->
+        lifecycleScope.launchCollect(viewModel.expenseDateFlow) { date ->
             setUpDateButton(date)
         }
 
-        viewModel.finishEventStream.observe(this) {
+        lifecycleScope.launchCollect(viewModel.finishFlow) {
             setResult(Activity.RESULT_OK)
             finish()
         }
 
-        viewModel.expenseAddBeforeInitDateEventStream.observe(this) {
+        lifecycleScope.launchCollect(viewModel.expenseAddBeforeInitDateEventFlow) {
             AlertDialog.Builder(this)
                 .setTitle(R.string.expense_add_before_init_date_dialog_title)
                 .setMessage(R.string.expense_add_before_init_date_dialog_description)

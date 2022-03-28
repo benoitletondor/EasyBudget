@@ -16,13 +16,14 @@
 
 package com.benoitletondor.easybudgetapp.view.report
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.db.DB
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -30,11 +31,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MonthlyReportViewModel @Inject constructor(private val db: DB) : ViewModel() {
-    val monthlyReportDataLiveData = MutableLiveData<MonthlyReportData>()
+    private val stateMutableFlow = MutableStateFlow<MonthlyReportState>(MonthlyReportState.Loading)
+    val stateFlow: Flow<MonthlyReportState> = stateMutableFlow
 
-    sealed class MonthlyReportData {
-        object Empty: MonthlyReportData()
-        class Data(val expenses: List<Expense>, val revenues: List<Expense>, val expensesAmount: Double, val revenuesAmount: Double) : MonthlyReportData()
+    sealed class MonthlyReportState {
+        object Loading : MonthlyReportState()
+        object Empty: MonthlyReportState()
+        class Loaded(val expenses: List<Expense>, val revenues: List<Expense>, val expensesAmount: Double, val revenuesAmount: Double) : MonthlyReportState()
     }
 
     fun loadDataForMonth(month: Date) {
@@ -43,7 +46,7 @@ class MonthlyReportViewModel @Inject constructor(private val db: DB) : ViewModel
                 db.getExpensesForMonth(month)
             }
             if( expensesForMonth.isEmpty() ) {
-                monthlyReportDataLiveData.value = MonthlyReportData.Empty
+                stateMutableFlow.emit(MonthlyReportState.Empty)
                 return@launch
             }
 
@@ -64,7 +67,7 @@ class MonthlyReportViewModel @Inject constructor(private val db: DB) : ViewModel
                 }
             }
 
-            monthlyReportDataLiveData.value = MonthlyReportData.Data(expenses, revenues, expensesAmount, revenuesAmount)
+            stateMutableFlow.emit(MonthlyReportState.Loaded(expenses, revenues, expensesAmount, revenuesAmount))
         }
     }
 }

@@ -22,11 +22,12 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
 import com.benoitletondor.easybudgetapp.databinding.ActivityMonthlyReportBinding
 import com.benoitletondor.easybudgetapp.helper.BaseActivity
 import com.benoitletondor.easybudgetapp.helper.getMonthTitle
+import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.helper.removeButtonBorder
 import com.benoitletondor.easybudgetapp.view.report.MonthlyReportFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -52,10 +53,6 @@ class MonthlyReportBaseActivity : BaseActivity<ActivityMonthlyReportBinding>(), 
         supportActionBar?.setDisplayShowHomeEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        if( savedInstanceState == null ) {
-            viewModel.loadData(intent.getBooleanExtra(FROM_NOTIFICATION_EXTRA, false))
-        }
-
         binding.monthlyReportPreviousMonthButton.text = "<"
         binding.monthlyReportNextMonthButton.text = ">"
 
@@ -70,28 +67,38 @@ class MonthlyReportBaseActivity : BaseActivity<ActivityMonthlyReportBinding>(), 
         binding.monthlyReportPreviousMonthButton.removeButtonBorder()
         binding.monthlyReportNextMonthButton.removeButtonBorder()
 
-        viewModel.datesLiveData.observe(this, Observer { dates ->
-            configureViewPager(dates)
+        var loadedDates: List<Date> = emptyList()
+        lifecycleScope.launchCollect(viewModel.stateFlow) { state ->
+            when(state) {
+                is MonthlyReportBaseViewModel.State.Loaded -> {
+                    binding.monthlyReportProgressBar.visibility = View.GONE
+                    binding.monthlyReportContent.visibility = View.VISIBLE
 
-            binding.monthlyReportProgressBar.visibility = View.GONE
-            binding.monthlyReportContent.visibility = View.VISIBLE
-        })
+                    if (state.dates != loadedDates) {
+                        loadedDates = state.dates
+                        configureViewPager(state.dates)
+                    }
 
-        viewModel.selectedPositionLiveData.observe(this, Observer { (position, date, isLatestMonth) ->
-            if( !ignoreNextPageSelectedEvent ) {
-                binding.monthlyReportViewPager.setCurrentItem(position, true)
+                    if( !ignoreNextPageSelectedEvent ) {
+                        binding.monthlyReportViewPager.setCurrentItem(state.selectedPosition.position, true)
+                    }
+
+                    ignoreNextPageSelectedEvent = false
+
+                    binding.monthlyReportMonthTitleTv.text = state.selectedPosition.date.getMonthTitle(this)
+
+                    // Last and first available month
+                    val isFirstMonth = state.selectedPosition.position == 0
+
+                    binding.monthlyReportNextMonthButton.isEnabled = !state.selectedPosition.latest
+                    binding.monthlyReportPreviousMonthButton.isEnabled = !isFirstMonth
+                }
+                MonthlyReportBaseViewModel.State.Loading -> {
+                    binding.monthlyReportProgressBar.visibility = View.VISIBLE
+                    binding.monthlyReportContent.visibility = View.GONE
+                }
             }
-
-            ignoreNextPageSelectedEvent = false
-
-            binding.monthlyReportMonthTitleTv.text = date.getMonthTitle(this)
-
-            // Last and first available month
-            val isFirstMonth = position == 0
-
-            binding.monthlyReportNextMonthButton.isEnabled = !isLatestMonth
-            binding.monthlyReportPreviousMonthButton.isEnabled = !isFirstMonth
-        })
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -109,6 +116,8 @@ class MonthlyReportBaseActivity : BaseActivity<ActivityMonthlyReportBinding>(), 
      * Configure the [.pager] adapter and listener.
      */
     private fun configureViewPager(dates: List<Date>) {
+        binding.monthlyReportViewPager.removeOnPageChangeListener(this)
+
         binding.monthlyReportViewPager.offscreenPageLimit = 0
         binding.monthlyReportViewPager.adapter = object : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
             override fun getItem(position: Int): Fragment {

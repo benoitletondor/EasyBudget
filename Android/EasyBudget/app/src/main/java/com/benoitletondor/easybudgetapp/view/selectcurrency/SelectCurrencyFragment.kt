@@ -26,9 +26,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 
 import com.benoitletondor.easybudgetapp.R
+import com.benoitletondor.easybudgetapp.helper.launchCollect
+import com.benoitletondor.easybudgetapp.helper.viewLifecycleScope
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -90,14 +91,19 @@ class SelectCurrencyFragment : DialogFragment() {
         val recyclerView = v.findViewById<RecyclerView>(R.id.select_currency_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(v.context)
 
-        viewModel.currenciesLiveData.observe(this, Observer { (availableCurrencies, otherAvailableCurrencies) ->
-            val adapter = SelectCurrencyRecyclerViewAdapter(availableCurrencies, otherAvailableCurrencies, parameters)
-            recyclerView.adapter = adapter
+        viewLifecycleScope.launchCollect(viewModel.stateFlow) { state ->
+            when(state) {
+                is SelectCurrencyViewModel.State.Loaded -> {
+                    val adapter = SelectCurrencyRecyclerViewAdapter(state.mainCurrencies, state.otherCurrencies, parameters)
+                    recyclerView.adapter = adapter
 
-            if( adapter.selectedCurrencyPosition() > 1 ) {
-                recyclerView.scrollToPosition(adapter.selectedCurrencyPosition()-1)
+                    if( adapter.selectedCurrencyPosition() > 1 ) {
+                        recyclerView.scrollToPosition(adapter.selectedCurrencyPosition()-1)
+                    }
+                }
+                SelectCurrencyViewModel.State.Loading -> Unit // TODO: loading state
             }
-        })
+        }
     }
 
     companion object {

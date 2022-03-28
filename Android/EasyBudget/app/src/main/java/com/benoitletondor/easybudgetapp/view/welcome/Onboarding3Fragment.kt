@@ -25,7 +25,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.coroutineScope
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.databinding.FragmentOnboarding3Binding
 import com.benoitletondor.easybudgetapp.db.DB
@@ -80,7 +79,7 @@ class Onboarding3Fragment : OnboardingFragment<FragmentOnboarding3Binding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewLifecycleOwner.lifecycle.coroutineScope.launch {
+        viewLifecycleScope.launch {
             val amount = withContext(Dispatchers.Default) {
                 -db.getBalanceForDay(Date())
             }
@@ -106,7 +105,7 @@ class Onboarding3Fragment : OnboardingFragment<FragmentOnboarding3Binding>() {
         })
 
         binding?.onboardingScreen3NextButton?.setOnClickListener { button ->
-            viewLifecycleOwner.lifecycle.coroutineScope.launch {
+            viewLifecycleScope.launch {
                 withContext(Dispatchers.Default) {
                     val currentBalance = -db.getBalanceForDay(Date())
                     val newBalance = amountValue

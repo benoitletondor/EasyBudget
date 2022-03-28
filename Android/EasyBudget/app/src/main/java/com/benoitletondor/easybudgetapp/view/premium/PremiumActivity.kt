@@ -25,9 +25,11 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.lifecycle.lifecycleScope
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.databinding.ActivityPremiumBinding
 import com.benoitletondor.easybudgetapp.helper.BaseActivity
+import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.helper.setStatusBarColor
 import com.benoitletondor.easybudgetapp.iab.PremiumPurchaseFlowResult
 import dagger.hilt.android.AndroidEntryPoint
@@ -81,7 +83,7 @@ class PremiumActivity : BaseActivity<ActivityPremiumBinding>() {
         }
 
         var loadingProgressDialog: ProgressDialog? = null
-        viewModel.premiumFlowErrorEventStream.observe(this) { status ->
+        lifecycleScope.launchCollect(viewModel.premiumFlowErrorEventFlow) { status ->
             when (status) {
                 PremiumPurchaseFlowResult.Cancelled -> {
                     loadingProgressDialog?.dismiss()
@@ -99,11 +101,17 @@ class PremiumActivity : BaseActivity<ActivityPremiumBinding>() {
                         }
                         .show()
                 }
-                PremiumPurchaseFlowResult.Success -> Unit
+                PremiumPurchaseFlowResult.Success -> {
+                    loadingProgressDialog?.dismiss()
+                    loadingProgressDialog = null
+
+                    setResult(Activity.RESULT_OK)
+                    finish()
+                }
             }
         }
 
-        viewModel.premiumFlowStatusLiveData.observe(this) { status ->
+        lifecycleScope.launchCollect(viewModel.premiumFlowStatusFlow) { status ->
             when (status) {
                 PremiumFlowStatus.NOT_STARTED -> {
                     loadingProgressDialog?.dismiss()
@@ -120,11 +128,7 @@ class PremiumActivity : BaseActivity<ActivityPremiumBinding>() {
                 PremiumFlowStatus.DONE -> {
                     loadingProgressDialog?.dismiss()
                     loadingProgressDialog = null
-
-                    setResult(Activity.RESULT_OK)
-                    finish()
                 }
-                null -> {}
             }
         }
 

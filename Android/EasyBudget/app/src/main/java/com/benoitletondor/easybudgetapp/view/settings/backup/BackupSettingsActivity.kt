@@ -23,9 +23,11 @@ import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.lifecycleScope
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.databinding.ActivityBackupSettingsBinding
 import com.benoitletondor.easybudgetapp.helper.BaseActivity
+import com.benoitletondor.easybudgetapp.helper.launchCollect
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import kotlin.system.exitProcess
@@ -43,7 +45,7 @@ class BackupSettingsActivity : BaseActivity<ActivityBackupSettingsBinding>() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        viewModel.cloudBackupStateStream.observe(this) { cloudBackupState ->
+        lifecycleScope.launchCollect(viewModel.cloudBackupStateFlow) { cloudBackupState ->
             when (cloudBackupState) {
                 BackupCloudStorageState.NotAuthenticated -> {
                     binding.backupSettingsCloudStorageNotAuthenticatedState.visibility = View.VISIBLE
@@ -187,14 +189,14 @@ class BackupSettingsActivity : BaseActivity<ActivityBackupSettingsBinding>() {
             }
         }
 
-        viewModel.backupNowErrorEvent.observe(this) {
+        lifecycleScope.launchCollect(viewModel.backupNowErrorEventFlow) {
             AlertDialog.Builder(this)
                 .setTitle(R.string.backup_now_error_title)
                 .setMessage(R.string.backup_now_error_message)
                 .setPositiveButton(android.R.string.ok, null)
         }
 
-        viewModel.previousBackupAvailableEvent.observe(this) { lastBackupDate ->
+        lifecycleScope.launchCollect(viewModel.previousBackupAvailableEventFlow) { lastBackupDate ->
             AlertDialog.Builder(this)
                 .setTitle(R.string.backup_already_exist_title)
                 .setMessage(
@@ -212,21 +214,21 @@ class BackupSettingsActivity : BaseActivity<ActivityBackupSettingsBinding>() {
                 .show()
         }
 
-        viewModel.restorationErrorEvent.observe(this) {
+        lifecycleScope.launchCollect(viewModel.restorationErrorEventFlow) {
             AlertDialog.Builder(this)
                 .setTitle(R.string.backup_restore_error_title)
                 .setMessage(R.string.backup_restore_error_message)
                 .setPositiveButton(android.R.string.ok, null)
         }
 
-        viewModel.appRestartEvent.observe(this) {
+        lifecycleScope.launchCollect(viewModel.appRestartEventFlow) {
             val intent = packageManager.getLaunchIntentForPackage(packageName)
             finishAffinity()
             startActivity(intent)
             exitProcess(0)
         }
 
-        viewModel.restoreConfirmationDisplayEvent.observe(this) { lastBackupDate ->
+        lifecycleScope.launchCollect(viewModel.restoreConfirmationDisplayEventFlow) { lastBackupDate ->
             AlertDialog.Builder(this)
                 .setTitle(R.string.backup_restore_confirmation_title)
                 .setMessage(
@@ -244,7 +246,7 @@ class BackupSettingsActivity : BaseActivity<ActivityBackupSettingsBinding>() {
                 .show()
         }
 
-        viewModel.authenticationConfirmationDisplayEvent.observe(this) {
+        lifecycleScope.launchCollect(viewModel.authenticationConfirmationDisplayEventFlow) {
             AlertDialog.Builder(this)
                 .setTitle(R.string.backup_settings_not_authenticated_privacy_title)
                 .setMessage(R.string.backup_settings_not_authenticated_privacy_message)
@@ -257,7 +259,7 @@ class BackupSettingsActivity : BaseActivity<ActivityBackupSettingsBinding>() {
                 .show()
         }
 
-        viewModel.deleteConfirmationDisplayEvent.observe(this) {
+        lifecycleScope.launchCollect(viewModel.deleteConfirmationDisplayEventFlow) {
             AlertDialog.Builder(this)
                 .setTitle(R.string.backup_wipe_data_confirmation_title)
                 .setMessage(R.string.backup_wipe_data_confirmation_message)
@@ -270,7 +272,7 @@ class BackupSettingsActivity : BaseActivity<ActivityBackupSettingsBinding>() {
                 .show()
         }
 
-        viewModel.backupDeletionErrorEvent.observe(this) {
+        lifecycleScope.launchCollect(viewModel.backupDeletionErrorEventFlow) {
             AlertDialog.Builder(this)
                 .setTitle(R.string.backup_wipe_data_error_title)
                 .setMessage(R.string.backup_wipe_data_error_message)
