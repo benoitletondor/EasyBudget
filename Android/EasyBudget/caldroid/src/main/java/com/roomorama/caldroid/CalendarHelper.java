@@ -2,6 +2,7 @@ package com.roomorama.caldroid;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -119,18 +120,16 @@ public class CalendarHelper {
         return new DateTime(year, javaMonth + 1, day, 0, 0, 0, 0);
     }
 
-    public static Date convertDateTimeToDate(DateTime dateTime) {
+    public static DateTime convertDateToDateTime(LocalDate date) {
+        return new DateTime(date.getYear(), date.getMonthValue(), date.getDayOfMonth(), 0, 0, 0, 0);
+    }
+
+    public static LocalDate convertDateTimeToDate(DateTime dateTime) {
         int year = dateTime.getYear();
         int datetimeMonth = dateTime.getMonth();
         int day = dateTime.getDay();
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.clear();
-
-        // datetimeMonth start at 1. Need to minus 1 to get javaMonth
-        calendar.set(year, datetimeMonth - 1, day);
-
-        return calendar.getTime();
+        return LocalDate.of(year, datetimeMonth, day);
     }
 
     /**

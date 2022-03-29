@@ -16,15 +16,9 @@
 
 package com.benoitletondor.easybudgetapp.helper
 
-import android.os.Build
-
 import com.benoitletondor.easybudgetapp.parameters.Parameters
-
 import java.text.NumberFormat
-import java.util.ArrayList
-import java.util.Currency
-import java.util.HashSet
-import java.util.Locale
+import java.util.*
 
 /**
  * Helper to work with currencies and display

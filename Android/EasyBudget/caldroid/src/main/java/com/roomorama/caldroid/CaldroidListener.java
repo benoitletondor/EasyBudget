@@ -1,5 +1,6 @@
 package com.roomorama.caldroid;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import android.view.View;
@@ -20,7 +21,7 @@ public abstract class CaldroidListener {
      * @param date
      * @param view
      */
-    public abstract void onSelectDate(Date date, View view);
+    public abstract void onSelectDate(LocalDate date, View view);
 
 
     /**
@@ -29,7 +30,7 @@ public abstract class CaldroidListener {
      * @param date
      * @param view
      */
-    public void onLongClickDate(Date date, View view) {
+    public void onLongClickDate(LocalDate date, View view) {
         // Do nothing
     }
 

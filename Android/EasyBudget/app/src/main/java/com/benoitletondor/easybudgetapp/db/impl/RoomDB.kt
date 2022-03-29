@@ -22,13 +22,14 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.benoitletondor.easybudgetapp.db.impl.entity.ExpenseEntity
 import com.benoitletondor.easybudgetapp.db.impl.entity.RecurringExpenseEntity
+import com.benoitletondor.easybudgetapp.helper.localDateFromTimestamp
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
-import java.util.*
+import java.time.LocalDate
 
 const val DB_NAME = "easybudget.db"
 
 @Database(exportSchema = false,
-          version = 5,
+          version = 6,
           entities = [
               ExpenseEntity::class,
               RecurringExpenseEntity::class
@@ -41,20 +42,46 @@ abstract class RoomDB : RoomDatabase() {
     companion object {
         fun create(context: Context): RoomDB = Room
             .databaseBuilder(context, RoomDB::class.java, DB_NAME)
-            .addMigrations(migrationFrom1To2, migrationFrom2To3, migrationToRoom, addCheckedField)
+            .addMigrations(migrationFrom1To2, migrationFrom2To3, migrationToRoom, addCheckedField, migrateTimestamps)
             .build()
     }
 }
 
 private class TimestampConverters {
     @TypeConverter
-    fun dateFromTimestamp(value: Long?): Date? {
-        return value?.let { Date(it) }
+    fun dateFromTimestamp(value: Long?): LocalDate? {
+        return value?.let { LocalDate.ofEpochDay(it) }
     }
 
     @TypeConverter
-    fun dateToTimestamp(date: Date?): Long? {
-        return date?.time
+    fun dateToTimestamp(date: LocalDate?): Long? {
+        return date?.toEpochDay()
+    }
+}
+
+private val migrateTimestamps = object : Migration(5, 6) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        val cursor = database.query("SELECT _expense_id,date FROM expense")
+        while(cursor.moveToNext()) {
+            val id = cursor.getLong(cursor.getColumnIndexOrThrow("_expense_id"))
+            val timestamp = cursor.getLong(cursor.getColumnIndexOrThrow("date"))
+
+            val localDate = localDateFromTimestamp(timestamp)
+            val newTimestamp = localDate.toEpochDay()
+
+            database.execSQL("UPDATE expense SET date = $newTimestamp WHERE _expense_id = $id")
+        }
+
+        val cursorRecurring = database.query("SELECT _expense_id,recurringDate FROM monthlyexpense")
+        while(cursorRecurring.moveToNext()) {
+            val id = cursorRecurring.getLong(cursorRecurring.getColumnIndexOrThrow("_expense_id"))
+            val timestamp = cursorRecurring.getLong(cursorRecurring.getColumnIndexOrThrow("recurringDate"))
+
+            val localDate = localDateFromTimestamp(timestamp)
+            val newTimestamp = localDate.toEpochDay()
+
+            database.execSQL("UPDATE monthlyexpense SET recurringDate = $newTimestamp WHERE _expense_id = $id")
+        }
     }
 }
 

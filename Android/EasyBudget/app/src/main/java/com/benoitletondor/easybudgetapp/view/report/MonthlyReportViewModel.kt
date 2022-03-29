@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.*
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -40,7 +40,7 @@ class MonthlyReportViewModel @Inject constructor(private val db: DB) : ViewModel
         class Loaded(val expenses: List<Expense>, val revenues: List<Expense>, val expensesAmount: Double, val revenuesAmount: Double) : MonthlyReportState()
     }
 
-    fun loadDataForMonth(month: Date) {
+    fun loadDataForMonth(month: LocalDate) {
         viewModelScope.launch {
             val expensesForMonth = withContext(Dispatchers.Default) {
                 db.getExpensesForMonth(month)

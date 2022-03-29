@@ -31,7 +31,8 @@ import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.view.DatePickerDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
-import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.inject.Inject
 import kotlin.math.abs
@@ -222,19 +223,13 @@ class ExpenseEditActivity : BaseActivity<ActivityExpenseEditBinding>() {
     /**
      * Set up the date button
      */
-    private fun setUpDateButton(date: Date) {
-        val formatter = SimpleDateFormat(resources.getString(R.string.add_expense_date_format), Locale.getDefault())
+    private fun setUpDateButton(date: LocalDate) {
+        val formatter = DateTimeFormatter.ofPattern(resources.getString(R.string.add_expense_date_format), Locale.getDefault())
         binding.dateButton.text = formatter.format(date)
 
         binding.dateButton.setOnClickListener {
             val fragment = DatePickerDialogFragment(date) { _, year, monthOfYear, dayOfMonth ->
-                val cal = Calendar.getInstance()
-
-                cal.set(Calendar.YEAR, year)
-                cal.set(Calendar.MONTH, monthOfYear)
-                cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-
-                viewModel.onDateChanged(cal.time)
+                viewModel.onDateChanged(LocalDate.of(year, monthOfYear + 1, dayOfMonth))
             }
 
             fragment.show(supportFragmentManager, "datePicker")

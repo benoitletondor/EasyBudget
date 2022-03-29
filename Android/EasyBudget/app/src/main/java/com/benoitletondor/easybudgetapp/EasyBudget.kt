@@ -90,7 +90,7 @@ class EasyBudget : Application(), Configuration.Provider {
             // FIXME this should be done on restore, change that for the whole parameters restoration
             if( parameters.getShouldResetInitDate() ) {
                 runBlocking { getOldestExpense() }?.let { expense ->
-                    parameters.setInitTimestamp(expense.date.time)
+                    parameters.setInitDate(expense.date.toStartOfDayDate())
                 }
 
                 parameters.setShouldResetInitDate(false)
@@ -118,9 +118,9 @@ class EasyBudget : Application(), Configuration.Provider {
         /*
          * Save first launch date if needed
          */
-        val initDate = parameters.getInitTimestamp()
-        if (initDate <= 0) {
-            parameters.setInitTimestamp(Date().time)
+        val initDate = parameters.getInitDate()
+        if (initDate == null) {
+            parameters.setInitDate(Date())
             parameters.setUserCurrency(Currency.getInstance(Locale.getDefault())) // Set a default currency before onboarding
         }
 

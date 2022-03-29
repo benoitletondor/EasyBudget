@@ -16,54 +16,31 @@
 
 package com.benoitletondor.easybudgetapp.helper
 
-import android.content.Context
-
-import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.parameters.Parameters
-import com.benoitletondor.easybudgetapp.parameters.getInitTimestamp
+import com.benoitletondor.easybudgetapp.parameters.getInitDate
 
-import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.ArrayList
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
 
 /**
  * Get the list of months available for the user for the monthly report view.
  *
  * @return a list of Date object set at the 1st day of the month 00:00:00:000
  */
-fun Parameters.getListOfMonthsAvailableForUser(): List<Date> {
-    val initDate = getInitTimestamp()
+fun Parameters.getListOfMonthsAvailableForUser(): List<LocalDate> {
+    val initDate = getInitDate() ?: return emptyList()
+    val today = LocalDate.now()
 
-    val cal = Calendar.getInstance()
-    cal.timeInMillis = initDate
+    val months = ArrayList<LocalDate>()
+    var currentDate = LocalDate.of(initDate.year, initDate.month, 1)
 
-    cal.set(Calendar.MILLISECOND, 0)
-    cal.set(Calendar.SECOND, 0)
-    cal.set(Calendar.MINUTE, 0)
-    cal.set(Calendar.HOUR_OF_DAY, 0)
-    cal.set(Calendar.DAY_OF_MONTH, 1)
-
-    val today = Date()
-
-    val months = ArrayList<Date>()
-
-    while (cal.time.before(today)) {
-        months.add(cal.time)
-        cal.add(Calendar.MONTH, 1)
+    while (currentDate.isBefore(today) || currentDate == today) {
+        months.add(currentDate)
+        currentDate = currentDate.plusMonths(1)
     }
 
     return months
 }
 
-/**
- * Get the title of the month to display in the report view
- *
- * @param context non null context
- * @return a formatted string like "January 2016"
- */
-fun Date.getMonthTitle(context: Context): String {
-    val format = SimpleDateFormat(context.resources.getString(R.string.monthly_report_month_title_format), Locale.getDefault())
-    return format.format(this)
-}
+fun LocalDate.computeCalendarMinDateFromInitDate(): LocalDate
+    = minusYears(1)

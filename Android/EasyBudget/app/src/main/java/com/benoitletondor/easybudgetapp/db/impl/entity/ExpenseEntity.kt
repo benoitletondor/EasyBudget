@@ -22,7 +22,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
-import java.util.*
+import java.time.LocalDate
 
 @Entity(tableName = "expense",
         indices = [Index(value = ["date"], name = "D_i")])
@@ -34,7 +34,7 @@ class ExpenseEntity(@PrimaryKey(autoGenerate = true)
                     @ColumnInfo(name = "amount")
                     val amount: Long,
                     @ColumnInfo(name = "date")
-                    val date: Date,
+                    val date: LocalDate,
                     @ColumnInfo(name = "checked")
                     val checked: Boolean,
                     @ColumnInfo(name = "monthly_id")
@@ -46,6 +46,6 @@ class ExpenseEntity(@PrimaryKey(autoGenerate = true)
         amount / 100.0,
         date,
         checked,
-        associatedRecurringExpense
+        associatedRecurringExpense,
     )
 }

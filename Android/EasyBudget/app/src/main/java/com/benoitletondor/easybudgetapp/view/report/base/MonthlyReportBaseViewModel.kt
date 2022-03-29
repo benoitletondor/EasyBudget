@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.*
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -91,8 +91,8 @@ class MonthlyReportBaseViewModel @Inject constructor(
 
     sealed class State {
         object Loading : State()
-        data class Loaded(val dates: List<Date>, val selectedPosition: MonthlyReportSelectedPosition) : State()
+        data class Loaded(val dates: List<LocalDate>, val selectedPosition: MonthlyReportSelectedPosition) : State()
     }
 }
 
-data class MonthlyReportSelectedPosition(val position: Int, val date: Date, val latest: Boolean)
+data class MonthlyReportSelectedPosition(val position: Int, val date: LocalDate, val latest: Boolean)

@@ -26,9 +26,7 @@ import android.widget.TextView
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.db.DB
 import com.roomorama.caldroid.CaldroidGridAdapter
-
-import java.util.Date
-import java.util.TimeZone
+import com.roomorama.caldroid.CalendarHelper
 
 import kotlinx.coroutines.runBlocking
 
@@ -42,6 +40,9 @@ class CalendarGridAdapter(context: Context,
                           caldroidData: Map<String, Any>,
                           extraData: Map<String, Any>)
     : CaldroidGridAdapter(context, month, year, caldroidData, extraData) {
+
+    private val roundingToIntFormatter = RoundedToIntNumberFormatter()
+    private val formatter = NumberFormatter.get()
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val cellView = convertView ?: createView(parent)
@@ -132,7 +133,7 @@ class CalendarGridAdapter(context: Context,
                 }
             }
 
-            val date = Date(dateTime.getMilliseconds(TimeZone.getDefault()))
+            val date = CalendarHelper.convertDateTimeToDate(dateTime)
             // FIXME coroutine threading!!
             if ( runBlocking { db.hasExpenseForDay(date) }) {
                 val balance = runBlocking { db.getBalanceForDay(date) }
@@ -143,7 +144,7 @@ class CalendarGridAdapter(context: Context,
                     viewData.containsExpenses = true
                 }
 
-                tv2.text = (-balance.toInt()).toString()
+                tv2.text = formatBalance(balance)
 
                 if (balance > 0) {
                     tv1.setTextColor(ContextCompat.getColor(context, if (isOutOfMonth) R.color.budget_red_out else R.color.budget_red))
@@ -167,6 +168,14 @@ class CalendarGridAdapter(context: Context,
 
         cellView.tag = viewData
         return cellView
+    }
+
+    private fun formatBalance(balance: Double): String {
+        val roundedToInt = roundingToIntFormatter.format(-balance)
+        return when {
+            roundedToInt.length <= 4 -> roundedToInt
+            else -> formatter.format(-balance)
+        }
     }
 
     /**

@@ -18,7 +18,7 @@ package com.benoitletondor.easybudgetapp.auth
 
 import android.app.Activity
 import android.content.Intent
-import android.util.Log
+import com.benoitletondor.easybudgetapp.helper.Logger
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseUser
@@ -52,7 +52,7 @@ class FirebaseAuth(
                 SIGN_IN_REQUEST_CODE
             )
         } catch (error: Throwable) {
-            Log.e("FirebaseAuth", "Error launching auth activity", error)
+            Logger.error("FirebaseAuth", "Error launching auth activity", error)
             currentState.value = getAuthState()
         }
 
@@ -64,7 +64,7 @@ class FirebaseAuth(
             if (resultCode != Activity.RESULT_OK) {
                 val response = IdpResponse.fromResultIntent(data)
                 if( response != null ) {
-                    Log.e(
+                    Logger.error(
                         "FirebaseAuth",
                         "Error while authenticating: ${response.error?.errorCode}: ${response.error?.localizedMessage}",
                         response.error

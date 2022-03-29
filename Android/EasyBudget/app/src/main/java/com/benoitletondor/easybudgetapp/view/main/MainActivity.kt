@@ -55,9 +55,7 @@ import com.getbase.floatingactionbutton.FloatingActionsMenu
 import com.roomorama.caldroid.CaldroidFragment
 import com.roomorama.caldroid.CaldroidListener
 
-import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Date
 import java.util.Locale
 
 import com.benoitletondor.easybudgetapp.helper.*
@@ -72,6 +70,8 @@ import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion
 import com.benoitletondor.easybudgetapp.view.welcome.getOnboardingStep
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import dagger.hilt.android.AndroidEntryPoint
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 import javax.inject.Inject
 
@@ -113,7 +113,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
 
     private lateinit var menu: FloatingActionsMenu
 
-    private var lastStopDate: Date? = null
+    private var lastStopDate: LocalDate? = null
 
     private val viewModel: MainViewModel by viewModels()
 
@@ -143,7 +143,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     }
 
     private fun observeViewModel() {
-
         lifecycleScope.launchCollect(viewModel.expenseDeletionSuccessEventFlow) { (deletedExpense, newBalance, maybeNewCheckecBalance) ->
             expensesViewAdapter.removeExpense(deletedExpense)
             updateBalanceDisplayForDay(
@@ -452,13 +451,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
 
         // If the last stop happened yesterday (or another day), set and refresh to the current date
         if (lastStopDate != null) {
-            val cal = Calendar.getInstance()
-            val currentDay = cal.get(Calendar.DAY_OF_YEAR)
-
-            cal.time = lastStopDate!!
-            val lastStopDay = cal.get(Calendar.DAY_OF_YEAR)
-
-            if (currentDay != lastStopDay) {
+            if (LocalDate.now() != lastStopDate) {
                 viewModel.onDayChanged()
             }
 
@@ -467,7 +460,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     }
 
     override fun onStop() {
-        lastStopDate = Date()
+        lastStopDate = LocalDate.now()
 
         super.onStop()
     }
@@ -591,8 +584,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
      * Update the balance for the given day
      * TODO optimization
      */
-    private fun updateBalanceDisplayForDay(day: Date, balance: Double, maybeCheckedBalance: Double?) {
-        val format = SimpleDateFormat(resources.getString(R.string.account_balance_date_format), Locale.getDefault())
+    private fun updateBalanceDisplayForDay(day: LocalDate, balance: Double, maybeCheckedBalance: Double?) {
+        val format = DateTimeFormatter.ofPattern(resources.getString(R.string.account_balance_date_format), Locale.getDefault())
 
         var formatted = resources.getString(R.string.account_balance_format, format.format(day))
 
@@ -688,7 +681,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     private fun openAddExpenseIfNeeded(intent: Intent) {
         if (intent.getBooleanExtra(INTENT_SHOW_ADD_EXPENSE, false)) {
             val startIntent = Intent(this, ExpenseEditActivity::class.java)
-            startIntent.putExtra("date", Date().time)
+            startIntent.putExtra("date", LocalDate.now().toEpochDay())
 
             ActivityCompat.startActivityForResult(this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null)
         }
@@ -703,7 +696,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     private fun openAddRecurringExpenseIfNeeded(intent: Intent) {
         if (intent.getBooleanExtra(INTENT_SHOW_ADD_RECURRING_EXPENSE, false)) {
             val startIntent = Intent(this, RecurringExpenseEditActivity::class.java)
-            startIntent.putExtra("dateStart", Date().time)
+            startIntent.putExtra("dateStart", LocalDate.now().toEpochDay())
 
             ActivityCompat.startActivityForResult(this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null)
         }
@@ -728,18 +721,18 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
             args.putInt(CaldroidFragment.THEME_RESOURCE, R.style.caldroid_style)
 
             calendarFragment.arguments = args
-            calendarFragment.setMinDate(Date(parameters.getInitTimestamp()).computeCalendarMinDateFromInitDate())
+            calendarFragment.setMinDate((parameters.getInitDate() ?: LocalDate.now()).computeCalendarMinDateFromInitDate())
         }
 
         val listener = object : CaldroidListener() {
-            override fun onSelectDate(date: Date, view: View) {
+            override fun onSelectDate(date: LocalDate, view: View) {
                 viewModel.onSelectDate(date)
             }
 
-            override fun onLongClickDate(date: Date, view: View?) // Add expense on long press
+            override fun onLongClickDate(date: LocalDate, view: View?) // Add expense on long press
             {
                 val startIntent = Intent(this@MainActivity, ExpenseEditActivity::class.java)
-                startIntent.putExtra("date", date.time)
+                startIntent.putExtra("date", date.toEpochDay())
 
                 // Get the absolute location on window for Y value
                 val viewLocation = IntArray(2)
@@ -753,7 +746,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
             }
 
             override fun onChangeMonth(month: Int, year: Int) {
-                viewModel.onMonthChanged(month - 1)
+                viewModel.onMonthChanged(month - 1, year)
             }
 
             override fun onCaldroidViewCreated() {
@@ -873,7 +866,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         val fabNewExpense = findViewById<FloatingActionButton>(R.id.fab_new_expense)
         fabNewExpense.setOnClickListener {
             val startIntent = Intent(this@MainActivity, ExpenseEditActivity::class.java)
-            startIntent.putExtra("date", calendarFragment.getSelectedDate().time)
+            startIntent.putExtra("date", calendarFragment.getSelectedDate().toEpochDay())
 
             startIntent.putExtra(ANIMATE_TRANSITION_KEY, true)
             startIntent.putExtra(CENTER_X_KEY, menu.x.toInt() + (menu.width.toFloat() / 1.2f).toInt())
@@ -887,7 +880,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         val fabNewRecurringExpense = findViewById<FloatingActionButton>(R.id.fab_new_recurring_expense)
         fabNewRecurringExpense.setOnClickListener {
             val startIntent = Intent(this@MainActivity, RecurringExpenseEditActivity::class.java)
-            startIntent.putExtra("dateStart", calendarFragment.getSelectedDate().time)
+            startIntent.putExtra("dateStart", calendarFragment.getSelectedDate().toEpochDay())
 
             startIntent.putExtra(ANIMATE_TRANSITION_KEY, true)
             startIntent.putExtra(CENTER_X_KEY, menu.x.toInt() + (menu.width.toFloat() / 1.2f).toInt())
@@ -903,13 +896,13 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
          */
         binding.expensesRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        expensesViewAdapter = ExpensesRecyclerViewAdapter(this, parameters, iab, Date()) { expense, checked ->
+        expensesViewAdapter = ExpensesRecyclerViewAdapter(this, parameters, iab, LocalDate.now()) { expense, checked ->
             viewModel.onExpenseChecked(expense, checked)
         }
         binding.expensesRecyclerView.adapter = expensesViewAdapter
     }
 
-    private fun refreshRecyclerViewForDate(date: Date, expenses: List<Expense>) {
+    private fun refreshRecyclerViewForDate(date: LocalDate, expenses: List<Expense>) {
         expensesViewAdapter.setDate(date, expenses)
 
         if ( expenses.isNotEmpty() ) {
@@ -921,10 +914,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
     }
 
-    private fun refreshAllForDate(date: Date, balance: Double, maybeCheckedBalance: Double?, expenses: List<Expense>) {
+    private fun refreshAllForDate(date: LocalDate, balance: Double, maybeCheckedBalance: Double?, expenses: List<Expense>) {
         refreshRecyclerViewForDate(date, expenses)
         updateBalanceDisplayForDay(date, balance, maybeCheckedBalance)
-        calendarFragment.setSelectedDates(date, date)
+        calendarFragment.setSelectedDate(date)
         calendarFragment.refreshView()
     }
 

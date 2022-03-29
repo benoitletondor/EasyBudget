@@ -18,12 +18,12 @@ package com.benoitletondor.easybudgetapp.model
 
 import android.os.Parcel
 import android.os.Parcelable
-import java.util.*
+import java.time.LocalDate
 
 data class RecurringExpense(val id: Long?,
                             val title: String,
                             val amount: Double,
-                            val recurringDate: Date,
+                            val recurringDate: LocalDate,
                             val modified: Boolean,
                             val type: RecurringExpenseType) : Parcelable {
     
@@ -31,21 +31,21 @@ data class RecurringExpense(val id: Long?,
         parcel.readValue(Long::class.java.classLoader) as? Long,
         parcel.readString()!!,
         parcel.readDouble(),
-        Date(parcel.readLong()),
+        LocalDate.ofEpochDay(parcel.readLong()),
         parcel.readByte() != 0.toByte(),
         RecurringExpenseType.values()[parcel.readInt()]
     )
 
     constructor(title: String,
                 originalAmount: Double,
-                recurringDate: Date,
+                recurringDate: LocalDate,
                 type: RecurringExpenseType) : this(null, title, originalAmount, recurringDate, false, type)
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeValue(id)
         parcel.writeString(title)
         parcel.writeDouble(amount)
-        parcel.writeLong(recurringDate.time)
+        parcel.writeLong(recurringDate.toEpochDay())
         parcel.writeByte(if (modified) 1 else 0)
         parcel.writeInt(type.ordinal)
     }

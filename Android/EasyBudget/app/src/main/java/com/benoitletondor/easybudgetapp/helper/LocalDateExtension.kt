@@ -13,26 +13,15 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-apply plugin: 'com.android.library'
+package com.benoitletondor.easybudgetapp.helper
 
-android {
-    defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 32
-    }
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.util.*
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+fun LocalDate.toStartOfDayDate(): Date = Date.from(atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
 
-        coreLibraryDesugaringEnabled true
-    }
-}
-
-dependencies {
-    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:1.1.5"
-
-    implementation 'androidx.appcompat:appcompat:1.4.1'
-    implementation 'androidx.viewpager:viewpager:1.0.0'
-    api 'com.darwinsys:hirondelle-date4j:1.5.1'
-}
+fun localDateFromTimestamp(timestamp: Long): LocalDate = Instant.ofEpochMilli(timestamp)
+    .atZone(ZoneId.systemDefault())
+    .toLocalDate()

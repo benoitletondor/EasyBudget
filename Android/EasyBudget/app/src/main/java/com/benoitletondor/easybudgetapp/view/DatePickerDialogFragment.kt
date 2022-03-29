@@ -21,35 +21,31 @@ import android.app.Dialog
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import com.benoitletondor.easybudgetapp.helper.computeCalendarMinDateFromInitDate
+import com.benoitletondor.easybudgetapp.helper.toStartOfDayDate
 import com.benoitletondor.easybudgetapp.parameters.Parameters
-import com.benoitletondor.easybudgetapp.parameters.getInitTimestamp
+import com.benoitletondor.easybudgetapp.parameters.getInitDate
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.*
+import java.time.LocalDate
 import javax.inject.Inject
 
 /**
  * @author Benoit LETONDOR
  */
 @AndroidEntryPoint
-class DatePickerDialogFragment(private val originalDate: Date, private val listener: DatePickerDialog.OnDateSetListener) : DialogFragment() {
+class DatePickerDialogFragment(
+    private val originalDate: LocalDate,
+    private val listener: DatePickerDialog.OnDateSetListener,
+) : DialogFragment() {
     @Inject lateinit var parameters: Parameters
 
-    constructor() : this(Date(), DatePickerDialog.OnDateSetListener { _, _, _, _ -> }) {
+    constructor() : this(LocalDate.now(), DatePickerDialog.OnDateSetListener { _, _, _, _ -> }) {
         throw RuntimeException("DatePickerDialogFragment is supposed to be instanciated with the date+listener constructor")
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        // Use the current date as the default date in the picker
-        val c = Calendar.getInstance()
-        c.time = originalDate
-
-        val year = c.get(Calendar.YEAR)
-        val month = c.get(Calendar.MONTH)
-        val day = c.get(Calendar.DAY_OF_MONTH)
-
         // Create a new instance of DatePickerDialog and return it
-        val dialog = DatePickerDialog(requireContext(), listener, year, month, day)
-        dialog.datePicker.minDate = Date(parameters.getInitTimestamp()).computeCalendarMinDateFromInitDate().time
+        val dialog = DatePickerDialog(requireContext(), listener, originalDate.year, originalDate.monthValue - 1, originalDate.dayOfMonth)
+        dialog.datePicker.minDate = (parameters.getInitDate() ?: LocalDate.now()).computeCalendarMinDateFromInitDate().toStartOfDayDate().time
         return dialog
     }
 }

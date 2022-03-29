@@ -228,9 +228,9 @@ class IabImpl(
 
         if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
             Logger.error("Error while purchasing premium: " + billingResult.responseCode)
-            when {
-                billingResult.responseCode == BillingClient.BillingResponseCode.USER_CANCELED -> premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Cancelled))
-                billingResult.responseCode == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> {
+            when (billingResult.responseCode) {
+                BillingClient.BillingResponseCode.USER_CANCELED -> premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Cancelled))
+                BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> {
                     setIabStatusAndNotify(PremiumCheckStatus.PREMIUM)
                     premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Success))
                     return

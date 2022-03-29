@@ -33,6 +33,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Exception
+import java.time.LocalDate
 import java.util.*
 import javax.inject.Inject
 
@@ -42,7 +43,7 @@ class MainViewModel @Inject constructor(
     private val iab: Iab,
     private val parameters: Parameters,
 ) : ViewModel() {
-    private val selectDateMutableStateFlow = MutableStateFlow(Date())
+    private val selectDateMutableStateFlow = MutableStateFlow(LocalDate.now())
 
     private val premiumStatusMutableStateFlow = MutableStateFlow(iab.isUserPremium())
     val premiumStatusFlow: StateFlow<Boolean> = premiumStatusMutableStateFlow
@@ -218,10 +219,10 @@ class MainViewModel @Inject constructor(
                             expensesToRestore
                         }
                         RecurringExpenseDeleteType.FROM -> {
-                            val expensesToRestore = db.getAllExpensesForRecurringExpenseFromDate(associatedRecurringExpense, expense.date)
+                            val expensesToRestore = db.getAllExpensesForRecurringExpenseAfterDate(associatedRecurringExpense, expense.date)
 
                             try {
-                                db.deleteAllExpenseForRecurringExpenseFromDate(associatedRecurringExpense, expense.date)
+                                db.deleteAllExpenseForRecurringExpenseAfterDate(associatedRecurringExpense, expense.date)
                             } catch (t: Throwable) {
                                 return@withContext null
                             }
@@ -313,7 +314,7 @@ class MainViewModel @Inject constructor(
     fun onAdjustCurrentBalanceClicked() {
         viewModelScope.launch {
             val balance = withContext(Dispatchers.Default) {
-                -db.getBalanceForDay(Date())
+                -db.getBalanceForDay(LocalDate.now())
             }
 
             startCurrentBalanceEditorEventMutableFlow.emit(balance)
@@ -324,7 +325,7 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val currentBalance = withContext(Dispatchers.Default) {
-                    -db.getBalanceForDay(Date())
+                    -db.getBalanceForDay(LocalDate.now())
                 }
 
                 if (newBalance == currentBalance) {
@@ -336,7 +337,7 @@ class MainViewModel @Inject constructor(
 
                 // Look for an existing balance for the day
                 val existingExpense = withContext(Dispatchers.Default) {
-                    db.getExpensesForDay(Date()).find { it.title == balanceExpenseTitle }
+                    db.getExpensesForDay(LocalDate.now()).find { it.title == balanceExpenseTitle }
                 }
 
                 if (existingExpense != null) { // If the adjust balance exists, just add the diff and persist it
@@ -347,7 +348,7 @@ class MainViewModel @Inject constructor(
                     currentBalanceEditedEventMutableFlow.emit(BalanceAdjustedData(newExpense, diff, newBalance))
                 } else { // If no adjust balance yet, create a new one
                     val persistedExpense = withContext(Dispatchers.Default) {
-                        db.persistExpense(Expense(balanceExpenseTitle, -diff, Date(), true))
+                        db.persistExpense(Expense(balanceExpenseTitle, -diff, LocalDate.now(), true))
                     }
 
                     currentBalanceEditedEventMutableFlow.emit(BalanceAdjustedData(persistedExpense, diff, newBalance))
@@ -388,7 +389,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun onSelectDate(date: Date) {
+    fun onSelectDate(date: LocalDate) {
         selectDateMutableStateFlow.value = date
     }
 
@@ -398,14 +399,14 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getBalanceForDay(date: Date): Double {
+    private suspend fun getBalanceForDay(date: LocalDate): Double {
         var balance = 0.0 // Just to keep a positive number if balance == 0
         balance -= db.getBalanceForDay(date)
 
         return balance
     }
 
-    private suspend fun getCheckedBalanceForDay(date: Date): Double {
+    private suspend fun getCheckedBalanceForDay(date: LocalDate): Double {
         var balance = 0.0 // Just to keep a positive number if balance == 0
         balance -= db.getCheckedBalanceForDay(date)
 
@@ -413,7 +414,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun onDayChanged() {
-        selectDateMutableStateFlow.value = Date()
+        selectDateMutableStateFlow.value = LocalDate.now()
     }
 
     fun onExpenseAdded() {
@@ -443,14 +444,15 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun onMonthChanged(month: Int) {
+    fun onMonthChanged(month: Int, year: Int) {
         val cal = Calendar.getInstance()
-        showGoToCurrentMonthButtonStateMutableFlow.value = cal.get(Calendar.MONTH) != month
+        showGoToCurrentMonthButtonStateMutableFlow.value = cal.get(Calendar.MONTH) != month || cal.get(Calendar.YEAR) != year
     }
 
     fun onGoBackToCurrentMonthButtonPressed() {
         viewModelScope.launch {
             goBackToCurrentMonthEventMutableFlow.emit(Unit)
+            selectDateMutableStateFlow.value = LocalDate.now()
         }
     }
 
@@ -470,7 +472,7 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 withContext(Dispatchers.Default) {
-                    db.markAllEntriesAsChecked(Date())
+                    db.markAllEntriesAsChecked(LocalDate.now())
                 }
 
                 forceRefreshFlow.emit(Unit)
@@ -482,6 +484,6 @@ class MainViewModel @Inject constructor(
     }
 }
 
-data class SelectedDateExpensesData(val date: Date, val balance: Double, val checkedBalance: Double?, val expenses: List<Expense>)
+data class SelectedDateExpensesData(val date: LocalDate, val balance: Double, val checkedBalance: Double?, val expenses: List<Expense>)
 data class ExpenseDeletionSuccessData(val deletedExpense: Expense, val newDayBalance: Double, val newCheckedBalance: Double?)
 data class BalanceAdjustedData(val balanceExpense: Expense, val diffWithOldBalance: Double, val newBalance: Double)

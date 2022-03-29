@@ -33,10 +33,10 @@ import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.helper.viewLifecycleScope
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.*
+import java.time.LocalDate
 import javax.inject.Inject
 
-private const val ARG_DATE = "arg_date"
+private const val ARG_FIRST_DAY_OF_MONTH_DATE = "arg_date"
 
 /**
  * Fragment that displays monthly report for a given month
@@ -46,9 +46,9 @@ private const val ARG_DATE = "arg_date"
 @AndroidEntryPoint
 class MonthlyReportFragment : Fragment() {
     /**
-     * The first date of the month at 00:00:00
+     * The first day of the month
      */
-    private lateinit var date: Date
+    private lateinit var firstDayOfMonth: LocalDate
 
     private val viewModel: MonthlyReportViewModel by viewModels()
     @Inject lateinit var parameters: Parameters
@@ -56,7 +56,7 @@ class MonthlyReportFragment : Fragment() {
 // ---------------------------------->
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        date = requireArguments().getSerializable(ARG_DATE) as Date
+        firstDayOfMonth = requireArguments().getSerializable(ARG_FIRST_DAY_OF_MONTH_DATE) as LocalDate
 
         // Inflate the layout for this fragment
         val v = inflater.inflate(R.layout.fragment_monthly_report, container, false)
@@ -103,7 +103,7 @@ class MonthlyReportFragment : Fragment() {
             }
         }
 
-        viewModel.loadDataForMonth(date)
+        viewModel.loadDataForMonth(firstDayOfMonth)
 
         return v
     }
@@ -117,9 +117,9 @@ class MonthlyReportFragment : Fragment() {
     }
 
     companion object {
-        fun newInstance(date: Date): MonthlyReportFragment = MonthlyReportFragment().apply {
+        fun newInstance(firstDayOfMonth: LocalDate): MonthlyReportFragment = MonthlyReportFragment().apply {
             arguments = Bundle().apply {
-                putSerializable(ARG_DATE, date)
+                putSerializable(ARG_FIRST_DAY_OF_MONTH_DATE, firstDayOfMonth)
             }
         }
     }

@@ -61,7 +61,7 @@
     <string name="check_all_past_expences_message">Möchten Sie alle Einträge vor heute markieren?\nSie können diese Aktion nicht abbrechen.</string>
     <string name="check_all_past_expences_confirm_cta">Ja</string>
     <string name="check_all_past_expences_error_title">Oops</string>
-    <string name="check_all_past_expences_error_message">Beim Markieren aller früheren Einträge ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut (% s).</string>
+    <string name="check_all_past_expences_error_message">Beim Markieren aller früheren Einträge ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut (%s).</string>
 
     <string name="dialog_edit_expense_title">Was möchten Sie tun?</string>
     <string name="dialog_edit_income_title">Was möchten Sie tun?</string>

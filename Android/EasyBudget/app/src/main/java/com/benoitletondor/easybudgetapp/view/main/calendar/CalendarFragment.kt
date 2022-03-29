@@ -20,8 +20,8 @@ import com.benoitletondor.easybudgetapp.db.DB
 import com.roomorama.caldroid.CaldroidFragment
 import com.roomorama.caldroid.CaldroidGridAdapter
 import dagger.hilt.android.AndroidEntryPoint
+import java.time.LocalDate
 
-import java.util.Date
 import javax.inject.Inject
 
 /**
@@ -29,7 +29,7 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class CalendarFragment : CaldroidFragment() {
-    private var mSelectedDate = Date()
+    private var mSelectedDate = LocalDate.now()
 
     @Inject lateinit var db: DB
 
@@ -39,17 +39,19 @@ class CalendarFragment : CaldroidFragment() {
         return CalendarGridAdapter(requireContext(), db, month, year, getCaldroidData(), extraData)
     }
 
-    override fun setSelectedDates(fromDate: Date, toDate: Date) {
-        this.mSelectedDate = fromDate
-        super.setSelectedDates(fromDate, toDate)
+    override fun setSelectedDate(date: LocalDate) {
+        this.mSelectedDate = date
+
+        super.clearSelectedDates()
+        super.setSelectedDate(date)
 
         try {
             // Exception that occurs if we call this code before the calendar being initialized
-            super.moveToDate(fromDate)
+            super.moveToDate(date)
         } catch (ignored: Exception) { }
     }
 
-    fun getSelectedDate() = mSelectedDate
+    fun getSelectedDate(): LocalDate = mSelectedDate
 
     fun setFirstDayOfWeek(firstDayOfWeek: Int) {
         if (firstDayOfWeek != startDayOfWeek) {
@@ -64,7 +66,7 @@ class CalendarFragment : CaldroidFragment() {
     fun goToCurrentMonth() {
         try {
             // Exception that occurs if we call this code before the calendar being initialized
-            super.moveToDate(Date())
+            super.moveToDate(LocalDate.now())
         } catch (ignored: Exception) { }
     }
 }

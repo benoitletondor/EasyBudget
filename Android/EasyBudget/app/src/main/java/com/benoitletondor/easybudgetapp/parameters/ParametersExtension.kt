@@ -17,14 +17,16 @@
 package com.benoitletondor.easybudgetapp.parameters
 
 import com.benoitletondor.easybudgetapp.helper.AppTheme
+import com.benoitletondor.easybudgetapp.helper.localDateFromTimestamp
 import com.roomorama.caldroid.CaldroidFragment
+import java.time.LocalDate
 import java.util.*
 
 private const val DEFAULT_LOW_MONEY_WARNING_AMOUNT = 100
 /**
- * Date of the base balance set-up (long)
+ * Timestamp of the base balance set-up (long)
  */
-private const val INIT_DATE_PARAMETERS_KEY = "init_date"
+private const val INIT_TIMESTAMP_PARAMETERS_KEY = "init_date"
 /**
  * Local identifier of the device (generated on first launch) (string)
  */
@@ -106,12 +108,17 @@ private const val SHOULD_RESET_INIT_DATE = "should_reset_init_date"
  */
 private const val SHOULD_SHOW_CHECKED_BALANCE = "should_show_checked_balance"
 
-fun Parameters.getInitTimestamp(): Long {
-    return getLong(INIT_DATE_PARAMETERS_KEY, 0L)
+fun Parameters.getInitDate(): LocalDate? {
+    val timestamp = getLong(INIT_TIMESTAMP_PARAMETERS_KEY, 0L)
+    if (timestamp <= 0L) {
+        return null
+    }
+
+    return localDateFromTimestamp(timestamp)
 }
 
-fun Parameters.setInitTimestamp(value: Long) {
-    putLong(INIT_DATE_PARAMETERS_KEY, value)
+fun Parameters.setInitDate(date: Date) {
+    putLong(INIT_TIMESTAMP_PARAMETERS_KEY, date.time)
 }
 
 fun Parameters.getLocalId(): String? {

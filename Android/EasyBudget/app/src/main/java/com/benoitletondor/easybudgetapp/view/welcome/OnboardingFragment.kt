@@ -17,10 +17,9 @@
 package com.benoitletondor.easybudgetapp.view.welcome
 
 import android.content.Intent
-import androidx.annotation.ColorRes
-import androidx.fragment.app.Fragment
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import android.view.View
+import androidx.annotation.ColorRes
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.viewbinding.ViewBinding
 import com.benoitletondor.easybudgetapp.helper.BaseFragment
 

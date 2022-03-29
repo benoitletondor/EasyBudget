@@ -23,14 +23,14 @@ import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
 import com.benoitletondor.easybudgetapp.parameters.Parameters
-import com.benoitletondor.easybudgetapp.parameters.getInitTimestamp
+import com.benoitletondor.easybudgetapp.parameters.getInitDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.*
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -44,8 +44,8 @@ class ExpenseEditViewModel @Inject constructor(
      */
     private val editedExpense: Expense? = savedStateHandle.get<Expense>("expense")
 
-    private val expenseDateMutableStateFlow = MutableStateFlow(Date(savedStateHandle.get<Long>("dateStart") ?: 0))
-    val expenseDateFlow: Flow<Date> = expenseDateMutableStateFlow
+    private val expenseDateMutableStateFlow = MutableStateFlow(LocalDate.ofEpochDay(savedStateHandle.get<Long>("date") ?: 0))
+    val expenseDateFlow: Flow<LocalDate> = expenseDateMutableStateFlow
 
     private val editTypeMutableStateFlow = MutableStateFlow(ExpenseEditType(
         editedExpense?.isRevenue() ?: false,
@@ -66,9 +66,6 @@ class ExpenseEditViewModel @Inject constructor(
     private val finishMutableFlow = MutableLiveFlow<Unit>()
     val finishFlow: Flow<Unit> = finishMutableFlow
 
-    private val errorMutableFlow = MutableLiveFlow<Unit>()
-    val errorFlow: Flow<Unit> = errorMutableFlow
-
     fun onExpenseRevenueValueChanged(isRevenue: Boolean) {
         editTypeMutableStateFlow.value = ExpenseEditType(isRevenue, editedExpense != null)
     }
@@ -77,14 +74,9 @@ class ExpenseEditViewModel @Inject constructor(
         val isRevenue = editTypeMutableStateFlow.value.isRevenue
         val date = expenseDateMutableStateFlow.value
 
-        val dateOfInstallationCalendar = Calendar.getInstance()
-        dateOfInstallationCalendar.time = Date(parameters.getInitTimestamp())
-        dateOfInstallationCalendar.set(Calendar.HOUR_OF_DAY, 0)
-        dateOfInstallationCalendar.set(Calendar.MINUTE, 0)
-        dateOfInstallationCalendar.set(Calendar.SECOND, 0)
-        dateOfInstallationCalendar.set(Calendar.MILLISECOND, 0)
+        val dateOfInstallation = parameters.getInitDate() ?: LocalDate.now()
 
-        if( date.before(dateOfInstallationCalendar.time) ) {
+        if( date.isBefore(dateOfInstallation) ) {
             viewModelScope.launch {
                 expenseAddBeforeInitDateErrorMutableFlow.emit(Unit)
             }
@@ -106,7 +98,7 @@ class ExpenseEditViewModel @Inject constructor(
         // No-op
     }
 
-    private fun doSaveExpense(value: Double, description: String, isRevenue: Boolean, date: Date) {
+    private fun doSaveExpense(value: Double, description: String, isRevenue: Boolean, date: LocalDate) {
         viewModelScope.launch {
             withContext(Dispatchers.Default) {
                 val expense = editedExpense?.copy(
@@ -122,7 +114,7 @@ class ExpenseEditViewModel @Inject constructor(
         }
     }
 
-    fun onDateChanged(date: Date) {
+    fun onDateChanged(date: LocalDate) {
         expenseDateMutableStateFlow.value = date
     }
 }

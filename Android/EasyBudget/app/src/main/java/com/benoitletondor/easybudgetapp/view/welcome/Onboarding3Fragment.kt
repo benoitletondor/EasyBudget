@@ -33,7 +33,7 @@ import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
-import java.util.*
+import java.time.LocalDate
 import javax.inject.Inject
 
 /**
@@ -81,7 +81,7 @@ class Onboarding3Fragment : OnboardingFragment<FragmentOnboarding3Binding>() {
 
         viewLifecycleScope.launch {
             val amount = withContext(Dispatchers.Default) {
-                -db.getBalanceForDay(Date())
+                -db.getBalanceForDay(LocalDate.now())
             }
 
             binding?.onboardingScreen3InitialAmountEt?.setText(if (amount == 0.0) "0" else amount.toString())
@@ -107,13 +107,13 @@ class Onboarding3Fragment : OnboardingFragment<FragmentOnboarding3Binding>() {
         binding?.onboardingScreen3NextButton?.setOnClickListener { button ->
             viewLifecycleScope.launch {
                 withContext(Dispatchers.Default) {
-                    val currentBalance = -db.getBalanceForDay(Date())
+                    val currentBalance = -db.getBalanceForDay(LocalDate.now())
                     val newBalance = amountValue
 
                     if (newBalance != currentBalance) {
                         val diff = newBalance - currentBalance
 
-                        val expense = Expense(resources.getString(R.string.adjust_balance_expense_title), -diff, Date(), true)
+                        val expense = Expense(resources.getString(R.string.adjust_balance_expense_title), -diff, LocalDate.now(), true)
                         db.persistExpense(expense)
                     }
                 }

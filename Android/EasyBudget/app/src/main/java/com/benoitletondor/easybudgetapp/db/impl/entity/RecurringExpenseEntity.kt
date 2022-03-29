@@ -21,7 +21,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
-import java.util.*
+import java.time.LocalDate
 
 @Entity(tableName = "monthlyexpense")
 class RecurringExpenseEntity(@PrimaryKey
@@ -32,7 +32,7 @@ class RecurringExpenseEntity(@PrimaryKey
                              @ColumnInfo(name = "amount")
                              val originalAmount: Long,
                              @ColumnInfo(name = "recurringDate")
-                             val recurringDate: Date,
+                             val recurringDate: LocalDate,
                              @ColumnInfo(name = "modified")
                              val modified: Boolean,
                              @ColumnInfo(name = "type")
@@ -44,6 +44,6 @@ class RecurringExpenseEntity(@PrimaryKey
         originalAmount / 100.0,
         recurringDate,
         modified,
-        RecurringExpenseType.valueOf(type)
+        RecurringExpenseType.valueOf(type),
     )
 }

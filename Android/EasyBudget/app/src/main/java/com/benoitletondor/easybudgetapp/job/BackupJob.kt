@@ -22,7 +22,6 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.benoitletondor.easybudgetapp.auth.Auth
 import com.benoitletondor.easybudgetapp.cloudstorage.CloudStorage
-import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.backupDB
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.parameters.Parameters

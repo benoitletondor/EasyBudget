@@ -18,29 +18,29 @@ package com.benoitletondor.easybudgetapp.model
 
 import android.os.Parcel
 import android.os.Parcelable
-import java.util.*
+import java.time.LocalDate
 
 data class Expense(val id: Long?,
                    val title: String,
                    val amount: Double,
-                   val date: Date,
+                   val date: LocalDate,
                    val checked: Boolean,
                    val associatedRecurringExpense: RecurringExpense?) : Parcelable {
 
     constructor(title: String,
                 amount: Double,
-                date: Date,
+                date: LocalDate,
                 checked: Boolean) : this(null, title, amount, date, checked, null)
 
     constructor(id: Long,
                 title: String,
                 amount: Double,
-                date: Date,
+                date: LocalDate,
                 checked: Boolean) : this(id, title, amount, date, checked, null)
 
     constructor(title: String,
                 amount: Double,
-                date: Date,
+                date: LocalDate,
                 checked: Boolean,
                 associatedRecurringExpense: RecurringExpense) : this(null, title, amount, date, checked, associatedRecurringExpense)
 
@@ -48,7 +48,7 @@ data class Expense(val id: Long?,
         parcel.readValue(Long::class.java.classLoader) as? Long,
         parcel.readString()!!,
         parcel.readDouble(),
-        Date(parcel.readLong()),
+        LocalDate.ofEpochDay(parcel.readLong()),
         parcel.readInt() == 1,
         parcel.readParcelable(RecurringExpense::class.java.classLoader)
     )
@@ -67,7 +67,7 @@ data class Expense(val id: Long?,
         parcel.writeValue(id)
         parcel.writeString(title)
         parcel.writeDouble(amount)
-        parcel.writeLong(date.time)
+        parcel.writeLong(date.toEpochDay())
         parcel.writeInt(if( checked ) { 1 } else { 0 })
         parcel.writeParcelable(associatedRecurringExpense, flags)
     }

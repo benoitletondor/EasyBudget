@@ -31,7 +31,7 @@ import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.helper.removeButtonBorder
 import com.benoitletondor.easybudgetapp.view.report.MonthlyReportFragment
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.*
+import java.time.LocalDate
 
 /**
  * Activity that displays monthly report
@@ -67,7 +67,7 @@ class MonthlyReportBaseActivity : BaseActivity<ActivityMonthlyReportBinding>(), 
         binding.monthlyReportPreviousMonthButton.removeButtonBorder()
         binding.monthlyReportNextMonthButton.removeButtonBorder()
 
-        var loadedDates: List<Date> = emptyList()
+        var loadedDates: List<LocalDate> = emptyList()
         lifecycleScope.launchCollect(viewModel.stateFlow) { state ->
             when(state) {
                 is MonthlyReportBaseViewModel.State.Loaded -> {
@@ -115,7 +115,7 @@ class MonthlyReportBaseActivity : BaseActivity<ActivityMonthlyReportBinding>(), 
     /**
      * Configure the [.pager] adapter and listener.
      */
-    private fun configureViewPager(dates: List<Date>) {
+    private fun configureViewPager(dates: List<LocalDate>) {
         binding.monthlyReportViewPager.removeOnPageChangeListener(this)
 
         binding.monthlyReportViewPager.offscreenPageLimit = 0
