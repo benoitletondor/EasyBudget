@@ -104,6 +104,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
                 }
                 INTENT_IAB_STATUS_CHANGED -> viewModel.onIabStatusChanged()
                 INTENT_SHOW_CHECKED_BALANCE_CHANGED -> viewModel.onShowCheckedBalanceChanged()
+                INTENT_LOW_MONEY_WARNING_THRESHOLD_CHANGED -> viewModel.onLowMoneyWarningThresholdChanged()
             }
         }
     }
@@ -374,6 +375,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
             refreshAllForDate(date, balance, maybeCheckedBalance, expenses)
         }
 
+        lifecycleScope.launchCollect(viewModel.refreshDatesFlow) {
+            calendarFragment.refreshView()
+        }
+
         lifecycleScope.launchCollect(viewModel.expenseCheckedErrorEventFlow) { exception ->
             AlertDialog.Builder(this@MainActivity)
                 .setTitle(R.string.expense_check_error_title)
@@ -441,7 +446,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         filter.addAction(INTENT_SHOW_WELCOME_SCREEN)
         filter.addAction(Intent.ACTION_VIEW)
         filter.addAction(INTENT_IAB_STATUS_CHANGED)
-        filter.addAction(INTENT_SHOW_CHECKED_BALANCE_CHANGED)
+        filter.addAction(INTENT_LOW_MONEY_WARNING_THRESHOLD_CHANGED)
 
         LocalBroadcastManager.getInstance(applicationContext).registerReceiver(receiver, filter)
     }
@@ -943,6 +948,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         const val INTENT_SHOW_ADD_EXPENSE = "intent.addexpense.show"
         const val INTENT_SHOW_ADD_RECURRING_EXPENSE = "intent.addrecurringexpense.show"
         const val INTENT_SHOW_CHECKED_BALANCE_CHANGED = "intent.showcheckedbalance.changed"
+        const val INTENT_LOW_MONEY_WARNING_THRESHOLD_CHANGED = "intent.lowmoneywarningthreshold.changed"
 
         const val INTENT_REDIRECT_TO_PREMIUM_EXTRA = "intent.extra.premiumshow"
         const val INTENT_REDIRECT_TO_SETTINGS_EXTRA = "intent.extra.redirecttosettings"

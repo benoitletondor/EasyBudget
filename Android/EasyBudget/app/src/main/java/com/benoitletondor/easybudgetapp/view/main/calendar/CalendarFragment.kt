@@ -17,6 +17,7 @@
 package com.benoitletondor.easybudgetapp.view.main.calendar
 
 import com.benoitletondor.easybudgetapp.db.DB
+import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.roomorama.caldroid.CaldroidFragment
 import com.roomorama.caldroid.CaldroidGridAdapter
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,11 +33,12 @@ class CalendarFragment : CaldroidFragment() {
     private var mSelectedDate = LocalDate.now()
 
     @Inject lateinit var db: DB
+    @Inject lateinit var parameters: Parameters
 
 // --------------------------------------->
 
     override fun getNewDatesGridAdapter(month: Int, year: Int): CaldroidGridAdapter {
-        return CalendarGridAdapter(requireContext(), db, month, year, getCaldroidData(), extraData)
+        return CalendarGridAdapter(requireContext(), db, parameters, month, year, getCaldroidData(), extraData)
     }
 
     override fun setSelectedDate(date: LocalDate) {

@@ -93,12 +93,12 @@ class MainViewModel @Inject constructor(
     private val checkAllPastEntriesErrorEventMutableFlow = MutableLiveFlow<Throwable>()
     val checkAllPastEntriesErrorEventFlow: Flow<Throwable> = checkAllPastEntriesErrorEventMutableFlow
 
-
-    private val forceRefreshFlow = MutableSharedFlow<Unit>()
+    private val forceRefreshMutableFlow = MutableSharedFlow<Unit>()
+    val refreshDatesFlow: Flow<Unit> = forceRefreshMutableFlow
 
     val selectedDateDataFlow = combine(
         selectDateMutableStateFlow,
-        forceRefreshFlow,
+        forceRefreshMutableFlow,
     ) { date, _ ->
         val (balance, expenses, checkedBalance) = withContext(Dispatchers.Default) {
             Triple(
@@ -117,7 +117,7 @@ class MainViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            forceRefreshFlow.emit(Unit)
+            forceRefreshMutableFlow.emit(Unit)
         }
     }
 
@@ -157,7 +157,7 @@ class MainViewModel @Inject constructor(
                     if (parameters.getShouldShowCheckedBalance()) { db.getCheckedBalanceForDay(selectedDate) } else { null },
                 ))
 
-                forceRefreshFlow.emit(Unit)
+                forceRefreshMutableFlow.emit(Unit)
             } catch (t: Throwable) {
                 Logger.error("Error while deleting expense", t)
                 expenseDeletionErrorEventMutableFlow.emit(expense)
@@ -172,7 +172,7 @@ class MainViewModel @Inject constructor(
                     db.persistExpense(expense)
                 }
 
-                forceRefreshFlow.emit(Unit)
+                forceRefreshMutableFlow.emit(Unit)
             } catch (t: Throwable) {
                 Logger.error("Error while restoring expense", t)
             }
@@ -264,7 +264,7 @@ class MainViewModel @Inject constructor(
                 recurringExpenseDeletionProgressStateMutableFlow.value = RecurringExpenseDeleteProgressState.Idle
             }
 
-            forceRefreshFlow.emit(Unit)
+            forceRefreshMutableFlow.emit(Unit)
         }
 
     }
@@ -307,7 +307,7 @@ class MainViewModel @Inject constructor(
                 recurringExpenseRestoreProgressStateMutableFlow.value = RecurringExpenseRestoreProgressState.Idle
             }
 
-            forceRefreshFlow.emit(Unit)
+            forceRefreshMutableFlow.emit(Unit)
         }
     }
 
@@ -354,7 +354,7 @@ class MainViewModel @Inject constructor(
                     currentBalanceEditedEventMutableFlow.emit(BalanceAdjustedData(persistedExpense, diff, newBalance))
                 }
 
-                forceRefreshFlow.emit(Unit)
+                forceRefreshMutableFlow.emit(Unit)
             } catch (e: Exception) {
                 Logger.error("Error while editing balance", e)
                 currentBalanceEditingErrorEventMutableFlow.emit(e)
@@ -374,7 +374,7 @@ class MainViewModel @Inject constructor(
                     }
                 }
 
-                forceRefreshFlow.emit(Unit)
+                forceRefreshMutableFlow.emit(Unit)
             } catch (e: Exception) {
                 Logger.error("Error while restoring balance", e)
                 currentBalanceRestoringErrorEventMutableFlow.emit(e)
@@ -385,7 +385,7 @@ class MainViewModel @Inject constructor(
     fun onIabStatusChanged() {
         premiumStatusMutableStateFlow.value = iab.isUserPremium()
         viewModelScope.launch {
-            forceRefreshFlow.emit(Unit)
+            forceRefreshMutableFlow.emit(Unit)
         }
     }
 
@@ -395,7 +395,7 @@ class MainViewModel @Inject constructor(
 
     fun onCurrencySelected() {
         viewModelScope.launch {
-            forceRefreshFlow.emit(Unit)
+            forceRefreshMutableFlow.emit(Unit)
         }
     }
 
@@ -419,13 +419,13 @@ class MainViewModel @Inject constructor(
 
     fun onExpenseAdded() {
         viewModelScope.launch {
-            forceRefreshFlow.emit(Unit)
+            forceRefreshMutableFlow.emit(Unit)
         }
     }
 
     fun onWelcomeScreenFinished() {
         viewModelScope.launch {
-            forceRefreshFlow.emit(Unit)
+            forceRefreshMutableFlow.emit(Unit)
         }
     }
 
@@ -436,7 +436,7 @@ class MainViewModel @Inject constructor(
                     db.persistExpense(expense.copy(checked = checked))
                 }
 
-                forceRefreshFlow.emit(Unit)
+                forceRefreshMutableFlow.emit(Unit)
             } catch (e: Exception) {
                 Logger.error("Error while checking expense", e)
                 expenseCheckedErrorEventMutableFlow.emit(e)
@@ -458,7 +458,7 @@ class MainViewModel @Inject constructor(
 
     fun onShowCheckedBalanceChanged() {
         viewModelScope.launch {
-            forceRefreshFlow.emit(Unit)
+            forceRefreshMutableFlow.emit(Unit)
         }
     }
 
@@ -475,11 +475,17 @@ class MainViewModel @Inject constructor(
                     db.markAllEntriesAsChecked(LocalDate.now())
                 }
 
-                forceRefreshFlow.emit(Unit)
+                forceRefreshMutableFlow.emit(Unit)
             } catch (e: Exception) {
                 Logger.error("Error while checking all past entries", e)
                 checkAllPastEntriesErrorEventMutableFlow.emit(e)
             }
+        }
+    }
+
+    fun onLowMoneyWarningThresholdChanged() {
+        viewModelScope.launch {
+            forceRefreshMutableFlow.emit(Unit)
         }
     }
 }

@@ -225,6 +225,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
 
                             parameters.setLowMoneyWarningAmount(newLimit)
                             setLimitWarningPreferenceTitle(limitWarningPreference)
+                            LocalBroadcastManager.getInstance(context).sendBroadcast(Intent(MainActivity.INTENT_LOW_MONEY_WARNING_THRESHOLD_CHANGED))
                         } catch (e: Exception) {
                             AlertDialog.Builder(context)
                                 .setTitle(R.string.adjust_limit_warning_error_title)

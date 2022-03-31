@@ -26,6 +26,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.launchCollect
@@ -91,7 +92,7 @@ class SelectCurrencyFragment : DialogFragment() {
         val recyclerView = v.findViewById<RecyclerView>(R.id.select_currency_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(v.context)
 
-        viewLifecycleScope.launchCollect(viewModel.stateFlow) { state ->
+        lifecycleScope.launchCollect(viewModel.stateFlow) { state ->
             when(state) {
                 is SelectCurrencyViewModel.State.Loaded -> {
                     val adapter = SelectCurrencyRecyclerViewAdapter(state.mainCurrencies, state.otherCurrencies, parameters)

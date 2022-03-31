@@ -25,6 +25,8 @@ import android.widget.TextView
 
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.db.DB
+import com.benoitletondor.easybudgetapp.parameters.Parameters
+import com.benoitletondor.easybudgetapp.parameters.getLowMoneyWarningAmount
 import com.roomorama.caldroid.CaldroidGridAdapter
 import com.roomorama.caldroid.CalendarHelper
 
@@ -35,6 +37,7 @@ import kotlinx.coroutines.runBlocking
  */
 class CalendarGridAdapter(context: Context,
                           private val db: DB,
+                          private val parameters: Parameters,
                           month: Int,
                           year: Int,
                           caldroidData: Map<String, Any>,
@@ -146,11 +149,11 @@ class CalendarGridAdapter(context: Context,
 
                 tv2.text = formatBalance(balance)
 
-                if (balance > 0) {
-                    tv1.setTextColor(ContextCompat.getColor(context, if (isOutOfMonth) R.color.budget_red_out else R.color.budget_red))
-                } else {
-                    tv1.setTextColor(ContextCompat.getColor(context, if (isOutOfMonth) R.color.budget_green_out else R.color.budget_green))
-                }
+                tv1.setTextColor(ContextCompat.getColor(tv1.context, when {
+                    -balance <= 0 -> R.color.budget_red
+                    -balance < parameters.getLowMoneyWarningAmount() -> R.color.budget_orange
+                    else -> R.color.budget_green
+                }))
             } else if (viewData.containsExpenses) {
                 tv2.visibility = View.INVISIBLE
 
