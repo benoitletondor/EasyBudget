@@ -121,7 +121,15 @@ class EasyBudget : Application(), Configuration.Provider {
         val initDate = parameters.getInitDate()
         if (initDate == null) {
             parameters.setInitDate(Date())
-            parameters.setUserCurrency(Currency.getInstance(Locale.getDefault())) // Set a default currency before onboarding
+
+            // Set a default currency before onboarding
+            val currency = try {
+                Currency.getInstance(Locale.getDefault())
+            } catch (e: Exception) {
+                Currency.getInstance("USD")
+            }
+
+            parameters.setUserCurrency(currency)
         }
 
         /*
