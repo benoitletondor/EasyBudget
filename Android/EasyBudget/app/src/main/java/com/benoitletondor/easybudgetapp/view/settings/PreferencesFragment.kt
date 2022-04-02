@@ -262,7 +262,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
         /*
          * Show checked balance
          */
-        val showCheckedBalancePref = findPreference<CheckBoxPreference>(resources.getString(R.string.setting_category_notifications_daily_key))
+        val showCheckedBalancePref = findPreference<CheckBoxPreference>(resources.getString(R.string.setting_category_show_checked_balance_key))
         showCheckedBalancePref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
             parameters.setShouldShowCheckedBalance((it as CheckBoxPreference).isChecked)
 

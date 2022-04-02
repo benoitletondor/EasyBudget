@@ -446,6 +446,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         filter.addAction(INTENT_SHOW_WELCOME_SCREEN)
         filter.addAction(Intent.ACTION_VIEW)
         filter.addAction(INTENT_IAB_STATUS_CHANGED)
+        filter.addAction(INTENT_SHOW_CHECKED_BALANCE_CHANGED)
         filter.addAction(INTENT_LOW_MONEY_WARNING_THRESHOLD_CHANGED)
 
         LocalBroadcastManager.getInstance(applicationContext).registerReceiver(receiver, filter)
