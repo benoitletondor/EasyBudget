@@ -199,7 +199,7 @@ class RecurringExpenseEditViewModel @Inject constructor(
                         return false
                     }
 
-                    currentDate.plus(1, ChronoUnit.WEEKS)
+                    currentDate = currentDate.plus(1, ChronoUnit.WEEKS)
                 }
             }
             RecurringExpenseType.BI_WEEKLY -> {
@@ -212,7 +212,7 @@ class RecurringExpenseEditViewModel @Inject constructor(
                         return false
                     }
 
-                    currentDate.plus(2, ChronoUnit.WEEKS)
+                    currentDate = currentDate.plus(2, ChronoUnit.WEEKS)
                 }
             }
             RecurringExpenseType.TER_WEEKLY -> {
@@ -225,7 +225,7 @@ class RecurringExpenseEditViewModel @Inject constructor(
                         return false
                     }
 
-                    currentDate.plus(3, ChronoUnit.WEEKS)
+                    currentDate = currentDate.plus(3, ChronoUnit.WEEKS)
                 }
             }
             RecurringExpenseType.FOUR_WEEKLY -> {
@@ -238,7 +238,7 @@ class RecurringExpenseEditViewModel @Inject constructor(
                         return false
                     }
 
-                    currentDate.plus(4, ChronoUnit.WEEKS)
+                    currentDate = currentDate.plus(4, ChronoUnit.WEEKS)
                 }
             }
             RecurringExpenseType.MONTHLY -> {
