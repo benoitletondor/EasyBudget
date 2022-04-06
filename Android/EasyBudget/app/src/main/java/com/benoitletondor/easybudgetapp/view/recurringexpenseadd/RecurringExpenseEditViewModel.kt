@@ -232,7 +232,7 @@ class RecurringExpenseEditViewModel @Inject constructor(
                 // Add up to 5 years of expenses
                 for (i in 0 until 12*4*5) {
                     try {
-                        db.persistExpense(Expense(expense.title, expense.amount, currentDate.plus(2, ChronoUnit.WEEKS), false, expense))
+                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, expense))
                     } catch (t: Throwable) {
                         Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
                         return false
