@@ -1,5 +1,5 @@
 /*
- *   Copyright 2021 Benoit LETONDOR
+ *   Copyright 2022 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 
-import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 /**
@@ -53,7 +53,7 @@ class MonthlyReportRecyclerViewAdapter(private val expenses: List<Expense>,
     /**
      * Formatter to get day number for each date
      */
-    private val dayFormatter = SimpleDateFormat("dd", Locale.getDefault())
+    private val dayFormatter = DateTimeFormatter.ofPattern("dd", Locale.getDefault())
 
 // --------------------------------------->
 

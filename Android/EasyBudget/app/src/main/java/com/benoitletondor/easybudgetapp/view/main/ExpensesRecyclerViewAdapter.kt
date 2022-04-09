@@ -1,5 +1,5 @@
 /*
- *   Copyright 2021 Benoit LETONDOR
+ *   Copyright 2022 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import com.benoitletondor.easybudgetapp.R
-import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.model.Expense
@@ -39,7 +38,7 @@ import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
-import java.util.*
+import java.time.LocalDate
 
 /**
  * Recycler view adapter to display expenses for a given date
@@ -49,17 +48,17 @@ import java.util.*
 class ExpensesRecyclerViewAdapter(private val activity: Activity,
                                   private val parameters: Parameters,
                                   private val iab: Iab,
-                                  private var date: Date,
+                                  private var date: LocalDate,
                                   private val onExpenseCheckedListener: (Expense, Boolean) -> Unit) : RecyclerView.Adapter<ExpensesRecyclerViewAdapter.ViewHolder>() {
 
     private var expenses = mutableListOf<Expense>()
 
-    fun getDate(): Date = date
+    fun getDate(): LocalDate = date
 
     /**
      * Set a new date and data to display
      */
-    fun setDate(date: Date, expenses: List<Expense>) {
+    fun setDate(date: LocalDate, expenses: List<Expense>) {
         this.date = date
         this.expenses.clear()
         this.expenses.addAll(expenses)
@@ -136,7 +135,7 @@ class ExpensesRecyclerViewAdapter(private val activity: Activity,
                         // Edit this one
                         0 -> {
                             val startIntent = Intent(viewHolder.view.context, ExpenseEditActivity::class.java)
-                            startIntent.putExtra("date", expense.date.time)
+                            startIntent.putExtra("date", expense.date.toEpochDay())
                             startIntent.putExtra("expense", expense)
 
                             ActivityCompat.startActivityForResult(activity, startIntent, MainActivity.ADD_EXPENSE_ACTIVITY_CODE, null)
@@ -144,7 +143,7 @@ class ExpensesRecyclerViewAdapter(private val activity: Activity,
                         // Edit this one and following ones
                         1 -> {
                             val startIntent = Intent(viewHolder.view.context, RecurringExpenseEditActivity::class.java)
-                            startIntent.putExtra("dateStart", expense.date.time)
+                            startIntent.putExtra("dateStart", expense.date.toEpochDay())
                             startIntent.putExtra("expense", expense)
 
                             ActivityCompat.startActivityForResult(activity, startIntent, MainActivity.MANAGE_RECURRING_EXPENSE_ACTIVITY_CODE, null)
@@ -192,7 +191,7 @@ class ExpensesRecyclerViewAdapter(private val activity: Activity,
                         0 // Edit expense
                         -> {
                             val startIntent = Intent(viewHolder.view.context, ExpenseEditActivity::class.java)
-                            startIntent.putExtra("date", expense.date.time)
+                            startIntent.putExtra("date", expense.date.toEpochDay())
                             startIntent.putExtra("expense", expense)
 
                             ActivityCompat.startActivityForResult(activity, startIntent, MainActivity.ADD_EXPENSE_ACTIVITY_CODE, null)

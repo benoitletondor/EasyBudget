@@ -1,5 +1,5 @@
 /*
- *   Copyright 2021 Benoit LETONDOR
+ *   Copyright 2022 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -16,12 +16,13 @@
 
 package com.benoitletondor.easybudgetapp.view.selectcurrency
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -29,15 +30,21 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SelectCurrencyViewModel @Inject constructor() : ViewModel() {
-    val currenciesLiveData = MutableLiveData<Pair<List<Currency>, List<Currency>>>()
+    private val stateMutableFlow = MutableStateFlow<State>(State.Loading)
+    val stateFlow: Flow<State> = stateMutableFlow
 
     init {
         viewModelScope.launch {
-            val data = withContext(Dispatchers.Default) {
+            val (mainCurrencies, otherCurrencies) = withContext(Dispatchers.Default) {
                 Pair(CurrencyHelper.getMainAvailableCurrencies(), CurrencyHelper.getOtherAvailableCurrencies())
             }
 
-            currenciesLiveData.value = data
+            stateMutableFlow.emit(State.Loaded(mainCurrencies, otherCurrencies))
         }
+    }
+
+    sealed class State {
+        object Loading : State()
+        data class Loaded(val mainCurrencies: List<Currency>, val otherCurrencies: List<Currency>) : State()
     }
 }

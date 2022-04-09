@@ -1,5 +1,5 @@
 /*
- *   Copyright 2021 Benoit LETONDOR
+ *   Copyright 2022 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -17,17 +17,18 @@
 package com.benoitletondor.easybudgetapp.view.welcome
 
 import android.content.Intent
-import androidx.annotation.ColorRes
-import androidx.fragment.app.Fragment
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import android.view.View
+import androidx.annotation.ColorRes
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.viewbinding.ViewBinding
+import com.benoitletondor.easybudgetapp.helper.BaseFragment
 
 /**
  * Abstract fragment that contains common methods of all onboarding fragments
  *
  * @author Benoit LETONDOR
  */
-abstract class OnboardingFragment : Fragment() {
+abstract class OnboardingFragment<V: ViewBinding> : BaseFragment<V>() {
     /**
      * Get the status bar color that should be used for this fragment
      *

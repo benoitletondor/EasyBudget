@@ -1,5 +1,5 @@
 /*
- *   Copyright 2021 Benoit LETONDOR
+ *   Copyright 2022 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -26,14 +26,14 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AlertDialog
 import com.benoitletondor.easybudgetapp.R
+import com.benoitletondor.easybudgetapp.databinding.FragmentOnboarding3Binding
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_onboarding3.*
 import kotlinx.coroutines.*
-import java.util.*
+import java.time.LocalDate
 import javax.inject.Inject
 
 /**
@@ -42,7 +42,7 @@ import javax.inject.Inject
  * @author Benoit LETONDOR
  */
 @AndroidEntryPoint
-class Onboarding3Fragment : OnboardingFragment(), CoroutineScope by MainScope() {
+class Onboarding3Fragment : OnboardingFragment<FragmentOnboarding3Binding>() {
     @Inject lateinit var parameters: Parameters
     @Inject lateinit var db: DB
 
@@ -51,7 +51,7 @@ class Onboarding3Fragment : OnboardingFragment(), CoroutineScope by MainScope() 
 
     private val amountValue: Double
         get() {
-            val valueString = onboarding_screen3_initial_amount_et.text.toString()
+            val valueString = binding?.onboardingScreen3InitialAmountEt?.text.toString()
 
             return try {
                 if ( "" == valueString || "-" == valueString) 0.0 else java.lang.Double.valueOf(valueString)
@@ -70,26 +70,27 @@ class Onboarding3Fragment : OnboardingFragment(), CoroutineScope by MainScope() 
 
         }
 
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_onboarding3, container, false)
-    }
+    override fun onCreateBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): FragmentOnboarding3Binding = FragmentOnboarding3Binding.inflate(inflater, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        launch {
+        viewLifecycleScope.launch {
             val amount = withContext(Dispatchers.Default) {
-                -db.getBalanceForDay(Date())
+                -db.getBalanceForDay(LocalDate.now())
             }
 
-            onboarding_screen3_initial_amount_et.setText(if (amount == 0.0) "0" else amount.toString())
+            binding?.onboardingScreen3InitialAmountEt?.setText(if (amount == 0.0) "0" else amount.toString())
         }
 
         setCurrency()
 
-        onboarding_screen3_initial_amount_et.preventUnsupportedInputForDecimals()
-        onboarding_screen3_initial_amount_et.addTextChangedListener(object : TextWatcher {
+        binding?.onboardingScreen3InitialAmountEt?.preventUnsupportedInputForDecimals()
+        binding?.onboardingScreen3InitialAmountEt?.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
 
             }
@@ -103,16 +104,16 @@ class Onboarding3Fragment : OnboardingFragment(), CoroutineScope by MainScope() 
             }
         })
 
-        onboarding_screen3_next_button.setOnClickListener {
-            launch {
+        binding?.onboardingScreen3NextButton?.setOnClickListener { button ->
+            viewLifecycleScope.launch {
                 withContext(Dispatchers.Default) {
-                    val currentBalance = -db.getBalanceForDay(Date())
+                    val currentBalance = -db.getBalanceForDay(LocalDate.now())
                     val newBalance = amountValue
 
                     if (newBalance != currentBalance) {
                         val diff = newBalance - currentBalance
 
-                        val expense = Expense(resources.getString(R.string.adjust_balance_expense_title), -diff, Date(), true)
+                        val expense = Expense(resources.getString(R.string.adjust_balance_expense_title), -diff, LocalDate.now(), true)
                         db.persistExpense(expense)
                     }
                 }
@@ -120,22 +121,16 @@ class Onboarding3Fragment : OnboardingFragment(), CoroutineScope by MainScope() 
                 // Hide keyboard
                 try {
                     val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-                    imm?.hideSoftInputFromWindow(onboarding_screen3_initial_amount_et.windowToken, 0)
+                    imm?.hideSoftInputFromWindow(binding?.onboardingScreen3InitialAmountEt?.windowToken, 0)
                 } catch (e: Exception) {
                     Logger.error("Error while hiding keyboard", e)
                 }
 
-                next(onboarding_screen3_next_button)
+                next(button)
             }
         }
 
         setButtonText()
-    }
-
-    override fun onDestroy() {
-        cancel()
-
-        super.onDestroy()
     }
 
     override fun onResume() {
@@ -148,10 +143,10 @@ class Onboarding3Fragment : OnboardingFragment(), CoroutineScope by MainScope() 
 // -------------------------------------->
 
     private fun setCurrency() {
-        onboarding_screen3_initial_amount_money_tv?.text = parameters.getUserCurrency().symbol
+        binding?.onboardingScreen3InitialAmountMoneyTv?.text = parameters.getUserCurrency().symbol
     }
 
     private fun setButtonText() {
-        onboarding_screen3_next_button?.text = getString(R.string.onboarding_screen_3_cta, CurrencyHelper.getFormattedCurrencyString(parameters, amountValue))
+        binding?.onboardingScreen3NextButton?.text = getString(R.string.onboarding_screen_3_cta, CurrencyHelper.getFormattedCurrencyString(parameters, amountValue))
     }
 }

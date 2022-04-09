@@ -1,5 +1,5 @@
 /*
- *   Copyright 2021 Benoit LETONDOR
+ *   Copyright 2022 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@ package com.benoitletondor.easybudgetapp.view
 
 import android.app.Activity
 import android.content.ActivityNotFoundException
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.benoitletondor.easybudgetapp.R
-import com.benoitletondor.easybudgetapp.helper.*
+import com.benoitletondor.easybudgetapp.helper.Logger
+import com.benoitletondor.easybudgetapp.helper.centerButtons
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.hasUserCompleteRating
 import com.benoitletondor.easybudgetapp.parameters.setUserHasCompleteRating

@@ -1,5 +1,5 @@
 /*
- *   Copyright 2021 Benoit LETONDOR
+ *   Copyright 2022 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@ package com.benoitletondor.easybudgetapp.auth
 
 import android.app.Activity
 import android.content.Intent
-import androidx.lifecycle.LiveData
+import kotlinx.coroutines.flow.StateFlow
 
 interface Auth {
-    val state: LiveData<AuthState>
+    val state: StateFlow<AuthState>
 
     fun startAuthentication(activity: Activity)
     fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?)

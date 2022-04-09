@@ -1,5 +1,5 @@
 /*
- *   Copyright 2021 Benoit LETONDOR
+ *   Copyright 2022 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package com.benoitletondor.easybudgetapp.injection
 
 import android.content.Context
-import androidx.collection.ArrayMap
 import com.benoitletondor.easybudgetapp.auth.Auth
 import com.benoitletondor.easybudgetapp.auth.FirebaseAuth
 import com.benoitletondor.easybudgetapp.cloudstorage.CloudStorage
@@ -36,7 +35,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import java.util.*
+import java.time.LocalDate
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
@@ -70,9 +69,9 @@ object AppModule {
     ): DB = CachedDBImpl(
         DBImpl(RoomDB.create(context)),
         object : CacheDBStorage {
-            override val expenses: MutableMap<Date, List<Expense>> = ArrayMap()
-            override val balances: MutableMap<Date, Double> = ArrayMap()
-            override val checkedBalances: MutableMap<Date, Double> = ArrayMap()
+            override val expenses: MutableMap<LocalDate, List<Expense>> = mutableMapOf()
+            override val balances: MutableMap<LocalDate, Double> = mutableMapOf()
+            override val checkedBalances: MutableMap<LocalDate, Double> = mutableMapOf()
         },
         Executors.newSingleThreadExecutor(),
     )

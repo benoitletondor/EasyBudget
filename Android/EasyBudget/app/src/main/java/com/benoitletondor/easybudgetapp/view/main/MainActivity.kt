@@ -1,5 +1,5 @@
 /*
- *   Copyright 2021 Benoit LETONDOR
+ *   Copyright 2022 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -42,8 +42,10 @@ import android.view.animation.Animation
 import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.activity.viewModels
+import androidx.lifecycle.lifecycleScope
 
 import com.benoitletondor.easybudgetapp.R
+import com.benoitletondor.easybudgetapp.databinding.ActivityMainBinding
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType
 import com.benoitletondor.easybudgetapp.view.main.calendar.CalendarFragment
@@ -53,9 +55,7 @@ import com.getbase.floatingactionbutton.FloatingActionsMenu
 import com.roomorama.caldroid.CaldroidFragment
 import com.roomorama.caldroid.CaldroidListener
 
-import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Date
 import java.util.Locale
 
 import com.benoitletondor.easybudgetapp.helper.*
@@ -70,8 +70,9 @@ import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion
 import com.benoitletondor.easybudgetapp.view.welcome.getOnboardingStep
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import dagger.hilt.android.AndroidEntryPoint
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
-import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
 /**
@@ -80,18 +81,40 @@ import javax.inject.Inject
  * @author Benoit LETONDOR
  */
 @AndroidEntryPoint
-class MainActivity : BaseActivity() {
+class MainActivity : BaseActivity<ActivityMainBinding>() {
 
-    private lateinit var receiver: BroadcastReceiver
+    private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            when (intent.action) {
+                INTENT_EXPENSE_DELETED -> {
+                    val expense = intent.getParcelableExtra<Expense>("expense")!!
+
+                    viewModel.onDeleteExpenseClicked(expense)
+                }
+                INTENT_RECURRING_EXPENSE_DELETED -> {
+                    val expense = intent.getParcelableExtra<Expense>("expense")!!
+                    val deleteType = RecurringExpenseDeleteType.fromValue(intent.getIntExtra("deleteType", RecurringExpenseDeleteType.ALL.value))!!
+
+                    viewModel.onDeleteRecurringExpenseClicked(expense, deleteType)
+                }
+                SelectCurrencyFragment.CURRENCY_SELECTED_INTENT -> viewModel.onCurrencySelected()
+                INTENT_SHOW_WELCOME_SCREEN -> {
+                    val startIntent = Intent(this@MainActivity, WelcomeActivity::class.java)
+                    ActivityCompat.startActivityForResult(this@MainActivity, startIntent, WELCOME_SCREEN_ACTIVITY_CODE, null)
+                }
+                INTENT_IAB_STATUS_CHANGED -> viewModel.onIabStatusChanged()
+                INTENT_SHOW_CHECKED_BALANCE_CHANGED -> viewModel.onShowCheckedBalanceChanged()
+                INTENT_LOW_MONEY_WARNING_THRESHOLD_CHANGED -> viewModel.onLowMoneyWarningThresholdChanged()
+            }
+        }
+    }
 
     private lateinit var calendarFragment: CalendarFragment
     private lateinit var expensesViewAdapter: ExpensesRecyclerViewAdapter
 
     private lateinit var menu: FloatingActionsMenu
 
-    private var isUserPremium = false
-
-    private var lastStopDate: Date? = null
+    private var lastStopDate: LocalDate? = null
 
     private val viewModel: MainViewModel by viewModels()
 
@@ -100,9 +123,10 @@ class MainActivity : BaseActivity() {
 
 // ------------------------------------------>
 
+    override fun createBinding(): ActivityMainBinding = ActivityMainBinding.inflate(layoutInflater)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
         // Launch welcome screen if needed
         if (parameters.getOnboardingStep() != WelcomeActivity.STEP_COMPLETED) {
@@ -110,93 +134,56 @@ class MainActivity : BaseActivity() {
             ActivityCompat.startActivityForResult(this, startIntent, WELCOME_SCREEN_ACTIVITY_CODE, null)
         }
 
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbar)
 
         initCalendarFragment(savedInstanceState)
         initRecyclerView()
+        registerBroadcastReceiver()
+        performIntentActionIfAny()
+        observeViewModel()
+    }
 
-        // Register receiver
-        val filter = IntentFilter()
-        filter.addAction(INTENT_EXPENSE_DELETED)
-        filter.addAction(INTENT_RECURRING_EXPENSE_DELETED)
-        filter.addAction(SelectCurrencyFragment.CURRENCY_SELECTED_INTENT)
-        filter.addAction(INTENT_SHOW_WELCOME_SCREEN)
-        filter.addAction(Intent.ACTION_VIEW)
-        filter.addAction(INTENT_IAB_STATUS_CHANGED)
-        filter.addAction(INTENT_SHOW_CHECKED_BALANCE_CHANGED)
-
-        receiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                when (intent.action) {
-                    INTENT_EXPENSE_DELETED -> {
-                        val expense = intent.getParcelableExtra<Expense>("expense")!!
-
-                        viewModel.onDeleteExpenseClicked(expense)
-                    }
-                    INTENT_RECURRING_EXPENSE_DELETED -> {
-                        val expense = intent.getParcelableExtra<Expense>("expense")!!
-                        val deleteType = RecurringExpenseDeleteType.fromValue(intent.getIntExtra("deleteType", RecurringExpenseDeleteType.ALL.value))!!
-
-                        viewModel.onDeleteRecurringExpenseClicked(expense, deleteType)
-                    }
-                    SelectCurrencyFragment.CURRENCY_SELECTED_INTENT -> viewModel.onCurrencySelected()
-                    INTENT_SHOW_WELCOME_SCREEN -> {
-                        val startIntent = Intent(this@MainActivity, WelcomeActivity::class.java)
-                        ActivityCompat.startActivityForResult(this@MainActivity, startIntent, WELCOME_SCREEN_ACTIVITY_CODE, null)
-                    }
-                    INTENT_IAB_STATUS_CHANGED -> viewModel.onIabStatusChanged()
-                    INTENT_SHOW_CHECKED_BALANCE_CHANGED -> viewModel.onShowCheckedBalanceChanged()
-                }
-            }
-        }
-
-        LocalBroadcastManager.getInstance(applicationContext).registerReceiver(receiver, filter)
-
-        if (intent != null) {
-            openSettingsIfNeeded(intent)
-            openMonthlyReportIfNeeded(intent)
-            openPremiumIfNeeded(intent)
-            openAddExpenseIfNeeded(intent)
-            openAddRecurringExpenseIfNeeded(intent)
-            openSettingsForBackupIfNeeded(intent)
-        }
-
-        viewModel.expenseDeletionSuccessEventStream.observe(this, { (deletedExpense, newBalance, maybeNewCheckecBalance) ->
-
+    private fun observeViewModel() {
+        lifecycleScope.launchCollect(viewModel.expenseDeletionSuccessEventFlow) { (deletedExpense, newBalance, maybeNewCheckecBalance) ->
             expensesViewAdapter.removeExpense(deletedExpense)
-            updateBalanceDisplayForDay(expensesViewAdapter.getDate(), newBalance, maybeNewCheckecBalance)
+            updateBalanceDisplayForDay(
+                expensesViewAdapter.getDate(),
+                newBalance,
+                maybeNewCheckecBalance
+            )
             calendarFragment.refreshView()
 
-            val snackbar = Snackbar.make(coordinatorLayout, if (deletedExpense.isRevenue()) R.string.income_delete_snackbar_text else R.string.expense_delete_snackbar_text, Snackbar.LENGTH_LONG)
+            val snackbar = Snackbar.make(
+                binding.coordinatorLayout,
+                if (deletedExpense.isRevenue()) R.string.income_delete_snackbar_text else R.string.expense_delete_snackbar_text,
+                Snackbar.LENGTH_LONG
+            )
             snackbar.setAction(R.string.undo) {
                 viewModel.onExpenseDeletionCancelled(deletedExpense)
             }
-            snackbar.setActionTextColor(ContextCompat.getColor(this@MainActivity, R.color.snackbar_action_undo))
+            snackbar.setActionTextColor(
+                ContextCompat.getColor(
+                    this@MainActivity,
+                    R.color.snackbar_action_undo
+                )
+            )
 
             snackbar.duration = BaseTransientBottomBar.LENGTH_LONG
             snackbar.show()
-        })
+        }
 
-        viewModel.expenseDeletionErrorEventStream.observe(this, {
+        lifecycleScope.launchCollect(viewModel.expenseDeletionErrorEventFlow) {
             AlertDialog.Builder(this@MainActivity)
                 .setTitle(R.string.expense_delete_error_title)
                 .setMessage(R.string.expense_delete_error_message)
                 .setNegativeButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
                 .show()
-        })
-
-        viewModel.expenseRecoverySuccessEventStream.observe(this, {
-            // Nothing to do
-        })
-
-        viewModel.expenseRecoveryErrorEventStream.observe(this, { expense ->
-            Logger.error("Error restoring deleted expense: $expense")
-        })
+        }
 
         var expenseDeletionDialog: ProgressDialog? = null
-        viewModel.recurringExpenseDeletionProgressEventStream.observe(this, { status ->
-            when(status) {
-                is MainViewModel.RecurringExpenseDeleteProgressState.Starting -> {
+        lifecycleScope.launchCollect(viewModel.recurringExpenseDeletionProgressStateFlow) { state ->
+            when(state) {
+                is MainViewModel.RecurringExpenseDeleteProgressState.Deleting -> {
                     val dialog = ProgressDialog(this@MainActivity)
                     dialog.isIndeterminate = true
                     dialog.setTitle(R.string.recurring_expense_delete_loading_title)
@@ -207,49 +194,63 @@ class MainActivity : BaseActivity() {
 
                     expenseDeletionDialog = dialog
                 }
-                is MainViewModel.RecurringExpenseDeleteProgressState.ErrorCantDeleteBeforeFirstOccurrence -> {
+                MainViewModel.RecurringExpenseDeleteProgressState.Idle -> {
                     expenseDeletionDialog?.dismiss()
                     expenseDeletionDialog = null
+                }
+            }
+        }
 
+        lifecycleScope.launchCollect(viewModel.recurringExpenseDeletionEventFlow) { event ->
+            when(event) {
+                is MainViewModel.RecurringExpenseDeletionEvent.ErrorCantDeleteBeforeFirstOccurrence -> {
                     AlertDialog.Builder(this@MainActivity)
                         .setTitle(R.string.recurring_expense_delete_first_error_title)
                         .setMessage(R.string.recurring_expense_delete_first_error_message)
                         .setNegativeButton(R.string.ok, null)
                         .show()
                 }
-                is MainViewModel.RecurringExpenseDeleteProgressState.ErrorRecurringExpenseDeleteNotAssociated -> {
+                is MainViewModel.RecurringExpenseDeletionEvent.ErrorIO -> {
                     showGenericRecurringDeleteErrorDialog()
-
-                    expenseDeletionDialog?.dismiss()
-                    expenseDeletionDialog = null
                 }
-                is MainViewModel.RecurringExpenseDeleteProgressState.ErrorIO -> {
+                is MainViewModel.RecurringExpenseDeletionEvent.ErrorRecurringExpenseDeleteNotAssociated -> {
                     showGenericRecurringDeleteErrorDialog()
-
-                    expenseDeletionDialog?.dismiss()
-                    expenseDeletionDialog = null
                 }
-                is MainViewModel.RecurringExpenseDeleteProgressState.Deleted -> {
-                    val snackbar = Snackbar.make(coordinatorLayout, R.string.recurring_expense_delete_success_message, Snackbar.LENGTH_LONG)
+                is MainViewModel.RecurringExpenseDeletionEvent.Success -> {
+                    val snackbar = Snackbar.make(
+                        binding.coordinatorLayout,
+                        R.string.recurring_expense_delete_success_message,
+                        Snackbar.LENGTH_LONG
+                    )
 
                     snackbar.setAction(R.string.undo) {
-                        viewModel.onRestoreRecurringExpenseClicked(status.recurringExpense, status.restoreRecurring, status.expensesToRestore)
+                        viewModel.onRestoreRecurringExpenseClicked(
+                            event.recurringExpense,
+                            event.restoreRecurring,
+                            event.expensesToRestore
+                        )
                     }
 
-                    snackbar.setActionTextColor(ContextCompat.getColor(this@MainActivity, R.color.snackbar_action_undo))
+                    snackbar.setActionTextColor(
+                        ContextCompat.getColor(
+                            this@MainActivity,
+                            R.color.snackbar_action_undo
+                        )
+                    )
                     snackbar.duration = BaseTransientBottomBar.LENGTH_LONG
                     snackbar.show()
-
-                    expenseDeletionDialog?.dismiss()
-                    expenseDeletionDialog = null
                 }
             }
-        })
+        }
 
         var expenseRestoreDialog: Dialog? = null
-        viewModel.recurringExpenseRestoreProgressEventStream.observe(this, { status ->
-            when(status) {
-                is MainViewModel.RecurringExpenseRestoreProgressState.Starting -> {
+        lifecycleScope.launchCollect(viewModel.recurringExpenseRestoreProgressStateFlow) { state ->
+            when(state) {
+                MainViewModel.RecurringExpenseRestoreProgressState.Idle -> {
+                    expenseRestoreDialog?.dismiss()
+                    expenseRestoreDialog = null
+                }
+                is MainViewModel.RecurringExpenseRestoreProgressState.Restoring -> {
                     val dialog = ProgressDialog(this@MainActivity)
                     dialog.isIndeterminate = true
                     dialog.setTitle(R.string.recurring_expense_restoring_loading_title)
@@ -260,29 +261,36 @@ class MainActivity : BaseActivity() {
 
                     expenseRestoreDialog = dialog
                 }
-                is MainViewModel.RecurringExpenseRestoreProgressState.ErrorIO -> {
+            }
+        }
+
+        lifecycleScope.launchCollect(viewModel.recurringExpenseRestoreEventFlow) { event ->
+            when(event) {
+                is MainViewModel.RecurringExpenseRestoreEvent.ErrorIO -> {
                     AlertDialog.Builder(this@MainActivity)
                         .setTitle(R.string.recurring_expense_restore_error_title)
                         .setMessage(resources.getString(R.string.recurring_expense_restore_error_message))
                         .setNegativeButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
                         .show()
-
-                    expenseRestoreDialog?.dismiss()
-                    expenseRestoreDialog = null
                 }
-                is MainViewModel.RecurringExpenseRestoreProgressState.Restored -> {
-                    Snackbar.make(coordinatorLayout, R.string.recurring_expense_restored_success_message, Snackbar.LENGTH_LONG).show()
-
-                    expenseRestoreDialog?.dismiss()
-                    expenseRestoreDialog = null
+                is MainViewModel.RecurringExpenseRestoreEvent.Success -> {
+                    Snackbar.make(
+                        binding.coordinatorLayout,
+                        R.string.recurring_expense_restored_success_message,
+                        Snackbar.LENGTH_LONG
+                    ).show()
                 }
             }
-        })
+        }
 
-        viewModel.startCurrentBalanceEditorEventStream.observe(this, { currentBalance ->
+        lifecycleScope.launchCollect(viewModel.startCurrentBalanceEditorEventFlow) { currentBalance ->
             val dialogView = layoutInflater.inflate(R.layout.dialog_adjust_balance, null)
             val amountEditText = dialogView.findViewById<EditText>(R.id.balance_amount)
-            amountEditText.setText(if (currentBalance == 0.0) "0" else CurrencyHelper.getFormattedAmountValue(currentBalance))
+            amountEditText.setText(
+                if (currentBalance == 0.0) "0" else CurrencyHelper.getFormattedAmountValue(
+                    currentBalance
+                )
+            )
             amountEditText.preventUnsupportedInputForDecimals()
             amountEditText.setSelection(amountEditText.text.length) // Put focus at the end of the text
 
@@ -294,9 +302,12 @@ class MainActivity : BaseActivity() {
             builder.setPositiveButton(R.string.ok) { dialog, _ ->
                 try {
                     val stringValue = amountEditText.text.toString()
-                    if( stringValue.isNotBlank() ) {
+                    if (stringValue.isNotBlank()) {
                         val newBalance = java.lang.Double.valueOf(stringValue)
-                        viewModel.onNewBalanceSelected(newBalance, getString(R.string.adjust_balance_expense_title))
+                        viewModel.onNewBalanceSelected(
+                            newBalance,
+                            getString(R.string.adjust_balance_expense_title)
+                        )
                     }
                 } catch (e: Exception) {
                     Logger.error("Error parsing new balance", e)
@@ -314,72 +325,82 @@ class MainActivity : BaseActivity() {
                     dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
                 }
             }
-        })
+        }
 
-        viewModel.currentBalanceEditingErrorEventStream.observe(this, { exception ->
-            Logger.error("Error while adjusting balance", exception)
-
+        lifecycleScope.launchCollect(viewModel.currentBalanceEditingErrorEventFlow) {
             AlertDialog.Builder(this@MainActivity)
                 .setTitle(R.string.adjust_balance_error_title)
                 .setMessage(R.string.adjust_balance_error_message)
                 .setNegativeButton(R.string.ok) { dialog1, _ -> dialog1.dismiss() }
                 .show()
-        })
+        }
 
-        viewModel.currentBalanceEditedEventStream.observe(this, { (expense, diff, newBalance) ->
+        lifecycleScope.launchCollect(viewModel.currentBalanceEditedEventFlow) { (expense, diff, newBalance) ->
             //Show snackbar
-            val snackbar = Snackbar.make(coordinatorLayout, resources.getString(R.string.adjust_balance_snackbar_text, CurrencyHelper.getFormattedCurrencyString(parameters, newBalance)), Snackbar.LENGTH_LONG)
+            val snackbar = Snackbar.make(
+                binding.coordinatorLayout,
+                resources.getString(
+                    R.string.adjust_balance_snackbar_text,
+                    CurrencyHelper.getFormattedCurrencyString(parameters, newBalance)
+                ),
+                Snackbar.LENGTH_LONG
+            )
             snackbar.setAction(R.string.undo) {
                 viewModel.onCurrentBalanceEditedCancelled(expense, diff)
             }
-            snackbar.setActionTextColor(ContextCompat.getColor(this@MainActivity, R.color.snackbar_action_undo))
+            snackbar.setActionTextColor(
+                ContextCompat.getColor(
+                    this@MainActivity,
+                    R.color.snackbar_action_undo
+                )
+            )
 
             snackbar.duration = BaseTransientBottomBar.LENGTH_LONG
             snackbar.show()
-        })
+        }
 
-        viewModel.currentBalanceRestoringEventStream.observe(this, {
-            // Nothing to do
-        })
-
-        viewModel.currentBalanceRestoringErrorEventStream.observe(this, { exception ->
-            Logger.error("An error occurred during balance", exception)
-
+        lifecycleScope.launchCollect(viewModel.currentBalanceRestoringErrorEventFlow) {
             AlertDialog.Builder(this@MainActivity)
                 .setTitle(R.string.adjust_balance_error_title)
                 .setMessage(R.string.adjust_balance_error_message)
                 .setNegativeButton(R.string.ok) { dialog1, _ -> dialog1.dismiss() }
                 .show()
-        })
+        }
 
-        viewModel.premiumStatusLiveData.observe(this, { isPremium ->
-            isUserPremium = isPremium
+        lifecycleScope.launchCollect(viewModel.premiumStatusFlow) {
             invalidateOptionsMenu()
-        })
+        }
 
-        viewModel.selectedDateChangeLiveData.observe(this, { (date, balance, maybeCheckedBalance, expenses) ->
+        lifecycleScope.launchCollect(viewModel.selectedDateDataFlow) { (date, balance, maybeCheckedBalance, expenses) ->
             refreshAllForDate(date, balance, maybeCheckedBalance, expenses)
-        })
+        }
 
-        viewModel.expenseCheckedErrorEventStream.observe(this, { exception ->
-            Logger.error("Error while checking expense", exception)
+        lifecycleScope.launchCollect(viewModel.refreshDatesFlow) {
+            calendarFragment.refreshView()
+        }
 
+        lifecycleScope.launchCollect(viewModel.expenseCheckedErrorEventFlow) { exception ->
             AlertDialog.Builder(this@MainActivity)
                 .setTitle(R.string.expense_check_error_title)
-                .setMessage(getString(R.string.expense_check_error_message, exception.localizedMessage))
-                .setNegativeButton(R.string.ok) { dialog2, _ ->  dialog2.dismiss() }
+                .setMessage(
+                    getString(
+                        R.string.expense_check_error_message,
+                        exception.localizedMessage
+                    )
+                )
+                .setNegativeButton(R.string.ok) { dialog2, _ -> dialog2.dismiss() }
                 .show()
-        })
+        }
 
-        viewModel.showGoToCurrentMonthButtonLiveData.observe(this, { _ ->
+        lifecycleScope.launchCollect(viewModel.showGoToCurrentMonthButtonStateFlow) {
             invalidateOptionsMenu()
-        })
+        }
 
-        viewModel.goBackToCurrentMonthEventStream.observe(this, {
+        lifecycleScope.launchCollect(viewModel.goBackToCurrentMonthEventFlow) {
             calendarFragment.goToCurrentMonth()
-        })
+        }
 
-        viewModel.confirmCheckAllPastEntriesEventStream.observe(this, {
+        lifecycleScope.launchCollect(viewModel.confirmCheckAllPastEntriesEventFlow) {
             AlertDialog.Builder(this@MainActivity)
                 .setTitle(R.string.check_all_past_expences_title)
                 .setMessage(getString(R.string.check_all_past_expences_message))
@@ -387,17 +408,48 @@ class MainActivity : BaseActivity() {
                     viewModel.onCheckAllPastEntriesConfirmPressed()
                     dialog2.dismiss()
                 }
-                .setNegativeButton(android.R.string.cancel) { dialog2, _ ->  dialog2.dismiss() }
+                .setNegativeButton(android.R.string.cancel) { dialog2, _ -> dialog2.dismiss() }
                 .show()
-        })
+        }
 
-        viewModel.checkAllPastEntriesErrorEventStream.observe(this, { error ->
+        lifecycleScope.launchCollect(viewModel.checkAllPastEntriesErrorEventFlow) { error ->
             AlertDialog.Builder(this@MainActivity)
                 .setTitle(R.string.check_all_past_expences_error_title)
-                .setMessage(getString(R.string.check_all_past_expences_error_message, error.localizedMessage))
-                .setNegativeButton(R.string.ok) { dialog2, _ ->  dialog2.dismiss() }
+                .setMessage(
+                    getString(
+                        R.string.check_all_past_expences_error_message,
+                        error.localizedMessage
+                    )
+                )
+                .setNegativeButton(R.string.ok) { dialog2, _ -> dialog2.dismiss() }
                 .show()
-        })
+        }
+    }
+
+    private fun performIntentActionIfAny() {
+        if (intent != null) {
+            openSettingsIfNeeded(intent)
+            openMonthlyReportIfNeeded(intent)
+            openPremiumIfNeeded(intent)
+            openAddExpenseIfNeeded(intent)
+            openAddRecurringExpenseIfNeeded(intent)
+            openSettingsForBackupIfNeeded(intent)
+        }
+    }
+
+    private fun registerBroadcastReceiver() {
+        // Register receiver
+        val filter = IntentFilter()
+        filter.addAction(INTENT_EXPENSE_DELETED)
+        filter.addAction(INTENT_RECURRING_EXPENSE_DELETED)
+        filter.addAction(SelectCurrencyFragment.CURRENCY_SELECTED_INTENT)
+        filter.addAction(INTENT_SHOW_WELCOME_SCREEN)
+        filter.addAction(Intent.ACTION_VIEW)
+        filter.addAction(INTENT_IAB_STATUS_CHANGED)
+        filter.addAction(INTENT_SHOW_CHECKED_BALANCE_CHANGED)
+        filter.addAction(INTENT_LOW_MONEY_WARNING_THRESHOLD_CHANGED)
+
+        LocalBroadcastManager.getInstance(applicationContext).registerReceiver(receiver, filter)
     }
 
     override fun onStart() {
@@ -405,13 +457,7 @@ class MainActivity : BaseActivity() {
 
         // If the last stop happened yesterday (or another day), set and refresh to the current date
         if (lastStopDate != null) {
-            val cal = Calendar.getInstance()
-            val currentDay = cal.get(Calendar.DAY_OF_YEAR)
-
-            cal.time = lastStopDate!!
-            val lastStopDay = cal.get(Calendar.DAY_OF_YEAR)
-
-            if (currentDay != lastStopDay) {
+            if (LocalDate.now() != lastStopDate) {
                 viewModel.onDayChanged()
             }
 
@@ -420,7 +466,7 @@ class MainActivity : BaseActivity() {
     }
 
     override fun onStop() {
-        lastStopDate = Date()
+        lastStopDate = LocalDate.now()
 
         super.onStop()
     }
@@ -485,20 +531,20 @@ class MainActivity : BaseActivity() {
         menuInflater.inflate(R.menu.menu_main, menu)
 
         // Remove monthly report for non premium users
-        if ( !isUserPremium ) {
+        if ( !viewModel.premiumStatusFlow.value ) {
             menu.removeItem(R.id.action_monthly_report)
             menu.removeItem(R.id.action_check_all_past_entries)
         } else if ( !parameters.hasUserSawMonthlyReportHint() ) {
-            monthly_report_hint.visibility = View.VISIBLE
+            binding.monthlyReportHint.visibility = View.VISIBLE
 
-            monthly_report_hint_button.setOnClickListener {
-                monthly_report_hint.visibility = View.GONE
+            binding.monthlyReportHintButton.setOnClickListener {
+                binding.monthlyReportHint.visibility = View.GONE
                 parameters.setUserSawMonthlyReportHint()
             }
         }
 
         // Remove back to today button if needed
-        if ( viewModel.showGoToCurrentMonthButtonLiveData.value != true ) {
+        if (!viewModel.showGoToCurrentMonthButtonStateFlow.value) {
             menu.removeItem(R.id.action_go_to_current_month)
         }
 
@@ -544,8 +590,8 @@ class MainActivity : BaseActivity() {
      * Update the balance for the given day
      * TODO optimization
      */
-    private fun updateBalanceDisplayForDay(day: Date, balance: Double, maybeCheckedBalance: Double?) {
-        val format = SimpleDateFormat(resources.getString(R.string.account_balance_date_format), Locale.getDefault())
+    private fun updateBalanceDisplayForDay(day: LocalDate, balance: Double, maybeCheckedBalance: Double?) {
+        val format = DateTimeFormatter.ofPattern(resources.getString(R.string.account_balance_date_format), Locale.getDefault())
 
         var formatted = resources.getString(R.string.account_balance_format, format.format(day))
 
@@ -556,8 +602,8 @@ class MainActivity : BaseActivity() {
             formatted = formatted.substring(0, formatted.length - 3) + " :" // Remove . at the end of the month (ex: nov. : -> nov :)
         }
 
-        budgetLine.text = formatted
-        budgetLineAmount.text = if (maybeCheckedBalance != null ) {
+        binding.budgetLine.text = formatted
+        binding.budgetLineAmount.text = if (maybeCheckedBalance != null ) {
             resources.getString(
                 R.string.account_balance_checked_format,
                 CurrencyHelper.getFormattedCurrencyString(parameters, balance),
@@ -567,7 +613,7 @@ class MainActivity : BaseActivity() {
             CurrencyHelper.getFormattedCurrencyString(parameters, balance)
         }
 
-        budgetLineAmount.setTextColor(ContextCompat.getColor(this, when {
+        binding.budgetLineAmount.setTextColor(ContextCompat.getColor(this, when {
             balance <= 0 -> R.color.budget_red
             balance < parameters.getLowMoneyWarningAmount() -> R.color.budget_orange
             else -> R.color.budget_green
@@ -641,7 +687,7 @@ class MainActivity : BaseActivity() {
     private fun openAddExpenseIfNeeded(intent: Intent) {
         if (intent.getBooleanExtra(INTENT_SHOW_ADD_EXPENSE, false)) {
             val startIntent = Intent(this, ExpenseEditActivity::class.java)
-            startIntent.putExtra("date", Date().time)
+            startIntent.putExtra("date", LocalDate.now().toEpochDay())
 
             ActivityCompat.startActivityForResult(this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null)
         }
@@ -656,7 +702,7 @@ class MainActivity : BaseActivity() {
     private fun openAddRecurringExpenseIfNeeded(intent: Intent) {
         if (intent.getBooleanExtra(INTENT_SHOW_ADD_RECURRING_EXPENSE, false)) {
             val startIntent = Intent(this, RecurringExpenseEditActivity::class.java)
-            startIntent.putExtra("dateStart", Date().time)
+            startIntent.putExtra("dateStart", LocalDate.now().toEpochDay())
 
             ActivityCompat.startActivityForResult(this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null)
         }
@@ -681,18 +727,18 @@ class MainActivity : BaseActivity() {
             args.putInt(CaldroidFragment.THEME_RESOURCE, R.style.caldroid_style)
 
             calendarFragment.arguments = args
-            calendarFragment.setMinDate(Date(parameters.getInitTimestamp()).computeCalendarMinDateFromInitDate())
+            calendarFragment.setMinDate((parameters.getInitDate() ?: LocalDate.now()).computeCalendarMinDateFromInitDate())
         }
 
         val listener = object : CaldroidListener() {
-            override fun onSelectDate(date: Date, view: View) {
+            override fun onSelectDate(date: LocalDate, view: View) {
                 viewModel.onSelectDate(date)
             }
 
-            override fun onLongClickDate(date: Date, view: View?) // Add expense on long press
+            override fun onLongClickDate(date: LocalDate, view: View?) // Add expense on long press
             {
                 val startIntent = Intent(this@MainActivity, ExpenseEditActivity::class.java)
-                startIntent.putExtra("date", date.time)
+                startIntent.putExtra("date", date.toEpochDay())
 
                 // Get the absolute location on window for Y value
                 val viewLocation = IntArray(2)
@@ -706,7 +752,7 @@ class MainActivity : BaseActivity() {
             }
 
             override fun onChangeMonth(month: Int, year: Int) {
-                viewModel.onMonthChanged(month - 1)
+                viewModel.onMonthChanged(month - 1, year)
             }
 
             override fun onCaldroidViewCreated() {
@@ -826,7 +872,7 @@ class MainActivity : BaseActivity() {
         val fabNewExpense = findViewById<FloatingActionButton>(R.id.fab_new_expense)
         fabNewExpense.setOnClickListener {
             val startIntent = Intent(this@MainActivity, ExpenseEditActivity::class.java)
-            startIntent.putExtra("date", calendarFragment.getSelectedDate().time)
+            startIntent.putExtra("date", calendarFragment.getSelectedDate().toEpochDay())
 
             startIntent.putExtra(ANIMATE_TRANSITION_KEY, true)
             startIntent.putExtra(CENTER_X_KEY, menu.x.toInt() + (menu.width.toFloat() / 1.2f).toInt())
@@ -840,7 +886,7 @@ class MainActivity : BaseActivity() {
         val fabNewRecurringExpense = findViewById<FloatingActionButton>(R.id.fab_new_recurring_expense)
         fabNewRecurringExpense.setOnClickListener {
             val startIntent = Intent(this@MainActivity, RecurringExpenseEditActivity::class.java)
-            startIntent.putExtra("dateStart", calendarFragment.getSelectedDate().time)
+            startIntent.putExtra("dateStart", calendarFragment.getSelectedDate().toEpochDay())
 
             startIntent.putExtra(ANIMATE_TRANSITION_KEY, true)
             startIntent.putExtra(CENTER_X_KEY, menu.x.toInt() + (menu.width.toFloat() / 1.2f).toInt())
@@ -854,30 +900,30 @@ class MainActivity : BaseActivity() {
         /*
          * Expense Recycler view
          */
-        expensesRecyclerView.layoutManager = LinearLayoutManager(this)
+        binding.expensesRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        expensesViewAdapter = ExpensesRecyclerViewAdapter(this, parameters, iab, Date()) { expense, checked ->
+        expensesViewAdapter = ExpensesRecyclerViewAdapter(this, parameters, iab, LocalDate.now()) { expense, checked ->
             viewModel.onExpenseChecked(expense, checked)
         }
-        expensesRecyclerView.adapter = expensesViewAdapter
+        binding.expensesRecyclerView.adapter = expensesViewAdapter
     }
 
-    private fun refreshRecyclerViewForDate(date: Date, expenses: List<Expense>) {
+    private fun refreshRecyclerViewForDate(date: LocalDate, expenses: List<Expense>) {
         expensesViewAdapter.setDate(date, expenses)
 
         if ( expenses.isNotEmpty() ) {
-            expensesRecyclerView.visibility = View.VISIBLE
-            emptyExpensesRecyclerViewPlaceholder.visibility = View.GONE
+            binding.expensesRecyclerView.visibility = View.VISIBLE
+            binding.emptyExpensesRecyclerViewPlaceholder.visibility = View.GONE
         } else {
-            expensesRecyclerView.visibility = View.GONE
-            emptyExpensesRecyclerViewPlaceholder.visibility = View.VISIBLE
+            binding.expensesRecyclerView.visibility = View.GONE
+            binding.emptyExpensesRecyclerViewPlaceholder.visibility = View.VISIBLE
         }
     }
 
-    private fun refreshAllForDate(date: Date, balance: Double, maybeCheckedBalance: Double?, expenses: List<Expense>) {
+    private fun refreshAllForDate(date: LocalDate, balance: Double, maybeCheckedBalance: Double?, expenses: List<Expense>) {
         refreshRecyclerViewForDate(date, expenses)
         updateBalanceDisplayForDay(date, balance, maybeCheckedBalance)
-        calendarFragment.setSelectedDates(date, date)
+        calendarFragment.setSelectedDate(date)
         calendarFragment.refreshView()
     }
 
@@ -903,6 +949,7 @@ class MainActivity : BaseActivity() {
         const val INTENT_SHOW_ADD_EXPENSE = "intent.addexpense.show"
         const val INTENT_SHOW_ADD_RECURRING_EXPENSE = "intent.addrecurringexpense.show"
         const val INTENT_SHOW_CHECKED_BALANCE_CHANGED = "intent.showcheckedbalance.changed"
+        const val INTENT_LOW_MONEY_WARNING_THRESHOLD_CHANGED = "intent.lowmoneywarningthreshold.changed"
 
         const val INTENT_REDIRECT_TO_PREMIUM_EXTRA = "intent.extra.premiumshow"
         const val INTENT_REDIRECT_TO_SETTINGS_EXTRA = "intent.extra.redirecttosettings"

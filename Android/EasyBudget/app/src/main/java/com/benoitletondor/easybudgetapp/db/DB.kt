@@ -1,5 +1,5 @@
 /*
- *   Copyright 2021 Benoit LETONDOR
+ *   Copyright 2022 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -18,8 +18,7 @@ package com.benoitletondor.easybudgetapp.db
 
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
-import java.io.Closeable
-import java.util.*
+import java.time.LocalDate
 
 interface DB {
     fun ensureDBCreated()
@@ -27,15 +26,15 @@ interface DB {
 
     suspend fun persistExpense(expense: Expense): Expense
 
-    suspend fun hasExpenseForDay(dayDate: Date): Boolean
+    suspend fun hasExpenseForDay(dayDate: LocalDate): Boolean
 
-    suspend fun getExpensesForDay(dayDate: Date): List<Expense>
+    suspend fun getExpensesForDay(dayDate: LocalDate): List<Expense>
 
-    suspend fun getExpensesForMonth(monthStartDate: Date): List<Expense>
+    suspend fun getExpensesForMonth(monthStartDate: LocalDate): List<Expense>
 
-    suspend fun getBalanceForDay(dayDate: Date): Double
+    suspend fun getBalanceForDay(dayDate: LocalDate): Double
 
-    suspend fun getCheckedBalanceForDay(dayDate: Date): Double
+    suspend fun getCheckedBalanceForDay(dayDate: LocalDate): Double
 
     suspend fun persistRecurringExpense(recurringExpense: RecurringExpense): RecurringExpense
 
@@ -47,19 +46,19 @@ interface DB {
 
     suspend fun getAllExpenseForRecurringExpense(recurringExpense: RecurringExpense): List<Expense>
 
-    suspend fun deleteAllExpenseForRecurringExpenseFromDate(recurringExpense: RecurringExpense, fromDate: Date)
+    suspend fun deleteAllExpenseForRecurringExpenseAfterDate(recurringExpense: RecurringExpense, afterDate: LocalDate)
 
-    suspend fun getAllExpensesForRecurringExpenseFromDate(recurringExpense: RecurringExpense, fromDate: Date): List<Expense>
+    suspend fun getAllExpensesForRecurringExpenseAfterDate(recurringExpense: RecurringExpense, afterDate: LocalDate): List<Expense>
 
-    suspend fun deleteAllExpenseForRecurringExpenseBeforeDate(recurringExpense: RecurringExpense, beforeDate: Date)
+    suspend fun deleteAllExpenseForRecurringExpenseBeforeDate(recurringExpense: RecurringExpense, beforeDate: LocalDate)
 
-    suspend fun getAllExpensesForRecurringExpenseBeforeDate(recurringExpense: RecurringExpense, beforeDate: Date): List<Expense>
+    suspend fun getAllExpensesForRecurringExpenseBeforeDate(recurringExpense: RecurringExpense, beforeDate: LocalDate): List<Expense>
 
-    suspend fun hasExpensesForRecurringExpenseBeforeDate(recurringExpense: RecurringExpense, beforeDate: Date): Boolean
+    suspend fun hasExpensesForRecurringExpenseBeforeDate(recurringExpense: RecurringExpense, beforeDate: LocalDate): Boolean
 
     suspend fun findRecurringExpenseForId(recurringExpenseId: Long): RecurringExpense?
 
     suspend fun getOldestExpense(): Expense?
 
-    suspend fun markAllEntriesAsChecked(beforeDate: Date)
+    suspend fun markAllEntriesAsChecked(beforeDate: LocalDate)
 }

@@ -1,5 +1,5 @@
 /*
- *   Copyright 2021 Benoit LETONDOR
+ *   Copyright 2022 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
-import java.util.*
+import java.time.LocalDate
 
 @Entity(tableName = "expense",
         indices = [Index(value = ["date"], name = "D_i")])
@@ -34,7 +34,7 @@ class ExpenseEntity(@PrimaryKey(autoGenerate = true)
                     @ColumnInfo(name = "amount")
                     val amount: Long,
                     @ColumnInfo(name = "date")
-                    val date: Date,
+                    val date: LocalDate,
                     @ColumnInfo(name = "checked")
                     val checked: Boolean,
                     @ColumnInfo(name = "monthly_id")
@@ -46,6 +46,6 @@ class ExpenseEntity(@PrimaryKey(autoGenerate = true)
         amount / 100.0,
         date,
         checked,
-        associatedRecurringExpense
+        associatedRecurringExpense,
     )
 }

@@ -1,5 +1,5 @@
 /*
- *   Copyright 2021 Benoit LETONDOR
+ *   Copyright 2022 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -25,17 +25,18 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
+import com.benoitletondor.easybudgetapp.helper.launchCollect
+import com.benoitletondor.easybudgetapp.helper.viewLifecycleScope
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.*
+import java.time.LocalDate
 import javax.inject.Inject
 
-private const val ARG_DATE = "arg_date"
+private const val ARG_FIRST_DAY_OF_MONTH_DATE = "arg_date"
 
 /**
  * Fragment that displays monthly report for a given month
@@ -45,9 +46,9 @@ private const val ARG_DATE = "arg_date"
 @AndroidEntryPoint
 class MonthlyReportFragment : Fragment() {
     /**
-     * The first date of the month at 00:00:00
+     * The first day of the month
      */
-    private lateinit var date: Date
+    private lateinit var firstDayOfMonth: LocalDate
 
     private val viewModel: MonthlyReportViewModel by viewModels()
     @Inject lateinit var parameters: Parameters
@@ -55,7 +56,7 @@ class MonthlyReportFragment : Fragment() {
 // ---------------------------------->
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        date = requireArguments().getSerializable(ARG_DATE) as Date
+        firstDayOfMonth = requireArguments().getSerializable(ARG_FIRST_DAY_OF_MONTH_DATE) as LocalDate
 
         // Inflate the layout for this fragment
         val v = inflater.inflate(R.layout.fragment_monthly_report, container, false)
@@ -68,12 +69,12 @@ class MonthlyReportFragment : Fragment() {
         val expensesAmountTextView = v.findViewById<TextView>(R.id.monthly_report_fragment_expenses_total_tv)
         val balanceTextView = v.findViewById<TextView>(R.id.monthly_report_fragment_balance_tv)
 
-        viewModel.monthlyReportDataLiveData.observe(viewLifecycleOwner, Observer { result ->
-            progressBar.visibility = View.GONE
-            content.visibility = View.VISIBLE
+        viewLifecycleScope.launchCollect(viewModel.stateFlow) { state ->
+            when(state) {
+                MonthlyReportViewModel.MonthlyReportState.Empty -> {
+                    progressBar.visibility = View.GONE
+                    content.visibility = View.VISIBLE
 
-            when(result) {
-                MonthlyReportViewModel.MonthlyReportData.Empty -> {
                     recyclerView.visibility = View.GONE
                     emptyState.visibility = View.VISIBLE
 
@@ -82,20 +83,27 @@ class MonthlyReportFragment : Fragment() {
                     balanceTextView.text = CurrencyHelper.getFormattedCurrencyString(parameters, 0.0)
                     balanceTextView.setTextColor(ContextCompat.getColor(balanceTextView.context, R.color.budget_green))
                 }
-                is MonthlyReportViewModel.MonthlyReportData.Data -> {
-                    configureRecyclerView(recyclerView, MonthlyReportRecyclerViewAdapter(result.expenses, result.revenues, parameters))
+                is MonthlyReportViewModel.MonthlyReportState.Loaded -> {
+                    progressBar.visibility = View.GONE
+                    content.visibility = View.VISIBLE
 
-                    revenuesAmountTextView.text = CurrencyHelper.getFormattedCurrencyString(parameters, result.revenuesAmount)
-                    expensesAmountTextView.text = CurrencyHelper.getFormattedCurrencyString(parameters, result.expensesAmount)
+                    configureRecyclerView(recyclerView, MonthlyReportRecyclerViewAdapter(state.expenses, state.revenues, parameters))
 
-                    val balance = result.revenuesAmount - result.expensesAmount
+                    revenuesAmountTextView.text = CurrencyHelper.getFormattedCurrencyString(parameters, state.revenuesAmount)
+                    expensesAmountTextView.text = CurrencyHelper.getFormattedCurrencyString(parameters, state.expensesAmount)
+
+                    val balance = state.revenuesAmount - state.expensesAmount
                     balanceTextView.text = CurrencyHelper.getFormattedCurrencyString(parameters, balance)
                     balanceTextView.setTextColor(ContextCompat.getColor(balanceTextView.context, if (balance >= 0) R.color.budget_green else R.color.budget_red))
                 }
+                MonthlyReportViewModel.MonthlyReportState.Loading -> {
+                    progressBar.visibility = View.VISIBLE
+                    content.visibility = View.GONE
+                }
             }
-        })
+        }
 
-        viewModel.loadDataForMonth(date)
+        viewModel.loadDataForMonth(firstDayOfMonth)
 
         return v
     }
@@ -109,9 +117,9 @@ class MonthlyReportFragment : Fragment() {
     }
 
     companion object {
-        fun newInstance(date: Date): MonthlyReportFragment = MonthlyReportFragment().apply {
+        fun newInstance(firstDayOfMonth: LocalDate): MonthlyReportFragment = MonthlyReportFragment().apply {
             arguments = Bundle().apply {
-                putSerializable(ARG_DATE, date)
+                putSerializable(ARG_FIRST_DAY_OF_MONTH_DATE, firstDayOfMonth)
             }
         }
     }

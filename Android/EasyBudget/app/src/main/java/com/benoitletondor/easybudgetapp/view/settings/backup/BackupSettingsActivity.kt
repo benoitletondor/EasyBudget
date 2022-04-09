@@ -1,5 +1,5 @@
 /*
- *   Copyright 2021 Benoit LETONDOR
+ *   Copyright 2022 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -23,174 +23,187 @@ import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.benoitletondor.easybudgetapp.R
+import com.benoitletondor.easybudgetapp.databinding.ActivityBackupSettingsBinding
 import com.benoitletondor.easybudgetapp.helper.BaseActivity
+import com.benoitletondor.easybudgetapp.helper.launchCollect
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.activity_backup_settings.*
 import java.util.*
 import kotlin.system.exitProcess
 
 @AndroidEntryPoint
-class BackupSettingsActivity : BaseActivity() {
+class BackupSettingsActivity : BaseActivity<ActivityBackupSettingsBinding>() {
     private val viewModel: BackupSettingsViewModel by viewModels()
+
+    override fun createBinding(): ActivityBackupSettingsBinding = ActivityBackupSettingsBinding.inflate(layoutInflater)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_backup_settings)
 
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        viewModel.cloudBackupStateStream.observe(this, Observer{ cloudBackupState ->
-            when(cloudBackupState) {
+        lifecycleScope.launchCollect(viewModel.cloudBackupStateFlow) { cloudBackupState ->
+            when (cloudBackupState) {
                 BackupCloudStorageState.NotAuthenticated -> {
-                    backup_settings_cloud_storage_not_authenticated_state.visibility = View.VISIBLE
-                    backup_settings_cloud_storage_authenticating_state.visibility = View.GONE
-                    backup_settings_cloud_storage_not_activated_state.visibility = View.GONE
+                    binding.backupSettingsCloudStorageNotAuthenticatedState.visibility = View.VISIBLE
+                    binding.backupSettingsCloudStorageAuthenticatingState.visibility = View.GONE
+                    binding.backupSettingsCloudStorageNotActivatedState.visibility = View.GONE
                 }
                 BackupCloudStorageState.Authenticating -> {
-                    backup_settings_cloud_storage_not_authenticated_state.visibility = View.GONE
-                    backup_settings_cloud_storage_authenticating_state.visibility = View.VISIBLE
-                    backup_settings_cloud_storage_not_activated_state.visibility = View.GONE
+                    binding.backupSettingsCloudStorageNotAuthenticatedState.visibility = View.GONE
+                    binding.backupSettingsCloudStorageAuthenticatingState.visibility = View.VISIBLE
+                    binding.backupSettingsCloudStorageNotActivatedState.visibility = View.GONE
                 }
                 is BackupCloudStorageState.NotActivated -> {
-                    backup_settings_cloud_storage_not_authenticated_state.visibility = View.GONE
-                    backup_settings_cloud_storage_authenticating_state.visibility = View.GONE
-                    backup_settings_cloud_storage_not_activated_state.visibility = View.VISIBLE
+                    binding.backupSettingsCloudStorageNotAuthenticatedState.visibility = View.GONE
+                    binding.backupSettingsCloudStorageAuthenticatingState.visibility = View.GONE
+                    binding.backupSettingsCloudStorageNotActivatedState.visibility = View.VISIBLE
 
-                    backup_settings_cloud_storage_email.text = cloudBackupState.currentUser.email
-                    backup_settings_cloud_storage_logout_button.visibility = View.VISIBLE
-                    backup_settings_cloud_storage_backup_switch.visibility = View.VISIBLE
-                    backup_settings_cloud_storage_backup_switch_description.visibility = View.VISIBLE
-                    backup_settings_cloud_storage_backup_switch_description.text = getString(R.string.backup_settings_cloud_backup_status, getString(R.string.backup_settings_cloud_backup_status_disabled))
-                    backup_settings_cloud_storage_backup_switch.isChecked = false
-                    backup_settings_cloud_storage_activated_description.visibility = View.GONE
-                    backup_settings_cloud_last_update.visibility = View.GONE
-                    backup_settings_cloud_backup_cta.visibility = View.GONE
-                    backup_settings_cloud_restore_cta.visibility = View.GONE
-                    backup_settings_cloud_storage_restore_description.visibility = View.GONE
-                    backup_settings_cloud_storage_restore_explanation.visibility = View.GONE
-                    backup_settings_cloud_storage_delete_title.visibility = View.GONE
-                    backup_settings_cloud_storage_delete_explanation.visibility = View.GONE
-                    backup_settings_cloud_delete_cta.visibility = View.GONE
-                    backup_settings_cloud_backup_loading_progress.visibility = View.GONE
+                    binding.backupSettingsCloudStorageEmail.text = cloudBackupState.currentUser.email
+                    binding.backupSettingsCloudStorageLogoutButton.visibility = View.VISIBLE
+                    binding.backupSettingsCloudStorageBackupSwitch.visibility = View.VISIBLE
+                    binding.backupSettingsCloudStorageBackupSwitchDescription.visibility = View.VISIBLE
+                    binding.backupSettingsCloudStorageBackupSwitchDescription.text = getString(
+                        R.string.backup_settings_cloud_backup_status,
+                        getString(R.string.backup_settings_cloud_backup_status_disabled),
+                    )
+                    binding.backupSettingsCloudStorageBackupSwitch.isChecked = false
+                    binding.backupSettingsCloudStorageActivatedDescription.visibility = View.GONE
+                    binding.backupSettingsCloudLastUpdate.visibility = View.GONE
+                    binding.backupSettingsCloudBackupCta.visibility = View.GONE
+                    binding.backupSettingsCloudRestoreCta.visibility = View.GONE
+                    binding.backupSettingsCloudStorageRestoreDescription.visibility = View.GONE
+                    binding.backupSettingsCloudStorageRestoreExplanation.visibility = View.GONE
+                    binding.backupSettingsCloudStorageDeleteTitle.visibility = View.GONE
+                    binding.backupSettingsCloudStorageDeleteExplanation.visibility = View.GONE
+                    binding.backupSettingsCloudDeleteCta.visibility = View.GONE
+                    binding.backupSettingsCloudBackupLoadingProgress.visibility = View.GONE
                 }
                 is BackupCloudStorageState.Activated -> {
-                    backup_settings_cloud_storage_not_authenticated_state.visibility = View.GONE
-                    backup_settings_cloud_storage_authenticating_state.visibility = View.GONE
-                    backup_settings_cloud_storage_not_activated_state.visibility = View.VISIBLE
+                    binding.backupSettingsCloudStorageNotAuthenticatedState.visibility = View.GONE
+                    binding.backupSettingsCloudStorageAuthenticatingState.visibility = View.GONE
+                    binding.backupSettingsCloudStorageNotActivatedState.visibility = View.VISIBLE
 
-                    backup_settings_cloud_storage_email.text = cloudBackupState.currentUser.email
-                    backup_settings_cloud_storage_logout_button.visibility = View.VISIBLE
-                    backup_settings_cloud_storage_backup_switch_description.visibility = View.VISIBLE
-                    backup_settings_cloud_storage_backup_switch_description.text = getString(R.string.backup_settings_cloud_backup_status, getString(R.string.backup_settings_cloud_backup_status_activated))
-                    backup_settings_cloud_storage_backup_switch.visibility = View.VISIBLE
-                    backup_settings_cloud_storage_backup_switch.isChecked = true
-                    backup_settings_cloud_storage_activated_description.visibility = View.VISIBLE
+                    binding.backupSettingsCloudStorageEmail.text = cloudBackupState.currentUser.email
+                    binding.backupSettingsCloudStorageLogoutButton.visibility = View.VISIBLE
+                    binding.backupSettingsCloudStorageBackupSwitchDescription.visibility = View.VISIBLE
+                    binding.backupSettingsCloudStorageBackupSwitchDescription.text = getString(
+                        R.string.backup_settings_cloud_backup_status,
+                        getString(R.string.backup_settings_cloud_backup_status_activated),
+                    )
+                    binding.backupSettingsCloudStorageBackupSwitch.visibility = View.VISIBLE
+                    binding.backupSettingsCloudStorageBackupSwitch.isChecked = true
+                    binding.backupSettingsCloudStorageActivatedDescription.visibility = View.VISIBLE
                     showLastUpdateDate(cloudBackupState.lastBackupDate)
-                    backup_settings_cloud_last_update.visibility = View.VISIBLE
+                    binding.backupSettingsCloudLastUpdate.visibility = View.VISIBLE
 
-                    if( cloudBackupState.backupNowAvailable ) {
-                        backup_settings_cloud_backup_cta.visibility = View.VISIBLE
+                    if (cloudBackupState.backupNowAvailable) {
+                        binding.backupSettingsCloudBackupCta.visibility = View.VISIBLE
                     } else {
-                        backup_settings_cloud_backup_cta.visibility = View.GONE
+                        binding.backupSettingsCloudBackupCta.visibility = View.GONE
                     }
 
-                    if( cloudBackupState.restoreAvailable ) {
-                        backup_settings_cloud_storage_restore_description.visibility = View.VISIBLE
-                        backup_settings_cloud_storage_restore_explanation.visibility = View.VISIBLE
-                        backup_settings_cloud_restore_cta.visibility = View.VISIBLE
+                    if (cloudBackupState.restoreAvailable) {
+                        binding.backupSettingsCloudStorageRestoreDescription.visibility = View.VISIBLE
+                        binding.backupSettingsCloudStorageRestoreExplanation.visibility = View.VISIBLE
+                        binding.backupSettingsCloudRestoreCta.visibility = View.VISIBLE
 
-                        backup_settings_cloud_storage_delete_title.visibility = View.VISIBLE
-                        backup_settings_cloud_storage_delete_explanation.visibility = View.VISIBLE
-                        backup_settings_cloud_delete_cta.visibility = View.VISIBLE
+                        binding.backupSettingsCloudStorageDeleteTitle.visibility = View.VISIBLE
+                        binding.backupSettingsCloudStorageDeleteExplanation.visibility = View.VISIBLE
+                        binding.backupSettingsCloudDeleteCta.visibility = View.VISIBLE
                     } else {
-                        backup_settings_cloud_restore_cta.visibility = View.GONE
-                        backup_settings_cloud_storage_restore_description.visibility = View.GONE
-                        backup_settings_cloud_storage_restore_explanation.visibility = View.GONE
+                        binding.backupSettingsCloudRestoreCta.visibility = View.GONE
+                        binding.backupSettingsCloudStorageRestoreDescription.visibility = View.GONE
+                        binding.backupSettingsCloudStorageRestoreExplanation.visibility = View.GONE
 
-                        backup_settings_cloud_storage_delete_title.visibility = View.GONE
-                        backup_settings_cloud_storage_delete_explanation.visibility = View.GONE
-                        backup_settings_cloud_delete_cta.visibility = View.GONE
+                        binding.backupSettingsCloudStorageDeleteTitle.visibility = View.GONE
+                        binding.backupSettingsCloudStorageDeleteExplanation.visibility = View.GONE
+                        binding.backupSettingsCloudDeleteCta.visibility = View.GONE
                     }
 
-                    backup_settings_cloud_backup_loading_progress.visibility = View.GONE
+                    binding.backupSettingsCloudBackupLoadingProgress.visibility = View.GONE
                 }
                 is BackupCloudStorageState.BackupInProgress -> {
-                    backup_settings_cloud_storage_not_authenticated_state.visibility = View.GONE
-                    backup_settings_cloud_storage_authenticating_state.visibility = View.GONE
-                    backup_settings_cloud_storage_not_activated_state.visibility = View.VISIBLE
+                    binding.backupSettingsCloudStorageNotAuthenticatedState.visibility = View.GONE
+                    binding.backupSettingsCloudStorageAuthenticatingState.visibility = View.GONE
+                    binding.backupSettingsCloudStorageNotActivatedState.visibility = View.VISIBLE
 
-                    backup_settings_cloud_storage_email.text = cloudBackupState.currentUser.email
-                    backup_settings_cloud_storage_logout_button.visibility = View.GONE
-                    backup_settings_cloud_storage_backup_switch.visibility = View.GONE
-                    backup_settings_cloud_storage_backup_switch_description.visibility = View.GONE
-                    backup_settings_cloud_storage_activated_description.visibility = View.GONE
-                    backup_settings_cloud_last_update.visibility = View.GONE
-                    backup_settings_cloud_backup_cta.visibility = View.GONE
-                    backup_settings_cloud_restore_cta.visibility = View.GONE
-                    backup_settings_cloud_storage_restore_description.visibility = View.GONE
-                    backup_settings_cloud_storage_restore_explanation.visibility = View.GONE
-                    backup_settings_cloud_storage_delete_title.visibility = View.GONE
-                    backup_settings_cloud_storage_delete_explanation.visibility = View.GONE
-                    backup_settings_cloud_delete_cta.visibility = View.GONE
-                    backup_settings_cloud_backup_loading_progress.visibility = View.VISIBLE
+                    binding.backupSettingsCloudStorageEmail.text = cloudBackupState.currentUser.email
+                    binding.backupSettingsCloudStorageLogoutButton.visibility = View.GONE
+                    binding.backupSettingsCloudStorageBackupSwitch.visibility = View.GONE
+                    binding.backupSettingsCloudStorageBackupSwitchDescription.visibility = View.GONE
+                    binding.backupSettingsCloudStorageActivatedDescription.visibility = View.GONE
+                    binding.backupSettingsCloudLastUpdate.visibility = View.GONE
+                    binding.backupSettingsCloudBackupCta.visibility = View.GONE
+                    binding.backupSettingsCloudRestoreCta.visibility = View.GONE
+                    binding.backupSettingsCloudStorageRestoreDescription.visibility = View.GONE
+                    binding.backupSettingsCloudStorageRestoreExplanation.visibility = View.GONE
+                    binding.backupSettingsCloudStorageDeleteTitle.visibility = View.GONE
+                    binding.backupSettingsCloudStorageDeleteExplanation.visibility = View.GONE
+                    binding.backupSettingsCloudDeleteCta.visibility = View.GONE
+                    binding.backupSettingsCloudBackupLoadingProgress.visibility = View.VISIBLE
                 }
                 is BackupCloudStorageState.RestorationInProgress -> {
-                    backup_settings_cloud_storage_not_authenticated_state.visibility = View.GONE
-                    backup_settings_cloud_storage_authenticating_state.visibility = View.GONE
-                    backup_settings_cloud_storage_not_activated_state.visibility = View.VISIBLE
+                    binding.backupSettingsCloudStorageNotAuthenticatedState.visibility = View.GONE
+                    binding.backupSettingsCloudStorageAuthenticatingState.visibility = View.GONE
+                    binding.backupSettingsCloudStorageNotActivatedState.visibility = View.VISIBLE
 
-                    backup_settings_cloud_storage_email.text = cloudBackupState.currentUser.email
-                    backup_settings_cloud_storage_logout_button.visibility = View.GONE
-                    backup_settings_cloud_storage_backup_switch.visibility = View.GONE
-                    backup_settings_cloud_storage_backup_switch_description.visibility = View.GONE
-                    backup_settings_cloud_storage_activated_description.visibility = View.GONE
-                    backup_settings_cloud_last_update.visibility = View.GONE
-                    backup_settings_cloud_backup_cta.visibility = View.GONE
-                    backup_settings_cloud_restore_cta.visibility = View.GONE
-                    backup_settings_cloud_storage_restore_description.visibility = View.GONE
-                    backup_settings_cloud_storage_restore_explanation.visibility = View.GONE
-                    backup_settings_cloud_storage_delete_title.visibility = View.GONE
-                    backup_settings_cloud_storage_delete_explanation.visibility = View.GONE
-                    backup_settings_cloud_delete_cta.visibility = View.GONE
-                    backup_settings_cloud_backup_loading_progress.visibility = View.VISIBLE
+                    binding.backupSettingsCloudStorageEmail.text = cloudBackupState.currentUser.email
+                    binding.backupSettingsCloudStorageLogoutButton.visibility = View.GONE
+                    binding.backupSettingsCloudStorageBackupSwitch.visibility = View.GONE
+                    binding.backupSettingsCloudStorageBackupSwitchDescription.visibility = View.GONE
+                    binding.backupSettingsCloudStorageActivatedDescription.visibility = View.GONE
+                    binding.backupSettingsCloudLastUpdate.visibility = View.GONE
+                    binding.backupSettingsCloudBackupCta.visibility = View.GONE
+                    binding.backupSettingsCloudRestoreCta.visibility = View.GONE
+                    binding.backupSettingsCloudStorageRestoreDescription.visibility = View.GONE
+                    binding.backupSettingsCloudStorageRestoreExplanation.visibility = View.GONE
+                    binding.backupSettingsCloudStorageDeleteTitle.visibility = View.GONE
+                    binding.backupSettingsCloudStorageDeleteExplanation.visibility = View.GONE
+                    binding.backupSettingsCloudDeleteCta.visibility = View.GONE
+                    binding.backupSettingsCloudBackupLoadingProgress.visibility = View.VISIBLE
                 }
                 is BackupCloudStorageState.DeletionInProgress -> {
-                    backup_settings_cloud_storage_not_authenticated_state.visibility = View.GONE
-                    backup_settings_cloud_storage_authenticating_state.visibility = View.GONE
-                    backup_settings_cloud_storage_not_activated_state.visibility = View.VISIBLE
+                    binding.backupSettingsCloudStorageNotAuthenticatedState.visibility = View.GONE
+                    binding.backupSettingsCloudStorageAuthenticatingState.visibility = View.GONE
+                    binding.backupSettingsCloudStorageNotActivatedState.visibility = View.VISIBLE
 
-                    backup_settings_cloud_storage_email.text = cloudBackupState.currentUser.email
-                    backup_settings_cloud_storage_logout_button.visibility = View.GONE
-                    backup_settings_cloud_storage_backup_switch.visibility = View.GONE
-                    backup_settings_cloud_storage_backup_switch_description.visibility = View.GONE
-                    backup_settings_cloud_storage_activated_description.visibility = View.GONE
-                    backup_settings_cloud_last_update.visibility = View.GONE
-                    backup_settings_cloud_backup_cta.visibility = View.GONE
-                    backup_settings_cloud_restore_cta.visibility = View.GONE
-                    backup_settings_cloud_storage_restore_description.visibility = View.GONE
-                    backup_settings_cloud_storage_restore_explanation.visibility = View.GONE
-                    backup_settings_cloud_storage_delete_title.visibility = View.GONE
-                    backup_settings_cloud_storage_delete_explanation.visibility = View.GONE
-                    backup_settings_cloud_delete_cta.visibility = View.GONE
-                    backup_settings_cloud_backup_loading_progress.visibility = View.VISIBLE
+                    binding.backupSettingsCloudStorageEmail.text = cloudBackupState.currentUser.email
+                    binding.backupSettingsCloudStorageLogoutButton.visibility = View.GONE
+                    binding.backupSettingsCloudStorageBackupSwitch.visibility = View.GONE
+                    binding.backupSettingsCloudStorageBackupSwitchDescription.visibility = View.GONE
+                    binding.backupSettingsCloudStorageActivatedDescription.visibility = View.GONE
+                    binding.backupSettingsCloudLastUpdate.visibility = View.GONE
+                    binding.backupSettingsCloudBackupCta.visibility = View.GONE
+                    binding.backupSettingsCloudRestoreCta.visibility = View.GONE
+                    binding.backupSettingsCloudStorageRestoreDescription.visibility = View.GONE
+                    binding.backupSettingsCloudStorageRestoreExplanation.visibility = View.GONE
+                    binding.backupSettingsCloudStorageDeleteTitle.visibility = View.GONE
+                    binding.backupSettingsCloudStorageDeleteExplanation.visibility = View.GONE
+                    binding.backupSettingsCloudDeleteCta.visibility = View.GONE
+                    binding.backupSettingsCloudBackupLoadingProgress.visibility = View.VISIBLE
                 }
             }
-        })
+        }
 
-        viewModel.backupNowErrorEvent.observe(this, Observer {
+        lifecycleScope.launchCollect(viewModel.backupNowErrorEventFlow) {
             AlertDialog.Builder(this)
                 .setTitle(R.string.backup_now_error_title)
                 .setMessage(R.string.backup_now_error_message)
                 .setPositiveButton(android.R.string.ok, null)
-        })
+        }
 
-        viewModel.previousBackupAvailableEvent.observe(this, Observer { lastBackupDate ->
+        lifecycleScope.launchCollect(viewModel.previousBackupAvailableEventFlow) { lastBackupDate ->
             AlertDialog.Builder(this)
                 .setTitle(R.string.backup_already_exist_title)
-                .setMessage(getString(R.string.backup_already_exist_message, lastBackupDate.formatLastBackupDate()))
+                .setMessage(
+                    getString(
+                        R.string.backup_already_exist_message,
+                        lastBackupDate.formatLastBackupDate()
+                    )
+                )
                 .setPositiveButton(R.string.backup_already_exist_positive_cta) { _, _ ->
                     viewModel.onRestorePreviousBackupButtonPressed()
                 }
@@ -198,26 +211,31 @@ class BackupSettingsActivity : BaseActivity() {
                     viewModel.onIgnorePreviousBackupButtonPressed()
                 }
                 .show()
-        })
+        }
 
-        viewModel.restorationErrorEvent.observe(this, Observer {
+        lifecycleScope.launchCollect(viewModel.restorationErrorEventFlow) {
             AlertDialog.Builder(this)
                 .setTitle(R.string.backup_restore_error_title)
                 .setMessage(R.string.backup_restore_error_message)
                 .setPositiveButton(android.R.string.ok, null)
-        })
+        }
 
-        viewModel.appRestartEvent.observe(this, Observer {
+        lifecycleScope.launchCollect(viewModel.appRestartEventFlow) {
             val intent = packageManager.getLaunchIntentForPackage(packageName)
             finishAffinity()
             startActivity(intent)
             exitProcess(0)
-        })
+        }
 
-        viewModel.restoreConfirmationDisplayEvent.observe(this, Observer { lastBackupDate ->
+        lifecycleScope.launchCollect(viewModel.restoreConfirmationDisplayEventFlow) { lastBackupDate ->
             AlertDialog.Builder(this)
                 .setTitle(R.string.backup_restore_confirmation_title)
-                .setMessage(getString(R.string.backup_restore_confirmation_message, lastBackupDate.formatLastBackupDate()))
+                .setMessage(
+                    getString(
+                        R.string.backup_restore_confirmation_message,
+                        lastBackupDate.formatLastBackupDate()
+                    )
+                )
                 .setPositiveButton(R.string.backup_restore_confirmation_positive_cta) { _, _ ->
                     viewModel.onRestoreBackupConfirmationConfirmed()
                 }
@@ -225,9 +243,9 @@ class BackupSettingsActivity : BaseActivity() {
                     viewModel.onRestoreBackupConfirmationCancelled()
                 }
                 .show()
-        })
+        }
 
-        viewModel.authenticationConfirmationDisplayEvent.observe(this, Observer {
+        lifecycleScope.launchCollect(viewModel.authenticationConfirmationDisplayEventFlow) {
             AlertDialog.Builder(this)
                 .setTitle(R.string.backup_settings_not_authenticated_privacy_title)
                 .setMessage(R.string.backup_settings_not_authenticated_privacy_message)
@@ -238,9 +256,9 @@ class BackupSettingsActivity : BaseActivity() {
                     viewModel.onAuthenticationConfirmationCancelled()
                 }
                 .show()
-        })
+        }
 
-        viewModel.deleteConfirmationDisplayEvent.observe(this, Observer {
+        lifecycleScope.launchCollect(viewModel.deleteConfirmationDisplayEventFlow) {
             AlertDialog.Builder(this)
                 .setTitle(R.string.backup_wipe_data_confirmation_title)
                 .setMessage(R.string.backup_wipe_data_confirmation_message)
@@ -251,25 +269,25 @@ class BackupSettingsActivity : BaseActivity() {
                     viewModel.onDeleteBackupConfirmationCancelled()
                 }
                 .show()
-        })
+        }
 
-        viewModel.backupDeletionErrorEvent.observe(this, Observer { _ ->
+        lifecycleScope.launchCollect(viewModel.backupDeletionErrorEventFlow) {
             AlertDialog.Builder(this)
                 .setTitle(R.string.backup_wipe_data_error_title)
                 .setMessage(R.string.backup_wipe_data_error_message)
                 .setPositiveButton(android.R.string.ok, null)
                 .show()
-        })
+        }
 
-        backup_settings_cloud_storage_authenticate_button.setOnClickListener {
+        binding.backupSettingsCloudStorageAuthenticateButton.setOnClickListener {
             viewModel.onAuthenticateButtonPressed()
         }
 
-        backup_settings_cloud_storage_logout_button.setOnClickListener {
+        binding.backupSettingsCloudStorageLogoutButton.setOnClickListener {
             viewModel.onLogoutButtonPressed()
         }
 
-        backup_settings_cloud_storage_backup_switch.setOnCheckedChangeListener { _, checked ->
+        binding.backupSettingsCloudStorageBackupSwitch.setOnCheckedChangeListener { _, checked ->
             if( checked ) {
                 viewModel.onBackupActivated()
             } else {
@@ -277,21 +295,21 @@ class BackupSettingsActivity : BaseActivity() {
             }
         }
 
-        backup_settings_cloud_backup_cta.setOnClickListener {
+        binding.backupSettingsCloudBackupCta.setOnClickListener {
             viewModel.onBackupNowButtonPressed()
         }
 
-        backup_settings_cloud_restore_cta.setOnClickListener {
+        binding.backupSettingsCloudRestoreCta.setOnClickListener {
             viewModel.onRestoreButtonPressed()
         }
 
-        backup_settings_cloud_delete_cta.setOnClickListener {
+        binding.backupSettingsCloudDeleteCta.setOnClickListener {
             viewModel.onDeleteBackupButtonPressed()
         }
     }
 
     private fun showLastUpdateDate(lastBackupDate: Date?) {
-        backup_settings_cloud_last_update.text = if( lastBackupDate != null ) {
+        binding.backupSettingsCloudLastUpdate.text = if( lastBackupDate != null ) {
             val timeFormatted = DateUtils.getRelativeDateTimeString(
                 this,
                 lastBackupDate.time,

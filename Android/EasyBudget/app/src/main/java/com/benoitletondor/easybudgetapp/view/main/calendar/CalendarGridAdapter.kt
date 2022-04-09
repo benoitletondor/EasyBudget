@@ -1,5 +1,5 @@
 /*
- *   Copyright 2021 Benoit LETONDOR
+ *   Copyright 2022 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -25,10 +25,10 @@ import android.widget.TextView
 
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.db.DB
+import com.benoitletondor.easybudgetapp.parameters.Parameters
+import com.benoitletondor.easybudgetapp.parameters.getLowMoneyWarningAmount
 import com.roomorama.caldroid.CaldroidGridAdapter
-
-import java.util.Date
-import java.util.TimeZone
+import com.roomorama.caldroid.CalendarHelper
 
 import kotlinx.coroutines.runBlocking
 
@@ -37,11 +37,15 @@ import kotlinx.coroutines.runBlocking
  */
 class CalendarGridAdapter(context: Context,
                           private val db: DB,
+                          private val parameters: Parameters,
                           month: Int,
                           year: Int,
                           caldroidData: Map<String, Any>,
                           extraData: Map<String, Any>)
     : CaldroidGridAdapter(context, month, year, caldroidData, extraData) {
+
+    private val roundingToIntFormatter = RoundedToIntNumberFormatter()
+    private val formatter = NumberFormatter.get()
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val cellView = convertView ?: createView(parent)
@@ -132,7 +136,7 @@ class CalendarGridAdapter(context: Context,
                 }
             }
 
-            val date = Date(dateTime.getMilliseconds(TimeZone.getDefault()))
+            val date = CalendarHelper.convertDateTimeToDate(dateTime)
             // FIXME coroutine threading!!
             if ( runBlocking { db.hasExpenseForDay(date) }) {
                 val balance = runBlocking { db.getBalanceForDay(date) }
@@ -143,13 +147,13 @@ class CalendarGridAdapter(context: Context,
                     viewData.containsExpenses = true
                 }
 
-                tv2.text = (-balance.toInt()).toString()
+                tv2.text = formatBalance(balance)
 
-                if (balance > 0) {
-                    tv1.setTextColor(ContextCompat.getColor(context, if (isOutOfMonth) R.color.budget_red_out else R.color.budget_red))
-                } else {
-                    tv1.setTextColor(ContextCompat.getColor(context, if (isOutOfMonth) R.color.budget_green_out else R.color.budget_green))
-                }
+                tv1.setTextColor(ContextCompat.getColor(tv1.context, when {
+                    -balance <= 0 -> R.color.budget_red
+                    -balance < parameters.getLowMoneyWarningAmount() -> R.color.budget_orange
+                    else -> R.color.budget_green
+                }))
             } else if (viewData.containsExpenses) {
                 tv2.visibility = View.INVISIBLE
 
@@ -167,6 +171,14 @@ class CalendarGridAdapter(context: Context,
 
         cellView.tag = viewData
         return cellView
+    }
+
+    private fun formatBalance(balance: Double): String {
+        val roundedToInt = roundingToIntFormatter.format(-balance)
+        return when {
+            roundedToInt.length <= 4 -> roundedToInt
+            else -> formatter.format(-balance)
+        }
     }
 
     /**

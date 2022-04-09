@@ -1,5 +1,5 @@
 /*
- *   Copyright 2021 Benoit LETONDOR
+ *   Copyright 2022 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -16,15 +16,9 @@
 
 package com.benoitletondor.easybudgetapp.helper
 
-import android.os.Build
-
 import com.benoitletondor.easybudgetapp.parameters.Parameters
-
 import java.text.NumberFormat
-import java.util.ArrayList
-import java.util.Currency
-import java.util.HashSet
-import java.util.Locale
+import java.util.*
 
 /**
  * Helper to work with currencies and display

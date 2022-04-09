@@ -1,5 +1,5 @@
 /*
- *   Copyright 2021 Benoit LETONDOR
+ *   Copyright 2022 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -225,6 +225,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
 
                             parameters.setLowMoneyWarningAmount(newLimit)
                             setLimitWarningPreferenceTitle(limitWarningPreference)
+                            LocalBroadcastManager.getInstance(context).sendBroadcast(Intent(MainActivity.INTENT_LOW_MONEY_WARNING_THRESHOLD_CHANGED))
                         } catch (e: Exception) {
                             AlertDialog.Builder(context)
                                 .setTitle(R.string.adjust_limit_warning_error_title)
@@ -261,7 +262,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
         /*
          * Show checked balance
          */
-        val showCheckedBalancePref = findPreference<CheckBoxPreference>(resources.getString(R.string.setting_category_notifications_daily_key))
+        val showCheckedBalancePref = findPreference<CheckBoxPreference>(resources.getString(R.string.setting_category_show_checked_balance_key))
         showCheckedBalancePref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
             parameters.setShouldShowCheckedBalance((it as CheckBoxPreference).isChecked)
 
@@ -288,7 +289,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
          */
         val devCategory = findPreference<PreferenceCategory>(resources.getString(R.string.setting_category_dev_key))
         if (!BuildConfig.DEV_PREFERENCES) {
-            preferenceScreen.removePreference(devCategory)
+            devCategory?.let { preferenceScreen.removePreference(it) }
         } else {
             /*
              * Show welcome screen button

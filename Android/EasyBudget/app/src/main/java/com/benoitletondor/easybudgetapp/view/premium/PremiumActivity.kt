@@ -1,5 +1,5 @@
 /*
- *   Copyright 2021 Benoit LETONDOR
+ *   Copyright 2022 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -25,13 +25,14 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.benoitletondor.easybudgetapp.R
+import com.benoitletondor.easybudgetapp.databinding.ActivityPremiumBinding
 import com.benoitletondor.easybudgetapp.helper.BaseActivity
+import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.helper.setStatusBarColor
 import com.benoitletondor.easybudgetapp.iab.PremiumPurchaseFlowResult
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.activity_premium.*
 import java.lang.IllegalStateException
 
 /**
@@ -41,17 +42,18 @@ import java.lang.IllegalStateException
  * @author Benoit LETONDOR
  */
 @AndroidEntryPoint
-class PremiumActivity : BaseActivity() {
+class PremiumActivity : BaseActivity<ActivityPremiumBinding>() {
     private val viewModel: PremiumViewModel by viewModels()
+
+    override fun createBinding(): ActivityPremiumBinding = ActivityPremiumBinding.inflate(layoutInflater)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_premium)
 
         // Cancelled by default
         setResult(Activity.RESULT_CANCELED)
 
-        premium_view_pager.adapter = object : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+        binding.premiumViewPager.adapter = object : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
             override fun getItem(position: Int): Fragment {
                 when (position) {
                     0 -> return Premium1Fragment()
@@ -67,22 +69,22 @@ class PremiumActivity : BaseActivity() {
 
             override fun getCount(): Int = 6
         }
-        premium_view_pager.offscreenPageLimit = premium_view_pager.adapter!!.count // preload all fragments for transitions smoothness
+        binding.premiumViewPager.offscreenPageLimit = binding.premiumViewPager.adapter!!.count // preload all fragments for transitions smoothness
 
         // Circle indicator
-        premium_view_pager_indicator.setViewPager(premium_view_pager)
+        binding.premiumViewPagerIndicator.setViewPager(binding.premiumViewPager)
 
-        premium_not_now_button.setOnClickListener {
+        binding.premiumNotNowButton.setOnClickListener {
             finish()
         }
 
-        premium_cta_button.setOnClickListener {
+        binding.premiumCtaButton.setOnClickListener {
             viewModel.onBuyPremiumClicked(this)
         }
 
         var loadingProgressDialog: ProgressDialog? = null
-        viewModel.premiumFlowErrorEventStream.observe(this, Observer { status ->
-            when(status) {
+        lifecycleScope.launchCollect(viewModel.premiumFlowErrorEventFlow) { status ->
+            when (status) {
                 PremiumPurchaseFlowResult.Cancelled -> {
                     loadingProgressDialog?.dismiss()
                     loadingProgressDialog = null
@@ -99,31 +101,36 @@ class PremiumActivity : BaseActivity() {
                         }
                         .show()
                 }
-            }
-        })
-
-        viewModel.premiumFlowStatusLiveData.observe(this, Observer { status ->
-            when(status) {
-                PremiumFlowStatus.NOT_STARTED -> {
-                    loadingProgressDialog?.dismiss()
-                    loadingProgressDialog = null
-                }
-                PremiumFlowStatus.LOADING -> {
-                    loadingProgressDialog = ProgressDialog.show(this@PremiumActivity,
-                        resources.getString(R.string.iab_purchase_wait_title),
-                        resources.getString(R.string.iab_purchase_wait_message),
-                        true, false)
-                }
-                PremiumFlowStatus.DONE -> {
+                PremiumPurchaseFlowResult.Success -> {
                     loadingProgressDialog?.dismiss()
                     loadingProgressDialog = null
 
                     setResult(Activity.RESULT_OK)
                     finish()
                 }
-                null -> {}
             }
-        })
+        }
+
+        lifecycleScope.launchCollect(viewModel.premiumFlowStatusFlow) { status ->
+            when (status) {
+                PremiumFlowStatus.NOT_STARTED -> {
+                    loadingProgressDialog?.dismiss()
+                    loadingProgressDialog = null
+                }
+                PremiumFlowStatus.LOADING -> {
+                    loadingProgressDialog = ProgressDialog.show(
+                        this@PremiumActivity,
+                        resources.getString(R.string.iab_purchase_wait_title),
+                        resources.getString(R.string.iab_purchase_wait_message),
+                        true, false
+                    )
+                }
+                PremiumFlowStatus.DONE -> {
+                    loadingProgressDialog?.dismiss()
+                    loadingProgressDialog = null
+                }
+            }
+        }
 
         setStatusBarColor(R.color.easy_budget_green)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -135,8 +142,8 @@ class PremiumActivity : BaseActivity() {
     }
 
     override fun onBackPressed() {
-        if (premium_view_pager.currentItem > 0) {
-            premium_view_pager.setCurrentItem(premium_view_pager.currentItem - 1, true)
+        if (binding.premiumViewPager.currentItem > 0) {
+            binding.premiumViewPager.setCurrentItem(binding.premiumViewPager.currentItem - 1, true)
             return
         }
 

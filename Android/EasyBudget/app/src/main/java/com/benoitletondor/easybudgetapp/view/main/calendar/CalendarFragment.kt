@@ -1,5 +1,5 @@
 /*
- *   Copyright 2021 Benoit LETONDOR
+ *   Copyright 2022 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -17,11 +17,12 @@
 package com.benoitletondor.easybudgetapp.view.main.calendar
 
 import com.benoitletondor.easybudgetapp.db.DB
+import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.roomorama.caldroid.CaldroidFragment
 import com.roomorama.caldroid.CaldroidGridAdapter
 import dagger.hilt.android.AndroidEntryPoint
+import java.time.LocalDate
 
-import java.util.Date
 import javax.inject.Inject
 
 /**
@@ -29,27 +30,30 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class CalendarFragment : CaldroidFragment() {
-    private var mSelectedDate = Date()
+    private var mSelectedDate = LocalDate.now()
 
     @Inject lateinit var db: DB
+    @Inject lateinit var parameters: Parameters
 
 // --------------------------------------->
 
     override fun getNewDatesGridAdapter(month: Int, year: Int): CaldroidGridAdapter {
-        return CalendarGridAdapter(requireContext(), db, month, year, getCaldroidData(), extraData)
+        return CalendarGridAdapter(requireContext(), db, parameters, month, year, getCaldroidData(), extraData)
     }
 
-    override fun setSelectedDates(fromDate: Date, toDate: Date) {
-        this.mSelectedDate = fromDate
-        super.setSelectedDates(fromDate, toDate)
+    override fun setSelectedDate(date: LocalDate) {
+        this.mSelectedDate = date
+
+        super.clearSelectedDates()
+        super.setSelectedDate(date)
 
         try {
             // Exception that occurs if we call this code before the calendar being initialized
-            super.moveToDate(fromDate)
+            super.moveToDate(date)
         } catch (ignored: Exception) { }
     }
 
-    fun getSelectedDate() = mSelectedDate
+    fun getSelectedDate(): LocalDate = mSelectedDate
 
     fun setFirstDayOfWeek(firstDayOfWeek: Int) {
         if (firstDayOfWeek != startDayOfWeek) {
@@ -64,7 +68,7 @@ class CalendarFragment : CaldroidFragment() {
     fun goToCurrentMonth() {
         try {
             // Exception that occurs if we call this code before the calendar being initialized
-            super.moveToDate(Date())
+            super.moveToDate(LocalDate.now())
         } catch (ignored: Exception) { }
     }
 }

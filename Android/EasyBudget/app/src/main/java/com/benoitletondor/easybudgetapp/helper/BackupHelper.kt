@@ -1,5 +1,5 @@
 /*
- *   Copyright 2021 Benoit LETONDOR
+ *   Copyright 2022 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package com.benoitletondor.easybudgetapp.helper
 
 import android.content.Context
 import android.util.Log
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.work.*
 import com.benoitletondor.easybudgetapp.auth.Auth
 import com.benoitletondor.easybudgetapp.auth.AuthState
@@ -32,6 +32,10 @@ import com.benoitletondor.easybudgetapp.job.BackupJob
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.saveLastBackupDate
 import com.benoitletondor.easybudgetapp.parameters.setShouldResetInitDate
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import net.lingala.zip4j.ZipFile
 import java.io.File
 import java.io.FileReader
@@ -245,6 +249,12 @@ fun unscheduleBackup(context: Context) {
     WorkManager.getInstance(context).cancelAllWorkByTag(BACKUP_JOB_REQUEST_TAG)
 }
 
-fun getBackupJobInfosLiveData(context: Context): LiveData<List<WorkInfo>> {
-    return WorkManager.getInstance(context).getWorkInfosByTagLiveData(BACKUP_JOB_REQUEST_TAG)
+fun getBackupJobInfosFlow(context: Context): Flow<List<WorkInfo>> = callbackFlow {
+    val liveData = WorkManager.getInstance(context).getWorkInfosByTagLiveData(BACKUP_JOB_REQUEST_TAG)
+    val observer = Observer<List<WorkInfo>> {
+        trySendBlocking(it)
+    }
+
+    liveData.observeForever(observer)
+    awaitClose { liveData.removeObserver(observer) }
 }

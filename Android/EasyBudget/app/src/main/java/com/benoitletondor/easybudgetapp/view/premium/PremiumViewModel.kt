@@ -1,5 +1,5 @@
 /*
- *   Copyright 2021 Benoit LETONDOR
+ *   Copyright 2022 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -17,36 +17,41 @@
 package com.benoitletondor.easybudgetapp.view.premium
 
 import android.app.Activity
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.benoitletondor.easybudgetapp.helper.SingleLiveEvent
+import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.iab.PremiumPurchaseFlowResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class PremiumViewModel @Inject constructor(private val iab: Iab) : ViewModel() {
-    val premiumFlowStatusLiveData = MutableLiveData(PremiumFlowStatus.NOT_STARTED)
-    val premiumFlowErrorEventStream = SingleLiveEvent<PremiumPurchaseFlowResult>()
+    private val premiumFlowStatusMutableFlow = MutableStateFlow(PremiumFlowStatus.NOT_STARTED)
+    val premiumFlowStatusFlow: Flow<PremiumFlowStatus> = premiumFlowStatusMutableFlow
+
+    private val premiumFlowErrorEventMutableFlow = MutableLiveFlow<PremiumPurchaseFlowResult>()
+    val premiumFlowErrorEventFlow: Flow<PremiumPurchaseFlowResult> = premiumFlowErrorEventMutableFlow
 
     fun onBuyPremiumClicked(activity: Activity) {
-        premiumFlowStatusLiveData.value = PremiumFlowStatus.LOADING
+        premiumFlowStatusMutableFlow.value = PremiumFlowStatus.LOADING
 
         viewModelScope.launch {
             when(val result = iab.launchPremiumPurchaseFlow(activity)) {
                 PremiumPurchaseFlowResult.Cancelled -> {
-                    premiumFlowErrorEventStream.value = result
-                    premiumFlowStatusLiveData.value = PremiumFlowStatus.NOT_STARTED
+                    premiumFlowErrorEventMutableFlow.emit(result)
+                    premiumFlowStatusMutableFlow.value = PremiumFlowStatus.NOT_STARTED
                 }
                 PremiumPurchaseFlowResult.Success -> {
-                    premiumFlowStatusLiveData.value = PremiumFlowStatus.DONE
+                    premiumFlowErrorEventMutableFlow.emit(result)
+                    premiumFlowStatusMutableFlow.value = PremiumFlowStatus.DONE
                 }
                 is PremiumPurchaseFlowResult.Error -> {
-                    premiumFlowErrorEventStream.value = result
-                    premiumFlowStatusLiveData.value = PremiumFlowStatus.NOT_STARTED
+                    premiumFlowErrorEventMutableFlow.emit(result)
+                    premiumFlowStatusMutableFlow.value = PremiumFlowStatus.NOT_STARTED
                 }
             }
         }

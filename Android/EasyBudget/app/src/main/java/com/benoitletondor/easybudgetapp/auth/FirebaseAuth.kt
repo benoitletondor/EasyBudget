@@ -1,5 +1,5 @@
 /*
- *   Copyright 2021 Benoit LETONDOR
+ *   Copyright 2022 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -18,30 +18,30 @@ package com.benoitletondor.easybudgetapp.auth
 
 import android.app.Activity
 import android.content.Intent
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import com.benoitletondor.easybudgetapp.helper.Logger
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseUser
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 private const val SIGN_IN_REQUEST_CODE = 10524
 
-class FirebaseAuth(private val auth: com.google.firebase.auth.FirebaseAuth) : Auth {
+class FirebaseAuth(
+    private val auth: com.google.firebase.auth.FirebaseAuth,
+) : Auth {
 
-    private val currentState = MutableLiveData(getAuthState())
-
-    override val state: LiveData<AuthState>
-        get() = currentState
+    private val currentState = MutableStateFlow(getAuthState())
+    override val state: StateFlow<AuthState> = currentState
 
     init {
         auth.addAuthStateListener {
-            currentState.postValue(getAuthState())
+            currentState.value = getAuthState()
         }
     }
 
     override fun startAuthentication(activity: Activity) {
-        currentState.postValue(AuthState.Authenticating)
+        currentState.value = AuthState.Authenticating
 
         try {
             activity.startActivityForResult(
@@ -52,8 +52,8 @@ class FirebaseAuth(private val auth: com.google.firebase.auth.FirebaseAuth) : Au
                 SIGN_IN_REQUEST_CODE
             )
         } catch (error: Throwable) {
-            Log.e("FirebaseAuth", "Error launching auth activity", error)
-            currentState.postValue(getAuthState())
+            Logger.error("FirebaseAuth", "Error launching auth activity", error)
+            currentState.value = getAuthState()
         }
 
     }
@@ -64,7 +64,7 @@ class FirebaseAuth(private val auth: com.google.firebase.auth.FirebaseAuth) : Au
             if (resultCode != Activity.RESULT_OK) {
                 val response = IdpResponse.fromResultIntent(data)
                 if( response != null ) {
-                    Log.e(
+                    Logger.error(
                         "FirebaseAuth",
                         "Error while authenticating: ${response.error?.errorCode}: ${response.error?.localizedMessage}",
                         response.error
@@ -72,13 +72,13 @@ class FirebaseAuth(private val auth: com.google.firebase.auth.FirebaseAuth) : Au
                 }
             }
 
-            currentState.postValue(getAuthState())
+            currentState.value = getAuthState()
         }
     }
 
     override fun logout() {
         auth.signOut()
-        currentState.postValue(getAuthState())
+        currentState.value = getAuthState()
     }
 
     private fun getAuthState(): AuthState {

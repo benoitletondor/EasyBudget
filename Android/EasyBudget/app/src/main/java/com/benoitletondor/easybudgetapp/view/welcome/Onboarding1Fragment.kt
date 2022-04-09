@@ -1,5 +1,5 @@
 /*
- *   Copyright 2021 Benoit LETONDOR
+ *   Copyright 2022 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import android.view.View
 import android.view.ViewGroup
 
 import com.benoitletondor.easybudgetapp.R
+import com.benoitletondor.easybudgetapp.databinding.FragmentOnboarding1Binding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_onboarding1.*
 
 /**
  * Onboarding step 1 fragment
@@ -31,20 +31,22 @@ import kotlinx.android.synthetic.main.fragment_onboarding1.*
  * @author Benoit LETONDOR
  */
 @AndroidEntryPoint
-class Onboarding1Fragment : OnboardingFragment() {
+class Onboarding1Fragment : OnboardingFragment<FragmentOnboarding1Binding>() {
 
     override val statusBarColor: Int
         get() = R.color.primary_dark
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_onboarding1, container, false)
-    }
+    override fun onCreateBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): FragmentOnboarding1Binding = FragmentOnboarding1Binding.inflate(inflater, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        onboarding_screen1_next_button.setOnClickListener {
-            next(onboarding_screen1_next_button)
+        binding?.onboardingScreen1NextButton?.setOnClickListener { button ->
+            next(button)
         }
     }
 }
