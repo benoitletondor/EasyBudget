@@ -199,7 +199,7 @@ class RecurringExpenseEditViewModel @Inject constructor(
                         return false
                     }
 
-                    currentDate.plus(1, ChronoUnit.WEEKS)
+                    currentDate = currentDate.plus(1, ChronoUnit.WEEKS)
                 }
             }
             RecurringExpenseType.BI_WEEKLY -> {
@@ -212,7 +212,7 @@ class RecurringExpenseEditViewModel @Inject constructor(
                         return false
                     }
 
-                    currentDate.plus(2, ChronoUnit.WEEKS)
+                    currentDate = currentDate.plus(2, ChronoUnit.WEEKS)
                 }
             }
             RecurringExpenseType.TER_WEEKLY -> {
@@ -225,20 +225,20 @@ class RecurringExpenseEditViewModel @Inject constructor(
                         return false
                     }
 
-                    currentDate.plus(3, ChronoUnit.WEEKS)
+                    currentDate = currentDate.plus(3, ChronoUnit.WEEKS)
                 }
             }
             RecurringExpenseType.FOUR_WEEKLY -> {
                 // Add up to 5 years of expenses
                 for (i in 0 until 12*4*5) {
                     try {
-                        db.persistExpense(Expense(expense.title, expense.amount, currentDate.plus(2, ChronoUnit.WEEKS), false, expense))
+                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, expense))
                     } catch (t: Throwable) {
                         Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
                         return false
                     }
 
-                    currentDate.plus(4, ChronoUnit.WEEKS)
+                    currentDate = currentDate.plus(4, ChronoUnit.WEEKS)
                 }
             }
             RecurringExpenseType.MONTHLY -> {
