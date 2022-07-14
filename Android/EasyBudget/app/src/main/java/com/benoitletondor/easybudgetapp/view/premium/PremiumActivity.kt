@@ -141,6 +141,7 @@ class PremiumActivity : BaseActivity<ActivityPremiumBinding>() {
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         if (binding.premiumViewPager.currentItem > 0) {
             binding.premiumViewPager.setCurrentItem(binding.premiumViewPager.currentItem - 1, true)

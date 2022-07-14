@@ -483,6 +483,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         super.onSaveInstanceState(outState)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -501,6 +502,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         if ( menu.isExpanded) {
             menu.collapse()

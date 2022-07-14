@@ -4,7 +4,13 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/EasyBudget.iml" filepath="$PROJECT_DIR$/EasyBudget.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/EasyBudget.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/EasyBudget.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/EasyBudget.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/EasyBudget.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/EasyBudget.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/EasyBudget.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/EasyBudget.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/EasyBudget.app.unitTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/caldroid/EasyBudget.caldroid.iml" filepath="$PROJECT_DIR$/.idea/modules/caldroid/EasyBudget.caldroid.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/caldroid/EasyBudget.caldroid.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/caldroid/EasyBudget.caldroid.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/caldroid/EasyBudget.caldroid.main.iml" filepath="$PROJECT_DIR$/.idea/modules/caldroid/EasyBudget.caldroid.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/caldroid/EasyBudget.caldroid.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/caldroid/EasyBudget.caldroid.unitTest.iml" />
     </modules>
   </component>
 </project>

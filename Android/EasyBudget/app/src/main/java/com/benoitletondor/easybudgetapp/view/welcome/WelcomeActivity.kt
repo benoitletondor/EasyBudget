@@ -168,6 +168,7 @@ class WelcomeActivity : BaseActivity<ActivityWelcomeBinding>() {
         super.onDestroy()
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         if (binding.welcomeViewPager.currentItem > 0) {
             binding.welcomeViewPager.setCurrentItem(binding.welcomeViewPager.currentItem - 1, true)
