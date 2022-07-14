@@ -16,14 +16,14 @@
 
 <resources>
 
-    <style name="Base.AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar.Bridge">
+    <style name="Base.AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
         <item name="android:windowBackground">@color/window_background</item>
         <item name="toolbarStyle">@style/ToolBarStyle</item>
         <item name="android:actionBarStyle">@style/ToolBarStyle</item>
-        <item name="alertDialogTheme">@style/AlertDialogTheme</item>
+        <item name="materialAlertDialogTheme">@style/AlertDialogTheme</item>
         <item name="android:statusBarColor">@color/status_bar_color</item>
         <item name="colorBackgroundFloating">@color/window_background</item>
     </style>
@@ -44,18 +44,18 @@
         <item name="android:textColor">@color/easy_budget_green_night</item>
     </style>
 
-    <style name="ToolBarStyle" parent="Widget.AppCompat.Toolbar">
+    <style name="ToolBarStyle" parent="Widget.Material3.Toolbar">
         <item name="android:background">@color/action_bar_background</item>
         <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
         <item name="android:titleTextStyle">@style/ToolbarTitleTextAppearance</item>
         <item name="titleTextAppearance">@style/ToolbarTitleTextAppearance</item>
     </style>
 
-    <style name="ToolbarTitleTextAppearance" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+    <style name="ToolbarTitleTextAppearance" parent="TextAppearance.Material3.TitleLarge">
         <item name="android:textColor">@color/action_bar_text_color</item>
     </style>
 
-    <style name="ToolbarTheme" parent="ThemeOverlay.AppCompat.ActionBar">
+    <style name="ToolbarTheme" parent="ThemeOverlay.Material3.ActionBar">
         <item name="colorControlNormal">@color/action_bar_text_color</item>
         <item name="actionMenuTextColor">@color/action_bar_text_color</item>
     </style>
@@ -78,50 +78,50 @@
     </style>
 
     <!-- Buttons -->
-    <style name="BlueButton" parent="Widget.AppCompat.Button.Colored">
+    <style name="BlueButton" parent="Widget.Material3.Button">
         <item name="android:textColor">@color/white</item>
         <item name="colorButtonNormal">@color/secondary</item>
     </style>
 
-    <style name="GreenButton" parent="Widget.AppCompat.Button.Colored">
+    <style name="GreenButton" parent="Widget.Material3.Button">
         <item name="android:textColor">@color/white</item>
         <item name="colorButtonNormal">@color/accent</item>
     </style>
 
-    <style name="LightGreenButton" parent="Widget.AppCompat.Button.Colored">
+    <style name="LightGreenButton" parent="Widget.Material3.Button">
         <item name="android:textColor">@color/accent</item>
         <item name="colorButtonNormal">@color/accent_ripple</item>
     </style>
 
-    <style name="LightGreenButton.Borderless" parent="Widget.AppCompat.Button.Borderless">
+    <style name="LightGreenButton.Borderless" parent="Widget.Material3.Button.UnelevatedButton">
         <item name="android:textColor">@color/accent</item>
     </style>
 
-    <style name="RedButton" parent="Widget.AppCompat.Button.Colored">
+    <style name="RedButton" parent="Widget.Material3.Button">
         <item name="android:textColor">@color/white</item>
         <item name="colorButtonNormal">@color/budget_red</item>
     </style>
 
-    <style name="RedButton.Borderless" parent="Widget.AppCompat.Button.Borderless.Colored">
+    <style name="RedButton.Borderless" parent="Widget.Material3.Button.UnelevatedButton">
         <item name="android:textColor">@color/budget_red</item>
     </style>
 
     <!-- AlertDialog -->
-    <style name="AlertDialogTheme" parent="ThemeOverlay.AppCompat.Dialog.Alert">
+    <style name="AlertDialogTheme" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
         <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
         <item name="buttonBarNeutralButtonStyle">@style/NeutralButtonStyle</item>
     </style>
 
-    <style name="NegativeButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+    <style name="NegativeButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
         <item name="android:textColor">@color/accent</item>
     </style>
 
-    <style name="NeutralButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+    <style name="NeutralButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
         <item name="android:textColor">@color/accent</item>
     </style>
 
-    <style name="PositiveButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+    <style name="PositiveButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
         <item name="android:textColor">@color/accent</item>
     </style>
 
@@ -134,15 +134,15 @@
         <item name="colorControlActivated">@color/expense_edit_field_accent_color_dark</item>
     </style>
 
-    <style name="TextLabelHintTextAppearance" parent="TextAppearance.Design.Hint">
+    <style name="TextLabelHintTextAppearance" parent="TextAppearance.MaterialComponents.Caption">
         <item name="android:textColor">@color/expense_edit_title_text_color_dark</item>
         <item name="android:textSize">14sp</item>
     </style>
 
     <!-- Expense switch -->
-    <style name="ExpenseSwitchTheme">
+    <style name="ExpenseSwitchTheme" parent="Widget.MaterialComponents.CompoundButton.Switch">
         <item name="colorControlActivated">@color/budget_green</item>
-        <item name="colorSwitchThumbNormal">@color/budget_red</item>
+        <item name="colorOnSurface">@color/budget_red</item>
     </style>
 
     <!-- FAB style -->

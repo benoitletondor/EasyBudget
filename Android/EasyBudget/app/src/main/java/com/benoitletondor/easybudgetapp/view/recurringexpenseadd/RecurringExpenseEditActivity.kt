@@ -74,8 +74,6 @@ class RecurringExpenseEditActivity : BaseActivity<ActivityRecurringExpenseAddBin
             binding.saveExpenseFab.animateFABAppearance()
         }
 
-        binding.dateButton.removeButtonBorder() // Remove border
-
         lifecycleScope.launchCollect(viewModel.editTypeFlow) { (isRevenue, isEditing) ->
             setExpenseTypeTextViewLayout(isRevenue, isEditing)
         }

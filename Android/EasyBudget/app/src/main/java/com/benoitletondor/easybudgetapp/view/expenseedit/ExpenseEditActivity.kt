@@ -83,8 +83,6 @@ class ExpenseEditActivity : BaseActivity<ActivityExpenseEditBinding>() {
             binding.saveExpenseFab.animateFABAppearance()
         }
 
-        binding.dateButton.removeButtonBorder()
-
         lifecycleScope.launchCollect(viewModel.editTypeFlow) { (isRevenue, isEdit) ->
             setExpenseTypeTextViewLayout(isRevenue, isEdit)
         }

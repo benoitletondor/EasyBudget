@@ -63,10 +63,13 @@
                     android:id="@+id/monthly_report_previous_month_button"
                     android:layout_width="50dp"
                     android:layout_height="wrap_content"
-                    android:textSize="24dp"
                     android:textColor="@color/monthly_report_month_switch_button"
                     android:background="@drawable/calendar_month_switcher_button_drawable"
-                    tools:ignore="SpUsage" />
+                    app:icon="@drawable/ic_baseline_navigate_before_24"
+                    app:iconTint="@color/monthly_report_month_switch_button"
+                    app:iconSize="24dp"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"/>
 
                 <TextView
                     android:id="@+id/monthly_report_month_title_tv"
@@ -82,10 +85,12 @@
                     android:id="@+id/monthly_report_next_month_button"
                     android:layout_width="50dp"
                     android:layout_height="wrap_content"
-                    android:textSize="24dp"
-                    android:textColor="@color/monthly_report_month_switch_button"
                     android:background="@drawable/calendar_month_switcher_button_drawable"
-                    tools:ignore="SpUsage" />
+                    app:icon="@drawable/ic_baseline_navigate_next_24"
+                    app:iconTint="@color/monthly_report_month_switch_button"
+                    app:iconSize="24dp"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp" />
 
             </LinearLayout>
 
