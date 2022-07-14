@@ -24,7 +24,6 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.widget.ArrayAdapter
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.benoitletondor.easybudgetapp.R
@@ -33,6 +32,7 @@ import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import com.benoitletondor.easybudgetapp.view.DatePickerDialogFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -128,7 +128,7 @@ class RecurringExpenseEditActivity : BaseActivity<ActivityRecurringExpenseAddBin
         }
 
         lifecycleScope.launchCollect(viewModel.errorFlow) {
-            AlertDialog.Builder(this)
+            MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.recurring_expense_add_error_title)
                 .setMessage(getString(R.string.recurring_expense_add_error_message))
                 .setNegativeButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
@@ -136,7 +136,7 @@ class RecurringExpenseEditActivity : BaseActivity<ActivityRecurringExpenseAddBin
         }
 
         lifecycleScope.launchCollect(viewModel.expenseAddBeforeInitDateEventFlow) {
-            AlertDialog.Builder(this)
+            MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.expense_add_before_init_date_dialog_title)
                 .setMessage(R.string.expense_add_before_init_date_dialog_description)
                 .setPositiveButton(R.string.expense_add_before_init_date_dialog_positive_cta) { _, _ ->

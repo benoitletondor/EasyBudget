@@ -22,7 +22,6 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.lifecycleScope
@@ -32,6 +31,7 @@ import com.benoitletondor.easybudgetapp.helper.BaseActivity
 import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.helper.setStatusBarColor
 import com.benoitletondor.easybudgetapp.iab.PremiumPurchaseFlowResult
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import java.lang.IllegalStateException
 
@@ -93,7 +93,7 @@ class PremiumActivity : BaseActivity<ActivityPremiumBinding>() {
                     loadingProgressDialog?.dismiss()
                     loadingProgressDialog = null
 
-                    AlertDialog.Builder(this)
+                    MaterialAlertDialogBuilder(this)
                         .setTitle(R.string.iab_purchase_error_title)
                         .setMessage(getString(R.string.iab_purchase_error_message, status.reason))
                         .setPositiveButton(R.string.ok) { dialog, _ ->

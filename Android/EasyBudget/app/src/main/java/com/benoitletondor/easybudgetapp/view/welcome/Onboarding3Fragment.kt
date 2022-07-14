@@ -24,13 +24,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.app.AlertDialog
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.databinding.FragmentOnboarding3Binding
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.parameters.Parameters
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import java.time.LocalDate
@@ -58,7 +58,7 @@ class Onboarding3Fragment : OnboardingFragment<FragmentOnboarding3Binding>() {
             } catch (e: Exception) {
                 val context = context ?: return 0.0
 
-                AlertDialog.Builder(context)
+                MaterialAlertDialogBuilder(context)
                     .setTitle(R.string.adjust_balance_error_title)
                     .setMessage(R.string.adjust_balance_error_message)
                     .setNegativeButton(R.string.ok) { dialog, _ -> dialog.dismiss() }

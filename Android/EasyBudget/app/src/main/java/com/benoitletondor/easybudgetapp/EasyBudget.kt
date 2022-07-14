@@ -20,7 +20,6 @@ import android.app.*
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -42,6 +41,7 @@ import com.benoitletondor.easybudgetapp.view.main.MainActivity
 import com.benoitletondor.easybudgetapp.view.RatingPopup
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
 import com.benoitletondor.easybudgetapp.view.getRatingPopupUserStep
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.runBlocking
@@ -224,7 +224,7 @@ class EasyBudget : Application(), Configuration.Provider {
                 if ( !hasRatingPopupBeenShownToday() && shouldShowPremiumPopup() ) {
                     parameters.setPremiumPopupLastAutoShowTimestamp(Date().time)
 
-                    AlertDialog.Builder(activity)
+                    MaterialAlertDialogBuilder(activity)
                         .setTitle(R.string.premium_popup_become_title)
                         .setMessage(R.string.premium_popup_become_message)
                         .setPositiveButton(R.string.premium_popup_become_cta) { dialog13, _ ->

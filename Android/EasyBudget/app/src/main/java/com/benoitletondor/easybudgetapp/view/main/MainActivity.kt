@@ -30,7 +30,6 @@ import com.google.android.material.snackbar.Snackbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.Gravity
 import android.view.Menu
@@ -67,6 +66,7 @@ import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivi
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.SHOW_BACKUP_INTENT_KEY
 import com.benoitletondor.easybudgetapp.view.welcome.getOnboardingStep
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import dagger.hilt.android.AndroidEntryPoint
@@ -179,7 +179,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
 
         lifecycleScope.launchCollect(viewModel.expenseDeletionErrorEventFlow) {
-            AlertDialog.Builder(this@MainActivity)
+            MaterialAlertDialogBuilder(this@MainActivity)
                 .setTitle(R.string.expense_delete_error_title)
                 .setMessage(R.string.expense_delete_error_message)
                 .setNegativeButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
@@ -210,7 +210,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         lifecycleScope.launchCollect(viewModel.recurringExpenseDeletionEventFlow) { event ->
             when(event) {
                 is MainViewModel.RecurringExpenseDeletionEvent.ErrorCantDeleteBeforeFirstOccurrence -> {
-                    AlertDialog.Builder(this@MainActivity)
+                    MaterialAlertDialogBuilder(this@MainActivity)
                         .setTitle(R.string.recurring_expense_delete_first_error_title)
                         .setMessage(R.string.recurring_expense_delete_first_error_message)
                         .setNegativeButton(R.string.ok, null)
@@ -273,7 +273,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         lifecycleScope.launchCollect(viewModel.recurringExpenseRestoreEventFlow) { event ->
             when(event) {
                 is MainViewModel.RecurringExpenseRestoreEvent.ErrorIO -> {
-                    AlertDialog.Builder(this@MainActivity)
+                    MaterialAlertDialogBuilder(this@MainActivity)
                         .setTitle(R.string.recurring_expense_restore_error_title)
                         .setMessage(resources.getString(R.string.recurring_expense_restore_error_message))
                         .setNegativeButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
@@ -300,7 +300,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
             amountEditText.preventUnsupportedInputForDecimals()
             amountEditText.setSelection(amountEditText.text.length) // Put focus at the end of the text
 
-            val builder = AlertDialog.Builder(this)
+            val builder = MaterialAlertDialogBuilder(this)
             builder.setTitle(R.string.adjust_balance_title)
             builder.setMessage(R.string.adjust_balance_message)
             builder.setView(dialogView)
@@ -334,7 +334,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
 
         lifecycleScope.launchCollect(viewModel.currentBalanceEditingErrorEventFlow) {
-            AlertDialog.Builder(this@MainActivity)
+            MaterialAlertDialogBuilder(this@MainActivity)
                 .setTitle(R.string.adjust_balance_error_title)
                 .setMessage(R.string.adjust_balance_error_message)
                 .setNegativeButton(R.string.ok) { dialog1, _ -> dialog1.dismiss() }
@@ -366,7 +366,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
 
         lifecycleScope.launchCollect(viewModel.currentBalanceRestoringErrorEventFlow) {
-            AlertDialog.Builder(this@MainActivity)
+            MaterialAlertDialogBuilder(this@MainActivity)
                 .setTitle(R.string.adjust_balance_error_title)
                 .setMessage(R.string.adjust_balance_error_message)
                 .setNegativeButton(R.string.ok) { dialog1, _ -> dialog1.dismiss() }
@@ -386,7 +386,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
 
         lifecycleScope.launchCollect(viewModel.expenseCheckedErrorEventFlow) { exception ->
-            AlertDialog.Builder(this@MainActivity)
+            MaterialAlertDialogBuilder(this@MainActivity)
                 .setTitle(R.string.expense_check_error_title)
                 .setMessage(
                     getString(
@@ -407,7 +407,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
 
         lifecycleScope.launchCollect(viewModel.confirmCheckAllPastEntriesEventFlow) {
-            AlertDialog.Builder(this@MainActivity)
+            MaterialAlertDialogBuilder(this@MainActivity)
                 .setTitle(R.string.check_all_past_expences_title)
                 .setMessage(getString(R.string.check_all_past_expences_message))
                 .setPositiveButton(R.string.check_all_past_expences_confirm_cta) { dialog2, _ ->
@@ -419,7 +419,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
 
         lifecycleScope.launchCollect(viewModel.checkAllPastEntriesErrorEventFlow) { error ->
-            AlertDialog.Builder(this@MainActivity)
+            MaterialAlertDialogBuilder(this@MainActivity)
                 .setTitle(R.string.check_all_past_expences_error_title)
                 .setMessage(
                     getString(
@@ -942,7 +942,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
      * Show a generic alert dialog telling the user an error occured while deleting recurring expense
      */
     private fun showGenericRecurringDeleteErrorDialog() {
-        AlertDialog.Builder(this@MainActivity)
+        MaterialAlertDialogBuilder(this@MainActivity)
             .setTitle(R.string.recurring_expense_delete_error_title)
             .setMessage(R.string.recurring_expense_delete_error_message)
             .setNegativeButton(R.string.ok) { dialog, _ -> dialog.dismiss() }

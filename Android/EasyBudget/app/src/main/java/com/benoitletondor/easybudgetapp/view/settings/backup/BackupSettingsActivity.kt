@@ -22,12 +22,12 @@ import android.text.format.DateUtils
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.databinding.ActivityBackupSettingsBinding
 import com.benoitletondor.easybudgetapp.helper.BaseActivity
 import com.benoitletondor.easybudgetapp.helper.launchCollect
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import kotlin.system.exitProcess
@@ -189,14 +189,14 @@ class BackupSettingsActivity : BaseActivity<ActivityBackupSettingsBinding>() {
         }
 
         lifecycleScope.launchCollect(viewModel.backupNowErrorEventFlow) {
-            AlertDialog.Builder(this)
+            MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.backup_now_error_title)
                 .setMessage(R.string.backup_now_error_message)
                 .setPositiveButton(android.R.string.ok, null)
         }
 
         lifecycleScope.launchCollect(viewModel.previousBackupAvailableEventFlow) { lastBackupDate ->
-            AlertDialog.Builder(this)
+            MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.backup_already_exist_title)
                 .setMessage(
                     getString(
@@ -214,7 +214,7 @@ class BackupSettingsActivity : BaseActivity<ActivityBackupSettingsBinding>() {
         }
 
         lifecycleScope.launchCollect(viewModel.restorationErrorEventFlow) {
-            AlertDialog.Builder(this)
+            MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.backup_restore_error_title)
                 .setMessage(R.string.backup_restore_error_message)
                 .setPositiveButton(android.R.string.ok, null)
@@ -228,7 +228,7 @@ class BackupSettingsActivity : BaseActivity<ActivityBackupSettingsBinding>() {
         }
 
         lifecycleScope.launchCollect(viewModel.restoreConfirmationDisplayEventFlow) { lastBackupDate ->
-            AlertDialog.Builder(this)
+            MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.backup_restore_confirmation_title)
                 .setMessage(
                     getString(
@@ -246,7 +246,7 @@ class BackupSettingsActivity : BaseActivity<ActivityBackupSettingsBinding>() {
         }
 
         lifecycleScope.launchCollect(viewModel.authenticationConfirmationDisplayEventFlow) {
-            AlertDialog.Builder(this)
+            MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.backup_settings_not_authenticated_privacy_title)
                 .setMessage(R.string.backup_settings_not_authenticated_privacy_message)
                 .setPositiveButton(R.string.backup_settings_not_authenticated_privacy_positive_cta) { _, _ ->
@@ -259,7 +259,7 @@ class BackupSettingsActivity : BaseActivity<ActivityBackupSettingsBinding>() {
         }
 
         lifecycleScope.launchCollect(viewModel.deleteConfirmationDisplayEventFlow) {
-            AlertDialog.Builder(this)
+            MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.backup_wipe_data_confirmation_title)
                 .setMessage(R.string.backup_wipe_data_confirmation_message)
                 .setPositiveButton(R.string.backup_wipe_data_confirmation_positive_cta) { _, _ ->
@@ -272,7 +272,7 @@ class BackupSettingsActivity : BaseActivity<ActivityBackupSettingsBinding>() {
         }
 
         lifecycleScope.launchCollect(viewModel.backupDeletionErrorEventFlow) {
-            AlertDialog.Builder(this)
+            MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.backup_wipe_data_error_title)
                 .setMessage(R.string.backup_wipe_data_error_message)
                 .setPositiveButton(android.R.string.ok, null)

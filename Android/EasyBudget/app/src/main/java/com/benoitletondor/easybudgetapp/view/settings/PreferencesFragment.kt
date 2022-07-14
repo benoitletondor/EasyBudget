@@ -27,7 +27,6 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.EditText
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -45,6 +44,7 @@ import com.benoitletondor.easybudgetapp.view.premium.PremiumActivity
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.SHOW_BACKUP_INTENT_KEY
 import com.benoitletondor.easybudgetapp.view.settings.backup.BackupSettingsActivity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.roomorama.caldroid.CaldroidFragment
 import dagger.hilt.android.AndroidEntryPoint
 import java.net.URLEncoder
@@ -204,7 +204,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                 limitEditText.setSelection(limitEditText.text.length) // Put focus at the end of the text
 
                 context?.let { context ->
-                    val builder = AlertDialog.Builder(context)
+                    val builder = MaterialAlertDialogBuilder(context)
                     builder.setTitle(R.string.adjust_limit_warning_title)
                     builder.setMessage(R.string.adjust_limit_warning_message)
                     builder.setView(dialogView)
@@ -227,7 +227,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                             setLimitWarningPreferenceTitle(limitWarningPreference)
                             LocalBroadcastManager.getInstance(context).sendBroadcast(Intent(MainActivity.INTENT_LOW_MONEY_WARNING_THRESHOLD_CHANGED))
                         } catch (e: Exception) {
-                            AlertDialog.Builder(context)
+                            MaterialAlertDialogBuilder(context)
                                 .setTitle(R.string.adjust_limit_warning_error_title)
                                 .setMessage(resources.getString(R.string.adjust_limit_warning_error_message))
                                 .setPositiveButton(R.string.ok) { dialog1, _ -> dialog1.dismiss() }
@@ -336,7 +336,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
 
                 } else if (USER_GONE_PREMIUM_INTENT == intent.action) {
                     context?.let { context ->
-                        AlertDialog.Builder(context)
+                        MaterialAlertDialogBuilder(context)
                             .setTitle(R.string.iab_purchase_success_title)
                             .setMessage(R.string.iab_purchase_success_message)
                             .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
@@ -421,7 +421,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             // Premium preference
             findPreference<Preference>(resources.getString(R.string.setting_category_premium_status_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                 context?.let {context ->
-                    AlertDialog.Builder(context)
+                    MaterialAlertDialogBuilder(context)
                         .setTitle(R.string.premium_popup_premium_title)
                         .setMessage(R.string.premium_popup_premium_message)
                         .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
@@ -487,7 +487,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                     val dialogView = activity.layoutInflater.inflate(R.layout.dialog_redeem_voucher, null)
                     val voucherEditText = dialogView.findViewById<View>(R.id.voucher) as EditText
 
-                    val builder = AlertDialog.Builder(activity)
+                    val builder = MaterialAlertDialogBuilder(activity)
                         .setTitle(R.string.voucher_redeem_dialog_title)
                         .setMessage(R.string.voucher_redeem_dialog_message)
                         .setView(dialogView)
@@ -496,7 +496,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
 
                             val promocode = voucherEditText.text.toString()
                             if (promocode.trim { it <= ' ' }.isEmpty()) {
-                                AlertDialog.Builder(activity)
+                                MaterialAlertDialogBuilder(activity)
                                     .setTitle(R.string.voucher_redeem_error_dialog_title)
                                     .setMessage(R.string.voucher_redeem_error_code_invalid_dialog_message)
                                     .setPositiveButton(R.string.ok) { dialog12, _ -> dialog12.dismiss() }
@@ -504,7 +504,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                             }
 
                             if (!launchRedeemPromocodeFlow(promocode)) {
-                                AlertDialog.Builder(activity)
+                                MaterialAlertDialogBuilder(activity)
                                     .setTitle(R.string.iab_purchase_error_title)
                                     .setMessage(resources.getString(R.string.iab_purchase_error_message, "Error redeeming promo code"))
                                     .setPositiveButton(R.string.ok) { dialog1, _ -> dialog1.dismiss() }
