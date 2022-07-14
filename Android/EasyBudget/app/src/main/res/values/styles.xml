@@ -26,6 +26,8 @@
         <item name="materialAlertDialogTheme">@style/AlertDialogTheme</item>
         <item name="android:statusBarColor">@color/status_bar_color</item>
         <item name="colorBackgroundFloating">@color/window_background</item>
+        <item name="textAppearanceLargePopupMenu">@style/ToolbarMenuTextAppearance</item>
+        <item name="textAppearanceSmallPopupMenu">@style/ToolbarMenuTextAppearance</item>
     </style>
 
     <style name="Base.LoadingTheme" parent="android:Theme.Material">
@@ -58,6 +60,10 @@
     <style name="ToolbarTheme" parent="ThemeOverlay.Material3.ActionBar">
         <item name="colorControlNormal">@color/action_bar_text_color</item>
         <item name="actionMenuTextColor">@color/action_bar_text_color</item>
+    </style>
+
+    <style name="ToolbarMenuTextAppearance" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:textColor">@color/primary_text</item>
     </style>
 
     <!-- App theme -->
