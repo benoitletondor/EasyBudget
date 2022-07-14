@@ -99,7 +99,7 @@
         <item name="colorButtonNormal">@color/accent_ripple</item>
     </style>
 
-    <style name="LightGreenButton.Borderless" parent="Widget.Material3.Button.UnelevatedButton">
+    <style name="LightGreenButton.Borderless" parent="Widget.Material3.Button.TextButton">
         <item name="android:textColor">@color/accent</item>
     </style>
 
@@ -108,7 +108,7 @@
         <item name="colorButtonNormal">@color/budget_red</item>
     </style>
 
-    <style name="RedButton.Borderless" parent="Widget.Material3.Button.UnelevatedButton">
+    <style name="RedButton.Borderless" parent="Widget.Material3.Button.TextButton">
         <item name="android:textColor">@color/budget_red</item>
     </style>
 
