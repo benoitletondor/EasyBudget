@@ -117,7 +117,7 @@
         android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/window_background"/>
+        android:background="@color/menu_background_overlay_color"/>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/coordinatorLayout"

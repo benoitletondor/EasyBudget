@@ -112,8 +112,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     private lateinit var calendarFragment: CalendarFragment
     private lateinit var expensesViewAdapter: ExpensesRecyclerViewAdapter
 
-    private val menuBackgroundAlpha = 0.8f
-    private val menuBackgroundAnimationDuration: Long = 200
+    private val menuBackgroundAnimationDuration: Long = 150
     private var menuExpandAnimation: Animation? = null
     private var menuCollapseAnimation: Animation? = null
 
@@ -868,18 +867,19 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         menuExpandAnimation?.cancel()
         menuCollapseAnimation?.cancel()
 
-        menuCollapseAnimation = AlphaAnimation(menuBackgroundAlpha, 0.0f)
+        menuCollapseAnimation = AlphaAnimation(1.0f, 0.0f)
         menuCollapseAnimation?.duration = menuBackgroundAnimationDuration
         menuCollapseAnimation?.fillAfter = true
         menuCollapseAnimation?.setAnimationListener(object : Animation.AnimationListener {
             override fun onAnimationStart(animation: Animation) {
-                binding.fabNewRecurringExpenseContainer.isVisible = false
-                binding.fabNewExpenseContainer.isVisible = false
             }
 
             override fun onAnimationEnd(animation: Animation) {
                 binding.fabChoicesBackground.visibility = View.GONE
                 binding.fabChoicesBackground.isClickable = false
+
+                binding.fabNewRecurringExpenseContainer.isVisible = false
+                binding.fabNewExpenseContainer.isVisible = false
             }
 
             override fun onAnimationRepeat(animation: Animation) {
@@ -888,6 +888,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         })
 
         binding.fabChoicesBackground.startAnimation(menuCollapseAnimation)
+        binding.fabNewRecurringExpenseContainer.startAnimation(menuCollapseAnimation)
+        binding.fabNewExpenseContainer.startAnimation(menuCollapseAnimation)
     }
 
     private fun expandMenu() {
@@ -895,7 +897,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         menuExpandAnimation?.cancel()
         menuCollapseAnimation?.cancel()
 
-        menuExpandAnimation = AlphaAnimation(0.0f, menuBackgroundAlpha)
+        menuExpandAnimation = AlphaAnimation(0.0f, 1.0f)
         menuExpandAnimation?.duration = menuBackgroundAnimationDuration
         menuExpandAnimation?.fillAfter = true
         menuExpandAnimation?.setAnimationListener(object : Animation.AnimationListener {
@@ -917,6 +919,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         })
 
         binding.fabChoicesBackground.startAnimation(menuExpandAnimation)
+        binding.fabNewRecurringExpenseContainer.startAnimation(menuExpandAnimation)
+        binding.fabNewExpenseContainer.startAnimation(menuExpandAnimation)
     }
 
     private fun refreshRecyclerViewForDate(date: LocalDate, expenses: List<Expense>) {
