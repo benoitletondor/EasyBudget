@@ -262,6 +262,11 @@
     <string name="onboarding_screen_3_message">Step 2: How much do you currently have on your account?\n(You can set and change it later)</string>
     <string name="onboarding_screen_3_cta">Start with %s</string>
 
+    <string name="onboarding_screen_push_permission_title">Receive important notifications?</string>
+    <string name="onboarding_screen_push_permission_message">To avoid missing anything important about your budget or the app, please allow notifications.\n\n(No spam, no useless notifications, only the essential!)</string>
+    <string name="onboarding_screen_push_permission_accept_cta">Allow</string>
+    <string name="onboarding_screen_push_permission_not_now_cta">Not now</string>
+
     <string name="onboarding_screen_4_title">All set!</string>
     <string name="onboarding_screen_4_message">(That was easy, huh?)</string>
     <string name="onboarding_screen_4_message2">What do you have to do next?</string>
@@ -362,4 +367,10 @@
         <item>1</item>
         <item>2</item>
     </string-array>
+
+    <string name="setting_notification_permission_rejected_dialog_title">Notifications permission denied</string>
+    <string name="setting_notification_permission_rejected_dialog_description">To receive your premium daily and monthly reminders, you need to allow notifications. Do you want to receive notifications?</string>
+    <string name="setting_notification_permission_rejected_dialog_accept_cta">Allow</string>
+    <string name="setting_notification_permission_rejected_dialog_not_now_cta">Not now</string>
 </resources>
+

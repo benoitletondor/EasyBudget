@@ -251,6 +251,11 @@
     <string name="onboarding_screen_3_message">Étape 2 : Combien avez-vous actuellement sur votre compte ?\n(Vous pouvez le changer plus tard)</string>
     <string name="onboarding_screen_3_cta">Démarrer avec %s</string>
 
+    <string name="onboarding_screen_push_permission_title">Recevoir les notifications importantes?</string>
+    <string name="onboarding_screen_push_permission_message">Pour éviter de rater la moindre information importante à propos de votre budget ou de l\'application, veuillez accepter les notifications.\n\n(Pas de spam, rien d\'inutile, juste les notifications essentielles!)</string>
+    <string name="onboarding_screen_push_permission_accept_cta">Autoriser</string>
+    <string name="onboarding_screen_push_permission_not_now_cta">Pas maintenant</string>
+
     <string name="onboarding_screen_4_title">C\'est tout bon !</string>
     <string name="onboarding_screen_4_message">(C\'était facile non ?)</string>
     <string name="onboarding_screen_4_message2">Quelles sont les prochaines étapes ?</string>
@@ -314,4 +319,9 @@
     <string name="backup_wipe_data_confirmation_negative_cta">Annuler</string>
     <string name="backup_wipe_data_error_title">Impossible de supprimer la sauvegarde cloud</string>
     <string name="backup_wipe_data_error_message">Une erreur est survenue lors de la suppression de votre sauvegarde cloud. Vérifiez votre connexion internet et réessayez.</string>
+
+    <string name="setting_notification_permission_rejected_dialog_title">Permission de notification refusée</string>
+    <string name="setting_notification_permission_rejected_dialog_description">Pour recevoir vos rappels quotidiens et mensuels premium, vous devez autoriser les notifications. Voulez-vous recevoir les notifications?</string>
+    <string name="setting_notification_permission_rejected_dialog_accept_cta">Autoriser</string>
+    <string name="setting_notification_permission_rejected_dialog_not_now_cta">Pas maintenant</string>
 </resources>

@@ -16,19 +16,25 @@
 
 package com.benoitletondor.easybudgetapp.view.settings
 
+import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.preference.*
 import com.benoitletondor.easybudgetapp.BuildConfig
@@ -76,6 +82,10 @@ class PreferencesFragment : PreferenceFragmentCompat() {
      */
     private lateinit var notPremiumCategory: PreferenceCategory
     /**
+     * Launcher for notification permission request
+     */
+    private lateinit var notificationRequestPermissionLauncher: ActivityResultLauncher<String>
+    /**
      * Is the premium category shown
      */
     private var premiumShown = true
@@ -95,6 +105,24 @@ class PreferencesFragment : PreferenceFragmentCompat() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        notificationRequestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            if (!granted) {
+                activity?.let {
+                    MaterialAlertDialogBuilder(it)
+                        .setTitle(R.string.setting_notification_permission_rejected_dialog_title)
+                        .setMessage(R.string.setting_notification_permission_rejected_dialog_description)
+                        .setPositiveButton(R.string.setting_notification_permission_rejected_dialog_accept_cta) { dialog, _ ->
+                            dialog.dismiss()
+                            showNotificationPermissionIfNeeded()
+                        }
+                        .setNegativeButton(R.string.setting_notification_permission_rejected_dialog_not_now_cta) { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        .show()
+                }
+            }
+        }
 
         /*
          * Rating button
@@ -279,7 +307,13 @@ class PreferencesFragment : PreferenceFragmentCompat() {
          */
         val updateNotifPref = findPreference<CheckBoxPreference>(resources.getString(R.string.setting_category_notifications_update_key))
         updateNotifPref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-            parameters.setUserAllowUpdatePushes((it as CheckBoxPreference).isChecked)
+            val checked = (it as CheckBoxPreference).isChecked
+            parameters.setUserAllowUpdatePushes(checked)
+
+            if (checked) {
+                showNotificationPermissionIfNeeded()
+            }
+
             true
         }
         updateNotifPref?.isChecked = parameters.isUserAllowingUpdatePushes()
@@ -340,6 +374,9 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                             .setTitle(R.string.iab_purchase_success_title)
                             .setMessage(R.string.iab_purchase_success_message)
                             .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
+                            .setOnDismissListener {
+                                showNotificationPermissionIfNeeded()
+                            }
                             .show()
                     }
 
@@ -375,6 +412,16 @@ class PreferencesFragment : PreferenceFragmentCompat() {
         } else {
             R.string.backup_settings_backups_deactivated
         })
+    }
+
+    private fun showNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT < 33) {
+            return
+        }
+
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            notificationRequestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
     }
 
     override fun onResume() {
@@ -434,7 +481,13 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             // Daily reminder notif preference
             val dailyNotifPref = findPreference<CheckBoxPreference>(resources.getString(R.string.setting_category_notifications_daily_key))
             dailyNotifPref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                parameters.setUserAllowDailyReminderPushes((it as CheckBoxPreference).isChecked)
+                val checked = (it as CheckBoxPreference).isChecked
+                parameters.setUserAllowDailyReminderPushes(checked)
+
+                if (checked) {
+                    showNotificationPermissionIfNeeded()
+                }
+
                 true
             }
             dailyNotifPref?.isChecked = parameters.isUserAllowingDailyReminderPushes()
@@ -442,7 +495,13 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             // Monthly reminder for reports
             val monthlyNotifPref = findPreference<CheckBoxPreference>(resources.getString(R.string.setting_category_notifications_monthly_key))
             monthlyNotifPref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                parameters.setUserAllowMonthlyReminderPushes((it as CheckBoxPreference).isChecked)
+                val checked = (it as CheckBoxPreference).isChecked
+                parameters.setUserAllowMonthlyReminderPushes(checked)
+
+                if (checked) {
+                    showNotificationPermissionIfNeeded()
+                }
+
                 true
             }
             monthlyNotifPref?.isChecked = parameters.isUserAllowingMonthlyReminderPushes()

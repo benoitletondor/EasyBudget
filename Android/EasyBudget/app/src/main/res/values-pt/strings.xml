@@ -251,6 +251,11 @@
     <string name="onboarding_screen_3_message">Passo 2: Quanto você tem atualmente em sua conta?\n(Você pode mudar mais tarde)</string>
     <string name="onboarding_screen_3_cta">Começar com %s</string>
 
+    <string name="onboarding_screen_push_permission_title">Receber notificações importantes?</string>
+    <string name="onboarding_screen_push_permission_message">Para evitar perder algo importante sobre seu orçamento ou o aplicativo, permita notificações.\n\n(Sem spam, sem notificações inúteis, apenas o essencial!)</string>
+    <string name="onboarding_screen_push_permission_accept_cta">Permitir</string>
+    <string name="onboarding_screen_push_permission_not_now_cta">Agora não</string>
+
     <string name="onboarding_screen_4_title">Tudo pronto!</string>
     <string name="onboarding_screen_4_message">(Foi fácil, não é?)</string>
     <string name="onboarding_screen_4_message2">Quais são os próximos passos?</string>
@@ -314,4 +319,9 @@
     <string name="backup_wipe_data_confirmation_negative_cta">Cancelar</string>
     <string name="backup_wipe_data_error_title">Não foi possível excluir la cópia de segurança na nuvem</string>
     <string name="backup_wipe_data_error_message">Ocorreu um erro ao excluir seus dados de cópia de segurança. Verifique sua conexão e tente novamente mais tarde.</string>
+
+    <string name="setting_notification_permission_rejected_dialog_title">Permissão de notificações negada</string>
+    <string name="setting_notification_permission_rejected_dialog_description">Para receber seus lembretes premium diários e mensais, você precisa permitir notificações. Deseja receber notificações?</string>
+    <string name="setting_notification_permission_rejected_dialog_accept_cta">Permitir</string>
+    <string name="setting_notification_permission_rejected_dialog_not_now_cta">Agora não</string>
 </resources>

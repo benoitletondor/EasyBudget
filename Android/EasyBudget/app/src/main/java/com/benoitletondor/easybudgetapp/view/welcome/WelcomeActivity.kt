@@ -67,6 +67,8 @@ class WelcomeActivity : BaseActivity<ActivityWelcomeBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val isAndroid13OrMore = Build.VERSION.SDK_INT >= 33
+
         // Reinit step to 0 if already completed
         if (step == STEP_COMPLETED) {
             step = 0
@@ -74,17 +76,26 @@ class WelcomeActivity : BaseActivity<ActivityWelcomeBinding>() {
 
         binding.welcomeViewPager.adapter = object : FragmentStatePagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
             override fun getItem(position: Int): Fragment {
-                when (position) {
-                    0 -> return Onboarding1Fragment()
-                    1 -> return Onboarding2Fragment()
-                    2 -> return Onboarding3Fragment()
-                    3 -> return Onboarding4Fragment()
+                if (isAndroid13OrMore) {
+                    when (position) {
+                        0 -> return Onboarding1Fragment()
+                        1 -> return Onboarding2Fragment()
+                        2 -> return Onboarding3Fragment()
+                        3 -> return OnboardingPushPermissionFragment()
+                        4 -> return Onboarding4Fragment()
+                    }
+                } else {
+                    when (position) {
+                        0 -> return Onboarding1Fragment()
+                        1 -> return Onboarding2Fragment()
+                        2 -> return Onboarding3Fragment()
+                        3 -> return Onboarding4Fragment()
+                    }
                 }
-
                 throw IllegalStateException("unknown position $position")
             }
 
-            override fun getCount(): Int = 4
+            override fun getCount(): Int = if (isAndroid13OrMore) 5 else 4
         }
         binding.welcomeViewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}

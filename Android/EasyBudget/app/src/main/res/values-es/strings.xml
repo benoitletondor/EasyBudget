@@ -251,6 +251,11 @@
     <string name="onboarding_screen_3_message">Paso 2: ¿Cuánto dinero tienes en tu cuenta?\n(puedes modificar el monto después)</string>
     <string name="onboarding_screen_3_cta">Empezar con %s</string>
 
+    <string name="onboarding_screen_push_permission_title">¿Recibir notificaciones importantes?</string>
+    <string name="onboarding_screen_push_permission_message">Para evitar perderse algo importante sobre su presupuesto o la aplicación, permita las notificaciones.\n\n(Sin spam, sin notificaciones inútiles, ¡solo lo esencial!)</string>
+    <string name="onboarding_screen_push_permission_accept_cta">Permitir</string>
+    <string name="onboarding_screen_push_permission_not_now_cta">No ahora</string>
+
     <string name="onboarding_screen_4_title">¡Ya está!</string>
     <string name="onboarding_screen_4_message">(Ha sido fácil, ¿verdad?)</string>
     <string name="onboarding_screen_4_message2">¿Y ahora qué sigue?</string>
@@ -314,4 +319,9 @@
     <string name="backup_wipe_data_confirmation_negative_cta">Cancelar</string>
     <string name="backup_wipe_data_error_title">No se puede eliminar la copia de seguridad en la nube</string>
     <string name="backup_wipe_data_error_message">Se produjo un error al eliminar sus datos de la copia de seguridad. Verifique su conexión e intente nuevamente más tarde.</string>
+
+    <string name="setting_notification_permission_rejected_dialog_title">Permiso de notificaciones denegado</string>
+    <string name="setting_notification_permission_rejected_dialog_description">Para recibir los recordatorios diarios y mensuales de su prima, debe permitir las notificaciones. ¿Quieres recibir notificaciones?</string>
+    <string name="setting_notification_permission_rejected_dialog_accept_cta">Permitir</string>
+    <string name="setting_notification_permission_rejected_dialog_not_now_cta">No ahora</string>
 </resources>

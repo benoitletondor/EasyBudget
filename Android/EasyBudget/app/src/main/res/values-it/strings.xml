@@ -251,6 +251,11 @@
     <string name="onboarding_screen_3_message">Tappa n° 2: Di quanto disponi attualmente sul tuo conto?\n(Potrai cambiare la cifra più tardi).</string>
     <string name="onboarding_screen_3_cta">Inizia con %s</string>
 
+    <string name="onboarding_screen_push_permission_title">Ricevi notifiche importanti?</string>
+    <string name="onboarding_screen_push_permission_message">Per evitare di perdere qualcosa di importante sul tuo budget o sull\'app, consenti le notifiche.\n\n(Niente spam, niente notifiche inutili, solo l\'essenziale!)</string>
+    <string name="onboarding_screen_push_permission_accept_cta">Permettere</string>
+    <string name="onboarding_screen_push_permission_not_now_cta">Non adesso</string>
+
     <string name="onboarding_screen_4_title">Perfetto!</string>
     <string name="onboarding_screen_4_message">(È stato facile, no?)</string>
     <string name="onboarding_screen_4_message2">Quali sono le prossime tappe?</string>
@@ -314,4 +319,9 @@
     <string name="backup_wipe_data_confirmation_negative_cta">Annulla</string>
     <string name="backup_wipe_data_error_title">Impossibile eliminare il backup su cloud</string>
     <string name="backup_wipe_data_error_message">Si è verificato un errore durante l\'eliminazione dei dati di backup. Verifica la connessione e riprova più tardi.</string>
+
+    <string name="setting_notification_permission_rejected_dialog_title">Autorizzazione notifiche negata</string>
+    <string name="setting_notification_permission_rejected_dialog_description">Per ricevere i tuoi promemoria giornalieri e mensili premium, devi consentire le notifiche. Vuoi ricevere le notifiche?</string>
+    <string name="setting_notification_permission_rejected_dialog_accept_cta">Permettere</string>
+    <string name="setting_notification_permission_rejected_dialog_not_now_cta">Non adesso</string>
 </resources>
