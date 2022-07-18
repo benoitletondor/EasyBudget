@@ -42,4 +42,13 @@ class FloatingActionButtonBehavior(context: Context, attrs: AttributeSet) : Coor
         child.translationY = translationY
         return true
     }
+
+    override fun onDependentViewRemoved(
+        parent: CoordinatorLayout,
+        child: LinearLayout,
+        dependency: View
+    ) {
+        super.onDependentViewRemoved(parent, child, dependency)
+        child.translationY = 0f
+    }
 }

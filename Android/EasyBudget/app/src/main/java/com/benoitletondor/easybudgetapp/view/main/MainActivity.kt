@@ -888,8 +888,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         })
 
         binding.fabChoicesBackground.startAnimation(menuCollapseAnimation)
-        binding.fabNewRecurringExpenseContainer.startAnimation(menuCollapseAnimation)
-        binding.fabNewExpenseContainer.startAnimation(menuCollapseAnimation)
+        binding.fabNewRecurringExpense.startAnimation(menuCollapseAnimation)
+        binding.fabNewRecurringExpenseText.startAnimation(menuCollapseAnimation)
+        binding.fabNewExpense.startAnimation(menuCollapseAnimation)
+        binding.fabNewExpenseText.startAnimation(menuCollapseAnimation)
     }
 
     private fun expandMenu() {
@@ -919,8 +921,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         })
 
         binding.fabChoicesBackground.startAnimation(menuExpandAnimation)
-        binding.fabNewRecurringExpenseContainer.startAnimation(menuExpandAnimation)
-        binding.fabNewExpenseContainer.startAnimation(menuExpandAnimation)
+        binding.fabNewRecurringExpense.startAnimation(menuExpandAnimation)
+        binding.fabNewRecurringExpenseText.startAnimation(menuExpandAnimation)
+        binding.fabNewExpense.startAnimation(menuExpandAnimation)
+        binding.fabNewExpenseText.startAnimation(menuExpandAnimation)
     }
 
     private fun refreshRecyclerViewForDate(date: LocalDate, expenses: List<Expense>) {
