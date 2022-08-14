@@ -21,25 +21,34 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.snackbar.Snackbar
 import android.util.AttributeSet
 import android.view.View
+import android.widget.LinearLayout
 
-import com.getbase.floatingactionbutton.FloatingActionsMenu
 import kotlin.math.min
 
 /**
- * Behavior of FAB for [FloatingActionsMenu] reacting to Snackbar
+ * Behavior of FAB for the floating action menu reacting to Snackbar
  *
  * @author Benoit LETONDOR
  */
 @Suppress("UNUSED_PARAMETER")
-class FloatingActionButtonBehavior(context: Context, attrs: AttributeSet) : CoordinatorLayout.Behavior<FloatingActionsMenu>() {
+class FloatingActionButtonBehavior(context: Context, attrs: AttributeSet) : CoordinatorLayout.Behavior<LinearLayout>() {
 
-    override fun layoutDependsOn(parent: CoordinatorLayout, child: FloatingActionsMenu, dependency: View): Boolean {
+    override fun layoutDependsOn(parent: CoordinatorLayout, child: LinearLayout, dependency: View): Boolean {
         return dependency is Snackbar.SnackbarLayout
     }
 
-    override fun onDependentViewChanged(parent: CoordinatorLayout, child: FloatingActionsMenu, dependency: View): Boolean {
+    override fun onDependentViewChanged(parent: CoordinatorLayout, child: LinearLayout, dependency: View): Boolean {
         val translationY = min(0f, dependency.translationY - dependency.height)
         child.translationY = translationY
         return true
+    }
+
+    override fun onDependentViewRemoved(
+        parent: CoordinatorLayout,
+        child: LinearLayout,
+        dependency: View
+    ) {
+        super.onDependentViewRemoved(parent, child, dependency)
+        child.translationY = 0f
     }
 }

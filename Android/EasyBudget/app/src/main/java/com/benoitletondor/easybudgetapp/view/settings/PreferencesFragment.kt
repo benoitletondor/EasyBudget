@@ -16,20 +16,25 @@
 
 package com.benoitletondor.easybudgetapp.view.settings
 
+import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import android.widget.EditText
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.preference.*
 import com.benoitletondor.easybudgetapp.BuildConfig
@@ -45,6 +50,7 @@ import com.benoitletondor.easybudgetapp.view.premium.PremiumActivity
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.SHOW_BACKUP_INTENT_KEY
 import com.benoitletondor.easybudgetapp.view.settings.backup.BackupSettingsActivity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.roomorama.caldroid.CaldroidFragment
 import dagger.hilt.android.AndroidEntryPoint
 import java.net.URLEncoder
@@ -76,6 +82,10 @@ class PreferencesFragment : PreferenceFragmentCompat() {
      */
     private lateinit var notPremiumCategory: PreferenceCategory
     /**
+     * Launcher for notification permission request
+     */
+    private lateinit var notificationRequestPermissionLauncher: ActivityResultLauncher<String>
+    /**
      * Is the premium category shown
      */
     private var premiumShown = true
@@ -95,6 +105,24 @@ class PreferencesFragment : PreferenceFragmentCompat() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        notificationRequestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            if (!granted) {
+                activity?.let {
+                    MaterialAlertDialogBuilder(it)
+                        .setTitle(R.string.setting_notification_permission_rejected_dialog_title)
+                        .setMessage(R.string.setting_notification_permission_rejected_dialog_description)
+                        .setPositiveButton(R.string.setting_notification_permission_rejected_dialog_accept_cta) { dialog, _ ->
+                            dialog.dismiss()
+                            showNotificationPermissionIfNeeded()
+                        }
+                        .setNegativeButton(R.string.setting_notification_permission_rejected_dialog_not_now_cta) { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        .show()
+                }
+            }
+        }
 
         /*
          * Rating button
@@ -204,7 +232,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                 limitEditText.setSelection(limitEditText.text.length) // Put focus at the end of the text
 
                 context?.let { context ->
-                    val builder = AlertDialog.Builder(context)
+                    val builder = MaterialAlertDialogBuilder(context)
                     builder.setTitle(R.string.adjust_limit_warning_title)
                     builder.setMessage(R.string.adjust_limit_warning_message)
                     builder.setView(dialogView)
@@ -227,7 +255,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                             setLimitWarningPreferenceTitle(limitWarningPreference)
                             LocalBroadcastManager.getInstance(context).sendBroadcast(Intent(MainActivity.INTENT_LOW_MONEY_WARNING_THRESHOLD_CHANGED))
                         } catch (e: Exception) {
-                            AlertDialog.Builder(context)
+                            MaterialAlertDialogBuilder(context)
                                 .setTitle(R.string.adjust_limit_warning_error_title)
                                 .setMessage(resources.getString(R.string.adjust_limit_warning_error_message))
                                 .setPositiveButton(R.string.ok) { dialog1, _ -> dialog1.dismiss() }
@@ -279,7 +307,13 @@ class PreferencesFragment : PreferenceFragmentCompat() {
          */
         val updateNotifPref = findPreference<CheckBoxPreference>(resources.getString(R.string.setting_category_notifications_update_key))
         updateNotifPref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-            parameters.setUserAllowUpdatePushes((it as CheckBoxPreference).isChecked)
+            val checked = (it as CheckBoxPreference).isChecked
+            parameters.setUserAllowUpdatePushes(checked)
+
+            if (checked) {
+                showNotificationPermissionIfNeeded()
+            }
+
             true
         }
         updateNotifPref?.isChecked = parameters.isUserAllowingUpdatePushes()
@@ -336,10 +370,13 @@ class PreferencesFragment : PreferenceFragmentCompat() {
 
                 } else if (USER_GONE_PREMIUM_INTENT == intent.action) {
                     context?.let { context ->
-                        AlertDialog.Builder(context)
+                        MaterialAlertDialogBuilder(context)
                             .setTitle(R.string.iab_purchase_success_title)
                             .setMessage(R.string.iab_purchase_success_message)
                             .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
+                            .setOnDismissListener {
+                                showNotificationPermissionIfNeeded()
+                            }
                             .show()
                     }
 
@@ -375,6 +412,16 @@ class PreferencesFragment : PreferenceFragmentCompat() {
         } else {
             R.string.backup_settings_backups_deactivated
         })
+    }
+
+    private fun showNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT < 33) {
+            return
+        }
+
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            notificationRequestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
     }
 
     override fun onResume() {
@@ -421,7 +468,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             // Premium preference
             findPreference<Preference>(resources.getString(R.string.setting_category_premium_status_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                 context?.let {context ->
-                    AlertDialog.Builder(context)
+                    MaterialAlertDialogBuilder(context)
                         .setTitle(R.string.premium_popup_premium_title)
                         .setMessage(R.string.premium_popup_premium_message)
                         .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
@@ -434,7 +481,13 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             // Daily reminder notif preference
             val dailyNotifPref = findPreference<CheckBoxPreference>(resources.getString(R.string.setting_category_notifications_daily_key))
             dailyNotifPref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                parameters.setUserAllowDailyReminderPushes((it as CheckBoxPreference).isChecked)
+                val checked = (it as CheckBoxPreference).isChecked
+                parameters.setUserAllowDailyReminderPushes(checked)
+
+                if (checked) {
+                    showNotificationPermissionIfNeeded()
+                }
+
                 true
             }
             dailyNotifPref?.isChecked = parameters.isUserAllowingDailyReminderPushes()
@@ -442,7 +495,13 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             // Monthly reminder for reports
             val monthlyNotifPref = findPreference<CheckBoxPreference>(resources.getString(R.string.setting_category_notifications_monthly_key))
             monthlyNotifPref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                parameters.setUserAllowMonthlyReminderPushes((it as CheckBoxPreference).isChecked)
+                val checked = (it as CheckBoxPreference).isChecked
+                parameters.setUserAllowMonthlyReminderPushes(checked)
+
+                if (checked) {
+                    showNotificationPermissionIfNeeded()
+                }
+
                 true
             }
             monthlyNotifPref?.isChecked = parameters.isUserAllowingMonthlyReminderPushes()
@@ -487,7 +546,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                     val dialogView = activity.layoutInflater.inflate(R.layout.dialog_redeem_voucher, null)
                     val voucherEditText = dialogView.findViewById<View>(R.id.voucher) as EditText
 
-                    val builder = AlertDialog.Builder(activity)
+                    val builder = MaterialAlertDialogBuilder(activity)
                         .setTitle(R.string.voucher_redeem_dialog_title)
                         .setMessage(R.string.voucher_redeem_dialog_message)
                         .setView(dialogView)
@@ -496,7 +555,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
 
                             val promocode = voucherEditText.text.toString()
                             if (promocode.trim { it <= ' ' }.isEmpty()) {
-                                AlertDialog.Builder(activity)
+                                MaterialAlertDialogBuilder(activity)
                                     .setTitle(R.string.voucher_redeem_error_dialog_title)
                                     .setMessage(R.string.voucher_redeem_error_code_invalid_dialog_message)
                                     .setPositiveButton(R.string.ok) { dialog12, _ -> dialog12.dismiss() }
@@ -504,7 +563,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                             }
 
                             if (!launchRedeemPromocodeFlow(promocode)) {
-                                AlertDialog.Builder(activity)
+                                MaterialAlertDialogBuilder(activity)
                                     .setTitle(R.string.iab_purchase_error_title)
                                     .setMessage(resources.getString(R.string.iab_purchase_error_message, "Error redeeming promo code"))
                                     .setPositiveButton(R.string.ok) { dialog1, _ -> dialog1.dismiss() }

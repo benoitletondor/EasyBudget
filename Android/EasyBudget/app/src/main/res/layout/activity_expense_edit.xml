@@ -111,6 +111,8 @@
                     android:layout_height="wrap_content"
                     android:theme="@style/TextLabel"
                     app:hintTextAppearance="@style/TextLabelHintTextAppearance"
+                    app:hintTextColor="@color/expense_edit_title_text_color_dark"
+                    android:textColorHint="@color/expense_edit_title_text_color_dark"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
@@ -135,6 +137,8 @@
                     android:theme="@style/TextLabel"
                     android:layout_marginTop="16dp"
                     app:hintTextAppearance="@style/TextLabelHintTextAppearance"
+                    app:hintTextColor="@color/expense_edit_title_text_color_dark"
+                    android:textColorHint="@color/expense_edit_title_text_color_dark"
                     app:layout_constraintTop_toBottomOf="@+id/description_inputlayout"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="@+id/guidelineMiddleForm">
@@ -160,6 +164,7 @@
                 android:layout_height="wrap_content"
                 android:translationY="-30dp"
                 app:elevation="10dp"
+                app:tint="@color/white"
                 app:srcCompat="@drawable/ic_save_white_24dp"
                 app:backgroundTint="@color/secondary"
                 app:pressedTranslationZ="10dp"
@@ -216,13 +221,16 @@
                 app:layout_constraintStart_toEndOf="@+id/guidelineMiddle"
                 app:layout_constraintBaseline_toBaselineOf="@+id/expense_type_title"/>
 
-            <Button
+            <TextView
                 android:id="@+id/date_button"
                 android:layout_width="0dp"
                 android:layout_height="36dp"
                 android:textColor="@color/primary_text"
                 android:layout_marginTop="6dp"
-                android:textAllCaps="false"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:textAppearance="?attr/textAppearanceLabelLarge"
                 android:background="@drawable/expense_date_background_drawable"
                 app:layout_constraintStart_toStartOf="@+id/expense_date_title"
                 app:layout_constraintEnd_toEndOf="@+id/guidelineEnd"

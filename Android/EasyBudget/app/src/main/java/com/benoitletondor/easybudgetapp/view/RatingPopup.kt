@@ -28,6 +28,7 @@ import com.benoitletondor.easybudgetapp.helper.centerButtons
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.hasUserCompleteRating
 import com.benoitletondor.easybudgetapp.parameters.setUserHasCompleteRating
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.play.core.review.ReviewManagerFactory
 
 /**
@@ -74,7 +75,7 @@ class RatingPopup(private val activity: Activity,
      * @return A ready to be shown [AlertDialog]
      */
     private fun buildStep1(includeDontAskMeAgainButton: Boolean): AlertDialog {
-        val builder = AlertDialog.Builder(activity)
+        val builder = MaterialAlertDialogBuilder(activity)
             .setTitle(R.string.rating_popup_question_title)
             .setMessage(R.string.rating_popup_question_message)
             .setNegativeButton(R.string.rating_popup_question_cta_negative) { _, _ ->
@@ -103,7 +104,7 @@ class RatingPopup(private val activity: Activity,
      * @return A ready to be shown [AlertDialog]
      */
     private fun buildNegativeStep(): AlertDialog {
-        return AlertDialog.Builder(activity)
+        return MaterialAlertDialogBuilder(activity)
             .setTitle(R.string.rating_popup_negative_title)
             .setMessage(R.string.rating_popup_negative_message)
             .setNegativeButton(R.string.rating_popup_negative_cta_negative) { _, _ ->
@@ -136,7 +137,7 @@ class RatingPopup(private val activity: Activity,
      * @return A ready to be shown [AlertDialog]
      */
     private fun buildPositiveStep(): AlertDialog {
-        return AlertDialog.Builder(activity)
+        return MaterialAlertDialogBuilder(activity)
             .setTitle(R.string.rating_popup_positive_title)
             .setMessage(R.string.rating_popup_positive_message)
             .setNegativeButton(R.string.rating_popup_positive_cta_negative) { _, _ ->

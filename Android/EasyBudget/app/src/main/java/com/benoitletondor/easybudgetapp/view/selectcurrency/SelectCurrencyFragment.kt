@@ -19,7 +19,6 @@ package com.benoitletondor.easybudgetapp.view.selectcurrency
 import android.app.Dialog
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
-import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
@@ -30,8 +29,8 @@ import androidx.lifecycle.lifecycleScope
 
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.launchCollect
-import com.benoitletondor.easybudgetapp.helper.viewLifecycleScope
 import com.benoitletondor.easybudgetapp.parameters.Parameters
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -73,7 +72,7 @@ class SelectCurrencyFragment : DialogFragment() {
         // Put some padding between title and content
         v.setPadding(0, resources.getDimensionPixelSize(R.dimen.select_currency_dialog_padding_top), 0, 0)
 
-        val builder = AlertDialog.Builder(requireActivity())
+        val builder = MaterialAlertDialogBuilder(requireActivity())
 
         builder.setView(v)
         builder.setTitle(R.string.setting_category_currency_change_dialog_title)

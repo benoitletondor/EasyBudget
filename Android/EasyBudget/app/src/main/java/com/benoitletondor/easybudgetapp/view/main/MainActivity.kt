@@ -30,7 +30,6 @@ import com.google.android.material.snackbar.Snackbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.Gravity
 import android.view.Menu
@@ -42,6 +41,7 @@ import android.view.animation.Animation
 import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.activity.viewModels
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 
 import com.benoitletondor.easybudgetapp.R
@@ -50,8 +50,6 @@ import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType
 import com.benoitletondor.easybudgetapp.view.main.calendar.CalendarFragment
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment
-import com.getbase.floatingactionbutton.FloatingActionButton
-import com.getbase.floatingactionbutton.FloatingActionsMenu
 import com.roomorama.caldroid.CaldroidFragment
 import com.roomorama.caldroid.CaldroidListener
 
@@ -68,6 +66,8 @@ import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivi
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.SHOW_BACKUP_INTENT_KEY
 import com.benoitletondor.easybudgetapp.view.welcome.getOnboardingStep
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
@@ -112,7 +112,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     private lateinit var calendarFragment: CalendarFragment
     private lateinit var expensesViewAdapter: ExpensesRecyclerViewAdapter
 
-    private lateinit var menu: FloatingActionsMenu
+    private val menuBackgroundAnimationDuration: Long = 150
+    private var menuExpandAnimation: Animation? = null
+    private var menuCollapseAnimation: Animation? = null
+
+    private var isMenuExpended = false
 
     private var lastStopDate: LocalDate? = null
 
@@ -137,6 +141,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         setSupportActionBar(binding.toolbar)
 
         initCalendarFragment(savedInstanceState)
+        initFab()
         initRecyclerView()
         registerBroadcastReceiver()
         performIntentActionIfAny()
@@ -173,7 +178,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
 
         lifecycleScope.launchCollect(viewModel.expenseDeletionErrorEventFlow) {
-            AlertDialog.Builder(this@MainActivity)
+            MaterialAlertDialogBuilder(this@MainActivity)
                 .setTitle(R.string.expense_delete_error_title)
                 .setMessage(R.string.expense_delete_error_message)
                 .setNegativeButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
@@ -204,7 +209,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         lifecycleScope.launchCollect(viewModel.recurringExpenseDeletionEventFlow) { event ->
             when(event) {
                 is MainViewModel.RecurringExpenseDeletionEvent.ErrorCantDeleteBeforeFirstOccurrence -> {
-                    AlertDialog.Builder(this@MainActivity)
+                    MaterialAlertDialogBuilder(this@MainActivity)
                         .setTitle(R.string.recurring_expense_delete_first_error_title)
                         .setMessage(R.string.recurring_expense_delete_first_error_message)
                         .setNegativeButton(R.string.ok, null)
@@ -267,7 +272,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         lifecycleScope.launchCollect(viewModel.recurringExpenseRestoreEventFlow) { event ->
             when(event) {
                 is MainViewModel.RecurringExpenseRestoreEvent.ErrorIO -> {
-                    AlertDialog.Builder(this@MainActivity)
+                    MaterialAlertDialogBuilder(this@MainActivity)
                         .setTitle(R.string.recurring_expense_restore_error_title)
                         .setMessage(resources.getString(R.string.recurring_expense_restore_error_message))
                         .setNegativeButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
@@ -294,7 +299,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
             amountEditText.preventUnsupportedInputForDecimals()
             amountEditText.setSelection(amountEditText.text.length) // Put focus at the end of the text
 
-            val builder = AlertDialog.Builder(this)
+            val builder = MaterialAlertDialogBuilder(this)
             builder.setTitle(R.string.adjust_balance_title)
             builder.setMessage(R.string.adjust_balance_message)
             builder.setView(dialogView)
@@ -328,7 +333,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
 
         lifecycleScope.launchCollect(viewModel.currentBalanceEditingErrorEventFlow) {
-            AlertDialog.Builder(this@MainActivity)
+            MaterialAlertDialogBuilder(this@MainActivity)
                 .setTitle(R.string.adjust_balance_error_title)
                 .setMessage(R.string.adjust_balance_error_message)
                 .setNegativeButton(R.string.ok) { dialog1, _ -> dialog1.dismiss() }
@@ -360,7 +365,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
 
         lifecycleScope.launchCollect(viewModel.currentBalanceRestoringErrorEventFlow) {
-            AlertDialog.Builder(this@MainActivity)
+            MaterialAlertDialogBuilder(this@MainActivity)
                 .setTitle(R.string.adjust_balance_error_title)
                 .setMessage(R.string.adjust_balance_error_message)
                 .setNegativeButton(R.string.ok) { dialog1, _ -> dialog1.dismiss() }
@@ -380,7 +385,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
 
         lifecycleScope.launchCollect(viewModel.expenseCheckedErrorEventFlow) { exception ->
-            AlertDialog.Builder(this@MainActivity)
+            MaterialAlertDialogBuilder(this@MainActivity)
                 .setTitle(R.string.expense_check_error_title)
                 .setMessage(
                     getString(
@@ -401,7 +406,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
 
         lifecycleScope.launchCollect(viewModel.confirmCheckAllPastEntriesEventFlow) {
-            AlertDialog.Builder(this@MainActivity)
+            MaterialAlertDialogBuilder(this@MainActivity)
                 .setTitle(R.string.check_all_past_expences_title)
                 .setMessage(getString(R.string.check_all_past_expences_message))
                 .setPositiveButton(R.string.check_all_past_expences_confirm_cta) { dialog2, _ ->
@@ -413,7 +418,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
 
         lifecycleScope.launchCollect(viewModel.checkAllPastEntriesErrorEventFlow) { error ->
-            AlertDialog.Builder(this@MainActivity)
+            MaterialAlertDialogBuilder(this@MainActivity)
                 .setTitle(R.string.check_all_past_expences_error_title)
                 .setMessage(
                     getString(
@@ -483,6 +488,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         super.onSaveInstanceState(outState)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -501,12 +507,13 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
-        if ( menu.isExpanded) {
+        /*if ( menu.isExpanded) {
             menu.collapse()
-        } else {
+        } else {*/
             super.onBackPressed()
-        }
+        //}
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -797,10 +804,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
 
                 viewPager.setBackgroundColor(ContextCompat.getColor(this@MainActivity, R.color.calendar_background))
                 (viewPager.parent as View?)?.setBackgroundColor(ContextCompat.getColor(this@MainActivity, R.color.calendar_background))
-
-                // Remove border
-                leftButton.removeButtonBorder()
-                rightButton.removeButtonBorder()
             }
         }
 
@@ -811,101 +814,117 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         t.commit()
     }
 
+    private fun initFab() {
+        isMenuExpended = binding.fabChoicesBackground.visibility == View.VISIBLE
+
+        binding.fabChoicesBackground.setOnClickListener { collapseMenu() }
+        binding.fabChoices.setOnClickListener {
+            if (isMenuExpended) {
+                collapseMenu()
+            } else {
+                expandMenu()
+            }
+        }
+
+        listOf(binding.fabNewExpense, binding.fabNewExpenseText).forEach {
+            it.setOnClickListener {
+                val startIntent = Intent(this@MainActivity, ExpenseEditActivity::class.java)
+                startIntent.putExtra("date", calendarFragment.getSelectedDate().toEpochDay())
+
+                startIntent.putExtra(ANIMATE_TRANSITION_KEY, true)
+
+                ActivityCompat.startActivityForResult(this@MainActivity, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null)
+
+                collapseMenu()
+            }
+        }
+
+        listOf(binding.fabNewRecurringExpense, binding.fabNewRecurringExpenseText).forEach {
+            it.setOnClickListener {
+                val startIntent = Intent(this@MainActivity, RecurringExpenseEditActivity::class.java)
+                startIntent.putExtra("dateStart", calendarFragment.getSelectedDate().toEpochDay())
+
+                startIntent.putExtra(ANIMATE_TRANSITION_KEY, true)
+
+                ActivityCompat.startActivityForResult(this@MainActivity, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null)
+
+                collapseMenu()
+            }
+        }
+    }
+
     private fun initRecyclerView() {
-        /*
-         * FAB
-         */
-        menu = findViewById(R.id.fab_choices)
-
-        val background = this@MainActivity.findViewById<View>(R.id.fab_choices_background)
-        val backgroundAlpha = 0.8f
-        val backgroundAnimationDuration: Long = 200
-
-        background.setOnClickListener { menu.collapse() }
-
-        menu.setOnFloatingActionsMenuUpdateListener(object : FloatingActionsMenu.OnFloatingActionsMenuUpdateListener {
-            override fun onMenuExpanded() {
-                val fadeInAnimation = AlphaAnimation(0.0f, backgroundAlpha)
-                fadeInAnimation.duration = backgroundAnimationDuration
-                fadeInAnimation.fillAfter = true
-                fadeInAnimation.setAnimationListener(object : Animation.AnimationListener {
-                    override fun onAnimationStart(animation: Animation) {
-                        background.visibility = View.VISIBLE
-                        background.isClickable = true
-                    }
-
-                    override fun onAnimationEnd(animation: Animation) {
-
-                    }
-
-                    override fun onAnimationRepeat(animation: Animation) {
-
-                    }
-                })
-
-                background.startAnimation(fadeInAnimation)
-            }
-
-            override fun onMenuCollapsed() {
-                val fadeOutAnimation = AlphaAnimation(backgroundAlpha, 0.0f)
-                fadeOutAnimation.duration = backgroundAnimationDuration
-                fadeOutAnimation.fillAfter = true
-                fadeOutAnimation.setAnimationListener(object : Animation.AnimationListener {
-                    override fun onAnimationStart(animation: Animation) {
-
-                    }
-
-                    override fun onAnimationEnd(animation: Animation) {
-                        background.visibility = View.GONE
-                        background.isClickable = false
-                    }
-
-                    override fun onAnimationRepeat(animation: Animation) {
-
-                    }
-                })
-
-                background.startAnimation(fadeOutAnimation)
-            }
-        })
-
-        val fabNewExpense = findViewById<FloatingActionButton>(R.id.fab_new_expense)
-        fabNewExpense.setOnClickListener {
-            val startIntent = Intent(this@MainActivity, ExpenseEditActivity::class.java)
-            startIntent.putExtra("date", calendarFragment.getSelectedDate().toEpochDay())
-
-            startIntent.putExtra(ANIMATE_TRANSITION_KEY, true)
-            startIntent.putExtra(CENTER_X_KEY, menu.x.toInt() + (menu.width.toFloat() / 1.2f).toInt())
-            startIntent.putExtra(CENTER_Y_KEY, menu.y.toInt() + (menu.height.toFloat() / 1.2f).toInt())
-
-            ActivityCompat.startActivityForResult(this@MainActivity, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null)
-
-            menu.collapse()
-        }
-
-        val fabNewRecurringExpense = findViewById<FloatingActionButton>(R.id.fab_new_recurring_expense)
-        fabNewRecurringExpense.setOnClickListener {
-            val startIntent = Intent(this@MainActivity, RecurringExpenseEditActivity::class.java)
-            startIntent.putExtra("dateStart", calendarFragment.getSelectedDate().toEpochDay())
-
-            startIntent.putExtra(ANIMATE_TRANSITION_KEY, true)
-            startIntent.putExtra(CENTER_X_KEY, menu.x.toInt() + (menu.width.toFloat() / 1.2f).toInt())
-            startIntent.putExtra(CENTER_Y_KEY, menu.y.toInt() + (menu.height.toFloat() / 1.2f).toInt())
-
-            ActivityCompat.startActivityForResult(this@MainActivity, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null)
-
-            menu.collapse()
-        }
-
-        /*
-         * Expense Recycler view
-         */
         binding.expensesRecyclerView.layoutManager = LinearLayoutManager(this)
 
         expensesViewAdapter = ExpensesRecyclerViewAdapter(this, parameters, iab, LocalDate.now()) { expense, checked ->
             viewModel.onExpenseChecked(expense, checked)
         }
         binding.expensesRecyclerView.adapter = expensesViewAdapter
+    }
+
+    private fun collapseMenu() {
+        isMenuExpended = false
+        menuExpandAnimation?.cancel()
+        menuCollapseAnimation?.cancel()
+
+        menuCollapseAnimation = AlphaAnimation(1.0f, 0.0f)
+        menuCollapseAnimation?.duration = menuBackgroundAnimationDuration
+        menuCollapseAnimation?.fillAfter = true
+        menuCollapseAnimation?.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation) {
+            }
+
+            override fun onAnimationEnd(animation: Animation) {
+                binding.fabChoicesBackground.visibility = View.GONE
+                binding.fabChoicesBackground.isClickable = false
+
+                binding.fabNewRecurringExpenseContainer.isVisible = false
+                binding.fabNewExpenseContainer.isVisible = false
+            }
+
+            override fun onAnimationRepeat(animation: Animation) {
+
+            }
+        })
+
+        binding.fabChoicesBackground.startAnimation(menuCollapseAnimation)
+        binding.fabNewRecurringExpense.startAnimation(menuCollapseAnimation)
+        binding.fabNewRecurringExpenseText.startAnimation(menuCollapseAnimation)
+        binding.fabNewExpense.startAnimation(menuCollapseAnimation)
+        binding.fabNewExpenseText.startAnimation(menuCollapseAnimation)
+    }
+
+    private fun expandMenu() {
+        isMenuExpended = true
+        menuExpandAnimation?.cancel()
+        menuCollapseAnimation?.cancel()
+
+        menuExpandAnimation = AlphaAnimation(0.0f, 1.0f)
+        menuExpandAnimation?.duration = menuBackgroundAnimationDuration
+        menuExpandAnimation?.fillAfter = true
+        menuExpandAnimation?.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation) {
+                binding.fabChoicesBackground.visibility = View.VISIBLE
+                binding.fabChoicesBackground.isClickable = true
+
+                binding.fabNewRecurringExpenseContainer.isVisible = true
+                binding.fabNewExpenseContainer.isVisible = true
+            }
+
+            override fun onAnimationEnd(animation: Animation) {
+
+            }
+
+            override fun onAnimationRepeat(animation: Animation) {
+
+            }
+        })
+
+        binding.fabChoicesBackground.startAnimation(menuExpandAnimation)
+        binding.fabNewRecurringExpense.startAnimation(menuExpandAnimation)
+        binding.fabNewRecurringExpenseText.startAnimation(menuExpandAnimation)
+        binding.fabNewExpense.startAnimation(menuExpandAnimation)
+        binding.fabNewExpenseText.startAnimation(menuExpandAnimation)
     }
 
     private fun refreshRecyclerViewForDate(date: LocalDate, expenses: List<Expense>) {
@@ -931,7 +950,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
      * Show a generic alert dialog telling the user an error occured while deleting recurring expense
      */
     private fun showGenericRecurringDeleteErrorDialog() {
-        AlertDialog.Builder(this@MainActivity)
+        MaterialAlertDialogBuilder(this@MainActivity)
             .setTitle(R.string.recurring_expense_delete_error_title)
             .setMessage(R.string.recurring_expense_delete_error_message)
             .setNegativeButton(R.string.ok) { dialog, _ -> dialog.dismiss() }

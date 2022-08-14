@@ -251,6 +251,11 @@
     <string name="onboarding_screen_3_message">Schritt 2: Wie viel haben Sie aktuell auf Ihrem Konto?\n(Sie können das später ändern)</string>
     <string name="onboarding_screen_3_cta">Mit %s beginnen</string>
 
+    <string name="onboarding_screen_push_permission_title">Wichtige Benachrichtigungen erhalten?</string>
+    <string name="onboarding_screen_push_permission_message">Damit Sie nichts Wichtiges über Ihr Budget oder die App verpassen, erlauben Sie bitte Benachrichtigungen.\n\n(Kein Spam, keine nutzlosen Benachrichtigungen, nur das Wesentliche!)</string>
+    <string name="onboarding_screen_push_permission_accept_cta">Erlauben</string>
+    <string name="onboarding_screen_push_permission_not_now_cta">Nicht jetzt</string>
+
     <string name="onboarding_screen_4_title">Fertig!</string>
     <string name="onboarding_screen_4_message">(Das war einfach, oder?)</string>
     <string name="onboarding_screen_4_message2">Was Sie als nächstes tun müssen?</string>
@@ -314,4 +319,9 @@
     <string name="backup_wipe_data_confirmation_negative_cta">Stornieren</string>
     <string name="backup_wipe_data_error_title">Cloud-Sicherung kann nicht gelöscht werden</string>
     <string name="backup_wipe_data_error_message">Beim Löschen Ihrer Sicherungsdaten ist ein Fehler aufgetreten. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es später erneut.</string>
+
+    <string name="setting_notification_permission_rejected_dialog_title">Berechtigung für Benachrichtigungen verweigert</string>
+    <string name="setting_notification_permission_rejected_dialog_description">Um Ihre täglichen und monatlichen Prämienerinnerungen zu erhalten, müssen Sie Benachrichtigungen zulassen. Möchten Sie Benachrichtigungen erhalten?</string>
+    <string name="setting_notification_permission_rejected_dialog_accept_cta">Erlauben</string>
+    <string name="setting_notification_permission_rejected_dialog_not_now_cta">Nicht jetzt</string>
 </resources>

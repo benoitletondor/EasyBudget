@@ -252,6 +252,11 @@
     <string name="onboarding_screen_3_message">Шаг 2: Сколько денег сейчас на Вашем счету?\n(Вы можете изменить это позже)</string>
     <string name="onboarding_screen_3_cta">Начать с %s</string>
 
+    <string name="onboarding_screen_push_permission_title">Получать важные уведомления?</string>
+    <string name="onboarding_screen_push_permission_message">Чтобы не пропустить ничего важного о вашем бюджете или приложении, разрешите уведомления.\n\n(Никакого спама, никаких бесполезных уведомлений, только самое важное!)</string>
+    <string name="onboarding_screen_push_permission_accept_cta">Разрешать</string>
+    <string name="onboarding_screen_push_permission_not_now_cta">Не сейчас</string>
+
     <string name="onboarding_screen_4_title">Все готово!</string>
     <string name="onboarding_screen_4_message">(Это просто, не так ли?)</string>
     <string name="onboarding_screen_4_message2">Что Вы должны делать дальше?</string>
@@ -316,4 +321,9 @@
     <string name="backup_wipe_data_confirmation_negative_cta">Отмена</string>
     <string name="backup_wipe_data_error_title">Невозможно удалить облачную резервную копию</string>
     <string name="backup_wipe_data_error_message">Произошла ошибка при удалении ваших резервных данных. Пожалуйста, проверьте вашу связь и повторите попытку позже.</string>
+
+    <string name="setting_notification_permission_rejected_dialog_title">Notifications permission denied</string>
+    <string name="setting_notification_permission_rejected_dialog_description">To receive your premium daily and monthly reminders, you need to allow notifications. Do you want to receive notifications?</string>
+    <string name="setting_notification_permission_rejected_dialog_accept_cta">Разрешать</string>
+    <string name="setting_notification_permission_rejected_dialog_not_now_cta">Не сейчас</string>
 </resources>

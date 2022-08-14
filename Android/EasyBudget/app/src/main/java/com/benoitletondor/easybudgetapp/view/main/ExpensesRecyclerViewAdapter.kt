@@ -24,7 +24,6 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -38,6 +37,7 @@ import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.time.LocalDate
 
 /**
@@ -128,7 +128,7 @@ class ExpensesRecyclerViewAdapter(private val activity: Activity,
 
         val onClickListener = View.OnClickListener {
             if (expense.isRecurring()) {
-                val builder = AlertDialog.Builder(activity)
+                val builder = MaterialAlertDialogBuilder(activity)
                 builder.setTitle(if (expense.isRevenue()) R.string.dialog_edit_recurring_income_title else R.string.dialog_edit_recurring_expense_title)
                 builder.setItems(if (expense.isRevenue()) R.array.dialog_edit_recurring_income_choices else R.array.dialog_edit_recurring_expense_choices) { _, which ->
                     when (which) {
@@ -184,7 +184,7 @@ class ExpensesRecyclerViewAdapter(private val activity: Activity,
                 }
                 builder.show()
             } else {
-                val builder = AlertDialog.Builder(activity)
+                val builder = MaterialAlertDialogBuilder(activity)
                 builder.setTitle(if (expense.isRevenue()) R.string.dialog_edit_income_title else R.string.dialog_edit_expense_title)
                 builder.setItems(if (expense.isRevenue()) R.array.dialog_edit_income_choices else R.array.dialog_edit_expense_choices) { _, which ->
                     when (which) {
