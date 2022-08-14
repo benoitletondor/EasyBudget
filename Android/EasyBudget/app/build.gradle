@@ -35,8 +35,8 @@ android {
         applicationId "com.benoitletondor.easybudgetapp"
         minSdkVersion 21
         targetSdkVersion 33
-        versionCode 81
-        versionName "2.4.0"
+        versionCode 83
+        versionName "2.5.0"
         vectorDrawables.useSupportLibrary = true
 
         javaCompileOptions {
@@ -115,8 +115,8 @@ dependencies {
     implementation 'androidx.work:work-gcm:2.7.1'
     implementation 'com.google.android.play:core:1.10.3'
 
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.3'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.3'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
 
     implementation platform("com.google.firebase:firebase-bom:30.3.0")
     implementation "com.google.firebase:firebase-messaging-ktx"
