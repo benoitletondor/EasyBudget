@@ -78,7 +78,7 @@
     <string-array name="dialog_edit_recurring_expense_choices">
         <item>Modifica questo elemento</item>
         <item>Modifica questo e tutti gli elementi seguenti</item>
-        <item>Modifica soltanto questo elemento</item>
+        <item>Elimina soltanto questo elemento</item>
         <item>Elimina tutti gli elementi seguenti</item>
         <item>Elimina tutti gli elementi precedenti</item>
         <item>Elimina tutto</item>
@@ -86,7 +86,7 @@
     <string-array name="dialog_edit_recurring_income_choices">
         <item>Modifica questo elemento</item>
         <item>Modifica questo e tutti gli elementi seguenti</item>
-        <item>Modifica soltanto questo elemento</item>
+        <item>Elimina soltanto questo elemento</item>
         <item>Elimina tutti gli elementi seguenti</item>
         <item>Elimina tutti gli elementi precedenti</item>
         <item>Elimina tutto</item>
