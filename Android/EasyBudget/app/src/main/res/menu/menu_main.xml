@@ -20,6 +20,12 @@
     tools:context=".view.main.MainActivity">
 
     <item
+        android:id="@+id/action_become_premium"
+        android:title="@string/action_become_premium"
+        android:icon="@drawable/ic_baseline_star_24"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/action_go_to_current_month"
         android:title="@string/action_go_to_current_month"
         android:icon="@drawable/ic_calendar_today"

@@ -101,6 +101,10 @@ class IabImpl(
         LocalBroadcastManager.getInstance(appContext).sendBroadcast(intent)
     }
 
+    override fun isIabReady(): Boolean {
+        return isUserPremium() || iabStatus == PremiumCheckStatus.NOT_PREMIUM
+    }
+
     /**
      * Is the user a premium user
      *

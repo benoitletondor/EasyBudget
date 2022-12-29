@@ -45,8 +45,8 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
     private val selectDateMutableStateFlow = MutableStateFlow(LocalDate.now())
 
-    private val premiumStatusMutableStateFlow = MutableStateFlow(iab.isUserPremium())
-    val premiumStatusFlow: StateFlow<Boolean> = premiumStatusMutableStateFlow
+    private val premiumStatusMutableStateFlow = MutableStateFlow(if (!iab.isIabReady()) null else iab.isUserPremium())
+    val premiumStatusFlow: StateFlow<Boolean?> = premiumStatusMutableStateFlow
 
     private val expenseDeletionSuccessEventMutableFlow = MutableLiveFlow<ExpenseDeletionSuccessData>()
     val expenseDeletionSuccessEventFlow: Flow<ExpenseDeletionSuccessData> = expenseDeletionSuccessEventMutableFlow
@@ -95,6 +95,9 @@ class MainViewModel @Inject constructor(
 
     private val forceRefreshMutableFlow = MutableSharedFlow<Unit>()
     val refreshDatesFlow: Flow<Unit> = forceRefreshMutableFlow
+
+    private val openPremiumEventMutableFlow = MutableLiveFlow<Unit>()
+    val openPremiumEventFlow: Flow<Unit> = openPremiumEventMutableFlow
 
     val selectedDateDataFlow = combine(
         selectDateMutableStateFlow,
@@ -383,7 +386,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun onIabStatusChanged() {
-        premiumStatusMutableStateFlow.value = iab.isUserPremium()
+        premiumStatusMutableStateFlow.value = if (!iab.isIabReady()) null else iab.isUserPremium()
         viewModelScope.launch {
             forceRefreshMutableFlow.emit(Unit)
         }
@@ -486,6 +489,12 @@ class MainViewModel @Inject constructor(
     fun onLowMoneyWarningThresholdChanged() {
         viewModelScope.launch {
             forceRefreshMutableFlow.emit(Unit)
+        }
+    }
+
+    fun onBecomePremiumButtonPressed() {
+        viewModelScope.launch {
+            openPremiumEventMutableFlow.emit(Unit)
         }
     }
 }

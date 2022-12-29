@@ -21,6 +21,7 @@
     <string name="action_settings">Settings</string>
     <string name="action_balance">Adjust current balance</string>
     <string name="action_go_to_current_month">Go back to current month</string>
+    <string name="action_become_premium">Become premium</string>
     <string name="action_mark_all_past_entries_as_checked">Tick all past entries</string>
     <string name="fab_add_expense">Add expense/income</string>
     <string name="fab_add_monthly_expense">Add recurring expense/income</string>
