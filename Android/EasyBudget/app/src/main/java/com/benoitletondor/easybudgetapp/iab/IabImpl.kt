@@ -23,13 +23,18 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.android.billingclient.api.*
 import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.parameters.Parameters
-import kotlin.coroutines.Continuation
-import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.first
 
 /**
  * SKU premium
  */
-private const val SKU_PREMIUM = "premium"
+private const val SKU_PREMIUM_LEGACY = "premium"
+/**
+ * SKU premium
+ */
+private const val SKU_SUBSCRIPTION = "premium_subscription"
 /**
  * Is the user premium from AppTurbo (bool)
  */
@@ -46,7 +51,11 @@ private const val BATCH_OFFER_REDEEMED_PARAMETER_KEY = "batch_offer_redeemed"
 class IabImpl(
     context: Context,
     private val parameters: Parameters,
-) : Iab, PurchasesUpdatedListener, BillingClientStateListener, PurchasesResponseListener, AcknowledgePurchaseResponseListener {
+) : Iab, PurchasesUpdatedListener, BillingClientStateListener {
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val pendingPurchaseEventMutableFlow = MutableSharedFlow<PremiumPurchaseFlowResult>()
+
+    private var queryPurchasesJob: Job? = null
 
     private val appContext = context.applicationContext
     private val billingClient = BillingClient.newBuilder(appContext)
@@ -58,8 +67,6 @@ class IabImpl(
      * iab check status
      */
     private var iabStatus: PremiumCheckStatus = PremiumCheckStatus.INITIALIZING
-
-    private var premiumFlowContinuation: Continuation<PremiumPurchaseFlowResult>? = null
 
     init {
         startBillingClient()
@@ -85,8 +92,8 @@ class IabImpl(
         iabStatus = status
 
         // Save status only on success
-        if (status == PremiumCheckStatus.PREMIUM || status == PremiumCheckStatus.NOT_PREMIUM) {
-            parameters.setUserPremium(iabStatus == PremiumCheckStatus.PREMIUM)
+        if (status == PremiumCheckStatus.LEGACY_PREMIUM || status == PremiumCheckStatus.NOT_PREMIUM) {
+            parameters.setUserPremium(iabStatus == PremiumCheckStatus.LEGACY_PREMIUM)
         }
 
         val intent = Intent(INTENT_IAB_STATUS_CHANGED)
@@ -104,7 +111,7 @@ class IabImpl(
         return parameters.isUserPremium() ||
             parameters.getBoolean(BATCH_OFFER_REDEEMED_PARAMETER_KEY, false) ||
             parameters.getBoolean(APP_TURBO_PREMIUM_PARAMETER_KEY, false) ||
-            iabStatus == PremiumCheckStatus.PREMIUM
+            (iabStatus == PremiumCheckStatus.LEGACY_PREMIUM || iabStatus == PremiumCheckStatus.SUBSCRIBED)
     }
 
     /**
@@ -115,25 +122,63 @@ class IabImpl(
 
         if ( iabStatus == PremiumCheckStatus.NOT_PREMIUM ) {
             setIabStatusAndNotify(PremiumCheckStatus.CHECKING)
-            billingClient.queryPurchasesAsync(
-                QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP).build(),
-                this
-            )
+            queryPurchases()
         } else if ( iabStatus == PremiumCheckStatus.ERROR ) {
             startBillingClient()
         }
     }
 
-    /**
-     * Launch the premium purchase flow
-     *
-     * @param activity activity that started this purchase
-     */
-    override suspend fun launchPremiumPurchaseFlow(activity: Activity): PremiumPurchaseFlowResult {
+    private fun queryPurchases() {
+        queryPurchasesJob?.cancel()
+        queryPurchasesJob = scope.launch {
+            val subscribedToPremiumResult = billingClient.queryPurchasesAsync(
+                QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.SUBS).build(),
+            )
+
+            // Is it a failure?
+            if (subscribedToPremiumResult.billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
+                Logger.error("Error while querying iab inventory: " + subscribedToPremiumResult.billingResult.responseCode)
+                setIabStatusAndNotify(PremiumCheckStatus.ERROR)
+                return@launch
+            }
+
+            val subscribed = subscribedToPremiumResult.purchasesList.any { it.products.contains(SKU_SUBSCRIPTION) }
+
+            Logger.debug("iab query inventory was successful: $subscribed")
+
+            if (subscribed) {
+                setIabStatusAndNotify(PremiumCheckStatus.SUBSCRIBED)
+                return@launch
+            }
+
+            val legacyPremiumResult = billingClient.queryPurchasesAsync(
+                QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP).build(),
+            )
+
+            // Is it a failure?
+            if (legacyPremiumResult.billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
+                Logger.error("Error while querying iab inventory: " + legacyPremiumResult.billingResult.responseCode)
+                setIabStatusAndNotify(PremiumCheckStatus.ERROR)
+                return@launch
+            }
+
+            val legacyPremium = legacyPremiumResult.purchasesList.any { it.products.contains(SKU_PREMIUM_LEGACY) }
+
+            Logger.debug("legacy iab query inventory was successful: $legacyPremium")
+
+            if (legacyPremium) {
+                setIabStatusAndNotify(PremiumCheckStatus.LEGACY_PREMIUM)
+            } else {
+                setIabStatusAndNotify(PremiumCheckStatus.NOT_PREMIUM)
+            }
+        }
+    }
+
+    override suspend fun launchPremiumSubscriptionFlow(activity: Activity): PremiumPurchaseFlowResult {
         if ( iabStatus != PremiumCheckStatus.NOT_PREMIUM ) {
             return when (iabStatus) {
                 PremiumCheckStatus.ERROR -> PremiumPurchaseFlowResult.Error("Unable to connect to your Google account. Please restart the app and try again")
-                PremiumCheckStatus.PREMIUM -> PremiumPurchaseFlowResult.Error("You already bought Premium with that Google account. Restart the app if you don't have access to premium features.")
+                PremiumCheckStatus.LEGACY_PREMIUM, PremiumCheckStatus.SUBSCRIBED -> PremiumPurchaseFlowResult.Error("You already bought Premium with that Google account. Restart the app if you don't have access to premium features.")
                 else -> PremiumPurchaseFlowResult.Error("Runtime error: $iabStatus")
             }
         }
@@ -141,8 +186,8 @@ class IabImpl(
         val skuList = listOf(
             QueryProductDetailsParams.Product
                 .newBuilder()
-                .setProductId(SKU_PREMIUM)
-                .setProductType(BillingClient.ProductType.INAPP)
+                .setProductId(SKU_SUBSCRIPTION)
+                .setProductType(BillingClient.ProductType.SUBS)
                 .build()
         )
 
@@ -154,7 +199,7 @@ class IabImpl(
 
         if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
             if (billingResult.responseCode == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED) {
-                setIabStatusAndNotify(PremiumCheckStatus.PREMIUM)
+                setIabStatusAndNotify(PremiumCheckStatus.SUBSCRIBED)
                 return PremiumPurchaseFlowResult.Success
             }
 
@@ -165,122 +210,90 @@ class IabImpl(
             return PremiumPurchaseFlowResult.Error("Unable to fetch content from PlayStore (response code: skuDetailsList is empty). Please restart the app and try again")
         }
 
-        return suspendCoroutine { continuation ->
-            premiumFlowContinuation = continuation
+        val product = skuDetailsList.first()
+        val offerToken = product.subscriptionOfferDetails?.firstOrNull()?.offerToken ?: return PremiumPurchaseFlowResult.Error("Unable to fetch content from PlayStore (response code: null offerToken). Please restart the app and try again")
 
-            val productDetailsParamsList =
-                listOf(
-                    BillingFlowParams.ProductDetailsParams.newBuilder()
-                        .setProductDetails(skuDetailsList[0])
-                        .build()
-                )
+        val productDetailsParamsList =
+            listOf(
+                BillingFlowParams.ProductDetailsParams.newBuilder()
+                    .setProductDetails(product)
+                    .setOfferToken(offerToken)
+                    .build()
+            )
 
-            val billingFlowParams = BillingFlowParams.newBuilder()
-                .setProductDetailsParamsList(productDetailsParamsList)
-                .build()
+        val billingFlowParams = BillingFlowParams.newBuilder()
+            .setProductDetailsParamsList(productDetailsParamsList)
+            .build()
 
-            billingClient.launchBillingFlow(activity, billingFlowParams)
-        }
+        billingClient.launchBillingFlow(activity, billingFlowParams)
+
+        return pendingPurchaseEventMutableFlow.first()
     }
 
     override fun onBillingSetupFinished(billingResult: BillingResult) {
         Logger.debug("iab setup finished.")
 
         if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
-            // Oh noes, there was a problem.
             setIabStatusAndNotify(PremiumCheckStatus.ERROR)
             Logger.error("Error while setting-up iab: " + billingResult.responseCode)
             return
         }
 
         setIabStatusAndNotify(PremiumCheckStatus.CHECKING)
-
-        billingClient.queryPurchasesAsync(
-            QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP).build(),
-            this
-        )
+        queryPurchases()
     }
 
     override fun onBillingServiceDisconnected() {
         Logger.debug("onBillingServiceDisconnected")
 
-        premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Error("Lost connection with Google Play")))
+        scope.launch {
+            pendingPurchaseEventMutableFlow.emit(PremiumPurchaseFlowResult.Error("Lost connection with Google Play"))
+        }
+
         setIabStatusAndNotify(PremiumCheckStatus.ERROR)
     }
 
-    override fun onQueryPurchasesResponse(billingResult: BillingResult, purchaseHistoryRecordList: MutableList<Purchase>) {
-        Logger.debug("iab query inventory finished.")
-
-        // Is it a failure?
-        if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
-            Logger.error("Error while querying iab inventory: " + billingResult.responseCode)
-            setIabStatusAndNotify(PremiumCheckStatus.ERROR)
-            return
-        }
-
-        var premium = false
-        for (purchase in purchaseHistoryRecordList) {
-            if (purchase.products.contains(SKU_PREMIUM)) {
-                premium = true
-            }
-        }
-
-        Logger.debug("iab query inventory was successful: $premium")
-
-        setIabStatusAndNotify(if (premium) PremiumCheckStatus.PREMIUM else PremiumCheckStatus.NOT_PREMIUM)
-    }
 
     override fun onPurchasesUpdated(billingResult: BillingResult, purchases: List<Purchase>?) {
         Logger.debug("Purchase finished: " + billingResult.responseCode)
 
-        if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
-            Logger.error("Error while purchasing premium: " + billingResult.responseCode)
-            when (billingResult.responseCode) {
-                BillingClient.BillingResponseCode.USER_CANCELED -> premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Cancelled))
-                BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> {
-                    setIabStatusAndNotify(PremiumCheckStatus.PREMIUM)
-                    premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Success))
-                    return
+        scope.launch {
+            if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
+                Logger.error("Error while purchasing premium: " + billingResult.responseCode)
+                when (billingResult.responseCode) {
+                    BillingClient.BillingResponseCode.USER_CANCELED -> pendingPurchaseEventMutableFlow.emit(PremiumPurchaseFlowResult.Cancelled)
+                    else -> pendingPurchaseEventMutableFlow.emit(PremiumPurchaseFlowResult.Error("An error occurred (status code: " + billingResult.responseCode + ")"))
                 }
-                else -> premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Error("An error occurred (status code: " + billingResult.responseCode + ")")))
+
+                return@launch
             }
 
-            premiumFlowContinuation = null
-            return
-        }
 
-
-        if ( purchases.isNullOrEmpty() ) {
-            premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Error("No purchased item found")))
-            premiumFlowContinuation = null
-            return
-        }
-
-        Logger.debug("Purchase successful.")
-
-        for (purchase in purchases) {
-            if (purchase.products.contains(SKU_PREMIUM)) {
-                billingClient.acknowledgePurchase(AcknowledgePurchaseParams.newBuilder().setPurchaseToken(purchase.purchaseToken).build(), this)
-                return
+            if ( purchases.isNullOrEmpty() ) {
+                pendingPurchaseEventMutableFlow.emit(PremiumPurchaseFlowResult.Error("No purchased item found"))
+                return@launch
             }
+
+            Logger.debug("Purchase successful.")
+
+            for (purchase in purchases) {
+                if (purchase.products.contains(SKU_PREMIUM_LEGACY) || purchase.products.contains(SKU_SUBSCRIPTION)) {
+                    val ackResult = billingClient.acknowledgePurchase(AcknowledgePurchaseParams.newBuilder().setPurchaseToken(purchase.purchaseToken).build())
+
+                    if( ackResult.responseCode != BillingClient.BillingResponseCode.OK ) {
+                        pendingPurchaseEventMutableFlow.emit(PremiumPurchaseFlowResult.Error("Error when acknowledging purchase with Google (${ackResult.responseCode}, ${ackResult.debugMessage}). Please try again"))
+                        return@launch
+                    }
+
+                    setIabStatusAndNotify(PremiumCheckStatus.SUBSCRIBED)
+                    pendingPurchaseEventMutableFlow.emit(PremiumPurchaseFlowResult.Success)
+
+                    return@launch
+                }
+            }
+
+            pendingPurchaseEventMutableFlow.emit(PremiumPurchaseFlowResult.Error("No purchased item found"))
         }
-
-        premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Error("No purchased item found")))
-        premiumFlowContinuation = null
-    }
-
-    override fun onAcknowledgePurchaseResponse(billingResult: BillingResult) {
-        Logger.debug("Acknowledge successful.")
-
-        if( billingResult.responseCode != BillingClient.BillingResponseCode.OK ) {
-            premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Error("Error when acknowledging purchase with Google (${billingResult.responseCode}, ${billingResult.debugMessage}). Please try again")))
-            premiumFlowContinuation = null
-            return
-        }
-
-        setIabStatusAndNotify(PremiumCheckStatus.PREMIUM)
-        premiumFlowContinuation?.resumeWith(Result.success(PremiumPurchaseFlowResult.Success))
-        premiumFlowContinuation = null
     }
 }
 
@@ -301,5 +314,7 @@ private enum class PremiumCheckStatus {
 
     NOT_PREMIUM,
 
-    PREMIUM
+    LEGACY_PREMIUM,
+
+    SUBSCRIBED,
 }

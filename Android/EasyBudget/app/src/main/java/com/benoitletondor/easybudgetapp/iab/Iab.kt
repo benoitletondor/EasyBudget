@@ -21,7 +21,7 @@ import android.app.Activity
 interface Iab {
     fun isUserPremium(): Boolean
     fun updateIAPStatusIfNeeded()
-    suspend fun launchPremiumPurchaseFlow(activity: Activity): PremiumPurchaseFlowResult
+    suspend fun launchPremiumSubscriptionFlow(activity: Activity): PremiumPurchaseFlowResult
 }
 
 sealed class PremiumPurchaseFlowResult {

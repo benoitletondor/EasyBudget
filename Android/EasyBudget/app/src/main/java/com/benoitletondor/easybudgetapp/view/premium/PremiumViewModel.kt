@@ -40,7 +40,7 @@ class PremiumViewModel @Inject constructor(private val iab: Iab) : ViewModel() {
         premiumFlowStatusMutableFlow.value = PremiumFlowStatus.LOADING
 
         viewModelScope.launch {
-            when(val result = iab.launchPremiumPurchaseFlow(activity)) {
+            when(val result = iab.launchPremiumSubscriptionFlow(activity)) {
                 PremiumPurchaseFlowResult.Cancelled -> {
                     premiumFlowErrorEventMutableFlow.emit(result)
                     premiumFlowStatusMutableFlow.value = PremiumFlowStatus.NOT_STARTED
