@@ -19,6 +19,7 @@
     <string name="action_settings">Ajustes</string>
     <string name="action_balance">Ajustar el saldo actual</string>
     <string name="action_go_to_current_month">Volver al mes actual</string>
+    <string name="action_become_premium">Vuélvete premium</string>
     <string name="action_mark_all_past_entries_as_checked">Marcar todas las entradas pasadas</string>
     <string name="fab_add_expense">Añadir un gasto/ingreso</string>
     <string name="fab_add_monthly_expense">Añadir un gasto/ingreso recurrente</string>

@@ -19,6 +19,7 @@
     <string name="action_settings">Настройки</string>
     <string name="action_balance">Отрегулировать текущий баланс</string>
     <string name="action_go_to_current_month">Вернуться к текущему месяцу</string>
+    <string name="action_become_premium">Стать премиум-пользователем</string>
     <string name="action_mark_all_past_entries_as_checked">Отметить все прошлые записи</string>
     <string name="fab_add_expense">Добавить расход/доход</string>
     <string name="fab_add_monthly_expense">Добавить периодический расход/доход</string>

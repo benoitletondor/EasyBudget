@@ -19,6 +19,7 @@
     <string name="action_settings">Impostazioni</string>
     <string name="action_balance">Correggi il saldo</string>
     <string name="action_go_to_current_month">Torna al mese corrente</string>
+    <string name="action_become_premium">Diventa premium</string>
     <string name="action_mark_all_past_entries_as_checked">Contrassegna tutte le voci precedenti</string>
     <string name="fab_add_expense">Aggiungi un’entrata/uscita</string>
     <string name="fab_add_monthly_expense">Aggiungi un’entrata/uscita ricorrente</string>
