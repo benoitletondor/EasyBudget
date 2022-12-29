@@ -1,5 +1,5 @@
 /*
- *   Copyright 2022 Benoit LETONDOR
+ *   Copyright 2023 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.android.billingclient.api.*
 import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.parameters.Parameters
-import java.util.*
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
 
@@ -47,7 +46,7 @@ private const val BATCH_OFFER_REDEEMED_PARAMETER_KEY = "batch_offer_redeemed"
 class IabImpl(
     context: Context,
     private val parameters: Parameters,
-) : Iab, PurchasesUpdatedListener, BillingClientStateListener, PurchaseHistoryResponseListener, AcknowledgePurchaseResponseListener {
+) : Iab, PurchasesUpdatedListener, BillingClientStateListener, PurchasesResponseListener, AcknowledgePurchaseResponseListener {
 
     private val appContext = context.applicationContext
     private val billingClient = BillingClient.newBuilder(appContext)
@@ -116,7 +115,10 @@ class IabImpl(
 
         if ( iabStatus == PremiumCheckStatus.NOT_PREMIUM ) {
             setIabStatusAndNotify(PremiumCheckStatus.CHECKING)
-            billingClient.queryPurchaseHistoryAsync(BillingClient.SkuType.INAPP, this)
+            billingClient.queryPurchasesAsync(
+                QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP).build(),
+                this
+            )
         } else if ( iabStatus == PremiumCheckStatus.ERROR ) {
             startBillingClient()
         }
@@ -136,13 +138,17 @@ class IabImpl(
             }
         }
 
-        val skuList = ArrayList<String>(1)
-        skuList.add(SKU_PREMIUM)
+        val skuList = listOf(
+            QueryProductDetailsParams.Product
+                .newBuilder()
+                .setProductId(SKU_PREMIUM)
+                .setProductType(BillingClient.ProductType.INAPP)
+                .build()
+        )
 
-        val (billingResult, skuDetailsList) = querySkuDetails(
-            SkuDetailsParams.newBuilder()
-                .setSkusList(skuList)
-                .setType(BillingClient.SkuType.INAPP)
+        val (billingResult, skuDetailsList) = billingClient.queryProductDetails(
+            QueryProductDetailsParams.newBuilder()
+                .setProductList(skuList)
                 .build()
         )
 
@@ -155,25 +161,25 @@ class IabImpl(
             return PremiumPurchaseFlowResult.Error("Unable to connect to reach PlayStore (response code: " + billingResult.responseCode + "). Please restart the app and try again")
         }
 
-        if (skuDetailsList.isEmpty()) {
+        if (skuDetailsList == null || skuDetailsList.isEmpty()) {
             return PremiumPurchaseFlowResult.Error("Unable to fetch content from PlayStore (response code: skuDetailsList is empty). Please restart the app and try again")
         }
 
         return suspendCoroutine { continuation ->
             premiumFlowContinuation = continuation
 
-            billingClient.launchBillingFlow(activity, BillingFlowParams.newBuilder()
-                .setSkuDetails(skuDetailsList[0])
+            val productDetailsParamsList =
+                listOf(
+                    BillingFlowParams.ProductDetailsParams.newBuilder()
+                        .setProductDetails(skuDetailsList[0])
+                        .build()
+                )
+
+            val billingFlowParams = BillingFlowParams.newBuilder()
+                .setProductDetailsParamsList(productDetailsParamsList)
                 .build()
-            )
-        }
-    }
 
-    data class SkuDetailsResponse(val billingResult: BillingResult, val skuDetailsList: List<SkuDetails>)
-
-    private suspend fun querySkuDetails(params: SkuDetailsParams): SkuDetailsResponse = suspendCoroutine { continuation ->
-        billingClient.querySkuDetailsAsync(params) { billingResult, skuDetailsList ->
-            continuation.resumeWith(Result.success(SkuDetailsResponse(billingResult, skuDetailsList ?: emptyList())))
+            billingClient.launchBillingFlow(activity, billingFlowParams)
         }
     }
 
@@ -189,7 +195,10 @@ class IabImpl(
 
         setIabStatusAndNotify(PremiumCheckStatus.CHECKING)
 
-        billingClient.queryPurchaseHistoryAsync(BillingClient.SkuType.INAPP, this)
+        billingClient.queryPurchasesAsync(
+            QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP).build(),
+            this
+        )
     }
 
     override fun onBillingServiceDisconnected() {
@@ -199,7 +208,7 @@ class IabImpl(
         setIabStatusAndNotify(PremiumCheckStatus.ERROR)
     }
 
-    override fun onPurchaseHistoryResponse(billingResult: BillingResult, purchaseHistoryRecordList: List<PurchaseHistoryRecord>?) {
+    override fun onQueryPurchasesResponse(billingResult: BillingResult, purchaseHistoryRecordList: MutableList<Purchase>) {
         Logger.debug("iab query inventory finished.")
 
         // Is it a failure?
@@ -210,11 +219,9 @@ class IabImpl(
         }
 
         var premium = false
-        if (purchaseHistoryRecordList != null) {
-            for (purchase in purchaseHistoryRecordList) {
-                if (SKU_PREMIUM in purchase.skus) {
-                    premium = true
-                }
+        for (purchase in purchaseHistoryRecordList) {
+            if (purchase.products.contains(SKU_PREMIUM)) {
+                premium = true
             }
         }
 
@@ -252,7 +259,7 @@ class IabImpl(
         Logger.debug("Purchase successful.")
 
         for (purchase in purchases) {
-            if (SKU_PREMIUM in purchase.skus) {
+            if (purchase.products.contains(SKU_PREMIUM)) {
                 billingClient.acknowledgePurchase(AcknowledgePurchaseParams.newBuilder().setPurchaseToken(purchase.purchaseToken).build(), this)
                 return
             }
