@@ -1,5 +1,5 @@
 /*
- *   Copyright 2022 Benoit LETONDOR
+ *   Copyright 2023 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -428,6 +428,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
                 .setNegativeButton(R.string.ok) { dialog2, _ -> dialog2.dismiss() }
                 .show()
         }
+
+        lifecycleScope.launchCollect(viewModel.openPremiumEventFlow) {
+            val startIntent = Intent(this, SettingsActivity::class.java)
+            startIntent.putExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, true)
+            ActivityCompat.startActivity(this, startIntent, null)
+        }
     }
 
     private fun performIntentActionIfAny() {
@@ -506,15 +512,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {
-        /*if ( menu.isExpanded) {
-            menu.collapse()
-        } else {*/
-            super.onBackPressed()
-        //}
-    }
-
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
 
@@ -536,17 +533,26 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
 
-        // Remove monthly report for non premium users
-        if ( !viewModel.premiumStatusFlow.value ) {
-            menu.removeItem(R.id.action_monthly_report)
-            menu.removeItem(R.id.action_check_all_past_entries)
-        } else if ( !parameters.hasUserSawMonthlyReportHint() ) {
-            binding.monthlyReportHint.visibility = View.VISIBLE
+        val isPremiumOrNull = viewModel.premiumStatusFlow.value
+        if (isPremiumOrNull != null) {
+            // Remove monthly report for non premium users
+            if ( !isPremiumOrNull ) {
+                menu.removeItem(R.id.action_monthly_report)
+                menu.removeItem(R.id.action_check_all_past_entries)
+            } else {
+                menu.removeItem(R.id.action_become_premium)
 
-            binding.monthlyReportHintButton.setOnClickListener {
-                binding.monthlyReportHint.visibility = View.GONE
-                parameters.setUserSawMonthlyReportHint()
+                if ( !parameters.hasUserSawMonthlyReportHint() ) {
+                    binding.monthlyReportHint.isVisible = true
+
+                    binding.monthlyReportHintButton.setOnClickListener {
+                        binding.monthlyReportHint.isVisible = false
+                        parameters.setUserSawMonthlyReportHint()
+                    }
+                }
             }
+        } else {
+            menu.removeItem(R.id.action_become_premium)
         }
 
         // Remove back to today button if needed
@@ -583,6 +589,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
             }
             R.id.action_check_all_past_entries -> {
                 viewModel.onCheckAllPastEntriesPressed()
+
+                return true
+            }
+            R.id.action_become_premium -> {
+                viewModel.onBecomePremiumButtonPressed()
 
                 return true
             }

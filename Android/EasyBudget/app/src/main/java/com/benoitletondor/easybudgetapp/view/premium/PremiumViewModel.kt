@@ -1,5 +1,5 @@
 /*
- *   Copyright 2022 Benoit LETONDOR
+ *   Copyright 2023 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ class PremiumViewModel @Inject constructor(private val iab: Iab) : ViewModel() {
         premiumFlowStatusMutableFlow.value = PremiumFlowStatus.LOADING
 
         viewModelScope.launch {
-            when(val result = iab.launchPremiumPurchaseFlow(activity)) {
+            when(val result = iab.launchPremiumSubscriptionFlow(activity)) {
                 PremiumPurchaseFlowResult.Cancelled -> {
                     premiumFlowErrorEventMutableFlow.emit(result)
                     premiumFlowStatusMutableFlow.value = PremiumFlowStatus.NOT_STARTED

@@ -1,5 +1,5 @@
 <!--
-   Copyright 2022 Benoit LETONDOR
+   Copyright 2023 Benoit LETONDOR
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
     <string name="action_settings">Einstellungen</string>
     <string name="action_balance">Kontostand anpassen</string>
     <string name="action_go_to_current_month">Zurück zum aktuellen Monat</string>
+    <string name="action_become_premium">Premium-Nutzer werden</string>
     <string name="action_mark_all_past_entries_as_checked">Markieren Sie alle vergangenen Einträge</string>
     <string name="fab_add_expense">Neue Ausgabe/Einnahme</string>
     <string name="fab_add_monthly_expense">Wiederkehrende Einnahme/Ausgabe hinzufügen</string>

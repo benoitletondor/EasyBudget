@@ -1,5 +1,5 @@
 <!--
-   Copyright 2022 Benoit LETONDOR
+   Copyright 2023 Benoit LETONDOR
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
     <string name="action_settings">Impostazioni</string>
     <string name="action_balance">Correggi il saldo</string>
     <string name="action_go_to_current_month">Torna al mese corrente</string>
+    <string name="action_become_premium">Diventa premium</string>
     <string name="action_mark_all_past_entries_as_checked">Contrassegna tutte le voci precedenti</string>
     <string name="fab_add_expense">Aggiungi un’entrata/uscita</string>
     <string name="fab_add_monthly_expense">Aggiungi un’entrata/uscita ricorrente</string>
@@ -78,7 +79,7 @@
     <string-array name="dialog_edit_recurring_expense_choices">
         <item>Modifica questo elemento</item>
         <item>Modifica questo e tutti gli elementi seguenti</item>
-        <item>Modifica soltanto questo elemento</item>
+        <item>Elimina soltanto questo elemento</item>
         <item>Elimina tutti gli elementi seguenti</item>
         <item>Elimina tutti gli elementi precedenti</item>
         <item>Elimina tutto</item>
@@ -86,7 +87,7 @@
     <string-array name="dialog_edit_recurring_income_choices">
         <item>Modifica questo elemento</item>
         <item>Modifica questo e tutti gli elementi seguenti</item>
-        <item>Modifica soltanto questo elemento</item>
+        <item>Elimina soltanto questo elemento</item>
         <item>Elimina tutti gli elementi seguenti</item>
         <item>Elimina tutti gli elementi precedenti</item>
         <item>Elimina tutto</item>
