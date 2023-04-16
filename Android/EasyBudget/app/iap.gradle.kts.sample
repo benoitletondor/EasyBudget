@@ -1,0 +1,2 @@
+val licenceKey by rootProject.extra("LICENCE_KEY")
+

@@ -1,4 +1,0 @@
-ext { 
-    batch_devkey = '"BATCH_DEV_API_KEY"'
-    batch_livekey = '"BATCH_LIVE_API_KEY"'
-}

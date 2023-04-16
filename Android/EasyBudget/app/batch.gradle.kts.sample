@@ -1,0 +1,2 @@
+val batchDevKey by rootProject.extra("BATCH_DEV_API_KEY")
+val batchLiveKey by rootProject.extra("BATCH_LIVE_API_KEY")
