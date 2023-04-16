@@ -48,6 +48,10 @@ class DBImpl(private val roomDB: RoomDB) : DB {
         return roomDB.expenseDao().hasExpenseForDay(dayDate) > 0
     }
 
+    override suspend fun hasUncheckedExpenseForDay(dayDate: LocalDate): Boolean {
+        return roomDB.expenseDao().hasUncheckedExpenseForDay(dayDate) > 0
+    }
+
     override suspend fun getExpensesForDay(dayDate: LocalDate): List<Expense> {
         return roomDB.expenseDao().getExpensesForDay(dayDate).toExpenses(this)
     }

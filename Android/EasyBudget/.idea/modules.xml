@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/EasyBudget.iml" filepath="$PROJECT_DIR$/EasyBudget.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/EasyBudget.iml" filepath="$PROJECT_DIR$/.idea/modules/EasyBudget.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/EasyBudget.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/EasyBudget.app.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/EasyBudget.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/EasyBudget.app.androidTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/EasyBudget.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/EasyBudget.app.main.iml" />

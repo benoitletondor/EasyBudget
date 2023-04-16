@@ -32,6 +32,9 @@ interface ExpenseDao {
     @Query("SELECT COUNT(*) FROM expense WHERE date = :dayDate LIMIT 1")
     suspend fun hasExpenseForDay(dayDate: LocalDate): Int
 
+    @Query("SELECT COUNT(*) FROM expense WHERE date = :dayDate AND checked = 0 LIMIT 1")
+    suspend fun hasUncheckedExpenseForDay(dayDate: LocalDate): Int
+
     @Query("SELECT * FROM expense WHERE date = :dayDate")
     suspend fun getExpensesForDay(dayDate: LocalDate): List<ExpenseEntity>
 

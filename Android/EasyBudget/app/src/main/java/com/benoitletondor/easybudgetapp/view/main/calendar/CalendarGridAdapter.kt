@@ -17,6 +17,7 @@
 package com.benoitletondor.easybudgetapp.view.main.calendar
 
 import android.content.Context
+import android.graphics.Typeface
 import androidx.core.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.View
@@ -27,6 +28,7 @@ import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.getLowMoneyWarningAmount
+import com.benoitletondor.easybudgetapp.parameters.getShouldShowCheckedBalance
 import com.roomorama.caldroid.CaldroidGridAdapter
 import com.roomorama.caldroid.CalendarHelper
 
@@ -139,6 +141,12 @@ class CalendarGridAdapter(context: Context,
             val date = CalendarHelper.convertDateTimeToDate(dateTime)
             // FIXME coroutine threading!!
             if ( runBlocking { db.hasExpenseForDay(date) }) {
+                val hasUnchecked = if (parameters.getShouldShowCheckedBalance()) {
+                    runBlocking { db.hasUncheckedExpenseForDay(date) }
+                } else {
+                    false
+                }
+
                 val balance = runBlocking { db.getBalanceForDay(date) }
 
                 if (!viewData.containsExpenses) {
@@ -149,6 +157,7 @@ class CalendarGridAdapter(context: Context,
 
                 tv2.text = formatBalance(balance)
 
+                tv1.setTypeface(null, if (hasUnchecked) Typeface.ITALIC else Typeface.BOLD);
                 tv1.setTextColor(ContextCompat.getColor(tv1.context, when {
                     -balance <= 0 -> R.color.budget_red
                     -balance < parameters.getLowMoneyWarningAmount() -> R.color.budget_orange
@@ -156,6 +165,7 @@ class CalendarGridAdapter(context: Context,
                 }))
             } else if (viewData.containsExpenses) {
                 tv2.visibility = View.INVISIBLE
+                tv1.setTypeface(null, Typeface.BOLD)
 
                 if (!isOutOfMonth) {
                     tv1.setTextColor(ContextCompat.getColor(context, R.color.primary_text))

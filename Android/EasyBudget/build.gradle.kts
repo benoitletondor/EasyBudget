@@ -13,30 +13,15 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-apply plugin: 'com.android.library'
+val kotlinVersion by extra("1.8.20") // Change in the plugins below too
+val hiltVersion by extra("2.45") // Change in the plugins below too
 
-android {
-    compileSdkVersion 33
-
-    namespace 'com.caldroid'
-
-    defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 33
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
-
-        coreLibraryDesugaringEnabled true
-    }
-}
-
-dependencies {
-    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:1.2.2"
-
-    implementation 'androidx.appcompat:appcompat:1.5.1'
-    implementation 'androidx.viewpager:viewpager:1.0.0'
-    api 'com.darwinsys:hirondelle-date4j:1.5.1'
+plugins {
+    id("com.android.application") version "8.0.0" apply false
+    id("com.android.library") version "8.0.0" apply false
+    id("com.google.firebase.crashlytics") version "2.9.5" apply false
+    id("com.google.gms.google-services") version "4.3.15" apply false
+    id("org.jetbrains.kotlin.android") version "1.8.20" apply false
+    id("com.google.dagger.hilt.android") version "2.45" apply false
+    id("com.google.devtools.ksp") version "1.8.20-1.0.10" apply false
 }

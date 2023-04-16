@@ -25,6 +25,7 @@ import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 
 /**
@@ -66,7 +67,7 @@ class IabImpl(
     /**
      * iab check status
      */
-    private var iabStatus: PremiumCheckStatus = PremiumCheckStatus.INITIALIZING
+    private val iabStatusFlow = MutableStateFlow(PremiumCheckStatus.INITIALIZING)
 
     init {
         startBillingClient()
@@ -89,11 +90,11 @@ class IabImpl(
      * @param status the new status
      */
     private fun setIabStatusAndNotify(status: PremiumCheckStatus) {
-        iabStatus = status
+        iabStatusFlow.value = status
 
         // Save status only on success
         if (status == PremiumCheckStatus.LEGACY_PREMIUM || status == PremiumCheckStatus.NOT_PREMIUM) {
-            parameters.setUserPremium(iabStatus == PremiumCheckStatus.LEGACY_PREMIUM)
+            parameters.setUserPremium(iabStatusFlow.value == PremiumCheckStatus.LEGACY_PREMIUM)
         }
 
         val intent = Intent(INTENT_IAB_STATUS_CHANGED)
@@ -102,7 +103,7 @@ class IabImpl(
     }
 
     override fun isIabReady(): Boolean {
-        return isUserPremium() || iabStatus == PremiumCheckStatus.NOT_PREMIUM
+        return isUserPremium() || iabStatusFlow.value == PremiumCheckStatus.NOT_PREMIUM
     }
 
     /**
@@ -115,19 +116,41 @@ class IabImpl(
         return parameters.isUserPremium() ||
             parameters.getBoolean(BATCH_OFFER_REDEEMED_PARAMETER_KEY, false) ||
             parameters.getBoolean(APP_TURBO_PREMIUM_PARAMETER_KEY, false) ||
-            (iabStatus == PremiumCheckStatus.LEGACY_PREMIUM || iabStatus == PremiumCheckStatus.SUBSCRIBED)
+            (iabStatusFlow.value == PremiumCheckStatus.LEGACY_PREMIUM || iabStatusFlow.value == PremiumCheckStatus.SUBSCRIBED)
+    }
+
+    override suspend fun waitForIsUserPremiumResponse(): Boolean {
+        if (isUserPremium()) {
+            return true
+        }
+
+        val status = iabStatusFlow.first {
+            it == PremiumCheckStatus.LEGACY_PREMIUM ||
+                it == PremiumCheckStatus.SUBSCRIBED ||
+                it == PremiumCheckStatus.ERROR ||
+                it == PremiumCheckStatus.NOT_PREMIUM
+        }
+
+        return when(status) {
+            PremiumCheckStatus.INITIALIZING -> false
+            PremiumCheckStatus.CHECKING -> false
+            PremiumCheckStatus.ERROR -> false
+            PremiumCheckStatus.NOT_PREMIUM -> false
+            PremiumCheckStatus.LEGACY_PREMIUM -> true
+            PremiumCheckStatus.SUBSCRIBED -> true
+        }
     }
 
     /**
      * Update the current IAP status if already checked
      */
     override fun updateIAPStatusIfNeeded() {
-        Logger.debug("updateIAPStatusIfNeeded: $iabStatus")
+        Logger.debug("updateIAPStatusIfNeeded: ${iabStatusFlow.value}")
 
-        if ( iabStatus == PremiumCheckStatus.NOT_PREMIUM ) {
+        if ( iabStatusFlow.value == PremiumCheckStatus.NOT_PREMIUM ) {
             setIabStatusAndNotify(PremiumCheckStatus.CHECKING)
             queryPurchases()
-        } else if ( iabStatus == PremiumCheckStatus.ERROR ) {
+        } else if ( iabStatusFlow.value == PremiumCheckStatus.ERROR ) {
             startBillingClient()
         }
     }
@@ -179,11 +202,11 @@ class IabImpl(
     }
 
     override suspend fun launchPremiumSubscriptionFlow(activity: Activity): PremiumPurchaseFlowResult {
-        if ( iabStatus != PremiumCheckStatus.NOT_PREMIUM ) {
-            return when (iabStatus) {
+        if ( iabStatusFlow.value != PremiumCheckStatus.NOT_PREMIUM ) {
+            return when (iabStatusFlow.value) {
                 PremiumCheckStatus.ERROR -> PremiumPurchaseFlowResult.Error("Unable to connect to your Google account. Please restart the app and try again")
                 PremiumCheckStatus.LEGACY_PREMIUM, PremiumCheckStatus.SUBSCRIBED -> PremiumPurchaseFlowResult.Error("You already bought Premium with that Google account. Restart the app if you don't have access to premium features.")
-                else -> PremiumPurchaseFlowResult.Error("Runtime error: $iabStatus")
+                else -> PremiumPurchaseFlowResult.Error("Runtime error: ${iabStatusFlow.value}")
             }
         }
 

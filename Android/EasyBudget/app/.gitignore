@@ -1,1 +1,4 @@
 /build
+batch.gradle.kts
+iap.gradle.kts
+fabric.properties
