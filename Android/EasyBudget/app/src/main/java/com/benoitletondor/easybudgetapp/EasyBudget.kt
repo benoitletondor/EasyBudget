@@ -44,7 +44,12 @@ import com.benoitletondor.easybudgetapp.view.getRatingPopupUserStep
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
 
@@ -199,52 +204,57 @@ class EasyBudget : Application(), Configuration.Provider {
 
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     private fun showPremiumPopupIfNeeded(activity: Activity) {
-        try {
-            if (activity !is MainActivity) {
-                return
-            }
-
-            if ( parameters.hasPremiumPopupBeenShow() ) {
-                return
-            }
-
-            if ( iab.isUserPremium() ) {
-                return
-            }
-
-            if ( !parameters.hasUserCompleteRating() ) {
-                return
-            }
-
-            val currentStep = parameters.getRatingPopupUserStep()
-            if (currentStep == RatingPopup.RatingPopupStep.STEP_LIKE ||
-                currentStep == RatingPopup.RatingPopupStep.STEP_LIKE_NOT_RATED ||
-                currentStep == RatingPopup.RatingPopupStep.STEP_LIKE_RATED) {
-                if ( !hasRatingPopupBeenShownToday() && shouldShowPremiumPopup() ) {
-                    parameters.setPremiumPopupLastAutoShowTimestamp(Date().time)
-
-                    MaterialAlertDialogBuilder(activity)
-                        .setTitle(R.string.premium_popup_become_title)
-                        .setMessage(R.string.premium_popup_become_message)
-                        .setPositiveButton(R.string.premium_popup_become_cta) { dialog13, _ ->
-                            val startIntent = Intent(activity, SettingsActivity::class.java)
-                            startIntent.putExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, true)
-                            ActivityCompat.startActivity(activity, startIntent, null)
-
-                            dialog13.dismiss()
-                        }
-                        .setNegativeButton(R.string.premium_popup_become_not_now) { dialog12, _ -> dialog12.dismiss() }
-                        .setNeutralButton(R.string.premium_popup_become_not_ask_again) { dialog1, _ ->
-                            parameters.setPremiumPopupShown()
-                            dialog1.dismiss()
-                        }
-                        .show()
-                        .centerButtons()
+        GlobalScope.launch {
+            try {
+                if (activity !is MainActivity) {
+                    return@launch
                 }
+
+                if ( parameters.hasPremiumPopupBeenShow() ) {
+                    return@launch
+                }
+
+                if ( iab.waitForIsUserPremiumResponse() ) {
+                    return@launch
+                }
+
+                if ( !parameters.hasUserCompleteRating() ) {
+                    return@launch
+                }
+
+                val currentStep = parameters.getRatingPopupUserStep()
+                if (currentStep == RatingPopup.RatingPopupStep.STEP_LIKE ||
+                    currentStep == RatingPopup.RatingPopupStep.STEP_LIKE_NOT_RATED ||
+                    currentStep == RatingPopup.RatingPopupStep.STEP_LIKE_RATED) {
+                    if ( !hasRatingPopupBeenShownToday() && shouldShowPremiumPopup() ) {
+                        parameters.setPremiumPopupLastAutoShowTimestamp(Date().time)
+
+                        withContext(Dispatchers.Main) {
+                            MaterialAlertDialogBuilder(activity)
+                                .setTitle(R.string.premium_popup_become_title)
+                                .setMessage(R.string.premium_popup_become_message)
+                                .setPositiveButton(R.string.premium_popup_become_cta) { dialog13, _ ->
+                                    val startIntent = Intent(activity, SettingsActivity::class.java)
+                                    startIntent.putExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, true)
+                                    ActivityCompat.startActivity(activity, startIntent, null)
+
+                                    dialog13.dismiss()
+                                }
+                                .setNegativeButton(R.string.premium_popup_become_not_now) { dialog12, _ -> dialog12.dismiss() }
+                                .setNeutralButton(R.string.premium_popup_become_not_ask_again) { dialog1, _ ->
+                                    parameters.setPremiumPopupShown()
+                                    dialog1.dismiss()
+                                }
+                                .show()
+                                .centerButtons()
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Logger.error("Error while showing become premium popup", e)
             }
-        } catch (e: Exception) {
-            Logger.error("Error while showing become premium popup", e)
         }
 
     }

@@ -24,7 +24,6 @@ import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 import java.util.concurrent.Executor
 
-@Suppress("DeferredResultUnused")
 class CachedDBImpl(private val wrappedDB: DB,
                    private val cacheStorage: CacheDBStorage,
                    private val executor: Executor) : DB {
@@ -55,6 +54,19 @@ class CachedDBImpl(private val wrappedDB: DB,
             wrappedDB.hasExpenseForDay(dayDate)
         } else {
             expensesForDay.isNotEmpty()
+        }
+    }
+
+    override suspend fun hasUncheckedExpenseForDay(dayDate: LocalDate): Boolean {
+        val expensesForDay = synchronized(cacheStorage.expenses) {
+            cacheStorage.expenses[dayDate]
+        }
+
+        return if (expensesForDay == null) {
+            executor.execute(CacheExpensesForMonthRunnable(dayDate.startOfMonth(), this, cacheStorage))
+            wrappedDB.hasUncheckedExpenseForDay(dayDate)
+        } else {
+            expensesForDay.firstOrNull { !it.checked } != null
         }
     }
 

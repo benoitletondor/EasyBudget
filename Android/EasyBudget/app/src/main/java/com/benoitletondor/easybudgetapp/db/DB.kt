@@ -28,6 +28,8 @@ interface DB {
 
     suspend fun hasExpenseForDay(dayDate: LocalDate): Boolean
 
+    suspend fun hasUncheckedExpenseForDay(dayDate: LocalDate): Boolean
+
     suspend fun getExpensesForDay(dayDate: LocalDate): List<Expense>
 
     suspend fun getExpensesForMonth(monthStartDate: LocalDate): List<Expense>

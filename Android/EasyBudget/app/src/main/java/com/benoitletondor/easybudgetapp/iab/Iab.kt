@@ -21,6 +21,7 @@ import android.app.Activity
 interface Iab {
     fun isIabReady(): Boolean
     fun isUserPremium(): Boolean
+    suspend fun waitForIsUserPremiumResponse(): Boolean
     fun updateIAPStatusIfNeeded()
     suspend fun launchPremiumSubscriptionFlow(activity: Activity): PremiumPurchaseFlowResult
 }
