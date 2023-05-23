@@ -233,7 +233,7 @@ class IabImpl(
             return PremiumPurchaseFlowResult.Error("Unable to connect to reach PlayStore (response code: " + billingResult.responseCode + "). Please restart the app and try again")
         }
 
-        if (skuDetailsList == null || skuDetailsList.isEmpty()) {
+        if (skuDetailsList.isNullOrEmpty()) {
             return PremiumPurchaseFlowResult.Error("Unable to fetch content from PlayStore (response code: skuDetailsList is empty). Please restart the app and try again")
         }
 

@@ -30,7 +30,7 @@ class FirebaseStorage(private val storage: com.google.firebase.storage.FirebaseS
         uploadFile(file, path, null)
     }
 
-    override suspend fun uploadFile(file: File, path: String, progressListener: ((Double) -> Unit)?) = suspendCancellableCoroutine<Unit> { continuation ->
+    override suspend fun uploadFile(file: File, path: String, progressListener: ((Double) -> Unit)?) = suspendCancellableCoroutine { continuation ->
         val reference = storage.reference.child(path)
 
         reference.putFile(Uri.fromFile(file)).addOnSuccessListener {
@@ -42,7 +42,7 @@ class FirebaseStorage(private val storage: com.google.firebase.storage.FirebaseS
         }
     }
 
-    override suspend fun getFileMetaData(path: String) = suspendCancellableCoroutine<FileMetaData?> { continuation ->
+    override suspend fun getFileMetaData(path: String) = suspendCancellableCoroutine { continuation ->
         val reference = storage.reference.child(path)
 
         reference.metadata.addOnSuccessListener { metadata ->
@@ -56,7 +56,7 @@ class FirebaseStorage(private val storage: com.google.firebase.storage.FirebaseS
         }
     }
 
-    override suspend fun downloadFile(path: String, toFile: File) = suspendCancellableCoroutine<Unit> { continuation ->
+    override suspend fun downloadFile(path: String, toFile: File) = suspendCancellableCoroutine { continuation ->
         val reference = storage.reference.child(path)
 
         reference.getFile(toFile).addOnSuccessListener {

@@ -1,7 +1,6 @@
 package com.roomorama.caldroid;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 import android.view.View;
 
