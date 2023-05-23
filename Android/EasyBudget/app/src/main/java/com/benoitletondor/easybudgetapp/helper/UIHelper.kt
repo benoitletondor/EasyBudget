@@ -139,13 +139,12 @@ fun Activity.animateActivityEnter(listener: Animator.AnimatorListener) {
     val viewTreeObserver = rootView.viewTreeObserver
     if (viewTreeObserver.isAlive) {
         viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-            @TargetApi(Build.VERSION_CODES.LOLLIPOP)
             override fun onGlobalLayout() {
                 rootView.viewTreeObserver.removeOnGlobalLayoutListener(this)
 
                 // get the center for the clipping circle
-                val cx = intent?.getIntExtra(MainActivity.CENTER_X_KEY, rootView.width / 2) ?: rootView.width / 2
-                val cy = intent?.getIntExtra(MainActivity.CENTER_Y_KEY, rootView.height / 2) ?: rootView.height / 2
+                val cx = intent?.getIntExtra(MainActivity.CENTER_X_KEY, rootView.width / 2) ?: (rootView.width / 2)
+                val cy = intent?.getIntExtra(MainActivity.CENTER_Y_KEY, rootView.height / 2) ?: (rootView.height / 2)
 
                 // get the final radius for the clipping circle
                 val finalRadius = max(rootView.width, rootView.height)
