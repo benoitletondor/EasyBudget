@@ -13,15 +13,15 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-val kotlinVersion by extra("1.8.21") // Change in the plugins below too
+val kotlinVersion by extra("1.8.22") // Change in the plugins below too
 val hiltVersion by extra("2.46.1") // Change in the plugins below too
 
 plugins {
-    id("com.android.application") version "8.0.1" apply false
-    id("com.android.library") version "8.0.1" apply false
-    id("com.google.firebase.crashlytics") version "2.9.5" apply false
+    id("com.android.application") version "8.0.2" apply false
+    id("com.android.library") version "8.0.2" apply false
+    id("com.google.firebase.crashlytics") version "2.9.6" apply false
     id("com.google.gms.google-services") version "4.3.15" apply false
-    id("org.jetbrains.kotlin.android") version "1.8.21" apply false
+    id("org.jetbrains.kotlin.android") version "1.8.22" apply false
     id("com.google.dagger.hilt.android") version "2.46.1" apply false
-    id("com.google.devtools.ksp") version "1.8.21-1.0.11" apply false
+    id("com.google.devtools.ksp") version "1.8.22-1.0.11" apply false
 }
