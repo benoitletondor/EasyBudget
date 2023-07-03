@@ -1,12 +1,10 @@
 package com.benoitletondor.easybudgetapp.accounts
 
-import android.util.Log
 import com.benoitletondor.easybudgetapp.accounts.model.Account
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.MemoryCacheSettings
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.cancel
@@ -15,11 +13,18 @@ import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChangedBy
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.tasks.await
+
+private const val INVITATIONS_COLLECTION = "invitations"
+private const val INVITATION_DOCUMENT_RECEIVER_EMAIL = "receiverEmail"
+private const val INVITATION_DOCUMENT_STATUS = "status"
+private const val INVITATION_DOCUMENT_ACCOUNT_ID = "accountId"
+
+private const val ACCOUNTS_COLLECTION = "accounts"
+private const val ACCOUNT_DOCUMENT_OWNER_ID = "owner_id"
+private const val ACCOUNT_DOCUMENT_OWNER_EMAIL = "ownerEmail"
+private const val ACCOUNT_DOCUMENT_NAME = "name"
 
 class FirebaseAccounts(
     private val db: FirebaseFirestore,
@@ -39,9 +44,8 @@ class FirebaseAccounts(
             }
     }
 
-    private fun watchOwnAccounts(currentUser: CurrentUser): Flow<List<Account>> = db.collection("accounts")
-        .whereArrayContains("members", currentUser.email)
-        .whereEqualTo("ownerId", currentUser.id)
+    private fun watchOwnAccounts(currentUser: CurrentUser): Flow<List<Account>> = db.collection(ACCOUNTS_COLLECTION)
+        .whereEqualTo(ACCOUNT_DOCUMENT_OWNER_ID, currentUser.id)
         .watchAsFlow { value ->
             value.documents.mapNotNull {
                 it.toAccountOrThrow(currentUser)
@@ -55,7 +59,7 @@ class FirebaseAccounts(
                     return@flatMapLatest flowOf(emptyList())
                 }
 
-                return@flatMapLatest db.collection("accounts")
+                return@flatMapLatest db.collection(ACCOUNTS_COLLECTION)
                     .whereIn(FieldPath.documentId(), accountIds)
                     .watchAsFlow { value ->
                         value.documents.mapNotNull {
@@ -64,12 +68,12 @@ class FirebaseAccounts(
                     }
             }
 
-    private fun watchAcceptedInvitations(currentUser: CurrentUser): Flow<List<String>> = db.collection("invitations")
-        .whereEqualTo("receiverEmail", currentUser.email)
-        .whereEqualTo("status", InvitationStatus.ACCEPTED.dbValue)
+    private fun watchAcceptedInvitations(currentUser: CurrentUser): Flow<List<String>> = db.collection(INVITATIONS_COLLECTION)
+        .whereEqualTo(INVITATION_DOCUMENT_RECEIVER_EMAIL, currentUser.email)
+        .whereEqualTo(INVITATION_DOCUMENT_STATUS, InvitationStatus.ACCEPTED.dbValue)
         .watchAsFlow { value ->
             value.documents.mapNotNull {
-                it.getString("accountId")
+                it.getString(INVITATION_DOCUMENT_ACCOUNT_ID)
             }
         }
 
@@ -101,11 +105,11 @@ class FirebaseAccounts(
     }
 
     private fun DocumentSnapshot.toAccountOrThrow(currentUser: CurrentUser): Account {
-        val ownerEmail = getString("ownerEmail")!!
+        val ownerEmail = getString(ACCOUNT_DOCUMENT_OWNER_EMAIL)!!
 
         return Account(
             id = id,
-            name = getString("name")!!,
+            name = getString(ACCOUNT_DOCUMENT_NAME)!!,
             ownerEmail = ownerEmail,
             isUserOwner = ownerEmail == currentUser.email,
         )
