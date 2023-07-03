@@ -146,6 +146,7 @@ dependencies {
     implementation("com.google.firebase:firebase-storage")
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.firebaseui:firebase-ui-auth:8.0.2")
 
     val composeBom = platform("androidx.compose:compose-bom:2023.06.01")

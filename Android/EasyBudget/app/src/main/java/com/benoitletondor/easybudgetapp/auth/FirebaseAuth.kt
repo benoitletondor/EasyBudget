@@ -82,19 +82,16 @@ class FirebaseAuth(
     }
 
     private fun getAuthState(): AuthState {
-        val currentUser = auth.currentUser
-        return if( currentUser == null ) {
+        val firebaseUser = auth.currentUser
+        return if( firebaseUser == null ) {
             AuthState.NotAuthenticated
         } else {
-            AuthState.Authenticated(FirebaseCurrentUser(currentUser))
+            AuthState.Authenticated(firebaseUser.toCurrentUser())
         }
     }
 }
 
-class FirebaseCurrentUser(private val user: FirebaseUser) : CurrentUser {
-    override val email: String
-        get() = user.email!!
-
-    override val id: String
-        get() = user.uid
-}
+private fun FirebaseUser.toCurrentUser() = CurrentUser(
+    id = uid,
+    email = email!!,
+)

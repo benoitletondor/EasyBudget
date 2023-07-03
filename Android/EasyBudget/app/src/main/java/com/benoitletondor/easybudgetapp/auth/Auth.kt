@@ -34,7 +34,7 @@ sealed class AuthState {
     data class Authenticated(val currentUser: CurrentUser) : AuthState()
 }
 
-interface CurrentUser {
-    val id: String
-    val email: String
-}
+data class CurrentUser(
+    val id: String,
+    val email: String,
+)

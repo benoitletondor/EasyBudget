@@ -17,6 +17,8 @@
 package com.benoitletondor.easybudgetapp.injection
 
 import android.content.Context
+import com.benoitletondor.easybudgetapp.accounts.Accounts
+import com.benoitletondor.easybudgetapp.accounts.FirebaseAccounts
 import com.benoitletondor.easybudgetapp.auth.Auth
 import com.benoitletondor.easybudgetapp.auth.FirebaseAuth
 import com.benoitletondor.easybudgetapp.cloudstorage.CloudStorage
@@ -30,6 +32,8 @@ import com.benoitletondor.easybudgetapp.db.impl.CachedDBImpl
 import com.benoitletondor.easybudgetapp.db.impl.CacheDBStorage
 import com.benoitletondor.easybudgetapp.db.impl.DBImpl
 import com.benoitletondor.easybudgetapp.db.impl.RoomDB
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -53,6 +57,10 @@ object AppModule {
     @Provides
     @Singleton
     fun provideFirebaseAuth(): Auth = FirebaseAuth(com.google.firebase.auth.FirebaseAuth.getInstance())
+
+    @Provides
+    @Singleton
+    fun provideAccounts(): Accounts = FirebaseAccounts(Firebase.firestore)
 
     @Provides
     @Singleton

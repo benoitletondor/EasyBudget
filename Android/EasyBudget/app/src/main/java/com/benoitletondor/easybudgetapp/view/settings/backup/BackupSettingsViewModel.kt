@@ -23,6 +23,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.ListenableWorker
+import com.benoitletondor.easybudgetapp.accounts.Accounts
 import com.benoitletondor.easybudgetapp.auth.Auth
 import com.benoitletondor.easybudgetapp.auth.AuthState
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
@@ -35,6 +36,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -48,6 +50,7 @@ class BackupSettingsViewModel @Inject constructor(
     private val cloudStorage: CloudStorage,
     private val iab: Iab,
     @ApplicationContext private val appContext: Context,
+    private val accounts: Accounts,
 ) : ViewModel() {
 
     private val cloudBackupStateMutableFlow = MutableStateFlow<BackupCloudStorageState>(BackupCloudStorageState.NotAuthenticated)
@@ -84,6 +87,18 @@ class BackupSettingsViewModel @Inject constructor(
     init {
         viewModelScope.launchCollect(auth.state) { authState ->
             if( authState is AuthState.Authenticated ) {
+                viewModelScope.launch {
+                    Log.d("ACCOUNTS", "Accounts fetch")
+
+                    accounts.watchAccounts(authState.currentUser)
+                        .catch { e ->
+                            Log.e("ACCOUNTS", "Accounts error", e)
+                        }
+                        .collect { accountsList ->
+                            Log.d("ACCOUNTS", "Accounts: $accountsList")
+                        }
+                }
+
                 viewModelScope.launch {
                     withContext(Dispatchers.IO) {
                         try {
