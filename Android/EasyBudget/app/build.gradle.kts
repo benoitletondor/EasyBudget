@@ -21,6 +21,7 @@ plugins {
     id("dagger.hilt.android.plugin")
     id("com.google.devtools.ksp")
     id("com.google.gms.google-services")
+    id("io.realm.kotlin")
 }
 
 apply {
@@ -170,6 +171,10 @@ dependencies {
     ksp("androidx.room:room-compiler:2.5.2")
     implementation("androidx.room:room-runtime:2.5.2")
     implementation("androidx.room:room-ktx:2.5.2")
+
+    implementation("io.realm.kotlin:library-sync:1.8.0")
+
+    implementation("net.sf.biweekly:biweekly:0.6.7")
 
     implementation("net.lingala.zip4j:zip4j:2.11.5")
 }
