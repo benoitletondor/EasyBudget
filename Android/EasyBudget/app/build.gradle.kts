@@ -119,6 +119,7 @@ java {
 dependencies {
     val kotlinVersion: String by rootProject.extra
     val hiltVersion: String by rootProject.extra
+    val realmVersion: String by rootProject.extra
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion")
 
@@ -172,7 +173,7 @@ dependencies {
     implementation("androidx.room:room-runtime:2.5.2")
     implementation("androidx.room:room-ktx:2.5.2")
 
-    implementation("io.realm.kotlin:library-sync:1.8.0")
+    implementation("io.realm.kotlin:library-sync:$realmVersion")
 
     implementation("net.sf.biweekly:biweekly:0.6.7")
 

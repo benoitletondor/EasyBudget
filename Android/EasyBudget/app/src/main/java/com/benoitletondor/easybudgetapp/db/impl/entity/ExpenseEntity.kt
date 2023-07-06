@@ -20,6 +20,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.benoitletondor.easybudgetapp.helper.getRealValueFromDB
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import java.time.LocalDate
@@ -43,7 +44,7 @@ class ExpenseEntity(@PrimaryKey(autoGenerate = true)
     fun toExpense(associatedRecurringExpense: RecurringExpense?) = Expense(
         id,
         title,
-        amount / 100.0,
+        amount.getRealValueFromDB(),
         date,
         checked,
         associatedRecurringExpense,

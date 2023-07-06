@@ -1,20 +1,27 @@
 package com.benoitletondor.easybudgetapp.db.onlineimpl
 
+import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.benoitletondor.easybudgetapp.db.DB
+import com.benoitletondor.easybudgetapp.db.onlineimpl.entity.Account
+import com.benoitletondor.easybudgetapp.db.onlineimpl.entity.ExpenseEntity
+import com.benoitletondor.easybudgetapp.db.onlineimpl.entity.RecurringExpenseEntity
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
+import io.realm.kotlin.Realm
+import io.realm.kotlin.mongodb.App
+import io.realm.kotlin.mongodb.Credentials
+import io.realm.kotlin.mongodb.sync.SyncConfiguration
 import java.time.LocalDate
 
-class OnlineDBImpl : DB {
+class OnlineDBImpl(
+    private val realm: Realm,
+    private val accountId: String,
+    private val accountSecret: String,
+) : DB {
 
+    override fun ensureDBCreated() { /* No-op */ }
 
-    override fun ensureDBCreated() {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun triggerForceWriteToDisk() {
-        TODO("Not yet implemented")
-    }
+    override suspend fun triggerForceWriteToDisk() { /* No-op */ }
 
     override suspend fun persistExpense(expense: Expense): Expense {
         TODO("Not yet implemented")
@@ -109,5 +116,29 @@ class OnlineDBImpl : DB {
 
     override suspend fun markAllEntriesAsChecked(beforeDate: LocalDate) {
         TODO("Not yet implemented")
+    }
+
+    companion object {
+        suspend fun provideFor(
+            atlasAppId: String,
+            currentUser: CurrentUser,
+            accountId: String,
+            accountSecret: String,
+        ): OnlineDBImpl {
+            val app = App.create(atlasAppId)
+            val user = app.login(Credentials.jwt(currentUser.token))
+            val realm = Realm.open(
+                SyncConfiguration.Builder(
+                    user = user,
+                    schema = setOf(ExpenseEntity::class, RecurringExpenseEntity::class, Account::class),
+                ).build()
+            )
+
+            return OnlineDBImpl(
+                realm,
+                accountId,
+                accountSecret,
+            )
+        }
     }
 }

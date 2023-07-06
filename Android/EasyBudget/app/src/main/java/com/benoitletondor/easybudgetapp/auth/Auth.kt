@@ -37,4 +37,5 @@ sealed class AuthState {
 data class CurrentUser(
     val id: String,
     val email: String,
+    val token: String,
 )

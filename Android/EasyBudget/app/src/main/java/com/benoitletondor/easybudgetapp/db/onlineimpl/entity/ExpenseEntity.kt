@@ -1,21 +1,58 @@
 package com.benoitletondor.easybudgetapp.db.onlineimpl.entity
 
+import com.benoitletondor.easybudgetapp.helper.getDBValue
+import com.benoitletondor.easybudgetapp.helper.getRealValueFromDB
 import com.benoitletondor.easybudgetapp.model.Expense
+import com.benoitletondor.easybudgetapp.model.RecurringExpense
+import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.PrimaryKey
+import java.security.SecureRandom
 import java.time.LocalDate
 
-data class ExpenseEntity(
-    val id: Long,
-    val title: String,
-    val amount: Long,
-    val date: Long,
-    val checked: Boolean,
-) {
-    fun toExpense() = Expense(
+class ExpenseEntity() : RealmObject {
+    @PrimaryKey
+    var id: Long = SecureRandom().nextLong()
+    var title: String = ""
+    var amount: Long = 0
+    var date: Long = 0
+    var checked: Boolean = false
+    var account: Account? = null
+
+    constructor(
+        id: Long?,
+        title: String,
+        amount: Long,
+        date: Long,
+        checked: Boolean,
+        account: Account,
+    ) : this() {
+        this.id = id ?: SecureRandom().nextLong()
+        this.title = title
+        this.amount = amount
+        this.date = date
+        this.checked = checked
+        this.account = account
+    }
+
+    fun toExpense(associatedRecurringExpense: RecurringExpense?) = Expense(
         id,
         title,
-        amount / 100.0,
+        amount.getRealValueFromDB(),
         LocalDate.ofEpochDay(date),
         checked,
-        associatedRecurringExpense = null,
+        associatedRecurringExpense,
     )
+
+    companion object {
+        fun fromExpense(expense: Expense, account: Account): ExpenseEntity {
+            return ExpenseEntity(
+                expense.id,
+                expense.title,
+                expense.amount.getDBValue(),
+                expense.date.toEpochDay(),
+                expense.checked,
+                account,
+            )
+        }
+    }
 }

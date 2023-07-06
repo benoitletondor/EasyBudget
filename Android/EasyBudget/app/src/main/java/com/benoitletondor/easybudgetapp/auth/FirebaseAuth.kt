@@ -18,25 +18,31 @@ package com.benoitletondor.easybudgetapp.auth
 
 import android.app.Activity
 import android.content.Intent
+import android.util.Log
 import com.benoitletondor.easybudgetapp.helper.Logger
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseUser
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 private const val SIGN_IN_REQUEST_CODE = 10524
 
 class FirebaseAuth(
     private val auth: com.google.firebase.auth.FirebaseAuth,
-) : Auth {
+) : Auth, CoroutineScope by CoroutineScope(Job() + Dispatchers.IO) {
 
-    private val currentState = MutableStateFlow(getAuthState())
+    private val currentState = MutableStateFlow<AuthState>(AuthState.Authenticating)
     override val state: StateFlow<AuthState> = currentState
 
     init {
         auth.addAuthStateListener {
-            currentState.value = getAuthState()
+            updateAuthState()
         }
     }
 
@@ -53,7 +59,7 @@ class FirebaseAuth(
             )
         } catch (error: Throwable) {
             Logger.error("FirebaseAuth", "Error launching auth activity", error)
-            currentState.value = getAuthState()
+            updateAuthState()
         }
 
     }
@@ -72,26 +78,39 @@ class FirebaseAuth(
                 }
             }
 
-            currentState.value = getAuthState()
+            updateAuthState()
         }
     }
 
     override fun logout() {
         auth.signOut()
-        currentState.value = getAuthState()
+        updateAuthState()
     }
 
-    private fun getAuthState(): AuthState {
+    private fun updateAuthState() {
+        launch {
+            currentState.value = getAuthState()
+        }
+    }
+
+    private suspend fun getAuthState(): AuthState {
         val firebaseUser = auth.currentUser
         return if( firebaseUser == null ) {
             AuthState.NotAuthenticated
         } else {
-            AuthState.Authenticated(firebaseUser.toCurrentUser())
+            try {
+                val token = firebaseUser.getIdToken(false).await().token!!
+                AuthState.Authenticated(firebaseUser.toCurrentUser(token))
+            } catch (e: Exception) {
+                Log.e("Auth", "Error while getting firebase token", e)
+                AuthState.NotAuthenticated
+            }
         }
     }
 }
 
-private fun FirebaseUser.toCurrentUser() = CurrentUser(
+private fun FirebaseUser.toCurrentUser(token: String) = CurrentUser(
     id = uid,
     email = email!!,
+    token = token,
 )
