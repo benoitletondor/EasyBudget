@@ -17,11 +17,11 @@ package com.benoitletondor.easybudgetapp.helper
 
 import java.time.Instant
 import java.time.LocalDate
-import java.time.ZoneOffset
+import java.time.ZoneId
 import java.util.*
 
-fun LocalDate.toStartOfDayDate(): Date = Date.from(atStartOfDay().atZone(ZoneOffset.UTC).toInstant())
+fun LocalDate.toStartOfDayDate(): Date = Date.from(atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
 
 fun localDateFromTimestamp(timestamp: Long): LocalDate = Instant.ofEpochMilli(timestamp)
-    .atZone(ZoneOffset.UTC)
+    .atZone(ZoneId.systemDefault())
     .toLocalDate()
