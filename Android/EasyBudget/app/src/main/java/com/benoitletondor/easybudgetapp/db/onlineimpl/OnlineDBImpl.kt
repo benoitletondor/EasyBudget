@@ -142,7 +142,7 @@ class OnlineDBImpl(
             .firstOrNull()
 
         if (recurringExpensesOfTheDay != null) {
-            return true;
+            return true
         }
 
         val expenses = realm.query<ExpenseEntity>("${account.generateQuery()} AND ${generateQueryForDateRange(dayDate, dayDate)}")
@@ -163,7 +163,7 @@ class OnlineDBImpl(
             .firstOrNull { it.checked }
 
         if (recurringExpensesOfTheDayChecked != null) {
-            return true;
+            return true
         }
 
         val expenses = realm.query<ExpenseEntity>("${account.generateQuery()} AND ${generateQueryForDateRange(dayDate, dayDate)} AND checked = true")

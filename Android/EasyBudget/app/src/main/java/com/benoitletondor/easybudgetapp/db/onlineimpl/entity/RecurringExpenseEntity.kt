@@ -138,7 +138,7 @@ class RecurringExpenseEntity() : RealmObject {
                 // Check if there is an exception for this instance
                 val eventException = exceptions[eventOccurrenceDate]
                 if (eventException != null) {
-                    if (eventException.status != Status.cancelled()) {
+                    if (!eventException.status.isCancelled) {
                         // This instance has been replaced by an exception and isn't cancelled
                         eventsInRange.add(Pair(eventException, eventOccurrenceDate))
                     }
