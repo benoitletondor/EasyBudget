@@ -83,7 +83,7 @@ class MonthlyReportRecyclerViewAdapter(private val expenses: List<Expense>,
             viewHolder.monthlyIndicator.visibility = if (expense.isRecurring()) View.VISIBLE else View.GONE
 
             if (expense.isRecurring()) {
-                when (expense.associatedRecurringExpense!!.type) {
+                when (expense.associatedRecurringExpense!!.recurringExpense.type) {
                     RecurringExpenseType.DAILY -> viewHolder.recurringExpenseTypeTextView.text = viewHolder.view.context.getString(R.string.daily)
                     RecurringExpenseType.WEEKLY -> viewHolder.recurringExpenseTypeTextView.text = viewHolder.view.context.getString(R.string.weekly)
                     RecurringExpenseType.BI_WEEKLY -> viewHolder.recurringExpenseTypeTextView.text = viewHolder.view.context.getString(R.string.bi_weekly)

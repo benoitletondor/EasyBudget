@@ -112,7 +112,7 @@ class ExpensesRecyclerViewAdapter(private val activity: Activity,
         viewHolder.checkedCheckBox.isChecked = expense.checked
 
         if (expense.isRecurring()) {
-            when (expense.associatedRecurringExpense!!.type) {
+            when (expense.associatedRecurringExpense!!.recurringExpense.type) {
                 RecurringExpenseType.DAILY -> viewHolder.recurringIndicatorTextview.text = viewHolder.view.context.getString(R.string.daily)
                 RecurringExpenseType.WEEKLY -> viewHolder.recurringIndicatorTextview.text = viewHolder.view.context.getString(R.string.weekly)
                 RecurringExpenseType.BI_WEEKLY -> viewHolder.recurringIndicatorTextview.text = viewHolder.view.context.getString(R.string.bi_weekly)

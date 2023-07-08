@@ -22,6 +22,7 @@ private const val INVITATION_DOCUMENT_STATUS = "status"
 private const val INVITATION_DOCUMENT_ACCOUNT_ID = "accountId"
 
 private const val ACCOUNTS_COLLECTION = "accounts"
+private const val ACCOUNT_DOCUMENT_SECRET = "secret"
 private const val ACCOUNT_DOCUMENT_OWNER_ID = "owner_id"
 private const val ACCOUNT_DOCUMENT_OWNER_EMAIL = "ownerEmail"
 private const val ACCOUNT_DOCUMENT_NAME = "name"
@@ -109,6 +110,7 @@ class FirebaseAccounts(
 
         return Account(
             id = id,
+            secret = getString(ACCOUNT_DOCUMENT_SECRET)!!,
             name = getString(ACCOUNT_DOCUMENT_NAME)!!,
             ownerEmail = ownerEmail,
             isUserOwner = ownerEmail == currentUser.email,

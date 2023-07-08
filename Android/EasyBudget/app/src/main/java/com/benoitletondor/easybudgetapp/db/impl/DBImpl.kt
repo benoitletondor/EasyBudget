@@ -161,7 +161,7 @@ private fun Expense.toExpenseEntity() = ExpenseEntity(
     amount.getDBValue(),
     date,
     checked,
-    associatedRecurringExpense?.id
+    associatedRecurringExpense?.recurringExpense?.id,
 )
 
 private fun RecurringExpense.toRecurringExpenseEntity() = RecurringExpenseEntity (

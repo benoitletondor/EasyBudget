@@ -194,7 +194,7 @@ class MainViewModel @Inject constructor(
                 }
 
                 val firstOccurrenceError = withContext(Dispatchers.Default) {
-                    deleteType == RecurringExpenseDeleteType.TO && !db.hasExpensesForRecurringExpenseBeforeDate(associatedRecurringExpense, expense.date)
+                    deleteType == RecurringExpenseDeleteType.TO && !db.hasExpensesForRecurringExpenseBeforeDate(associatedRecurringExpense.recurringExpense, expense.date)
                 }
 
                 if ( firstOccurrenceError ) {
@@ -205,16 +205,16 @@ class MainViewModel @Inject constructor(
                 val expensesToRestore: List<Expense>? = withContext(Dispatchers.Default) {
                     when (deleteType) {
                         RecurringExpenseDeleteType.ALL -> {
-                            val expensesToRestore = db.getAllExpenseForRecurringExpense(associatedRecurringExpense)
+                            val expensesToRestore = db.getAllExpenseForRecurringExpense(associatedRecurringExpense.recurringExpense)
 
                             try {
-                                db.deleteAllExpenseForRecurringExpense(associatedRecurringExpense)
+                                db.deleteAllExpenseForRecurringExpense(associatedRecurringExpense.recurringExpense)
                             } catch (t: Throwable) {
                                 return@withContext null
                             }
 
                             try {
-                                db.deleteRecurringExpense(associatedRecurringExpense)
+                                db.deleteRecurringExpense(associatedRecurringExpense.recurringExpense)
                             } catch (t: Throwable) {
                                 return@withContext null
                             }
@@ -222,10 +222,10 @@ class MainViewModel @Inject constructor(
                             expensesToRestore
                         }
                         RecurringExpenseDeleteType.FROM -> {
-                            val expensesToRestore = db.getAllExpensesForRecurringExpenseAfterDate(associatedRecurringExpense, expense.date)
+                            val expensesToRestore = db.getAllExpensesForRecurringExpenseAfterDate(associatedRecurringExpense.recurringExpense, expense.date)
 
                             try {
-                                db.deleteAllExpenseForRecurringExpenseAfterDate(associatedRecurringExpense, expense.date)
+                                db.deleteAllExpenseForRecurringExpenseAfterDate(associatedRecurringExpense.recurringExpense, expense.date)
                             } catch (t: Throwable) {
                                 return@withContext null
                             }
@@ -233,10 +233,10 @@ class MainViewModel @Inject constructor(
                             expensesToRestore
                         }
                         RecurringExpenseDeleteType.TO -> {
-                            val expensesToRestore = db.getAllExpensesForRecurringExpenseBeforeDate(associatedRecurringExpense, expense.date)
+                            val expensesToRestore = db.getAllExpensesForRecurringExpenseBeforeDate(associatedRecurringExpense.recurringExpense, expense.date)
 
                             try {
-                                db.deleteAllExpenseForRecurringExpenseBeforeDate(associatedRecurringExpense, expense.date)
+                                db.deleteAllExpenseForRecurringExpenseBeforeDate(associatedRecurringExpense.recurringExpense, expense.date)
                             } catch (t: Throwable) {
                                 return@withContext null
                             }
@@ -262,7 +262,7 @@ class MainViewModel @Inject constructor(
                     return@launch
                 }
 
-                recurringExpenseDeletionEventMutableFlow.emit(RecurringExpenseDeletionEvent.Success(associatedRecurringExpense, deleteType == RecurringExpenseDeleteType.ALL, expensesToRestore))
+                recurringExpenseDeletionEventMutableFlow.emit(RecurringExpenseDeletionEvent.Success(associatedRecurringExpense.recurringExpense, deleteType == RecurringExpenseDeleteType.ALL, expensesToRestore))
             } finally {
                 recurringExpenseDeletionProgressStateMutableFlow.value = RecurringExpenseDeleteProgressState.Idle
             }

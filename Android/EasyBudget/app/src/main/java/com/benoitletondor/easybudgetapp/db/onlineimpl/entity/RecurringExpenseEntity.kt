@@ -4,13 +4,21 @@ import androidx.room.PrimaryKey
 import biweekly.Biweekly
 import biweekly.ICalendar
 import biweekly.component.VEvent
+import biweekly.property.DateStart
+import biweekly.property.RecurrenceId
+import biweekly.property.Summary
+import biweekly.util.ICalDate
+import com.benoitletondor.easybudgetapp.helper.getDBValue
 import com.benoitletondor.easybudgetapp.helper.getRealValueFromDB
 import com.benoitletondor.easybudgetapp.helper.localDateFromTimestamp
 import com.benoitletondor.easybudgetapp.helper.toRecurringExpenseType
 import com.benoitletondor.easybudgetapp.helper.toStartOfDayDate
+import com.benoitletondor.easybudgetapp.model.AssociatedRecurringExpense
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import io.realm.kotlin.types.RealmObject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.security.SecureRandom
 import java.time.LocalDate
 import java.util.Date
@@ -33,31 +41,55 @@ class RecurringExpenseEntity() : RealmObject {
         this.account = account
     }
 
-    private fun getCal(): ICalendar = Biweekly.parse(iCalRepresentation).first()
+    suspend fun toRecurringExpense(): RecurringExpense {
+        return withContext(Dispatchers.IO) {
+            val event = getCal().events.first()
 
-    fun toRecurringExpense(): RecurringExpense {
-        val event = getCal().events.first()
+            val startDate = localDateFromTimestamp(event.dateStart.value.time)
+            val title = event.summary.value
+            val originalAmount = event.getExperimentalProperty(AMOUNT_KEY).value.toLong()
+            val recurrenceExpenseType = event.recurrenceRule.value.toRecurringExpenseType()
 
-        val startDate = localDateFromTimestamp(event.dateStart.value.time)
-        val title = event.summary.value
-        val originalAmount = event.getExperimentalProperty(AMOUNT_KEY).value.toLong()
-        val recurrenceExpenseType = event.recurrenceRule.value.toRecurringExpenseType()
-
-        return RecurringExpense(
-            id,
-            title,
-            originalAmount.getRealValueFromDB(),
-            startDate,
-            modified = false,
-            recurrenceExpenseType,
-        )
+            return@withContext RecurringExpense(
+                id,
+                title,
+                originalAmount.getRealValueFromDB(),
+                startDate,
+                modified = false,
+                recurrenceExpenseType,
+            )
+        }
     }
 
-    fun generateExpenses(from: LocalDate, to: LocalDate): List<Expense> {
-        return getCal().getExpenses(from, to, toRecurringExpense())
+    suspend fun generateExpenses(from: LocalDate, to: LocalDate): List<Expense> {
+        return withContext(Dispatchers.IO) {
+            getCal().getExpenses(from, to, toRecurringExpense())
+        }
     }
 
-    private fun ICalendar.getExpenses(from: LocalDate, to: LocalDate, recurringExpense: RecurringExpense): List<Expense> {
+    suspend fun addExceptionFromExpense(expense: Expense, originalOccurrenceDate: LocalDate) {
+        withContext(Dispatchers.IO) {
+            val cal = getCal()
+
+            val exceptionEvent = VEvent()
+            exceptionEvent.dateStart = DateStart(expense.date.toStartOfDayDate(), false)
+            exceptionEvent.summary = Summary(expense.title)
+            exceptionEvent.addExperimentalProperty(AMOUNT_KEY, expense.amount.getDBValue().toString())
+            exceptionEvent.addExperimentalProperty(CHECKED_KEY, expense.checked.toString())
+            exceptionEvent.uid = cal.events.first().uid
+
+            val recurrenceId = RecurrenceId(ICalDate(originalOccurrenceDate.toStartOfDayDate(), false))
+            exceptionEvent.recurrenceId = recurrenceId
+
+            cal.addEvent(exceptionEvent)
+
+            iCalRepresentation = cal.write()
+        }
+    }
+
+    private suspend fun getCal(): ICalendar = Biweekly.parse(iCalRepresentation).first()
+
+    private suspend fun ICalendar.getExpenses(from: LocalDate, to: LocalDate, recurringExpense: RecurringExpense): List<Expense> {
         val startDate = from.toStartOfDayDate()
         val endDate = to.toStartOfDayDate()
 
@@ -108,7 +140,10 @@ class RecurringExpenseEntity() : RealmObject {
                     amount = event.getExperimentalProperty(AMOUNT_KEY).value.toLong() / 100.0,
                     date = localDateFromTimestamp(date.time),
                     checked = event.getExperimentalProperty(CHECKED_KEY)?.value == "true",
-                    associatedRecurringExpense = recurringExpense,
+                    associatedRecurringExpense = AssociatedRecurringExpense(
+                        recurringExpense = recurringExpense,
+                        originalDate = localDateFromTimestamp(event.dateStart.value.time)
+                    ),
                 )
             }
     }

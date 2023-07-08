@@ -25,7 +25,7 @@ import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -35,7 +35,7 @@ private const val SIGN_IN_REQUEST_CODE = 10524
 
 class FirebaseAuth(
     private val auth: com.google.firebase.auth.FirebaseAuth,
-) : Auth, CoroutineScope by CoroutineScope(Job() + Dispatchers.IO) {
+) : Auth, CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.IO) {
 
     private val currentState = MutableStateFlow<AuthState>(AuthState.Authenticating)
     override val state: StateFlow<AuthState> = currentState
@@ -112,5 +112,5 @@ class FirebaseAuth(
 private fun FirebaseUser.toCurrentUser(token: String) = CurrentUser(
     id = uid,
     email = email!!,
-    token = token,
+    token,
 )

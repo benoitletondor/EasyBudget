@@ -8,26 +8,115 @@ import com.benoitletondor.easybudgetapp.db.onlineimpl.entity.RecurringExpenseEnt
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import io.realm.kotlin.Realm
+import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.ext.query
 import io.realm.kotlin.mongodb.App
 import io.realm.kotlin.mongodb.Credentials
+import io.realm.kotlin.mongodb.annotations.ExperimentalFlexibleSyncApi
+import io.realm.kotlin.mongodb.ext.subscribe
 import io.realm.kotlin.mongodb.sync.SyncConfiguration
+import io.realm.kotlin.mongodb.sync.WaitForSync
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import java.time.LocalDate
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 class OnlineDBImpl(
     private val realm: Realm,
     private val accountId: String,
     private val accountSecret: String,
-) : DB {
+) : DB, CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.IO) {
+    private val account get() = Account(accountId, accountSecret)
+
+    private var recurringExpenseWatchingJob: Job? = null
+
+    private val recurringExpensesLoadingStateMutableFlow = MutableStateFlow<RecurringExpenseLoadingState>(RecurringExpenseLoadingState.NotLoaded)
+
+    init {
+        watchAllRecurringExpenses()
+    }
 
     override fun ensureDBCreated() { /* No-op */ }
 
     override suspend fun triggerForceWriteToDisk() { /* No-op */ }
 
+    @OptIn(ExperimentalFlexibleSyncApi::class)
+    private fun watchAllRecurringExpenses() {
+        recurringExpenseWatchingJob?.cancel()
+        recurringExpenseWatchingJob = launch {
+            recurringExpensesLoadingStateMutableFlow.value = RecurringExpenseLoadingState.Loading
+
+            realm.query<RecurringExpenseEntity>(account.generateQuery())
+                .subscribe(mode = WaitForSync.FIRST_TIME, timeout = 5.toDuration(DurationUnit.SECONDS))
+                .asFlow()
+                .catch { e ->
+                    recurringExpensesLoadingStateMutableFlow.value = RecurringExpenseLoadingState.Error(e)
+                }
+                .collect { changes ->
+                    recurringExpensesLoadingStateMutableFlow.value = RecurringExpenseLoadingState.Loaded(changes.list)
+                }
+        }
+    }
+
+    private suspend fun awaitRecurringExpensesLoadOrThrow(): RecurringExpenseLoadingState.Loaded {
+        suspend fun awaitResultsWithTimeout(): RecurringExpenseLoadingState.Loaded {
+            return withTimeout(5.toDuration(DurationUnit.SECONDS)) {
+                recurringExpensesLoadingStateMutableFlow
+                    .filterIsInstance<RecurringExpenseLoadingState.Loaded>()
+                    .first()
+            }
+        }
+
+        suspend fun reloadAndAwaitResultsWithTimeout(): RecurringExpenseLoadingState.Loaded {
+            watchAllRecurringExpenses()
+            return awaitResultsWithTimeout()
+        }
+
+        return when(val state = recurringExpensesLoadingStateMutableFlow.value) {
+            is RecurringExpenseLoadingState.Error ->  reloadAndAwaitResultsWithTimeout()
+            is RecurringExpenseLoadingState.Loaded -> state
+            RecurringExpenseLoadingState.Loading -> awaitResultsWithTimeout()
+            RecurringExpenseLoadingState.NotLoaded -> reloadAndAwaitResultsWithTimeout()
+        }
+    }
+
     override suspend fun persistExpense(expense: Expense): Expense {
-        TODO("Not yet implemented")
+        val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
+
+        if (expense.associatedRecurringExpense != null) {
+            val recurringExpenseEntity = recurringExpenses.firstOrNull { it.id == expense.associatedRecurringExpense.recurringExpense.id }
+                ?: throw IllegalStateException("Unable to persist exception for recurring expense id ${expense.associatedRecurringExpense.recurringExpense.id}, not found")
+
+            recurringExpenseEntity.addExceptionFromExpense(
+                expense = expense,
+                originalOccurrenceDate = expense.associatedRecurringExpense.originalDate
+            )
+
+            return realm.write {
+                copyToRealm(recurringExpenseEntity, updatePolicy = UpdatePolicy.ALL)
+                return@write expense
+            }
+        } else {
+            val entity = ExpenseEntity.fromExpense(expense, account)
+            return realm.write {
+                val persistedExpense = copyToRealm(entity, updatePolicy = UpdatePolicy.ALL)
+                return@write persistedExpense.toExpense(associatedRecurringExpense = null)
+            }
+        }
     }
 
     override suspend fun hasExpenseForDay(dayDate: LocalDate): Boolean {
+        awaitRecurringExpensesLoadOrThrow()
+
         TODO("Not yet implemented")
     }
 
@@ -116,6 +205,13 @@ class OnlineDBImpl(
 
     override suspend fun markAllEntriesAsChecked(beforeDate: LocalDate) {
         TODO("Not yet implemented")
+    }
+
+    private sealed class RecurringExpenseLoadingState {
+        object NotLoaded : RecurringExpenseLoadingState()
+        object Loading : RecurringExpenseLoadingState()
+        data class Loaded(val expenses: List<RecurringExpenseEntity>) : RecurringExpenseLoadingState()
+        class Error(val exception: Throwable) : RecurringExpenseLoadingState()
     }
 
     companion object {

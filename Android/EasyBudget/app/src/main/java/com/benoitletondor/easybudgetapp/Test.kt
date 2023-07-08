@@ -14,40 +14,42 @@ import java.util.TimeZone
 
 
 class Main {
-    data class Expense(val title: String, val amount: Double)
-
     companion object {
-
-
         @JvmStatic fun main(args: Array<String>) {
             val ical = ICalendar()
             val event = VEvent()
             event.addExperimentalProperty("amount", 20020.0.toString())
+            event.addExperimentalProperty("checked", false.toString())
             event.summary = Summary("Coucou")
             event.setDateStart(Date(), false)
             val recur = Recurrence.Builder(Frequency.WEEKLY).interval(2).build()
             event.setRecurrenceRule(recur)
-
-            val exceptionEvent = VEvent()
-            exceptionEvent.dateStart = event.dateStart
-            exceptionEvent.summary = Summary("Exception")
-            exceptionEvent.addExperimentalProperty("amount", 21022.0.toString())
-            exceptionEvent.uid = event.uid
-
-            val recurrenceId = RecurrenceId(event.dateStart.value)
-            exceptionEvent.recurrenceId = recurrenceId
-
             ical.addEvent(event)
-            ical.addEvent(exceptionEvent)
-            println(Biweekly.write(ical).go())
 
-            println(event.recurrenceRule.value.frequency)
-            println(event.recurrenceRule.value.interval)
+            for (i in 0..50000) {
+                val exceptionEvent = VEvent()
+                exceptionEvent.dateStart = event.dateStart
+                exceptionEvent.summary = Summary("Exception: $i")
+                exceptionEvent.addExperimentalProperty("amount", 21022.0.toString())
+                exceptionEvent.addExperimentalProperty("checked", true.toString())
+                exceptionEvent.uid = event.uid
 
-            val expenses = ical.getExpense(LocalDate.now(), LocalDate.now().plusDays(60))
-            for (expense in expenses) {
-                println("title: " + expense.title + " / amount: "+ expense.amount)
+                val recurrenceId = RecurrenceId(event.dateStart.value)
+                exceptionEvent.recurrenceId = recurrenceId
+
+                ical.addEvent(exceptionEvent)
             }
+
+            val now = System.currentTimeMillis()
+            val json = Biweekly.write(ical).go()
+            val after = System.currentTimeMillis()
+            println("Time to write: ${after-now}ms")
+            println("Size: ${json.toByteArray().size / 1000.0} kb")
+
+            val now2 = System.currentTimeMillis()
+            Biweekly.parse(json).all().map { it.events }
+            val after2 = System.currentTimeMillis()
+            println("Time to read: ${after2-now2}ms")
         }
     }
 }

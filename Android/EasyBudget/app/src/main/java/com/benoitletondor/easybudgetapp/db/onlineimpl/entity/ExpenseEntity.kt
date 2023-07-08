@@ -2,6 +2,7 @@ package com.benoitletondor.easybudgetapp.db.onlineimpl.entity
 
 import com.benoitletondor.easybudgetapp.helper.getDBValue
 import com.benoitletondor.easybudgetapp.helper.getRealValueFromDB
+import com.benoitletondor.easybudgetapp.model.AssociatedRecurringExpense
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import io.realm.kotlin.types.RealmObject
@@ -40,7 +41,10 @@ class ExpenseEntity() : RealmObject {
         amount.getRealValueFromDB(),
         LocalDate.ofEpochDay(date),
         checked,
-        associatedRecurringExpense,
+        associatedRecurringExpense?.let { AssociatedRecurringExpense(
+            recurringExpense = it,
+            originalDate = it.recurringDate,
+        ) },
     )
 
     companion object {

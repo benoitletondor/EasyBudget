@@ -24,6 +24,7 @@ import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
+import com.benoitletondor.easybudgetapp.model.AssociatedRecurringExpense
 import kotlinx.coroutines.launch
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.parameters.Parameters
@@ -58,7 +59,7 @@ class RecurringExpenseEditViewModel @Inject constructor(
     val editTypeFlow: Flow<ExpenseEditType> = editTypeMutableStateFlow
 
     val existingExpenseData = editedExpense?.let { expense ->
-        ExistingExpenseData(expense.title, expense.amount, expense.associatedRecurringExpense!!.type)
+        ExistingExpenseData(expense.title, expense.amount, expense.associatedRecurringExpense!!.recurringExpense.type)
     }
 
     private val savingStateMutableStateFlow: MutableStateFlow<SavingState> = MutableStateFlow(SavingState.Idle)
@@ -134,7 +135,7 @@ class RecurringExpenseEditViewModel @Inject constructor(
                         return@withContext true
                     } else {
                         val recurringExpense = try {
-                            val recurringExpense = editedExpense.associatedRecurringExpense!!
+                            val recurringExpense = editedExpense.associatedRecurringExpense!!.recurringExpense
                             db.deleteAllExpenseForRecurringExpenseAfterDate(recurringExpense, editedExpense.date)
                             db.deleteExpense(editedExpense)
 
@@ -180,7 +181,7 @@ class RecurringExpenseEditViewModel @Inject constructor(
                 // Add up to 5 years of expenses
                 for (i in 0 until 365*5) {
                     try {
-                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, expense))
+                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, AssociatedRecurringExpense(expense, expense.recurringDate)))
                     } catch (t: Throwable) {
                         Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false")
                         return false
@@ -193,7 +194,7 @@ class RecurringExpenseEditViewModel @Inject constructor(
                 // Add up to 5 years of expenses
                 for (i in 0 until 12*4*5) {
                     try {
-                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, expense))
+                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, AssociatedRecurringExpense(expense, expense.recurringDate)))
                     } catch (t: Throwable) {
                         Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
                         return false
@@ -206,7 +207,7 @@ class RecurringExpenseEditViewModel @Inject constructor(
                 // Add up to 5 years of expenses
                 for (i in 0 until 12*4*5) {
                     try {
-                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, expense))
+                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, AssociatedRecurringExpense(expense, expense.recurringDate)))
                     } catch (t: Throwable) {
                         Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
                         return false
@@ -219,7 +220,7 @@ class RecurringExpenseEditViewModel @Inject constructor(
                 // Add up to 5 years of expenses
                 for (i in 0 until 12*4*5) {
                     try {
-                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, expense))
+                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, AssociatedRecurringExpense(expense, expense.recurringDate)))
                     } catch (t: Throwable) {
                         Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
                         return false
@@ -232,7 +233,7 @@ class RecurringExpenseEditViewModel @Inject constructor(
                 // Add up to 5 years of expenses
                 for (i in 0 until 12*4*5) {
                     try {
-                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, expense))
+                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, AssociatedRecurringExpense(expense, expense.recurringDate)))
                     } catch (t: Throwable) {
                         Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
                         return false
@@ -245,7 +246,7 @@ class RecurringExpenseEditViewModel @Inject constructor(
                 // Add up to 10 years of expenses
                 for (i in 0 until 12*10) {
                     try {
-                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, expense))
+                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, AssociatedRecurringExpense(expense, expense.recurringDate)))
                     } catch (t: Throwable) {
                         Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
                         return false
@@ -258,7 +259,7 @@ class RecurringExpenseEditViewModel @Inject constructor(
                 // Add up to 25 years of expenses
                 for (i in 0 until 6*25) {
                     try {
-                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, expense))
+                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, AssociatedRecurringExpense(expense, expense.recurringDate)))
                     } catch (t: Throwable) {
                         Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
                         return false
@@ -271,7 +272,7 @@ class RecurringExpenseEditViewModel @Inject constructor(
                 // Add up to 25 years of expenses
                 for (i in 0 until 4*25) {
                     try {
-                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, expense))
+                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, AssociatedRecurringExpense(expense, expense.recurringDate)))
                     } catch (t: Throwable) {
                         Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
                         return false
@@ -284,7 +285,7 @@ class RecurringExpenseEditViewModel @Inject constructor(
                 // Add up to 25 years of expenses
                 for (i in 0 until 2*25) {
                     try {
-                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, expense))
+                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, AssociatedRecurringExpense(expense, expense.recurringDate)))
                     } catch (t: Throwable) {
                         Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
                         return false
@@ -297,7 +298,7 @@ class RecurringExpenseEditViewModel @Inject constructor(
                 // Add up to 100 years of expenses
                 for (i in 0 until 100) {
                     try {
-                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, expense))
+                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, AssociatedRecurringExpense(expense, expense.recurringDate)))
                     } catch (t: Throwable) {
                         Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false")
                         return false
