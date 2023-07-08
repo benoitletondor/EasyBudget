@@ -50,12 +50,12 @@ class ExpenseEntity() : RealmObject {
     companion object {
         fun fromExpense(expense: Expense, account: Account): ExpenseEntity {
             return ExpenseEntity(
-                expense.id,
-                expense.title,
-                expense.amount.getDBValue(),
-                expense.date.toEpochDay(),
-                expense.checked,
-                account,
+                id = expense.id,
+                title = expense.title,
+                amount = expense.amount.getDBValue(),
+                date = expense.date.toEpochDay(),
+                checked = expense.checked,
+                account = account,
             )
         }
     }

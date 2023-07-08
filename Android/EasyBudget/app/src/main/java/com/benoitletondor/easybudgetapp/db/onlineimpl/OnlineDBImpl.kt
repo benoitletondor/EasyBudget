@@ -5,6 +5,7 @@ import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.db.onlineimpl.entity.Account
 import com.benoitletondor.easybudgetapp.db.onlineimpl.entity.ExpenseEntity
 import com.benoitletondor.easybudgetapp.db.onlineimpl.entity.RecurringExpenseEntity
+import com.benoitletondor.easybudgetapp.helper.getRealValueFromDB
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import io.realm.kotlin.Realm
@@ -12,10 +13,8 @@ import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.mongodb.App
 import io.realm.kotlin.mongodb.Credentials
-import io.realm.kotlin.mongodb.annotations.ExperimentalFlexibleSyncApi
-import io.realm.kotlin.mongodb.ext.subscribe
+import io.realm.kotlin.mongodb.subscriptions
 import io.realm.kotlin.mongodb.sync.SyncConfiguration
-import io.realm.kotlin.mongodb.sync.WaitForSync
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -27,18 +26,17 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import java.time.LocalDate
+import java.util.concurrent.TimeoutException
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 class OnlineDBImpl(
     private val realm: Realm,
-    private val accountId: String,
-    private val accountSecret: String,
+    private val account: Account,
 ) : DB, CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.IO) {
-    private val account get() = Account(accountId, accountSecret)
-
     private var recurringExpenseWatchingJob: Job? = null
 
+    private val syncSessionState = MutableStateFlow<SyncSessionState>(SyncSessionState.NotStarted)
     private val recurringExpensesLoadingStateMutableFlow = MutableStateFlow<RecurringExpenseLoadingState>(RecurringExpenseLoadingState.NotLoaded)
 
     init {
@@ -49,14 +47,35 @@ class OnlineDBImpl(
 
     override suspend fun triggerForceWriteToDisk() { /* No-op */ }
 
-    @OptIn(ExperimentalFlexibleSyncApi::class)
+    private suspend fun awaitSyncDone() {
+        if (syncSessionState.value is SyncSessionState.Done) {
+            return
+        }
+
+        if (syncSessionState.value is SyncSessionState.Started) {
+            syncSessionState.first { it is SyncSessionState.Done || it is SyncSessionState.Error }
+            return
+        }
+
+        syncSessionState.value = SyncSessionState.Started
+
+        if (!realm.subscriptions.waitForSynchronization(timeout = 10.toDuration(DurationUnit.SECONDS)) ) {
+            syncSessionState.value = SyncSessionState.Error(
+                realm.subscriptions.errorMessage?.let { TimeoutException(it) } ?: TimeoutException("Unknown error")
+            )
+        } else {
+            syncSessionState.value = SyncSessionState.Done
+        }
+    }
+
     private fun watchAllRecurringExpenses() {
         recurringExpenseWatchingJob?.cancel()
         recurringExpenseWatchingJob = launch {
             recurringExpensesLoadingStateMutableFlow.value = RecurringExpenseLoadingState.Loading
 
+            awaitSyncDone()
+
             realm.query<RecurringExpenseEntity>(account.generateQuery())
-                .subscribe(mode = WaitForSync.FIRST_TIME, timeout = 5.toDuration(DurationUnit.SECONDS))
                 .asFlow()
                 .catch { e ->
                     recurringExpensesLoadingStateMutableFlow.value = RecurringExpenseLoadingState.Error(e)
@@ -69,7 +88,7 @@ class OnlineDBImpl(
 
     private suspend fun awaitRecurringExpensesLoadOrThrow(): RecurringExpenseLoadingState.Loaded {
         suspend fun awaitResultsWithTimeout(): RecurringExpenseLoadingState.Loaded {
-            return withTimeout(5.toDuration(DurationUnit.SECONDS)) {
+            return withTimeout(readWriteTimeout) {
                 recurringExpensesLoadingStateMutableFlow
                     .filterIsInstance<RecurringExpenseLoadingState.Loaded>()
                     .first()
@@ -115,41 +134,159 @@ class OnlineDBImpl(
     }
 
     override suspend fun hasExpenseForDay(dayDate: LocalDate): Boolean {
-        awaitRecurringExpensesLoadOrThrow()
+        val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
 
-        TODO("Not yet implemented")
+        val recurringExpensesOfTheDay = recurringExpenses
+            .map { it.generateExpenses(dayDate, dayDate) }
+            .flatten()
+            .firstOrNull()
+
+        if (recurringExpensesOfTheDay != null) {
+            return true;
+        }
+
+        val expenses = realm.query<ExpenseEntity>("${account.generateQuery()} AND ${generateQueryForDateRange(dayDate, dayDate)}")
+            .limit(1)
+            .count()
+            .asFlow()
+            .first()
+
+        return expenses > 0
     }
 
     override suspend fun hasUncheckedExpenseForDay(dayDate: LocalDate): Boolean {
-        TODO("Not yet implemented")
+        val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
+
+        val recurringExpensesOfTheDayChecked = recurringExpenses
+            .map { it.generateExpenses(dayDate, dayDate) }
+            .flatten()
+            .firstOrNull { it.checked }
+
+        if (recurringExpensesOfTheDayChecked != null) {
+            return true;
+        }
+
+        val expenses = realm.query<ExpenseEntity>("${account.generateQuery()} AND ${generateQueryForDateRange(dayDate, dayDate)} AND checked = true")
+            .limit(1)
+            .count()
+            .asFlow()
+            .first()
+
+        return expenses > 0
     }
 
     override suspend fun getExpensesForDay(dayDate: LocalDate): List<Expense> {
-        TODO("Not yet implemented")
+        val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
+
+        val recurringExpensesOfTheDay = recurringExpenses
+            .map { it.generateExpenses(dayDate, dayDate) }
+            .flatten()
+
+        val expenses = realm.query<ExpenseEntity>("${account.generateQuery()} AND ${generateQueryForDateRange(dayDate, dayDate)}")
+            .asFlow()
+            .first()
+            .list
+            .map { it.toExpense(associatedRecurringExpense = null) }
+
+        return recurringExpensesOfTheDay + expenses
     }
 
     override suspend fun getExpensesForMonth(monthStartDate: LocalDate): List<Expense> {
-        TODO("Not yet implemented")
+        val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
+        val monthEndDate = monthStartDate.plusMonths(1).minusDays(1)
+
+        val recurringExpensesOfTheDay = recurringExpenses
+            .map { it.generateExpenses(monthStartDate, monthEndDate) }
+            .flatten()
+
+        val expenses = realm.query<ExpenseEntity>("${account.generateQuery()} AND ${generateQueryForDateRange(monthStartDate, monthEndDate)}")
+            .asFlow()
+            .first()
+            .list
+            .map { it.toExpense(associatedRecurringExpense = null) }
+
+        return recurringExpensesOfTheDay + expenses
     }
 
     override suspend fun getBalanceForDay(dayDate: LocalDate): Double {
-        TODO("Not yet implemented")
+        val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
+
+        val sumOfRecurringExpenseUpToTheDay = recurringExpenses
+            .map { it.generateExpenses(LocalDate.MIN, dayDate) }
+            .flatten()
+            .map { it.amount }
+            .reduce { acc, expenseAmount -> acc + expenseAmount }
+
+        val expensesSumUpToTheDay = realm.query<ExpenseEntity>("${account.generateQuery()} AND date <= ${dayDate.toEpochDay()}")
+            .sum("amount", Long::class)
+            .asFlow()
+            .first()
+            .let { it.getRealValueFromDB() }
+
+        return sumOfRecurringExpenseUpToTheDay + expensesSumUpToTheDay
     }
 
     override suspend fun getCheckedBalanceForDay(dayDate: LocalDate): Double {
-        TODO("Not yet implemented")
+        val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
+
+        val sumOfRecurringCheckedExpenseUpToTheDay = recurringExpenses
+            .map { it.generateExpenses(LocalDate.MIN, dayDate) }
+            .flatten()
+            .filter { it.checked }
+            .map { it.amount }
+            .reduce { acc, expenseAmount -> acc + expenseAmount }
+
+        val checkedExpensesSumUpToTheDay = realm.query<ExpenseEntity>("${account.generateQuery()} AND date <= ${dayDate.toEpochDay()} AND checked = true")
+            .sum("amount", Long::class)
+            .asFlow()
+            .first()
+            .let { it.getRealValueFromDB() }
+
+        return sumOfRecurringCheckedExpenseUpToTheDay + checkedExpensesSumUpToTheDay
     }
 
     override suspend fun persistRecurringExpense(recurringExpense: RecurringExpense): RecurringExpense {
-        TODO("Not yet implemented")
+        awaitRecurringExpensesLoadOrThrow()
+
+        val entity = RecurringExpenseEntity.newFromRecurringExpense(recurringExpense, account)
+
+        return realm.write {
+            val persistedEntity = copyToRealm(entity, updatePolicy = UpdatePolicy.ALL)
+            return@write recurringExpense.copy(
+                id = persistedEntity.id,
+            )
+        }
     }
 
     override suspend fun deleteRecurringExpense(recurringExpense: RecurringExpense) {
-        TODO("Not yet implemented")
+        val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
+
+        val id = recurringExpense.id ?: throw IllegalStateException("Deleting recurring expense without id")
+        val entity = recurringExpenses.firstOrNull { it.id == id } ?: throw IllegalStateException("Deleting recurring expense but can't find it for id: $id")
+
+        realm.write {
+            delete(entity)
+        }
     }
 
     override suspend fun deleteExpense(expense: Expense) {
-        TODO("Not yet implemented")
+        val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
+        val expenseId = expense.id ?: throw IllegalStateException("Try to delete an expense without id")
+
+        if (expense.associatedRecurringExpense != null) {
+            val recurringExpenseId = expense.associatedRecurringExpense.recurringExpense.id ?: throw IllegalStateException("Deleting recurring expense occurrence without id")
+            val entity = recurringExpenses.firstOrNull { it.id == recurringExpenseId } ?: throw IllegalStateException("Deleting recurring expense occurrence but can't find it for id: $recurringExpenseId")
+            entity.deleteOccurrence(expense.associatedRecurringExpense.originalDate)
+
+            realm.write {
+                copyToRealm(entity, UpdatePolicy.ALL)
+            }
+        } else {
+            realm.write {
+                val expenseEntity: ExpenseEntity = query<ExpenseEntity>("id = $expenseId").find().first()
+                delete(expenseEntity)
+            }
+        }
     }
 
     override suspend fun deleteAllExpenseForRecurringExpense(recurringExpense: RecurringExpense) {
@@ -207,6 +344,16 @@ class OnlineDBImpl(
         TODO("Not yet implemented")
     }
 
+    private fun generateQueryForDateRange(from: LocalDate, to: LocalDate): String
+        = "date >= ${from.toEpochDay()} AND date <= ${to.toEpochDay()}"
+
+    private sealed class SyncSessionState {
+        object NotStarted : SyncSessionState()
+        object Started : SyncSessionState()
+        object Done : SyncSessionState()
+        class Error(val exception: Throwable) : SyncSessionState()
+    }
+
     private sealed class RecurringExpenseLoadingState {
         object NotLoaded : RecurringExpenseLoadingState()
         object Loading : RecurringExpenseLoadingState()
@@ -215,6 +362,8 @@ class OnlineDBImpl(
     }
 
     companion object {
+        private val readWriteTimeout = 5.toDuration(DurationUnit.SECONDS)
+
         suspend fun provideFor(
             atlasAppId: String,
             currentUser: CurrentUser,
@@ -223,17 +372,27 @@ class OnlineDBImpl(
         ): OnlineDBImpl {
             val app = App.create(atlasAppId)
             val user = app.login(Credentials.jwt(currentUser.token))
+            val account = Account(accountId, accountSecret)
+
             val realm = Realm.open(
                 SyncConfiguration.Builder(
                     user = user,
                     schema = setOf(ExpenseEntity::class, RecurringExpenseEntity::class, Account::class),
-                ).build()
+                ).initialSubscriptions { realm ->
+                    add(
+                        query = realm.query<ExpenseEntity>(account.generateQuery()),
+                        name = "${currentUser.email}:${account.id}:expenses",
+                    )
+                    add(
+                        query = realm.query<RecurringExpenseEntity>(account.generateQuery()),
+                        name = "${currentUser.email}:${account.id}:recurring",
+                    )
+                }.build()
             )
 
             return OnlineDBImpl(
                 realm,
-                accountId,
-                accountSecret,
+                account,
             )
         }
     }

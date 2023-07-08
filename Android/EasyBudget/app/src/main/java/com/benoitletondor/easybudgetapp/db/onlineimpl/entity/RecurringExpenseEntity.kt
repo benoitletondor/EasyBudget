@@ -6,11 +6,13 @@ import biweekly.ICalendar
 import biweekly.component.VEvent
 import biweekly.property.DateStart
 import biweekly.property.RecurrenceId
+import biweekly.property.Status
 import biweekly.property.Summary
 import biweekly.util.ICalDate
 import com.benoitletondor.easybudgetapp.helper.getDBValue
 import com.benoitletondor.easybudgetapp.helper.getRealValueFromDB
 import com.benoitletondor.easybudgetapp.helper.localDateFromTimestamp
+import com.benoitletondor.easybudgetapp.helper.toRecurrence
 import com.benoitletondor.easybudgetapp.helper.toRecurringExpenseType
 import com.benoitletondor.easybudgetapp.helper.toStartOfDayDate
 import com.benoitletondor.easybudgetapp.model.AssociatedRecurringExpense
@@ -74,11 +76,29 @@ class RecurringExpenseEntity() : RealmObject {
             val exceptionEvent = VEvent()
             exceptionEvent.dateStart = DateStart(expense.date.toStartOfDayDate(), false)
             exceptionEvent.summary = Summary(expense.title)
+            exceptionEvent.status = Status.accepted()
             exceptionEvent.addExperimentalProperty(AMOUNT_KEY, expense.amount.getDBValue().toString())
             exceptionEvent.addExperimentalProperty(CHECKED_KEY, expense.checked.toString())
             exceptionEvent.uid = cal.events.first().uid
 
             val recurrenceId = RecurrenceId(ICalDate(originalOccurrenceDate.toStartOfDayDate(), false))
+            exceptionEvent.recurrenceId = recurrenceId
+
+            cal.addEvent(exceptionEvent)
+
+            iCalRepresentation = cal.write()
+        }
+    }
+
+    suspend fun deleteOccurrence(occurrenceDate: LocalDate) {
+        withContext(Dispatchers.IO) {
+            val cal = getCal()
+
+            val exceptionEvent = VEvent()
+            exceptionEvent.dateStart = DateStart(occurrenceDate.toStartOfDayDate(), false)
+            exceptionEvent.uid = cal.events.first().uid
+            exceptionEvent.status = Status.cancelled()
+            val recurrenceId = RecurrenceId(ICalDate(occurrenceDate.toStartOfDayDate(), false))
             exceptionEvent.recurrenceId = recurrenceId
 
             cal.addEvent(exceptionEvent)
@@ -93,41 +113,38 @@ class RecurringExpenseEntity() : RealmObject {
         val startDate = from.toStartOfDayDate()
         val endDate = to.toStartOfDayDate()
 
-        val exceptions: MutableMap<String, MutableMap<Date, VEvent>> = mutableMapOf()
-        val recurrentEvents: MutableMap<String, VEvent> = mutableMapOf()
+        val exceptions: MutableMap<Date, VEvent> = mutableMapOf()
+        val recurrentEvent = events.first()
 
         for (event in events) {
             val recurrenceId = event.recurrenceId
             if (recurrenceId != null) {
                 // This is an exception event, store it in the map.
-                exceptions.computeIfAbsent(event.uid.value) { HashMap() }[recurrenceId.value] = event
-            } else if (event.recurrenceRule != null) {
-                // This is a recurrent event
-                recurrentEvents[event.uid.value] = event
+                exceptions[recurrenceId.value] = event
             }
         }
 
         val eventsInRange = mutableListOf<Pair<VEvent, Date>>()
-        for (event in recurrentEvents.values) {
-            val eventDateIterator = event.getDateIterator(TimeZone.getDefault())
-            eventDateIterator.advanceTo(startDate)
+        val eventDateIterator = recurrentEvent.getDateIterator(TimeZone.getDefault())
+        eventDateIterator.advanceTo(startDate)
 
-            while (eventDateIterator.hasNext()) {
-                val eventOccurrenceDate = eventDateIterator.next()
-                if (eventOccurrenceDate.after(endDate)) {
-                    break
-                }
+        while (eventDateIterator.hasNext()) {
+            val eventOccurrenceDate = eventDateIterator.next()
+            if (eventOccurrenceDate.after(endDate)) {
+                break
+            }
 
-                if (!eventOccurrenceDate.before(startDate) && !eventOccurrenceDate.after(endDate)) {
-                    // Check if there is an exception for this instance
-                    val eventException = exceptions[event.uid.value]?.get(eventOccurrenceDate)
-                    if (eventException != null) {
-                        // This instance has been replaced by an exception
+            if (!eventOccurrenceDate.before(startDate) && !eventOccurrenceDate.after(endDate)) {
+                // Check if there is an exception for this instance
+                val eventException = exceptions[eventOccurrenceDate]
+                if (eventException != null) {
+                    if (eventException.status != Status.cancelled()) {
+                        // This instance has been replaced by an exception and isn't cancelled
                         eventsInRange.add(Pair(eventException, eventOccurrenceDate))
-                    } else {
-                        // No exception for this instance, use the original event
-                        eventsInRange.add(Pair(event, eventOccurrenceDate))
                     }
+                } else {
+                    // No exception for this instance, use the original event
+                    eventsInRange.add(Pair(recurrentEvent, eventOccurrenceDate))
                 }
             }
         }
@@ -146,5 +163,25 @@ class RecurringExpenseEntity() : RealmObject {
                     ),
                 )
             }
+    }
+
+    companion object {
+        fun newFromRecurringExpense(recurringExpense: RecurringExpense, account: Account): RecurringExpenseEntity {
+            val cal = ICalendar()
+            val event = VEvent()
+
+            event.summary.value = recurringExpense.title
+            event.addExperimentalProperty(AMOUNT_KEY, recurringExpense.amount.getDBValue().toString())
+            event.addExperimentalProperty(CHECKED_KEY, false.toString())
+            event.status = Status.accepted()
+            event.dateStart.value = ICalDate(recurringExpense.recurringDate.toStartOfDayDate(), false)
+            event.recurrenceRule.value = recurringExpense.type.toRecurrence()
+            cal.addEvent(event)
+
+            return RecurringExpenseEntity(
+                representation = cal.write(),
+                account = account,
+            )
+        }
     }
 }
