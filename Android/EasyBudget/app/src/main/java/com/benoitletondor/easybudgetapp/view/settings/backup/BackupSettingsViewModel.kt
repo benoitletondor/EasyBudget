@@ -19,7 +19,6 @@ package com.benoitletondor.easybudgetapp.view.settings.backup
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.ListenableWorker
@@ -93,8 +92,7 @@ class BackupSettingsViewModel @Inject constructor(
                                 }
                             }
                         } catch (e: Throwable) {
-                            Log.e(
-                                "BackupSettingsViewModel",
+                            Logger.error(
                                 "Error getting last backup date",
                                 e
                             )
@@ -217,7 +215,7 @@ class BackupSettingsViewModel @Inject constructor(
                     }
                 }
             } catch (error: Throwable) {
-                Log.e("BackupSettingsViewModel", "Error while backup now", error)
+                Logger.error("Error while backup now", error)
                 backupNowErrorEventMutableFlow.emit(error)
             } finally {
                 backupInProgress = false
@@ -263,7 +261,7 @@ class BackupSettingsViewModel @Inject constructor(
                     parameters.saveLastBackupDate(null)
                 }
             } catch (error: Throwable) {
-                Log.e("BackupSettingsViewModel", "Error while deleting backup", error)
+                Logger.error("Error while deleting backup", error)
                 backupDeletionErrorEventMutableFlow.emit(error)
             } finally {
                 deletionInProgress = false
@@ -300,7 +298,7 @@ class BackupSettingsViewModel @Inject constructor(
 
                 appRestartEventMutableFlow.emit(Unit)
             } catch (error: Throwable) {
-                Log.e("BackupSettingsViewModel", "Error while restoring", error)
+                Logger.error("Error while restoring", error)
                 restorationErrorEventMutableFlow.emit(error)
             } finally {
                 restorationInProgress = false

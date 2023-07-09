@@ -427,6 +427,10 @@ class OnlineDBImpl(
         }
     }
 
+    override fun close() {
+        realm.close()
+    }
+
     private fun generateQueryForDateRange(from: LocalDate, to: LocalDate): String
         = "date >= ${from.toEpochDay()} AND date <= ${to.toEpochDay()}"
 

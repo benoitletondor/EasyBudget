@@ -14,11 +14,13 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp.db.impl
+package com.benoitletondor.easybudgetapp.db.cacheimpl
 
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.db.DB
+import com.benoitletondor.easybudgetapp.db.RestoreAction
+import com.benoitletondor.easybudgetapp.db.restoreAction
 import com.benoitletondor.easybudgetapp.helper.Logger
 import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
@@ -127,42 +129,49 @@ class CachedDBImpl(private val wrappedDB: DB,
     override suspend fun persistRecurringExpense(recurringExpense: RecurringExpense): RecurringExpense
         = wrappedDB.persistRecurringExpense(recurringExpense)
 
-    override suspend fun deleteRecurringExpense(recurringExpense: RecurringExpense) {
-        wrappedDB.deleteRecurringExpense(recurringExpense)
-    }
-
-    override suspend fun deleteExpense(expense: Expense) {
-        wrappedDB.deleteExpense(expense)
+    override suspend fun deleteRecurringExpense(recurringExpense: RecurringExpense): RestoreAction {
+        val dbRestoreAction = wrappedDB.deleteRecurringExpense(recurringExpense)
 
         wipeCache()
+
+        return restoreAction {
+            dbRestoreAction.restore()
+            wipeCache()
+        }
     }
 
-    override suspend fun deleteAllExpenseForRecurringExpense(recurringExpense: RecurringExpense) {
-        wrappedDB.deleteAllExpenseForRecurringExpense(recurringExpense)
+    override suspend fun deleteExpense(expense: Expense): RestoreAction {
+        val dbRestoreAction = wrappedDB.deleteExpense(expense)
 
         wipeCache()
+
+        return restoreAction {
+            dbRestoreAction.restore()
+            wipeCache()
+        }
     }
 
-    override suspend fun getAllExpenseForRecurringExpense(recurringExpense: RecurringExpense): List<Expense>
-        = wrappedDB.getAllExpenseForRecurringExpense(recurringExpense)
-
-    override suspend fun deleteAllExpenseForRecurringExpenseAfterDate(recurringExpense: RecurringExpense, afterDate: LocalDate) {
-        wrappedDB.deleteAllExpenseForRecurringExpenseAfterDate(recurringExpense, afterDate)
+    override suspend fun deleteAllExpenseForRecurringExpenseAfterDate(recurringExpense: RecurringExpense, afterDate: LocalDate): RestoreAction {
+        val dbRestoreAction = wrappedDB.deleteAllExpenseForRecurringExpenseAfterDate(recurringExpense, afterDate)
 
         wipeCache()
+
+        return restoreAction {
+            dbRestoreAction.restore()
+            wipeCache()
+        }
     }
 
-    override suspend fun getAllExpensesForRecurringExpenseAfterDate(recurringExpense: RecurringExpense, afterDate: LocalDate): List<Expense>
-        = wrappedDB.getAllExpensesForRecurringExpenseAfterDate(recurringExpense, afterDate)
-
-    override suspend fun deleteAllExpenseForRecurringExpenseBeforeDate(recurringExpense: RecurringExpense, beforeDate: LocalDate) {
-        wrappedDB.deleteAllExpenseForRecurringExpenseBeforeDate(recurringExpense, beforeDate)
+    override suspend fun deleteAllExpenseForRecurringExpenseBeforeDate(recurringExpense: RecurringExpense, beforeDate: LocalDate): RestoreAction {
+        val dbRestoreAction = wrappedDB.deleteAllExpenseForRecurringExpenseBeforeDate(recurringExpense, beforeDate)
 
         wipeCache()
-    }
 
-    override suspend fun getAllExpensesForRecurringExpenseBeforeDate(recurringExpense: RecurringExpense, beforeDate: LocalDate): List<Expense>
-        = wrappedDB.getAllExpensesForRecurringExpenseBeforeDate(recurringExpense, beforeDate)
+        return restoreAction {
+            dbRestoreAction.restore()
+            wipeCache()
+        }
+    }
 
     override suspend fun hasExpensesForRecurringExpenseBeforeDate(recurringExpense: RecurringExpense, beforeDate: LocalDate): Boolean
         = wrappedDB.hasExpensesForRecurringExpenseBeforeDate(recurringExpense, beforeDate)
@@ -176,6 +185,11 @@ class CachedDBImpl(private val wrappedDB: DB,
     override suspend fun markAllEntriesAsChecked(beforeDate: LocalDate) {
         wrappedDB.markAllEntriesAsChecked(beforeDate)
 
+        wipeCache()
+    }
+
+    override fun close() {
+        wrappedDB.close()
         wipeCache()
     }
 

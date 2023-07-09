@@ -17,9 +17,9 @@
 package com.benoitletondor.easybudgetapp.view.premium
 
 import android.app.Activity
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.iab.PremiumPurchaseFlowResult
@@ -51,7 +51,7 @@ class PremiumViewModel @Inject constructor(private val iab: Iab) : ViewModel() {
                     premiumFlowStatusMutableFlow.value = PremiumFlowStatus.DONE
                 }
                 is PremiumPurchaseFlowResult.Error -> {
-                    Log.e("PremiumViewModel", "Error while launching premium purchase flow: ${result.reason}")
+                    Logger.error("Error while launching premium purchase flow: ${result.reason}")
                     premiumFlowErrorEventMutableFlow.emit(result)
                     premiumFlowStatusMutableFlow.value = PremiumFlowStatus.NOT_STARTED
                 }

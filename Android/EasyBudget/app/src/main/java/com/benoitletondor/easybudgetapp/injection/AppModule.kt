@@ -28,8 +28,8 @@ import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.iab.IabImpl
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.db.DB
-import com.benoitletondor.easybudgetapp.db.impl.CachedDBImpl
-import com.benoitletondor.easybudgetapp.db.impl.CacheDBStorage
+import com.benoitletondor.easybudgetapp.db.cacheimpl.CachedDBImpl
+import com.benoitletondor.easybudgetapp.db.cacheimpl.CacheDBStorage
 import com.benoitletondor.easybudgetapp.db.impl.DBImpl
 import com.benoitletondor.easybudgetapp.db.impl.RoomDB
 import com.google.firebase.firestore.ktx.firestore

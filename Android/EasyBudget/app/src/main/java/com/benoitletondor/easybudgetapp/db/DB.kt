@@ -18,9 +18,10 @@ package com.benoitletondor.easybudgetapp.db
 
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
+import java.io.Closeable
 import java.time.LocalDate
 
-interface DB {
+interface DB : Closeable {
     fun ensureDBCreated()
     suspend fun triggerForceWriteToDisk()
 

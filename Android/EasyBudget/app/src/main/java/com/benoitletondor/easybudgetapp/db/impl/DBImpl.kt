@@ -176,6 +176,10 @@ class DBImpl(private val roomDB: RoomDB) : DB {
         roomDB.expenseDao().markAllEntriesAsChecked(beforeDate)
     }
 
+    override fun close() {
+        roomDB.close()
+    }
+
 }
 
 private suspend fun List<ExpenseEntity>.toExpenses(db: DB): List<Expense> {

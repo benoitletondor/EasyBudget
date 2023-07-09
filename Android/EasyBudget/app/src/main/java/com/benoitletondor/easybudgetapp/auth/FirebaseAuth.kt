@@ -18,7 +18,6 @@ package com.benoitletondor.easybudgetapp.auth
 
 import android.app.Activity
 import android.content.Intent
-import android.util.Log
 import com.benoitletondor.easybudgetapp.helper.Logger
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
@@ -102,7 +101,7 @@ class FirebaseAuth(
                 val token = firebaseUser.getIdToken(false).await().token!!
                 AuthState.Authenticated(firebaseUser.toCurrentUser(token))
             } catch (e: Exception) {
-                Log.e("Auth", "Error while getting firebase token", e)
+                Logger.error("Error while getting firebase token", e)
                 AuthState.NotAuthenticated
             }
         }
