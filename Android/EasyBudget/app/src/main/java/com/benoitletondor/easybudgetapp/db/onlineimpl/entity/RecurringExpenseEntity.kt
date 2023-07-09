@@ -1,15 +1,17 @@
 package com.benoitletondor.easybudgetapp.db.onlineimpl.entity
 
-import androidx.room.PrimaryKey
 import biweekly.Biweekly
 import biweekly.ICalendar
 import biweekly.component.VEvent
 import biweekly.property.DateEnd
 import biweekly.property.DateStart
+import biweekly.property.ProductId
 import biweekly.property.RecurrenceId
+import biweekly.property.RecurrenceRule
 import biweekly.property.Status
 import biweekly.property.Summary
 import biweekly.util.ICalDate
+import com.benoitletondor.easybudgetapp.db.onlineimpl.Account
 import com.benoitletondor.easybudgetapp.helper.getDBValue
 import com.benoitletondor.easybudgetapp.helper.getRealValueFromDB
 import com.benoitletondor.easybudgetapp.helper.localDateFromTimestamp
@@ -20,6 +22,7 @@ import com.benoitletondor.easybudgetapp.model.AssociatedRecurringExpense
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.security.SecureRandom
@@ -32,16 +35,20 @@ private const val CHECKED_KEY = "checked"
 
 class RecurringExpenseEntity() : RealmObject {
     @PrimaryKey
-    var id: Long = SecureRandom().nextLong()
+    var _id: Long = SecureRandom().nextLong()
     var iCalRepresentation: String = ""
-    var account: Account? = null
+    var accountId: String = ""
+    var accountSecret: String = ""
 
     constructor(
+        id: Long?,
         representation: String,
         account: Account,
     ) : this() {
+        this._id = id ?: SecureRandom().nextLong()
         this.iCalRepresentation = representation
-        this.account = account
+        this.accountId = account.id
+        this.accountSecret = account.secret
     }
 
     suspend fun toRecurringExpense(): RecurringExpense {
@@ -54,7 +61,7 @@ class RecurringExpenseEntity() : RealmObject {
             val recurrenceExpenseType = event.recurrenceRule.value.toRecurringExpenseType()
 
             return@withContext RecurringExpense(
-                id,
+                _id,
                 title,
                 originalAmount.getRealValueFromDB(),
                 startDate,
@@ -172,7 +179,11 @@ class RecurringExpenseEntity() : RealmObject {
         }
     }
 
-    private suspend fun getCal(): ICalendar = Biweekly.parse(iCalRepresentation).first()
+    private suspend fun getCal(): ICalendar = Biweekly.parse(iCalRepresentation)
+        .first()
+        .apply {
+            setProductId(null as String?)
+        }
 
     private suspend fun ICalendar.getExpenses(from: LocalDate, to: LocalDate, recurringExpense: RecurringExpense): List<Expense> {
         val startDate = from.toStartOfDayDate()
@@ -232,18 +243,19 @@ class RecurringExpenseEntity() : RealmObject {
 
     companion object {
         fun newFromRecurringExpense(recurringExpense: RecurringExpense, account: Account): RecurringExpenseEntity {
-            val cal = ICalendar()
+            val cal = ICalendar().apply { setProductId(null as String?) }
             val event = VEvent()
 
-            event.summary.value = recurringExpense.title
+            event.summary = Summary(recurringExpense.title)
             event.addExperimentalProperty(AMOUNT_KEY, recurringExpense.amount.getDBValue().toString())
             event.addExperimentalProperty(CHECKED_KEY, false.toString())
             event.status = Status.accepted()
-            event.dateStart.value = ICalDate(recurringExpense.recurringDate.toStartOfDayDate(), false)
-            event.recurrenceRule.value = recurringExpense.type.toRecurrence()
+            event.dateStart = DateStart(recurringExpense.recurringDate.toStartOfDayDate(), false)
+            event.recurrenceRule = RecurrenceRule(recurringExpense.type.toRecurrence())
             cal.addEvent(event)
 
             return RecurringExpenseEntity(
+                id = recurringExpense.id,
                 representation = cal.write(),
                 account = account,
             )

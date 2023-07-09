@@ -1,12 +1,13 @@
 package com.benoitletondor.easybudgetapp.db.onlineimpl
 
+import com.benoitletondor.easybudgetapp.BuildConfig
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.db.RestoreAction
-import com.benoitletondor.easybudgetapp.db.onlineimpl.entity.Account
 import com.benoitletondor.easybudgetapp.db.onlineimpl.entity.ExpenseEntity
 import com.benoitletondor.easybudgetapp.db.onlineimpl.entity.RecurringExpenseEntity
 import com.benoitletondor.easybudgetapp.db.restoreAction
+import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.helper.getRealValueFromDB
 import com.benoitletondor.easybudgetapp.helper.toStartOfDayDate
 import com.benoitletondor.easybudgetapp.model.Expense
@@ -14,8 +15,11 @@ import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.log.LogLevel
+import io.realm.kotlin.log.RealmLogger
 import io.realm.kotlin.mongodb.App
 import io.realm.kotlin.mongodb.Credentials
+import io.realm.kotlin.mongodb.ext.insert
 import io.realm.kotlin.mongodb.subscriptions
 import io.realm.kotlin.mongodb.sync.SyncConfiguration
 import kotlinx.coroutines.CoroutineScope
@@ -115,7 +119,7 @@ class OnlineDBImpl(
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
 
         if (expense.associatedRecurringExpense != null) {
-            val recurringExpenseEntity = recurringExpenses.firstOrNull { it.id == expense.associatedRecurringExpense.recurringExpense.id }
+            val recurringExpenseEntity = recurringExpenses.firstOrNull { it._id == expense.associatedRecurringExpense.recurringExpense.id }
                 ?: throw IllegalStateException("Unable to persist exception for recurring expense id ${expense.associatedRecurringExpense.recurringExpense.id}, not found")
 
             recurringExpenseEntity.addExceptionFromExpense(
@@ -128,8 +132,9 @@ class OnlineDBImpl(
                 return@write expense
             }
         } else {
-            val entity = ExpenseEntity.fromExpense(expense, account)
             return realm.write {
+                val entity = ExpenseEntity.fromExpense(expense, account)
+
                 val persistedExpense = copyToRealm(entity, updatePolicy = UpdatePolicy.ALL)
                 return@write persistedExpense.toExpense(associatedRecurringExpense = null)
             }
@@ -148,7 +153,7 @@ class OnlineDBImpl(
             return true
         }
 
-        val expenses = realm.query<ExpenseEntity>("${account.generateQuery()} AND ${generateQueryForDateRange(dayDate, dayDate)}")
+        val expenses = realm.query<ExpenseEntity>("${account.generateQuery()} AND ${generateQueryForDay(dayDate)}")
             .limit(1)
             .count()
             .asFlow()
@@ -169,7 +174,7 @@ class OnlineDBImpl(
             return true
         }
 
-        val expenses = realm.query<ExpenseEntity>("${account.generateQuery()} AND ${generateQueryForDateRange(dayDate, dayDate)} AND checked = true")
+        val expenses = realm.query<ExpenseEntity>("${account.generateQuery()} AND ${generateQueryForDay(dayDate)} AND checked == true")
             .limit(1)
             .count()
             .asFlow()
@@ -185,7 +190,7 @@ class OnlineDBImpl(
             .map { it.generateExpenses(dayDate, dayDate) }
             .flatten()
 
-        val expenses = realm.query<ExpenseEntity>("${account.generateQuery()} AND ${generateQueryForDateRange(dayDate, dayDate)}")
+        val expenses = realm.query<ExpenseEntity>("${account.generateQuery()} AND ${generateQueryForDay(dayDate)}")
             .asFlow()
             .first()
             .list
@@ -239,7 +244,7 @@ class OnlineDBImpl(
             .map { it.amount }
             .reduce { acc, expenseAmount -> acc + expenseAmount }
 
-        val checkedExpensesSumUpToTheDay = realm.query<ExpenseEntity>("${account.generateQuery()} AND date <= ${dayDate.toEpochDay()} AND checked = true")
+        val checkedExpensesSumUpToTheDay = realm.query<ExpenseEntity>("${account.generateQuery()} AND date <= ${dayDate.toEpochDay()} AND checked == true")
             .sum("amount", Long::class)
             .asFlow()
             .first()
@@ -251,12 +256,12 @@ class OnlineDBImpl(
     override suspend fun persistRecurringExpense(recurringExpense: RecurringExpense): RecurringExpense {
         awaitRecurringExpensesLoadOrThrow()
 
-        val entity = RecurringExpenseEntity.newFromRecurringExpense(recurringExpense, account)
-
         return realm.write {
+            val entity = RecurringExpenseEntity.newFromRecurringExpense(recurringExpense, account)
+
             val persistedEntity = copyToRealm(entity, updatePolicy = UpdatePolicy.ALL)
             return@write recurringExpense.copy(
-                id = persistedEntity.id,
+                id = persistedEntity._id,
             )
         }
     }
@@ -265,7 +270,7 @@ class OnlineDBImpl(
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
 
         val id = recurringExpense.id ?: throw IllegalStateException("Deleting recurring expense without id")
-        val entity = recurringExpenses.firstOrNull { it.id == id } ?: throw IllegalStateException("Deleting recurring expense but can't find it for id: $id")
+        val entity = recurringExpenses.firstOrNull { it._id == id } ?: throw IllegalStateException("Deleting recurring expense but can't find it for id: $id")
 
         realm.write {
             findLatest(entity)?.let { delete(it) }
@@ -284,7 +289,7 @@ class OnlineDBImpl(
 
         if (expense.associatedRecurringExpense != null) {
             val recurringExpenseId = expense.associatedRecurringExpense.recurringExpense.id ?: throw IllegalStateException("Deleting recurring expense occurrence without id")
-            val entity = recurringExpenses.firstOrNull { it.id == recurringExpenseId } ?: throw IllegalStateException("Deleting recurring expense occurrence but can't find it for id: $recurringExpenseId")
+            val entity = recurringExpenses.firstOrNull { it._id == recurringExpenseId } ?: throw IllegalStateException("Deleting recurring expense occurrence but can't find it for id: $recurringExpenseId")
             val icalBeforeDeletion = entity.iCalRepresentation
             entity.deleteOccurrence(expense.associatedRecurringExpense.originalDate)
 
@@ -299,7 +304,7 @@ class OnlineDBImpl(
                 }
             }
         } else {
-            val expenseEntity: ExpenseEntity = realm.query<ExpenseEntity>("id = $expenseId").find().first()
+            val expenseEntity: ExpenseEntity = realm.query<ExpenseEntity>("${account.generateQuery()} AND _id == $expenseId").find().first()
 
             realm.write {
                 findLatest(expenseEntity)?.let { delete(it) }
@@ -320,7 +325,7 @@ class OnlineDBImpl(
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
 
         val recurringExpenseId = recurringExpense.id ?: throw IllegalStateException("Editing recurring expense occurrence without id")
-        val entity = recurringExpenses.firstOrNull { it.id == recurringExpenseId } ?: throw IllegalStateException("Editing recurring expense occurrence but can't find it for id: $recurringExpenseId")
+        val entity = recurringExpenses.firstOrNull { it._id == recurringExpenseId } ?: throw IllegalStateException("Editing recurring expense occurrence but can't find it for id: $recurringExpenseId")
         val icalBeforeEdit = entity.iCalRepresentation
 
         entity.deleteOccurrencesAfterDate(afterDate)
@@ -344,7 +349,7 @@ class OnlineDBImpl(
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
 
         val recurringExpenseId = recurringExpense.id ?: throw IllegalStateException("Editing recurring expense occurrence without id")
-        val entity = recurringExpenses.firstOrNull { it.id == recurringExpenseId } ?: throw IllegalStateException("Editing recurring expense occurrence but can't find it for id: $recurringExpenseId")
+        val entity = recurringExpenses.firstOrNull { it._id == recurringExpenseId } ?: throw IllegalStateException("Editing recurring expense occurrence but can't find it for id: $recurringExpenseId")
         val icalBeforeEdit = entity.iCalRepresentation
 
         entity.deleteOccurrencesBeforeDate(beforeDate)
@@ -368,14 +373,14 @@ class OnlineDBImpl(
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
 
         val recurringExpenseId = recurringExpense.id ?: throw IllegalStateException("Editing recurring expense occurrence without id")
-        val entity = recurringExpenses.firstOrNull { it.id == recurringExpenseId } ?: throw IllegalStateException("Editing recurring expense occurrence but can't find it for id: $recurringExpenseId")
+        val entity = recurringExpenses.firstOrNull { it._id == recurringExpenseId } ?: throw IllegalStateException("Editing recurring expense occurrence but can't find it for id: $recurringExpenseId")
 
         return entity.getFirstOccurrenceDate().isBefore(beforeDate)
     }
 
     override suspend fun findRecurringExpenseForId(recurringExpenseId: Long): RecurringExpense? {
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
-        return recurringExpenses.firstOrNull { it.id == recurringExpenseId }?.toRecurringExpense()
+        return recurringExpenses.firstOrNull { it._id == recurringExpenseId }?.toRecurringExpense()
     }
 
     override suspend fun getOldestExpense(): Expense? {
@@ -434,6 +439,9 @@ class OnlineDBImpl(
     private fun generateQueryForDateRange(from: LocalDate, to: LocalDate): String
         = "date >= ${from.toEpochDay()} AND date <= ${to.toEpochDay()}"
 
+    private fun generateQueryForDay(day: LocalDate): String
+        = "date == ${day.toEpochDay()}"
+
     private sealed class SyncSessionState {
         object NotStarted : SyncSessionState()
         object Started : SyncSessionState()
@@ -464,7 +472,7 @@ class OnlineDBImpl(
             val realm = Realm.open(
                 SyncConfiguration.Builder(
                     user = user,
-                    schema = setOf(ExpenseEntity::class, RecurringExpenseEntity::class, Account::class),
+                    schema = setOf(ExpenseEntity::class, RecurringExpenseEntity::class),
                 ).initialSubscriptions { realm ->
                     add(
                         query = realm.query<ExpenseEntity>(account.generateQuery()),
@@ -474,7 +482,33 @@ class OnlineDBImpl(
                         query = realm.query<RecurringExpenseEntity>(account.generateQuery()),
                         name = "${currentUser.id}:${account.id}:recurring",
                     )
-                }.build()
+                }
+                .log(level = if (BuildConfig.DEBUG_LOG) LogLevel.DEBUG else LogLevel.WARN, listOf(
+                    object : RealmLogger {
+                        override val level: LogLevel = LogLevel.WARN
+                        override val tag: String = "EasyBudgetAtlas"
+
+                        override fun log(
+                            level: LogLevel,
+                            throwable: Throwable?,
+                            message: String?,
+                            vararg args: Any?
+                        ) {
+                            when (level) {
+                                LogLevel.WARN -> {
+                                    Logger.warning(message, throwable)
+                                }
+                                LogLevel.ERROR -> {
+                                    Logger.error(message, throwable)
+                                }
+
+                                else -> Unit // No-op
+                            }
+                        }
+
+                    }
+                ))
+                .build()
             )
 
             return OnlineDBImpl(

@@ -26,8 +26,12 @@ import com.benoitletondor.easybudgetapp.auth.Auth
 import com.benoitletondor.easybudgetapp.auth.AuthState
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.benoitletondor.easybudgetapp.cloudstorage.CloudStorage
+import com.benoitletondor.easybudgetapp.db.onlineimpl.OnlineDBImpl
 import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.iab.Iab
+import com.benoitletondor.easybudgetapp.model.Expense
+import com.benoitletondor.easybudgetapp.model.RecurringExpense
+import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import com.benoitletondor.easybudgetapp.parameters.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -38,6 +42,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 import java.lang.RuntimeException
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -84,6 +89,35 @@ class BackupSettingsViewModel @Inject constructor(
         viewModelScope.launchCollect(auth.state) { authState ->
             if( authState is AuthState.Authenticated ) {
                 viewModelScope.launch {
+                    val db = OnlineDBImpl.provideFor(
+                        "application-0-adkco",
+                        authState.currentUser,
+                        "id",
+                        "secret",
+                    )
+
+                    db.persistExpense(Expense(
+                        100,
+                        "testTitle",
+                        100.1,
+                        LocalDate.now(),
+                        false,
+                    ))
+                    db.persistRecurringExpense(
+                        RecurringExpense(
+                            101,
+                            "testTitle2",
+                            100.2,
+                            LocalDate.now(),
+                            false,
+                            RecurringExpenseType.MONTHLY,
+                        )
+                    )
+
+                    for (expense in db.getExpensesForDay(LocalDate.now()) ) {
+                        Logger.debug("EXPENSE: ${expense}")
+                    }
+
                     withContext(Dispatchers.IO) {
                         try {
                             if( parameters.getLastBackupDate() == null ) {

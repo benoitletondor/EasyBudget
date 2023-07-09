@@ -1,5 +1,6 @@
 package com.benoitletondor.easybudgetapp.db.onlineimpl.entity
 
+import com.benoitletondor.easybudgetapp.db.onlineimpl.Account
 import com.benoitletondor.easybudgetapp.helper.getDBValue
 import com.benoitletondor.easybudgetapp.helper.getRealValueFromDB
 import com.benoitletondor.easybudgetapp.model.AssociatedRecurringExpense
@@ -12,12 +13,13 @@ import java.time.LocalDate
 
 class ExpenseEntity() : RealmObject {
     @PrimaryKey
-    var id: Long = SecureRandom().nextLong()
+    var _id: Long = SecureRandom().nextLong()
     var title: String = ""
     var amount: Long = 0
     var date: Long = 0
     var checked: Boolean = false
-    var account: Account? = null
+    var accountId: String = ""
+    var accountSecret: String = ""
 
     constructor(
         id: Long?,
@@ -27,16 +29,17 @@ class ExpenseEntity() : RealmObject {
         checked: Boolean,
         account: Account,
     ) : this() {
-        this.id = id ?: SecureRandom().nextLong()
+        this._id = id ?: SecureRandom().nextLong()
         this.title = title
         this.amount = amount
         this.date = date
         this.checked = checked
-        this.account = account
+        this.accountId = account.id
+        this.accountSecret = account.secret
     }
 
     fun toExpense(associatedRecurringExpense: RecurringExpense?) = Expense(
-        id,
+        _id,
         title,
         amount.getRealValueFromDB(),
         LocalDate.ofEpochDay(date),
