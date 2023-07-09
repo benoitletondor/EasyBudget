@@ -136,6 +136,10 @@
             app:title="@string/setting_category_show_premium"
             app:key="@string/setting_category_dev_show_premium_key" />
 
+        <Preference
+            app:title="@string/setting_category_show_premium_2"
+            app:key="@string/setting_category_dev_show_premium_2_key" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>

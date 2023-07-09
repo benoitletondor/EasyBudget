@@ -178,6 +178,7 @@
     <string name="setting_category_dev_title" translatable="false">Dev</string>
     <string name="setting_category_show_welcome_screen_button_title" translatable="false">Show welcome screen</string>
     <string name="setting_category_show_premium" translatable="false">Show premium screen</string>
+    <string name="setting_category_show_premium_2" translatable="false">Show premium screen 2</string>
     <string name="setting_category_premium_title">Premium</string>
     <string name="setting_category_premium_status_title">You are premium!</string>
     <string name="setting_category_premium_status_message">You have access to premium features</string>
@@ -354,6 +355,7 @@
     <string name="setting_category_app_theme_key" translatable="false">app_theme</string>
     <string name="setting_category_not_premium_status_key" translatable="false">not_premium</string>
     <string name="setting_category_dev_show_premium_key" translatable="false">show_premium</string>
+    <string name="setting_category_dev_show_premium_2_key" translatable="false">show_premium_2</string>
     <string name="setting_category_start_day_of_week_key" translatable="false">start_day_of_week</string>
     <string name="setting_category_backup" translatable="false">backup</string>
 

@@ -30,7 +30,7 @@ import com.benoitletondor.easybudgetapp.databinding.ActivityPremiumBinding
 import com.benoitletondor.easybudgetapp.helper.BaseActivity
 import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.helper.setStatusBarColor
-import com.benoitletondor.easybudgetapp.iab.PremiumPurchaseFlowResult
+import com.benoitletondor.easybudgetapp.iab.PurchaseFlowResult
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import java.lang.IllegalStateException
@@ -85,11 +85,11 @@ class PremiumActivity : BaseActivity<ActivityPremiumBinding>() {
         var loadingProgressDialog: ProgressDialog? = null
         lifecycleScope.launchCollect(viewModel.premiumFlowErrorEventFlow) { status ->
             when (status) {
-                PremiumPurchaseFlowResult.Cancelled -> {
+                PurchaseFlowResult.Cancelled -> {
                     loadingProgressDialog?.dismiss()
                     loadingProgressDialog = null
                 }
-                is PremiumPurchaseFlowResult.Error -> {
+                is PurchaseFlowResult.Error -> {
                     loadingProgressDialog?.dismiss()
                     loadingProgressDialog = null
 
@@ -101,7 +101,7 @@ class PremiumActivity : BaseActivity<ActivityPremiumBinding>() {
                         }
                         .show()
                 }
-                PremiumPurchaseFlowResult.Success -> {
+                PurchaseFlowResult.Success -> {
                     loadingProgressDialog?.dismiss()
                     loadingProgressDialog = null
 

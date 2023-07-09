@@ -17,19 +17,22 @@
 package com.benoitletondor.easybudgetapp.iab
 
 import android.app.Activity
+import kotlinx.coroutines.flow.StateFlow
 
 interface Iab {
+    val iabStatusFlow: StateFlow<PremiumCheckStatus>
+
     fun isIabReady(): Boolean
     fun isUserPremium(): Boolean
     suspend fun waitForIsUserPremiumResponse(): Boolean
     fun updateIAPStatusIfNeeded()
-    suspend fun launchPremiumSubscriptionFlow(activity: Activity): PremiumPurchaseFlowResult
+    suspend fun launchPremiumSubscriptionFlow(activity: Activity): PurchaseFlowResult
 }
 
-sealed class PremiumPurchaseFlowResult {
-    object Cancelled : PremiumPurchaseFlowResult()
-    object Success : PremiumPurchaseFlowResult()
-    class Error(val reason: String): PremiumPurchaseFlowResult()
+sealed class PurchaseFlowResult {
+    object Cancelled : PurchaseFlowResult()
+    object Success : PurchaseFlowResult()
+    class Error(val reason: String): PurchaseFlowResult()
 }
 
 /**
