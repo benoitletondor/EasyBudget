@@ -150,7 +150,7 @@ class MainViewModel @Inject constructor(
     fun onDeleteExpenseClicked(expense: Expense) {
         viewModelScope.launch {
             try {
-                withContext(Dispatchers.Default) {
+                val restoreAction = withContext(Dispatchers.IO) {
                     db.deleteExpense(expense)
                 }
 
@@ -159,6 +159,7 @@ class MainViewModel @Inject constructor(
                     expense,
                     getBalanceForDay(selectedDate),
                     if (parameters.getShouldShowCheckedBalance()) { db.getCheckedBalanceForDay(selectedDate) } else { null },
+                    restoreAction,
                 ))
 
                 forceRefreshMutableFlow.emit(Unit)
@@ -169,11 +170,11 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun onExpenseDeletionCancelled(expense: Expense) {
+    fun onExpenseDeletionCancelled(restoreAction: RestoreAction) {
         viewModelScope.launch {
             try {
-                withContext(Dispatchers.Default) {
-                    db.persistExpense(expense)
+                withContext(Dispatchers.IO) {
+                    restoreAction.restore()
                 }
 
                 forceRefreshMutableFlow.emit(Unit)
@@ -454,5 +455,5 @@ class MainViewModel @Inject constructor(
 }
 
 data class SelectedDateExpensesData(val date: LocalDate, val balance: Double, val checkedBalance: Double?, val expenses: List<Expense>)
-data class ExpenseDeletionSuccessData(val deletedExpense: Expense, val newDayBalance: Double, val newCheckedBalance: Double?)
+data class ExpenseDeletionSuccessData(val deletedExpense: Expense, val newDayBalance: Double, val newCheckedBalance: Double?, val restoreAction: RestoreAction)
 data class BalanceAdjustedData(val balanceExpense: Expense, val diffWithOldBalance: Double, val newBalance: Double)

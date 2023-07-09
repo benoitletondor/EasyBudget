@@ -4,6 +4,7 @@ import androidx.room.PrimaryKey
 import biweekly.Biweekly
 import biweekly.ICalendar
 import biweekly.component.VEvent
+import biweekly.property.DateEnd
 import biweekly.property.DateStart
 import biweekly.property.RecurrenceId
 import biweekly.property.Status
@@ -72,22 +73,24 @@ class RecurringExpenseEntity() : RealmObject {
     suspend fun addExceptionFromExpense(expense: Expense, originalOccurrenceDate: LocalDate) {
         withContext(Dispatchers.IO) {
             val cal = getCal()
-
-            val exceptionEvent = VEvent()
-            exceptionEvent.dateStart = DateStart(expense.date.toStartOfDayDate(), false)
-            exceptionEvent.summary = Summary(expense.title)
-            exceptionEvent.status = Status.accepted()
-            exceptionEvent.addExperimentalProperty(AMOUNT_KEY, expense.amount.getDBValue().toString())
-            exceptionEvent.addExperimentalProperty(CHECKED_KEY, expense.checked.toString())
-            exceptionEvent.uid = cal.events.first().uid
-
-            val recurrenceId = RecurrenceId(ICalDate(originalOccurrenceDate.toStartOfDayDate(), false))
-            exceptionEvent.recurrenceId = recurrenceId
-
-            cal.addEvent(exceptionEvent)
-
+            cal.addExceptionFromExpense(expense, originalOccurrenceDate)
             iCalRepresentation = cal.write()
         }
+    }
+
+    private fun ICalendar.addExceptionFromExpense(expense: Expense, originalOccurrenceDate: LocalDate) {
+        val exceptionEvent = VEvent()
+        exceptionEvent.dateStart = DateStart(expense.date.toStartOfDayDate(), false)
+        exceptionEvent.summary = Summary(expense.title)
+        exceptionEvent.status = Status.accepted()
+        exceptionEvent.addExperimentalProperty(AMOUNT_KEY, expense.amount.getDBValue().toString())
+        exceptionEvent.addExperimentalProperty(CHECKED_KEY, expense.checked.toString())
+        exceptionEvent.uid = events.first().uid
+
+        val recurrenceId = RecurrenceId(ICalDate(originalOccurrenceDate.toStartOfDayDate(), false))
+        exceptionEvent.recurrenceId = recurrenceId
+
+        addEvent(exceptionEvent)
     }
 
     suspend fun deleteOccurrence(occurrenceDate: LocalDate) {
@@ -102,6 +105,68 @@ class RecurringExpenseEntity() : RealmObject {
             exceptionEvent.recurrenceId = recurrenceId
 
             cal.addEvent(exceptionEvent)
+
+            iCalRepresentation = cal.write()
+        }
+    }
+
+    suspend fun deleteOccurrencesAfterDate(date: LocalDate) {
+        withContext(Dispatchers.IO) {
+            val cal = getCal()
+
+            val event = cal.events.first()
+            event.dateEnd = DateEnd(date.toStartOfDayDate(), false)
+
+            iCalRepresentation = cal.write()
+        }
+    }
+
+    suspend fun deleteOccurrencesBeforeDate(date: LocalDate) {
+        withContext(Dispatchers.IO) {
+            val cal = getCal()
+
+            val event = cal.events.first()
+            event.dateStart = DateStart(date.toStartOfDayDate(), false)
+
+            iCalRepresentation = cal.write()
+        }
+    }
+
+    suspend fun getFirstOccurrenceDate(): LocalDate {
+        return withContext(Dispatchers.IO) {
+            val cal = getCal()
+
+            val event = cal.events.first()
+
+            return@withContext localDateFromTimestamp(event.dateStart.value.time)
+        }
+    }
+
+    suspend fun getFirstOccurrence(): Expense {
+        return withContext(Dispatchers.IO) {
+            val cal = getCal()
+            val event = cal.events.first()
+
+            val firstOccurrenceDate = localDateFromTimestamp(event.dateStart.value.time)
+            return@withContext cal.getExpenses(
+                firstOccurrenceDate,
+                firstOccurrenceDate.plusDays(1),
+                toRecurringExpense()
+            ).first()
+        }
+    }
+
+    suspend fun markAllOccurrencesAsChecked(beforeDate: LocalDate) {
+        return withContext(Dispatchers.IO) {
+            val cal = getCal()
+            val expenses = cal.getExpenses(LocalDate.MIN, beforeDate, toRecurringExpense())
+            for (expense in expenses) {
+                if (expense.date == beforeDate) {
+                    continue
+                }
+
+                cal.addExceptionFromExpense(expense.copy(checked = true), expense.date)
+            }
 
             iCalRepresentation = cal.write()
         }

@@ -148,12 +148,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     }
 
     private fun observeViewModel() {
-        lifecycleScope.launchCollect(viewModel.expenseDeletionSuccessEventFlow) { (deletedExpense, newBalance, maybeNewCheckecBalance) ->
+        lifecycleScope.launchCollect(viewModel.expenseDeletionSuccessEventFlow) { (deletedExpense, newBalance, maybeNewCheckedBalance, restoreAction) ->
             expensesViewAdapter.removeExpense(deletedExpense)
             updateBalanceDisplayForDay(
                 expensesViewAdapter.getDate(),
                 newBalance,
-                maybeNewCheckecBalance
+                maybeNewCheckedBalance
             )
             calendarFragment.refreshView()
 
@@ -163,7 +163,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
                 Snackbar.LENGTH_LONG
             )
             snackbar.setAction(R.string.undo) {
-                viewModel.onExpenseDeletionCancelled(deletedExpense)
+                viewModel.onExpenseDeletionCancelled(restoreAction)
             }
             snackbar.setActionTextColor(
                 ContextCompat.getColor(
