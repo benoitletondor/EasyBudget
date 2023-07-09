@@ -2,9 +2,11 @@ package com.benoitletondor.easybudgetapp.db.onlineimpl
 
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.benoitletondor.easybudgetapp.db.DB
+import com.benoitletondor.easybudgetapp.db.RestoreAction
 import com.benoitletondor.easybudgetapp.db.onlineimpl.entity.Account
 import com.benoitletondor.easybudgetapp.db.onlineimpl.entity.ExpenseEntity
 import com.benoitletondor.easybudgetapp.db.onlineimpl.entity.RecurringExpenseEntity
+import com.benoitletondor.easybudgetapp.db.restoreAction
 import com.benoitletondor.easybudgetapp.helper.getRealValueFromDB
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
@@ -258,70 +260,69 @@ class OnlineDBImpl(
         }
     }
 
-    override suspend fun deleteRecurringExpense(recurringExpense: RecurringExpense) {
+    override suspend fun deleteRecurringExpense(recurringExpense: RecurringExpense): RestoreAction {
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
 
         val id = recurringExpense.id ?: throw IllegalStateException("Deleting recurring expense without id")
         val entity = recurringExpenses.firstOrNull { it.id == id } ?: throw IllegalStateException("Deleting recurring expense but can't find it for id: $id")
 
         realm.write {
-            delete(entity)
+            findLatest(entity)?.let { delete(it) }
+        }
+
+        return restoreAction {
+            realm.write {
+                copyToRealm(entity, UpdatePolicy.ALL)
+            }
         }
     }
 
-    override suspend fun deleteExpense(expense: Expense) {
+    override suspend fun deleteExpense(expense: Expense): RestoreAction {
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
         val expenseId = expense.id ?: throw IllegalStateException("Try to delete an expense without id")
 
         if (expense.associatedRecurringExpense != null) {
             val recurringExpenseId = expense.associatedRecurringExpense.recurringExpense.id ?: throw IllegalStateException("Deleting recurring expense occurrence without id")
             val entity = recurringExpenses.firstOrNull { it.id == recurringExpenseId } ?: throw IllegalStateException("Deleting recurring expense occurrence but can't find it for id: $recurringExpenseId")
+            val icalBeforeDeletion = entity.iCalRepresentation
             entity.deleteOccurrence(expense.associatedRecurringExpense.originalDate)
 
             realm.write {
                 copyToRealm(entity, UpdatePolicy.ALL)
             }
+
+            return restoreAction {
+                entity.iCalRepresentation = icalBeforeDeletion
+                realm.write {
+                    copyToRealm(entity, UpdatePolicy.ALL)
+                }
+            }
         } else {
+            val expenseEntity: ExpenseEntity = realm.query<ExpenseEntity>("id = $expenseId").find().first()
+
             realm.write {
-                val expenseEntity: ExpenseEntity = query<ExpenseEntity>("id = $expenseId").find().first()
-                delete(expenseEntity)
+                findLatest(expenseEntity)?.let { delete(it) }
+            }
+
+            return restoreAction {
+                realm.write {
+                    copyToRealm(expenseEntity, UpdatePolicy.ALL)
+                }
             }
         }
-    }
-
-    override suspend fun deleteAllExpenseForRecurringExpense(recurringExpense: RecurringExpense) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getAllExpenseForRecurringExpense(recurringExpense: RecurringExpense): List<Expense> {
-        TODO("Not yet implemented")
     }
 
     override suspend fun deleteAllExpenseForRecurringExpenseAfterDate(
         recurringExpense: RecurringExpense,
         afterDate: LocalDate
-    ) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getAllExpensesForRecurringExpenseAfterDate(
-        recurringExpense: RecurringExpense,
-        afterDate: LocalDate
-    ): List<Expense> {
+    ): RestoreAction {
         TODO("Not yet implemented")
     }
 
     override suspend fun deleteAllExpenseForRecurringExpenseBeforeDate(
         recurringExpense: RecurringExpense,
         beforeDate: LocalDate
-    ) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getAllExpensesForRecurringExpenseBeforeDate(
-        recurringExpense: RecurringExpense,
-        beforeDate: LocalDate
-    ): List<Expense> {
+    ): RestoreAction {
         TODO("Not yet implemented")
     }
 
@@ -381,11 +382,11 @@ class OnlineDBImpl(
                 ).initialSubscriptions { realm ->
                     add(
                         query = realm.query<ExpenseEntity>(account.generateQuery()),
-                        name = "${currentUser.email}:${account.id}:expenses",
+                        name = "${currentUser.id}:${account.id}:expenses",
                     )
                     add(
                         query = realm.query<RecurringExpenseEntity>(account.generateQuery()),
-                        name = "${currentUser.email}:${account.id}:recurring",
+                        name = "${currentUser.id}:${account.id}:recurring",
                     )
                 }.build()
             )

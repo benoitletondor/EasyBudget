@@ -20,8 +20,10 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.db.DB
+import com.benoitletondor.easybudgetapp.db.RestoreAction
 import com.benoitletondor.easybudgetapp.db.impl.entity.ExpenseEntity
 import com.benoitletondor.easybudgetapp.db.impl.entity.RecurringExpenseEntity
+import com.benoitletondor.easybudgetapp.db.restoreAction
 import com.benoitletondor.easybudgetapp.helper.getDBValue
 import com.benoitletondor.easybudgetapp.helper.getRealValueFromDB
 import java.time.LocalDate
@@ -74,53 +76,83 @@ class DBImpl(private val roomDB: RoomDB) : DB {
         return recurringExpense.copy(id = newId)
     }
 
-    override suspend fun deleteRecurringExpense(recurringExpense: RecurringExpense) {
+    override suspend fun deleteRecurringExpense(recurringExpense: RecurringExpense): RestoreAction {
         if( recurringExpense.id == null ) {
             throw IllegalArgumentException("deleteRecurringExpense called with a recurring expense that has no id")
         }
 
+        val allExpenses = getAllExpenseForRecurringExpense(recurringExpense)
+
+        deleteAllExpenseForRecurringExpense(recurringExpense)
         roomDB.expenseDao().deleteRecurringExpense(recurringExpense.toRecurringExpenseEntity())
+
+        return restoreAction {
+            persistRecurringExpense(recurringExpense)
+            for(expense in allExpenses) {
+                persistExpense(expense)
+            }
+        }
     }
 
-    override suspend fun deleteExpense(expense: Expense) {
+    override suspend fun deleteExpense(expense: Expense): RestoreAction {
         if( expense.id == null ) {
             throw IllegalArgumentException("deleteExpense called with an expense that has no id")
         }
 
         roomDB.expenseDao().deleteExpense(expense.toExpenseEntity())
+
+        return restoreAction {
+            persistExpense(expense)
+        }
     }
 
-    override suspend fun deleteAllExpenseForRecurringExpense(recurringExpense: RecurringExpense) {
+    private suspend fun deleteAllExpenseForRecurringExpense(recurringExpense: RecurringExpense) {
         val recurringExpenseId = recurringExpense.id ?: throw IllegalArgumentException("deleteAllExpenseForRecurringExpense called with a recurring expense that has no id")
 
         roomDB.expenseDao().deleteAllExpenseForRecurringExpense(recurringExpenseId)
     }
 
-    override suspend fun getAllExpenseForRecurringExpense(recurringExpense: RecurringExpense): List<Expense> {
+    private suspend fun getAllExpenseForRecurringExpense(recurringExpense: RecurringExpense): List<Expense> {
         val recurringExpenseId = recurringExpense.id ?: throw IllegalArgumentException("getAllExpenseForRecurringExpense called with a recurring expense that has no id")
 
         return roomDB.expenseDao().getAllExpenseForRecurringExpense(recurringExpenseId).toExpenses(this)
     }
 
-    override suspend fun deleteAllExpenseForRecurringExpenseAfterDate(recurringExpense: RecurringExpense, afterDate: LocalDate) {
+    override suspend fun deleteAllExpenseForRecurringExpenseAfterDate(recurringExpense: RecurringExpense, afterDate: LocalDate): RestoreAction {
         val recurringExpenseId = recurringExpense.id ?: throw IllegalArgumentException("deleteAllExpenseForRecurringExpenseFromDate called with a recurring expense that has no id")
 
-        return roomDB.expenseDao().deleteAllExpenseForRecurringExpenseAfterDate(recurringExpenseId, afterDate)
+        val allExpenses = getAllExpensesForRecurringExpenseAfterDate(recurringExpense, afterDate)
+
+        roomDB.expenseDao().deleteAllExpenseForRecurringExpenseAfterDate(recurringExpenseId, afterDate)
+
+        return restoreAction {
+            for(expense in allExpenses) {
+                persistExpense(expense)
+            }
+        }
     }
 
-    override suspend fun getAllExpensesForRecurringExpenseAfterDate(recurringExpense: RecurringExpense, afterDate: LocalDate): List<Expense> {
+    private suspend fun getAllExpensesForRecurringExpenseAfterDate(recurringExpense: RecurringExpense, afterDate: LocalDate): List<Expense> {
         val recurringExpenseId = recurringExpense.id ?: throw IllegalArgumentException("getAllExpensesForRecurringExpenseAfterDate called with a recurring expense that has no id")
 
         return roomDB.expenseDao().getAllExpensesForRecurringExpenseAfterDate(recurringExpenseId, afterDate).toExpenses(this)
     }
 
-    override suspend fun deleteAllExpenseForRecurringExpenseBeforeDate(recurringExpense: RecurringExpense, beforeDate: LocalDate) {
+    override suspend fun deleteAllExpenseForRecurringExpenseBeforeDate(recurringExpense: RecurringExpense, beforeDate: LocalDate): RestoreAction {
         val recurringExpenseId = recurringExpense.id ?: throw IllegalArgumentException("deleteAllExpenseForRecurringExpenseBeforeDate called with a recurring expense that has no id")
 
-        return roomDB.expenseDao().deleteAllExpenseForRecurringExpenseBeforeDate(recurringExpenseId, beforeDate)
+        val allExpenses = getAllExpensesForRecurringExpenseBeforeDate(recurringExpense, beforeDate)
+
+        roomDB.expenseDao().deleteAllExpenseForRecurringExpenseBeforeDate(recurringExpenseId, beforeDate)
+
+        return restoreAction {
+            for(expense in allExpenses) {
+                persistExpense(expense)
+            }
+        }
     }
 
-    override suspend fun getAllExpensesForRecurringExpenseBeforeDate(recurringExpense: RecurringExpense, beforeDate: LocalDate): List<Expense> {
+    private suspend fun getAllExpensesForRecurringExpenseBeforeDate(recurringExpense: RecurringExpense, beforeDate: LocalDate): List<Expense> {
         val recurringExpenseId = recurringExpense.id ?: throw IllegalArgumentException("getAllExpensesForRecurringExpenseBeforeDate called with a recurring expense that has no id")
 
         return roomDB.expenseDao().getAllExpensesForRecurringExpenseBeforeDate(recurringExpenseId, beforeDate).toExpenses(this)

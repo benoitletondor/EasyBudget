@@ -23,6 +23,7 @@ import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType
 import com.benoitletondor.easybudgetapp.db.DB
+import com.benoitletondor.easybudgetapp.db.RestoreAction
 import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
 import com.benoitletondor.easybudgetapp.parameters.Parameters
@@ -32,10 +33,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.lang.Exception
 import java.time.LocalDate
 import java.util.*
 import javax.inject.Inject
+import kotlin.Exception
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -133,7 +134,7 @@ class MainViewModel @Inject constructor(
         class ErrorRecurringExpenseDeleteNotAssociated(val expense: Expense): RecurringExpenseDeletionEvent()
         class ErrorCantDeleteBeforeFirstOccurrence(val expense: Expense): RecurringExpenseDeletionEvent()
         class ErrorIO(val expense: Expense): RecurringExpenseDeletionEvent()
-        class Success(val recurringExpense: RecurringExpense, val restoreRecurring: Boolean, val expensesToRestore: List<Expense>): RecurringExpenseDeletionEvent()
+        class Success(val recurringExpense: RecurringExpense, val restoreAction: RestoreAction): RecurringExpenseDeletionEvent()
     }
 
     sealed class RecurringExpenseRestoreProgressState {
@@ -202,67 +203,45 @@ class MainViewModel @Inject constructor(
                     return@launch
                 }
 
-                val expensesToRestore: List<Expense>? = withContext(Dispatchers.Default) {
+                val restoreAction: RestoreAction? = withContext(Dispatchers.IO) {
                     when (deleteType) {
                         RecurringExpenseDeleteType.ALL -> {
-                            val expensesToRestore = db.getAllExpenseForRecurringExpense(associatedRecurringExpense.recurringExpense)
-
-                            try {
-                                db.deleteAllExpenseForRecurringExpense(associatedRecurringExpense.recurringExpense)
-                            } catch (t: Throwable) {
-                                return@withContext null
-                            }
-
                             try {
                                 db.deleteRecurringExpense(associatedRecurringExpense.recurringExpense)
                             } catch (t: Throwable) {
-                                return@withContext null
+                                null
                             }
-
-                            expensesToRestore
                         }
                         RecurringExpenseDeleteType.FROM -> {
-                            val expensesToRestore = db.getAllExpensesForRecurringExpenseAfterDate(associatedRecurringExpense.recurringExpense, expense.date)
-
                             try {
                                 db.deleteAllExpenseForRecurringExpenseAfterDate(associatedRecurringExpense.recurringExpense, expense.date)
                             } catch (t: Throwable) {
-                                return@withContext null
+                                null
                             }
-
-                            expensesToRestore
                         }
                         RecurringExpenseDeleteType.TO -> {
-                            val expensesToRestore = db.getAllExpensesForRecurringExpenseBeforeDate(associatedRecurringExpense.recurringExpense, expense.date)
-
                             try {
                                 db.deleteAllExpenseForRecurringExpenseBeforeDate(associatedRecurringExpense.recurringExpense, expense.date)
                             } catch (t: Throwable) {
-                                return@withContext null
+                                null
                             }
-
-                            expensesToRestore
                         }
                         RecurringExpenseDeleteType.ONE -> {
-                            val expensesToRestore = listOf(expense)
-
                             try {
                                 db.deleteExpense(expense)
                             } catch (t: Throwable) {
-                                return@withContext null
+                                null
                             }
-
-                            expensesToRestore
                         }
                     }
                 }
 
-                if( expensesToRestore == null ) {
+                if( restoreAction == null ) {
                     recurringExpenseDeletionEventMutableFlow.emit(RecurringExpenseDeletionEvent.ErrorIO(expense))
                     return@launch
                 }
 
-                recurringExpenseDeletionEventMutableFlow.emit(RecurringExpenseDeletionEvent.Success(associatedRecurringExpense.recurringExpense, deleteType == RecurringExpenseDeleteType.ALL, expensesToRestore))
+                recurringExpenseDeletionEventMutableFlow.emit(RecurringExpenseDeletionEvent.Success(associatedRecurringExpense.recurringExpense, restoreAction))
             } finally {
                 recurringExpenseDeletionProgressStateMutableFlow.value = RecurringExpenseDeleteProgressState.Idle
             }
@@ -272,40 +251,15 @@ class MainViewModel @Inject constructor(
 
     }
 
-    fun onRestoreRecurringExpenseClicked(recurringExpense: RecurringExpense, restoreRecurring: Boolean, expensesToRestore: List<Expense>) {
+    fun onRestoreRecurringExpenseClicked(recurringExpense: RecurringExpense, restoreAction: RestoreAction) {
         viewModelScope.launch {
             recurringExpenseRestoreProgressStateMutableFlow.value = RecurringExpenseRestoreProgressState.Restoring(recurringExpense)
 
             try {
-                if( restoreRecurring ) {
-                    try {
-                        withContext(Dispatchers.Default) {
-                            db.persistRecurringExpense(recurringExpense)
-                        }
-                    } catch (t: Throwable) {
-                        recurringExpenseRestoreEventMutableFlow.emit(RecurringExpenseRestoreEvent.ErrorIO(recurringExpense))
-                        return@launch
-                    }
-                }
-
-                val expensesAdd = withContext(Dispatchers.Default) {
-                    for (expense in expensesToRestore) {
-                        try {
-                            db.persistExpense(expense)
-                        } catch (t: Throwable) {
-                            return@withContext false
-                        }
-                    }
-
-                    return@withContext true
-                }
-
-                if( !expensesAdd ) {
-                    recurringExpenseRestoreEventMutableFlow.emit(RecurringExpenseRestoreEvent.ErrorIO(recurringExpense))
-                    return@launch
-                }
-
+                restoreAction.restore()
                 recurringExpenseRestoreEventMutableFlow.emit(RecurringExpenseRestoreEvent.Success(recurringExpense))
+            } catch (e: Exception) {
+                recurringExpenseRestoreEventMutableFlow.emit(RecurringExpenseRestoreEvent.ErrorIO(recurringExpense))
             } finally {
                 recurringExpenseRestoreProgressStateMutableFlow.value = RecurringExpenseRestoreProgressState.Idle
             }

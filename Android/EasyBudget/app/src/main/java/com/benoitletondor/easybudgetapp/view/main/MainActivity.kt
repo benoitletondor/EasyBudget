@@ -230,8 +230,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
                     snackbar.setAction(R.string.undo) {
                         viewModel.onRestoreRecurringExpenseClicked(
                             event.recurringExpense,
-                            event.restoreRecurring,
-                            event.expensesToRestore
+                            event.restoreAction,
                         )
                     }
 

@@ -40,21 +40,13 @@ interface DB {
 
     suspend fun persistRecurringExpense(recurringExpense: RecurringExpense): RecurringExpense
 
-    suspend fun deleteRecurringExpense(recurringExpense: RecurringExpense)
+    suspend fun deleteRecurringExpense(recurringExpense: RecurringExpense): RestoreAction
 
-    suspend fun deleteExpense(expense: Expense)
+    suspend fun deleteExpense(expense: Expense): RestoreAction
 
-    suspend fun deleteAllExpenseForRecurringExpense(recurringExpense: RecurringExpense)
+    suspend fun deleteAllExpenseForRecurringExpenseAfterDate(recurringExpense: RecurringExpense, afterDate: LocalDate): RestoreAction
 
-    suspend fun getAllExpenseForRecurringExpense(recurringExpense: RecurringExpense): List<Expense>
-
-    suspend fun deleteAllExpenseForRecurringExpenseAfterDate(recurringExpense: RecurringExpense, afterDate: LocalDate)
-
-    suspend fun getAllExpensesForRecurringExpenseAfterDate(recurringExpense: RecurringExpense, afterDate: LocalDate): List<Expense>
-
-    suspend fun deleteAllExpenseForRecurringExpenseBeforeDate(recurringExpense: RecurringExpense, beforeDate: LocalDate)
-
-    suspend fun getAllExpensesForRecurringExpenseBeforeDate(recurringExpense: RecurringExpense, beforeDate: LocalDate): List<Expense>
+    suspend fun deleteAllExpenseForRecurringExpenseBeforeDate(recurringExpense: RecurringExpense, beforeDate: LocalDate): RestoreAction
 
     suspend fun hasExpensesForRecurringExpenseBeforeDate(recurringExpense: RecurringExpense, beforeDate: LocalDate): Boolean
 
