@@ -44,9 +44,16 @@ class PremiumActivity : AppCompatActivity() {
 
                     when(state) {
                         PremiumViewModel.SubscriptionStatus.Error,
-                        PremiumViewModel.SubscriptionStatus.NotSubscribed -> SubscribeView(viewModel, premiumSubscribed = false, proSubscribed = false)
-                        PremiumViewModel.SubscriptionStatus.PremiumSubscribed -> SubscribeView(viewModel, premiumSubscribed = true, proSubscribed = false)
-                        PremiumViewModel.SubscriptionStatus.ProSubscribed -> SubscribeView(viewModel, premiumSubscribed = true, proSubscribed = true)
+                        PremiumViewModel.SubscriptionStatus.NotSubscribed,
+                        PremiumViewModel.SubscriptionStatus.PremiumSubscribed,
+                        PremiumViewModel.SubscriptionStatus.ProSubscribed -> SubscribeView(
+                            viewModel,
+                            premiumSubscribed = state == PremiumViewModel.SubscriptionStatus.PremiumSubscribed,
+                            proSubscribed = state == PremiumViewModel.SubscriptionStatus.ProSubscribed,
+                            onCancelButtonClicked = {
+                                finish()
+                            },
+                        )
                         PremiumViewModel.SubscriptionStatus.Verifying -> LoadingView()
                     }
                 }
