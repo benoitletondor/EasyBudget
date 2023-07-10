@@ -334,6 +334,8 @@
     <string name="backup_wipe_data_error_title">Unable to delete cloud backup</string>
     <string name="backup_wipe_data_error_message">An error occurred while deleting your backup data. Please check your connexion and try again later.</string>
 
+    <string name="settings_subscribe_premium">Premium</string>
+    <string name="settings_subscribe_pro">Pro</string>
 
     <!-- Keys, not for translations. -->
     <string name="setting_category_bug_report_send_button_key" translatable="false">send_bug_report</string>

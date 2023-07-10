@@ -19,7 +19,9 @@ import com.benoitletondor.easybudgetapp.theme.AppTheme
 import com.benoitletondor.easybudgetapp.theme.easyBudgetGreenColor
 import com.benoitletondor.easybudgetapp.view.premium2.view.LoadingView
 import com.benoitletondor.easybudgetapp.view.premium2.view.SubscribeView
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class PremiumActivity : AppCompatActivity() {
     private val viewModel: PremiumViewModel by viewModels()
 
