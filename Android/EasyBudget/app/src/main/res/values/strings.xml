@@ -203,6 +203,8 @@
     <string name="premium_popup_premium_message">You have access to premium features:\n\n- Monthly report: Get a sum-up of your expenses and incomes of the month\n- Daily reminder if you forgot to enter your expenses during the day\n- Dark Theme support\n- Data backup\n- Tick entries\n…and more premium features that will be added soon!</string>
     <string name="premium_popup_not_premium_title">Become a premium user</string>
     <string name="premium_popup_not_premium_message">Access all the premium features!</string>
+    <string name="premium_popup_premium_description">Unlock the next level of EasyBudget with all the features you need to manage one account in depth:</string>
+    <string name="premium_popup_premium_unlocked_description">You are premium! Here\'s what\'s included:</string>
     <string name="premium_popup_not_premium_feature1_title">3. Daily reminder</string>
     <string name="premium_popup_not_premium_feature1_message">Receive a notification at the end of the day if you didn\'t enter your expenses.</string>
     <string name="premium_popup_not_premium_feature2_title">1. Monthly report</string>
@@ -210,9 +212,18 @@
     <string name="premium_popup_not_premium_feature_more_expense_check">4. Tick entries</string>
     <string name="premium_popup_not_premium_feature_more_expense_check_desc">Ability to tick an entry when it has reached your bank account to keep tracks of what\'s going on</string>
     <string name="premium_popup_not_premium_feature_more_dark_theme">5. Dark theme support!</string>
+    <string name="premium_popup_not_premium_feature_more_dark_theme_desc">Unlock dark theme for the app and activate it automatically or when you want it.</string>
     <string name="premium_popup_not_premium_feature_more_backup_title">2. Backup</string>
     <string name="premium_popup_not_premium_feature_more_backup_message">Automatic backup of your data in the cloud! No need to worry about losing your budget anymore.</string>
     <string name="premium_popup_not_premium_feature_more_title">… and more premium features that will be added soon!</string>
+    <string name="premium_popup_pro_description">Do more with EasyBudget, everything included in Premium plus advanced features to handle multiple sharable accounts:</string>
+    <string name="premium_popup_pro_unlocked_description">You are pro! You have access to everything included in premium, plus:</string>
+    <string name="premium_popup_not_pro_feature1_title">1. Multiple accounts</string>
+    <string name="premium_popup_not_pro_feature1_message">Add up to 5 online accounts to manage your joint account, savings or a professional account.</string>
+    <string name="premium_popup_not_pro_feature2_title">2. Share your accounts</string>
+    <string name="premium_popup_not_pro_feature2_message">You can invite other pro users to your online accounts so that they can see and add/edit entries.</string>
+    <string name="premium_popup_not_pro_feature3_title">3. Export or print your data</string>
+    <string name="premium_popup_not_pro_feature3_message">Export your monthly reports as CSV to use the data on another app or to PDF to print it.</string>
     <string name="premium_popup_not_premium_cta">Purchase</string>
     <string name="premium_popup_become_title">Become a premium user</string>
     <string name="premium_popup_become_message">It seems that you like using EasyBudget!\nWould you like to take it to next level and discover premium features?</string>
