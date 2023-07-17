@@ -39,6 +39,9 @@ class MainViewModel @Inject constructor(
     private val openPremiumEventMutableFlow = MutableLiveFlow<Unit>()
     val openPremiumEventFlow: Flow<Unit> = openPremiumEventMutableFlow
 
+    val accountSelectionFlow = flowOf(SelectedAccount.Offline)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, SelectedAccount.Loading)
+
     fun onBecomePremiumButtonPressed() {
         viewModelScope.launch {
             openPremiumEventMutableFlow.emit(Unit)
@@ -47,5 +50,11 @@ class MainViewModel @Inject constructor(
 
     fun onWelcomeScreenFinished() {
         // TODO
+    }
+
+    sealed class SelectedAccount {
+        object Loading : SelectedAccount()
+        object Offline : SelectedAccount()
+        class Online(val accountId: String, val accountSecret: String) : SelectedAccount()
     }
 }

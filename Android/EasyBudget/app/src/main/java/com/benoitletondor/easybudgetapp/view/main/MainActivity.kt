@@ -34,7 +34,6 @@ import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.databinding.ActivityMainBinding
 
 import com.benoitletondor.easybudgetapp.helper.*
-import com.benoitletondor.easybudgetapp.iab.PremiumCheckStatus
 import com.benoitletondor.easybudgetapp.parameters.*
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.main.account.AccountFragment
@@ -44,7 +43,6 @@ import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.SHOW_BACKUP_INTENT_KEY
 import com.benoitletondor.easybudgetapp.view.welcome.getOnboardingStep
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.firstOrNull
 import java.time.LocalDate
 
 import javax.inject.Inject
@@ -79,10 +77,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
         addMenuProvider(this)
 
         collectViewModelEvents()
-
-        supportFragmentManager.commit {
-            replace(R.id.mainFragmentContainer, AccountFragment())
-        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -107,32 +101,37 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
             startIntent.putExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, true)
             ActivityCompat.startActivity(this, startIntent, null)
         }
+
+        lifecycleScope.launchCollect(viewModel.accountSelectionFlow) { selectedAccount ->
+            performIntentActionIfAny()
+
+            when(selectedAccount) {
+                MainViewModel.SelectedAccount.Loading -> Unit // TODO
+                MainViewModel.SelectedAccount.Offline -> supportFragmentManager.commit {
+                    replace(R.id.mainFragmentContainer, AccountFragment())
+                }
+                is MainViewModel.SelectedAccount.Online -> Unit // TODO
+            }
+        }
     }
 
     private fun performIntentActionIfAny() {
-        if (intent != null) {
+        if (intent != null && viewModel.accountSelectionFlow.value !== MainViewModel.SelectedAccount.Loading) {
             openSettingsIfNeeded(intent)
             openMonthlyReportIfNeeded(intent)
             openPremiumIfNeeded(intent)
             openAddExpenseIfNeeded(intent)
             openAddRecurringExpenseIfNeeded(intent)
             openSettingsForBackupIfNeeded(intent)
+            intent = null
         }
     }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
 
-        if (intent == null) {
-            return
-        }
-
-        openSettingsIfNeeded(intent)
-        openMonthlyReportIfNeeded(intent)
-        openPremiumIfNeeded(intent)
-        openAddExpenseIfNeeded(intent)
-        openAddRecurringExpenseIfNeeded(intent)
-        openSettingsForBackupIfNeeded(intent)
+        this.intent = intent
+        performIntentActionIfAny()
     }
 
 // ------------------------------------------>

@@ -28,7 +28,6 @@ import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.benoitletondor.easybudgetapp.R
@@ -38,9 +37,9 @@ import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.helper.computeCalendarMinDateFromInitDate
 import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.helper.preventUnsupportedInputForDecimals
+import com.benoitletondor.easybudgetapp.helper.viewLifecycleScope
 import com.benoitletondor.easybudgetapp.iab.INTENT_IAB_STATUS_CHANGED
 import com.benoitletondor.easybudgetapp.iab.Iab
-import com.benoitletondor.easybudgetapp.iab.PremiumCheckStatus
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType
 import com.benoitletondor.easybudgetapp.parameters.Parameters
@@ -208,7 +207,7 @@ class AccountFragment : Fragment(), MenuProvider {
     }
 
     private fun observeViewModel() {
-        lifecycleScope.launchCollect(viewModel.expenseDeletionSuccessEventFlow) { (deletedExpense, newBalance, maybeNewCheckedBalance, restoreAction) ->
+        viewLifecycleScope.launchCollect(viewModel.expenseDeletionSuccessEventFlow) { (deletedExpense, newBalance, maybeNewCheckedBalance, restoreAction) ->
             expensesViewAdapter.removeExpense(deletedExpense)
             updateBalanceDisplayForDay(
                 expensesViewAdapter.getDate(),
@@ -236,7 +235,7 @@ class AccountFragment : Fragment(), MenuProvider {
             snackbar.show()
         }
 
-        lifecycleScope.launchCollect(viewModel.expenseDeletionErrorEventFlow) {
+        viewLifecycleScope.launchCollect(viewModel.expenseDeletionErrorEventFlow) {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.expense_delete_error_title)
                 .setMessage(R.string.expense_delete_error_message)
@@ -245,7 +244,7 @@ class AccountFragment : Fragment(), MenuProvider {
         }
 
         var expenseDeletionDialog: ProgressDialog? = null
-        lifecycleScope.launchCollect(viewModel.recurringExpenseDeletionProgressStateFlow) { state ->
+        viewLifecycleScope.launchCollect(viewModel.recurringExpenseDeletionProgressStateFlow) { state ->
             when(state) {
                 is AccountViewModel.RecurringExpenseDeleteProgressState.Deleting -> {
                     val dialog = ProgressDialog(requireContext())
@@ -265,7 +264,7 @@ class AccountFragment : Fragment(), MenuProvider {
             }
         }
 
-        lifecycleScope.launchCollect(viewModel.recurringExpenseDeletionEventFlow) { event ->
+        viewLifecycleScope.launchCollect(viewModel.recurringExpenseDeletionEventFlow) { event ->
             when(event) {
                 is AccountViewModel.RecurringExpenseDeletionEvent.ErrorCantDeleteBeforeFirstOccurrence -> {
                     MaterialAlertDialogBuilder(requireContext())
@@ -307,7 +306,7 @@ class AccountFragment : Fragment(), MenuProvider {
         }
 
         var expenseRestoreDialog: Dialog? = null
-        lifecycleScope.launchCollect(viewModel.recurringExpenseRestoreProgressStateFlow) { state ->
+        viewLifecycleScope.launchCollect(viewModel.recurringExpenseRestoreProgressStateFlow) { state ->
             when(state) {
                 AccountViewModel.RecurringExpenseRestoreProgressState.Idle -> {
                     expenseRestoreDialog?.dismiss()
@@ -327,7 +326,7 @@ class AccountFragment : Fragment(), MenuProvider {
             }
         }
 
-        lifecycleScope.launchCollect(viewModel.recurringExpenseRestoreEventFlow) { event ->
+        viewLifecycleScope.launchCollect(viewModel.recurringExpenseRestoreEventFlow) { event ->
             when(event) {
                 is AccountViewModel.RecurringExpenseRestoreEvent.ErrorIO -> {
                     MaterialAlertDialogBuilder(requireContext())
@@ -346,7 +345,7 @@ class AccountFragment : Fragment(), MenuProvider {
             }
         }
 
-        lifecycleScope.launchCollect(viewModel.startCurrentBalanceEditorEventFlow) { currentBalance ->
+        viewLifecycleScope.launchCollect(viewModel.startCurrentBalanceEditorEventFlow) { currentBalance ->
             val dialogView = layoutInflater.inflate(R.layout.dialog_adjust_balance, null)
             val amountEditText = dialogView.findViewById<EditText>(R.id.balance_amount)
             amountEditText.setText(
@@ -390,7 +389,7 @@ class AccountFragment : Fragment(), MenuProvider {
             }
         }
 
-        lifecycleScope.launchCollect(viewModel.currentBalanceEditingErrorEventFlow) {
+        viewLifecycleScope.launchCollect(viewModel.currentBalanceEditingErrorEventFlow) {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.adjust_balance_error_title)
                 .setMessage(R.string.adjust_balance_error_message)
@@ -398,7 +397,7 @@ class AccountFragment : Fragment(), MenuProvider {
                 .show()
         }
 
-        lifecycleScope.launchCollect(viewModel.currentBalanceEditedEventFlow) { (expense, diff, newBalance) ->
+        viewLifecycleScope.launchCollect(viewModel.currentBalanceEditedEventFlow) { (expense, diff, newBalance) ->
             //Show snackbar
             val snackbar = Snackbar.make(
                 binding.coordinatorLayout,
@@ -422,7 +421,7 @@ class AccountFragment : Fragment(), MenuProvider {
             snackbar.show()
         }
 
-        lifecycleScope.launchCollect(viewModel.currentBalanceRestoringErrorEventFlow) {
+        viewLifecycleScope.launchCollect(viewModel.currentBalanceRestoringErrorEventFlow) {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.adjust_balance_error_title)
                 .setMessage(R.string.adjust_balance_error_message)
@@ -430,19 +429,19 @@ class AccountFragment : Fragment(), MenuProvider {
                 .show()
         }
 
-        lifecycleScope.launchCollect(viewModel.selectedDateDataFlow) { (date, balance, maybeCheckedBalance, expenses) ->
+        viewLifecycleScope.launchCollect(viewModel.selectedDateDataFlow) { (date, balance, maybeCheckedBalance, expenses) ->
             refreshAllForDate(date, balance, maybeCheckedBalance, expenses)
         }
 
-        lifecycleScope.launchCollect(viewModel.refreshDatesFlow) {
+        viewLifecycleScope.launchCollect(viewModel.refreshDatesFlow) {
             calendarFragment.refreshView()
         }
 
-        lifecycleScope.launchCollect(viewModel.premiumStatusFlow) {
+        viewLifecycleScope.launchCollect(viewModel.premiumStatusFlow) {
             invalidateOptionsMenu(requireActivity())
         }
 
-        lifecycleScope.launchCollect(viewModel.expenseCheckedErrorEventFlow) { exception ->
+        viewLifecycleScope.launchCollect(viewModel.expenseCheckedErrorEventFlow) { exception ->
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.expense_check_error_title)
                 .setMessage(
@@ -455,15 +454,15 @@ class AccountFragment : Fragment(), MenuProvider {
                 .show()
         }
 
-        lifecycleScope.launchCollect(viewModel.showGoToCurrentMonthButtonStateFlow) {
+        viewLifecycleScope.launchCollect(viewModel.showGoToCurrentMonthButtonStateFlow) {
             invalidateOptionsMenu(requireActivity())
         }
 
-        lifecycleScope.launchCollect(viewModel.goBackToCurrentMonthEventFlow) {
+        viewLifecycleScope.launchCollect(viewModel.goBackToCurrentMonthEventFlow) {
             calendarFragment.goToCurrentMonth()
         }
 
-        lifecycleScope.launchCollect(viewModel.confirmCheckAllPastEntriesEventFlow) {
+        viewLifecycleScope.launchCollect(viewModel.confirmCheckAllPastEntriesEventFlow) {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.check_all_past_expences_title)
                 .setMessage(getString(R.string.check_all_past_expences_message))
@@ -475,7 +474,7 @@ class AccountFragment : Fragment(), MenuProvider {
                 .show()
         }
 
-        lifecycleScope.launchCollect(viewModel.checkAllPastEntriesErrorEventFlow) { error ->
+        viewLifecycleScope.launchCollect(viewModel.checkAllPastEntriesErrorEventFlow) { error ->
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.check_all_past_expences_error_title)
                 .setMessage(
