@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp.view.main.calendar
+package com.benoitletondor.easybudgetapp.view.main.account.calendar
 
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.parameters.Parameters

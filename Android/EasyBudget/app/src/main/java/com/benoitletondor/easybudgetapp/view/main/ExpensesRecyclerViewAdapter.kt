@@ -16,7 +16,6 @@
 
 package com.benoitletondor.easybudgetapp.view.main
 
-import android.app.Activity
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
@@ -26,6 +25,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import com.benoitletondor.easybudgetapp.R
@@ -45,7 +45,7 @@ import java.time.LocalDate
  *
  * @author Benoit LETONDOR
  */
-class ExpensesRecyclerViewAdapter(private val activity: Activity,
+class ExpensesRecyclerViewAdapter(private val fragment: Fragment,
                                   private val parameters: Parameters,
                                   private val iab: Iab,
                                   private var date: LocalDate,
@@ -128,7 +128,7 @@ class ExpensesRecyclerViewAdapter(private val activity: Activity,
 
         val onClickListener = View.OnClickListener {
             if (expense.isRecurring()) {
-                val builder = MaterialAlertDialogBuilder(activity)
+                val builder = MaterialAlertDialogBuilder(fragment.requireContext())
                 builder.setTitle(if (expense.isRevenue()) R.string.dialog_edit_recurring_income_title else R.string.dialog_edit_recurring_expense_title)
                 builder.setItems(if (expense.isRevenue()) R.array.dialog_edit_recurring_income_choices else R.array.dialog_edit_recurring_expense_choices) { _, which ->
                     when (which) {
@@ -138,7 +138,7 @@ class ExpensesRecyclerViewAdapter(private val activity: Activity,
                             startIntent.putExtra("date", expense.date.toEpochDay())
                             startIntent.putExtra("expense", expense)
 
-                            ActivityCompat.startActivityForResult(activity, startIntent, MainActivity.ADD_EXPENSE_ACTIVITY_CODE, null)
+                            ActivityCompat.startActivityForResult(fragment.requireActivity(), startIntent, MainActivity.ADD_EXPENSE_ACTIVITY_CODE, null)
                         }
                         // Edit this one and following ones
                         1 -> {
@@ -146,7 +146,7 @@ class ExpensesRecyclerViewAdapter(private val activity: Activity,
                             startIntent.putExtra("dateStart", expense.date.toEpochDay())
                             startIntent.putExtra("expense", expense)
 
-                            ActivityCompat.startActivityForResult(activity, startIntent, MainActivity.MANAGE_RECURRING_EXPENSE_ACTIVITY_CODE, null)
+                            ActivityCompat.startActivityForResult(fragment.requireActivity(), startIntent, MainActivity.MANAGE_RECURRING_EXPENSE_ACTIVITY_CODE, null)
                         }
                         // Delete this one
                         2 -> {
@@ -154,7 +154,7 @@ class ExpensesRecyclerViewAdapter(private val activity: Activity,
                             val intent = Intent(MainActivity.INTENT_RECURRING_EXPENSE_DELETED)
                             intent.putExtra("expense", expense)
                             intent.putExtra("deleteType", RecurringExpenseDeleteType.ONE.value)
-                            LocalBroadcastManager.getInstance(activity.applicationContext).sendBroadcast(intent)
+                            LocalBroadcastManager.getInstance(fragment.requireContext()).sendBroadcast(intent)
                         }
                         // Delete from
                         3 -> {
@@ -162,7 +162,7 @@ class ExpensesRecyclerViewAdapter(private val activity: Activity,
                             val intent = Intent(MainActivity.INTENT_RECURRING_EXPENSE_DELETED)
                             intent.putExtra("expense", expense)
                             intent.putExtra("deleteType", RecurringExpenseDeleteType.FROM.value)
-                            LocalBroadcastManager.getInstance(activity.applicationContext).sendBroadcast(intent)
+                            LocalBroadcastManager.getInstance(fragment.requireContext()).sendBroadcast(intent)
                         }
                         // Delete up to
                         4 -> {
@@ -170,7 +170,7 @@ class ExpensesRecyclerViewAdapter(private val activity: Activity,
                             val intent = Intent(MainActivity.INTENT_RECURRING_EXPENSE_DELETED)
                             intent.putExtra("expense", expense)
                             intent.putExtra("deleteType", RecurringExpenseDeleteType.TO.value)
-                            LocalBroadcastManager.getInstance(activity.applicationContext).sendBroadcast(intent)
+                            LocalBroadcastManager.getInstance(fragment.requireContext()).sendBroadcast(intent)
                         }
                         // Delete all
                         5 -> {
@@ -178,13 +178,13 @@ class ExpensesRecyclerViewAdapter(private val activity: Activity,
                             val intent = Intent(MainActivity.INTENT_RECURRING_EXPENSE_DELETED)
                             intent.putExtra("expense", expense)
                             intent.putExtra("deleteType", RecurringExpenseDeleteType.ALL.value)
-                            LocalBroadcastManager.getInstance(activity.applicationContext).sendBroadcast(intent)
+                            LocalBroadcastManager.getInstance(fragment.requireContext()).sendBroadcast(intent)
                         }
                     }
                 }
                 builder.show()
             } else {
-                val builder = MaterialAlertDialogBuilder(activity)
+                val builder = MaterialAlertDialogBuilder(fragment.requireContext())
                 builder.setTitle(if (expense.isRevenue()) R.string.dialog_edit_income_title else R.string.dialog_edit_expense_title)
                 builder.setItems(if (expense.isRevenue()) R.array.dialog_edit_income_choices else R.array.dialog_edit_expense_choices) { _, which ->
                     when (which) {
@@ -194,14 +194,14 @@ class ExpensesRecyclerViewAdapter(private val activity: Activity,
                             startIntent.putExtra("date", expense.date.toEpochDay())
                             startIntent.putExtra("expense", expense)
 
-                            ActivityCompat.startActivityForResult(activity, startIntent, MainActivity.ADD_EXPENSE_ACTIVITY_CODE, null)
+                            ActivityCompat.startActivityForResult(fragment.requireActivity(), startIntent, MainActivity.ADD_EXPENSE_ACTIVITY_CODE, null)
                         }
                         1 // Delete
                         -> {
                             // Send notification to inform views that this expense has been deleted
                             val intent = Intent(MainActivity.INTENT_EXPENSE_DELETED)
                             intent.putExtra("expense", expense)
-                            LocalBroadcastManager.getInstance(activity.applicationContext).sendBroadcast(intent)
+                            LocalBroadcastManager.getInstance(fragment.requireContext()).sendBroadcast(intent)
                         }
                     }
                 }

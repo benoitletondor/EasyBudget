@@ -1,4 +1,4 @@
-package com.benoitletondor.easybudgetapp.view.main.calendar
+package com.benoitletondor.easybudgetapp.view.main.account.calendar
 
 import android.icu.number.Notation
 import android.icu.text.CompactDecimalFormat

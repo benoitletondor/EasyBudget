@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp.view.main.calendar
+package com.benoitletondor.easybudgetapp.view.main.account.calendar
 
 import android.content.Context
 import android.graphics.Typeface
