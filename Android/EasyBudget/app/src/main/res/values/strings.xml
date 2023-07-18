@@ -348,6 +348,10 @@
     <string name="settings_subscribe_premium">Premium</string>
     <string name="settings_subscribe_pro">Pro</string>
 
+    <string name="account_error_loading_title">Oops</string>
+    <string name="account_error_loading_message">Unable to load your account data.\n(%s)\n\nPlease check your network and try again.</string>
+    <string name="account_error_loading_retry_cta">Retry</string>
+
     <!-- Keys, not for translations. -->
     <string name="setting_category_bug_report_send_button_key" translatable="false">send_bug_report</string>
     <string name="setting_category_show_welcome_screen_button_key" translatable="false">show_welcome_screen</string>

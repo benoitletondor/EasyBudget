@@ -22,11 +22,13 @@ plugins {
     id("com.google.devtools.ksp")
     id("com.google.gms.google-services")
     id("io.realm.kotlin")
+    id("kotlin-parcelize")
 }
 
 apply {
     from("batch.gradle.kts")
     from("iap.gradle.kts")
+    from("atlas.gradle.kts")
 }
 
 android {
@@ -54,6 +56,7 @@ android {
         debug {
             val batchDevKey = rootProject.extra["batchDevKey"] as String
             val licenceKey = rootProject.extra["licenceKey"] as String
+            val atlasAppId = rootProject.extra["atlasAppId"] as String
 
             buildConfigField("boolean", "DEBUG_LOG", "true")
             buildConfigField("boolean", "CRASHLYTICS_ACTIVATED", "false")
@@ -61,12 +64,14 @@ android {
             buildConfigField("boolean", "ANALYTICS_ACTIVATED", "false")
             buildConfigField("boolean", "DEV_PREFERENCES", "true")
             buildConfigField("String", "LICENCE_KEY", "\"$licenceKey\"")
+            buildConfigField("String", "ATLAS_APP_ID", "\"$atlasAppId\"")
 
             signingConfig = signingConfigs.getByName("debug")
         }
         release {
             val batchLiveKey = rootProject.extra["batchLiveKey"] as String
             val licenceKey = rootProject.extra["licenceKey"] as String
+            val atlasAppId = rootProject.extra["atlasAppId"] as String
 
             buildConfigField("boolean", "DEBUG_LOG", "false")
             buildConfigField("boolean", "CRASHLYTICS_ACTIVATED", "true")
@@ -74,6 +79,7 @@ android {
             buildConfigField("boolean", "ANALYTICS_ACTIVATED", "true")
             buildConfigField("boolean", "DEV_PREFERENCES", "false")
             buildConfigField("String", "LICENCE_KEY", "\"$licenceKey\"")
+            buildConfigField("String", "ATLAS_APP_ID", "\"$atlasAppId\"")
 
             isMinifyEnabled = true
             isShrinkResources = true

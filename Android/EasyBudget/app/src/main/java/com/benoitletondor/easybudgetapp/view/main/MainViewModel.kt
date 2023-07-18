@@ -16,6 +16,7 @@
 
 package com.benoitletondor.easybudgetapp.view.main
 
+import android.os.Parcelable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.iab.Iab
@@ -24,6 +25,7 @@ import com.benoitletondor.easybudgetapp.iab.PremiumCheckStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
 
 @HiltViewModel
@@ -33,13 +35,10 @@ class MainViewModel @Inject constructor(
     val premiumStatusFlow: StateFlow<PremiumCheckStatus> = iab.iabStatusFlow
         .stateIn(viewModelScope, SharingStarted.Eagerly, PremiumCheckStatus.INITIALIZING)
 
-    val isIabReady: Boolean get() = iab.isIabReady()
-    val isUserPremium: Boolean get() = iab.isUserPremium()
-
     private val openPremiumEventMutableFlow = MutableLiveFlow<Unit>()
     val openPremiumEventFlow: Flow<Unit> = openPremiumEventMutableFlow
 
-    val accountSelectionFlow = flowOf(SelectedAccount.Offline)
+    val accountSelectionFlow: StateFlow<SelectedAccount> = flowOf(SelectedAccount.Selected.Offline)
         .stateIn(viewModelScope, SharingStarted.Eagerly, SelectedAccount.Loading)
 
     fun onBecomePremiumButtonPressed() {
@@ -52,9 +51,16 @@ class MainViewModel @Inject constructor(
         // TODO
     }
 
+    fun shouldShowMenuButtons(): Boolean = iab.isIabReady() && accountSelectionFlow.value is SelectedAccount.Selected
+    fun showPremiumMenuButtons(): Boolean = iab.isUserPremium()
+
     sealed class SelectedAccount {
         object Loading : SelectedAccount()
-        object Offline : SelectedAccount()
-        class Online(val accountId: String, val accountSecret: String) : SelectedAccount()
+        sealed class Selected : SelectedAccount(), Parcelable {
+            @Parcelize
+            object Offline : Selected()
+            @Parcelize
+            data class Online(val accountId: String, val accountSecret: String) : Selected()
+        }
     }
 }

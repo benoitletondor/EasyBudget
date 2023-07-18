@@ -37,6 +37,7 @@ import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.parameters.*
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.main.account.AccountFragment
+import com.benoitletondor.easybudgetapp.view.main.loading.LoadingFragment
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
@@ -103,20 +104,27 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
         }
 
         lifecycleScope.launchCollect(viewModel.accountSelectionFlow) { selectedAccount ->
-            performIntentActionIfAny()
+            invalidateOptionsMenu()
 
             when(selectedAccount) {
-                MainViewModel.SelectedAccount.Loading -> Unit // TODO
-                MainViewModel.SelectedAccount.Offline -> supportFragmentManager.commit {
-                    replace(R.id.mainFragmentContainer, AccountFragment())
+                MainViewModel.SelectedAccount.Loading -> {
+                    supportFragmentManager.commit {
+                        replace(R.id.mainFragmentContainer, LoadingFragment())
+                    }
                 }
-                is MainViewModel.SelectedAccount.Online -> Unit // TODO
+                is MainViewModel.SelectedAccount.Selected -> {
+                    performIntentActionIfAny()
+
+                    supportFragmentManager.commit {
+                        replace(R.id.mainFragmentContainer, AccountFragment.newInstance(selectedAccount))
+                    }
+                }
             }
         }
     }
 
     private fun performIntentActionIfAny() {
-        if (intent != null && viewModel.accountSelectionFlow.value !== MainViewModel.SelectedAccount.Loading) {
+        if (intent != null && viewModel.accountSelectionFlow.value is MainViewModel.SelectedAccount.Selected) {
             openSettingsIfNeeded(intent)
             openMonthlyReportIfNeeded(intent)
             openPremiumIfNeeded(intent)
@@ -140,9 +148,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
 
-        if (viewModel.isIabReady) {
+        if (viewModel.shouldShowMenuButtons()) {
             // Remove monthly report for non premium users
-            if ( !viewModel.isUserPremium ) {
+            if ( !viewModel.showPremiumMenuButtons() ) {
                 menu.removeItem(R.id.action_monthly_report)
             } else {
                 menu.removeItem(R.id.action_become_premium)
@@ -157,6 +165,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
                 }
             }
         } else {
+            menu.removeItem(R.id.action_monthly_report)
             menu.removeItem(R.id.action_become_premium)
         }
     }

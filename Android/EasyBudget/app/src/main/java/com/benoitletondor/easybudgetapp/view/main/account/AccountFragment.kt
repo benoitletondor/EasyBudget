@@ -49,6 +49,7 @@ import com.benoitletondor.easybudgetapp.parameters.getLowMoneyWarningAmount
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.main.ExpensesRecyclerViewAdapter
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
+import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import com.benoitletondor.easybudgetapp.view.main.account.calendar.CalendarFragment
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment
@@ -207,6 +208,19 @@ class AccountFragment : Fragment(), MenuProvider {
     }
 
     private fun observeViewModel() {
+        viewLifecycleScope.launchCollect(viewModel.dbAvailableFlow) { dbState ->
+            binding.accountLoadedView.isVisible = dbState is AccountViewModel.DBState.Loaded
+            binding.accountLoadingView.isVisible = dbState is AccountViewModel.DBState.Loading
+            binding.accountErrorView.isVisible = dbState is AccountViewModel.DBState.Error
+
+            if (dbState is AccountViewModel.DBState.Error) {
+                binding.accountErrorMessageTextView.text = getString(R.string.account_error_loading_message, dbState.error.localizedMessage)
+                binding.accountErrorMessageRetryCta.setOnClickListener {
+                    viewModel.onRetryLoadingButtonPressed()
+                }
+            }
+        }
+
         viewLifecycleScope.launchCollect(viewModel.expenseDeletionSuccessEventFlow) { (deletedExpense, newBalance, maybeNewCheckedBalance, restoreAction) ->
             expensesViewAdapter.removeExpense(deletedExpense)
             updateBalanceDisplayForDay(
@@ -798,6 +812,15 @@ class AccountFragment : Fragment(), MenuProvider {
     }
 
     companion object {
+        const val ARG_SELECTED_ACCOUNT = "selected_account"
         private const val CALENDAR_SAVED_STATE = "calendar_saved_state"
+
+        fun newInstance(account: MainViewModel.SelectedAccount.Selected): AccountFragment {
+            return AccountFragment().apply {
+                arguments = Bundle().apply {
+                    putParcelable(ARG_SELECTED_ACCOUNT, account);
+                }
+            }
+        }
     }
 }

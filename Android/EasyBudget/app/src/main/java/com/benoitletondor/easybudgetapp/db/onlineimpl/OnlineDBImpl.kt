@@ -53,14 +53,13 @@ class OnlineDBImpl(
 
     override suspend fun triggerForceWriteToDisk() { /* No-op */ }
 
-    private suspend fun awaitSyncDone() {
+    suspend fun awaitSyncDone(): SyncSessionState {
         if (syncSessionState.value is SyncSessionState.Done) {
-            return
+            return SyncSessionState.Done
         }
 
         if (syncSessionState.value is SyncSessionState.Started) {
-            syncSessionState.first { it is SyncSessionState.Done || it is SyncSessionState.Error }
-            return
+            return syncSessionState.first { it is SyncSessionState.Done || it is SyncSessionState.Error }
         }
 
         syncSessionState.value = SyncSessionState.Started
@@ -72,6 +71,8 @@ class OnlineDBImpl(
         } else {
             syncSessionState.value = SyncSessionState.Done
         }
+
+        return syncSessionState.value
     }
 
     private fun watchAllRecurringExpenses() {
@@ -441,7 +442,7 @@ class OnlineDBImpl(
     private fun generateQueryForDay(day: LocalDate): String
         = "date == ${day.toEpochDay()}"
 
-    private sealed class SyncSessionState {
+    sealed class SyncSessionState {
         object NotStarted : SyncSessionState()
         object Started : SyncSessionState()
         object Done : SyncSessionState()

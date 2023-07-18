@@ -1,19 +1,27 @@
 package com.benoitletondor.easybudgetapp.view.main.account
 
+import android.content.Context
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.benoitletondor.easybudgetapp.auth.Auth
+import com.benoitletondor.easybudgetapp.auth.AuthState
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.db.RestoreAction
 import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.iab.PremiumCheckStatus
+import com.benoitletondor.easybudgetapp.injection.AppModule
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.getShouldShowCheckedBalance
+import com.benoitletondor.easybudgetapp.view.main.MainViewModel
+import com.benoitletondor.easybudgetapp.view.main.account.AccountFragment.Companion.ARG_SELECTED_ACCOUNT
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -21,6 +29,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -30,10 +40,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AccountViewModel @Inject constructor(
-    private val db: DB,
     private val parameters: Parameters,
     private val iab: Iab,
+    private val auth: Auth,
+    private val savedStateHandle: SavedStateHandle,
+    @ApplicationContext private val appContext: Context,
 ): ViewModel() {
+    private val dbAvailableMutableStateFlow = MutableStateFlow<DBState>(DBState.Loading)
+    val dbAvailableFlow: StateFlow<DBState> = dbAvailableMutableStateFlow
+
     val premiumStatusFlow: StateFlow<PremiumCheckStatus> = iab.iabStatusFlow
         .stateIn(viewModelScope, SharingStarted.Eagerly, PremiumCheckStatus.INITIALIZING)
 
@@ -98,7 +113,7 @@ class AccountViewModel @Inject constructor(
         val (balance, expenses, checkedBalance) = withContext(Dispatchers.Default) {
             Triple(
                 getBalanceForDay(date),
-                db.getExpensesForDay(date),
+                awaitDB().getExpensesForDay(date),
                 if (parameters.getShouldShowCheckedBalance()) {
                     getCheckedBalanceForDay(date)
                 } else {
@@ -111,9 +126,48 @@ class AccountViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.Eagerly, SelectedDateExpensesData(selectDateMutableStateFlow.value, 0.0, null, emptyList()))
 
     init {
+        loadDB()
+    }
+
+    override fun onCleared() {
+        (dbAvailableMutableStateFlow.value as? DBState.Loaded)?.db?.close()
+
+        super.onCleared()
+    }
+
+    private fun loadDB() {
+        dbAvailableMutableStateFlow.value = DBState.Loading
+
         viewModelScope.launch {
-            forceRefreshMutableFlow.emit(Unit)
+            val selectedDB = savedStateHandle.get<MainViewModel.SelectedAccount.Selected>(ARG_SELECTED_ACCOUNT)
+                ?: throw IllegalStateException("No ARG_SELECTED_ACCOUNT arg")
+
+            try {
+                dbAvailableMutableStateFlow.value = when(selectedDB) {
+                    MainViewModel.SelectedAccount.Selected.Offline -> DBState.Loaded(AppModule.provideDB(appContext))
+                    is MainViewModel.SelectedAccount.Selected.Online -> {
+                        val currentUser = (auth.state.value as? AuthState.Authenticated)?.currentUser ?: throw IllegalStateException("User is not authenticated")
+
+                        val onlineDb = AppModule.provideSyncedOnlineDBOrThrow(
+                            currentUser = currentUser,
+                            accountId = selectedDB.accountId,
+                            accountSecret = selectedDB.accountSecret,
+                        )
+
+                        DBState.Loaded(onlineDb)
+                    }
+                }
+
+                forceRefreshMutableFlow.emit(Unit)
+            } catch (e: Exception) {
+                Logger.error("Error while loading DB", e)
+                dbAvailableMutableStateFlow.value = DBState.Error(e);
+            }
         }
+    }
+
+    fun onRetryLoadingButtonPressed() {
+        loadDB()
     }
 
     sealed class RecurringExpenseDeleteProgressState {
@@ -142,14 +196,14 @@ class AccountViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val restoreAction = withContext(Dispatchers.IO) {
-                    db.deleteExpense(expense)
+                    awaitDB().deleteExpense(expense)
                 }
 
                 val selectedDate = selectDateMutableStateFlow.value
                 expenseDeletionSuccessEventMutableFlow.emit(ExpenseDeletionSuccessData(
                     expense,
                     getBalanceForDay(selectedDate),
-                    if (parameters.getShouldShowCheckedBalance()) { db.getCheckedBalanceForDay(selectedDate) } else { null },
+                    if (parameters.getShouldShowCheckedBalance()) { awaitDB().getCheckedBalanceForDay(selectedDate) } else { null },
                     restoreAction,
                 ))
 
@@ -187,7 +241,7 @@ class AccountViewModel @Inject constructor(
                 }
 
                 val firstOccurrenceError = withContext(Dispatchers.Default) {
-                    deleteType == RecurringExpenseDeleteType.TO && !db.hasExpensesForRecurringExpenseBeforeDate(associatedRecurringExpense.recurringExpense, expense.date)
+                    deleteType == RecurringExpenseDeleteType.TO && !awaitDB().hasExpensesForRecurringExpenseBeforeDate(associatedRecurringExpense.recurringExpense, expense.date)
                 }
 
                 if ( firstOccurrenceError ) {
@@ -199,28 +253,28 @@ class AccountViewModel @Inject constructor(
                     when (deleteType) {
                         RecurringExpenseDeleteType.ALL -> {
                             try {
-                                db.deleteRecurringExpense(associatedRecurringExpense.recurringExpense)
+                                awaitDB().deleteRecurringExpense(associatedRecurringExpense.recurringExpense)
                             } catch (t: Throwable) {
                                 null
                             }
                         }
                         RecurringExpenseDeleteType.FROM -> {
                             try {
-                                db.deleteAllExpenseForRecurringExpenseAfterDate(associatedRecurringExpense.recurringExpense, expense.date)
+                                awaitDB().deleteAllExpenseForRecurringExpenseAfterDate(associatedRecurringExpense.recurringExpense, expense.date)
                             } catch (t: Throwable) {
                                 null
                             }
                         }
                         RecurringExpenseDeleteType.TO -> {
                             try {
-                                db.deleteAllExpenseForRecurringExpenseBeforeDate(associatedRecurringExpense.recurringExpense, expense.date)
+                                awaitDB().deleteAllExpenseForRecurringExpenseBeforeDate(associatedRecurringExpense.recurringExpense, expense.date)
                             } catch (t: Throwable) {
                                 null
                             }
                         }
                         RecurringExpenseDeleteType.ONE -> {
                             try {
-                                db.deleteExpense(expense)
+                                awaitDB().deleteExpense(expense)
                             } catch (t: Throwable) {
                                 null
                             }
@@ -269,7 +323,7 @@ class AccountViewModel @Inject constructor(
     fun onAdjustCurrentBalanceClicked() {
         viewModelScope.launch {
             val balance = withContext(Dispatchers.Default) {
-                -db.getBalanceForDay(LocalDate.now())
+                -awaitDB().getBalanceForDay(LocalDate.now())
             }
 
             startCurrentBalanceEditorEventMutableFlow.emit(balance)
@@ -280,7 +334,7 @@ class AccountViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val currentBalance = withContext(Dispatchers.Default) {
-                    -db.getBalanceForDay(LocalDate.now())
+                    -awaitDB().getBalanceForDay(LocalDate.now())
                 }
 
                 if (newBalance == currentBalance) {
@@ -292,18 +346,18 @@ class AccountViewModel @Inject constructor(
 
                 // Look for an existing balance for the day
                 val existingExpense = withContext(Dispatchers.Default) {
-                    db.getExpensesForDay(LocalDate.now()).find { it.title == balanceExpenseTitle }
+                    awaitDB().getExpensesForDay(LocalDate.now()).find { it.title == balanceExpenseTitle }
                 }
 
                 if (existingExpense != null) { // If the adjust balance exists, just add the diff and persist it
                     val newExpense = withContext(Dispatchers.Default) {
-                        db.persistExpense(existingExpense.copy(amount = existingExpense.amount - diff))
+                        awaitDB().persistExpense(existingExpense.copy(amount = existingExpense.amount - diff))
                     }
 
                     currentBalanceEditedEventMutableFlow.emit(BalanceAdjustedData(newExpense, diff, newBalance))
                 } else { // If no adjust balance yet, create a new one
                     val persistedExpense = withContext(Dispatchers.Default) {
-                        db.persistExpense(Expense(balanceExpenseTitle, -diff, LocalDate.now(), true))
+                        awaitDB().persistExpense(Expense(balanceExpenseTitle, -diff, LocalDate.now(), true))
                     }
 
                     currentBalanceEditedEventMutableFlow.emit(BalanceAdjustedData(persistedExpense, diff, newBalance))
@@ -322,10 +376,10 @@ class AccountViewModel @Inject constructor(
             try {
                 withContext(Dispatchers.Default) {
                     if( expense.amount + diff == 0.0 ) {
-                        db.deleteExpense(expense)
+                        awaitDB().deleteExpense(expense)
                     } else {
                         val newExpense = expense.copy(amount = expense.amount + diff)
-                        db.persistExpense(newExpense)
+                        awaitDB().persistExpense(newExpense)
                     }
                 }
 
@@ -349,14 +403,14 @@ class AccountViewModel @Inject constructor(
 
     private suspend fun getBalanceForDay(date: LocalDate): Double {
         var balance = 0.0 // Just to keep a positive number if balance == 0
-        balance -= db.getBalanceForDay(date)
+        balance -= awaitDB().getBalanceForDay(date)
 
         return balance
     }
 
     private suspend fun getCheckedBalanceForDay(date: LocalDate): Double {
         var balance = 0.0 // Just to keep a positive number if balance == 0
-        balance -= db.getCheckedBalanceForDay(date)
+        balance -= awaitDB().getCheckedBalanceForDay(date)
 
         return balance
     }
@@ -375,7 +429,7 @@ class AccountViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 withContext(Dispatchers.Default) {
-                    db.persistExpense(expense.copy(checked = checked))
+                    awaitDB().persistExpense(expense.copy(checked = checked))
                 }
 
                 forceRefreshMutableFlow.emit(Unit)
@@ -415,7 +469,7 @@ class AccountViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 withContext(Dispatchers.Default) {
-                    db.markAllEntriesAsChecked(LocalDate.now())
+                    awaitDB().markAllEntriesAsChecked(LocalDate.now())
                 }
 
                 forceRefreshMutableFlow.emit(Unit)
@@ -430,6 +484,14 @@ class AccountViewModel @Inject constructor(
         viewModelScope.launch {
             forceRefreshMutableFlow.emit(Unit)
         }
+    }
+
+    private suspend fun awaitDB() = dbAvailableMutableStateFlow.filterIsInstance<DBState.Loaded>().first().db
+
+    sealed class DBState {
+        object Loading : DBState()
+        class Loaded(val db: DB) : DBState()
+        class Error(val error: Exception) : DBState()
     }
 }
 

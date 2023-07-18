@@ -17,9 +17,11 @@
 package com.benoitletondor.easybudgetapp.injection
 
 import android.content.Context
+import com.benoitletondor.easybudgetapp.BuildConfig
 import com.benoitletondor.easybudgetapp.accounts.Accounts
 import com.benoitletondor.easybudgetapp.accounts.FirebaseAccounts
 import com.benoitletondor.easybudgetapp.auth.Auth
+import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.benoitletondor.easybudgetapp.auth.FirebaseAuth
 import com.benoitletondor.easybudgetapp.cloudstorage.CloudStorage
 import com.benoitletondor.easybudgetapp.cloudstorage.FirebaseStorage
@@ -32,6 +34,7 @@ import com.benoitletondor.easybudgetapp.db.cacheimpl.CachedDBImpl
 import com.benoitletondor.easybudgetapp.db.cacheimpl.CacheDBStorage
 import com.benoitletondor.easybudgetapp.db.impl.DBImpl
 import com.benoitletondor.easybudgetapp.db.impl.RoomDB
+import com.benoitletondor.easybudgetapp.db.onlineimpl.OnlineDBImpl
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import dagger.Module
@@ -83,4 +86,32 @@ object AppModule {
         },
         Executors.newSingleThreadExecutor(),
     )
+
+    suspend fun provideSyncedOnlineDBOrThrow(
+        currentUser: CurrentUser,
+        accountId: String,
+        accountSecret: String,
+    ): DB {
+        val onlineDB = OnlineDBImpl.provideFor(
+            atlasAppId = BuildConfig.ATLAS_APP_ID,
+            currentUser = currentUser,
+            accountId = accountId,
+            accountSecret = accountSecret
+        )
+
+        val dbSyncState = onlineDB.awaitSyncDone()
+        if (dbSyncState is OnlineDBImpl.SyncSessionState.Error) {
+            throw dbSyncState.exception
+        }
+
+        return CachedDBImpl(
+            onlineDB,
+            object : CacheDBStorage {
+                override val expenses: MutableMap<LocalDate, List<Expense>> = mutableMapOf()
+                override val balances: MutableMap<LocalDate, Double> = mutableMapOf()
+                override val checkedBalances: MutableMap<LocalDate, Double> = mutableMapOf()
+            },
+            Executors.newSingleThreadExecutor(),
+        )
+    }
 }
