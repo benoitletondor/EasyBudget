@@ -39,6 +39,11 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/mainComposeView"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent" />
+
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/mainFragmentContainer"
             android:layout_width="match_parent"

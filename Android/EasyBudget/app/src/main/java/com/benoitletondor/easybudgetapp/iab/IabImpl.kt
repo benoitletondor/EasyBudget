@@ -22,7 +22,6 @@ import android.content.Intent
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.android.billingclient.api.*
 import com.benoitletondor.easybudgetapp.helper.Logger
-import com.benoitletondor.easybudgetapp.parameters.Parameters
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,7 +39,6 @@ private const val SKU_SUBSCRIPTION = "premium_subscription"
 
 class IabImpl(
     context: Context,
-    private val parameters: Parameters,
 ) : Iab, PurchasesUpdatedListener, BillingClientStateListener {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val pendingPurchaseEventMutableFlow = MutableSharedFlow<PurchaseFlowResult>()
@@ -101,6 +99,10 @@ class IabImpl(
         return (iabStatusMutableFlow.value == PremiumCheckStatus.LEGACY_PREMIUM ||
             iabStatusMutableFlow.value == PremiumCheckStatus.PREMIUM_SUBSCRIBED ||
             iabStatusMutableFlow.value == PremiumCheckStatus.PRO_SUBSCRIBED)
+    }
+
+    override fun isUserPro(): Boolean {
+        return iabStatusMutableFlow.value == PremiumCheckStatus.PRO_SUBSCRIBED
     }
 
     override suspend fun waitForIsUserPremiumResponse(): Boolean {

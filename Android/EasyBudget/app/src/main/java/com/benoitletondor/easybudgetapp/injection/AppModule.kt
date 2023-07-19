@@ -54,8 +54,7 @@ object AppModule {
     @Singleton
     fun provideIab(
         @ApplicationContext context: Context,
-        parameters: Parameters,
-    ): Iab = IabImpl(context, parameters)
+    ): Iab = IabImpl(context)
 
     @Provides
     @Singleton

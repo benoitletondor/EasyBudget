@@ -19,6 +19,9 @@ package com.benoitletondor.easybudgetapp.view.main
 import android.os.Parcelable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.benoitletondor.easybudgetapp.accounts.Accounts
+import com.benoitletondor.easybudgetapp.auth.Auth
+import com.benoitletondor.easybudgetapp.auth.AuthState
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
 import com.benoitletondor.easybudgetapp.iab.PremiumCheckStatus
@@ -33,6 +36,8 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val iab: Iab,
     private val parameters: Parameters,
+    private val accounts: Accounts,
+    private val auth: Auth,
 ) : ViewModel() {
     val premiumStatusFlow: StateFlow<PremiumCheckStatus> = iab.iabStatusFlow
         .stateIn(viewModelScope, SharingStarted.Eagerly, PremiumCheckStatus.INITIALIZING)
@@ -40,26 +45,28 @@ class MainViewModel @Inject constructor(
     private val openPremiumEventMutableFlow = MutableLiveFlow<Unit>()
     val openPremiumEventFlow: Flow<Unit> = openPremiumEventMutableFlow
 
-    private val selectedAccountMutableStateFlow: MutableStateFlow<SelectedAccount.Selected> = MutableStateFlow(kotlin.run {
-        val selectedOnlineAccount = parameters.getLatestSelectedOnlineAccount()
-        if (selectedOnlineAccount != null) {
-            return@run selectedOnlineAccount
-        }
-
-        return@run SelectedAccount.Selected.Offline
-    })
+    private val selectedOnlineAccountIdMutableStateFlow: MutableStateFlow<String?>
+        = MutableStateFlow(parameters.getLatestSelectedOnlineAccountId())
 
     val accountSelectionFlow: StateFlow<SelectedAccount> = combine(
-        selectedAccountMutableStateFlow
-            .onEach { selectedAccount ->
-                when(selectedAccount) {
-                    SelectedAccount.Selected.Offline -> parameters.clearLatestSelectedAccount()
-                    is SelectedAccount.Selected.Online -> parameters.setLatestSelectedOnlineAccount(selectedAccount)
-                }
-            },
+        selectedOnlineAccountIdMutableStateFlow,
         iab.iabStatusFlow,
-    ) { selectedAccount, iabStatus ->
-        if (selectedAccount is SelectedAccount.Selected.Offline) {
+        iab.iabStatusFlow
+            .flatMapLatest { iabStatus ->
+                when(iabStatus) {
+                    PremiumCheckStatus.PRO_SUBSCRIBED -> auth.state
+                        .flatMapLatest { authState ->
+                            when(authState) {
+                                is AuthState.Authenticated -> accounts.watchAccounts(authState.currentUser)
+                                AuthState.Authenticating,
+                                AuthState.NotAuthenticated -> flowOf(emptyList())
+                            }
+                        }
+                    else -> flowOf(emptyList())
+                }
+            }
+    ) { selectedOnlineAccountId, iabStatus, onlineAccounts ->
+        if (selectedOnlineAccountId == null) {
             return@combine SelectedAccount.Selected.Offline
         }
 
@@ -70,7 +77,17 @@ class MainViewModel @Inject constructor(
             PremiumCheckStatus.NOT_PREMIUM,
             PremiumCheckStatus.LEGACY_PREMIUM,
             PremiumCheckStatus.PREMIUM_SUBSCRIBED -> SelectedAccount.Selected.Offline
-            PremiumCheckStatus.PRO_SUBSCRIBED -> selectedAccount
+            PremiumCheckStatus.PRO_SUBSCRIBED -> onlineAccounts
+                .firstOrNull { it.id == selectedOnlineAccountId }
+                ?.let { account ->
+                    SelectedAccount.Selected.Online(
+                        name = account.name,
+                        isOwner = account.isUserOwner,
+                        ownerEmail = account.ownerEmail,
+                        accountId = account.id,
+                        accountSecret = account.secret,
+                    )
+                } ?: SelectedAccount.Selected.Offline
         }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, SelectedAccount.Loading)
 
@@ -93,34 +110,30 @@ class MainViewModel @Inject constructor(
             @Parcelize
             object Offline : Selected()
             @Parcelize
-            data class Online(val accountId: String, val accountSecret: String) : Selected()
+            data class Online(
+                val name: String,
+                val isOwner: Boolean,
+                val ownerEmail: String,
+                val accountId: String,
+                val accountSecret: String,
+            ) : Selected()
         }
     }
 
-    private fun Parameters.getLatestSelectedOnlineAccount(): SelectedAccount.Selected.Online? {
-        val id = getString(SELECTED_ACCOUNT_ID_KEY)
-        val secret = getString(SELECTED_ACCOUNT_SECRET_KEY)
-
-        if (id != null && secret != null) {
-            return SelectedAccount.Selected.Online(id, secret)
-        }
-
-        return null
+    private fun Parameters.getLatestSelectedOnlineAccountId(): String? {
+        return getString(SELECTED_ACCOUNT_ID_KEY)
     }
 
-    private fun Parameters.setLatestSelectedOnlineAccount(account: SelectedAccount.Selected.Online) {
-        putString(SELECTED_ACCOUNT_ID_KEY, account.accountId)
-        putString(SELECTED_ACCOUNT_SECRET_KEY, account.accountSecret)
+    private fun Parameters.setLatestSelectedOnlineAccountId(accountId: String) {
+        putString(SELECTED_ACCOUNT_ID_KEY, accountId)
     }
 
 
     private fun Parameters.clearLatestSelectedAccount() {
         remove(SELECTED_ACCOUNT_ID_KEY)
-        remove(SELECTED_ACCOUNT_SECRET_KEY)
     }
 
     companion object {
         private const val SELECTED_ACCOUNT_ID_KEY = "selectedAccountId";
-        private const val SELECTED_ACCOUNT_SECRET_KEY = "selectedAccountSecret"
     }
 }

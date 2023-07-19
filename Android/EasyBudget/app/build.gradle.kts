@@ -162,6 +162,7 @@ dependencies {
     androidTestImplementation(composeBom)
     debugImplementation("androidx.compose.ui:ui-tooling")
     implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.ui:ui")
     implementation("androidx.activity:activity-compose:1.7.2")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
     implementation("com.google.accompanist:accompanist-themeadapter-material3:0.31.5-beta")

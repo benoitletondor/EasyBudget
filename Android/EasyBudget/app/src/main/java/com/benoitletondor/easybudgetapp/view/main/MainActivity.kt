@@ -25,6 +25,20 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import androidx.activity.viewModels
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
@@ -35,6 +49,7 @@ import com.benoitletondor.easybudgetapp.databinding.ActivityMainBinding
 
 import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.parameters.*
+import com.benoitletondor.easybudgetapp.theme.AppTheme
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.main.account.AccountFragment
 import com.benoitletondor.easybudgetapp.view.main.loading.LoadingFragment
@@ -78,6 +93,37 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
         addMenuProvider(this)
 
         collectViewModelEvents()
+
+        binding.mainComposeView.setContent {
+            val selectedAccount by viewModel.accountSelectionFlow.collectAsState()
+
+            AppTheme {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+
+                        }
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    when(val account = selectedAccount) {
+                        MainViewModel.SelectedAccount.Loading -> Unit /* Nothing to display when loading */
+                        MainViewModel.SelectedAccount.Selected.Offline -> Row {
+                            Text(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = "Default (offline)",
+                            )
+                        }
+                        is MainViewModel.SelectedAccount.Selected.Online -> Row {
+                            Text(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = "${account.name} (online)",
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
