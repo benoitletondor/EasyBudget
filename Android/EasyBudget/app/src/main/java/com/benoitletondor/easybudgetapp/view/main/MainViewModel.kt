@@ -48,6 +48,10 @@ class MainViewModel @Inject constructor(
     private val selectedOnlineAccountIdMutableStateFlow: MutableStateFlow<String?>
         = MutableStateFlow(parameters.getLatestSelectedOnlineAccountId())
 
+    private val eventMutableFlow = MutableLiveFlow<Event>()
+    val eventFlow: Flow<Event> = eventMutableFlow
+
+
     val accountSelectionFlow: StateFlow<SelectedAccount> = combine(
         selectedOnlineAccountIdMutableStateFlow,
         iab.iabStatusFlow,
@@ -101,6 +105,22 @@ class MainViewModel @Inject constructor(
         // TODO
     }
 
+    fun onAccountTapped() {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.ShowAccountSelect)
+        }
+    }
+
+    fun onAccountSelected(account: SelectedAccount.Selected) {
+        val onlineAccountId = when(account) {
+            SelectedAccount.Selected.Offline -> null
+            is SelectedAccount.Selected.Online -> account.accountId
+        }
+
+        parameters.setLatestSelectedOnlineAccountId(onlineAccountId)
+        selectedOnlineAccountIdMutableStateFlow.value = onlineAccountId
+    }
+
     fun shouldShowMenuButtons(): Boolean = iab.isIabReady() && accountSelectionFlow.value is SelectedAccount.Selected
     fun showPremiumMenuButtons(): Boolean = iab.isUserPremium()
 
@@ -120,20 +140,21 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun Parameters.getLatestSelectedOnlineAccountId(): String? {
-        return getString(SELECTED_ACCOUNT_ID_KEY)
+    sealed class Event {
+        object ShowAccountSelect : Event()
     }
 
-    private fun Parameters.setLatestSelectedOnlineAccountId(accountId: String) {
-        putString(SELECTED_ACCOUNT_ID_KEY, accountId)
+    private fun Parameters.setLatestSelectedOnlineAccountId(accountId: String?) {
+        if (accountId != null) {
+            putString(SELECTED_ACCOUNT_ID_KEY, accountId)
+        } else {
+            remove(SELECTED_ACCOUNT_ID_KEY)
+        }
     }
+}
 
+private const val SELECTED_ACCOUNT_ID_KEY = "selectedAccountId";
 
-    private fun Parameters.clearLatestSelectedAccount() {
-        remove(SELECTED_ACCOUNT_ID_KEY)
-    }
-
-    companion object {
-        private const val SELECTED_ACCOUNT_ID_KEY = "selectedAccountId";
-    }
+fun Parameters.getLatestSelectedOnlineAccountId(): String? {
+    return getString(SELECTED_ACCOUNT_ID_KEY)
 }

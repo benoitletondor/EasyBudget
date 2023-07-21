@@ -134,11 +134,17 @@ class IabImpl(
     override fun updateIAPStatusIfNeeded() {
         Logger.debug("updateIAPStatusIfNeeded: ${iabStatusMutableFlow.value}")
 
-        if ( iabStatusMutableFlow.value == PremiumCheckStatus.NOT_PREMIUM ) {
-            setIabStatusAndNotify(PremiumCheckStatus.CHECKING)
-            queryPurchases()
-        } else if ( iabStatusMutableFlow.value == PremiumCheckStatus.ERROR ) {
-            startBillingClient()
+        when(iabStatusMutableFlow.value) {
+            PremiumCheckStatus.INITIALIZING,
+            PremiumCheckStatus.CHECKING -> Unit
+            PremiumCheckStatus.ERROR -> startBillingClient()
+            PremiumCheckStatus.NOT_PREMIUM,
+            PremiumCheckStatus.LEGACY_PREMIUM,
+            PremiumCheckStatus.PREMIUM_SUBSCRIBED,
+            PremiumCheckStatus.PRO_SUBSCRIBED -> {
+                setIabStatusAndNotify(PremiumCheckStatus.CHECKING)
+                queryPurchases()
+            }
         }
     }
 

@@ -406,6 +406,14 @@ class PreferencesFragment : PreferenceFragmentCompat() {
         }
 
         /*
+         * Check if we should show pro popup
+         */
+        if (activity?.intent?.getBooleanExtra(SettingsActivity.SHOW_PRO_INTENT_KEY, false) == true) {
+            activity?.intent?.putExtra(SettingsActivity.SHOW_PRO_INTENT_KEY, false)
+            showBecomeProDialog()
+        }
+
+        /*
          * Check if we should show backup options
          */
         if( activity?.intent?.getBooleanExtra(SHOW_BACKUP_INTENT_KEY, false) == true ) {
@@ -599,6 +607,14 @@ class PreferencesFragment : PreferenceFragmentCompat() {
     private fun showBecomePremiumDialog() {
         activity?.let { activity ->
             val intent = Intent(activity, PremiumActivity::class.java)
+            ActivityCompat.startActivityForResult(activity, intent, SettingsActivity.PREMIUM_ACTIVITY, null)
+        }
+    }
+
+    private fun showBecomeProDialog() {
+        activity?.let { activity ->
+            val intent = Intent(activity, PremiumActivity::class.java)
+            TODO("Pass the right param")
             ActivityCompat.startActivityForResult(activity, intent, SettingsActivity.PREMIUM_ACTIVITY, null)
         }
     }

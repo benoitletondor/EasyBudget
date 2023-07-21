@@ -1,5 +1,6 @@
 package com.benoitletondor.easybudgetapp.accounts
 
+import com.benoitletondor.easybudgetapp.BuildConfig
 import com.benoitletondor.easybudgetapp.accounts.model.Account
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.google.firebase.firestore.DocumentSnapshot
@@ -32,7 +33,9 @@ class FirebaseAccounts(
 ) : Accounts {
 
     init {
-        db.useEmulator("10.0.2.2", 8080)
+        if (BuildConfig.DEBUG) {
+            db.useEmulator("10.0.2.2", 8080)
+        }
     }
 
     override fun watchAccounts(currentUser: CurrentUser): Flow<List<Account>> {

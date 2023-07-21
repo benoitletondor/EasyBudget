@@ -16,6 +16,7 @@
 
 package com.benoitletondor.easybudgetapp.view.main
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 
@@ -28,15 +29,11 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.view.MenuProvider
@@ -52,6 +49,7 @@ import com.benoitletondor.easybudgetapp.parameters.*
 import com.benoitletondor.easybudgetapp.theme.AppTheme
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.main.account.AccountFragment
+import com.benoitletondor.easybudgetapp.view.main.accountselector.AccountSelectorFragment
 import com.benoitletondor.easybudgetapp.view.main.loading.LoadingFragment
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
@@ -102,7 +100,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
-
+                            viewModel.onAccountTapped()
                         }
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                 ) {
@@ -167,6 +165,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
                 }
             }
         }
+
+        lifecycleScope.launchCollect(viewModel.eventFlow) { event ->
+            when(event) {
+                MainViewModel.Event.ShowAccountSelect -> AccountSelectorFragment().show(supportFragmentManager, "accountSelector")
+            }
+        }
     }
 
     private fun performIntentActionIfAny() {
@@ -181,11 +185,16 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
         }
     }
 
+    @SuppressLint("MissingSuperCall") // Not sure why this is reported, probably a bug
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
 
         this.intent = intent
         performIntentActionIfAny()
+    }
+
+    fun onAccountSelectedFromBottomSheet(account: MainViewModel.SelectedAccount.Selected) {
+        viewModel.onAccountSelected(account)
     }
 
 // ------------------------------------------>
