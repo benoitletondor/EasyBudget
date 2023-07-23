@@ -16,7 +16,6 @@ fun AppTheme(
 ) {
     return Mdc3Theme(
         context = ContextThemeWrapper(LocalContext.current, R.style.AppTheme),
-        setTextColors = true,
         content = content,
     )
 }

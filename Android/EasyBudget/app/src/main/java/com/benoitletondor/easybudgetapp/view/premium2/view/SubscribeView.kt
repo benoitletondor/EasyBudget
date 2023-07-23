@@ -195,8 +195,8 @@ private fun BoxScope.SubscribeView(
             Button(
                 onClick = onCancelButtonClicked,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.primaryContainer,
+                    containerColor = Color.White.copy(alpha = 0.3f),
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
                 ),
                 modifier = Modifier.weight(0.5f),
             ) {
@@ -214,7 +214,7 @@ private fun BoxScope.SubscribeView(
                 onClick = { },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = Color.White,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
                 ),
                 modifier = Modifier.weight(0.5f),
             ) {

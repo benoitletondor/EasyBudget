@@ -28,6 +28,7 @@
     <color name="menu_background_overlay_color">#bbffffff</color>
     <color name="calendar_background">@color/window_background</color>
     <color name="primary">@color/easy_budget_green</color>
+    <color name="onPrimary">@color/white</color>
     <color name="primary_dark">@color/easy_budget_green_dark</color>
     <color name="primary_light">@color/easy_budget_green_light</color>
     <color name="secondary">#2196F3</color>
