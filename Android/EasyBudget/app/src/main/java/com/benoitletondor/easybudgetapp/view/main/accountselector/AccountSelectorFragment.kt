@@ -44,13 +44,21 @@ class AccountSelectorFragment : BottomSheetDialogFragment() {
 
         viewLifecycleScope.launchCollect(viewModel.eventFlow) { event ->
             when(event) {
-                is AccountSelectorViewModel.Event.AccountSelected -> (activity as? MainActivity)?.onAccountSelectedFromBottomSheet(event.account)
-                AccountSelectorViewModel.Event.DismissAndOpenProScreen -> {
+                is AccountSelectorViewModel.Event.AccountSelected -> {
+                    (activity as? MainActivity)?.onAccountSelectedFromBottomSheet(event.account)
+                    dismiss()
+                }
+                AccountSelectorViewModel.Event.OpenProScreen -> {
                     activity?.let { activity ->
                         val startIntent = Intent(activity, SettingsActivity::class.java)
                         startIntent.putExtra(SettingsActivity.SHOW_PRO_INTENT_KEY, true)
                         ActivityCompat.startActivityForResult(activity, startIntent, MainActivity.SETTINGS_SCREEN_ACTIVITY_CODE, null)
                     }
+                    dismiss()
+                }
+
+                AccountSelectorViewModel.Event.OpenLoginScreen -> {
+                    (activity as? MainActivity)?.onOpenLoginScreenButtonPressed()
                     dismiss()
                 }
             }

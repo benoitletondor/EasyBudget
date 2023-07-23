@@ -38,6 +38,7 @@ fun AccountsView(viewModel: AccountSelectorViewModel) {
         onIabErrorRetryButtonClicked = viewModel::onIabErrorRetryButtonClicked,
         onAccountSelected = viewModel::onAccountSelected,
         onBecomeProButtonClicked = viewModel::onBecomeProButtonClicked,
+        onLoginButtonPressed = viewModel::onLoginButtonPressed,
     )
 }
 
@@ -47,6 +48,7 @@ private fun AccountsView(
     onIabErrorRetryButtonClicked: () -> Unit,
     onAccountSelected: (MainViewModel.SelectedAccount.Selected) -> Unit,
     onBecomeProButtonClicked: () -> Unit,
+    onLoginButtonPressed: () -> Unit,
 ) {
     val isLoading = state is AccountSelectorViewModel.State.Loading
     val offlineAccountSelected = when(state) {
@@ -83,13 +85,10 @@ private fun AccountsView(
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .apply {
-                   if (!isLoading) {
-                       clickable {
-                           onAccountSelected(MainViewModel.SelectedAccount.Selected.Offline)
-                       }
-                   }
-                },
+                .clickable (
+                    enabled = !isLoading,
+                    onClick = { onAccountSelected(MainViewModel.SelectedAccount.Selected.Offline) },
+                ),
             tonalElevation = if (isLoading) { 0.dp } else { 2.dp },
             shadowElevation = if (isLoading) { 0.dp } else { 2.dp },
             shape = RoundedCornerShape(16.dp),
@@ -102,7 +101,8 @@ private fun AccountsView(
             ) {
                 RadioButton(
                     selected = offlineAccountSelected,
-                    onClick = {},
+                    enabled = !isLoading,
+                    onClick = { onAccountSelected(MainViewModel.SelectedAccount.Selected.Offline) },
                 )
 
                 Spacer(modifier = Modifier.width(10.dp))
@@ -131,14 +131,16 @@ private fun AccountsView(
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
             }
-            is AccountSelectorViewModel.State.AccountsAvailable -> OnlineAccounts(
+            is AccountSelectorViewModel.State.AccountsAvailable -> OnlineAccountsView(
                 ownAccounts = state.ownAccounts,
                 invitedAccounts = state.invitedAccounts,
             )
             AccountSelectorViewModel.State.IabError -> IabErrorView(
                 onRetryButtonClicked = onIabErrorRetryButtonClicked,
             )
-            AccountSelectorViewModel.State.NotAuthenticated -> TODO()
+            AccountSelectorViewModel.State.NotAuthenticated -> NotAuthenticatedView(
+                onLoginButtonPressed = onLoginButtonPressed,
+            )
             AccountSelectorViewModel.State.NotPro -> NotProView(
                 onBecomeProButtonClicked = onBecomeProButtonClicked,
             )
@@ -147,7 +149,37 @@ private fun AccountsView(
 }
 
 @Composable
-private fun ColumnScope.OnlineAccounts(
+private fun ColumnScope.NotAuthenticatedView(
+    onLoginButtonPressed: () -> Unit,
+) {
+    Text(
+        modifier = Modifier.fillMaxWidth(),
+        text = "Login with your Google account",
+        textAlign = TextAlign.Center,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 16.sp,
+    )
+
+    Spacer(modifier = Modifier.height(10.dp))
+
+    Text(
+        modifier = Modifier.fillMaxWidth(),
+        text = "To create or retrieve your online accounts, login with your Google account.",
+        fontSize = 16.sp,
+    )
+
+    Spacer(modifier = Modifier.height(10.dp))
+
+    Button(
+        modifier = Modifier.align(Alignment.CenterHorizontally),
+        onClick = onLoginButtonPressed,
+    ) {
+        Text("Login with Google")
+    }
+}
+
+@Composable
+private fun ColumnScope.OnlineAccountsView(
     ownAccounts: List<AccountSelectorViewModel.Account>,
     invitedAccounts: List<AccountSelectorViewModel.Account>,
 ) {
@@ -223,6 +255,7 @@ fun AccountsLoadingViewPreview() {
             onIabErrorRetryButtonClicked = {},
             onAccountSelected = {},
             onBecomeProButtonClicked = {},
+            onLoginButtonPressed = {},
         )
     }
 }
@@ -236,6 +269,7 @@ fun AccountsIabErrorViewPreview() {
             onIabErrorRetryButtonClicked = {},
             onAccountSelected = {},
             onBecomeProButtonClicked = {},
+            onLoginButtonPressed = {},
         )
     }
 }
@@ -249,6 +283,21 @@ fun AccountsNotProViewPreview() {
             onIabErrorRetryButtonClicked = {},
             onAccountSelected = {},
             onBecomeProButtonClicked = {},
+            onLoginButtonPressed = {},
+        )
+    }
+}
+
+@Composable
+@Preview(name = "Not authenticated")
+fun AccountsNotAuthenticatedViewPreview() {
+    AppTheme {
+        AccountsView(
+            state = AccountSelectorViewModel.State.NotAuthenticated,
+            onIabErrorRetryButtonClicked = {},
+            onAccountSelected = {},
+            onBecomeProButtonClicked = {},
+            onLoginButtonPressed = {},
         )
     }
 }
@@ -289,6 +338,7 @@ fun AccountsAvailableViewPreview() {
             onIabErrorRetryButtonClicked = {},
             onAccountSelected = {},
             onBecomeProButtonClicked = {},
+            onLoginButtonPressed = {},
         )
     }
 }

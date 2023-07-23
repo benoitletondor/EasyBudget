@@ -51,6 +51,7 @@ import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.main.account.AccountFragment
 import com.benoitletondor.easybudgetapp.view.main.accountselector.AccountSelectorFragment
 import com.benoitletondor.easybudgetapp.view.main.loading.LoadingFragment
+import com.benoitletondor.easybudgetapp.view.main.login.LoginActivity
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
@@ -169,6 +170,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
         lifecycleScope.launchCollect(viewModel.eventFlow) { event ->
             when(event) {
                 MainViewModel.Event.ShowAccountSelect -> AccountSelectorFragment().show(supportFragmentManager, "accountSelector")
+                MainViewModel.Event.OpenLoginScreen -> startActivity(Intent(this, LoginActivity::class.java))
             }
         }
     }
@@ -195,6 +197,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
 
     fun onAccountSelectedFromBottomSheet(account: MainViewModel.SelectedAccount.Selected) {
         viewModel.onAccountSelected(account)
+    }
+
+    fun onOpenLoginScreenButtonPressed() {
+        viewModel.onOpenLoginScreenButtonPressed()
     }
 
 // ------------------------------------------>

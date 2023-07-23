@@ -104,7 +104,13 @@ class AccountSelectorViewModel @Inject constructor(
 
     fun onBecomeProButtonClicked() {
         viewModelScope.launch {
-            eventMutableFlow.emit(Event.DismissAndOpenProScreen)
+            eventMutableFlow.emit(Event.OpenProScreen)
+        }
+    }
+
+    fun onLoginButtonPressed() {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.OpenLoginScreen)
         }
     }
 
@@ -130,6 +136,7 @@ class AccountSelectorViewModel @Inject constructor(
 
     sealed class Event {
         data class AccountSelected(val account: MainViewModel.SelectedAccount.Selected) : Event()
-        object DismissAndOpenProScreen : Event()
+        object OpenProScreen : Event()
+        object OpenLoginScreen : Event()
     }
 }

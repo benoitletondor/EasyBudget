@@ -36,6 +36,7 @@
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_welcome">EasyBudget</string>
     <string name="title_activity_premium">Premium</string>
+    <string name="title_activity_login">Google Login</string>
     <string name="title_activity_monthly_report">Monthly report</string>
     <string name="cancel">Cancel</string>
     <string name="undo">UNDO</string>

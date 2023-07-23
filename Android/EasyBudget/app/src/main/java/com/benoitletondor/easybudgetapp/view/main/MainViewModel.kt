@@ -121,6 +121,12 @@ class MainViewModel @Inject constructor(
         selectedOnlineAccountIdMutableStateFlow.value = onlineAccountId
     }
 
+    fun onOpenLoginScreenButtonPressed() {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.OpenLoginScreen)
+        }
+    }
+
     fun shouldShowMenuButtons(): Boolean = iab.isIabReady() && accountSelectionFlow.value is SelectedAccount.Selected
     fun showPremiumMenuButtons(): Boolean = iab.isUserPremium()
 
@@ -142,6 +148,7 @@ class MainViewModel @Inject constructor(
 
     sealed class Event {
         object ShowAccountSelect : Event()
+        object OpenLoginScreen : Event()
     }
 
     private fun Parameters.setLatestSelectedOnlineAccountId(accountId: String?) {
