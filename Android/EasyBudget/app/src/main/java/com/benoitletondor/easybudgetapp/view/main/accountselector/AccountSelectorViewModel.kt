@@ -81,9 +81,11 @@ class AccountSelectorViewModel @Inject constructor(
                         ) }
 
                     State.AccountsAvailable(
+                        userEmail = authStatus.currentUser.email,
                         isOfflineSelected = parameters.getLatestSelectedOnlineAccountId() == null ||
                             (ownAccounts.none { it.selected } && invitedAccounts.none { it.selected } ),
-                        ownAccounts = ownAccounts,
+                        ownAccounts = ownAccounts.take(5),
+                        showCreateOnlineAccountButton = ownAccounts.size < 5,
                         invitedAccounts = invitedAccounts,
                         isOfflineBackupEnabled = parameters.isBackupEnabled(),
                     )
@@ -118,6 +120,10 @@ class AccountSelectorViewModel @Inject constructor(
         }
     }
 
+    fun onCreateAccountClicked() {
+        TODO("Not yet implemented")
+    }
+
     data class Account(
         val id: String,
         val secret: String,
@@ -136,8 +142,10 @@ class AccountSelectorViewModel @Inject constructor(
         data class NotPro(override val isOfflineBackupEnabled: Boolean) : State(), OfflineBackStateAvailable
         data class NotAuthenticated(override val isOfflineBackupEnabled: Boolean) : State(), OfflineBackStateAvailable
         data class AccountsAvailable(
+            val userEmail: String,
             val isOfflineSelected: Boolean,
             val ownAccounts: List<Account>,
+            val showCreateOnlineAccountButton: Boolean,
             val invitedAccounts: List<Account>,
             override val isOfflineBackupEnabled: Boolean,
         ) : State(), OfflineBackStateAvailable
