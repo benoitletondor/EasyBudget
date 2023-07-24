@@ -26,13 +26,6 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/action_monthly_report"
-        android:title="@string/monthly_report_button_title"
-        android:icon="@drawable/ic_list_alt_24"
-        android:orderInCategory="60"
-        app:showAsAction="ifRoom" />
-
-    <item
         android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:orderInCategory="100"

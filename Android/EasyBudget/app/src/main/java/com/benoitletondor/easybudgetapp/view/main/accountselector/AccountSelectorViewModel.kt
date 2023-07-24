@@ -9,8 +9,9 @@ import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.iab.PremiumCheckStatus
 import com.benoitletondor.easybudgetapp.parameters.Parameters
+import com.benoitletondor.easybudgetapp.parameters.getLatestSelectedOnlineAccountId
+import com.benoitletondor.easybudgetapp.parameters.isBackupEnabled
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
-import com.benoitletondor.easybudgetapp.view.main.getLatestSelectedOnlineAccountId
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -54,9 +55,9 @@ class AccountSelectorViewModel @Inject constructor(
             PremiumCheckStatus.INITIALIZING,
             PremiumCheckStatus.CHECKING -> State.Loading
             PremiumCheckStatus.ERROR -> State.IabError
-            PremiumCheckStatus.NOT_PREMIUM,
+            PremiumCheckStatus.NOT_PREMIUM -> State.NotPro(isOfflineBackupEnabled = false)
             PremiumCheckStatus.LEGACY_PREMIUM,
-            PremiumCheckStatus.PREMIUM_SUBSCRIBED -> State.NotPro
+            PremiumCheckStatus.PREMIUM_SUBSCRIBED -> State.NotPro(isOfflineBackupEnabled = parameters.isBackupEnabled())
             PremiumCheckStatus.PRO_SUBSCRIBED -> when(authStatus) {
                 is AuthState.Authenticated -> {
                     val ownAccounts = onlineAccounts
@@ -84,10 +85,13 @@ class AccountSelectorViewModel @Inject constructor(
                             (ownAccounts.none { it.selected } && invitedAccounts.none { it.selected } ),
                         ownAccounts = ownAccounts,
                         invitedAccounts = invitedAccounts,
+                        isOfflineBackupEnabled = parameters.isBackupEnabled(),
                     )
                 }
                 AuthState.Authenticating -> State.Loading
-                AuthState.NotAuthenticated -> State.NotAuthenticated
+                AuthState.NotAuthenticated -> State.NotAuthenticated(
+                    isOfflineBackupEnabled = parameters.isBackupEnabled(),
+                )
             }
         }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, State.Loading)
@@ -122,16 +126,21 @@ class AccountSelectorViewModel @Inject constructor(
         val ownerEmail: String,
     )
 
+    sealed interface OfflineBackStateAvailable {
+        val isOfflineBackupEnabled: Boolean
+    }
+
     sealed class State {
         object Loading : State()
         object IabError : State()
-        object NotPro : State()
-        object NotAuthenticated : State()
+        data class NotPro(override val isOfflineBackupEnabled: Boolean) : State(), OfflineBackStateAvailable
+        data class NotAuthenticated(override val isOfflineBackupEnabled: Boolean) : State(), OfflineBackStateAvailable
         data class AccountsAvailable(
             val isOfflineSelected: Boolean,
             val ownAccounts: List<Account>,
             val invitedAccounts: List<Account>,
-        ) : State()
+            override val isOfflineBackupEnabled: Boolean,
+        ) : State(), OfflineBackStateAvailable
     }
 
     sealed class Event {

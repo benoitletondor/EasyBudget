@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -20,11 +21,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.theme.AppTheme
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import com.benoitletondor.easybudgetapp.view.main.accountselector.AccountSelectorViewModel
@@ -54,10 +58,11 @@ private fun AccountsView(
     val offlineAccountSelected = when(state) {
         is AccountSelectorViewModel.State.AccountsAvailable -> state.isOfflineSelected
         AccountSelectorViewModel.State.Loading -> false
-        AccountSelectorViewModel.State.NotAuthenticated,
+        is AccountSelectorViewModel.State.NotAuthenticated,
         AccountSelectorViewModel.State.IabError,
-        AccountSelectorViewModel.State.NotPro -> true
+        is AccountSelectorViewModel.State.NotPro -> true
     }
+    val shouldDisplayOfflineBackupEnabled = state is AccountSelectorViewModel.OfflineBackStateAvailable && state.isOfflineBackupEnabled
 
     Column(
         modifier = Modifier
@@ -73,14 +78,6 @@ private fun AccountsView(
         )
 
         Spacer(modifier = Modifier.height(26.dp))
-
-        Text(
-            text = "Offline",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.SemiBold,
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
 
         Surface(
             modifier = Modifier
@@ -108,14 +105,25 @@ private fun AccountsView(
                 Spacer(modifier = Modifier.width(10.dp))
 
                 Text(
-                    text = "Default",
+                    text = "Default (Offline)",
                     fontSize = 16.sp,
                 )
             }
 
         }
 
-        Spacer(modifier = Modifier.height(26.dp))
+        if (shouldDisplayOfflineBackupEnabled) {
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Text(
+                text = "Automatic cloud backup enabled.",
+                fontSize = 15.sp,
+                modifier = Modifier.padding(horizontal = 4.dp),
+                color = colorResource(R.color.secondary_text),
+            )
+        }
+
+        Spacer(modifier = Modifier.height(30.dp))
 
         Text(
             text = "Online",
@@ -138,10 +146,10 @@ private fun AccountsView(
             AccountSelectorViewModel.State.IabError -> IabErrorView(
                 onRetryButtonClicked = onIabErrorRetryButtonClicked,
             )
-            AccountSelectorViewModel.State.NotAuthenticated -> NotAuthenticatedView(
+            is AccountSelectorViewModel.State.NotAuthenticated -> NotAuthenticatedView(
                 onLoginButtonPressed = onLoginButtonPressed,
             )
-            AccountSelectorViewModel.State.NotPro -> NotProView(
+            is AccountSelectorViewModel.State.NotPro -> NotProView(
                 onBecomeProButtonClicked = onBecomeProButtonClicked,
             )
         }
@@ -279,7 +287,9 @@ fun AccountsIabErrorViewPreview() {
 fun AccountsNotProViewPreview() {
     AppTheme {
         AccountsView(
-            state = AccountSelectorViewModel.State.NotPro,
+            state = AccountSelectorViewModel.State.NotPro(
+                isOfflineBackupEnabled = false,
+            ),
             onIabErrorRetryButtonClicked = {},
             onAccountSelected = {},
             onBecomeProButtonClicked = {},
@@ -293,7 +303,9 @@ fun AccountsNotProViewPreview() {
 fun AccountsNotAuthenticatedViewPreview() {
     AppTheme {
         AccountsView(
-            state = AccountSelectorViewModel.State.NotAuthenticated,
+            state = AccountSelectorViewModel.State.NotAuthenticated(
+                isOfflineBackupEnabled = false,
+            ),
             onIabErrorRetryButtonClicked = {},
             onAccountSelected = {},
             onBecomeProButtonClicked = {},
@@ -333,7 +345,8 @@ fun AccountsAvailableViewPreview() {
                         name = "Other person account",
                         ownerEmail = "other.person@gmail.com",
                     ),
-                )
+                ),
+                isOfflineBackupEnabled = true,
             ),
             onIabErrorRetryButtonClicked = {},
             onAccountSelected = {},

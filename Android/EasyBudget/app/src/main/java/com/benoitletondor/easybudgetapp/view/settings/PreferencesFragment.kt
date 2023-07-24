@@ -35,6 +35,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.preference.*
 import com.benoitletondor.easybudgetapp.BuildConfig
@@ -53,6 +54,7 @@ import com.benoitletondor.easybudgetapp.view.settings.backup.BackupSettingsActiv
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.roomorama.caldroid.CaldroidFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.net.URLEncoder
 import javax.inject.Inject
 
@@ -468,138 +470,140 @@ class PreferencesFragment : PreferenceFragmentCompat() {
      * Show the right premium preference depending on the user state
      */
     private fun refreshPremiumPreference() {
-        val isPremium = iab.isUserPremium()
+        lifecycleScope.launch {
+            val isPremium = iab.isUserPremium()
 
-        if (isPremium) {
-            if (notPremiumShown) {
-                preferenceScreen.removePreference(notPremiumCategory)
-                notPremiumShown = false
-            }
-
-            if (!premiumShown) {
-                preferenceScreen.addPreference(premiumCategory)
-                premiumShown = true
-            }
-
-            // Premium preference
-            findPreference<Preference>(resources.getString(R.string.setting_category_premium_status_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                context?.let {context ->
-                    MaterialAlertDialogBuilder(context)
-                        .setTitle(R.string.premium_popup_premium_title)
-                        .setMessage(R.string.premium_popup_premium_message)
-                        .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
-                        .show()
+            if (isPremium) {
+                if (notPremiumShown) {
+                    preferenceScreen.removePreference(notPremiumCategory)
+                    notPremiumShown = false
                 }
 
-                false
-            }
-
-            // Daily reminder notif preference
-            val dailyNotifPref = findPreference<CheckBoxPreference>(resources.getString(R.string.setting_category_notifications_daily_key))
-            dailyNotifPref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                val checked = (it as CheckBoxPreference).isChecked
-                parameters.setUserAllowDailyReminderPushes(checked)
-
-                if (checked) {
-                    showNotificationPermissionIfNeeded()
+                if (!premiumShown) {
+                    preferenceScreen.addPreference(premiumCategory)
+                    premiumShown = true
                 }
 
-                true
-            }
-            dailyNotifPref?.isChecked = parameters.isUserAllowingDailyReminderPushes()
+                // Premium preference
+                findPreference<Preference>(resources.getString(R.string.setting_category_premium_status_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                    context?.let {context ->
+                        MaterialAlertDialogBuilder(context)
+                            .setTitle(R.string.premium_popup_premium_title)
+                            .setMessage(R.string.premium_popup_premium_message)
+                            .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
+                            .show()
+                    }
 
-            // Monthly reminder for reports
-            val monthlyNotifPref = findPreference<CheckBoxPreference>(resources.getString(R.string.setting_category_notifications_monthly_key))
-            monthlyNotifPref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                val checked = (it as CheckBoxPreference).isChecked
-                parameters.setUserAllowMonthlyReminderPushes(checked)
-
-                if (checked) {
-                    showNotificationPermissionIfNeeded()
+                    false
                 }
 
-                true
-            }
-            monthlyNotifPref?.isChecked = parameters.isUserAllowingMonthlyReminderPushes()
+                // Daily reminder notif preference
+                val dailyNotifPref = findPreference<CheckBoxPreference>(resources.getString(R.string.setting_category_notifications_daily_key))
+                dailyNotifPref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                    val checked = (it as CheckBoxPreference).isChecked
+                    parameters.setUserAllowDailyReminderPushes(checked)
 
-            // Theme
-            findPreference<ListPreference>(getString(R.string.setting_category_app_theme_key))?.let { themePref ->
-                val currentTheme = parameters.getTheme()
-
-                themePref.value = currentTheme.value.toString()
-                themePref.summary = themePref.entries[themePref.findIndexOfValue(themePref.value)]
-                themePref.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
-                    themePref.summary = themePref.entries[themePref.findIndexOfValue(newValue as String)]
-
-                    val newTheme = AppTheme.values().first { it.value == newValue.toInt() }
-
-                    parameters.setTheme(newTheme)
-                    AppCompatDelegate.setDefaultNightMode(newTheme.toPlatformValue())
+                    if (checked) {
+                        showNotificationPermissionIfNeeded()
+                    }
 
                     true
                 }
-            }
-        } else {
-            if (premiumShown) {
-                preferenceScreen.removePreference(premiumCategory)
-                premiumShown = false
-            }
+                dailyNotifPref?.isChecked = parameters.isUserAllowingDailyReminderPushes()
 
-            if (!notPremiumShown) {
-                preferenceScreen.addPreference(notPremiumCategory)
-                notPremiumShown = true
-            }
+                // Monthly reminder for reports
+                val monthlyNotifPref = findPreference<CheckBoxPreference>(resources.getString(R.string.setting_category_notifications_monthly_key))
+                monthlyNotifPref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                    val checked = (it as CheckBoxPreference).isChecked
+                    parameters.setUserAllowMonthlyReminderPushes(checked)
 
-            // Not premium preference
-            findPreference<Preference>(resources.getString(R.string.setting_category_not_premium_status_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                showBecomePremiumDialog()
-                false
-            }
+                    if (checked) {
+                        showNotificationPermissionIfNeeded()
+                    }
 
-            // Redeem promo code pref
-            findPreference<Preference>(resources.getString(R.string.setting_category_premium_redeem_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                activity?.let { activity ->
-                    val dialogView = activity.layoutInflater.inflate(R.layout.dialog_redeem_voucher, null)
-                    val voucherEditText = dialogView.findViewById<View>(R.id.voucher) as EditText
+                    true
+                }
+                monthlyNotifPref?.isChecked = parameters.isUserAllowingMonthlyReminderPushes()
 
-                    val builder = MaterialAlertDialogBuilder(activity)
-                        .setTitle(R.string.voucher_redeem_dialog_title)
-                        .setMessage(R.string.voucher_redeem_dialog_message)
-                        .setView(dialogView)
-                        .setPositiveButton(R.string.voucher_redeem_dialog_cta) { dialog, _ ->
-                            dialog.dismiss()
+                // Theme
+                findPreference<ListPreference>(getString(R.string.setting_category_app_theme_key))?.let { themePref ->
+                    val currentTheme = parameters.getTheme()
 
-                            val promocode = voucherEditText.text.toString()
-                            if (promocode.trim { it <= ' ' }.isEmpty()) {
-                                MaterialAlertDialogBuilder(activity)
-                                    .setTitle(R.string.voucher_redeem_error_dialog_title)
-                                    .setMessage(R.string.voucher_redeem_error_code_invalid_dialog_message)
-                                    .setPositiveButton(R.string.ok) { dialog12, _ -> dialog12.dismiss() }
-                                    .show()
-                            }
+                    themePref.value = currentTheme.value.toString()
+                    themePref.summary = themePref.entries[themePref.findIndexOfValue(themePref.value)]
+                    themePref.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+                        themePref.summary = themePref.entries[themePref.findIndexOfValue(newValue as String)]
 
-                            if (!launchRedeemPromocodeFlow(promocode)) {
-                                MaterialAlertDialogBuilder(activity)
-                                    .setTitle(R.string.iab_purchase_error_title)
-                                    .setMessage(resources.getString(R.string.iab_purchase_error_message, "Error redeeming promo code"))
-                                    .setPositiveButton(R.string.ok) { dialog1, _ -> dialog1.dismiss() }
-                                    .show()
-                            }
-                        }
-                        .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
+                        val newTheme = AppTheme.values().first { it.value == newValue.toInt() }
 
-                    val dialog = builder.show()
+                        parameters.setTheme(newTheme)
+                        AppCompatDelegate.setDefaultNightMode(newTheme.toPlatformValue())
 
-                    // Directly show keyboard when the dialog pops
-                    voucherEditText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
-                        // Check if the device doesn't have a physical keyboard
-                        if (hasFocus && resources.configuration.keyboard == Configuration.KEYBOARD_NOKEYS) {
-                            dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-                        }
+                        true
                     }
                 }
+            } else {
+                if (premiumShown) {
+                    preferenceScreen.removePreference(premiumCategory)
+                    premiumShown = false
+                }
 
-                false
+                if (!notPremiumShown) {
+                    preferenceScreen.addPreference(notPremiumCategory)
+                    notPremiumShown = true
+                }
+
+                // Not premium preference
+                findPreference<Preference>(resources.getString(R.string.setting_category_not_premium_status_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                    showBecomePremiumDialog()
+                    false
+                }
+
+                // Redeem promo code pref
+                findPreference<Preference>(resources.getString(R.string.setting_category_premium_redeem_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                    activity?.let { activity ->
+                        val dialogView = activity.layoutInflater.inflate(R.layout.dialog_redeem_voucher, null)
+                        val voucherEditText = dialogView.findViewById<View>(R.id.voucher) as EditText
+
+                        val builder = MaterialAlertDialogBuilder(activity)
+                            .setTitle(R.string.voucher_redeem_dialog_title)
+                            .setMessage(R.string.voucher_redeem_dialog_message)
+                            .setView(dialogView)
+                            .setPositiveButton(R.string.voucher_redeem_dialog_cta) { dialog, _ ->
+                                dialog.dismiss()
+
+                                val promocode = voucherEditText.text.toString()
+                                if (promocode.trim { it <= ' ' }.isEmpty()) {
+                                    MaterialAlertDialogBuilder(activity)
+                                        .setTitle(R.string.voucher_redeem_error_dialog_title)
+                                        .setMessage(R.string.voucher_redeem_error_code_invalid_dialog_message)
+                                        .setPositiveButton(R.string.ok) { dialog12, _ -> dialog12.dismiss() }
+                                        .show()
+                                }
+
+                                if (!launchRedeemPromocodeFlow(promocode)) {
+                                    MaterialAlertDialogBuilder(activity)
+                                        .setTitle(R.string.iab_purchase_error_title)
+                                        .setMessage(resources.getString(R.string.iab_purchase_error_message, "Error redeeming promo code"))
+                                        .setPositiveButton(R.string.ok) { dialog1, _ -> dialog1.dismiss() }
+                                        .show()
+                                }
+                            }
+                            .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
+
+                        val dialog = builder.show()
+
+                        // Directly show keyboard when the dialog pops
+                        voucherEditText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+                            // Check if the device doesn't have a physical keyboard
+                            if (hasFocus && resources.configuration.keyboard == Configuration.KEYBOARD_NOKEYS) {
+                                dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+                            }
+                        }
+                    }
+
+                    false
+                }
             }
         }
     }

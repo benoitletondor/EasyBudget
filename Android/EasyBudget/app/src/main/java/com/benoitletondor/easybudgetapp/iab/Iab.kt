@@ -23,7 +23,7 @@ interface Iab {
     val iabStatusFlow: StateFlow<PremiumCheckStatus>
 
     fun isIabReady(): Boolean
-    fun isUserPremium(): Boolean
+    suspend fun isUserPremium(): Boolean
     fun isUserPro(): Boolean
     suspend fun waitForIsUserPremiumResponse(): Boolean
     fun updateIAPStatusIfNeeded()

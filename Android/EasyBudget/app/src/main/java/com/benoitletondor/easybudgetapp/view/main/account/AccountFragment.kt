@@ -40,6 +40,7 @@ import com.benoitletondor.easybudgetapp.helper.preventUnsupportedInputForDecimal
 import com.benoitletondor.easybudgetapp.helper.viewLifecycleScope
 import com.benoitletondor.easybudgetapp.iab.INTENT_IAB_STATUS_CHANGED
 import com.benoitletondor.easybudgetapp.iab.Iab
+import com.benoitletondor.easybudgetapp.iab.PremiumCheckStatus
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType
 import com.benoitletondor.easybudgetapp.parameters.Parameters
@@ -47,11 +48,11 @@ import com.benoitletondor.easybudgetapp.parameters.getCaldroidFirstDayOfWeek
 import com.benoitletondor.easybudgetapp.parameters.getInitDate
 import com.benoitletondor.easybudgetapp.parameters.getLowMoneyWarningAmount
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
-import com.benoitletondor.easybudgetapp.view.main.ExpensesRecyclerViewAdapter
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import com.benoitletondor.easybudgetapp.view.main.account.calendar.CalendarFragment
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
+import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment
 import com.benoitletondor.easybudgetapp.view.welcome.WelcomeActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -154,7 +155,7 @@ class AccountFragment : Fragment(), MenuProvider {
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
         menuInflater.inflate(R.menu.menu_account, menu)
 
-        if (viewModel.isIabReady && !viewModel.isUserPremium) {
+        if (!viewModel.shouldShowPremiumRelatedButtons) {
             // Remove monthly report for non premium users
             menu.removeItem(R.id.action_monthly_report)
             menu.removeItem(R.id.action_check_all_past_entries)
@@ -182,6 +183,10 @@ class AccountFragment : Fragment(), MenuProvider {
             }
             R.id.action_go_to_current_month -> {
                 viewModel.onGoBackToCurrentMonthButtonPressed()
+                true
+            }
+            R.id.action_monthly_report -> {
+                viewModel.onMonthlyReportButtonPressed()
                 true
             }
             else -> false
@@ -453,6 +458,16 @@ class AccountFragment : Fragment(), MenuProvider {
 
         viewLifecycleScope.launchCollect(viewModel.premiumStatusFlow) {
             invalidateOptionsMenu(requireActivity())
+
+            expensesViewAdapter.setUserPremium(isPremium = when(it) {
+                PremiumCheckStatus.INITIALIZING,
+                PremiumCheckStatus.CHECKING,
+                PremiumCheckStatus.ERROR,
+                PremiumCheckStatus.NOT_PREMIUM -> false
+                PremiumCheckStatus.LEGACY_PREMIUM,
+                PremiumCheckStatus.PREMIUM_SUBSCRIBED,
+                PremiumCheckStatus.PRO_SUBSCRIBED -> true
+            })
         }
 
         viewLifecycleScope.launchCollect(viewModel.expenseCheckedErrorEventFlow) { exception ->
@@ -499,6 +514,11 @@ class AccountFragment : Fragment(), MenuProvider {
                 )
                 .setNegativeButton(R.string.ok) { dialog2, _ -> dialog2.dismiss() }
                 .show()
+        }
+
+        viewLifecycleScope.launchCollect(viewModel.openMonthlyReportEventFlow) {
+            val startIntent = Intent(requireActivity(), MonthlyReportBaseActivity::class.java)
+            ActivityCompat.startActivity(requireContext(), startIntent, null)
         }
     }
 
@@ -710,7 +730,7 @@ class AccountFragment : Fragment(), MenuProvider {
     private fun initRecyclerView() {
         binding.expensesRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        expensesViewAdapter = ExpensesRecyclerViewAdapter(this, parameters, iab, LocalDate.now()) { expense, checked ->
+        expensesViewAdapter = ExpensesRecyclerViewAdapter(this, parameters, LocalDate.now()) { expense, checked ->
             viewModel.onExpenseChecked(expense, checked)
         }
         binding.expensesRecyclerView.adapter = expensesViewAdapter

@@ -26,6 +26,8 @@ import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
 import com.benoitletondor.easybudgetapp.iab.PremiumCheckStatus
 import com.benoitletondor.easybudgetapp.parameters.Parameters
+import com.benoitletondor.easybudgetapp.parameters.getLatestSelectedOnlineAccountId
+import com.benoitletondor.easybudgetapp.parameters.setLatestSelectedOnlineAccountId
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -128,7 +130,15 @@ class MainViewModel @Inject constructor(
     }
 
     fun shouldShowMenuButtons(): Boolean = iab.isIabReady() && accountSelectionFlow.value is SelectedAccount.Selected
-    fun showPremiumMenuButtons(): Boolean = iab.isUserPremium()
+    fun showPremiumMenuButtons(): Boolean = when(iab.iabStatusFlow.value) {
+        PremiumCheckStatus.INITIALIZING,
+        PremiumCheckStatus.CHECKING,
+        PremiumCheckStatus.ERROR,
+        PremiumCheckStatus.NOT_PREMIUM -> false
+        PremiumCheckStatus.LEGACY_PREMIUM,
+        PremiumCheckStatus.PREMIUM_SUBSCRIBED,
+        PremiumCheckStatus.PRO_SUBSCRIBED -> true
+    }
 
     sealed class SelectedAccount {
         object Loading : SelectedAccount()
@@ -150,18 +160,4 @@ class MainViewModel @Inject constructor(
         object ShowAccountSelect : Event()
         object OpenLoginScreen : Event()
     }
-
-    private fun Parameters.setLatestSelectedOnlineAccountId(accountId: String?) {
-        if (accountId != null) {
-            putString(SELECTED_ACCOUNT_ID_KEY, accountId)
-        } else {
-            remove(SELECTED_ACCOUNT_ID_KEY)
-        }
-    }
-}
-
-private const val SELECTED_ACCOUNT_ID_KEY = "selectedAccountId";
-
-fun Parameters.getLatestSelectedOnlineAccountId(): String? {
-    return getString(SELECTED_ACCOUNT_ID_KEY)
 }

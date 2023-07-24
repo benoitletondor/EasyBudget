@@ -211,9 +211,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
 
         if (viewModel.shouldShowMenuButtons()) {
             // Remove monthly report for non premium users
-            if ( !viewModel.showPremiumMenuButtons() ) {
-                menu.removeItem(R.id.action_monthly_report)
-            } else {
+            if ( viewModel.showPremiumMenuButtons() ) {
                 menu.removeItem(R.id.action_become_premium)
 
                 if ( !parameters.hasUserSawMonthlyReportHint() ) {
@@ -226,7 +224,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
                 }
             }
         } else {
-            menu.removeItem(R.id.action_monthly_report)
             menu.removeItem(R.id.action_become_premium)
         }
     }
@@ -236,12 +233,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
             R.id.action_settings -> {
                 val startIntent = Intent(this, SettingsActivity::class.java)
                 ActivityCompat.startActivityForResult(this@MainActivity, startIntent, SETTINGS_SCREEN_ACTIVITY_CODE, null)
-
-                true
-            }
-            R.id.action_monthly_report -> {
-                val startIntent = Intent(this, MonthlyReportBaseActivity::class.java)
-                ActivityCompat.startActivity(this@MainActivity, startIntent, null)
 
                 true
             }

@@ -52,8 +52,15 @@ class AccountViewModel @Inject constructor(
     val premiumStatusFlow: StateFlow<PremiumCheckStatus> = iab.iabStatusFlow
         .stateIn(viewModelScope, SharingStarted.Eagerly, PremiumCheckStatus.INITIALIZING)
 
-    val isIabReady: Boolean get() = iab.isIabReady()
-    val isUserPremium: Boolean get() = iab.isUserPremium()
+    val shouldShowPremiumRelatedButtons: Boolean get() = when(iab.iabStatusFlow.value) {
+        PremiumCheckStatus.INITIALIZING,
+        PremiumCheckStatus.CHECKING,
+        PremiumCheckStatus.ERROR,
+        PremiumCheckStatus.NOT_PREMIUM -> false
+        PremiumCheckStatus.LEGACY_PREMIUM,
+        PremiumCheckStatus.PREMIUM_SUBSCRIBED,
+        PremiumCheckStatus.PRO_SUBSCRIBED -> true
+    }
 
     private val selectDateMutableStateFlow = MutableStateFlow(LocalDate.now())
 
@@ -102,6 +109,9 @@ class AccountViewModel @Inject constructor(
 
     private val checkAllPastEntriesErrorEventMutableFlow = MutableLiveFlow<Throwable>()
     val checkAllPastEntriesErrorEventFlow: Flow<Throwable> = checkAllPastEntriesErrorEventMutableFlow
+
+    private val openMonthlyReportEventMutableFlow = MutableLiveFlow<Unit>()
+    val openMonthlyReportEventFlow: Flow<Unit> = openMonthlyReportEventMutableFlow
 
     private val forceRefreshMutableFlow = MutableSharedFlow<Unit>()
     val refreshDatesFlow: Flow<Unit> = forceRefreshMutableFlow
@@ -168,6 +178,12 @@ class AccountViewModel @Inject constructor(
 
     fun onRetryLoadingButtonPressed() {
         loadDB()
+    }
+
+    fun onMonthlyReportButtonPressed() {
+        viewModelScope.launch {
+            openMonthlyReportEventMutableFlow.emit(Unit)
+        }
     }
 
     sealed class RecurringExpenseDeleteProgressState {

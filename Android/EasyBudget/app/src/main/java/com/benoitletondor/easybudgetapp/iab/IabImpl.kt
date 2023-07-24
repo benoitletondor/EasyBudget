@@ -86,7 +86,17 @@ class IabImpl(
     }
 
     override fun isIabReady(): Boolean {
-        return isUserPremium() || iabStatusMutableFlow.value == PremiumCheckStatus.NOT_PREMIUM
+        return iabStatusMutableFlow.value.isFinal()
+    }
+
+    private fun PremiumCheckStatus.isFinal() = when(this) {
+        PremiumCheckStatus.INITIALIZING,
+        PremiumCheckStatus.CHECKING -> false
+        PremiumCheckStatus.ERROR,
+        PremiumCheckStatus.NOT_PREMIUM,
+        PremiumCheckStatus.LEGACY_PREMIUM,
+        PremiumCheckStatus.PREMIUM_SUBSCRIBED,
+        PremiumCheckStatus.PRO_SUBSCRIBED -> true
     }
 
     /**
@@ -94,8 +104,10 @@ class IabImpl(
      *
      * @return true if the user if premium, false otherwise
      */
-    override fun isUserPremium(): Boolean
+    override suspend fun isUserPremium(): Boolean
     {
+        iabStatusMutableFlow.first { it.isFinal() }
+
         return (iabStatusMutableFlow.value == PremiumCheckStatus.LEGACY_PREMIUM ||
             iabStatusMutableFlow.value == PremiumCheckStatus.PREMIUM_SUBSCRIBED ||
             iabStatusMutableFlow.value == PremiumCheckStatus.PRO_SUBSCRIBED)
