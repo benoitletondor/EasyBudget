@@ -24,6 +24,7 @@ class CreateAccountViewModel @Inject constructor(
     auth: Auth,
     private val accounts: Accounts,
 ) : ViewModel() {
+    private var lastSubmittedValue: String? = null
     private val isCreatingMutableFlow = MutableStateFlow(false)
 
     val stateFlow: StateFlow<State> = combine(auth.state, isCreatingMutableFlow) { authState, isCreating ->
@@ -32,7 +33,10 @@ class CreateAccountViewModel @Inject constructor(
         }
 
         return@combine when(authState) {
-            is AuthState.Authenticated -> State.Ready(authState.currentUser)
+            is AuthState.Authenticated -> State.Ready(
+                initialNameValue = lastSubmittedValue ?: "",
+                currentUser = authState.currentUser,
+            )
             AuthState.Authenticating -> State.Loading
             AuthState.NotAuthenticated -> State.NotAuthenticatedError
         }
@@ -44,6 +48,7 @@ class CreateAccountViewModel @Inject constructor(
 
     fun onCreateAccountButtonPressed(accountName: String) {
         val readyState = stateFlow.value as? State.Ready ?: return
+        lastSubmittedValue = accountName
         isCreatingMutableFlow.value = true
 
         viewModelScope.launch {
@@ -68,9 +73,15 @@ class CreateAccountViewModel @Inject constructor(
         }
     }
 
+    fun onFinishButtonClicked() {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.Finish)
+        }
+    }
+
     sealed class State {
         object Loading : State()
-        data class Ready(val currentUser: CurrentUser) : State()
+        data class Ready(val initialNameValue: String, val currentUser: CurrentUser) : State()
         object NotAuthenticatedError : State()
         data class Creating(val currentUser: CurrentUser) : State()
     }

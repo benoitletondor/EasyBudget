@@ -135,8 +135,8 @@ class FirebaseAccounts(
     }
 
     private fun generateSecureAccountIdAndSecret(): Pair<String, String> {
-        val accountId = generateRandomString(25)
-        val accountSecret = generateRandomString(50)
+        val accountId = generateRandomString(50)
+        val accountSecret = generateRandomString(100)
 
         return Pair(accountId, accountSecret)
     }

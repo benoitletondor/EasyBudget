@@ -47,6 +47,8 @@ import com.benoitletondor.easybudgetapp.parameters.*
 import com.benoitletondor.easybudgetapp.view.RatingPopup
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.USER_GONE_PREMIUM_INTENT
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
+import com.benoitletondor.easybudgetapp.view.main.createaccount.CreateAccountActivity
+import com.benoitletondor.easybudgetapp.view.main.login.LoginActivity
 import com.benoitletondor.easybudgetapp.view.premium.PremiumActivity
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.SHOW_BACKUP_INTENT_KEY
@@ -351,6 +353,22 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                 activity?.let { activity ->
                     val intent = Intent(activity, com.benoitletondor.easybudgetapp.view.premium2.PremiumActivity::class.java)
                     ActivityCompat.startActivityForResult(activity, intent, SettingsActivity.PREMIUM_ACTIVITY, null)
+                }
+                false
+            }
+
+            findPreference<Preference>(getString(R.string.setting_category_dev_show_login))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                activity?.let { activity ->
+                    val intent = Intent(activity, LoginActivity::class.java)
+                    activity.startActivity(intent)
+                }
+                false
+            }
+
+            findPreference<Preference>(getString(R.string.setting_category_dev_show_create_account))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                activity?.let { activity ->
+                    val intent = Intent(activity, CreateAccountActivity::class.java)
+                    activity.startActivity(intent)
                 }
                 false
             }
