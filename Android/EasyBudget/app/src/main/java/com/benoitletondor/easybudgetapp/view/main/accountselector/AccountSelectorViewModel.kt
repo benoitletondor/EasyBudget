@@ -121,7 +121,9 @@ class AccountSelectorViewModel @Inject constructor(
     }
 
     fun onCreateAccountClicked() {
-        TODO("Not yet implemented")
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.OpenCreateAccountScreen)
+        }
     }
 
     data class Account(
@@ -155,5 +157,6 @@ class AccountSelectorViewModel @Inject constructor(
         data class AccountSelected(val account: MainViewModel.SelectedAccount.Selected) : Event()
         object OpenProScreen : Event()
         object OpenLoginScreen : Event()
+        object OpenCreateAccountScreen : Event()
     }
 }

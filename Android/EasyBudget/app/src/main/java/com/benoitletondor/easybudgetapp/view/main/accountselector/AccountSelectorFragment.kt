@@ -13,6 +13,8 @@ import com.benoitletondor.easybudgetapp.helper.viewLifecycleScope
 import com.benoitletondor.easybudgetapp.theme.AppTheme
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
 import com.benoitletondor.easybudgetapp.view.main.accountselector.view.AccountsView
+import com.benoitletondor.easybudgetapp.view.main.createaccount.CreateAccountActivity
+import com.benoitletondor.easybudgetapp.view.main.login.LoginActivity
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -56,10 +58,15 @@ class AccountSelectorFragment : BottomSheetDialogFragment() {
                     }
                     dismiss()
                 }
-
                 AccountSelectorViewModel.Event.OpenLoginScreen -> {
-                    (activity as? MainActivity)?.onOpenLoginScreenButtonPressed()
-                    dismiss()
+                    activity?.let {
+                        it.startActivity(Intent(it, LoginActivity::class.java))
+                    }
+                }
+                AccountSelectorViewModel.Event.OpenCreateAccountScreen -> {
+                    activity?.let {
+                        it.startActivity(Intent(it, CreateAccountActivity::class.java))
+                    }
                 }
             }
         }

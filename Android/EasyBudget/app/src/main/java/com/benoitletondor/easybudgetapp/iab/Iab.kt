@@ -24,8 +24,7 @@ interface Iab {
 
     fun isIabReady(): Boolean
     suspend fun isUserPremium(): Boolean
-    fun isUserPro(): Boolean
-    suspend fun waitForIsUserPremiumResponse(): Boolean
+    suspend fun isUserPro(): Boolean
     fun updateIAPStatusIfNeeded()
     suspend fun launchPremiumSubscriptionFlow(activity: Activity): PurchaseFlowResult
 }

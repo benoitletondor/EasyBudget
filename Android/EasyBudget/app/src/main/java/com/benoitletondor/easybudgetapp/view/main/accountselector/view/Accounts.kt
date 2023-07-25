@@ -376,6 +376,7 @@ fun AccountsLoadingViewPreview() {
             onAccountSelected = {},
             onBecomeProButtonClicked = {},
             onLoginButtonPressed = {},
+            onCreateAccountClicked = {},
         )
     }
 }
@@ -390,6 +391,7 @@ fun AccountsIabErrorViewPreview() {
             onAccountSelected = {},
             onBecomeProButtonClicked = {},
             onLoginButtonPressed = {},
+            onCreateAccountClicked = {},
         )
     }
 }
@@ -406,6 +408,7 @@ fun AccountsNotProViewPreview() {
             onAccountSelected = {},
             onBecomeProButtonClicked = {},
             onLoginButtonPressed = {},
+            onCreateAccountClicked = {},
         )
     }
 }
@@ -422,6 +425,7 @@ fun AccountsNotAuthenticatedViewPreview() {
             onAccountSelected = {},
             onBecomeProButtonClicked = {},
             onLoginButtonPressed = {},
+            onCreateAccountClicked = {},
         )
     }
 }
@@ -473,6 +477,7 @@ fun AccountsAvailableViewPreview() {
             onAccountSelected = {},
             onBecomeProButtonClicked = {},
             onLoginButtonPressed = {},
+            onCreateAccountClicked = {},
         )
     }
 }
@@ -510,6 +515,7 @@ fun AccountsAvailableFullViewPreview() {
             onAccountSelected = {},
             onBecomeProButtonClicked = {},
             onLoginButtonPressed = {},
+            onCreateAccountClicked = {},
         )
     }
 }

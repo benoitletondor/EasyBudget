@@ -6,4 +6,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface Accounts {
     fun watchAccounts(currentUser: CurrentUser): Flow<List<Account>>
+    suspend fun createAccount(currentUser: CurrentUser, name: String): Account
 }

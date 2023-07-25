@@ -170,7 +170,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
         lifecycleScope.launchCollect(viewModel.eventFlow) { event ->
             when(event) {
                 MainViewModel.Event.ShowAccountSelect -> AccountSelectorFragment().show(supportFragmentManager, "accountSelector")
-                MainViewModel.Event.OpenLoginScreen -> startActivity(Intent(this, LoginActivity::class.java))
             }
         }
     }
@@ -197,10 +196,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
 
     fun onAccountSelectedFromBottomSheet(account: MainViewModel.SelectedAccount.Selected) {
         viewModel.onAccountSelected(account)
-    }
-
-    fun onOpenLoginScreenButtonPressed() {
-        viewModel.onOpenLoginScreenButtonPressed()
     }
 
 // ------------------------------------------>

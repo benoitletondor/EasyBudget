@@ -37,6 +37,7 @@
     <string name="title_activity_welcome">EasyBudget</string>
     <string name="title_activity_premium">Premium</string>
     <string name="title_activity_login">Google Login</string>
+    <string name="title_activity_create_account">Create online account</string>
     <string name="title_activity_monthly_report">Monthly report</string>
     <string name="cancel">Cancel</string>
     <string name="undo">UNDO</string>
@@ -352,6 +353,10 @@
     <string name="account_error_loading_title">Oops</string>
     <string name="account_error_loading_message">Unable to load your account data.\n(%s)\n\nPlease check your network and try again.</string>
     <string name="account_error_loading_retry_cta">Retry</string>
+
+    <string name="account_creation_success_toast">Account created successfully!</string>
+    <string name="account_creation_success_error_title">Oops</string>
+    <string name="account_creation_success_error_message">An error occurred while creating your account. Check your network and try again.\n(%s)</string>
 
     <!-- Keys, not for translations. -->
     <string name="setting_category_bug_report_send_button_key" translatable="false">send_bug_report</string>

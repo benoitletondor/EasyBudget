@@ -102,40 +102,32 @@ class IabImpl(
     /**
      * Is the user a premium user
      *
-     * @return true if the user if premium, false otherwise
+     * @return true if we could verify that the user is premium, false otherwise
      */
-    override suspend fun isUserPremium(): Boolean
-    {
+    override suspend fun isUserPremium(): Boolean {
         iabStatusMutableFlow.first { it.isFinal() }
 
-        return (iabStatusMutableFlow.value == PremiumCheckStatus.LEGACY_PREMIUM ||
-            iabStatusMutableFlow.value == PremiumCheckStatus.PREMIUM_SUBSCRIBED ||
-            iabStatusMutableFlow.value == PremiumCheckStatus.PRO_SUBSCRIBED)
-    }
-
-    override fun isUserPro(): Boolean {
-        return iabStatusMutableFlow.value == PremiumCheckStatus.PRO_SUBSCRIBED
-    }
-
-    override suspend fun waitForIsUserPremiumResponse(): Boolean {
-        if (isUserPremium()) {
-            return true
-        }
-
-        val status = iabStatusMutableFlow.first {
-            it == PremiumCheckStatus.LEGACY_PREMIUM ||
-                it == PremiumCheckStatus.PREMIUM_SUBSCRIBED ||
-                it == PremiumCheckStatus.ERROR ||
-                it == PremiumCheckStatus.NOT_PREMIUM
-        }
-
-        return when(status) {
-            PremiumCheckStatus.INITIALIZING -> false
-            PremiumCheckStatus.CHECKING -> false
-            PremiumCheckStatus.ERROR -> false
+        return when(iabStatusMutableFlow.value) {
+            PremiumCheckStatus.INITIALIZING,
+            PremiumCheckStatus.CHECKING,
+            PremiumCheckStatus.ERROR,
             PremiumCheckStatus.NOT_PREMIUM -> false
-            PremiumCheckStatus.LEGACY_PREMIUM -> true
-            PremiumCheckStatus.PREMIUM_SUBSCRIBED -> true
+            PremiumCheckStatus.LEGACY_PREMIUM,
+            PremiumCheckStatus.PREMIUM_SUBSCRIBED,
+            PremiumCheckStatus.PRO_SUBSCRIBED -> true
+        }
+    }
+
+    override suspend fun isUserPro(): Boolean {
+        iabStatusMutableFlow.first { it.isFinal() }
+
+        return when(iabStatusMutableFlow.value) {
+            PremiumCheckStatus.INITIALIZING,
+            PremiumCheckStatus.CHECKING,
+            PremiumCheckStatus.ERROR,
+            PremiumCheckStatus.NOT_PREMIUM,
+            PremiumCheckStatus.LEGACY_PREMIUM,
+            PremiumCheckStatus.PREMIUM_SUBSCRIBED -> false
             PremiumCheckStatus.PRO_SUBSCRIBED -> true
         }
     }
