@@ -53,6 +53,20 @@ class MainViewModel @Inject constructor(
     private val eventMutableFlow = MutableLiveFlow<Event>()
     val eventFlow: Flow<Event> = eventMutableFlow
 
+    val hasPendingInvitationsFlow: StateFlow<Boolean> = iab.iabStatusFlow.flatMapLatest { iabStatus ->
+        when(iabStatus) {
+            PremiumCheckStatus.PRO_SUBSCRIBED -> auth.state
+                .flatMapLatest { authState ->
+                    when(authState) {
+                        is AuthState.Authenticated -> accounts.watchHasPendingInvitedAccounts(authState.currentUser)
+                        AuthState.Authenticating,
+                        AuthState.NotAuthenticated -> flowOf(false)
+                    }
+                }
+            else -> flowOf(false)
+        }
+    }
+    .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     val accountSelectionFlow: StateFlow<SelectedAccount> = combine(
         selectedOnlineAccountIdMutableStateFlow,
@@ -124,6 +138,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun shouldShowMenuButtons(): Boolean = iab.isIabReady() && accountSelectionFlow.value is SelectedAccount.Selected
+
     fun showPremiumMenuButtons(): Boolean = when(iab.iabStatusFlow.value) {
         PremiumCheckStatus.INITIALIZING,
         PremiumCheckStatus.CHECKING,

@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import java.math.BigInteger
 import java.security.SecureRandom
@@ -39,6 +40,10 @@ class FirebaseAccounts(
                 (a + b).distinctBy { it.id }
             }
     }
+
+    override fun watchHasPendingInvitedAccounts(currentUser: CurrentUser): Flow<Boolean>
+        = watchPendingInvitations(currentUser)
+            .map { it.isNotEmpty() }
 
     override suspend fun createAccount(currentUser: CurrentUser, name: String): Account {
         val (id, secret) = generateSecureAccountIdAndSecret()
@@ -70,25 +75,68 @@ class FirebaseAccounts(
             }
         }
 
+    override fun watchPendingInvitedAccounts(currentUser: CurrentUser): Flow<List<Account>> =
+        watchPendingInvitations(currentUser)
+            .flatMapToAccounts(currentUser)
+
+    override suspend fun acceptInvitationToAccount(currentUser: CurrentUser, account: Account) {
+        updateInvitationStatus(currentUser, account, InvitationStatus.ACCEPTED)
+    }
+
+    override suspend fun rejectInvitationToAccount(currentUser: CurrentUser, account: Account) {
+        updateInvitationStatus(currentUser, account, InvitationStatus.REJECTED)
+    }
+
+    private suspend fun updateInvitationStatus(currentUser: CurrentUser, account: Account, status: InvitationStatus) {
+        val invitationResult = db.collection(INVITATIONS_COLLECTION)
+            .whereEqualTo(INVITATION_DOCUMENT_RECEIVER_EMAIL, currentUser.email)
+            .whereEqualTo(INVITATION_DOCUMENT_ACCOUNT_ID, account.id)
+            .get()
+            .await()
+
+        if (invitationResult.isEmpty || invitationResult.documents.isEmpty()) {
+            throw IllegalStateException("Unable to find invitation")
+        }
+
+        db.collection(ACCOUNTS_COLLECTION)
+            .document(invitationResult.documents.first().id)
+            .update(mapOf(
+                INVITATION_DOCUMENT_STATUS to status.dbValue,
+            ))
+            .await()
+    }
+
     private fun watchInvitedAccounts(currentUser: CurrentUser): Flow<List<Account>> =
         watchAcceptedInvitations(currentUser)
-            .flatMapLatest { accountIds ->
-                if (accountIds.isEmpty()) {
-                    return@flatMapLatest flowOf(emptyList())
-                }
+            .flatMapToAccounts(currentUser)
 
-                return@flatMapLatest db.collection(ACCOUNTS_COLLECTION)
-                    .whereIn(FieldPath.documentId(), accountIds)
-                    .watchAsFlow { value ->
-                        value.documents.mapNotNull {
-                            it.toAccountOrThrow(currentUser)
-                        }
-                    }
+    private fun Flow<List<String>>.flatMapToAccounts(currentUser: CurrentUser): Flow<List<Account>>
+        = flatMapLatest { accountIds ->
+            if (accountIds.isEmpty()) {
+                return@flatMapLatest flowOf(emptyList())
             }
+
+            return@flatMapLatest db.collection(ACCOUNTS_COLLECTION)
+                .whereIn(FieldPath.documentId(), accountIds)
+                .watchAsFlow { value ->
+                    value.documents.mapNotNull {
+                        it.toAccountOrThrow(currentUser)
+                    }
+                }
+        }
 
     private fun watchAcceptedInvitations(currentUser: CurrentUser): Flow<List<String>> = db.collection(INVITATIONS_COLLECTION)
         .whereEqualTo(INVITATION_DOCUMENT_RECEIVER_EMAIL, currentUser.email)
         .whereEqualTo(INVITATION_DOCUMENT_STATUS, InvitationStatus.ACCEPTED.dbValue)
+        .watchAsFlow { value ->
+            value.documents.mapNotNull {
+                it.getString(INVITATION_DOCUMENT_ACCOUNT_ID)
+            }
+        }
+
+    private fun watchPendingInvitations(currentUser: CurrentUser): Flow<List<String>> = db.collection(INVITATIONS_COLLECTION)
+        .whereEqualTo(INVITATION_DOCUMENT_RECEIVER_EMAIL, currentUser.email)
+        .whereEqualTo(INVITATION_DOCUMENT_STATUS, InvitationStatus.SENT.dbValue)
         .watchAsFlow { value ->
             value.documents.mapNotNull {
                 it.getString(INVITATION_DOCUMENT_ACCOUNT_ID)

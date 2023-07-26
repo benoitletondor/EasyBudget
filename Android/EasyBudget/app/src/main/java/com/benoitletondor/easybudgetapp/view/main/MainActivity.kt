@@ -26,15 +26,32 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import androidx.activity.viewModels
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
@@ -51,7 +68,6 @@ import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.main.account.AccountFragment
 import com.benoitletondor.easybudgetapp.view.main.accountselector.AccountSelectorFragment
 import com.benoitletondor.easybudgetapp.view.main.loading.LoadingFragment
-import com.benoitletondor.easybudgetapp.view.main.login.LoginActivity
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
@@ -95,31 +111,75 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
 
         binding.mainComposeView.setContent {
             val selectedAccount by viewModel.accountSelectionFlow.collectAsState()
+            val hasPendingInvitations by viewModel.hasPendingInvitationsFlow.collectAsState()
 
             AppTheme {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable {
-                            viewModel.onAccountTapped()
-                        }
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .background(colorResource(R.color.status_bar_color))
+                        .padding(bottom = 8.dp)
+                        .clickable(
+                            onClick = viewModel::onAccountTapped,
+                        )
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
                 ) {
-                    when(val account = selectedAccount) {
-                        MainViewModel.SelectedAccount.Loading -> Unit /* Nothing to display when loading */
-                        MainViewModel.SelectedAccount.Selected.Offline -> Row {
-                            Text(
-                                modifier = Modifier.fillMaxWidth(),
-                                text = "Default (offline)",
-                            )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Box(
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            when(val account = selectedAccount) {
+                                MainViewModel.SelectedAccount.Loading -> Unit /* Nothing to display when loading */
+                                is MainViewModel.SelectedAccount.Selected -> {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                    ) {
+                                        Text(
+                                            text = "Account: ",
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = colorResource(R.color.action_bar_text_color),
+                                        )
+
+                                        Text(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            text = when(account) {
+                                                MainViewModel.SelectedAccount.Selected.Offline -> "Default (offline)"
+                                                is MainViewModel.SelectedAccount.Selected.Online -> account.name
+                                            },
+                                            maxLines = 1,
+                                            color = colorResource(R.color.action_bar_text_color),
+                                            overflow = TextOverflow.Ellipsis,
+                                        )
+                                    }
+                                }
+                            }
                         }
-                        is MainViewModel.SelectedAccount.Selected.Online -> Row {
-                            Text(
-                                modifier = Modifier.fillMaxWidth(),
-                                text = "${account.name} (online)",
-                            )
+
+
+                        if (hasPendingInvitations && selectedAccount is MainViewModel.SelectedAccount.Selected) {
+                            Box(
+                                modifier = Modifier.padding(start = 16.dp),
+                            ){
+                                Image(
+                                    painter =  painterResource(id = R.drawable.ic_baseline_notifications_24),
+                                    colorFilter = ColorFilter.tint(colorResource(R.color.action_bar_text_color)),
+                                    contentDescription = stringResource(R.string.account_pending_invitation_description),
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .size(7.dp)
+                                        .clip(CircleShape)
+                                        .background(colorResource(R.color.budget_red))
+                                        .align(Alignment.TopEnd)
+                                )
+                            }
+
                         }
                     }
+
                 }
             }
         }

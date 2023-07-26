@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.accounts.Accounts
 import com.benoitletondor.easybudgetapp.auth.Auth
 import com.benoitletondor.easybudgetapp.auth.AuthState
+import com.benoitletondor.easybudgetapp.auth.CurrentUser
+import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.iab.PremiumCheckStatus
@@ -13,7 +15,9 @@ import com.benoitletondor.easybudgetapp.parameters.getLatestSelectedOnlineAccoun
 import com.benoitletondor.easybudgetapp.parameters.isBackupEnabled
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -33,6 +37,8 @@ class AccountSelectorViewModel @Inject constructor(
     private val eventMutableFlow = MutableLiveFlow<Event>()
     val eventFlow: Flow<Event> = eventMutableFlow
 
+    private val loadingInvitationMutableFlow = MutableStateFlow<Invitation?>(null)
+
     val stateFlow: StateFlow<State> = combine(
         iab.iabStatusFlow,
         auth.state,
@@ -49,8 +55,23 @@ class AccountSelectorViewModel @Inject constructor(
                         }
                     else -> flowOf(emptyList())
                 }
-            }
-    ) { iabStatus, authStatus, onlineAccounts ->
+            },
+        iab.iabStatusFlow
+            .flatMapLatest { iabStatus ->
+                when(iabStatus) {
+                    PremiumCheckStatus.PRO_SUBSCRIBED -> auth.state
+                        .flatMapLatest { authState ->
+                            when(authState) {
+                                is AuthState.Authenticated -> accounts.watchPendingInvitedAccounts(authState.currentUser)
+                                AuthState.Authenticating,
+                                AuthState.NotAuthenticated -> flowOf(emptyList())
+                            }
+                        }
+                    else -> flowOf(emptyList())
+                }
+            },
+        loadingInvitationMutableFlow
+    ) { iabStatus, authStatus, onlineAccounts, pendingAccountsInvitation, maybeLoadingInvitation ->
         return@combine when(iabStatus) {
             PremiumCheckStatus.INITIALIZING,
             PremiumCheckStatus.CHECKING -> State.Loading
@@ -62,23 +83,11 @@ class AccountSelectorViewModel @Inject constructor(
                 is AuthState.Authenticated -> {
                     val ownAccounts = onlineAccounts
                         .filter { it.isUserOwner }
-                        .map { Account(
-                            id = it.id,
-                            secret = it.secret,
-                            name = it.name,
-                            ownerEmail = it.ownerEmail,
-                            selected = parameters.getLatestSelectedOnlineAccountId() == it.id,
-                        ) }
+                        .map { it.toViewModelAccount() }
 
                     val invitedAccounts = onlineAccounts
                         .filter { !it.isUserOwner }
-                        .map { Account(
-                            id = it.id,
-                            secret = it.secret,
-                            name = it.name,
-                            ownerEmail = it.ownerEmail,
-                            selected = parameters.getLatestSelectedOnlineAccountId() == it.id,
-                        ) }
+                        .map { it.toViewModelAccount() }
 
                     State.AccountsAvailable(
                         userEmail = authStatus.currentUser.email,
@@ -87,6 +96,13 @@ class AccountSelectorViewModel @Inject constructor(
                         ownAccounts = ownAccounts.take(5),
                         showCreateOnlineAccountButton = ownAccounts.size < 5,
                         invitedAccounts = invitedAccounts,
+                        pendingInvitations = pendingAccountsInvitation.map { account ->
+                            Invitation(
+                                account = account.toViewModelAccount(),
+                                user = authStatus.currentUser,
+                                isLoading = maybeLoadingInvitation?.account?.id == account.id,
+                            )
+                        },
                         isOfflineBackupEnabled = parameters.isBackupEnabled(),
                     )
                 }
@@ -126,12 +142,92 @@ class AccountSelectorViewModel @Inject constructor(
         }
     }
 
+    fun onAcceptInvitationConfirmed(invitation: Invitation) {
+        viewModelScope.launch {
+            if (loadingInvitationMutableFlow.value != null) {
+                Logger.debug("onAcceptInvitationConfirmed clicked while already accepting, ignoring")
+                return@launch
+            }
+
+            loadingInvitationMutableFlow.value = invitation
+
+            try {
+                accounts.acceptInvitationToAccount(
+                    currentUser = invitation.user,
+                    account = invitation.account.toDomainAccount(
+                        isUserOwner = invitation.user.email == invitation.account.ownerEmail,
+                    )
+                )
+
+                eventMutableFlow.emit(Event.InvitationAccepted)
+            } catch (e: Exception) {
+                if (e is CancellationException) { throw e }
+
+                Logger.error("Error while accepting invitation", e)
+                eventMutableFlow.emit(Event.ErrorAcceptingInvitation(e))
+            } finally {
+                loadingInvitationMutableFlow.value = null
+            }
+        }
+    }
+
+    fun onRejectInvitationConfirmed(invitation: Invitation) {
+        viewModelScope.launch {
+            if (loadingInvitationMutableFlow.value != null) {
+                Logger.debug("onAcceptInvitationConfirmed clicked while already accepting, ignoring")
+                return@launch
+            }
+
+            loadingInvitationMutableFlow.value = invitation
+
+            try {
+                accounts.rejectInvitationToAccount(
+                    currentUser = invitation.user,
+                    account = invitation.account.toDomainAccount(
+                        isUserOwner = invitation.user.email == invitation.account.ownerEmail,
+                    )
+                )
+
+                eventMutableFlow.emit(Event.InvitationRejected)
+            } catch (e: Exception) {
+                if (e is CancellationException) { throw e }
+
+                Logger.error("Error while rejecting invitation", e)
+                eventMutableFlow.emit(Event.ErrorRejectingInvitation(e))
+            } finally {
+                loadingInvitationMutableFlow.value = null
+            }
+        }
+    }
+
     data class Account(
         val id: String,
         val secret: String,
         val name: String,
         val selected: Boolean,
         val ownerEmail: String,
+    ) {
+        fun toDomainAccount(isUserOwner: Boolean) = com.benoitletondor.easybudgetapp.accounts.model.Account(
+            id = id,
+            secret = secret,
+            name = name,
+            ownerEmail = ownerEmail,
+            isUserOwner = isUserOwner,
+        )
+    }
+
+    private fun com.benoitletondor.easybudgetapp.accounts.model.Account.toViewModelAccount() = Account(
+        id = id,
+        secret = secret,
+        name = name,
+        ownerEmail = ownerEmail,
+        selected = parameters.getLatestSelectedOnlineAccountId() == id,
+    )
+
+    data class Invitation(
+        val account: Account,
+        val user: CurrentUser,
+        val isLoading: Boolean,
     )
 
     sealed interface OfflineBackStateAvailable {
@@ -149,12 +245,17 @@ class AccountSelectorViewModel @Inject constructor(
             val ownAccounts: List<Account>,
             val showCreateOnlineAccountButton: Boolean,
             val invitedAccounts: List<Account>,
+            val pendingInvitations: List<Invitation>,
             override val isOfflineBackupEnabled: Boolean,
         ) : State(), OfflineBackStateAvailable
     }
 
     sealed class Event {
         data class AccountSelected(val account: MainViewModel.SelectedAccount.Selected) : Event()
+        class ErrorAcceptingInvitation(val error: Throwable) : Event()
+        object InvitationAccepted : Event()
+        class ErrorRejectingInvitation(val error: Throwable) : Event()
+        object InvitationRejected : Event()
         object OpenProScreen : Event()
         object OpenLoginScreen : Event()
         object OpenCreateAccountScreen : Event()

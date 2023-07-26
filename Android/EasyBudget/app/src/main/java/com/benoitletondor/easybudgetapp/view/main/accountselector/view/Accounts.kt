@@ -1,6 +1,7 @@
 package com.benoitletondor.easybudgetapp.view.main.accountselector.view
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -13,6 +14,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
@@ -24,6 +27,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -31,9 +35,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.benoitletondor.easybudgetapp.R
+import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.benoitletondor.easybudgetapp.theme.AppTheme
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import com.benoitletondor.easybudgetapp.view.main.accountselector.AccountSelectorViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 @Composable
 fun AccountsView(viewModel: AccountSelectorViewModel) {
@@ -46,6 +52,8 @@ fun AccountsView(viewModel: AccountSelectorViewModel) {
         onBecomeProButtonClicked = viewModel::onBecomeProButtonClicked,
         onLoginButtonPressed = viewModel::onLoginButtonPressed,
         onCreateAccountClicked = viewModel::onCreateAccountClicked,
+        onAcceptInvitationConfirmed = viewModel::onAcceptInvitationConfirmed,
+        onRejectInvitationConfirmed = viewModel::onRejectInvitationConfirmed,
     )
 }
 
@@ -57,6 +65,8 @@ private fun AccountsView(
     onBecomeProButtonClicked: () -> Unit,
     onLoginButtonPressed: () -> Unit,
     onCreateAccountClicked: () -> Unit,
+    onAcceptInvitationConfirmed: (AccountSelectorViewModel.Invitation) -> Unit,
+    onRejectInvitationConfirmed: (AccountSelectorViewModel.Invitation) -> Unit,
 ) {
     val isLoading = state is AccountSelectorViewModel.State.Loading
     val offlineAccountSelected = when(state) {
@@ -140,6 +150,9 @@ private fun AccountsView(
                     ))
                 },
                 onCreateAccountClicked = onCreateAccountClicked,
+                pendingInvitations = state.pendingInvitations,
+                onAcceptInvitationConfirmed = onAcceptInvitationConfirmed,
+                onRejectInvitationConfirmed = onRejectInvitationConfirmed,
             )
             AccountSelectorViewModel.State.IabError -> IabErrorView(
                 onRetryButtonClicked = onIabErrorRetryButtonClicked,
@@ -191,7 +204,30 @@ private fun ColumnScope.OnlineAccountsView(
     invitedAccounts: List<AccountSelectorViewModel.Account>,
     onAccountSelected: (AccountSelectorViewModel.Account) -> Unit,
     onCreateAccountClicked: () -> Unit,
+    pendingInvitations: List<AccountSelectorViewModel.Invitation>,
+    onAcceptInvitationConfirmed: (AccountSelectorViewModel.Invitation) -> Unit,
+    onRejectInvitationConfirmed: (AccountSelectorViewModel.Invitation) -> Unit,
 ) {
+    if (pendingInvitations.isNotEmpty()) {
+        Text(
+            text = "Pending invitations",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.SemiBold,
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        for(invitation in pendingInvitations) {
+            InvitationView(
+                invitation = invitation,
+                onRejectInvitationConfirmed = onRejectInvitationConfirmed,
+                onAcceptInvitationConfirmed = onAcceptInvitationConfirmed,
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
+
     Text(
         text = "Your accounts",
         fontSize = 16.sp,
@@ -367,6 +403,87 @@ private fun AccountButton(
 }
 
 @Composable
+private fun InvitationView(
+    invitation: AccountSelectorViewModel.Invitation,
+    onRejectInvitationConfirmed: (AccountSelectorViewModel.Invitation) -> Unit,
+    onAcceptInvitationConfirmed: (AccountSelectorViewModel.Invitation) -> Unit,
+) {
+    val context = LocalContext.current
+
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth(),
+        tonalElevation = 3.dp,
+        shape = RoundedCornerShape(10.dp),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 6.dp, horizontal = 10.dp),
+        ) {
+            Text(
+                text = invitation.account.name,
+                fontSize = 16.sp,
+            )
+
+            Text(
+                text = invitation.account.ownerEmail,
+                fontSize = 15.sp,
+                color = colorResource(R.color.secondary_text),
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                if (invitation.isLoading) {
+                    CircularProgressIndicator()
+                } else {
+                    Button(
+                        onClick = {
+                            MaterialAlertDialogBuilder(context)
+                                .setTitle("Reject invitation")
+                                .setMessage("Are you sure you want to reject this account invitation? You'll need to be invited again to be able to access it.")
+                                .setNegativeButton("Cancel") { dialog, _ ->
+                                    dialog.dismiss()
+                                }
+                                .setPositiveButton("Reject") { dialog, _ ->
+                                    onRejectInvitationConfirmed(invitation)
+                                    dialog.dismiss()
+                                }
+                                .show()
+                        },
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.error,
+                        ),
+                    ) {
+                        Text(
+                            text = "Reject",
+                            color = MaterialTheme.colorScheme.onError,
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    Button(
+                        onClick = {
+                            onAcceptInvitationConfirmed(invitation)
+                        },
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        Text("Accept")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 @Preview(name = "Loading preview")
 fun AccountsLoadingViewPreview() {
     AppTheme {
@@ -377,6 +494,8 @@ fun AccountsLoadingViewPreview() {
             onBecomeProButtonClicked = {},
             onLoginButtonPressed = {},
             onCreateAccountClicked = {},
+            onRejectInvitationConfirmed = {},
+            onAcceptInvitationConfirmed = {},
         )
     }
 }
@@ -392,6 +511,8 @@ fun AccountsIabErrorViewPreview() {
             onBecomeProButtonClicked = {},
             onLoginButtonPressed = {},
             onCreateAccountClicked = {},
+            onRejectInvitationConfirmed = {},
+            onAcceptInvitationConfirmed = {},
         )
     }
 }
@@ -409,6 +530,8 @@ fun AccountsNotProViewPreview() {
             onBecomeProButtonClicked = {},
             onLoginButtonPressed = {},
             onCreateAccountClicked = {},
+            onRejectInvitationConfirmed = {},
+            onAcceptInvitationConfirmed = {},
         )
     }
 }
@@ -426,6 +549,8 @@ fun AccountsNotAuthenticatedViewPreview() {
             onBecomeProButtonClicked = {},
             onLoginButtonPressed = {},
             onCreateAccountClicked = {},
+            onRejectInvitationConfirmed = {},
+            onAcceptInvitationConfirmed = {},
         )
     }
 }
@@ -471,6 +596,7 @@ fun AccountsAvailableViewPreview() {
                         ownerEmail = "other.person.withasuperlongemailoiqoisqdohqsolihqsdoiqshdoqisdhqsdoihsdqoihqsdiouhhqohidqsh@gmail.com",
                     )
                 ),
+                pendingInvitations = listOf(),
                 isOfflineBackupEnabled = true,
             ),
             onIabErrorRetryButtonClicked = {},
@@ -478,6 +604,8 @@ fun AccountsAvailableViewPreview() {
             onBecomeProButtonClicked = {},
             onLoginButtonPressed = {},
             onCreateAccountClicked = {},
+            onRejectInvitationConfirmed = {},
+            onAcceptInvitationConfirmed = {},
         )
     }
 }
@@ -509,6 +637,41 @@ fun AccountsAvailableFullViewPreview() {
                         ownerEmail = "other.person@gmail.com",
                     ),
                 ),
+                pendingInvitations = listOf(
+                    AccountSelectorViewModel.Invitation(
+                        account = AccountSelectorViewModel.Account(
+                            id = "",
+                            secret = "",
+                            selected = false,
+                            name = "Other person account",
+                            ownerEmail = "other.person@gmail.com",
+                        ),
+                        isLoading = true,
+                        user = CurrentUser("", "", ""),
+                    ),
+                    AccountSelectorViewModel.Invitation(
+                        account = AccountSelectorViewModel.Account(
+                            id = "",
+                            secret = "",
+                            selected = false,
+                            name = "Other person account 2",
+                            ownerEmail = "other.person@gmail.com",
+                        ),
+                        isLoading = false,
+                        user = CurrentUser("", "", ""),
+                    ),
+                    AccountSelectorViewModel.Invitation(
+                        account = AccountSelectorViewModel.Account(
+                            id = "",
+                            secret = "",
+                            selected = false,
+                            name = "Other person account with a super long name to test how it looks on multiple lines to make sure it's ok",
+                            ownerEmail = "other.person.with.a.super.long.email.that.nobody.can.type@gmail.com",
+                        ),
+                        isLoading = false,
+                        user = CurrentUser("", "", ""),
+                    )
+                ),
                 isOfflineBackupEnabled = false,
             ),
             onIabErrorRetryButtonClicked = {},
@@ -516,6 +679,8 @@ fun AccountsAvailableFullViewPreview() {
             onBecomeProButtonClicked = {},
             onLoginButtonPressed = {},
             onCreateAccountClicked = {},
+            onRejectInvitationConfirmed = {},
+            onAcceptInvitationConfirmed = {},
         )
     }
 }
