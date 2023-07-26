@@ -122,7 +122,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
                         .clickable(
                             onClick = viewModel::onAccountTapped,
                         )
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                        .padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 10.dp),
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -158,10 +158,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
                             }
                         }
 
-
                         if (hasPendingInvitations && selectedAccount is MainViewModel.SelectedAccount.Selected) {
                             Box(
-                                modifier = Modifier.padding(start = 16.dp),
+                                modifier = Modifier.padding(start = 16.dp, end = 6.dp),
                             ){
                                 Image(
                                     painter =  painterResource(id = R.drawable.ic_baseline_notifications_24),
@@ -176,7 +175,13 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
                                         .align(Alignment.TopEnd)
                                 )
                             }
-
+                        } else {
+                            Image(
+                                painter =  painterResource(id = R.drawable.ic_baseline_arrow_drop_down_24),
+                                colorFilter = ColorFilter.tint(colorResource(R.color.action_bar_text_color)),
+                                contentDescription = null,
+                                modifier = Modifier.padding(start = 10.dp),
+                            )
                         }
                     }
 
