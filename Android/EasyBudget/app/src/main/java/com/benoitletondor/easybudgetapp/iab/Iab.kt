@@ -27,12 +27,13 @@ interface Iab {
     suspend fun isUserPro(): Boolean
     fun updateIAPStatusIfNeeded()
     suspend fun launchPremiumSubscriptionFlow(activity: Activity): PurchaseFlowResult
+    suspend fun launchProSubscriptionFlow(activity: Activity): PurchaseFlowResult
 }
 
 sealed class PurchaseFlowResult {
     object Cancelled : PurchaseFlowResult()
-    object Success : PurchaseFlowResult()
-    class Error(val reason: String): PurchaseFlowResult()
+    data class Success(val sku: String) : PurchaseFlowResult()
+    data class Error(val reason: String): PurchaseFlowResult()
 }
 
 /**
