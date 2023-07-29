@@ -25,7 +25,6 @@ import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.benoitletondor.easybudgetapp.auth.FirebaseAuth
 import com.benoitletondor.easybudgetapp.cloudstorage.CloudStorage
 import com.benoitletondor.easybudgetapp.cloudstorage.FirebaseStorage
-import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.iab.IabImpl
 import com.benoitletondor.easybudgetapp.model.Expense

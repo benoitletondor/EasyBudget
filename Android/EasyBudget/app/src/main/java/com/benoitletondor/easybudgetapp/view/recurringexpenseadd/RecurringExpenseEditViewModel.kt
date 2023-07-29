@@ -19,37 +19,44 @@ package com.benoitletondor.easybudgetapp.view.recurringexpenseadd
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.benoitletondor.easybudgetapp.auth.Auth
+import com.benoitletondor.easybudgetapp.auth.AuthState
 import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
-import com.benoitletondor.easybudgetapp.model.AssociatedRecurringExpense
+import com.benoitletondor.easybudgetapp.injection.AppModule
 import kotlinx.coroutines.launch
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.getInitDate
+import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 @HiltViewModel
 class RecurringExpenseEditViewModel @Inject constructor(
-    private val db: DB,
+    offlineDB: DB,
+    private val auth: Auth,
     private val parameters: Parameters,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     /**
      * Expense that is being edited (will be null if it's a new one)
      */
-    private val editedExpense: Expense? = savedStateHandle.get<Expense>("expense")
+    private val editedExpense: Expense? = savedStateHandle[RecurringExpenseEditActivity.ARG_EXPENSE]
 
-    private val expenseDateMutableStateFlow = MutableStateFlow(LocalDate.ofEpochDay(savedStateHandle.get<Long>("dateStart") ?: 0))
+    private val account = savedStateHandle.get<MainViewModel.SelectedAccount.Selected>(RecurringExpenseEditActivity.ARG_SELECTED_ACCOUNT)
+        ?: throw IllegalStateException("No ARG_SELECTED_ACCOUNT arg")
+
+    private val expenseDateMutableStateFlow = MutableStateFlow(LocalDate.ofEpochDay(
+        savedStateHandle[RecurringExpenseEditActivity.ARG_START_DATE] ?: throw IllegalStateException("No ARG_START_DATE arg")))
     val expenseDateFlow: Flow<LocalDate> = expenseDateMutableStateFlow
 
     private val editTypeMutableStateFlow = MutableStateFlow(ExpenseEditType(
@@ -68,11 +75,42 @@ class RecurringExpenseEditViewModel @Inject constructor(
     private val expenseAddBeforeInitDateErrorMutableFlow = MutableLiveFlow<Unit>()
     val expenseAddBeforeInitDateEventFlow: Flow<Unit> = expenseAddBeforeInitDateErrorMutableFlow
 
+    private val unableToLoadDBEventMutableFlow = MutableLiveFlow<Unit>()
+    val unableToLoadDBEventFlow: Flow<Unit> = unableToLoadDBEventMutableFlow
+
     private val finishMutableFlow = MutableLiveFlow<Unit>()
     val finishFlow: Flow<Unit> = finishMutableFlow
 
     private val errorMutableFlow = MutableLiveFlow<Unit>()
     val errorFlow: Flow<Unit> = errorMutableFlow
+
+    private val dbMutableFlow = MutableStateFlow<DB?>(null)
+
+    init {
+        viewModelScope.launch {
+            dbMutableFlow.value = when(val selectedAccount = account) {
+                MainViewModel.SelectedAccount.Selected.Offline -> offlineDB
+                is MainViewModel.SelectedAccount.Selected.Online -> {
+                    try {
+                        val currentUser = (auth.state.value as? AuthState.Authenticated)?.currentUser ?: throw IllegalStateException("User is not authenticated")
+
+                        val onlineDb = AppModule.provideSyncedOnlineDBOrThrow(
+                            currentUser = currentUser,
+                            accountId = selectedAccount.accountId,
+                            accountSecret = selectedAccount.accountSecret,
+                        )
+
+                        addCloseable(onlineDb)
+                        onlineDb
+                    } catch (e: Exception) {
+                        Logger.error("Error while loading online DB", e)
+                        unableToLoadDBEventMutableFlow.emit(Unit)
+                        null
+                    }
+                }
+            }
+        }
+    }
 
     fun onExpenseRevenueValueChanged(isRevenue: Boolean) {
         editTypeMutableStateFlow.value = ExpenseEditType(isRevenue, editedExpense != null)
@@ -117,24 +155,26 @@ class RecurringExpenseEditViewModel @Inject constructor(
         savingStateMutableStateFlow.value = SavingState.Saving(isRevenue)
 
         viewModelScope.launch {
+            val db = dbMutableFlow.value
+            if (db == null) {
+                savingStateMutableStateFlow.value = SavingState.Idle
+                unableToLoadDBEventMutableFlow.emit(Unit)
+                return@launch
+            }
+
             try {
                 val inserted = withContext(Dispatchers.Default) {
                     if( editedExpense == null ) {
-                        val insertedExpense = try {
+                        try {
                             db.persistRecurringExpense(RecurringExpense(description, if (isRevenue) -value else value, date, recurringExpenseType))
+                            return@withContext true
                         } catch (t: Throwable) {
                             Logger.error(false, "Error while inserting recurring expense into DB: addRecurringExpense returned false")
                             return@withContext false
                         }
 
-                        if( !flattenExpensesForRecurringExpense(insertedExpense, date) ) {
-                            Logger.error(false, "Error while flattening expenses for recurring expense: flattenExpensesForRecurringExpense returned false")
-                            return@withContext false
-                        }
-
-                        return@withContext true
                     } else {
-                        val recurringExpense = try {
+                        try {
                             val recurringExpense = editedExpense.associatedRecurringExpense!!.recurringExpense
                             db.deleteAllExpenseForRecurringExpenseAfterDate(recurringExpense, editedExpense.date)
                             db.deleteExpense(editedExpense)
@@ -147,17 +187,11 @@ class RecurringExpenseEditViewModel @Inject constructor(
                                 amount = if (isRevenue) -value else value
                             )
                             db.persistRecurringExpense(newRecurringExpense)
+                            return@withContext true
                         } catch (t: Throwable) {
                             Logger.error(false, "Error while editing recurring expense into DB: addRecurringExpense returned false")
                             return@withContext false
                         }
-
-                        if( !flattenExpensesForRecurringExpense(recurringExpense, date) ) {
-                            Logger.error(false, "Error while flattening expenses for recurring expense edit: flattenExpensesForRecurringExpense returned false")
-                            return@withContext false
-                        }
-
-                        return@withContext true
                     }
                 }
 
@@ -170,146 +204,6 @@ class RecurringExpenseEditViewModel @Inject constructor(
                 savingStateMutableStateFlow.value = SavingState.Idle
             }
         }
-    }
-
-    private suspend fun flattenExpensesForRecurringExpense(expense: RecurringExpense, date: LocalDate): Boolean
-    {
-        var currentDate = date
-
-        when (expense.type) {
-            RecurringExpenseType.DAILY -> {
-                // Add up to 5 years of expenses
-                for (i in 0 until 365*5) {
-                    try {
-                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, AssociatedRecurringExpense(expense, expense.recurringDate)))
-                    } catch (t: Throwable) {
-                        Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false")
-                        return false
-                    }
-
-                    currentDate = currentDate.plusDays(1)
-                }
-            }
-            RecurringExpenseType.WEEKLY -> {
-                // Add up to 5 years of expenses
-                for (i in 0 until 12*4*5) {
-                    try {
-                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, AssociatedRecurringExpense(expense, expense.recurringDate)))
-                    } catch (t: Throwable) {
-                        Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
-                        return false
-                    }
-
-                    currentDate = currentDate.plus(1, ChronoUnit.WEEKS)
-                }
-            }
-            RecurringExpenseType.BI_WEEKLY -> {
-                // Add up to 5 years of expenses
-                for (i in 0 until 12*4*5) {
-                    try {
-                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, AssociatedRecurringExpense(expense, expense.recurringDate)))
-                    } catch (t: Throwable) {
-                        Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
-                        return false
-                    }
-
-                    currentDate = currentDate.plus(2, ChronoUnit.WEEKS)
-                }
-            }
-            RecurringExpenseType.TER_WEEKLY -> {
-                // Add up to 5 years of expenses
-                for (i in 0 until 12*4*5) {
-                    try {
-                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, AssociatedRecurringExpense(expense, expense.recurringDate)))
-                    } catch (t: Throwable) {
-                        Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
-                        return false
-                    }
-
-                    currentDate = currentDate.plus(3, ChronoUnit.WEEKS)
-                }
-            }
-            RecurringExpenseType.FOUR_WEEKLY -> {
-                // Add up to 5 years of expenses
-                for (i in 0 until 12*4*5) {
-                    try {
-                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, AssociatedRecurringExpense(expense, expense.recurringDate)))
-                    } catch (t: Throwable) {
-                        Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
-                        return false
-                    }
-
-                    currentDate = currentDate.plus(4, ChronoUnit.WEEKS)
-                }
-            }
-            RecurringExpenseType.MONTHLY -> {
-                // Add up to 10 years of expenses
-                for (i in 0 until 12*10) {
-                    try {
-                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, AssociatedRecurringExpense(expense, expense.recurringDate)))
-                    } catch (t: Throwable) {
-                        Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
-                        return false
-                    }
-
-                    currentDate = currentDate.plusMonths(1)
-                }
-            }
-            RecurringExpenseType.BI_MONTHLY -> {
-                // Add up to 25 years of expenses
-                for (i in 0 until 6*25) {
-                    try {
-                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, AssociatedRecurringExpense(expense, expense.recurringDate)))
-                    } catch (t: Throwable) {
-                        Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
-                        return false
-                    }
-
-                    currentDate = currentDate.plusMonths(2)
-                }
-            }
-            RecurringExpenseType.TER_MONTHLY -> {
-                // Add up to 25 years of expenses
-                for (i in 0 until 4*25) {
-                    try {
-                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, AssociatedRecurringExpense(expense, expense.recurringDate)))
-                    } catch (t: Throwable) {
-                        Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
-                        return false
-                    }
-
-                    currentDate = currentDate.plusMonths(3)
-                }
-            }
-            RecurringExpenseType.SIX_MONTHLY -> {
-                // Add up to 25 years of expenses
-                for (i in 0 until 2*25) {
-                    try {
-                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, AssociatedRecurringExpense(expense, expense.recurringDate)))
-                    } catch (t: Throwable) {
-                        Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false", t)
-                        return false
-                    }
-
-                    currentDate = currentDate.plusMonths(6)
-                }
-            }
-            RecurringExpenseType.YEARLY -> {
-                // Add up to 100 years of expenses
-                for (i in 0 until 100) {
-                    try {
-                        db.persistExpense(Expense(expense.title, expense.amount, currentDate, false, AssociatedRecurringExpense(expense, expense.recurringDate)))
-                    } catch (t: Throwable) {
-                        Logger.error(false, "Error while inserting expense for recurring expense into DB: persistExpense returned false")
-                        return false
-                    }
-
-                    currentDate = currentDate.plusYears(1)
-                }
-            }
-        }
-
-        return true
     }
 
     fun onDateChanged(date: LocalDate) {

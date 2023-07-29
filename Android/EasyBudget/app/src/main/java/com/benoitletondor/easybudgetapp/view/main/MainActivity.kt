@@ -223,7 +223,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
                     }
                 }
                 is MainViewModel.SelectedAccount.Selected -> {
-                    performIntentActionIfAny()
+                    performIntentActionIfAny(selectedAccount)
 
                     supportFragmentManager.commit {
                         replace(R.id.mainFragmentContainer, AccountFragment.newInstance(selectedAccount))
@@ -239,13 +239,13 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
         }
     }
 
-    private fun performIntentActionIfAny() {
-        if (intent != null && viewModel.accountSelectionFlow.value is MainViewModel.SelectedAccount.Selected) {
+    private fun performIntentActionIfAny(selectedAccount: MainViewModel.SelectedAccount.Selected ) {
+        if (intent != null) {
             openSettingsIfNeeded(intent)
-            openMonthlyReportIfNeeded(intent)
+            openMonthlyReportIfNeeded(intent, selectedAccount)
             openPremiumIfNeeded(intent)
-            openAddExpenseIfNeeded(intent)
-            openAddRecurringExpenseIfNeeded(intent)
+            openAddExpenseIfNeeded(intent, selectedAccount)
+            openAddRecurringExpenseIfNeeded(intent, selectedAccount)
             openSettingsForBackupIfNeeded(intent)
             intent = null
         }
@@ -256,7 +256,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
         super.onNewIntent(intent)
 
         this.intent = intent
-        performIntentActionIfAny()
+
+        (viewModel.accountSelectionFlow.value as? MainViewModel.SelectedAccount.Selected)?.let { selectedAccount ->
+            performIntentActionIfAny(selectedAccount)
+        }
     }
 
     fun onAccountSelectedFromBottomSheet(account: MainViewModel.SelectedAccount.Selected) {
@@ -336,7 +339,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
      *
      * @param intent
      */
-    private fun openMonthlyReportIfNeeded(intent: Intent) {
+    private fun openMonthlyReportIfNeeded(intent: Intent, selectedAccount: MainViewModel.SelectedAccount.Selected) {
         try {
             val data = intent.data
             if (data != null && "true" == data.getQueryParameter("monthly")) {
@@ -371,10 +374,14 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
      *
      * @param intent
      */
-    private fun openAddExpenseIfNeeded(intent: Intent) {
+    private fun openAddExpenseIfNeeded(intent: Intent, selectedAccount: MainViewModel.SelectedAccount.Selected) {
         if (intent.getBooleanExtra(INTENT_SHOW_ADD_EXPENSE, false)) {
-            val startIntent = Intent(this, ExpenseEditActivity::class.java)
-            startIntent.putExtra("date", LocalDate.now().toEpochDay())
+            val startIntent = ExpenseEditActivity.newIntent(
+                context = this,
+                account = selectedAccount,
+                date = LocalDate.now(),
+                editedExpense = null,
+            )
 
             ActivityCompat.startActivityForResult(this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null)
         }
@@ -386,10 +393,14 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
      *
      * @param intent
      */
-    private fun openAddRecurringExpenseIfNeeded(intent: Intent) {
+    private fun openAddRecurringExpenseIfNeeded(intent: Intent, selectedAccount: MainViewModel.SelectedAccount.Selected) {
         if (intent.getBooleanExtra(INTENT_SHOW_ADD_RECURRING_EXPENSE, false)) {
-            val startIntent = Intent(this, RecurringExpenseEditActivity::class.java)
-            startIntent.putExtra("dateStart", LocalDate.now().toEpochDay())
+            val startIntent = RecurringExpenseEditActivity.newIntent(
+                context = this,
+                account = ,
+                startDate = LocalDate.now(),
+                editedExpense = null,
+            )
 
             ActivityCompat.startActivityForResult(this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null)
         }

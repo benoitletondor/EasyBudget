@@ -145,18 +145,24 @@ class ExpensesRecyclerViewAdapter(
                     when (which) {
                         // Edit this one
                         0 -> {
-                            val startIntent = Intent(viewHolder.view.context, ExpenseEditActivity::class.java)
-                            startIntent.putExtra("date", expense.date.toEpochDay())
-                            startIntent.putExtra("expense", expense)
+                            val startIntent = ExpenseEditActivity.newIntent(
+                                context = viewHolder.view.context,
+                                account = ,
+                                editedExpense = expense,
+                                date = expense.date,
+                            )
 
                             ActivityCompat.startActivityForResult(fragment.requireActivity(), startIntent,
                                 MainActivity.ADD_EXPENSE_ACTIVITY_CODE, null)
                         }
                         // Edit this one and following ones
                         1 -> {
-                            val startIntent = Intent(viewHolder.view.context, RecurringExpenseEditActivity::class.java)
-                            startIntent.putExtra("dateStart", expense.date.toEpochDay())
-                            startIntent.putExtra("expense", expense)
+                            val startIntent = ExpenseEditActivity.newIntent(
+                                context = viewHolder.view.context,
+                                account = ,
+                                editedExpense = expense,
+                                date = expense.date,
+                            )
 
                             ActivityCompat.startActivityForResult(fragment.requireActivity(), startIntent,
                                 MainActivity.MANAGE_RECURRING_EXPENSE_ACTIVITY_CODE, null)
@@ -203,9 +209,12 @@ class ExpensesRecyclerViewAdapter(
                     when (which) {
                         0 // Edit expense
                         -> {
-                            val startIntent = Intent(viewHolder.view.context, ExpenseEditActivity::class.java)
-                            startIntent.putExtra("date", expense.date.toEpochDay())
-                            startIntent.putExtra("expense", expense)
+                            val startIntent = ExpenseEditActivity.newIntent(
+                                context = viewHolder.view.context,
+                                account = ,
+                                editedExpense = expense,
+                                date = expense.date,
+                            )
 
                             ActivityCompat.startActivityForResult(fragment.requireActivity(), startIntent,
                                 MainActivity.ADD_EXPENSE_ACTIVITY_CODE, null)

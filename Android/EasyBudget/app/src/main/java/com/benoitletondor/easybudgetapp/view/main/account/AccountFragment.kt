@@ -615,8 +615,12 @@ class AccountFragment : Fragment(), MenuProvider {
 
             override fun onLongClickDate(date: LocalDate, view: View?) // Add expense on long press
             {
-                val startIntent = Intent(requireContext(), ExpenseEditActivity::class.java)
-                startIntent.putExtra("date", date.toEpochDay())
+                val startIntent = ExpenseEditActivity.newIntent(
+                    context = requireContext(),
+                    account = ,
+                    editedExpense = null,
+                    date = date,
+                )
 
                 // Get the absolute location on window for Y value
                 val viewLocation = IntArray(2)
@@ -700,8 +704,12 @@ class AccountFragment : Fragment(), MenuProvider {
 
         listOf(binding.fabNewExpense, binding.fabNewExpenseText).forEach {
             it.setOnClickListener {
-                val startIntent = Intent(requireContext(), ExpenseEditActivity::class.java)
-                startIntent.putExtra("date", calendarFragment.getSelectedDate().toEpochDay())
+                val startIntent = ExpenseEditActivity.newIntent(
+                    context = requireContext(),
+                    account = ,
+                    editedExpense = null,
+                    date = calendarFragment.getSelectedDate(),
+                )
 
                 startIntent.putExtra(MainActivity.ANIMATE_TRANSITION_KEY, true)
 
@@ -714,8 +722,12 @@ class AccountFragment : Fragment(), MenuProvider {
 
         listOf(binding.fabNewRecurringExpense, binding.fabNewRecurringExpenseText).forEach {
             it.setOnClickListener {
-                val startIntent = Intent(requireContext(), RecurringExpenseEditActivity::class.java)
-                startIntent.putExtra("dateStart", calendarFragment.getSelectedDate().toEpochDay())
+                val startIntent = RecurringExpenseEditActivity.newIntent(
+                    context = requireContext(),
+                    account = ,
+                    startDate = calendarFragment.getSelectedDate(),
+                    editedExpense = null,
+                )
 
                 startIntent.putExtra(MainActivity.ANIMATE_TRANSITION_KEY, true)
 

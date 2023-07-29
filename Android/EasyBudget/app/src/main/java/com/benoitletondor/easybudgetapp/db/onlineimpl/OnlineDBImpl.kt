@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import java.time.LocalDate
 import java.util.concurrent.TimeoutException
@@ -466,7 +467,9 @@ class OnlineDBImpl(
             accountSecret: String,
         ): OnlineDBImpl {
             val app = App.create(atlasAppId)
-            val user = app.login(Credentials.jwt(currentUser.token))
+            val user = withContext(Dispatchers.IO) {
+                app.login(Credentials.jwt(currentUser.token))
+            }
             val account = Account(accountId, accountSecret)
 
             val realm = Realm.open(
@@ -483,7 +486,7 @@ class OnlineDBImpl(
                         name = "${currentUser.id}:${account.id}:recurring",
                     )
                 }
-                .log(level = if (BuildConfig.DEBUG_LOG) LogLevel.DEBUG else LogLevel.WARN, listOf(
+                .log(level = if (BuildConfig.DEBUG_LOG) LogLevel.INFO else LogLevel.WARN, listOf(
                     object : RealmLogger {
                         override val level: LogLevel = LogLevel.WARN
                         override val tag: String = "EasyBudgetAtlas"

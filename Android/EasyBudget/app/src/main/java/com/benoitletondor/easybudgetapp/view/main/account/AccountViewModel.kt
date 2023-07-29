@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.Closeable
 import java.time.LocalDate
 import java.util.Calendar
 import javax.inject.Inject
@@ -139,12 +140,6 @@ class AccountViewModel @Inject constructor(
         loadDB()
     }
 
-    override fun onCleared() {
-        (dbAvailableMutableStateFlow.value as? DBState.Loaded)?.db?.close()
-
-        super.onCleared()
-    }
-
     private fun loadDB() {
         dbAvailableMutableStateFlow.value = DBState.Loading
 
@@ -164,6 +159,7 @@ class AccountViewModel @Inject constructor(
                             accountSecret = selectedDB.accountSecret,
                         )
 
+                        addCloseable(onlineDb)
                         DBState.Loaded(onlineDb)
                     }
                 }
@@ -184,6 +180,10 @@ class AccountViewModel @Inject constructor(
         viewModelScope.launch {
             openMonthlyReportEventMutableFlow.emit(Unit)
         }
+    }
+
+    override fun addCloseable(closeable: Closeable) {
+        super.addCloseable(closeable)
     }
 
     sealed class RecurringExpenseDeleteProgressState {
