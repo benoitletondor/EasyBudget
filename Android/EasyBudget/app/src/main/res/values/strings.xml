@@ -182,9 +182,12 @@
     <string name="setting_category_show_premium" translatable="false">Show premium screen</string>
     <string name="setting_category_show_login" translatable="false">Show login</string>
     <string name="setting_category_show_create_account" translatable="false">Show create account</string>
-    <string name="setting_category_premium_title">Premium</string>
+    <string name="setting_category_premium_title">Subscription</string>
+    <string name="setting_category_not_premium_title" translatable="false">Premium / Pro</string>
     <string name="setting_category_premium_status_title">You are premium!</string>
+    <string name="setting_category_pro_status_title">You are pro!</string>
     <string name="setting_category_premium_status_message">You have access to premium features</string>
+    <string name="setting_category_pro_status_message">You have access to pro and premium features</string>
     <string name="setting_category_premium_redeem_title">Promo code</string>
     <string name="setting_category_premium_redeem_message">Redeem a promo code</string>
     <string name="setting_category_notifications_update_title">Updates</string>
@@ -193,8 +196,8 @@
     <string name="setting_category_show_checked_balance_message">Also display the balance of entries you ✓ to mark as paid after normal balance</string>
     <string name="setting_category_notifications_daily_title">Daily reminder</string>
     <string name="setting_category_notifications_daily_message">Receive a notification at the end of the day if you didn\'t enter your expenses</string>
-    <string name="setting_category_not_premium_status_title">Become a premium user</string>
-    <string name="setting_category_not_premium_status_message">Access all the premium features</string>
+    <string name="setting_category_not_premium_status_title">Become a premium or pro user</string>
+    <string name="setting_category_not_premium_status_message">Unlock new exclusive features</string>
     <string name="setting_category_notifications_monthly_title">Monthly report notification</string>
     <string name="setting_category_notifications_monthly_message">Receive a notification when a new monthly report is complete</string>
     <string name="setting_category_theme_title">Theme</string>
@@ -202,8 +205,8 @@
     <string name="setting_theme_dark">Dark</string>
     <string name="setting_theme_platform">System default</string>
 
-    <string name="premium_popup_premium_title">You are premium!</string>
-    <string name="premium_popup_premium_message">You have access to premium features:\n\n- Monthly report: Get a sum-up of your expenses and incomes of the month\n- Daily reminder if you forgot to enter your expenses during the day\n- Dark Theme support\n- Data backup\n- Tick entries\n…and more premium features that will be added soon!</string>
+    <string name="pro_popup_title">You are pro!</string>
+    <string name="pro_popup_message">You have access to all features! Thanks for your support.</string>
     <string name="premium_popup_not_premium_title">Become a premium user</string>
     <string name="premium_popup_not_premium_message">Access all the premium features!</string>
     <string name="premium_popup_premium_description">Unlock the next level of EasyBudget with all the features you need to manage one account in depth:</string>
@@ -235,7 +238,7 @@
     <string name="premium_popup_become_not_ask_again">Don\'t ask me again</string>
 
     <string name="iab_purchase_success_title">Thank you</string>
-    <string name="iab_purchase_success_message">Thank you so much for your support! You can now enjoy the premium features.</string>
+    <string name="iab_purchase_success_message">Thank you so much for your support! You can now enjoy the unlocked features.</string>
     <string name="iab_purchase_wait_title">Purchasing</string>
     <string name="iab_purchase_wait_message">Please wait</string>
     <string name="iab_purchase_error_title">Oops</string>

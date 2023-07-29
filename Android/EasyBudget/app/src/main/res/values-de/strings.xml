@@ -169,7 +169,7 @@
     <string name="setting_category_app_version_message">Gemacht von @BenoitLetondor</string>
     <string name="setting_category_share_app_title">Mit Freunden teilen</string>
     <string name="setting_category_share_app_message">EasyBudget ist gratis, warum sie also nicht mit Ihren Freunden teilen!</string>
-    <string name="setting_category_premium_title">Premium</string>
+    <string name="setting_category_premium_title">Abonnement</string>
     <string name="setting_category_premium_status_title">Sie sind Premium-Nutzer!</string>
     <string name="setting_category_premium_status_message">Sie haben Zugriff auf Premium-Features</string>
     <string name="setting_category_premium_redeem_title">Promocode</string>
@@ -180,8 +180,8 @@
     <string name="setting_category_show_checked_balance_message">Zeigen Sie auch den Saldo der Einträge an, die Sie ✓ als nach dem normalen Saldo bezahlt markieren möchten</string>
     <string name="setting_category_notifications_daily_title">Tägliche Erinnerung</string>
     <string name="setting_category_notifications_daily_message">Erhalten Sie eine Benachrichtigung am Ende des Tages, wenn Sie Ihre Ausgaben noch nicht eingetragen haben</string>
-    <string name="setting_category_not_premium_status_title">Premium-Nutzer werden</string>
-    <string name="setting_category_not_premium_status_message">Auf alle Premium-Features zugreifen</string>
+    <string name="setting_category_not_premium_status_title">Werden Sie Premium- oder Pro-Benutzer</string>
+    <string name="setting_category_not_premium_status_message">Schalten Sie neue exklusive Funktionen frei</string>
     <string name="setting_category_notifications_monthly_title">Monatliche Zusammenfassung</string>
     <string name="setting_category_notifications_monthly_message">Erhalten Sie eine Benachrichtigung, wenn eine neue monatl. Zusammenfassung vollständig ist</string>
     <string name="setting_category_theme_title">Theme</string>
@@ -211,7 +211,7 @@
     <string name="premium_popup_become_not_ask_again">Nicht wieder fragen</string>
 
     <string name="iab_purchase_success_title">Danke</string>
-    <string name="iab_purchase_success_message">Vielen Dank für Ihre Unterstützung! Sie haben von nun an Zugriff auf.</string>
+    <string name="iab_purchase_success_message">Vielen dank für Ihre Hilfe! Sie können jetzt die freigeschalteten Funktionen genießen.</string>
     <string name="iab_purchase_wait_title">Wird gekauft</string>
     <string name="iab_purchase_wait_message">Bitte warten</string>
     <string name="iab_purchase_error_title">Oops</string>

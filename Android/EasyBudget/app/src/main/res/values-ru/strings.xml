@@ -170,7 +170,7 @@
     <string name="setting_category_app_version_message">Создано @BenoitLetondor</string>
     <string name="setting_category_share_app_title">Рассказать друзьям</string>
     <string name="setting_category_share_app_message">Приложение EasyBudget бесплатно, так почему бы не поделиться им с друзьями!</string>
-    <string name="setting_category_premium_title">Премиум</string>
+    <string name="setting_category_premium_title">Подписка</string>
     <string name="setting_category_premium_status_title">Вы премиум-пользователь!</string>
     <string name="setting_category_premium_status_message">У Вас есть доступ к функциям премиум</string>
     <string name="setting_category_premium_redeem_title">Промокод</string>
@@ -181,8 +181,8 @@
     <string name="setting_category_show_checked_balance_message">Также отобразите баланс записей, которые вы ✓ отметите как оплаченные после нормального баланса</string>
     <string name="setting_category_notifications_daily_title">Ежедневное напоминание</string>
     <string name="setting_category_notifications_daily_message">Получите уведомление в конце дня, если Вы не указали свои расходы</string>
-    <string name="setting_category_not_premium_status_title">Стать премиум-пользователем</string>
-    <string name="setting_category_not_premium_status_message">Получить доступ ко всем премиум-функциям</string>
+    <string name="setting_category_not_premium_status_title">Стать премиум или профессиональным пользователем</string>
+    <string name="setting_category_not_premium_status_message">Разблокируйте новые эксклюзивные функции</string>
     <string name="setting_category_notifications_monthly_title">Уведомление о ежемесячном отчете</string>
     <string name="setting_category_notifications_monthly_message">Получать уведомление, когда новый ежемесячный отчет готов</string>
     <string name="setting_category_theme_title">тем</string>
@@ -212,7 +212,7 @@
     <string name="premium_popup_become_not_ask_again">Не спрашивать в дальнейшем</string>
 
     <string name="iab_purchase_success_title">Спасибо</string>
-    <string name="iab_purchase_success_message">Спасибо большое за Вашу поддержку! Теперь Вы можете наслаждаться премиум-функциями.</string>
+    <string name="iab_purchase_success_message">Большое спасибо за вашу поддержку! Теперь вы можете наслаждаться разблокированными функциями.</string>
     <string name="iab_purchase_wait_title">Покупка</string>
     <string name="iab_purchase_wait_message">Пожалуйста, подождите</string>
     <string name="iab_purchase_error_title">Ой…</string>

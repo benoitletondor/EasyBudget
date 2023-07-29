@@ -169,7 +169,7 @@
     <string name="setting_category_app_version_message">Realizzata da @BenoitLetondor</string>
     <string name="setting_category_share_app_title">Condividi con i tuoi amici</string>
     <string name="setting_category_share_app_message">EasyBudget è gratis! Non c’è motivo di non farla conoscere ai tuoi amici!</string>
-    <string name="setting_category_premium_title">Premium</string>
+    <string name="setting_category_premium_title">Sottoscrizione</string>
     <string name="setting_category_premium_status_title">Sei… premium!</string>
     <string name="setting_category_premium_status_message">Hai ora accesso alle funzionalità premium</string>
     <string name="setting_category_premium_redeem_title">Codice promozionale</string>
@@ -180,8 +180,8 @@
     <string name="setting_category_show_checked_balance_message">Visualizza anche il saldo delle voci che ✓ per contrassegnare come pagate dopo il saldo normale</string>
     <string name="setting_category_notifications_daily_title">Allerta quotidiana</string>
     <string name="setting_category_notifications_daily_message">Ricevi una notifica alla fine della giornata se non hai inserito le tue spese</string>
-    <string name="setting_category_not_premium_status_title">Diventa premium</string>
-    <string name="setting_category_not_premium_status_message">Accedi a tutte le funzionalità premium</string>
+    <string name="setting_category_not_premium_status_title">Diventa premium o pro</string>
+    <string name="setting_category_not_premium_status_message">Sblocca nuove funzionalità esclusive</string>
     <string name="setting_category_notifications_monthly_title">Notifica di rapporto mensile</string>
     <string name="setting_category_notifications_monthly_message">Ricevi una notifica quando un nuovo rapporto mensile è completo</string>
     <string name="setting_category_theme_title">Tema</string>
@@ -211,7 +211,7 @@
     <string name="premium_popup_become_not_ask_again">Non chiedermelo più</string>
 
     <string name="iab_purchase_success_title">Grazie</string>
-    <string name="iab_purchase_success_message">Grazie mille per il tuo sostegno! Puoi ora goderti le funzionalità premium.</string>
+    <string name="iab_purchase_success_message">Grazie mille per il vostro sostegno! Ora puoi goderti le funzionalità sbloccate.</string>
     <string name="iab_purchase_wait_title">Acquisto</string>
     <string name="iab_purchase_wait_message">Attendi, prego</string>
     <string name="iab_purchase_error_title">OPS!</string>

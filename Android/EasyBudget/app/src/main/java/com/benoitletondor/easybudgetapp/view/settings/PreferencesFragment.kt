@@ -345,7 +345,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
              * Show premium screen
              */
             findPreference<Preference>(resources.getString(R.string.setting_category_dev_show_premium_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                showBecomePremiumDialog()
+                showBecomePremiumActivity()
                 false
             }
 
@@ -414,7 +414,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
          */
         if (activity?.intent?.getBooleanExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, false) == true) {
             activity?.intent?.putExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, false)
-            showBecomePremiumDialog()
+            showBecomePremiumActivity()
         }
 
         /*
@@ -422,7 +422,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
          */
         if (activity?.intent?.getBooleanExtra(SettingsActivity.SHOW_PRO_INTENT_KEY, false) == true) {
             activity?.intent?.putExtra(SettingsActivity.SHOW_PRO_INTENT_KEY, false)
-            showBecomeProDialog()
+            showBecomeProActivity()
         }
 
         /*
@@ -482,6 +482,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
     private fun refreshPremiumPreference() {
         lifecycleScope.launch {
             val isPremium = iab.isUserPremium()
+            val isPro = iab.isUserPro()
 
             if (isPremium) {
                 if (notPremiumShown) {
@@ -494,17 +495,26 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                     premiumShown = true
                 }
 
-                // Premium preference
-                findPreference<Preference>(resources.getString(R.string.setting_category_premium_status_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                    context?.let {context ->
-                        MaterialAlertDialogBuilder(context)
-                            .setTitle(R.string.premium_popup_premium_title)
-                            .setMessage(R.string.premium_popup_premium_message)
-                            .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
-                            .show()
-                    }
+                // Premium/Pro preference
+                findPreference<Preference>(resources.getString(R.string.setting_category_premium_status_key))?.let {
+                    it.title = if (isPro) { getString(R.string.setting_category_pro_status_title)} else { getString(R.string.setting_category_premium_status_title) }
+                    it.summary = if (isPro) { getString(R.string.setting_category_pro_status_message)} else { getString(R.string.setting_category_premium_status_message) }
+                    it.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                        context?.let { context ->
+                            if (!isPro) {
+                                showBecomeProActivity()
+                            } else {
+                                MaterialAlertDialogBuilder(context)
+                                    .setTitle(R.string.pro_popup_title)
+                                    .setMessage(R.string.pro_popup_message)
+                                    .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
+                                    .show()
+                            }
 
-                    false
+                        }
+
+                        false
+                    }
                 }
 
                 // Daily reminder notif preference
@@ -565,7 +575,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
 
                 // Not premium preference
                 findPreference<Preference>(resources.getString(R.string.setting_category_not_premium_status_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                    showBecomePremiumDialog()
+                    showBecomePremiumActivity()
                     false
                 }
 
@@ -618,17 +628,16 @@ class PreferencesFragment : PreferenceFragmentCompat() {
         }
     }
 
-    private fun showBecomePremiumDialog() {
+    private fun showBecomePremiumActivity() {
         activity?.let { activity ->
-            val intent = Intent(activity, PremiumActivity::class.java)
+            val intent = PremiumActivity.createIntent(activity, shouldShowProByDefault = false)
             ActivityCompat.startActivityForResult(activity, intent, SettingsActivity.PREMIUM_ACTIVITY, null)
         }
     }
 
-    private fun showBecomeProDialog() {
+    private fun showBecomeProActivity() {
         activity?.let { activity ->
-            val intent = Intent(activity, PremiumActivity::class.java)
-            TODO("Pass the right param")
+            val intent = PremiumActivity.createIntent(activity, shouldShowProByDefault = true)
             ActivityCompat.startActivityForResult(activity, intent, SettingsActivity.PREMIUM_ACTIVITY, null)
         }
     }

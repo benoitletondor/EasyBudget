@@ -80,7 +80,7 @@
 
     <PreferenceCategory
         app:key="@string/setting_category_not_premium_key"
-        app:title="@string/setting_category_premium_title">
+        app:title="@string/setting_category_not_premium_title">
 
         <Preference
             app:key="@string/setting_category_not_premium_status_key"

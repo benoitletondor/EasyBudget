@@ -169,7 +169,7 @@
     <string name="setting_category_app_version_message">Creada por @BenoitLetondor</string>
     <string name="setting_category_share_app_title">Comparte con tus amigos</string>
     <string name="setting_category_share_app_message">Ayuda a tus amigos a tener su dinero bajo control. ¡EasyBudget es gratis!</string>
-    <string name="setting_category_premium_title">Premium</string>
+    <string name="setting_category_premium_title">Suscripción</string>
     <string name="setting_category_premium_status_title">¡Eres premium!</string>
     <string name="setting_category_premium_status_message">Tienes acceso a las funcionalidades premium</string>
     <string name="setting_category_premium_redeem_title">Código promocional</string>
@@ -180,8 +180,8 @@
     <string name="setting_category_show_checked_balance_message">También muestre el saldo de las entradas que ✓ marcará como pagadas después del saldo normal</string>
     <string name="setting_category_notifications_daily_title">Recordatorio diario</string>
     <string name="setting_category_notifications_daily_message">Recibe una notificación al final del día si no has entrado tus gastos</string>
-    <string name="setting_category_not_premium_status_title">Vuélvete premium</string>
-    <string name="setting_category_not_premium_status_message">Accede a las funcionalidades premium</string>
+    <string name="setting_category_not_premium_status_title">Conviértete en un usuario premium o pro</string>
+    <string name="setting_category_not_premium_status_message">Desbloquea nuevas características exclusivas</string>
     <string name="setting_category_notifications_monthly_title">Notificación de informe mensual</string>
     <string name="setting_category_notifications_monthly_message">Recibe una notificación cuando un nuevo informe mensual esté listo</string>
     <string name="setting_category_theme_title">Tema</string>
@@ -211,7 +211,7 @@
     <string name="premium_popup_become_not_ask_again">No preguntar más</string>
 
     <string name="iab_purchase_success_title">Gracias</string>
-    <string name="iab_purchase_success_message">¡Muchas gracias por tu apoyo! Ahora tienes acceso a las funcionalidades premium.</string>
+    <string name="iab_purchase_success_message">¡Muchas gracias por su apoyo! Ahora puede disfrutar de las funciones desbloqueadas.</string>
     <string name="iab_purchase_wait_title">Comprando</string>
     <string name="iab_purchase_wait_message">Por favor espera</string>
     <string name="iab_purchase_error_title">¡Ups!</string>

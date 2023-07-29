@@ -1,6 +1,7 @@
 package com.benoitletondor.easybudgetapp.view.premium
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -22,6 +23,7 @@ import com.benoitletondor.easybudgetapp.theme.AppTheme
 import com.benoitletondor.easybudgetapp.theme.easyBudgetGreenColor
 import com.benoitletondor.easybudgetapp.view.premium.view.LoadingView
 import com.benoitletondor.easybudgetapp.view.premium.view.SubscribeView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -47,13 +49,19 @@ class PremiumActivity : AppCompatActivity() {
                     val premiumBuyingState by viewModel.premiumPurchaseStatusFlow.collectAsState(PremiumViewModel.PurchaseFlowStatus.NOT_STARTED)
                     val proBuyingState by viewModel.proPurchaseStatusFlow.collectAsState(PremiumViewModel.PurchaseFlowStatus.NOT_STARTED)
 
+                    if (premiumBuyingState == PremiumViewModel.PurchaseFlowStatus.LOADING || proBuyingState == PremiumViewModel.PurchaseFlowStatus.LOADING) {
+                        LoadingView()
+                        return@Box
+                    }
+
                     when(state) {
                         PremiumViewModel.SubscriptionStatus.Error,
                         PremiumViewModel.SubscriptionStatus.NotSubscribed,
                         PremiumViewModel.SubscriptionStatus.PremiumSubscribed,
                         PremiumViewModel.SubscriptionStatus.ProSubscribed -> SubscribeView(
                             viewModel,
-                            premiumSubscribed = state == PremiumViewModel.SubscriptionStatus.PremiumSubscribed,
+                            showProByDefault = intent.getBooleanExtra(EXTRA_SHOW_PRO, false),
+                            premiumSubscribed = state == PremiumViewModel.SubscriptionStatus.PremiumSubscribed || state == PremiumViewModel.SubscriptionStatus.ProSubscribed,
                             proSubscribed = state == PremiumViewModel.SubscriptionStatus.ProSubscribed,
                             onCancelButtonClicked = {
                                 finish()
@@ -80,8 +88,16 @@ class PremiumActivity : AppCompatActivity() {
     private fun collectViewModelEvents() {
         lifecycleScope.launchCollect(viewModel.premiumPurchaseEventFlow) { purchaseResult ->
             when(purchaseResult) {
-                PurchaseFlowResult.Cancelled -> TODO()
-                is PurchaseFlowResult.Error -> TODO()
+                PurchaseFlowResult.Cancelled -> Unit
+                is PurchaseFlowResult.Error -> {
+                    MaterialAlertDialogBuilder(this)
+                        .setTitle(R.string.iab_purchase_error_title)
+                        .setMessage(getString(R.string.iab_purchase_error_message, purchaseResult.reason))
+                        .setPositiveButton(R.string.ok) { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        .show()
+                }
                 is PurchaseFlowResult.Success -> {
                     setResult(Activity.RESULT_OK)
                     finish()
@@ -91,12 +107,30 @@ class PremiumActivity : AppCompatActivity() {
 
         lifecycleScope.launchCollect(viewModel.proPurchaseEventFlow) { purchaseResult ->
             when(purchaseResult) {
-                PurchaseFlowResult.Cancelled -> TODO()
-                is PurchaseFlowResult.Error -> TODO()
+                PurchaseFlowResult.Cancelled -> Unit
+                is PurchaseFlowResult.Error -> {
+                    MaterialAlertDialogBuilder(this)
+                        .setTitle(R.string.iab_purchase_error_title)
+                        .setMessage(getString(R.string.iab_purchase_error_message, purchaseResult.reason))
+                        .setPositiveButton(R.string.ok) { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        .show()
+                }
                 is PurchaseFlowResult.Success -> {
                     setResult(Activity.RESULT_OK)
                     finish()
                 }
+            }
+        }
+    }
+
+    companion object {
+        private const val EXTRA_SHOW_PRO = "showPro"
+
+        fun createIntent(activity: Activity, shouldShowProByDefault: Boolean): Intent {
+            return Intent(activity, PremiumActivity::class.java).apply {
+                putExtra(EXTRA_SHOW_PRO, shouldShowProByDefault)
             }
         }
     }

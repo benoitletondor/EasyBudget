@@ -57,6 +57,7 @@ private val starsGreyColor = Color(0xFFD7D7D7)
 @Composable
 fun BoxScope.SubscribeView(
     viewModel: PremiumViewModel,
+    showProByDefault: Boolean,
     premiumSubscribed: Boolean,
     proSubscribed: Boolean,
     onCancelButtonClicked: () -> Unit,
@@ -64,6 +65,7 @@ fun BoxScope.SubscribeView(
     onBuyProButtonClicked: () -> Unit,
 ) {
     SubscribeView(
+        showProByDefault = showProByDefault,
         premiumSubscribed = premiumSubscribed,
         proSubscribed = proSubscribed,
         onCancelButtonClicked = onCancelButtonClicked,
@@ -74,16 +76,18 @@ fun BoxScope.SubscribeView(
 
 @Composable
 private fun BoxScope.SubscribeView(
+    showProByDefault: Boolean,
     premiumSubscribed: Boolean,
     proSubscribed: Boolean,
     onCancelButtonClicked: () -> Unit,
     onBuyPremiumButtonClicked: () -> Unit,
     onBuyProButtonClicked: () -> Unit,
 ) {
-    var selectedIndex by remember { mutableIntStateOf(if (!premiumSubscribed) 0 else 1) }
+    var selectedIndex by remember { mutableIntStateOf(if (!premiumSubscribed && !showProByDefault) 0 else 1) }
 
     val starsColor by animateColorAsState(
-        if (selectedIndex == 0) starsGreyColor else starsYellowColor
+        targetValue = if (selectedIndex == 0) starsGreyColor else starsYellowColor,
+        label = "stars color animation",
     )
 
     Column(
@@ -435,6 +439,7 @@ private fun SubscribeToPremiumPreview() {
                 .fillMaxHeight()
         ) {
             SubscribeView(
+                showProByDefault = false,
                 premiumSubscribed = false,
                 proSubscribed = false,
                 onCancelButtonClicked = { },
@@ -456,6 +461,7 @@ private fun PremiumSubscribedPreview() {
                 .fillMaxHeight()
         ) {
             SubscribeView(
+                showProByDefault = false,
                 premiumSubscribed = true,
                 proSubscribed = false,
                 onCancelButtonClicked = { },
@@ -477,6 +483,7 @@ private fun ProSubscribedPreview() {
                 .fillMaxHeight()
         ) {
             SubscribeView(
+                showProByDefault = false,
                 premiumSubscribed = true,
                 proSubscribed = true,
                 onCancelButtonClicked = { },
