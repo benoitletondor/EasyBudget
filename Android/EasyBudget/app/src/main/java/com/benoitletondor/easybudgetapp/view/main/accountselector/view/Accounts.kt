@@ -48,6 +48,7 @@ fun AccountsView(viewModel: AccountSelectorViewModel) {
     AccountsView(
         state = state,
         onIabErrorRetryButtonClicked = viewModel::onIabErrorRetryButtonClicked,
+        onErrorRetryButtonClicked = viewModel::onRetryErrorButtonClicked,
         onAccountSelected = viewModel::onAccountSelected,
         onBecomeProButtonClicked = viewModel::onBecomeProButtonClicked,
         onLoginButtonPressed = viewModel::onLoginButtonPressed,
@@ -61,6 +62,7 @@ fun AccountsView(viewModel: AccountSelectorViewModel) {
 private fun AccountsView(
     state: AccountSelectorViewModel.State,
     onIabErrorRetryButtonClicked: () -> Unit,
+    onErrorRetryButtonClicked: () -> Unit,
     onAccountSelected: (MainViewModel.SelectedAccount.Selected) -> Unit,
     onBecomeProButtonClicked: () -> Unit,
     onLoginButtonPressed: () -> Unit,
@@ -74,7 +76,8 @@ private fun AccountsView(
         AccountSelectorViewModel.State.Loading -> false
         is AccountSelectorViewModel.State.NotAuthenticated,
         AccountSelectorViewModel.State.IabError,
-        is AccountSelectorViewModel.State.NotPro -> true
+        is AccountSelectorViewModel.State.NotPro,
+        is AccountSelectorViewModel.State.Error -> true
     }
     val shouldDisplayOfflineBackupEnabled = state is AccountSelectorViewModel.OfflineBackStateAvailable && state.isOfflineBackupEnabled
 
@@ -162,6 +165,10 @@ private fun AccountsView(
             )
             is AccountSelectorViewModel.State.NotPro -> NotProView(
                 onBecomeProButtonClicked = onBecomeProButtonClicked,
+            )
+            is AccountSelectorViewModel.State.Error -> ErrorView(
+                error = state.cause,
+                onRetryButtonClicked = onErrorRetryButtonClicked,
             )
         }
     }
@@ -348,6 +355,37 @@ private fun ColumnScope.IabErrorView(
 }
 
 @Composable
+private fun ColumnScope.ErrorView(
+    error: Throwable,
+    onRetryButtonClicked: () -> Unit,
+) {
+    Text(
+        modifier = Modifier.fillMaxWidth(),
+        text = "Unable to fetch online accounts",
+        textAlign = TextAlign.Center,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 16.sp,
+    )
+
+    Spacer(modifier = Modifier.height(10.dp))
+
+    Text(
+        modifier = Modifier.fillMaxWidth(),
+        text = "An error occurred while fetching your online accounts. Please check your network and try again.\n(${error.localizedMessage})",
+        fontSize = 16.sp,
+    )
+
+    Spacer(modifier = Modifier.height(10.dp))
+
+    Button(
+        modifier = Modifier.align(Alignment.CenterHorizontally),
+        onClick = onRetryButtonClicked,
+    ) {
+        Text("Retry")
+    }
+}
+
+@Composable
 private fun AccountButton(
     title: String,
     subtitle: String?,
@@ -490,6 +528,7 @@ fun AccountsLoadingViewPreview() {
         AccountsView(
             state = AccountSelectorViewModel.State.Loading,
             onIabErrorRetryButtonClicked = {},
+            onErrorRetryButtonClicked = {},
             onAccountSelected = {},
             onBecomeProButtonClicked = {},
             onLoginButtonPressed = {},
@@ -507,6 +546,7 @@ fun AccountsIabErrorViewPreview() {
         AccountsView(
             state = AccountSelectorViewModel.State.IabError,
             onIabErrorRetryButtonClicked = {},
+            onErrorRetryButtonClicked = {},
             onAccountSelected = {},
             onBecomeProButtonClicked = {},
             onLoginButtonPressed = {},
@@ -526,6 +566,7 @@ fun AccountsNotProViewPreview() {
                 isOfflineBackupEnabled = false,
             ),
             onIabErrorRetryButtonClicked = {},
+            onErrorRetryButtonClicked = {},
             onAccountSelected = {},
             onBecomeProButtonClicked = {},
             onLoginButtonPressed = {},
@@ -545,6 +586,7 @@ fun AccountsNotAuthenticatedViewPreview() {
                 isOfflineBackupEnabled = false,
             ),
             onIabErrorRetryButtonClicked = {},
+            onErrorRetryButtonClicked = {},
             onAccountSelected = {},
             onBecomeProButtonClicked = {},
             onLoginButtonPressed = {},
@@ -600,6 +642,7 @@ fun AccountsAvailableViewPreview() {
                 isOfflineBackupEnabled = true,
             ),
             onIabErrorRetryButtonClicked = {},
+            onErrorRetryButtonClicked = {},
             onAccountSelected = {},
             onBecomeProButtonClicked = {},
             onLoginButtonPressed = {},
@@ -675,6 +718,7 @@ fun AccountsAvailableFullViewPreview() {
                 isOfflineBackupEnabled = false,
             ),
             onIabErrorRetryButtonClicked = {},
+            onErrorRetryButtonClicked = {},
             onAccountSelected = {},
             onBecomeProButtonClicked = {},
             onLoginButtonPressed = {},

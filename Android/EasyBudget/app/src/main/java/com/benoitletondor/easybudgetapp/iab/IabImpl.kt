@@ -228,7 +228,7 @@ class IabImpl(
         if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
             if (billingResult.responseCode == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED) {
                 setIabStatusAndNotify(PremiumCheckStatus.PREMIUM_SUBSCRIBED)
-                return PurchaseFlowResult.Success(sku = SKU_PREMIUM_SUBSCRIPTION)
+                return PurchaseFlowResult.Success(purchaseType = PurchaseType.PREMIUM_SUBSCRIPTION)
             }
 
             return PurchaseFlowResult.Error("Unable to connect to reach PlayStore (response code: " + billingResult.responseCode + "). Please restart the app and try again")
@@ -259,7 +259,7 @@ class IabImpl(
             when(it) {
                 PurchaseFlowResult.Cancelled,
                 is PurchaseFlowResult.Error -> true
-                is PurchaseFlowResult.Success -> it.sku == SKU_PREMIUM_SUBSCRIPTION
+                is PurchaseFlowResult.Success -> it.purchaseType == PurchaseType.PREMIUM_SUBSCRIPTION
             }
         }
     }
@@ -292,7 +292,7 @@ class IabImpl(
         if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
             if (billingResult.responseCode == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED) {
                 setIabStatusAndNotify(PremiumCheckStatus.PRO_SUBSCRIBED)
-                return PurchaseFlowResult.Success(sku = SKU_PRO_SUBSCRIPTION)
+                return PurchaseFlowResult.Success(purchaseType = PurchaseType.PRO_SUBSCRIPTION)
             }
 
             return PurchaseFlowResult.Error("Unable to connect to reach PlayStore (response code: " + billingResult.responseCode + "). Please restart the app and try again")
@@ -352,7 +352,7 @@ class IabImpl(
             when(it) {
                 PurchaseFlowResult.Cancelled,
                 is PurchaseFlowResult.Error -> true
-                is PurchaseFlowResult.Success -> it.sku == SKU_PRO_SUBSCRIPTION
+                is PurchaseFlowResult.Success -> it.purchaseType == PurchaseType.PRO_SUBSCRIPTION
             }
         }
     }
@@ -416,13 +416,13 @@ class IabImpl(
 
                     if (purchase.products.contains(SKU_PREMIUM_LEGACY)) {
                         setIabStatusAndNotify(PremiumCheckStatus.PREMIUM_SUBSCRIBED)
-                        pendingPurchaseEventMutableFlow.emit(PurchaseFlowResult.Success(sku = SKU_PREMIUM_LEGACY))
+                        pendingPurchaseEventMutableFlow.emit(PurchaseFlowResult.Success(purchaseType = PurchaseType.LEGACY_PREMIUM))
                     } else if(purchase.products.contains(SKU_PREMIUM_SUBSCRIPTION)) {
                         setIabStatusAndNotify(PremiumCheckStatus.PREMIUM_SUBSCRIBED)
-                        pendingPurchaseEventMutableFlow.emit(PurchaseFlowResult.Success(sku = SKU_PREMIUM_SUBSCRIPTION))
+                        pendingPurchaseEventMutableFlow.emit(PurchaseFlowResult.Success(purchaseType = PurchaseType.PREMIUM_SUBSCRIPTION))
                     } else if(purchase.products.contains(SKU_PRO_SUBSCRIPTION)) {
                         setIabStatusAndNotify(PremiumCheckStatus.PRO_SUBSCRIBED)
-                        pendingPurchaseEventMutableFlow.emit(PurchaseFlowResult.Success(sku = SKU_PRO_SUBSCRIPTION))
+                        pendingPurchaseEventMutableFlow.emit(PurchaseFlowResult.Success(purchaseType = PurchaseType.PRO_SUBSCRIPTION))
                     }
 
                     return@launch

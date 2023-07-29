@@ -349,14 +349,6 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                 false
             }
 
-            findPreference<Preference>(resources.getString(R.string.setting_category_dev_show_premium_2_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                activity?.let { activity ->
-                    val intent = Intent(activity, com.benoitletondor.easybudgetapp.view.premium2.PremiumActivity::class.java)
-                    ActivityCompat.startActivityForResult(activity, intent, SettingsActivity.PREMIUM_ACTIVITY, null)
-                }
-                false
-            }
-
             findPreference<Preference>(getString(R.string.setting_category_dev_show_login))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                 activity?.let { activity ->
                     val intent = Intent(activity, LoginActivity::class.java)

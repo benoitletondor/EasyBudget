@@ -32,8 +32,14 @@ interface Iab {
 
 sealed class PurchaseFlowResult {
     object Cancelled : PurchaseFlowResult()
-    data class Success(val sku: String) : PurchaseFlowResult()
+    data class Success(val purchaseType: PurchaseType) : PurchaseFlowResult()
     data class Error(val reason: String): PurchaseFlowResult()
+}
+
+enum class PurchaseType {
+    LEGACY_PREMIUM,
+    PREMIUM_SUBSCRIPTION,
+    PRO_SUBSCRIPTION,
 }
 
 /**

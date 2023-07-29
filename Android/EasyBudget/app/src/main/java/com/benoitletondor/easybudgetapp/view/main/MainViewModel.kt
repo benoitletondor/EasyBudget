@@ -22,6 +22,7 @@ import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.accounts.Accounts
 import com.benoitletondor.easybudgetapp.auth.Auth
 import com.benoitletondor.easybudgetapp.auth.AuthState
+import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
 import com.benoitletondor.easybudgetapp.iab.PremiumCheckStatus
@@ -68,6 +69,8 @@ class MainViewModel @Inject constructor(
     }
     .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
+    private val retryEventMutableFlow = MutableSharedFlow<Unit>()
+
     val accountSelectionFlow: StateFlow<SelectedAccount> = combine(
         selectedOnlineAccountIdMutableStateFlow,
         iab.iabStatusFlow,
@@ -109,6 +112,13 @@ class MainViewModel @Inject constructor(
                     )
                 } ?: SelectedAccount.Selected.Offline
         }
+    }.retryWhen { cause, _ ->
+        Logger.error("Error while building accountSelectionFlow", cause)
+        emit(SelectedAccount.Selected.Offline)
+
+        retryEventMutableFlow.first()
+
+        true
     }.stateIn(viewModelScope, SharingStarted.Eagerly, SelectedAccount.Loading)
 
     fun onBecomePremiumButtonPressed() {
@@ -123,11 +133,16 @@ class MainViewModel @Inject constructor(
 
     fun onAccountTapped() {
         viewModelScope.launch {
+            retryEventMutableFlow.emit(Unit)
             eventMutableFlow.emit(Event.ShowAccountSelect)
         }
     }
 
     fun onAccountSelected(account: SelectedAccount.Selected) {
+        viewModelScope.launch {
+            retryEventMutableFlow.emit(Unit)
+        }
+
         val onlineAccountId = when(account) {
             SelectedAccount.Selected.Offline -> null
             is SelectedAccount.Selected.Online -> account.accountId

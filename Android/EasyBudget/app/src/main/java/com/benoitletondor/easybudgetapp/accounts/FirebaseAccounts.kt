@@ -5,6 +5,7 @@ import com.benoitletondor.easybudgetapp.accounts.model.Account
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldPath
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
@@ -35,15 +36,18 @@ class FirebaseAccounts(
         val invitedAccountsFlow = watchInvitedAccounts(currentUser)
         val ownAccountsFlow = watchOwnAccounts(currentUser)
 
-        return ownAccountsFlow
-            .combine(invitedAccountsFlow) { a, b ->
-                (a + b).distinctBy { it.id }
+        return combine(ownAccountsFlow, invitedAccountsFlow) { a, b ->
+            (a + b).distinctBy {
+                it.id
             }
+        }
     }
 
     override fun watchHasPendingInvitedAccounts(currentUser: CurrentUser): Flow<Boolean>
         = watchPendingInvitations(currentUser)
-            .map { it.isNotEmpty() }
+            .map {
+                it.isNotEmpty()
+            }
 
     override suspend fun createAccount(currentUser: CurrentUser, name: String): Account {
         val (id, secret) = generateSecureAccountIdAndSecret()
@@ -55,6 +59,7 @@ class FirebaseAccounts(
                 ACCOUNT_DOCUMENT_NAME to name,
                 ACCOUNT_DOCUMENT_OWNER_ID to currentUser.id,
                 ACCOUNT_DOCUMENT_OWNER_EMAIL to currentUser.email,
+                ACCOUNT_DOCUMENT_MEMBERS to listOf(currentUser.email),
             ))
             .await()
 
@@ -78,6 +83,29 @@ class FirebaseAccounts(
     override fun watchPendingInvitedAccounts(currentUser: CurrentUser): Flow<List<Account>> =
         watchPendingInvitations(currentUser)
             .flatMapToAccounts(currentUser)
+
+    override suspend fun sendInvitationToAccount(
+        currentUser: CurrentUser,
+        account: Account,
+        invitedUserEmail: String
+    ) {
+        val accountRef = db.collection(ACCOUNTS_COLLECTION).document(account.id)
+        val invitationRef = db.collection(INVITATIONS_COLLECTION).document()
+
+        db.runTransaction { transaction ->
+            transaction.update(accountRef, mapOf(
+                ACCOUNT_DOCUMENT_MEMBERS to FieldValue.arrayUnion(invitedUserEmail),
+            ))
+
+            transaction.set(invitationRef, mapOf(
+                INVITATION_DOCUMENT_ACCOUNT_ID to account.id,
+                INVITATION_DOCUMENT_STATUS to InvitationStatus.SENT.dbValue,
+                INVITATION_DOCUMENT_RECEIVER_EMAIL to invitedUserEmail,
+                INVITATION_DOCUMENT_SENDER_ID to currentUser.id,
+                INVITATION_DOCUMENT_SENDER_EMAIL to currentUser.email,
+            ))
+        }.await()
+    }
 
     override suspend fun acceptInvitationToAccount(currentUser: CurrentUser, account: Account) {
         updateInvitationStatus(currentUser, account, InvitationStatus.ACCEPTED)
@@ -117,6 +145,7 @@ class FirebaseAccounts(
             }
 
             return@flatMapLatest db.collection(ACCOUNTS_COLLECTION)
+                .whereArrayContains(ACCOUNT_DOCUMENT_MEMBERS, currentUser.email)
                 .whereIn(FieldPath.documentId(), accountIds)
                 .watchAsFlow { value ->
                     value.documents.mapNotNull {
@@ -146,19 +175,19 @@ class FirebaseAccounts(
     private fun <T> Query.watchAsFlow(processData: (QuerySnapshot) -> T): Flow<T> = callbackFlow {
         val snapshotListener = addSnapshotListener { value, error ->
             if (error != null) {
-                cancel("An error was returned by FB", error)
+                close(error)
                 return@addSnapshotListener
             }
 
             if (value == null) {
-                cancel("Missing value for snapshot listener")
+                close(IllegalStateException("Missing value for snapshot listener"))
                 return@addSnapshotListener
             }
 
             val data = try {
                 processData(value)
             } catch (e: Exception) {
-                cancel("Error while processing data", e)
+                close(e)
                 return@addSnapshotListener
             }
 
@@ -183,7 +212,7 @@ class FirebaseAccounts(
     }
 
     private fun generateSecureAccountIdAndSecret(): Pair<String, String> {
-        val accountId = generateRandomString(50)
+        val accountId = generateRandomString(100)
         val accountSecret = generateRandomString(100)
 
         return Pair(accountId, accountSecret)
@@ -208,12 +237,15 @@ class FirebaseAccounts(
         private const val INVITATION_DOCUMENT_RECEIVER_EMAIL = "receiverEmail"
         private const val INVITATION_DOCUMENT_STATUS = "status"
         private const val INVITATION_DOCUMENT_ACCOUNT_ID = "accountId"
+        private const val INVITATION_DOCUMENT_SENDER_ID = "senderId"
+        private const val INVITATION_DOCUMENT_SENDER_EMAIL = "senderEmail"
 
         private const val ACCOUNTS_COLLECTION = "accounts"
         private const val ACCOUNT_DOCUMENT_SECRET = "secret"
-        private const val ACCOUNT_DOCUMENT_OWNER_ID = "owner_id"
+        private const val ACCOUNT_DOCUMENT_OWNER_ID = "ownerId"
         private const val ACCOUNT_DOCUMENT_OWNER_EMAIL = "ownerEmail"
         private const val ACCOUNT_DOCUMENT_NAME = "name"
+        private const val ACCOUNT_DOCUMENT_MEMBERS = "members"
 
         private const val SECURE_STRING_ALLOWED_CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
     }

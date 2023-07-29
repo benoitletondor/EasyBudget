@@ -17,12 +17,15 @@ import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -38,6 +41,8 @@ class AccountSelectorViewModel @Inject constructor(
     val eventFlow: Flow<Event> = eventMutableFlow
 
     private val loadingInvitationMutableFlow = MutableStateFlow<Invitation?>(null)
+
+    private val retryMutableFlow = MutableSharedFlow<Unit>()
 
     val stateFlow: StateFlow<State> = combine(
         iab.iabStatusFlow,
@@ -112,10 +117,25 @@ class AccountSelectorViewModel @Inject constructor(
                 )
             }
         }
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, State.Loading)
+    }
+    .retryWhen { cause, _ ->
+        Logger.error("Error while computing account selector stateFlow", cause)
+        emit(State.Error(cause))
+
+        retryMutableFlow.first()
+
+        true
+    }
+    .stateIn(viewModelScope, SharingStarted.Eagerly, State.Loading)
 
     fun onIabErrorRetryButtonClicked() {
         iab.updateIAPStatusIfNeeded()
+    }
+
+    fun onRetryErrorButtonClicked() {
+        viewModelScope.launch {
+            retryMutableFlow.emit(Unit)
+        }
     }
 
     fun onAccountSelected(account: MainViewModel.SelectedAccount.Selected) {
@@ -237,6 +257,7 @@ class AccountSelectorViewModel @Inject constructor(
     sealed class State {
         object Loading : State()
         object IabError : State()
+        data class Error(val cause: Throwable) : State()
         data class NotPro(override val isOfflineBackupEnabled: Boolean) : State(), OfflineBackStateAvailable
         data class NotAuthenticated(override val isOfflineBackupEnabled: Boolean) : State(), OfflineBackStateAvailable
         data class AccountsAvailable(

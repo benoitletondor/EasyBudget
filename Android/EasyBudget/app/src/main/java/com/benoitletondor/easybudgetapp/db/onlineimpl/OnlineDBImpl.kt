@@ -223,7 +223,7 @@ class OnlineDBImpl(
             .map { it.generateExpenses(LocalDate.MIN, dayDate) }
             .flatten()
             .map { it.amount }
-            .reduce { acc, expenseAmount -> acc + expenseAmount }
+            .fold(0.0) { acc, expenseAmount -> acc + expenseAmount }
 
         val expensesSumUpToTheDay = realm.query<ExpenseEntity>("${account.generateQuery()} AND date <= ${dayDate.toEpochDay()}")
             .sum("amount", Long::class)
@@ -242,7 +242,7 @@ class OnlineDBImpl(
             .flatten()
             .filter { it.checked }
             .map { it.amount }
-            .reduce { acc, expenseAmount -> acc + expenseAmount }
+            .fold(0.0) { acc, expenseAmount -> acc + expenseAmount }
 
         val checkedExpensesSumUpToTheDay = realm.query<ExpenseEntity>("${account.generateQuery()} AND date <= ${dayDate.toEpochDay()} AND checked == true")
             .sum("amount", Long::class)

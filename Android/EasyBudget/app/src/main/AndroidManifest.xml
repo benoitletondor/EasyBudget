@@ -133,13 +133,6 @@
             android:exported="false"
             tools:ignore="LockedOrientationActivity"/>
         <activity
-            android:name=".view.premium2.PremiumActivity"
-            android:configChanges="locale|keyboardHidden|orientation|screenSize"
-            android:label="@string/title_activity_premium"
-            android:screenOrientation="portrait"
-            android:exported="false"
-            tools:ignore="LockedOrientationActivity"/>
-        <activity
             android:name=".view.main.login.LoginActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_login"

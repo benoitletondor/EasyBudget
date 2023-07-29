@@ -1,4 +1,4 @@
-package com.benoitletondor.easybudgetapp.view.premium2.view
+package com.benoitletondor.easybudgetapp.view.premium.view
 
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.material3.CircularProgressIndicator

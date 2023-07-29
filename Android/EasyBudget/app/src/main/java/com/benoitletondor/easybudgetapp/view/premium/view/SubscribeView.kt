@@ -1,4 +1,4 @@
-package com.benoitletondor.easybudgetapp.view.premium2.view
+package com.benoitletondor.easybudgetapp.view.premium.view
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
@@ -49,7 +49,7 @@ import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.theme.AppTheme
 import com.benoitletondor.easybudgetapp.theme.easyBudgetGreenColor
 import com.benoitletondor.easybudgetapp.theme.easyBudgetGreenDarkColor
-import com.benoitletondor.easybudgetapp.view.premium2.PremiumViewModel
+import com.benoitletondor.easybudgetapp.view.premium.PremiumViewModel
 
 private val starsYellowColor = Color(0xFFFEE101)
 private val starsGreyColor = Color(0xFFD7D7D7)
@@ -60,11 +60,15 @@ fun BoxScope.SubscribeView(
     premiumSubscribed: Boolean,
     proSubscribed: Boolean,
     onCancelButtonClicked: () -> Unit,
+    onBuyPremiumButtonClicked: () -> Unit,
+    onBuyProButtonClicked: () -> Unit,
 ) {
     SubscribeView(
         premiumSubscribed = premiumSubscribed,
         proSubscribed = proSubscribed,
         onCancelButtonClicked = onCancelButtonClicked,
+        onBuyPremiumButtonClicked = onBuyPremiumButtonClicked,
+        onBuyProButtonClicked = onBuyProButtonClicked,
     )
 }
 
@@ -73,6 +77,8 @@ private fun BoxScope.SubscribeView(
     premiumSubscribed: Boolean,
     proSubscribed: Boolean,
     onCancelButtonClicked: () -> Unit,
+    onBuyPremiumButtonClicked: () -> Unit,
+    onBuyProButtonClicked: () -> Unit,
 ) {
     var selectedIndex by remember { mutableIntStateOf(if (!premiumSubscribed) 0 else 1) }
 
@@ -201,29 +207,42 @@ private fun BoxScope.SubscribeView(
                 modifier = Modifier.weight(0.5f),
             ) {
                 Text(
-                    text = "Not now",
+                    text = if ((selectedIndex == 0 && premiumSubscribed) || (selectedIndex == 1 && proSubscribed)) { "Back" } else { "Not now" },
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 18.sp,
                 )
             }
 
-            Spacer(modifier = Modifier.width(16.dp))
+            if ((selectedIndex == 0 && !premiumSubscribed) ||
+                (selectedIndex == 1 && !proSubscribed))  {
+                Spacer(modifier = Modifier.width(16.dp))
 
-            Button(
-                onClick = { },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary,
-                ),
-                modifier = Modifier.weight(0.5f),
-            ) {
-                Text(
-                    text = "Purchase",
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 18.sp,
-                )
+                Button(
+                    onClick = {
+                        if (selectedIndex == 0) {
+                            onBuyPremiumButtonClicked()
+                        } else {
+                            onBuyProButtonClicked()
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                    ),
+                    modifier = Modifier.weight(0.5f),
+                ) {
+                    Text(
+                        text = if (premiumSubscribed) {
+                            "Upgrade"
+                        } else {
+                            "Purchase"
+                        },
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 18.sp,
+                    )
+                }
             }
         }
     }
@@ -419,6 +438,8 @@ private fun SubscribeToPremiumPreview() {
                 premiumSubscribed = false,
                 proSubscribed = false,
                 onCancelButtonClicked = { },
+                onBuyPremiumButtonClicked = {},
+                onBuyProButtonClicked = {},
             )
         }
     }
@@ -438,6 +459,8 @@ private fun PremiumSubscribedPreview() {
                 premiumSubscribed = true,
                 proSubscribed = false,
                 onCancelButtonClicked = { },
+                onBuyPremiumButtonClicked = {},
+                onBuyProButtonClicked = {},
             )
         }
     }
@@ -457,6 +480,8 @@ private fun ProSubscribedPreview() {
                 premiumSubscribed = true,
                 proSubscribed = true,
                 onCancelButtonClicked = { },
+                onBuyPremiumButtonClicked = {},
+                onBuyProButtonClicked = {},
             )
         }
     }
