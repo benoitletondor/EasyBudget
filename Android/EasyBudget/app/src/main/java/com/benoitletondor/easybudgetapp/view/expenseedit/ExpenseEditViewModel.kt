@@ -148,7 +148,12 @@ class ExpenseEditViewModel @Inject constructor(
                 ) ?: Expense(description, if (isRevenue) -value else value, date, false)
 
                 val db = dbMutableFlow.value
-                db?.persistExpense(expense) ?: unableToLoadDBEventMutableFlow.emit(Unit)
+                if (db == null) {
+                    unableToLoadDBEventMutableFlow.emit(Unit)
+                    return@withContext
+                }
+
+                db.persistExpense(expense)
 
                 withContext(Dispatchers.Main) {
                     finishMutableFlow.emit(Unit)

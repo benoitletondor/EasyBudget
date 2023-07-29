@@ -71,7 +71,7 @@ class RecurringExpenseEntity() : RealmObject {
         }
     }
 
-    suspend fun generateExpenses(from: LocalDate, to: LocalDate): List<Expense> {
+    suspend fun generateExpenses(from: LocalDate?, to: LocalDate): List<Expense> {
         return withContext(Dispatchers.IO) {
             getCal().getExpenses(from, to, toRecurringExpense())
         }
@@ -185,8 +185,8 @@ class RecurringExpenseEntity() : RealmObject {
             setProductId(null as String?)
         }
 
-    private suspend fun ICalendar.getExpenses(from: LocalDate, to: LocalDate, recurringExpense: RecurringExpense): List<Expense> {
-        val startDate = from.toStartOfDayDate()
+    private suspend fun ICalendar.getExpenses(from: LocalDate?, to: LocalDate, recurringExpense: RecurringExpense): List<Expense> {
+        val startDate = from?.toStartOfDayDate()
         val endDate = to.toStartOfDayDate()
 
         val exceptions: MutableMap<Date, VEvent> = mutableMapOf()
@@ -202,7 +202,9 @@ class RecurringExpenseEntity() : RealmObject {
 
         val eventsInRange = mutableListOf<Pair<VEvent, Date>>()
         val eventDateIterator = recurrentEvent.getDateIterator(TimeZone.getDefault())
-        eventDateIterator.advanceTo(startDate)
+        if (startDate != null) {
+            eventDateIterator.advanceTo(startDate)
+        }
 
         while (eventDateIterator.hasNext()) {
             val eventOccurrenceDate = eventDateIterator.next()
@@ -210,7 +212,7 @@ class RecurringExpenseEntity() : RealmObject {
                 break
             }
 
-            if (!eventOccurrenceDate.before(startDate) && !eventOccurrenceDate.after(endDate)) {
+            if ((startDate == null || !eventOccurrenceDate.before(startDate)) && !eventOccurrenceDate.after(endDate)) {
                 // Check if there is an exception for this instance
                 val eventException = exceptions[eventOccurrenceDate]
                 if (eventException != null) {

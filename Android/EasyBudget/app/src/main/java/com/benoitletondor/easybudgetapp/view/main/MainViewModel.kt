@@ -20,6 +20,7 @@ import android.os.Parcelable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.accounts.Accounts
+import com.benoitletondor.easybudgetapp.accounts.model.Account
 import com.benoitletondor.easybudgetapp.auth.Auth
 import com.benoitletondor.easybudgetapp.auth.AuthState
 import com.benoitletondor.easybudgetapp.helper.Logger
@@ -81,14 +82,15 @@ class MainViewModel @Inject constructor(
                         .flatMapLatest { authState ->
                             when(authState) {
                                 is AuthState.Authenticated -> accounts.watchAccounts(authState.currentUser)
+                                    .map { OnlineAccountResponse.Available(it) }
                                 AuthState.Authenticating,
-                                AuthState.NotAuthenticated -> flowOf(emptyList())
+                                AuthState.NotAuthenticated -> flowOf(OnlineAccountResponse.Loading)
                             }
                         }
-                    else -> flowOf(emptyList())
+                    else -> flowOf(OnlineAccountResponse.Loading)
                 }
             }
-    ) { selectedOnlineAccountId, iabStatus, onlineAccounts ->
+    ) { selectedOnlineAccountId, iabStatus, onlineAccountsReponse ->
         if (selectedOnlineAccountId == null) {
             return@combine SelectedAccount.Selected.Offline
         }
@@ -100,17 +102,20 @@ class MainViewModel @Inject constructor(
             PremiumCheckStatus.NOT_PREMIUM,
             PremiumCheckStatus.LEGACY_PREMIUM,
             PremiumCheckStatus.PREMIUM_SUBSCRIBED -> SelectedAccount.Selected.Offline
-            PremiumCheckStatus.PRO_SUBSCRIBED -> onlineAccounts
-                .firstOrNull { it.id == selectedOnlineAccountId }
-                ?.let { account ->
-                    SelectedAccount.Selected.Online(
-                        name = account.name,
-                        isOwner = account.isUserOwner,
-                        ownerEmail = account.ownerEmail,
-                        accountId = account.id,
-                        accountSecret = account.secret,
-                    )
-                } ?: SelectedAccount.Selected.Offline
+            PremiumCheckStatus.PRO_SUBSCRIBED -> when(onlineAccountsReponse) {
+                is OnlineAccountResponse.Available -> onlineAccountsReponse.accounts
+                    .firstOrNull { it.id == selectedOnlineAccountId }
+                    ?.let { account ->
+                        SelectedAccount.Selected.Online(
+                            name = account.name,
+                            isOwner = account.isUserOwner,
+                            ownerEmail = account.ownerEmail,
+                            accountId = account.id,
+                            accountSecret = account.secret,
+                        )
+                    } ?: SelectedAccount.Selected.Offline
+                OnlineAccountResponse.Loading -> SelectedAccount.Loading
+            }
         }
     }.retryWhen { cause, _ ->
         Logger.error("Error while building accountSelectionFlow", cause)
@@ -162,6 +167,11 @@ class MainViewModel @Inject constructor(
         PremiumCheckStatus.LEGACY_PREMIUM,
         PremiumCheckStatus.PREMIUM_SUBSCRIBED,
         PremiumCheckStatus.PRO_SUBSCRIBED -> true
+    }
+
+    private sealed class OnlineAccountResponse {
+        object Loading : OnlineAccountResponse()
+        data class Available(val accounts: List<Account>) : OnlineAccountResponse()
     }
 
     sealed class SelectedAccount {

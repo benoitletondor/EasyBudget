@@ -51,6 +51,7 @@ import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import com.benoitletondor.easybudgetapp.view.main.account.calendar.CalendarFragment
+import com.benoitletondor.easybudgetapp.view.main.account.calendar.CalendarGridAdapterDataProvider
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment
@@ -61,6 +62,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.roomorama.caldroid.CaldroidFragment
 import com.roomorama.caldroid.CaldroidListener
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
@@ -68,7 +70,7 @@ import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AccountFragment : Fragment(), MenuProvider {
+class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvider {
     private val viewModel: AccountViewModel by viewModels()
 
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -854,5 +856,20 @@ class AccountFragment : Fragment(), MenuProvider {
                 }
             }
         }
+    }
+
+    override fun hasExpenseForDay(dayDate: LocalDate): Boolean {
+        val state = viewModel.dbAvailableFlow.value as? AccountViewModel.DBState.Loaded ?: return false
+        return runBlocking { state.db.hasExpenseForDay(dayDate) }
+    }
+
+    override fun hasUncheckedExpenseForDay(dayDate: LocalDate): Boolean {
+        val state = viewModel.dbAvailableFlow.value as? AccountViewModel.DBState.Loaded ?: return false
+        return runBlocking { state.db.hasUncheckedExpenseForDay(dayDate) }
+    }
+
+    override fun getBalanceForDay(dayDate: LocalDate): Double {
+        val state = viewModel.dbAvailableFlow.value as? AccountViewModel.DBState.Loaded ?: return 0.0
+        return runBlocking { state.db.getBalanceForDay(dayDate) }
     }
 }

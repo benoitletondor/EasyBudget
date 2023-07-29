@@ -25,26 +25,26 @@ import android.view.ViewGroup
 import android.widget.TextView
 
 import com.benoitletondor.easybudgetapp.R
-import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.getLowMoneyWarningAmount
 import com.benoitletondor.easybudgetapp.parameters.getShouldShowCheckedBalance
 import com.roomorama.caldroid.CaldroidGridAdapter
 import com.roomorama.caldroid.CalendarHelper
 
-import kotlinx.coroutines.runBlocking
+import java.time.LocalDate
 
 /**
  * @author Benoit LETONDOR
  */
-class CalendarGridAdapter(context: Context,
-                          private val db: DB,
-                          private val parameters: Parameters,
-                          month: Int,
-                          year: Int,
-                          caldroidData: Map<String, Any>,
-                          extraData: Map<String, Any>)
-    : CaldroidGridAdapter(context, month, year, caldroidData, extraData) {
+class CalendarGridAdapter(
+    context: Context,
+    private val dataProvider: CalendarGridAdapterDataProvider,
+    private val parameters: Parameters,
+    month: Int,
+    year: Int,
+    caldroidData: Map<String, Any>,
+    extraData: Map<String, Any>,
+) : CaldroidGridAdapter(context, month, year, caldroidData, extraData) {
 
     private val roundingToIntFormatter = RoundedToIntNumberFormatter()
     private val formatter = NumberFormatter.get()
@@ -139,15 +139,14 @@ class CalendarGridAdapter(context: Context,
             }
 
             val date = CalendarHelper.convertDateTimeToDate(dateTime)
-            // FIXME coroutine threading!!
-            if ( runBlocking { db.hasExpenseForDay(date) }) {
+            if ( dataProvider.hasExpenseForDay(date)) {
                 val hasUnchecked = if (parameters.getShouldShowCheckedBalance()) {
-                    runBlocking { db.hasUncheckedExpenseForDay(date) }
+                    dataProvider.hasUncheckedExpenseForDay(date)
                 } else {
                     false
                 }
 
-                val balance = runBlocking { db.getBalanceForDay(date) }
+                val balance = dataProvider.getBalanceForDay(date)
 
                 if (!viewData.containsExpenses) {
                     tv2.visibility = View.VISIBLE
@@ -234,4 +233,10 @@ class CalendarGridAdapter(context: Context,
          */
         var colorIndicatorMarginForToday = false
     }
+}
+
+interface CalendarGridAdapterDataProvider {
+    fun hasExpenseForDay(dayDate: LocalDate): Boolean
+    fun hasUncheckedExpenseForDay(dayDate: LocalDate): Boolean
+    fun getBalanceForDay(dayDate: LocalDate): Double
 }

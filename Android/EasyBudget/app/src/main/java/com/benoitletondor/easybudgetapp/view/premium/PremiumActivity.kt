@@ -46,15 +46,8 @@ class PremiumActivity : AppCompatActivity() {
                     .fillMaxHeight()
                 ) {
                     val state by viewModel.userSubscriptionStatus.collectAsState(PremiumViewModel.SubscriptionStatus.Verifying)
-                    val premiumBuyingState by viewModel.premiumPurchaseStatusFlow.collectAsState(PremiumViewModel.PurchaseFlowStatus.NOT_STARTED)
-                    val proBuyingState by viewModel.proPurchaseStatusFlow.collectAsState(PremiumViewModel.PurchaseFlowStatus.NOT_STARTED)
 
-                    if (premiumBuyingState == PremiumViewModel.PurchaseFlowStatus.LOADING || proBuyingState == PremiumViewModel.PurchaseFlowStatus.LOADING) {
-                        LoadingView()
-                        return@Box
-                    }
-
-                    when(state) {
+                    when (state) {
                         PremiumViewModel.SubscriptionStatus.Error,
                         PremiumViewModel.SubscriptionStatus.NotSubscribed,
                         PremiumViewModel.SubscriptionStatus.PremiumSubscribed,
@@ -73,6 +66,7 @@ class PremiumActivity : AppCompatActivity() {
                                 viewModel.onBuyProClicked(this@PremiumActivity)
                             }
                         )
+
                         PremiumViewModel.SubscriptionStatus.Verifying -> LoadingView()
                     }
                 }

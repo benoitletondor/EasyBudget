@@ -97,12 +97,10 @@ object AppModule {
             accountSecret = accountSecret
         )
 
-        val dbSyncState = onlineDB.awaitSyncDone()
-        if (dbSyncState is OnlineDBImpl.SyncSessionState.Error) {
-            throw dbSyncState.exception
-        }
+        TODO("caching")
 
-        return CachedDBImpl(
+        return onlineDB
+        /*return CachedDBImpl(
             onlineDB,
             object : CacheDBStorage {
                 override val expenses: MutableMap<LocalDate, List<Expense>> = mutableMapOf()
@@ -110,6 +108,6 @@ object AppModule {
                 override val checkedBalances: MutableMap<LocalDate, Double> = mutableMapOf()
             },
             Executors.newSingleThreadExecutor(),
-        )
+        )*/
     }
 }

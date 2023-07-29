@@ -57,6 +57,8 @@ import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.whenStarted
+import androidx.lifecycle.withStarted
 
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.databinding.ActivityMainBinding
@@ -66,6 +68,7 @@ import com.benoitletondor.easybudgetapp.parameters.*
 import com.benoitletondor.easybudgetapp.theme.AppTheme
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.main.account.AccountFragment
+import com.benoitletondor.easybudgetapp.view.main.account.AccountViewModel
 import com.benoitletondor.easybudgetapp.view.main.accountselector.AccountSelectorFragment
 import com.benoitletondor.easybudgetapp.view.main.loading.LoadingFragment
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
@@ -114,77 +117,79 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
             val hasPendingInvitations by viewModel.hasPendingInvitationsFlow.collectAsState()
 
             AppTheme {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(colorResource(R.color.status_bar_color))
-                        .padding(bottom = 8.dp)
-                        .clickable(
-                            onClick = viewModel::onAccountTapped,
-                        )
-                        .padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 10.dp),
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth(),
+                if (selectedAccount is MainViewModel.SelectedAccount.Selected) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(colorResource(R.color.status_bar_color))
+                            .padding(bottom = 8.dp)
+                            .clickable(
+                                onClick = viewModel::onAccountTapped,
+                            )
+                            .padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 10.dp),
                     ) {
-                        Box(
-                            modifier = Modifier.weight(1f),
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth(),
                         ) {
-                            when(val account = selectedAccount) {
-                                MainViewModel.SelectedAccount.Loading -> Unit /* Nothing to display when loading */
-                                is MainViewModel.SelectedAccount.Selected -> {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                    ) {
-                                        Text(
-                                            text = "Account: ",
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = colorResource(R.color.action_bar_text_color),
-                                        )
-
-                                        Text(
+                            Box(
+                                modifier = Modifier.weight(1f),
+                            ) {
+                                when(val account = selectedAccount) {
+                                    MainViewModel.SelectedAccount.Loading -> Unit /* Nothing to display when loading */
+                                    is MainViewModel.SelectedAccount.Selected -> {
+                                        Row(
                                             modifier = Modifier.fillMaxWidth(),
-                                            text = when(account) {
-                                                MainViewModel.SelectedAccount.Selected.Offline -> "Default (offline)"
-                                                is MainViewModel.SelectedAccount.Selected.Online -> account.name
-                                            },
-                                            maxLines = 1,
-                                            color = colorResource(R.color.action_bar_text_color),
-                                            overflow = TextOverflow.Ellipsis,
-                                        )
+                                        ) {
+                                            Text(
+                                                text = "Account: ",
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = colorResource(R.color.action_bar_text_color),
+                                            )
+
+                                            Text(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                text = when(account) {
+                                                    MainViewModel.SelectedAccount.Selected.Offline -> "Default (offline)"
+                                                    is MainViewModel.SelectedAccount.Selected.Online -> account.name
+                                                },
+                                                maxLines = 1,
+                                                color = colorResource(R.color.action_bar_text_color),
+                                                overflow = TextOverflow.Ellipsis,
+                                            )
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        if (hasPendingInvitations && selectedAccount is MainViewModel.SelectedAccount.Selected) {
-                            Box(
-                                modifier = Modifier.padding(start = 16.dp, end = 6.dp),
-                            ){
-                                Image(
-                                    painter =  painterResource(id = R.drawable.ic_baseline_notifications_24),
-                                    colorFilter = ColorFilter.tint(colorResource(R.color.action_bar_text_color)),
-                                    contentDescription = stringResource(R.string.account_pending_invitation_description),
-                                )
+                            if (hasPendingInvitations && selectedAccount is MainViewModel.SelectedAccount.Selected) {
                                 Box(
-                                    modifier = Modifier
-                                        .size(7.dp)
-                                        .clip(CircleShape)
-                                        .background(colorResource(R.color.budget_red))
-                                        .align(Alignment.TopEnd)
+                                    modifier = Modifier.padding(start = 16.dp, end = 6.dp),
+                                ){
+                                    Image(
+                                        painter =  painterResource(id = R.drawable.ic_baseline_notifications_24),
+                                        colorFilter = ColorFilter.tint(colorResource(R.color.action_bar_text_color)),
+                                        contentDescription = stringResource(R.string.account_pending_invitation_description),
+                                    )
+                                    Box(
+                                        modifier = Modifier
+                                            .size(7.dp)
+                                            .clip(CircleShape)
+                                            .background(colorResource(R.color.budget_red))
+                                            .align(Alignment.TopEnd)
+                                    )
+                                }
+                            } else {
+                                Image(
+                                    painter =  painterResource(id = R.drawable.ic_baseline_arrow_drop_down_24),
+                                    colorFilter = ColorFilter.tint(colorResource(R.color.action_bar_text_color)),
+                                    contentDescription = null,
+                                    modifier = Modifier.padding(start = 10.dp),
                                 )
                             }
-                        } else {
-                            Image(
-                                painter =  painterResource(id = R.drawable.ic_baseline_arrow_drop_down_24),
-                                colorFilter = ColorFilter.tint(colorResource(R.color.action_bar_text_color)),
-                                contentDescription = null,
-                                modifier = Modifier.padding(start = 10.dp),
-                            )
                         }
-                    }
 
+                    }
                 }
             }
         }
@@ -198,6 +203,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
                 viewModel.onWelcomeScreenFinished()
             } else if (resultCode == RESULT_CANCELED) {
                 finish() // Finish activity if welcome screen is finish via back button
+            }
+        } else {
+            for (fragment in supportFragmentManager.fragments) {
+                fragment.onActivityResult(requestCode, resultCode, data)
             }
         }
     }
@@ -216,17 +225,19 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
         lifecycleScope.launchCollect(viewModel.accountSelectionFlow) { selectedAccount ->
             invalidateOptionsMenu()
 
-            when(selectedAccount) {
-                MainViewModel.SelectedAccount.Loading -> {
-                    supportFragmentManager.commit {
-                        replace(R.id.mainFragmentContainer, LoadingFragment())
+            withStarted {
+                when(selectedAccount) {
+                    MainViewModel.SelectedAccount.Loading -> {
+                        supportFragmentManager.commit {
+                            replace(R.id.mainFragmentContainer, LoadingFragment())
+                        }
                     }
-                }
-                is MainViewModel.SelectedAccount.Selected -> {
-                    performIntentActionIfAny(selectedAccount)
+                    is MainViewModel.SelectedAccount.Selected -> {
+                        performIntentActionIfAny(selectedAccount)
 
-                    supportFragmentManager.commit {
-                        replace(R.id.mainFragmentContainer, AccountFragment.newInstance(selectedAccount))
+                        supportFragmentManager.commit {
+                            replace(R.id.mainFragmentContainer, AccountFragment.newInstance(selectedAccount))
+                        }
                     }
                 }
             }

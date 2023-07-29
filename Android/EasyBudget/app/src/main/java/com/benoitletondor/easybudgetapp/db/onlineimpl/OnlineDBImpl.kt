@@ -33,6 +33,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import java.time.LocalDate
+import java.util.concurrent.CancellationException
 import java.util.concurrent.TimeoutException
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -221,7 +222,7 @@ class OnlineDBImpl(
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
 
         val sumOfRecurringExpenseUpToTheDay = recurringExpenses
-            .map { it.generateExpenses(LocalDate.MIN, dayDate) }
+            .map { it.generateExpenses(from = null, to = dayDate) }
             .flatten()
             .map { it.amount }
             .fold(0.0) { acc, expenseAmount -> acc + expenseAmount }
@@ -239,7 +240,7 @@ class OnlineDBImpl(
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
 
         val sumOfRecurringCheckedExpenseUpToTheDay = recurringExpenses
-            .map { it.generateExpenses(LocalDate.MIN, dayDate) }
+            .map { it.generateExpenses(from = null, to = dayDate) }
             .flatten()
             .filter { it.checked }
             .map { it.amount }
@@ -467,11 +468,24 @@ class OnlineDBImpl(
             accountSecret: String,
         ): OnlineDBImpl {
             val app = App.create(atlasAppId)
-            val user = withContext(Dispatchers.IO) {
-                app.login(Credentials.jwt(currentUser.token))
-            }
-            val account = Account(accountId, accountSecret)
 
+            val user = withContext(Dispatchers.IO) {
+                try {
+                    app.login(Credentials.jwt(currentUser.token))
+                } catch (e: Exception) {
+                    if (e is CancellationException) throw e
+
+                    val appCurrentUser = app.currentUser
+                    if (appCurrentUser != null && appCurrentUser.loggedIn && appCurrentUser.identities.firstOrNull()?.id == currentUser.id) {
+                        Logger.warning("Error while authenticating to Realm, using cached user", e)
+                        appCurrentUser
+                    } else {
+                        throw e
+                    }
+                }
+            }
+
+            val account = Account(accountId, accountSecret)
             val realm = Realm.open(
                 SyncConfiguration.Builder(
                     user = user,
