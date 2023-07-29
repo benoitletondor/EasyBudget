@@ -36,6 +36,7 @@ import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
+import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.time.LocalDate
@@ -47,6 +48,7 @@ import java.time.LocalDate
  */
 class ExpensesRecyclerViewAdapter(
     private val fragment: Fragment,
+    private val account: MainViewModel.SelectedAccount.Selected,
     private val parameters: Parameters,
     private var date: LocalDate,
     private val onExpenseCheckedListener: (Expense, Boolean) -> Unit,
@@ -147,7 +149,7 @@ class ExpensesRecyclerViewAdapter(
                         0 -> {
                             val startIntent = ExpenseEditActivity.newIntent(
                                 context = viewHolder.view.context,
-                                account = ,
+                                account = account,
                                 editedExpense = expense,
                                 date = expense.date,
                             )
@@ -159,7 +161,7 @@ class ExpensesRecyclerViewAdapter(
                         1 -> {
                             val startIntent = ExpenseEditActivity.newIntent(
                                 context = viewHolder.view.context,
-                                account = ,
+                                account = account,
                                 editedExpense = expense,
                                 date = expense.date,
                             )
@@ -211,7 +213,7 @@ class ExpensesRecyclerViewAdapter(
                         -> {
                             val startIntent = ExpenseEditActivity.newIntent(
                                 context = viewHolder.view.context,
-                                account = ,
+                                account = account,
                                 editedExpense = expense,
                                 date = expense.date,
                             )

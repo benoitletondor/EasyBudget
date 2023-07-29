@@ -44,9 +44,12 @@ class AccountViewModel @Inject constructor(
     private val parameters: Parameters,
     private val iab: Iab,
     private val auth: Auth,
-    private val savedStateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle,
     @ApplicationContext private val appContext: Context,
 ): ViewModel() {
+    val account = savedStateHandle.get<MainViewModel.SelectedAccount.Selected>(ARG_SELECTED_ACCOUNT)
+        ?: throw IllegalStateException("No ARG_SELECTED_ACCOUNT arg")
+
     private val dbAvailableMutableStateFlow = MutableStateFlow<DBState>(DBState.Loading)
     val dbAvailableFlow: StateFlow<DBState> = dbAvailableMutableStateFlow
 
@@ -144,19 +147,16 @@ class AccountViewModel @Inject constructor(
         dbAvailableMutableStateFlow.value = DBState.Loading
 
         viewModelScope.launch {
-            val selectedDB = savedStateHandle.get<MainViewModel.SelectedAccount.Selected>(ARG_SELECTED_ACCOUNT)
-                ?: throw IllegalStateException("No ARG_SELECTED_ACCOUNT arg")
-
             try {
-                dbAvailableMutableStateFlow.value = when(selectedDB) {
+                dbAvailableMutableStateFlow.value = when(account) {
                     MainViewModel.SelectedAccount.Selected.Offline -> DBState.Loaded(AppModule.provideDB(appContext))
                     is MainViewModel.SelectedAccount.Selected.Online -> {
                         val currentUser = (auth.state.value as? AuthState.Authenticated)?.currentUser ?: throw IllegalStateException("User is not authenticated")
 
                         val onlineDb = AppModule.provideSyncedOnlineDBOrThrow(
                             currentUser = currentUser,
-                            accountId = selectedDB.accountId,
-                            accountSecret = selectedDB.accountSecret,
+                            accountId = account.accountId,
+                            accountSecret = account.accountSecret,
                         )
 
                         addCloseable(onlineDb)

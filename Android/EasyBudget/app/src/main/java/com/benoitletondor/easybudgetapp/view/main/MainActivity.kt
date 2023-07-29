@@ -397,7 +397,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
         if (intent.getBooleanExtra(INTENT_SHOW_ADD_RECURRING_EXPENSE, false)) {
             val startIntent = RecurringExpenseEditActivity.newIntent(
                 context = this,
-                account = ,
+                account = selectedAccount,
                 startDate = LocalDate.now(),
                 editedExpense = null,
             )
