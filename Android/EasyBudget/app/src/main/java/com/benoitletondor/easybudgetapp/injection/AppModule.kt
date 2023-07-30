@@ -90,7 +90,6 @@ object AppModule {
         accountId: String,
         accountSecret: String,
     ): DB {
-
         return OnlineDBImpl.provideFor(
             atlasAppId = BuildConfig.ATLAS_APP_ID,
             currentUser = currentUser,
