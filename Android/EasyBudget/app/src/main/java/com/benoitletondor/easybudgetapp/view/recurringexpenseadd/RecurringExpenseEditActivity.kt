@@ -35,7 +35,6 @@ import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import com.benoitletondor.easybudgetapp.view.DatePickerDialogFragment
-import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
@@ -160,7 +159,10 @@ class RecurringExpenseEditActivity : BaseActivity<ActivityRecurringExpenseAddBin
             MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.expense_edit_unable_to_load_db_error_title)
                 .setMessage(R.string.expense_edit_unable_to_load_db_error_message)
-                .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
+                .setPositiveButton(R.string.expense_edit_unable_to_load_db_error_cta) { _, _ ->
+                    setResult(Activity.RESULT_CANCELED)
+                    finish()
+                }
                 .show()
         }
     }
@@ -369,16 +371,13 @@ class RecurringExpenseEditActivity : BaseActivity<ActivityRecurringExpenseAddBin
     companion object {
         const val ARG_EXPENSE = "expense"
         const val ARG_START_DATE = "dateStart"
-        const val ARG_SELECTED_ACCOUNT = "selectedAccount"
 
         fun newIntent(
             context: Context,
-            account: MainViewModel.SelectedAccount.Selected,
             editedExpense: Expense?,
             startDate: LocalDate,
         ): Intent {
             return Intent(context, RecurringExpenseEditActivity::class.java).apply {
-                putExtra(ARG_SELECTED_ACCOUNT, account)
                 putExtra(ARG_START_DATE, startDate.toEpochDay())
                 if (editedExpense != null) {
                     putExtra(ARG_EXPENSE, editedExpense)

@@ -90,24 +90,12 @@ object AppModule {
         accountId: String,
         accountSecret: String,
     ): DB {
-        val onlineDB = OnlineDBImpl.provideFor(
+
+        return OnlineDBImpl.provideFor(
             atlasAppId = BuildConfig.ATLAS_APP_ID,
             currentUser = currentUser,
             accountId = accountId,
             accountSecret = accountSecret
         )
-
-        TODO("caching")
-
-        return onlineDB
-        /*return CachedDBImpl(
-            onlineDB,
-            object : CacheDBStorage {
-                override val expenses: MutableMap<LocalDate, List<Expense>> = mutableMapOf()
-                override val balances: MutableMap<LocalDate, Double> = mutableMapOf()
-                override val checkedBalances: MutableMap<LocalDate, Double> = mutableMapOf()
-            },
-            Executors.newSingleThreadExecutor(),
-        )*/
     }
 }

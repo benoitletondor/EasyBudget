@@ -19,19 +19,16 @@ package com.benoitletondor.easybudgetapp.view.recurringexpenseadd
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.benoitletondor.easybudgetapp.auth.Auth
-import com.benoitletondor.easybudgetapp.auth.AuthState
 import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
-import com.benoitletondor.easybudgetapp.injection.AppModule
 import kotlinx.coroutines.launch
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.getInitDate
-import com.benoitletondor.easybudgetapp.view.main.MainViewModel
+import com.benoitletondor.easybudgetapp.view.main.account.AccountViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -42,8 +39,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RecurringExpenseEditViewModel @Inject constructor(
-    offlineDB: DB,
-    private val auth: Auth,
     private val parameters: Parameters,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -51,9 +46,6 @@ class RecurringExpenseEditViewModel @Inject constructor(
      * Expense that is being edited (will be null if it's a new one)
      */
     private val editedExpense: Expense? = savedStateHandle[RecurringExpenseEditActivity.ARG_EXPENSE]
-
-    private val account = savedStateHandle.get<MainViewModel.SelectedAccount.Selected>(RecurringExpenseEditActivity.ARG_SELECTED_ACCOUNT)
-        ?: throw IllegalStateException("No ARG_SELECTED_ACCOUNT arg")
 
     private val expenseDateMutableStateFlow = MutableStateFlow(LocalDate.ofEpochDay(
         savedStateHandle[RecurringExpenseEditActivity.ARG_START_DATE] ?: throw IllegalStateException("No ARG_START_DATE arg")))
@@ -84,31 +76,16 @@ class RecurringExpenseEditViewModel @Inject constructor(
     private val errorMutableFlow = MutableLiveFlow<Unit>()
     val errorFlow: Flow<Unit> = errorMutableFlow
 
-    private val dbMutableFlow = MutableStateFlow<DB?>(null)
+    private lateinit var db: DB
 
     init {
-        viewModelScope.launch {
-            dbMutableFlow.value = when(val selectedAccount = account) {
-                MainViewModel.SelectedAccount.Selected.Offline -> offlineDB
-                is MainViewModel.SelectedAccount.Selected.Online -> {
-                    try {
-                        val currentUser = (auth.state.value as? AuthState.Authenticated)?.currentUser ?: throw IllegalStateException("User is not authenticated")
-
-                        val onlineDb = AppModule.provideSyncedOnlineDBOrThrow(
-                            currentUser = currentUser,
-                            accountId = selectedAccount.accountId,
-                            accountSecret = selectedAccount.accountSecret,
-                        )
-
-                        addCloseable(onlineDb)
-                        onlineDb
-                    } catch (e: Exception) {
-                        Logger.error("Error while loading online DB", e)
-                        unableToLoadDBEventMutableFlow.emit(Unit)
-                        null
-                    }
-                }
+        val currentDb = AccountViewModel.getCurrentDB()
+        if (currentDb == null) {
+            viewModelScope.launch {
+                unableToLoadDBEventMutableFlow.emit(Unit)
             }
+        } else {
+            db = currentDb
         }
     }
 
@@ -155,13 +132,6 @@ class RecurringExpenseEditViewModel @Inject constructor(
         savingStateMutableStateFlow.value = SavingState.Saving(isRevenue)
 
         viewModelScope.launch {
-            val db = dbMutableFlow.value
-            if (db == null) {
-                savingStateMutableStateFlow.value = SavingState.Idle
-                unableToLoadDBEventMutableFlow.emit(Unit)
-                return@launch
-            }
-
             try {
                 val inserted = withContext(Dispatchers.Default) {
                     if( editedExpense == null ) {

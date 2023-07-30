@@ -372,6 +372,7 @@
 
     <string name="expense_edit_unable_to_load_db_error_title">Unable to access the database</string>
     <string name="expense_edit_unable_to_load_db_error_message">Cannot access the database to persist your expense. Please check your network and relaunch the app.</string>
+    <string name="expense_edit_unable_to_load_db_error_cta">Cancel</string>
 
     <!-- Keys, not for translations. -->
     <string name="setting_category_bug_report_send_button_key" translatable="false">send_bug_report</string>

@@ -233,7 +233,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
                         }
                     }
                     is MainViewModel.SelectedAccount.Selected -> {
-                        performIntentActionIfAny(selectedAccount)
+                        performIntentActionIfAny()
 
                         supportFragmentManager.commit {
                             replace(R.id.mainFragmentContainer, AccountFragment.newInstance(selectedAccount))
@@ -250,13 +250,13 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
         }
     }
 
-    private fun performIntentActionIfAny(selectedAccount: MainViewModel.SelectedAccount.Selected ) {
+    private fun performIntentActionIfAny() {
         if (intent != null) {
             openSettingsIfNeeded(intent)
-            openMonthlyReportIfNeeded(intent, selectedAccount)
+            openMonthlyReportIfNeeded(intent)
             openPremiumIfNeeded(intent)
-            openAddExpenseIfNeeded(intent, selectedAccount)
-            openAddRecurringExpenseIfNeeded(intent, selectedAccount)
+            openAddExpenseIfNeeded(intent)
+            openAddRecurringExpenseIfNeeded(intent)
             openSettingsForBackupIfNeeded(intent)
             intent = null
         }
@@ -268,8 +268,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
 
         this.intent = intent
 
-        (viewModel.accountSelectionFlow.value as? MainViewModel.SelectedAccount.Selected)?.let { selectedAccount ->
-            performIntentActionIfAny(selectedAccount)
+        (viewModel.accountSelectionFlow.value as? MainViewModel.SelectedAccount.Selected)?.let {
+            performIntentActionIfAny()
         }
     }
 
@@ -350,7 +350,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
      *
      * @param intent
      */
-    private fun openMonthlyReportIfNeeded(intent: Intent, selectedAccount: MainViewModel.SelectedAccount.Selected) {
+    private fun openMonthlyReportIfNeeded(intent: Intent) {
         try {
             val data = intent.data
             if (data != null && "true" == data.getQueryParameter("monthly")) {
@@ -385,11 +385,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
      *
      * @param intent
      */
-    private fun openAddExpenseIfNeeded(intent: Intent, selectedAccount: MainViewModel.SelectedAccount.Selected) {
+    private fun openAddExpenseIfNeeded(intent: Intent) {
         if (intent.getBooleanExtra(INTENT_SHOW_ADD_EXPENSE, false)) {
             val startIntent = ExpenseEditActivity.newIntent(
                 context = this,
-                account = selectedAccount,
                 date = LocalDate.now(),
                 editedExpense = null,
             )
@@ -404,11 +403,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
      *
      * @param intent
      */
-    private fun openAddRecurringExpenseIfNeeded(intent: Intent, selectedAccount: MainViewModel.SelectedAccount.Selected) {
+    private fun openAddRecurringExpenseIfNeeded(intent: Intent) {
         if (intent.getBooleanExtra(INTENT_SHOW_ADD_RECURRING_EXPENSE, false)) {
             val startIntent = RecurringExpenseEditActivity.newIntent(
                 context = this,
-                account = selectedAccount,
                 startDate = LocalDate.now(),
                 editedExpense = null,
             )

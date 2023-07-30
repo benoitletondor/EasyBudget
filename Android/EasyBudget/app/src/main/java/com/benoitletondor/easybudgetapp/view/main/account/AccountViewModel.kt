@@ -34,7 +34,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.Closeable
+import java.lang.ref.WeakReference
 import java.time.LocalDate
 import java.util.Calendar
 import javax.inject.Inject
@@ -47,7 +47,7 @@ class AccountViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     @ApplicationContext private val appContext: Context,
 ): ViewModel() {
-    val account = savedStateHandle.get<MainViewModel.SelectedAccount.Selected>(ARG_SELECTED_ACCOUNT)
+    private val account = savedStateHandle.get<MainViewModel.SelectedAccount.Selected>(ARG_SELECTED_ACCOUNT)
         ?: throw IllegalStateException("No ARG_SELECTED_ACCOUNT arg")
 
     private val dbAvailableMutableStateFlow = MutableStateFlow<DBState>(DBState.Loading)
@@ -149,17 +149,24 @@ class AccountViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 dbAvailableMutableStateFlow.value = when(account) {
-                    MainViewModel.SelectedAccount.Selected.Offline -> DBState.Loaded(AppModule.provideDB(appContext))
+                    MainViewModel.SelectedAccount.Selected.Offline -> {
+                        val db = AppModule.provideDB(appContext)
+                        currentDBRef = WeakReference(db)
+                        DBState.Loaded(db)
+                    }
                     is MainViewModel.SelectedAccount.Selected.Online -> {
                         val currentUser = (auth.state.value as? AuthState.Authenticated)?.currentUser ?: throw IllegalStateException("User is not authenticated")
 
-                        val onlineDb = AppModule.provideSyncedOnlineDBOrThrow(
-                            currentUser = currentUser,
-                            accountId = account.accountId,
-                            accountSecret = account.accountSecret,
-                        )
+                        val onlineDb = withContext(Dispatchers.IO) {
+                            AppModule.provideSyncedOnlineDBOrThrow(
+                                currentUser = currentUser,
+                                accountId = account.accountId,
+                                accountSecret = account.accountSecret,
+                            )
+                        }
 
                         addCloseable(onlineDb)
+                        currentDBRef = WeakReference(onlineDb)
                         DBState.Loaded(onlineDb)
                     }
                 }
@@ -172,6 +179,16 @@ class AccountViewModel @Inject constructor(
         }
     }
 
+    override fun onCleared() {
+        val currentDB = currentDBRef?.get()
+        val dbState = dbAvailableMutableStateFlow.value as? DBState.Loaded
+        if (currentDB != null && dbState != null && dbState.db == currentDB) {
+            currentDBRef = null
+        }
+
+        super.onCleared()
+    }
+
     fun onRetryLoadingButtonPressed() {
         loadDB()
     }
@@ -180,10 +197,6 @@ class AccountViewModel @Inject constructor(
         viewModelScope.launch {
             openMonthlyReportEventMutableFlow.emit(Unit)
         }
-    }
-
-    override fun addCloseable(closeable: Closeable) {
-        super.addCloseable(closeable)
     }
 
     sealed class RecurringExpenseDeleteProgressState {
@@ -508,6 +521,12 @@ class AccountViewModel @Inject constructor(
         object Loading : DBState()
         class Loaded(val db: DB) : DBState()
         class Error(val error: Exception) : DBState()
+    }
+
+    companion object {
+        private var currentDBRef: WeakReference<DB>? = null
+
+        fun getCurrentDB(): DB? = currentDBRef?.get()
     }
 }
 

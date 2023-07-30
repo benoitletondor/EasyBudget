@@ -619,7 +619,6 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
             {
                 val startIntent = ExpenseEditActivity.newIntent(
                     context = requireContext(),
-                    account = viewModel.account,
                     editedExpense = null,
                     date = date,
                 )
@@ -708,7 +707,6 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
             it.setOnClickListener {
                 val startIntent = ExpenseEditActivity.newIntent(
                     context = requireContext(),
-                    account = viewModel.account,
                     editedExpense = null,
                     date = calendarFragment.getSelectedDate(),
                 )
@@ -726,7 +724,6 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
             it.setOnClickListener {
                 val startIntent = RecurringExpenseEditActivity.newIntent(
                     context = requireContext(),
-                    account = viewModel.account,
                     startDate = calendarFragment.getSelectedDate(),
                     editedExpense = null,
                 )
@@ -744,7 +741,7 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
     private fun initRecyclerView() {
         binding.expensesRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        expensesViewAdapter = ExpensesRecyclerViewAdapter(this, viewModel.account, parameters, LocalDate.now()) { expense, checked ->
+        expensesViewAdapter = ExpensesRecyclerViewAdapter(this, parameters, LocalDate.now()) { expense, checked ->
             viewModel.onExpenseChecked(expense, checked)
         }
         binding.expensesRecyclerView.adapter = expensesViewAdapter

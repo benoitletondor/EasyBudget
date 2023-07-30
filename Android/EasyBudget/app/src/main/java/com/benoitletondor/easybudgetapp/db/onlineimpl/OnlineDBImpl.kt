@@ -137,6 +137,8 @@ class OnlineDBImpl(
             return realm.write {
                 val entity = ExpenseEntity.fromExpense(expense, account)
 
+                Logger.error("Adding expense with account: $account")
+
                 val persistedExpense = copyToRealm(entity, updatePolicy = UpdatePolicy.ALL)
                 return@write persistedExpense.toExpense(associatedRecurringExpense = null)
             }
