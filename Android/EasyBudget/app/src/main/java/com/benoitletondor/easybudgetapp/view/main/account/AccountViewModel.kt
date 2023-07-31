@@ -23,6 +23,7 @@ import com.benoitletondor.easybudgetapp.view.main.account.AccountFragment.Compan
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -120,6 +121,8 @@ class AccountViewModel @Inject constructor(
     private val forceRefreshMutableFlow = MutableSharedFlow<Unit>()
     val refreshDatesFlow: Flow<Unit> = forceRefreshMutableFlow
 
+    private var changesWatchingJob: Job? = null
+
     val selectedDateDataFlow = combine(
         selectDateMutableStateFlow,
         forceRefreshMutableFlow,
@@ -152,6 +155,15 @@ class AccountViewModel @Inject constructor(
                     MainViewModel.SelectedAccount.Selected.Offline -> {
                         val db = AppModule.provideDB(appContext)
                         currentDBRef = WeakReference(db)
+
+                        changesWatchingJob?.cancel()
+                        changesWatchingJob = launch {
+                            db.onChangeFlow
+                                .collect {
+                                    forceRefreshMutableFlow.emit(Unit)
+                                }
+                        }
+
                         DBState.Loaded(db)
                     }
                     is MainViewModel.SelectedAccount.Selected.Online -> {
@@ -165,13 +177,19 @@ class AccountViewModel @Inject constructor(
                             )
                         }
 
+                        changesWatchingJob?.cancel()
+                        changesWatchingJob = launch {
+                            onlineDb.onChangeFlow
+                                .collect {
+                                    forceRefreshMutableFlow.emit(Unit)
+                                }
+                        }
+
                         addCloseable(onlineDb)
                         currentDBRef = WeakReference(onlineDb)
                         DBState.Loaded(onlineDb)
                     }
                 }
-
-                forceRefreshMutableFlow.emit(Unit)
             } catch (e: Exception) {
                 Logger.error("Error while loading DB", e)
                 dbAvailableMutableStateFlow.value = DBState.Error(e);
@@ -235,8 +253,6 @@ class AccountViewModel @Inject constructor(
                     if (parameters.getShouldShowCheckedBalance()) { awaitDB().getCheckedBalanceForDay(selectedDate) } else { null },
                     restoreAction,
                 ))
-
-                forceRefreshMutableFlow.emit(Unit)
             } catch (t: Throwable) {
                 Logger.error("Error while deleting expense", t)
                 expenseDeletionErrorEventMutableFlow.emit(expense)
@@ -250,8 +266,6 @@ class AccountViewModel @Inject constructor(
                 withContext(Dispatchers.IO) {
                     restoreAction.restore()
                 }
-
-                forceRefreshMutableFlow.emit(Unit)
             } catch (t: Throwable) {
                 Logger.error("Error while restoring expense", t)
             }
@@ -320,8 +334,6 @@ class AccountViewModel @Inject constructor(
             } finally {
                 recurringExpenseDeletionProgressStateMutableFlow.value = RecurringExpenseDeleteProgressState.Idle
             }
-
-            forceRefreshMutableFlow.emit(Unit)
         }
 
     }
@@ -338,8 +350,6 @@ class AccountViewModel @Inject constructor(
             } finally {
                 recurringExpenseRestoreProgressStateMutableFlow.value = RecurringExpenseRestoreProgressState.Idle
             }
-
-            forceRefreshMutableFlow.emit(Unit)
         }
     }
 
@@ -391,8 +401,6 @@ class AccountViewModel @Inject constructor(
 
                     currentBalanceEditedEventMutableFlow.emit(BalanceAdjustedData(persistedExpense, diff, newBalance))
                 }
-
-                forceRefreshMutableFlow.emit(Unit)
             } catch (e: Exception) {
                 Logger.error("Error while editing balance", e)
                 currentBalanceEditingErrorEventMutableFlow.emit(e)
@@ -411,8 +419,6 @@ class AccountViewModel @Inject constructor(
                         awaitDB().persistExpense(newExpense)
                     }
                 }
-
-                forceRefreshMutableFlow.emit(Unit)
             } catch (e: Exception) {
                 Logger.error("Error while restoring balance", e)
                 currentBalanceRestoringErrorEventMutableFlow.emit(e)
@@ -448,20 +454,12 @@ class AccountViewModel @Inject constructor(
         selectDateMutableStateFlow.value = LocalDate.now()
     }
 
-    fun onExpenseAdded() {
-        viewModelScope.launch {
-            forceRefreshMutableFlow.emit(Unit)
-        }
-    }
-
     fun onExpenseChecked(expense: Expense, checked: Boolean) {
         viewModelScope.launch {
             try {
                 withContext(Dispatchers.Default) {
                     awaitDB().persistExpense(expense.copy(checked = checked))
                 }
-
-                forceRefreshMutableFlow.emit(Unit)
             } catch (e: Exception) {
                 Logger.error("Error while checking expense", e)
                 expenseCheckedErrorEventMutableFlow.emit(e)
@@ -500,8 +498,6 @@ class AccountViewModel @Inject constructor(
                 withContext(Dispatchers.Default) {
                     awaitDB().markAllEntriesAsChecked(LocalDate.now())
                 }
-
-                forceRefreshMutableFlow.emit(Unit)
             } catch (e: Exception) {
                 Logger.error("Error while checking all past entries", e)
                 checkAllPastEntriesErrorEventMutableFlow.emit(e)

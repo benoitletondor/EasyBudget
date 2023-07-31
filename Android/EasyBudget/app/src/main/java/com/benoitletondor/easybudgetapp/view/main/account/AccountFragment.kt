@@ -543,11 +543,7 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == MainActivity.ADD_EXPENSE_ACTIVITY_CODE || requestCode == MainActivity.MANAGE_RECURRING_EXPENSE_ACTIVITY_CODE) {
-            if (resultCode == AppCompatActivity.RESULT_OK) {
-                viewModel.onExpenseAdded()
-            }
-        } else if (requestCode == MainActivity.SETTINGS_SCREEN_ACTIVITY_CODE) {
+        if (requestCode == MainActivity.SETTINGS_SCREEN_ACTIVITY_CODE) {
             calendarFragment.setFirstDayOfWeek(parameters.getCaldroidFirstDayOfWeek())
         }
     }

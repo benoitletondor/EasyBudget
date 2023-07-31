@@ -23,9 +23,9 @@ import com.benoitletondor.easybudgetapp.auth.Auth
 import com.benoitletondor.easybudgetapp.auth.AuthState
 import com.benoitletondor.easybudgetapp.cloudstorage.CloudStorage
 import com.benoitletondor.easybudgetapp.cloudstorage.FileMetaData
-import com.benoitletondor.easybudgetapp.db.impl.DBImpl
-import com.benoitletondor.easybudgetapp.db.impl.DB_NAME
-import com.benoitletondor.easybudgetapp.db.impl.RoomDB
+import com.benoitletondor.easybudgetapp.db.offlineimpl.DBImpl
+import com.benoitletondor.easybudgetapp.db.offlineimpl.DB_NAME
+import com.benoitletondor.easybudgetapp.db.offlineimpl.RoomDB
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.job.BackupJob
 import com.benoitletondor.easybudgetapp.parameters.Parameters

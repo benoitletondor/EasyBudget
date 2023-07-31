@@ -14,11 +14,11 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp.db.impl
+package com.benoitletondor.easybudgetapp.db.offlineimpl
 
 import androidx.room.*
-import com.benoitletondor.easybudgetapp.db.impl.entity.ExpenseEntity
-import com.benoitletondor.easybudgetapp.db.impl.entity.RecurringExpenseEntity
+import com.benoitletondor.easybudgetapp.db.offlineimpl.entity.ExpenseEntity
+import com.benoitletondor.easybudgetapp.db.offlineimpl.entity.RecurringExpenseEntity
 import androidx.sqlite.db.SupportSQLiteQuery
 import androidx.room.RawQuery
 import java.time.LocalDate

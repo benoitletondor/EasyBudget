@@ -14,21 +14,30 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp.db.impl
+package com.benoitletondor.easybudgetapp.db.offlineimpl
 
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.db.RestoreAction
-import com.benoitletondor.easybudgetapp.db.impl.entity.ExpenseEntity
-import com.benoitletondor.easybudgetapp.db.impl.entity.RecurringExpenseEntity
+import com.benoitletondor.easybudgetapp.db.offlineimpl.entity.ExpenseEntity
+import com.benoitletondor.easybudgetapp.db.offlineimpl.entity.RecurringExpenseEntity
 import com.benoitletondor.easybudgetapp.db.restoreAction
 import com.benoitletondor.easybudgetapp.helper.getDBValue
 import com.benoitletondor.easybudgetapp.helper.getRealValueFromDB
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 class DBImpl(private val roomDB: RoomDB) : DB {
+    private val onChangeMutableFlow = MutableSharedFlow<Unit>()
+    override val onChangeFlow: Flow<Unit> = onChangeMutableFlow
 
     override fun ensureDBCreated() {
         roomDB.openHelper.writableDatabase
@@ -40,6 +49,9 @@ class DBImpl(private val roomDB: RoomDB) : DB {
 
     override suspend fun persistExpense(expense: Expense): Expense {
         val newId = roomDB.expenseDao().persistExpense(expense.toExpenseEntity())
+
+        onChangeMutableFlow.emit(Unit)
+
         return expense.copy(id = newId)
     }
 
@@ -73,6 +85,9 @@ class DBImpl(private val roomDB: RoomDB) : DB {
 
     override suspend fun persistRecurringExpense(recurringExpense: RecurringExpense): RecurringExpense {
         val newId = roomDB.expenseDao().persistRecurringExpense(recurringExpense.toRecurringExpenseEntity())
+
+        onChangeMutableFlow.emit(Unit)
+
         return recurringExpense.copy(id = newId)
     }
 
@@ -86,11 +101,15 @@ class DBImpl(private val roomDB: RoomDB) : DB {
         deleteAllExpenseForRecurringExpense(recurringExpense)
         roomDB.expenseDao().deleteRecurringExpense(recurringExpense.toRecurringExpenseEntity())
 
+        onChangeMutableFlow.emit(Unit)
+
         return restoreAction {
             persistRecurringExpense(recurringExpense)
             for(expense in allExpenses) {
                 persistExpense(expense)
             }
+
+            onChangeMutableFlow.emit(Unit)
         }
     }
 
@@ -101,8 +120,11 @@ class DBImpl(private val roomDB: RoomDB) : DB {
 
         roomDB.expenseDao().deleteExpense(expense.toExpenseEntity())
 
+        onChangeMutableFlow.emit(Unit)
+
         return restoreAction {
             persistExpense(expense)
+            onChangeMutableFlow.emit(Unit)
         }
     }
 
@@ -125,10 +147,14 @@ class DBImpl(private val roomDB: RoomDB) : DB {
 
         roomDB.expenseDao().deleteAllExpenseForRecurringExpenseAfterDate(recurringExpenseId, afterDate)
 
+        onChangeMutableFlow.emit(Unit)
+
         return restoreAction {
             for(expense in allExpenses) {
                 persistExpense(expense)
             }
+
+            onChangeMutableFlow.emit(Unit)
         }
     }
 
@@ -145,10 +171,14 @@ class DBImpl(private val roomDB: RoomDB) : DB {
 
         roomDB.expenseDao().deleteAllExpenseForRecurringExpenseBeforeDate(recurringExpenseId, beforeDate)
 
+        onChangeMutableFlow.emit(Unit)
+
         return restoreAction {
             for(expense in allExpenses) {
                 persistExpense(expense)
             }
+
+            onChangeMutableFlow.emit(Unit)
         }
     }
 
@@ -174,12 +204,13 @@ class DBImpl(private val roomDB: RoomDB) : DB {
 
     override suspend fun markAllEntriesAsChecked(beforeDate: LocalDate) {
         roomDB.expenseDao().markAllEntriesAsChecked(beforeDate)
+
+        onChangeMutableFlow.emit(Unit)
     }
 
     override fun close() {
         roomDB.close()
     }
-
 }
 
 private suspend fun List<ExpenseEntity>.toExpenses(db: DB): List<Expense> {

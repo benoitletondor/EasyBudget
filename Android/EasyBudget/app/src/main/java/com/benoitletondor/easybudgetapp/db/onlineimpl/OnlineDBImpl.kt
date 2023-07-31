@@ -21,12 +21,19 @@ import io.realm.kotlin.mongodb.App
 import io.realm.kotlin.mongodb.Credentials
 import io.realm.kotlin.mongodb.subscriptions
 import io.realm.kotlin.mongodb.sync.SyncConfiguration
+import io.realm.kotlin.notifications.InitialRealm
+import io.realm.kotlin.notifications.UpdatedRealm
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -43,13 +50,18 @@ class OnlineDBImpl(
     private val account: Account,
 ) : DB, CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.IO) {
     private var recurringExpenseWatchingJob: Job? = null
+    private var changesWatchingJob: Job? = null
 
     private val syncSessionState = MutableStateFlow<SyncSessionState>(SyncSessionState.NotStarted)
     private val recurringExpensesLoadingStateMutableFlow = MutableStateFlow<RecurringExpenseLoadingState>(RecurringExpenseLoadingState.NotLoaded)
 
     init {
         watchAllRecurringExpenses()
+        watchAllChanges()
     }
+
+    private val onChangeMutableFlow = MutableSharedFlow<Unit>()
+    override val onChangeFlow: Flow<Unit> = onChangeMutableFlow
 
     override fun ensureDBCreated() { /* No-op */ }
 
@@ -91,6 +103,18 @@ class OnlineDBImpl(
                 }
                 .collect { changes ->
                     recurringExpensesLoadingStateMutableFlow.value = RecurringExpenseLoadingState.Loaded(changes.list)
+                }
+        }
+    }
+
+    private fun watchAllChanges() {
+        changesWatchingJob?.cancel()
+        changesWatchingJob = launch {
+            realm.asFlow()
+                .filter { it is UpdatedRealm }
+                .debounce(500)
+                .collect {
+                    onChangeMutableFlow.emit(Unit)
                 }
         }
     }
@@ -436,6 +460,7 @@ class OnlineDBImpl(
 
     override fun close() {
         realm.close()
+        cancel()
     }
 
     private fun generateQueryForDateRange(from: LocalDate, to: LocalDate): String

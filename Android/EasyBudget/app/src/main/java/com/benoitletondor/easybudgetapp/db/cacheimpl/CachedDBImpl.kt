@@ -20,15 +20,37 @@ import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.db.RestoreAction
-import com.benoitletondor.easybudgetapp.db.restoreAction
 import com.benoitletondor.easybudgetapp.helper.Logger
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 import java.util.concurrent.Executor
 
-class CachedDBImpl(private val wrappedDB: DB,
-                   private val cacheStorage: CacheDBStorage,
-                   private val executor: Executor) : DB {
+class CachedDBImpl(
+    private val wrappedDB: DB,
+    private val cacheStorage: CacheDBStorage,
+    private val executor: Executor,
+) : DB, CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.IO) {
+
+    private val onChangeMutableFlow = MutableSharedFlow<Unit>()
+    override val onChangeFlow: Flow<Unit> = onChangeMutableFlow
+
+    init {
+        launch {
+            wrappedDB.onChangeFlow
+                .collect {
+                    wipeCache()
+                    onChangeMutableFlow.emit(Unit)
+                }
+        }
+    }
+
 
     override fun ensureDBCreated() {
         wrappedDB.ensureDBCreated()
@@ -38,13 +60,8 @@ class CachedDBImpl(private val wrappedDB: DB,
         wrappedDB.triggerForceWriteToDisk()
     }
 
-    override suspend fun persistExpense(expense: Expense): Expense {
-        val newExpense = wrappedDB.persistExpense(expense)
-
-        wipeCache()
-
-        return newExpense
-    }
+    override suspend fun persistExpense(expense: Expense): Expense
+        = wrappedDB.persistExpense(expense)
 
     override suspend fun hasExpenseForDay(dayDate: LocalDate): Boolean {
         val expensesForDay = synchronized(cacheStorage.expenses) {
@@ -129,49 +146,17 @@ class CachedDBImpl(private val wrappedDB: DB,
     override suspend fun persistRecurringExpense(recurringExpense: RecurringExpense): RecurringExpense
         = wrappedDB.persistRecurringExpense(recurringExpense)
 
-    override suspend fun deleteRecurringExpense(recurringExpense: RecurringExpense): RestoreAction {
-        val dbRestoreAction = wrappedDB.deleteRecurringExpense(recurringExpense)
+    override suspend fun deleteRecurringExpense(recurringExpense: RecurringExpense): RestoreAction
+        = wrappedDB.deleteRecurringExpense(recurringExpense)
 
-        wipeCache()
+    override suspend fun deleteExpense(expense: Expense): RestoreAction
+        = wrappedDB.deleteExpense(expense)
 
-        return restoreAction {
-            dbRestoreAction.restore()
-            wipeCache()
-        }
-    }
+    override suspend fun deleteAllExpenseForRecurringExpenseAfterDate(recurringExpense: RecurringExpense, afterDate: LocalDate): RestoreAction
+        = wrappedDB.deleteAllExpenseForRecurringExpenseAfterDate(recurringExpense, afterDate)
 
-    override suspend fun deleteExpense(expense: Expense): RestoreAction {
-        val dbRestoreAction = wrappedDB.deleteExpense(expense)
-
-        wipeCache()
-
-        return restoreAction {
-            dbRestoreAction.restore()
-            wipeCache()
-        }
-    }
-
-    override suspend fun deleteAllExpenseForRecurringExpenseAfterDate(recurringExpense: RecurringExpense, afterDate: LocalDate): RestoreAction {
-        val dbRestoreAction = wrappedDB.deleteAllExpenseForRecurringExpenseAfterDate(recurringExpense, afterDate)
-
-        wipeCache()
-
-        return restoreAction {
-            dbRestoreAction.restore()
-            wipeCache()
-        }
-    }
-
-    override suspend fun deleteAllExpenseForRecurringExpenseBeforeDate(recurringExpense: RecurringExpense, beforeDate: LocalDate): RestoreAction {
-        val dbRestoreAction = wrappedDB.deleteAllExpenseForRecurringExpenseBeforeDate(recurringExpense, beforeDate)
-
-        wipeCache()
-
-        return restoreAction {
-            dbRestoreAction.restore()
-            wipeCache()
-        }
-    }
+    override suspend fun deleteAllExpenseForRecurringExpenseBeforeDate(recurringExpense: RecurringExpense, beforeDate: LocalDate): RestoreAction
+        = wrappedDB.deleteAllExpenseForRecurringExpenseBeforeDate(recurringExpense, beforeDate)
 
     override suspend fun hasExpensesForRecurringExpenseBeforeDate(recurringExpense: RecurringExpense, beforeDate: LocalDate): Boolean
         = wrappedDB.hasExpensesForRecurringExpenseBeforeDate(recurringExpense, beforeDate)
@@ -184,13 +169,12 @@ class CachedDBImpl(private val wrappedDB: DB,
 
     override suspend fun markAllEntriesAsChecked(beforeDate: LocalDate) {
         wrappedDB.markAllEntriesAsChecked(beforeDate)
-
-        wipeCache()
     }
 
     override fun close() {
         wrappedDB.close()
         wipeCache()
+        cancel()
     }
 
     /**

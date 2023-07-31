@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp.db.impl.entity
+package com.benoitletondor.easybudgetapp.db.offlineimpl.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
