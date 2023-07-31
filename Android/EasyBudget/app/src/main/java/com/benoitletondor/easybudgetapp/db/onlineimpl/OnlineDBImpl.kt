@@ -490,7 +490,7 @@ class OnlineDBImpl(
                 SyncConfiguration.Builder(
                     user = user,
                     schema = setOf(ExpenseEntity::class, RecurringExpenseEntity::class),
-                ).initialSubscriptions { realm ->
+                ).initialSubscriptions(rerunOnOpen = true) { realm ->
                     add(
                         query = realm.query<ExpenseEntity>(account.generateQuery()),
                         name = "${currentUser.id}:${account.id}:expenses",
