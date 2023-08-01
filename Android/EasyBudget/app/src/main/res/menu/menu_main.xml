@@ -23,6 +23,7 @@
         android:id="@+id/action_become_premium"
         android:title="@string/action_become_premium"
         android:icon="@drawable/ic_baseline_star_24"
+        android:orderInCategory="0"
         app:showAsAction="always" />
 
     <item

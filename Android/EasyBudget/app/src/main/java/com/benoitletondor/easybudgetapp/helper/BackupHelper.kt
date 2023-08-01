@@ -23,7 +23,7 @@ import com.benoitletondor.easybudgetapp.auth.Auth
 import com.benoitletondor.easybudgetapp.auth.AuthState
 import com.benoitletondor.easybudgetapp.cloudstorage.CloudStorage
 import com.benoitletondor.easybudgetapp.cloudstorage.FileMetaData
-import com.benoitletondor.easybudgetapp.db.offlineimpl.DBImpl
+import com.benoitletondor.easybudgetapp.db.offlineimpl.OfflineDBImpl
 import com.benoitletondor.easybudgetapp.db.offlineimpl.DB_NAME
 import com.benoitletondor.easybudgetapp.db.offlineimpl.RoomDB
 import com.benoitletondor.easybudgetapp.iab.Iab
@@ -74,7 +74,7 @@ suspend fun backupDB(context: Context,
 
     try {
         val roomDb = RoomDB.create(context)
-        DBImpl(roomDb).triggerForceWriteToDisk()
+        OfflineDBImpl(roomDb).triggerForceWriteToDisk()
         roomDb.close()
     } catch (error: Throwable) {
         Logger.error(

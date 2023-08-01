@@ -6,7 +6,6 @@ import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.db.RestoreAction
 import com.benoitletondor.easybudgetapp.db.onlineimpl.entity.ExpenseEntity
 import com.benoitletondor.easybudgetapp.db.onlineimpl.entity.RecurringExpenseEntity
-import com.benoitletondor.easybudgetapp.db.restoreAction
 import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.helper.getRealValueFromDB
 import com.benoitletondor.easybudgetapp.helper.toStartOfDayDate
@@ -21,7 +20,6 @@ import io.realm.kotlin.mongodb.App
 import io.realm.kotlin.mongodb.Credentials
 import io.realm.kotlin.mongodb.subscriptions
 import io.realm.kotlin.mongodb.sync.SyncConfiguration
-import io.realm.kotlin.notifications.InitialRealm
 import io.realm.kotlin.notifications.UpdatedRealm
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -302,7 +300,7 @@ class OnlineDBImpl(
             findLatest(entity)?.let { delete(it) }
         }
 
-        return restoreAction {
+        return {
             realm.write {
                 copyToRealm(entity, UpdatePolicy.ALL)
             }
@@ -323,7 +321,7 @@ class OnlineDBImpl(
                 copyToRealm(entity, UpdatePolicy.ALL)
             }
 
-            return restoreAction {
+            return {
                 entity.iCalRepresentation = icalBeforeDeletion
                 realm.write {
                     copyToRealm(entity, UpdatePolicy.ALL)
@@ -336,7 +334,7 @@ class OnlineDBImpl(
                 findLatest(expenseEntity)?.let { delete(it) }
             }
 
-            return restoreAction {
+            return {
                 realm.write {
                     copyToRealm(expenseEntity, UpdatePolicy.ALL)
                 }
@@ -360,7 +358,7 @@ class OnlineDBImpl(
             copyToRealm(entity, UpdatePolicy.ALL)
         }
 
-        return restoreAction {
+        return {
             entity.iCalRepresentation = icalBeforeEdit
             realm.write {
                 copyToRealm(entity, UpdatePolicy.ALL)
@@ -384,7 +382,7 @@ class OnlineDBImpl(
             copyToRealm(entity, UpdatePolicy.ALL)
         }
 
-        return restoreAction {
+        return {
             entity.iCalRepresentation = icalBeforeEdit
             realm.write {
                 copyToRealm(entity, UpdatePolicy.ALL)

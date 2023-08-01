@@ -23,19 +23,13 @@ import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.db.RestoreAction
 import com.benoitletondor.easybudgetapp.db.offlineimpl.entity.ExpenseEntity
 import com.benoitletondor.easybudgetapp.db.offlineimpl.entity.RecurringExpenseEntity
-import com.benoitletondor.easybudgetapp.db.restoreAction
 import com.benoitletondor.easybudgetapp.helper.getDBValue
 import com.benoitletondor.easybudgetapp.helper.getRealValueFromDB
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.launch
 import java.time.LocalDate
 
-class DBImpl(private val roomDB: RoomDB) : DB {
+class OfflineDBImpl(private val roomDB: RoomDB) : DB {
     private val onChangeMutableFlow = MutableSharedFlow<Unit>()
     override val onChangeFlow: Flow<Unit> = onChangeMutableFlow
 
@@ -103,7 +97,7 @@ class DBImpl(private val roomDB: RoomDB) : DB {
 
         onChangeMutableFlow.emit(Unit)
 
-        return restoreAction {
+        return {
             persistRecurringExpense(recurringExpense)
             for(expense in allExpenses) {
                 persistExpense(expense)
@@ -122,7 +116,7 @@ class DBImpl(private val roomDB: RoomDB) : DB {
 
         onChangeMutableFlow.emit(Unit)
 
-        return restoreAction {
+        return {
             persistExpense(expense)
             onChangeMutableFlow.emit(Unit)
         }
@@ -149,7 +143,7 @@ class DBImpl(private val roomDB: RoomDB) : DB {
 
         onChangeMutableFlow.emit(Unit)
 
-        return restoreAction {
+        return {
             for(expense in allExpenses) {
                 persistExpense(expense)
             }
@@ -173,7 +167,7 @@ class DBImpl(private val roomDB: RoomDB) : DB {
 
         onChangeMutableFlow.emit(Unit)
 
-        return restoreAction {
+        return {
             for(expense in allExpenses) {
                 persistExpense(expense)
             }

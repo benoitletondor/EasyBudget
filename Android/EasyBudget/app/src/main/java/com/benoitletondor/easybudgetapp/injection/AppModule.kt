@@ -31,7 +31,7 @@ import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.db.cacheimpl.CachedDBImpl
 import com.benoitletondor.easybudgetapp.db.cacheimpl.CacheDBStorage
-import com.benoitletondor.easybudgetapp.db.offlineimpl.DBImpl
+import com.benoitletondor.easybudgetapp.db.offlineimpl.OfflineDBImpl
 import com.benoitletondor.easybudgetapp.db.offlineimpl.RoomDB
 import com.benoitletondor.easybudgetapp.db.onlineimpl.OnlineDBImpl
 import com.google.firebase.firestore.ktx.firestore
@@ -76,7 +76,7 @@ object AppModule {
     fun provideDB(
         @ApplicationContext context: Context,
     ): DB = CachedDBImpl(
-        DBImpl(RoomDB.create(context)),
+        OfflineDBImpl(RoomDB.create(context)),
         object : CacheDBStorage {
             override val expenses: MutableMap<LocalDate, List<Expense>> = mutableMapOf()
             override val balances: MutableMap<LocalDate, Double> = mutableMapOf()

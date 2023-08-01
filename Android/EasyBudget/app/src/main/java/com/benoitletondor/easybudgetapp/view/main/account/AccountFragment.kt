@@ -20,7 +20,6 @@ import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.widget.EditText
 import android.widget.LinearLayout
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.invalidateOptionsMenu
 import androidx.core.content.ContextCompat
@@ -167,6 +166,11 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
         if (!viewModel.showGoToCurrentMonthButtonStateFlow.value) {
             menu.removeItem(R.id.action_go_to_current_month)
         }
+
+        // Remove manage account if needed
+        if (!viewModel.showManageAccountMenuItem.value) {
+            menu.removeItem(R.id.action_manage_account)
+        }
     }
 
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -189,6 +193,10 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
             }
             R.id.action_monthly_report -> {
                 viewModel.onMonthlyReportButtonPressed()
+                true
+            }
+            R.id.action_manage_account -> {
+                viewModel.onManageAccountButtonPressed()
                 true
             }
             else -> false
@@ -489,6 +497,10 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
             invalidateOptionsMenu(requireActivity())
         }
 
+        viewLifecycleScope.launchCollect(viewModel.showManageAccountMenuItem) {
+            invalidateOptionsMenu(requireActivity())
+        }
+
         viewLifecycleScope.launchCollect(viewModel.goBackToCurrentMonthEventFlow) {
             calendarFragment.goToCurrentMonth()
         }
@@ -521,6 +533,10 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
         viewLifecycleScope.launchCollect(viewModel.openMonthlyReportEventFlow) {
             val startIntent = Intent(requireActivity(), MonthlyReportBaseActivity::class.java)
             ActivityCompat.startActivity(requireContext(), startIntent, null)
+        }
+
+        viewLifecycleScope.launchCollect(viewModel.openManageAccountEventFlow) {
+            TODO()
         }
     }
 

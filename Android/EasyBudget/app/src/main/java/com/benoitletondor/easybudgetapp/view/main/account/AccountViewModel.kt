@@ -118,8 +118,14 @@ class AccountViewModel @Inject constructor(
     private val openMonthlyReportEventMutableFlow = MutableLiveFlow<Unit>()
     val openMonthlyReportEventFlow: Flow<Unit> = openMonthlyReportEventMutableFlow
 
+    private val openManageAccountEventMutableFlow = MutableLiveFlow<Unit>()
+    val openManageAccountEventFlow: Flow<Unit> = openManageAccountEventMutableFlow
+
     private val forceRefreshMutableFlow = MutableSharedFlow<Unit>()
     val refreshDatesFlow: Flow<Unit> = forceRefreshMutableFlow
+
+    private val showManageAccountMenuItemMutableFlow = MutableStateFlow(false)
+    val showManageAccountMenuItem: StateFlow<Boolean> = showManageAccountMenuItemMutableFlow
 
     private var changesWatchingJob: Job? = null
 
@@ -148,24 +154,12 @@ class AccountViewModel @Inject constructor(
 
     private fun loadDB() {
         dbAvailableMutableStateFlow.value = DBState.Loading
+        showManageAccountMenuItemMutableFlow.value = false
 
         viewModelScope.launch {
             try {
-                dbAvailableMutableStateFlow.value = when(account) {
-                    MainViewModel.SelectedAccount.Selected.Offline -> {
-                        val db = AppModule.provideDB(appContext)
-                        currentDBRef = WeakReference(db)
-
-                        changesWatchingJob?.cancel()
-                        changesWatchingJob = launch {
-                            db.onChangeFlow
-                                .collect {
-                                    forceRefreshMutableFlow.emit(Unit)
-                                }
-                        }
-
-                        DBState.Loaded(db)
-                    }
+                val db = when(account) {
+                    MainViewModel.SelectedAccount.Selected.Offline -> AppModule.provideDB(appContext)
                     is MainViewModel.SelectedAccount.Selected.Online -> {
                         val currentUser = (auth.state.value as? AuthState.Authenticated)?.currentUser ?: throw IllegalStateException("User is not authenticated")
 
@@ -177,19 +171,22 @@ class AccountViewModel @Inject constructor(
                             )
                         }
 
-                        changesWatchingJob?.cancel()
-                        changesWatchingJob = launch {
-                            onlineDb.onChangeFlow
-                                .collect {
-                                    forceRefreshMutableFlow.emit(Unit)
-                                }
-                        }
-
                         addCloseable(onlineDb)
-                        currentDBRef = WeakReference(onlineDb)
-                        DBState.Loaded(onlineDb)
+                        showManageAccountMenuItemMutableFlow.value = true
+                        onlineDb
                     }
                 }
+
+                currentDBRef = WeakReference(db)
+                changesWatchingJob?.cancel()
+                changesWatchingJob = launch {
+                    db.onChangeFlow
+                        .collect {
+                            forceRefreshMutableFlow.emit(Unit)
+                        }
+                }
+
+                dbAvailableMutableStateFlow.value = DBState.Loaded(db)
             } catch (e: Exception) {
                 Logger.error("Error while loading DB", e)
                 dbAvailableMutableStateFlow.value = DBState.Error(e);
@@ -264,7 +261,7 @@ class AccountViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 withContext(Dispatchers.IO) {
-                    restoreAction.restore()
+                    restoreAction()
                 }
             } catch (t: Throwable) {
                 Logger.error("Error while restoring expense", t)
@@ -343,7 +340,7 @@ class AccountViewModel @Inject constructor(
             recurringExpenseRestoreProgressStateMutableFlow.value = RecurringExpenseRestoreProgressState.Restoring(recurringExpense)
 
             try {
-                restoreAction.restore()
+                restoreAction()
                 recurringExpenseRestoreEventMutableFlow.emit(RecurringExpenseRestoreEvent.Success(recurringExpense))
             } catch (e: Exception) {
                 recurringExpenseRestoreEventMutableFlow.emit(RecurringExpenseRestoreEvent.ErrorIO(recurringExpense))
@@ -508,6 +505,12 @@ class AccountViewModel @Inject constructor(
     fun onLowMoneyWarningThresholdChanged() {
         viewModelScope.launch {
             forceRefreshMutableFlow.emit(Unit)
+        }
+    }
+
+    fun onManageAccountButtonPressed() {
+        viewModelScope.launch {
+            openManageAccountEventMutableFlow.emit(Unit)
         }
     }
 
