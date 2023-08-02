@@ -145,6 +145,12 @@
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity"/>
         <activity
+            android:name=".view.main.manageaccount.ManageAccountActivity"
+            android:configChanges="locale|keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_manage_account"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"/>
+        <activity
             android:name=".view.settings.backup.BackupSettingsActivity"
             android:label="@string/backup_settings_activity_title"
             android:screenOrientation="portrait"

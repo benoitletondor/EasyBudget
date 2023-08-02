@@ -39,6 +39,7 @@
     <string name="title_activity_premium">Premium</string>
     <string name="title_activity_login">Google Login</string>
     <string name="title_activity_create_account">Create online account</string>
+    <string name="title_activity_manage_account">Manage online account</string>
     <string name="title_activity_monthly_report">Monthly report</string>
     <string name="cancel">Cancel</string>
     <string name="undo">UNDO</string>

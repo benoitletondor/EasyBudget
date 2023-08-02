@@ -51,6 +51,7 @@ import com.benoitletondor.easybudgetapp.view.main.MainActivity
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import com.benoitletondor.easybudgetapp.view.main.account.calendar.CalendarFragment
 import com.benoitletondor.easybudgetapp.view.main.account.calendar.CalendarGridAdapterDataProvider
+import com.benoitletondor.easybudgetapp.view.main.manageaccount.ManageAccountActivity
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment
@@ -535,8 +536,8 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
             ActivityCompat.startActivity(requireContext(), startIntent, null)
         }
 
-        viewLifecycleScope.launchCollect(viewModel.openManageAccountEventFlow) {
-            TODO()
+        viewLifecycleScope.launchCollect(viewModel.openManageAccountEventFlow) { account ->
+            startActivity(ManageAccountActivity.newIntent(requireContext(), account))
         }
     }
 

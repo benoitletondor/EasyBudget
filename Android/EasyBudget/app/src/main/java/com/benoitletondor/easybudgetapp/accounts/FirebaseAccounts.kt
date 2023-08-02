@@ -2,6 +2,8 @@ package com.benoitletondor.easybudgetapp.accounts
 
 import com.benoitletondor.easybudgetapp.BuildConfig
 import com.benoitletondor.easybudgetapp.accounts.model.Account
+import com.benoitletondor.easybudgetapp.accounts.model.Invitation
+import com.benoitletondor.easybudgetapp.accounts.model.InvitationStatus
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldPath
@@ -9,7 +11,6 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
@@ -41,6 +42,32 @@ class FirebaseAccounts(
                 it.id
             }
         }
+    }
+
+    override fun watchAccount(
+        currentUser: CurrentUser,
+        accountId: String,
+        accountSecret: String,
+    ): Flow<Account> {
+        return db.collection(ACCOUNTS_COLLECTION)
+            .whereArrayContains(ACCOUNT_DOCUMENT_MEMBERS, currentUser.email)
+            .whereEqualTo(ACCOUNT_DOCUMENT_SECRET, accountSecret)
+            .whereEqualTo(FieldPath.documentId(), accountId)
+            .watchAsFlow { value ->
+                value.documents.first().toAccountOrThrow(currentUser)
+            }
+    }
+
+    override fun watchInvitationsForAccount(
+        currentUser: CurrentUser,
+        accountId: String,
+    ): Flow<List<Invitation>> {
+        return db.collection(INVITATIONS_COLLECTION)
+            .whereEqualTo(INVITATION_DOCUMENT_ACCOUNT_ID, accountId)
+            .whereEqualTo(INVITATION_DOCUMENT_SENDER_ID, currentUser.id)
+            .watchAsFlow { value ->
+                value.documents.map { it.toInvitationOrThrow() }
+            }
     }
 
     override fun watchHasPendingInvitedAccounts(currentUser: CurrentUser): Flow<Boolean>
@@ -211,6 +238,19 @@ class FirebaseAccounts(
         )
     }
 
+    private fun DocumentSnapshot.toInvitationOrThrow(): Invitation {
+        return Invitation(
+            id = id,
+            senderEmail = getString(INVITATION_DOCUMENT_SENDER_EMAIL)!!,
+            senderId = getString(INVITATION_DOCUMENT_SENDER_ID)!!,
+            receiverEmail = getString(INVITATION_DOCUMENT_RECEIVER_EMAIL)!!,
+            accountId = getString(INVITATION_DOCUMENT_ACCOUNT_ID)!!,
+            status = InvitationStatus.values().first {
+                it.dbValue.toLong() == getLong(INVITATION_DOCUMENT_STATUS)
+            },
+        )
+    }
+
     private fun generateSecureAccountIdAndSecret(): Pair<String, String> {
         val accountId = generateRandomString(100)
         val accountSecret = generateRandomString(100)
@@ -224,12 +264,6 @@ class FirebaseAccounts(
             .take(length)
             .map { SECURE_STRING_ALLOWED_CHARS[BigInteger(it.toString(), 32).toInt()] }
             .joinToString("")
-    }
-
-    private enum class InvitationStatus(val dbValue: Int) {
-        SENT(0),
-        ACCEPTED(1),
-        REJECTED(2),
     }
 
     companion object {

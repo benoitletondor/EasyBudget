@@ -1,11 +1,14 @@
 package com.benoitletondor.easybudgetapp.accounts
 
 import com.benoitletondor.easybudgetapp.accounts.model.Account
+import com.benoitletondor.easybudgetapp.accounts.model.Invitation
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import kotlinx.coroutines.flow.Flow
 
 interface Accounts {
     fun watchAccounts(currentUser: CurrentUser): Flow<List<Account>>
+    fun watchAccount(currentUser: CurrentUser, accountId: String, accountSecret: String): Flow<Account>
+    fun watchInvitationsForAccount(currentUser: CurrentUser, accountId: String): Flow<List<Invitation>>
     fun watchHasPendingInvitedAccounts(currentUser: CurrentUser): Flow<Boolean>
     fun watchPendingInvitedAccounts(currentUser: CurrentUser): Flow<List<Account>>
     suspend fun sendInvitationToAccount(currentUser: CurrentUser, account: Account, invitedUserEmail: String)

@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.benoitletondor.easybudgetapp.databinding.ActivityCreateAccountBinding

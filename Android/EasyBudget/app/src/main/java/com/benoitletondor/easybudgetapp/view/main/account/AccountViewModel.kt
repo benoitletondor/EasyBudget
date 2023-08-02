@@ -118,8 +118,8 @@ class AccountViewModel @Inject constructor(
     private val openMonthlyReportEventMutableFlow = MutableLiveFlow<Unit>()
     val openMonthlyReportEventFlow: Flow<Unit> = openMonthlyReportEventMutableFlow
 
-    private val openManageAccountEventMutableFlow = MutableLiveFlow<Unit>()
-    val openManageAccountEventFlow: Flow<Unit> = openManageAccountEventMutableFlow
+    private val openManageAccountEventMutableFlow = MutableLiveFlow<MainViewModel.SelectedAccount.Selected.Online>()
+    val openManageAccountEventFlow: Flow<MainViewModel.SelectedAccount.Selected.Online> = openManageAccountEventMutableFlow
 
     private val forceRefreshMutableFlow = MutableSharedFlow<Unit>()
     val refreshDatesFlow: Flow<Unit> = forceRefreshMutableFlow
@@ -510,7 +510,9 @@ class AccountViewModel @Inject constructor(
 
     fun onManageAccountButtonPressed() {
         viewModelScope.launch {
-            openManageAccountEventMutableFlow.emit(Unit)
+            (account as? MainViewModel.SelectedAccount.Selected.Online)?.let {
+                openManageAccountEventMutableFlow.emit(it)
+            }
         }
     }
 

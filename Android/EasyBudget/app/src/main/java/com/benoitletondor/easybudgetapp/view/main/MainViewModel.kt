@@ -90,7 +90,7 @@ class MainViewModel @Inject constructor(
                     else -> flowOf(OnlineAccountResponse.Loading)
                 }
             }
-    ) { selectedOnlineAccountId, iabStatus, onlineAccountsReponse ->
+    ) { selectedOnlineAccountId, iabStatus, onlineAccountsResponse ->
         if (selectedOnlineAccountId == null) {
             return@combine SelectedAccount.Selected.Offline
         }
@@ -102,8 +102,8 @@ class MainViewModel @Inject constructor(
             PremiumCheckStatus.NOT_PREMIUM,
             PremiumCheckStatus.LEGACY_PREMIUM,
             PremiumCheckStatus.PREMIUM_SUBSCRIBED -> SelectedAccount.Selected.Offline
-            PremiumCheckStatus.PRO_SUBSCRIBED -> when(onlineAccountsReponse) {
-                is OnlineAccountResponse.Available -> onlineAccountsReponse.accounts
+            PremiumCheckStatus.PRO_SUBSCRIBED -> when(onlineAccountsResponse) {
+                is OnlineAccountResponse.Available -> onlineAccountsResponse.accounts
                     .firstOrNull { it.id == selectedOnlineAccountId }
                     ?.let { account ->
                         SelectedAccount.Selected.Online(
