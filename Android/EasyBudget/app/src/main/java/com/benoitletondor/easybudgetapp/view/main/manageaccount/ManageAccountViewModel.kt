@@ -1,9 +1,11 @@
 package com.benoitletondor.easybudgetapp.view.main.manageaccount
 
+import android.util.Patterns
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.accounts.Accounts
+import com.benoitletondor.easybudgetapp.accounts.model.Account
 import com.benoitletondor.easybudgetapp.accounts.model.Invitation
 import com.benoitletondor.easybudgetapp.accounts.model.InvitationStatus
 import com.benoitletondor.easybudgetapp.auth.Auth
@@ -15,6 +17,7 @@ import com.benoitletondor.easybudgetapp.helper.combine
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import com.benoitletondor.easybudgetapp.view.main.manageaccount.ManageAccountActivity.Companion.SELECTED_ACCOUNT_EXTRA
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,6 +44,8 @@ class ManageAccountViewModel @Inject constructor(
     private val isUpdatingNameMutableFlow = MutableStateFlow(false)
     private val isDeletingInvitationMutableFlow = MutableStateFlow(false)
     private val isSendingInvitationMutableFlow = MutableStateFlow(false)
+    private val isLeavingAccountMutableFlow = MutableStateFlow(false)
+    private val isDeletingAccountMutableFlow = MutableStateFlow(false)
 
     private val retryLoadingMutableFlow = MutableSharedFlow<Unit>()
 
@@ -49,6 +54,8 @@ class ManageAccountViewModel @Inject constructor(
         isUpdatingNameMutableFlow,
         isDeletingInvitationMutableFlow,
         isSendingInvitationMutableFlow,
+        isLeavingAccountMutableFlow,
+        isDeletingAccountMutableFlow,
         auth.state.flatMapLatest { authState ->
             when(authState) {
                 is AuthState.Authenticated -> accounts.watchAccount(
@@ -72,7 +79,15 @@ class ManageAccountViewModel @Inject constructor(
         } else {
             flowOf(AccountLoadingState.Loaded(emptyList()))
         },
-    ) { authState, isUpdatingName, isDeletingInvitation, isSendingInvitationMutableFlow, accountLoadingState, invitationsLoadingState ->
+    ) { authState,
+        isUpdatingName,
+        isDeletingInvitation,
+        isSendingInvitation,
+        isLeavingAccount,
+        isDeletingAccount,
+        accountLoadingState,
+        invitationsLoadingState ->
+
         if (isUpdatingName) {
             return@combine State.Updating
         }
@@ -81,8 +96,16 @@ class ManageAccountViewModel @Inject constructor(
             return@combine State.DeletingInvitation
         }
 
-        if (isSendingInvitationMutableFlow) {
+        if (isSendingInvitation) {
             return@combine State.SendingInvitation
+        }
+
+        if (isLeavingAccount) {
+            return@combine State.LeavingAccount
+        }
+
+        if (isDeletingAccount) {
+            return@combine State.DeletingAccount
         }
 
         val account = when(accountLoadingState) {
@@ -133,11 +156,65 @@ class ManageAccountViewModel @Inject constructor(
     val eventFlow: Flow<Event> = eventMutableFlow
 
     fun onUpdateAccountNameClicked(newName: String) {
-        TODO("Not yet implemented")
+        val state = stateFlow.value as? State.Ready.Owner ?: kotlin.run {
+            Logger.error("onUpdateAccountNameClicked while not being in loaded state")
+            return
+        }
+
+        if (newName.trim().isEmpty()) {
+            viewModelScope.launch {
+                eventMutableFlow.emit(Event.ErrorUpdatingAccountName(IllegalStateException("Account name must not be empty")))
+            }
+
+            return
+        }
+
+        if (newName.length >= 50) {
+            viewModelScope.launch {
+                eventMutableFlow.emit(Event.ErrorUpdatingAccountName(IllegalStateException("Account name must be less than 50 chars")))
+            }
+
+            return
+        }
+
+        viewModelScope.launch {
+            isUpdatingNameMutableFlow.value = true
+
+            try {
+                accounts.updateAccountName(state.currentUser, selectedAccount.accountId, newName)
+                eventMutableFlow.emit(Event.AccountNameUpdated)
+            } catch (e: Exception) {
+                if (e is CancellationException) { return@launch }
+
+                Logger.error("Error while updating account name", e)
+                eventMutableFlow.emit(Event.ErrorUpdatingAccountName(e))
+            } finally {
+                isUpdatingNameMutableFlow.value = false
+            }
+        }
     }
 
     fun onInvitationDeleteConfirmed(invitation: Invitation) {
-        TODO("Not yet implemented")
+        val state = stateFlow.value as? State.Ready.Owner ?: kotlin.run {
+            Logger.error("onInvitationDeleteConfirmed while not being in loaded state")
+            return
+        }
+
+        viewModelScope.launch {
+            isDeletingInvitationMutableFlow.value = true
+
+            try {
+                accounts.deleteInvitation(state.currentUser, invitation)
+                eventMutableFlow.emit(Event.InvitationDeleted(invitation))
+            } catch (e: Exception) {
+                if (e is CancellationException) { return@launch }
+
+                Logger.error("Error while deleting invitation", e)
+                eventMutableFlow.emit(Event.ErrorDeletingInvitation(e))
+            } finally {
+                isDeletingInvitationMutableFlow.value = false
+            }
+        }
     }
 
     fun onRetryButtonClicked() {
@@ -147,7 +224,100 @@ class ManageAccountViewModel @Inject constructor(
     }
 
     fun onLeaveAccountConfirmed() {
-        TODO("Not yet implemented")
+        val state = stateFlow.value as? State.Ready.Invited ?: kotlin.run {
+            Logger.error("onLeaveAccountConfirmed while not being in loaded state")
+            return
+        }
+
+        viewModelScope.launch {
+            isLeavingAccountMutableFlow.value = true
+
+            try {
+                accounts.leaveAccount(state.currentUser, selectedAccount.accountId)
+                eventMutableFlow.emit(Event.AccountLeft)
+                eventMutableFlow.emit(Event.Finish)
+            } catch (e: Exception) {
+                if (e is CancellationException) { return@launch }
+
+                Logger.error("Error while leaving account", e)
+                eventMutableFlow.emit(Event.ErrorWhileLeavingAccount(e))
+            } finally {
+                isLeavingAccountMutableFlow.value = false
+            }
+        }
+    }
+
+    fun onInviteEmailToAccount(email: String) {
+        val state = stateFlow.value as? State.Ready.Owner ?: kotlin.run {
+            Logger.error("onInviteEmailToAccount while not being in loaded state")
+            return
+        }
+
+        if (email.trim().isEmpty()) {
+            viewModelScope.launch {
+                eventMutableFlow.emit(Event.ErrorWhileInviting(IllegalStateException("Email must not be empty")))
+            }
+
+            return
+        }
+
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            viewModelScope.launch {
+                eventMutableFlow.emit(Event.ErrorWhileInviting(IllegalStateException("Email is invalid")))
+            }
+
+            return
+        }
+
+        viewModelScope.launch {
+            isSendingInvitationMutableFlow.value = true
+
+            try {
+                accounts.sendInvitationToAccount(
+                    state.currentUser,
+                    Account(
+                        id = selectedAccount.accountId,
+                        secret = selectedAccount.accountSecret,
+                        name = selectedAccount.name,
+                        ownerEmail = state.currentUser.email,
+                        isUserOwner = true,
+                    ),
+                    email,
+                )
+                eventMutableFlow.emit(Event.InvitationSent(email))
+            } catch (e: Exception) {
+                if (e is CancellationException) { return@launch }
+
+                Logger.error("Error while inviting to account", e)
+                eventMutableFlow.emit(Event.ErrorWhileInviting(e))
+            } finally {
+                isSendingInvitationMutableFlow.value = false
+            }
+        }
+    }
+
+    fun onDeleteAccountConfirmed() {
+        val state = stateFlow.value as? State.Ready.Owner ?: kotlin.run {
+            Logger.error("onDeleteAccountConfirmed while not being in loaded state")
+            return
+        }
+
+        viewModelScope.launch {
+            isDeletingAccountMutableFlow.value = true
+
+            try {
+                accounts.deleteAccount(state.currentUser, selectedAccount.accountId)
+                eventMutableFlow.emit(Event.AccountDeleted)
+                eventMutableFlow.emit(Event.Finish)
+            } catch (e: Exception) {
+                if (e is CancellationException) { return@launch }
+
+                Logger.error("Error while deleting account", e)
+                eventMutableFlow.emit(Event.ErrorWhileDeletingAccount(e))
+            } finally {
+                isDeletingAccountMutableFlow.value = false
+            }
+        }
     }
 
     private sealed class AccountLoadingState<T> {
@@ -182,6 +352,16 @@ class ManageAccountViewModel @Inject constructor(
     }
 
     sealed class Event {
-
+        data class ErrorDeletingInvitation(val error: Exception) : Event()
+        data class InvitationDeleted(val invitation: Invitation) : Event()
+        data class ErrorUpdatingAccountName(val error: Exception) : Event()
+        object AccountNameUpdated : Event()
+        data class ErrorWhileLeavingAccount(val error: Exception) : Event()
+        object AccountLeft : Event()
+        object Finish : Event()
+        data class ErrorWhileInviting(val error: Exception) : Event()
+        data class InvitationSent(val email: String) : Event()
+        object AccountDeleted : Event()
+        data class ErrorWhileDeletingAccount(val error: Exception) : Event()
     }
 }

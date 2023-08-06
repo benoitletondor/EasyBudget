@@ -15,4 +15,8 @@ interface Accounts {
     suspend fun acceptInvitationToAccount(currentUser: CurrentUser, account: Account)
     suspend fun rejectInvitationToAccount(currentUser: CurrentUser, account: Account)
     suspend fun createAccount(currentUser: CurrentUser, name: String): Account
+    suspend fun deleteInvitation(currentUser: CurrentUser, invitation: Invitation)
+    suspend fun updateAccountName(currentUser: CurrentUser, accountId: String, newName: String)
+    suspend fun leaveAccount(currentUser: CurrentUser, accountId: String)
+    suspend fun deleteAccount(currentUser: CurrentUser, accountId: String)
 }

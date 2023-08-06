@@ -85,12 +85,26 @@ class ManageAccountActivity : BaseActivity<ActivityCreateAccountBinding>() {
                     onInvitationDeleteConfirmed = viewModel::onInvitationDeleteConfirmed,
                     onRetryButtonClicked = viewModel::onRetryButtonClicked,
                     onLeaveAccountConfirmed = viewModel::onLeaveAccountConfirmed,
+                    onInviteEmailToAccount = viewModel::onInviteEmailToAccount,
+                    onDeleteAccountConfirmed = viewModel::onDeleteAccountConfirmed,
                 )
             }
         }
 
         lifecycleScope.launchCollect(viewModel.eventFlow) { event ->
-
+            when(event) {
+                ManageAccountViewModel.Event.AccountLeft -> TODO()
+                ManageAccountViewModel.Event.AccountNameUpdated -> TODO()
+                is ManageAccountViewModel.Event.ErrorDeletingInvitation -> TODO()
+                is ManageAccountViewModel.Event.ErrorUpdatingAccountName -> TODO()
+                is ManageAccountViewModel.Event.ErrorWhileInviting -> TODO()
+                is ManageAccountViewModel.Event.ErrorWhileLeavingAccount -> TODO()
+                ManageAccountViewModel.Event.Finish -> TODO()
+                is ManageAccountViewModel.Event.InvitationDeleted -> TODO()
+                is ManageAccountViewModel.Event.InvitationSent -> TODO()
+                ManageAccountViewModel.Event.AccountDeleted -> TODO()
+                is ManageAccountViewModel.Event.ErrorWhileDeletingAccount -> TODO()
+            }
         }
     }
 
@@ -124,5 +138,7 @@ enum class LoadingKind {
     DELETING_INVITATION,
     SENDING_INVITATION,
     UPDATING_NAME,
+    DELETING_ACCOUNT,
+    LEAVING_ACCOUNT,
 }
 

@@ -1,5 +1,6 @@
 package com.benoitletondor.easybudgetapp.view.main.manageaccount.view
 
+import android.util.Patterns
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,11 +14,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -29,10 +32,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -52,6 +58,8 @@ fun ContentView(
     onInvitationDeleteConfirmed: (Invitation) -> Unit,
     onRetryButtonClicked: () -> Unit,
     onLeaveAccountConfirmed: () -> Unit,
+    onInviteEmailToAccount: (String) -> Unit,
+    onDeleteAccountConfirmed: () -> Unit,
 ) {
     when(state) {
         ManageAccountViewModel.State.DeletingInvitation -> LoadingView(kind = LoadingKind.DELETING_INVITATION)
@@ -70,11 +78,13 @@ fun ContentView(
             invitationsAccepted = state.invitationsAccepted,
             onUpdateAccountNameClicked = onUpdateAccountNameClicked,
             onInvitationDeleteConfirmed = onInvitationDeleteConfirmed,
+            onInviteEmailToAccount = onInviteEmailToAccount,
+            onDeleteAccountConfirmed = onDeleteAccountConfirmed,
         )
         ManageAccountViewModel.State.SendingInvitation -> LoadingView(kind = LoadingKind.SENDING_INVITATION)
         ManageAccountViewModel.State.Updating -> LoadingView(kind = LoadingKind.UPDATING_NAME)
-        ManageAccountViewModel.State.DeletingAccount -> TODO()
-        ManageAccountViewModel.State.LeavingAccount -> TODO()
+        ManageAccountViewModel.State.DeletingAccount ->  LoadingView(kind = LoadingKind.DELETING_ACCOUNT)
+        ManageAccountViewModel.State.LeavingAccount ->  LoadingView(kind = LoadingKind.LEAVING_ACCOUNT)
     }
 }
 
@@ -138,10 +148,14 @@ private fun ManageAccountAsOwnerView(
     invitationsAccepted: List<Invitation>,
     onUpdateAccountNameClicked: (String) -> Unit,
     onInvitationDeleteConfirmed: (Invitation) -> Unit,
+    onInviteEmailToAccount: (String) -> Unit,
+    onDeleteAccountConfirmed: () -> Unit,
 ) {
     var accountName by remember { mutableStateOf(initialNameValue) }
     val isAccountNameValid = accountName.length in 1..49
     val shouldDisplayAccountNameError = accountName.length >= 50
+
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -215,6 +229,106 @@ private fun ManageAccountAsOwnerView(
             InvitationRow(
                 invitation = invitation,
                 onDeleteConfirmed = onInvitationDeleteConfirmed,
+            )
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        if (invitationsSent.size + invitationsAccepted.size < 5) {
+            SmallFloatingActionButton(
+                onClick = {
+                    var email = ""
+
+                    val composeView = ComposeView(context).apply {
+                        setContent {
+                            var emailState by remember { mutableStateOf(email) }
+                            val isEmailValid = Patterns.EMAIL_ADDRESS.matcher(emailState).matches()
+                            val shouldDisplaEmailError = emailState.isNotEmpty() && !isEmailValid
+
+                            AppTheme {
+                                TextField(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    value = emailState,
+                                    onValueChange = {
+                                        emailState = it
+                                        email = it
+                                    },
+                                    singleLine = true,
+                                    keyboardOptions = KeyboardOptions.Default.copy(
+                                        keyboardType = KeyboardType.Email,
+                                        capitalization = KeyboardCapitalization.None,
+                                    ),
+                                    isError = shouldDisplaEmailError,
+                                    supportingText = {
+                                        if (shouldDisplaEmailError) {
+                                            Text(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                text = "Please enter a valid email",
+                                                color = MaterialTheme.colorScheme.error,
+                                            )
+                                        }
+                                    },
+                                )
+                            }
+                        }
+                    }
+
+                    MaterialAlertDialogBuilder(context)
+                        .setTitle("Invite to account")
+                        .setMessage("Enter the email of the Google account of the EasyBudget Pro user you want to invite to this account.")
+                        .setView(composeView)
+                        .setNegativeButton("Cancel") { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        .setPositiveButton("Delete") { dialog, _ ->
+                            onInviteEmailToAccount(email)
+                            dialog.dismiss()
+                        }
+                        .show()
+                },
+                modifier = Modifier.align(Alignment.End),
+                containerColor = MaterialTheme.colorScheme.primary,
+            ) {
+                Text("+")
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = "Danger zone",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Button(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                onClick = {
+                    MaterialAlertDialogBuilder(context)
+                        .setTitle("Delete account")
+                        .setMessage("Are you sure you want to delete the account? All the data will definitely be deleted, it's impossible to cancel.")
+                        .setNegativeButton("Cancel") { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        .setPositiveButton("Delete") { dialog, _ ->
+                            onDeleteAccountConfirmed()
+                            dialog.dismiss()
+                        }
+                        .show()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorResource(R.color.budget_red),
+                )
+            ) {
+                Text("Delete account")
+            }
+        } else {
+            Text(
+                text = "This account is full, you can invite up to 5 person per online account.",
+                modifier = Modifier.fillMaxWidth(),
+                color = colorResource(id = R.color.secondary_text),
             )
         }
     }
@@ -344,6 +458,8 @@ private fun LoadingView(
                 LoadingKind.DELETING_INVITATION -> "Deleting invitation..."
                 LoadingKind.SENDING_INVITATION -> "Sending invitation..."
                 LoadingKind.UPDATING_NAME -> "Updating..."
+                LoadingKind.DELETING_ACCOUNT -> "Deleting account..."
+                LoadingKind.LEAVING_ACCOUNT -> "Leaving account..."
             },
         )
     }
@@ -359,6 +475,8 @@ private fun LoadingStatePreview() {
             onInvitationDeleteConfirmed = {},
             onRetryButtonClicked = {},
             onLeaveAccountConfirmed = {},
+            onInviteEmailToAccount = {},
+            onDeleteAccountConfirmed = {},
         )
     }
 }
@@ -373,6 +491,8 @@ private fun UpdatingStatePreview() {
             onInvitationDeleteConfirmed = {},
             onRetryButtonClicked = {},
             onLeaveAccountConfirmed = {},
+            onInviteEmailToAccount = {},
+            onDeleteAccountConfirmed = {},
         )
     }
 }
@@ -387,6 +507,8 @@ private fun DeletingInvitationStatePreview() {
             onInvitationDeleteConfirmed = {},
             onRetryButtonClicked = {},
             onLeaveAccountConfirmed = {},
+            onInviteEmailToAccount = {},
+            onDeleteAccountConfirmed = {},
         )
     }
 }
@@ -401,6 +523,8 @@ private fun SendingInvitationStatePreview() {
             onInvitationDeleteConfirmed = {},
             onRetryButtonClicked = {},
             onLeaveAccountConfirmed = {},
+            onInviteEmailToAccount = {},
+            onDeleteAccountConfirmed = {},
         )
     }
 }

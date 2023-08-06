@@ -99,6 +99,58 @@ class FirebaseAccounts(
         )
     }
 
+    override suspend fun deleteInvitation(currentUser: CurrentUser, invitation: Invitation) {
+        val accountRef = db.collection(ACCOUNTS_COLLECTION).document(invitation.accountId)
+        val invitationRef = db.collection(INVITATIONS_COLLECTION).document(invitation.id)
+
+        db.runTransaction { transaction ->
+            transaction.update(accountRef, mapOf(
+                ACCOUNT_DOCUMENT_MEMBERS to FieldValue.arrayRemove(invitation.receiverEmail),
+            ))
+
+            transaction.delete(invitationRef)
+        }.await()
+    }
+
+    override suspend fun updateAccountName(
+        currentUser: CurrentUser,
+        accountId: String,
+        newName: String,
+    ) {
+        db.collection(ACCOUNTS_COLLECTION).document(accountId)
+            .set(mapOf(
+                ACCOUNT_DOCUMENT_NAME to newName,
+            ))
+            .await()
+    }
+
+    override suspend fun leaveAccount(currentUser: CurrentUser, accountId: String) {
+        val accountRef = db.collection(ACCOUNTS_COLLECTION).document(accountId)
+
+        val invitationQuery = db.collection(INVITATIONS_COLLECTION)
+            .whereEqualTo(INVITATION_DOCUMENT_RECEIVER_EMAIL, currentUser.email)
+            .whereEqualTo(INVITATION_DOCUMENT_ACCOUNT_ID, accountId)
+            .get()
+            .await()
+
+        val invitationRef = invitationQuery.documents.first().reference
+
+        db.runTransaction { transaction ->
+            transaction.update(accountRef, mapOf(
+                ACCOUNT_DOCUMENT_MEMBERS to FieldValue.arrayRemove(currentUser.email),
+            ))
+
+            transaction.delete(invitationRef)
+        }.await()
+    }
+
+    override suspend fun deleteAccount(currentUser: CurrentUser, accountId: String) {
+        db.collection(ACCOUNTS_COLLECTION)
+            .document(accountId)
+            .delete()
+            .await()
+    }
+
     private fun watchOwnAccounts(currentUser: CurrentUser): Flow<List<Account>> = db.collection(ACCOUNTS_COLLECTION)
         .whereEqualTo(ACCOUNT_DOCUMENT_OWNER_ID, currentUser.id)
         .watchAsFlow { value ->
