@@ -1,6 +1,7 @@
 package com.benoitletondor.easybudgetapp.view.main.manageaccount.view
 
 import android.util.Patterns
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -26,13 +27,15 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
@@ -256,12 +259,15 @@ private fun ManageAccountAsOwnerView(
                         setContent {
                             var emailState by remember { mutableStateOf(email) }
                             val isEmailValid = Patterns.EMAIL_ADDRESS.matcher(emailState).matches()
-                            val shouldDisplaEmailError = emailState.isNotEmpty() && !isEmailValid
+                            val shouldDisplayEmailError = emailState.isNotEmpty() && !isEmailValid
 
                             AppTheme {
+                                val focusRequester = remember { FocusRequester() }
+
                                 TextField(
                                     modifier = Modifier
                                         .fillMaxWidth()
+                                        .focusRequester(focusRequester)
                                         .padding(start = 20.dp, end = 20.dp, top = 20.dp),
                                     value = emailState,
                                     onValueChange = {
@@ -276,9 +282,9 @@ private fun ManageAccountAsOwnerView(
                                     label = {
                                         Text("Email")
                                     },
-                                    isError = shouldDisplaEmailError,
+                                    isError = shouldDisplayEmailError,
                                     supportingText = {
-                                        if (shouldDisplaEmailError) {
+                                        if (shouldDisplayEmailError) {
                                             Text(
                                                 modifier = Modifier.fillMaxWidth(),
                                                 text = "Please enter a valid email",
@@ -287,6 +293,10 @@ private fun ManageAccountAsOwnerView(
                                         }
                                     },
                                 )
+
+                                LaunchedEffect(Unit) {
+                                    focusRequester.requestFocus()
+                                }
                             }
                         }
                     }
@@ -304,10 +314,18 @@ private fun ManageAccountAsOwnerView(
                         }
                         .create()
 
-                    dialog.window?.decorView?.setViewTreeLifecycleOwner(activity)
-                    dialog.window?.decorView?.setViewTreeSavedStateRegistryOwner(activity)
+                    dialog.window?.apply {
+                        decorView.setViewTreeLifecycleOwner(activity)
+                        decorView.setViewTreeSavedStateRegistryOwner(activity)
+                    }
 
                     dialog.show()
+
+                    // Allow text field to be focusable and keyboard to display
+                    dialog.window?.apply {
+                        clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
+                        clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
+                    }
                 },
                 modifier = Modifier.align(Alignment.End),
                 containerColor = MaterialTheme.colorScheme.primary,
