@@ -32,7 +32,7 @@ import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 import java.util.concurrent.Executor
 
-class CachedDBImpl(
+open class CachedDBImpl(
     private val wrappedDB: DB,
     private val cacheStorage: CacheDBStorage,
     private val executor: Executor,
@@ -180,7 +180,7 @@ class CachedDBImpl(
     /**
      * Instantly wipe all cached data
      */
-    private fun wipeCache() {
+    protected fun wipeCache() {
         Logger.debug("DBCache: Wipe all")
 
         synchronized(cacheStorage.balances) {

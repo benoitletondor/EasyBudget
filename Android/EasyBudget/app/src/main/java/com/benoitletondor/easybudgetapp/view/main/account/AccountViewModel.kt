@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -131,7 +132,10 @@ class AccountViewModel @Inject constructor(
 
     val selectedDateDataFlow = combine(
         selectDateMutableStateFlow,
-        forceRefreshMutableFlow,
+        forceRefreshMutableFlow
+            .onStart {
+                emit(Unit)
+            },
     ) { date, _ ->
         val (balance, expenses, checkedBalance) = withContext(Dispatchers.Default) {
             Triple(

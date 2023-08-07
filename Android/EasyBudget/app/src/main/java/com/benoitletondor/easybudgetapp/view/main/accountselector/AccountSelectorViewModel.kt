@@ -3,6 +3,7 @@ package com.benoitletondor.easybudgetapp.view.main.accountselector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.accounts.Accounts
+import com.benoitletondor.easybudgetapp.accounts.model.AccountCredentials
 import com.benoitletondor.easybudgetapp.auth.Auth
 import com.benoitletondor.easybudgetapp.auth.AuthState
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
@@ -174,9 +175,7 @@ class AccountSelectorViewModel @Inject constructor(
             try {
                 accounts.acceptInvitationToAccount(
                     currentUser = invitation.user,
-                    account = invitation.account.toDomainAccount(
-                        isUserOwner = invitation.user.email == invitation.account.ownerEmail,
-                    )
+                    accountCredentials = invitation.account.toAccountCredentials(),
                 )
 
                 eventMutableFlow.emit(Event.InvitationAccepted)
@@ -203,9 +202,7 @@ class AccountSelectorViewModel @Inject constructor(
             try {
                 accounts.rejectInvitationToAccount(
                     currentUser = invitation.user,
-                    account = invitation.account.toDomainAccount(
-                        isUserOwner = invitation.user.email == invitation.account.ownerEmail,
-                    )
+                    accountCredentials = invitation.account.toAccountCredentials(),
                 )
 
                 eventMutableFlow.emit(Event.InvitationRejected)
@@ -227,12 +224,9 @@ class AccountSelectorViewModel @Inject constructor(
         val selected: Boolean,
         val ownerEmail: String,
     ) {
-        fun toDomainAccount(isUserOwner: Boolean) = com.benoitletondor.easybudgetapp.accounts.model.Account(
+        fun toAccountCredentials() = AccountCredentials(
             id = id,
             secret = secret,
-            name = name,
-            ownerEmail = ownerEmail,
-            isUserOwner = isUserOwner,
         )
     }
 

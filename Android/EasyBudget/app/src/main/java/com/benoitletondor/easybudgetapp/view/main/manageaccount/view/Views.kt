@@ -1,6 +1,7 @@
 package com.benoitletondor.easybudgetapp.view.main.manageaccount.view
 
 import android.util.Patterns
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -43,6 +45,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.setViewTreeLifecycleOwner
+import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.accounts.model.Invitation
 import com.benoitletondor.easybudgetapp.accounts.model.InvitationStatus
@@ -156,6 +160,7 @@ private fun ManageAccountAsOwnerView(
     val shouldDisplayAccountNameError = accountName.length >= 50
 
     val context = LocalContext.current
+    val activity = context as AppCompatActivity
 
     Column(
         modifier = Modifier
@@ -218,23 +223,31 @@ private fun ManageAccountAsOwnerView(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        for(invitation in invitationsSent) {
-            InvitationRow(
-                invitation = invitation,
-                onDeleteConfirmed = onInvitationDeleteConfirmed,
-            )
-        }
+        if (invitationsSent.isNotEmpty() || invitationsAccepted.isNotEmpty()) {
+            for(invitation in invitationsSent) {
+                InvitationRow(
+                    invitation = invitation,
+                    onDeleteConfirmed = onInvitationDeleteConfirmed,
+                )
+            }
 
-        for(invitation in invitationsAccepted) {
-            InvitationRow(
-                invitation = invitation,
-                onDeleteConfirmed = onInvitationDeleteConfirmed,
+            for(invitation in invitationsAccepted) {
+                InvitationRow(
+                    invitation = invitation,
+                    onDeleteConfirmed = onInvitationDeleteConfirmed,
+                )
+            }
+        } else {
+            Text(
+                text = "No invitations sent yet",
+                modifier = Modifier.fillMaxWidth(),
+                color = colorResource(R.color.secondary_text),
             )
         }
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        if (invitationsSent.size + invitationsAccepted.size < 5) {
+        if (invitationsSent.size + invitationsAccepted.size < 10) {
             SmallFloatingActionButton(
                 onClick = {
                     var email = ""
@@ -247,7 +260,9 @@ private fun ManageAccountAsOwnerView(
 
                             AppTheme {
                                 TextField(
-                                    modifier = Modifier.fillMaxWidth(),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 20.dp, end = 20.dp, top = 20.dp),
                                     value = emailState,
                                     onValueChange = {
                                         emailState = it
@@ -258,6 +273,9 @@ private fun ManageAccountAsOwnerView(
                                         keyboardType = KeyboardType.Email,
                                         capitalization = KeyboardCapitalization.None,
                                     ),
+                                    label = {
+                                        Text("Email")
+                                    },
                                     isError = shouldDisplaEmailError,
                                     supportingText = {
                                         if (shouldDisplaEmailError) {
@@ -273,18 +291,23 @@ private fun ManageAccountAsOwnerView(
                         }
                     }
 
-                    MaterialAlertDialogBuilder(context)
+                    val dialog = MaterialAlertDialogBuilder(context)
                         .setTitle("Invite to account")
                         .setMessage("Enter the email of the Google account of the EasyBudget Pro user you want to invite to this account.")
                         .setView(composeView)
                         .setNegativeButton("Cancel") { dialog, _ ->
                             dialog.dismiss()
                         }
-                        .setPositiveButton("Delete") { dialog, _ ->
+                        .setPositiveButton("Invite") { dialog, _ ->
                             onInviteEmailToAccount(email)
                             dialog.dismiss()
                         }
-                        .show()
+                        .create()
+
+                    dialog.window?.decorView?.setViewTreeLifecycleOwner(activity)
+                    dialog.window?.decorView?.setViewTreeSavedStateRegistryOwner(activity)
+
+                    dialog.show()
                 },
                 modifier = Modifier.align(Alignment.End),
                 containerColor = MaterialTheme.colorScheme.primary,
@@ -292,7 +315,7 @@ private fun ManageAccountAsOwnerView(
                 Text("+")
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(40.dp))
 
             Text(
                 modifier = Modifier.fillMaxWidth(),
@@ -350,7 +373,8 @@ private fun InvitationRow(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 6.dp, horizontal = 10.dp),
+                .padding(vertical = 10.dp, horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(
                 modifier = Modifier.weight(1f),
@@ -364,7 +388,6 @@ private fun InvitationRow(
                     text = when(invitation.status) {
                         InvitationStatus.SENT -> "Sent"
                         InvitationStatus.ACCEPTED -> "Accepted"
-                        InvitationStatus.REJECTED -> "Rejected"
                     },
                     fontSize = 15.sp,
                     color = colorResource(R.color.secondary_text),
@@ -376,12 +399,12 @@ private fun InvitationRow(
             Image(
                 painter = painterResource(R.drawable.ic_baseline_delete_24),
                 contentDescription = "Delete",
+                colorFilter = ColorFilter.tint(colorResource(R.color.budget_red)),
                 modifier = Modifier
-                    .clip(RoundedCornerShape(50))
                     .clickable {
                         MaterialAlertDialogBuilder(context)
-                            .setTitle("Delete invitation")
-                            .setMessage("Are you sure you want to delete this invitation? ${invitation.receiverEmail} won't be able to access the account anymore.")
+                            .setTitle("Revoke invitation")
+                            .setMessage("Are you sure you want to revoke this invitation? ${invitation.receiverEmail} won't be able to access the account anymore.")
                             .setNegativeButton("Cancel") { dialog, _ ->
                                 dialog.dismiss()
                             }

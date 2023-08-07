@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.accounts.Accounts
 import com.benoitletondor.easybudgetapp.accounts.model.Account
+import com.benoitletondor.easybudgetapp.accounts.model.AccountCredentials
 import com.benoitletondor.easybudgetapp.auth.Auth
 import com.benoitletondor.easybudgetapp.auth.AuthState
 import com.benoitletondor.easybudgetapp.helper.Logger
@@ -186,7 +187,12 @@ class MainViewModel @Inject constructor(
                 val ownerEmail: String,
                 val accountId: String,
                 val accountSecret: String,
-            ) : Selected()
+            ) : Selected() {
+                fun toAccountCredentials() = AccountCredentials(
+                    id = accountId,
+                    secret = accountSecret,
+                )
+            }
         }
     }
 

@@ -5,16 +5,17 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.accounts.Accounts
-import com.benoitletondor.easybudgetapp.accounts.model.Account
 import com.benoitletondor.easybudgetapp.accounts.model.Invitation
 import com.benoitletondor.easybudgetapp.accounts.model.InvitationStatus
 import com.benoitletondor.easybudgetapp.auth.Auth
 import com.benoitletondor.easybudgetapp.auth.AuthState
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
+import com.benoitletondor.easybudgetapp.db.onlineimpl.OnlineDB
 import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
 import com.benoitletondor.easybudgetapp.helper.combine
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
+import com.benoitletondor.easybudgetapp.view.main.account.AccountViewModel
 import com.benoitletondor.easybudgetapp.view.main.manageaccount.ManageAccountActivity.Companion.SELECTED_ACCOUNT_EXTRA
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
@@ -60,8 +61,7 @@ class ManageAccountViewModel @Inject constructor(
             when(authState) {
                 is AuthState.Authenticated -> accounts.watchAccount(
                     authState.currentUser,
-                    selectedAccount.accountId,
-                    selectedAccount.accountSecret,
+                    selectedAccount.toAccountCredentials(),
                 ).map { AccountLoadingState.Loaded(it) }
                 AuthState.Authenticating -> flowOf(AccountLoadingState.Loading())
                 AuthState.NotAuthenticated -> flowOf(AccountLoadingState.Loading())
@@ -70,7 +70,7 @@ class ManageAccountViewModel @Inject constructor(
         if (selectedAccount.isOwner) {
             auth.state.flatMapLatest { authState ->
                 when(authState) {
-                    is AuthState.Authenticated -> accounts.watchInvitationsForAccount(authState.currentUser, selectedAccount.accountId,)
+                    is AuthState.Authenticated -> accounts.watchInvitationsForAccount(authState.currentUser, selectedAccount.toAccountCredentials())
                         .map { AccountLoadingState.Loaded(it) }
                     AuthState.Authenticating -> flowOf(AccountLoadingState.Loading())
                     AuthState.NotAuthenticated -> flowOf(AccountLoadingState.Loading())
@@ -181,7 +181,7 @@ class ManageAccountViewModel @Inject constructor(
             isUpdatingNameMutableFlow.value = true
 
             try {
-                accounts.updateAccountName(state.currentUser, selectedAccount.accountId, newName)
+                accounts.updateAccountName(state.currentUser, selectedAccount.toAccountCredentials(), newName)
                 eventMutableFlow.emit(Event.AccountNameUpdated)
             } catch (e: Exception) {
                 if (e is CancellationException) { return@launch }
@@ -233,7 +233,7 @@ class ManageAccountViewModel @Inject constructor(
             isLeavingAccountMutableFlow.value = true
 
             try {
-                accounts.leaveAccount(state.currentUser, selectedAccount.accountId)
+                accounts.leaveAccount(state.currentUser, selectedAccount.toAccountCredentials())
                 eventMutableFlow.emit(Event.AccountLeft)
                 eventMutableFlow.emit(Event.Finish)
             } catch (e: Exception) {
@@ -275,13 +275,7 @@ class ManageAccountViewModel @Inject constructor(
             try {
                 accounts.sendInvitationToAccount(
                     state.currentUser,
-                    Account(
-                        id = selectedAccount.accountId,
-                        secret = selectedAccount.accountSecret,
-                        name = selectedAccount.name,
-                        ownerEmail = state.currentUser.email,
-                        isUserOwner = true,
-                    ),
+                    selectedAccount.toAccountCredentials(),
                     email,
                 )
                 eventMutableFlow.emit(Event.InvitationSent(email))
@@ -306,7 +300,17 @@ class ManageAccountViewModel @Inject constructor(
             isDeletingAccountMutableFlow.value = true
 
             try {
-                accounts.deleteAccount(state.currentUser, selectedAccount.accountId)
+                val credentials = selectedAccount.toAccountCredentials()
+                val onlineDB = (AccountViewModel.getCurrentDB() as? OnlineDB)
+                    ?: throw IllegalStateException("No online DB found")
+
+                if (onlineDB.account.id != credentials.id || onlineDB.account.secret != credentials.secret) {
+                    throw IllegalStateException("Mismatching accounts")
+                }
+
+                onlineDB.deleteAllEntries()
+                accounts.deleteAccount(state.currentUser, selectedAccount.toAccountCredentials())
+
                 eventMutableFlow.emit(Event.AccountDeleted)
                 eventMutableFlow.emit(Event.Finish)
             } catch (e: Exception) {

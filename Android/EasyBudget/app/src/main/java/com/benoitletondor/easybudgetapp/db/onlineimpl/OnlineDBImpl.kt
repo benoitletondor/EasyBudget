@@ -2,7 +2,6 @@ package com.benoitletondor.easybudgetapp.db.onlineimpl
 
 import com.benoitletondor.easybudgetapp.BuildConfig
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
-import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.db.RestoreAction
 import com.benoitletondor.easybudgetapp.db.onlineimpl.entity.ExpenseEntity
 import com.benoitletondor.easybudgetapp.db.onlineimpl.entity.RecurringExpenseEntity
@@ -45,8 +44,8 @@ import kotlin.time.toDuration
 
 class OnlineDBImpl(
     private val realm: Realm,
-    private val account: Account,
-) : DB, CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.IO) {
+    override val account: Account,
+) : OnlineDB, CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.IO) {
     private var recurringExpenseWatchingJob: Job? = null
     private var changesWatchingJob: Job? = null
 
@@ -59,6 +58,7 @@ class OnlineDBImpl(
     }
 
     private val onChangeMutableFlow = MutableSharedFlow<Unit>()
+
     override val onChangeFlow: Flow<Unit> = onChangeMutableFlow
 
     override fun ensureDBCreated() { /* No-op */ }
@@ -453,6 +453,16 @@ class OnlineDBImpl(
             realm.write {
                 copyToRealm(recurringExpense, UpdatePolicy.ALL)
             }
+        }
+    }
+
+    override suspend fun deleteAllEntries() {
+        realm.write {
+            val expenses = query<ExpenseEntity>(account.generateQuery()).find()
+            val recurringExpenses = query<RecurringExpenseEntity>(account.generateQuery()).find()
+
+            delete(expenses)
+            delete(recurringExpenses)
         }
     }
 

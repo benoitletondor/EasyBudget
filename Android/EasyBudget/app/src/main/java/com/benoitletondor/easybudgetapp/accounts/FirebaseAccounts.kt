@@ -2,19 +2,25 @@ package com.benoitletondor.easybudgetapp.accounts
 
 import com.benoitletondor.easybudgetapp.BuildConfig
 import com.benoitletondor.easybudgetapp.accounts.model.Account
+import com.benoitletondor.easybudgetapp.accounts.model.AccountCredentials
 import com.benoitletondor.easybudgetapp.accounts.model.Invitation
 import com.benoitletondor.easybudgetapp.accounts.model.InvitationStatus
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
+import com.benoitletondor.easybudgetapp.helper.Logger
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.google.firebase.firestore.LocalCacheSettings
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.Source
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -46,13 +52,12 @@ class FirebaseAccounts(
 
     override fun watchAccount(
         currentUser: CurrentUser,
-        accountId: String,
-        accountSecret: String,
+        accountCredentials: AccountCredentials,
     ): Flow<Account> {
         return db.collection(ACCOUNTS_COLLECTION)
             .whereArrayContains(ACCOUNT_DOCUMENT_MEMBERS, currentUser.email)
-            .whereEqualTo(ACCOUNT_DOCUMENT_SECRET, accountSecret)
-            .whereEqualTo(FieldPath.documentId(), accountId)
+            .whereEqualTo(ACCOUNT_DOCUMENT_SECRET, accountCredentials.secret)
+            .whereEqualTo(FieldPath.documentId(), accountCredentials.id)
             .watchAsFlow { value ->
                 value.documents.first().toAccountOrThrow(currentUser)
             }
@@ -60,10 +65,10 @@ class FirebaseAccounts(
 
     override fun watchInvitationsForAccount(
         currentUser: CurrentUser,
-        accountId: String,
+        accountCredentials: AccountCredentials,
     ): Flow<List<Invitation>> {
         return db.collection(INVITATIONS_COLLECTION)
-            .whereEqualTo(INVITATION_DOCUMENT_ACCOUNT_ID, accountId)
+            .whereEqualTo(INVITATION_DOCUMENT_ACCOUNT_ID, accountCredentials.id)
             .whereEqualTo(INVITATION_DOCUMENT_SENDER_ID, currentUser.id)
             .watchAsFlow { value ->
                 value.documents.map { it.toInvitationOrThrow() }
@@ -114,39 +119,41 @@ class FirebaseAccounts(
 
     override suspend fun updateAccountName(
         currentUser: CurrentUser,
-        accountId: String,
+        accountCredentials: AccountCredentials,
         newName: String,
     ) {
-        db.collection(ACCOUNTS_COLLECTION).document(accountId)
-            .set(mapOf(
+        db.collection(ACCOUNTS_COLLECTION)
+            .document(accountCredentials.id)
+            .update(mapOf(
                 ACCOUNT_DOCUMENT_NAME to newName,
             ))
             .await()
     }
 
-    override suspend fun leaveAccount(currentUser: CurrentUser, accountId: String) {
-        val accountRef = db.collection(ACCOUNTS_COLLECTION).document(accountId)
+    override suspend fun leaveAccount(currentUser: CurrentUser, accountCredentials: AccountCredentials,) {
+        val accountRef = db.collection(ACCOUNTS_COLLECTION).document(accountCredentials.id)
 
         val invitationQuery = db.collection(INVITATIONS_COLLECTION)
             .whereEqualTo(INVITATION_DOCUMENT_RECEIVER_EMAIL, currentUser.email)
-            .whereEqualTo(INVITATION_DOCUMENT_ACCOUNT_ID, accountId)
+            .whereEqualTo(INVITATION_DOCUMENT_ACCOUNT_ID, accountCredentials.id)
+            .whereEqualTo(INVITATION_DOCUMENT_STATUS, InvitationStatus.ACCEPTED.dbValue)
             .get()
             .await()
 
         val invitationRef = invitationQuery.documents.first().reference
 
         db.runTransaction { transaction ->
+            transaction.delete(invitationRef)
+
             transaction.update(accountRef, mapOf(
                 ACCOUNT_DOCUMENT_MEMBERS to FieldValue.arrayRemove(currentUser.email),
             ))
-
-            transaction.delete(invitationRef)
         }.await()
     }
 
-    override suspend fun deleteAccount(currentUser: CurrentUser, accountId: String) {
+    override suspend fun deleteAccount(currentUser: CurrentUser, accountCredentials: AccountCredentials) {
         db.collection(ACCOUNTS_COLLECTION)
-            .document(accountId)
+            .document(accountCredentials.id)
             .delete()
             .await()
     }
@@ -165,10 +172,10 @@ class FirebaseAccounts(
 
     override suspend fun sendInvitationToAccount(
         currentUser: CurrentUser,
-        account: Account,
-        invitedUserEmail: String
+        accountCredentials: AccountCredentials,
+        invitedUserEmail: String,
     ) {
-        val accountRef = db.collection(ACCOUNTS_COLLECTION).document(account.id)
+        val accountRef = db.collection(ACCOUNTS_COLLECTION).document(accountCredentials.id)
         val invitationRef = db.collection(INVITATIONS_COLLECTION).document()
 
         db.runTransaction { transaction ->
@@ -177,7 +184,7 @@ class FirebaseAccounts(
             ))
 
             transaction.set(invitationRef, mapOf(
-                INVITATION_DOCUMENT_ACCOUNT_ID to account.id,
+                INVITATION_DOCUMENT_ACCOUNT_ID to accountCredentials.id,
                 INVITATION_DOCUMENT_STATUS to InvitationStatus.SENT.dbValue,
                 INVITATION_DOCUMENT_RECEIVER_EMAIL to invitedUserEmail,
                 INVITATION_DOCUMENT_SENDER_ID to currentUser.id,
@@ -186,18 +193,11 @@ class FirebaseAccounts(
         }.await()
     }
 
-    override suspend fun acceptInvitationToAccount(currentUser: CurrentUser, account: Account) {
-        updateInvitationStatus(currentUser, account, InvitationStatus.ACCEPTED)
-    }
-
-    override suspend fun rejectInvitationToAccount(currentUser: CurrentUser, account: Account) {
-        updateInvitationStatus(currentUser, account, InvitationStatus.REJECTED)
-    }
-
-    private suspend fun updateInvitationStatus(currentUser: CurrentUser, account: Account, status: InvitationStatus) {
+    override suspend fun acceptInvitationToAccount(currentUser: CurrentUser, accountCredentials: AccountCredentials) {
         val invitationResult = db.collection(INVITATIONS_COLLECTION)
             .whereEqualTo(INVITATION_DOCUMENT_RECEIVER_EMAIL, currentUser.email)
-            .whereEqualTo(INVITATION_DOCUMENT_ACCOUNT_ID, account.id)
+            .whereEqualTo(INVITATION_DOCUMENT_ACCOUNT_ID, accountCredentials.id)
+            .whereEqualTo(INVITATION_DOCUMENT_STATUS, InvitationStatus.SENT.dbValue)
             .get()
             .await()
 
@@ -205,12 +205,27 @@ class FirebaseAccounts(
             throw IllegalStateException("Unable to find invitation")
         }
 
-        db.collection(ACCOUNTS_COLLECTION)
+        db.collection(INVITATIONS_COLLECTION)
             .document(invitationResult.documents.first().id)
             .update(mapOf(
-                INVITATION_DOCUMENT_STATUS to status.dbValue,
+                INVITATION_DOCUMENT_STATUS to InvitationStatus.ACCEPTED.dbValue,
             ))
             .await()
+    }
+
+    override suspend fun rejectInvitationToAccount(currentUser: CurrentUser, accountCredentials: AccountCredentials) {
+        val invitationQuery = db.collection(INVITATIONS_COLLECTION)
+            .whereEqualTo(INVITATION_DOCUMENT_RECEIVER_EMAIL, currentUser.email)
+            .whereEqualTo(INVITATION_DOCUMENT_ACCOUNT_ID, accountCredentials.id)
+            .whereEqualTo(INVITATION_DOCUMENT_STATUS, InvitationStatus.SENT.dbValue)
+            .get()
+            .await()
+
+        if (invitationQuery.isEmpty || invitationQuery.documents.isEmpty()) {
+            throw IllegalStateException("Unable to find invitation")
+        }
+
+        invitationQuery.documents.first().reference.delete().await()
     }
 
     private fun watchInvitedAccounts(currentUser: CurrentUser): Flow<List<Account>> =

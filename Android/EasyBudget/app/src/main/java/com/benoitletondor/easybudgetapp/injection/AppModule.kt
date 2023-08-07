@@ -31,8 +31,10 @@ import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.db.cacheimpl.CachedDBImpl
 import com.benoitletondor.easybudgetapp.db.cacheimpl.CacheDBStorage
+import com.benoitletondor.easybudgetapp.db.cacheimpl.CachedOnlineDBImpl
 import com.benoitletondor.easybudgetapp.db.offlineimpl.OfflineDBImpl
 import com.benoitletondor.easybudgetapp.db.offlineimpl.RoomDB
+import com.benoitletondor.easybudgetapp.db.onlineimpl.OnlineDB
 import com.benoitletondor.easybudgetapp.db.onlineimpl.OnlineDBImpl
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -89,7 +91,7 @@ object AppModule {
         currentUser: CurrentUser,
         accountId: String,
         accountSecret: String,
-    ): DB = CachedDBImpl(
+    ): OnlineDB = CachedOnlineDBImpl(
         OnlineDBImpl.provideFor(
             atlasAppId = BuildConfig.ATLAS_APP_ID,
             currentUser = currentUser,

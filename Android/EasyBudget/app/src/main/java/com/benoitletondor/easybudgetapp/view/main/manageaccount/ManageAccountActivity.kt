@@ -6,53 +6,10 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.annotation.ContentView
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.lifecycleScope
 import com.benoitletondor.easybudgetapp.R
-import com.benoitletondor.easybudgetapp.accounts.model.Invitation
-import com.benoitletondor.easybudgetapp.accounts.model.InvitationStatus
-import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.benoitletondor.easybudgetapp.databinding.ActivityCreateAccountBinding
 import com.benoitletondor.easybudgetapp.helper.BaseActivity
 import com.benoitletondor.easybudgetapp.helper.launchCollect
@@ -93,17 +50,47 @@ class ManageAccountActivity : BaseActivity<ActivityCreateAccountBinding>() {
 
         lifecycleScope.launchCollect(viewModel.eventFlow) { event ->
             when(event) {
-                ManageAccountViewModel.Event.AccountLeft -> TODO()
-                ManageAccountViewModel.Event.AccountNameUpdated -> TODO()
-                is ManageAccountViewModel.Event.ErrorDeletingInvitation -> TODO()
-                is ManageAccountViewModel.Event.ErrorUpdatingAccountName -> TODO()
-                is ManageAccountViewModel.Event.ErrorWhileInviting -> TODO()
-                is ManageAccountViewModel.Event.ErrorWhileLeavingAccount -> TODO()
-                ManageAccountViewModel.Event.Finish -> TODO()
-                is ManageAccountViewModel.Event.InvitationDeleted -> TODO()
-                is ManageAccountViewModel.Event.InvitationSent -> TODO()
-                ManageAccountViewModel.Event.AccountDeleted -> TODO()
-                is ManageAccountViewModel.Event.ErrorWhileDeletingAccount -> TODO()
+                ManageAccountViewModel.Event.AccountLeft -> Toast.makeText(this, R.string.account_management_account_left_confirmation, Toast.LENGTH_LONG).show()
+                ManageAccountViewModel.Event.AccountNameUpdated -> Toast.makeText(this, R.string.account_management_account_name_updated_confirmation, Toast.LENGTH_LONG).show()
+                is ManageAccountViewModel.Event.ErrorDeletingInvitation -> MaterialAlertDialogBuilder(this)
+                    .setTitle(R.string.account_management_error_title)
+                    .setMessage(getString(R.string.account_management_error_deleting_invitation, event.error.localizedMessage))
+                    .setPositiveButton(R.string.ok) { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .show()
+                is ManageAccountViewModel.Event.ErrorUpdatingAccountName -> MaterialAlertDialogBuilder(this)
+                    .setTitle(R.string.account_management_error_title)
+                    .setMessage(getString(R.string.account_management_error_updating_name, event.error.localizedMessage))
+                    .setPositiveButton(R.string.ok) { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .show()
+                is ManageAccountViewModel.Event.ErrorWhileInviting -> MaterialAlertDialogBuilder(this)
+                    .setTitle(R.string.account_management_error_title)
+                    .setMessage(getString(R.string.account_management_error_sending_invitation, event.error.localizedMessage))
+                    .setPositiveButton(R.string.ok) { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .show()
+                is ManageAccountViewModel.Event.ErrorWhileLeavingAccount -> MaterialAlertDialogBuilder(this)
+                    .setTitle(R.string.account_management_error_title)
+                    .setMessage(getString(R.string.account_management_error_leaving_account, event.error.localizedMessage))
+                    .setPositiveButton(R.string.ok) { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .show()
+                ManageAccountViewModel.Event.Finish -> finish()
+                is ManageAccountViewModel.Event.InvitationDeleted -> Toast.makeText(this, R.string.account_management_invitation_revoked, Toast.LENGTH_LONG).show()
+                is ManageAccountViewModel.Event.InvitationSent -> Toast.makeText(this, R.string.account_management_invitation_sent, Toast.LENGTH_LONG).show()
+                ManageAccountViewModel.Event.AccountDeleted -> Toast.makeText(this, R.string.account_management_account_deleted, Toast.LENGTH_LONG).show()
+                is ManageAccountViewModel.Event.ErrorWhileDeletingAccount -> MaterialAlertDialogBuilder(this)
+                    .setTitle(R.string.account_management_error_title)
+                    .setMessage(getString(R.string.account_management_error_deleting_account, event.error.localizedMessage))
+                    .setPositiveButton(R.string.ok) { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .show()
             }
         }
     }

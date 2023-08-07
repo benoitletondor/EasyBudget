@@ -376,6 +376,18 @@
     <string name="expense_edit_unable_to_load_db_error_message">Cannot access the database to persist your expense. Please check your network and relaunch the app.</string>
     <string name="expense_edit_unable_to_load_db_error_cta">Cancel</string>
 
+    <string name="account_management_account_left_confirmation">Account left successfully</string>
+    <string name="account_management_account_name_updated_confirmation">Account name updated successfully</string>
+    <string name="account_management_error_title">Oops</string>
+    <string name="account_management_error_deleting_invitation">An error occurred while deleting the invitation. Please try again.\n(%s)</string>
+    <string name="account_management_error_updating_name">An error occurred while updating the account name. Please try again.\n(%s)</string>
+    <string name="account_management_error_sending_invitation">An error occurred while sending the invitation. Please try again.\n(%s)</string>
+    <string name="account_management_error_leaving_account">An error occurred while leaving the account. Please try again.\n(%s)</string>
+    <string name="account_management_invitation_revoked">Invitation revoked successfully</string>
+    <string name="account_management_invitation_sent">Invitation sent successfully</string>
+    <string name="account_management_account_deleted">Account deleted successfully</string>
+    <string name="account_management_error_deleting_account">An error occurred while deleting the account. Please try again.\n(%s)</string>
+
     <!-- Keys, not for translations. -->
     <string name="setting_category_bug_report_send_button_key" translatable="false">send_bug_report</string>
     <string name="setting_category_show_welcome_screen_button_key" translatable="false">show_welcome_screen</string>
