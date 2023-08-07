@@ -6,21 +6,18 @@ import com.benoitletondor.easybudgetapp.accounts.model.AccountCredentials
 import com.benoitletondor.easybudgetapp.accounts.model.Invitation
 import com.benoitletondor.easybudgetapp.accounts.model.InvitationStatus
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
-import com.benoitletondor.easybudgetapp.helper.Logger
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreSettings
-import com.google.firebase.firestore.LocalCacheSettings
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
-import com.google.firebase.firestore.Source
+import com.google.firebase.firestore.ktx.firestoreSettings
+import com.google.firebase.firestore.ktx.memoryCacheSettings
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -35,6 +32,9 @@ class FirebaseAccounts(
 
     init {
         if (BuildConfig.DEBUG) {
+            db.firestoreSettings = firestoreSettings {
+                setLocalCacheSettings(memoryCacheSettings {})
+            }
             db.useEmulator("10.0.2.2", 8080)
         }
     }
@@ -267,7 +267,7 @@ class FirebaseAccounts(
         }
 
     private fun <T> Query.watchAsFlow(processData: (QuerySnapshot) -> T): Flow<T> = callbackFlow {
-        val snapshotListener = addSnapshotListener { value, error ->
+        val snapshotListener = addSnapshotListener() { value, error ->
             if (error != null) {
                 close(error)
                 return@addSnapshotListener
