@@ -65,6 +65,9 @@ interface ExpenseDao {
     @Query("DELETE FROM expense WHERE monthly_id = :recurringExpenseId AND date > :afterDate")
     suspend fun deleteAllExpenseForRecurringExpenseAfterDate(recurringExpenseId: Long, afterDate: LocalDate)
 
+    @Query("DELETE FROM expense WHERE monthly_id = :recurringExpenseId AND date >= :afterDate")
+    suspend fun deleteAllExpenseForRecurringExpenseAfterDateInclusive(recurringExpenseId: Long, afterDate: LocalDate)
+
     @Query("SELECT * FROM expense WHERE monthly_id = :recurringExpenseId AND date > :afterDate")
     suspend fun getAllExpensesForRecurringExpenseAfterDate(recurringExpenseId: Long, afterDate: LocalDate): List<ExpenseEntity>
 

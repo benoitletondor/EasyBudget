@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.Flow
 import java.io.Closeable
 import java.time.LocalDate
 
-interface DB : Closeable {
+interface DB {
     val onChangeFlow: Flow<Unit>
 
     fun ensureDBCreated()
@@ -44,6 +44,8 @@ interface DB : Closeable {
     suspend fun getCheckedBalanceForDay(dayDate: LocalDate): Double
 
     suspend fun persistRecurringExpense(recurringExpense: RecurringExpense): RecurringExpense
+
+    suspend fun updateRecurringExpenseAfterDate(newRecurringExpense: RecurringExpense, date: LocalDate)
 
     suspend fun deleteRecurringExpense(recurringExpense: RecurringExpense): RestoreAction
 

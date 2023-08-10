@@ -139,7 +139,7 @@ class CalendarGridAdapter(
             }
 
             val date = CalendarHelper.convertDateTimeToDate(dateTime)
-            if ( dataProvider.hasExpenseForDay(date)) {
+            if (dataProvider.hasExpenseForDay(date)) {
                 val hasUnchecked = if (parameters.getShouldShowCheckedBalance()) {
                     dataProvider.hasUncheckedExpenseForDay(date)
                 } else {
@@ -156,7 +156,7 @@ class CalendarGridAdapter(
 
                 tv2.text = formatBalance(balance)
 
-                tv1.setTypeface(null, if (hasUnchecked) Typeface.ITALIC else Typeface.BOLD);
+                tv1.setTypeface(null, if (hasUnchecked) Typeface.ITALIC else Typeface.BOLD)
                 tv1.setTextColor(ContextCompat.getColor(tv1.context, when {
                     -balance <= 0 -> R.color.budget_red
                     -balance < parameters.getLowMoneyWarningAmount() -> R.color.budget_orange

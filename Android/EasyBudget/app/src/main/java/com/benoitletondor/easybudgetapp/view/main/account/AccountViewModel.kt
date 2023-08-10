@@ -22,6 +22,7 @@ import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import com.benoitletondor.easybudgetapp.view.main.account.AccountFragment.Companion.ARG_SELECTED_ACCOUNT
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -298,28 +299,40 @@ class AccountViewModel @Inject constructor(
                         RecurringExpenseDeleteType.ALL -> {
                             try {
                                 awaitDB().deleteRecurringExpense(associatedRecurringExpense.recurringExpense)
-                            } catch (t: Throwable) {
+                            } catch (e: Exception) {
+                                if (e is CancellationException) throw e
+
+                                Logger.error("Error while deleting recurring expense", e)
                                 null
                             }
                         }
                         RecurringExpenseDeleteType.FROM -> {
                             try {
                                 awaitDB().deleteAllExpenseForRecurringExpenseAfterDate(associatedRecurringExpense.recurringExpense, expense.date)
-                            } catch (t: Throwable) {
+                            } catch (e: Exception) {
+                                if (e is CancellationException) throw e
+
+                                Logger.error("Error while deleting recurring expense from", e)
                                 null
                             }
                         }
                         RecurringExpenseDeleteType.TO -> {
                             try {
                                 awaitDB().deleteAllExpenseForRecurringExpenseBeforeDate(associatedRecurringExpense.recurringExpense, expense.date)
-                            } catch (t: Throwable) {
+                            } catch (e: Exception) {
+                                if (e is CancellationException) throw e
+
+                                Logger.error("Error while deleting recurring expense to", e)
                                 null
                             }
                         }
                         RecurringExpenseDeleteType.ONE -> {
                             try {
                                 awaitDB().deleteExpense(expense)
-                            } catch (t: Throwable) {
+                            } catch (e: Exception) {
+                                if (e is CancellationException) throw e
+
+                                Logger.error("Error while deleting recurring expense one", e)
                                 null
                             }
                         }

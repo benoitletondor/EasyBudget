@@ -85,7 +85,7 @@ open class CachedDBImpl(
             executor.execute(CacheExpensesForMonthRunnable(dayDate.startOfMonth(), this, cacheStorage))
             wrappedDB.hasUncheckedExpenseForDay(dayDate)
         } else {
-            expensesForDay.firstOrNull { !it.checked } != null
+            expensesForDay.any { !it.checked }
         }
     }
 
@@ -146,6 +146,11 @@ open class CachedDBImpl(
     override suspend fun persistRecurringExpense(recurringExpense: RecurringExpense): RecurringExpense
         = wrappedDB.persistRecurringExpense(recurringExpense)
 
+    override suspend fun updateRecurringExpenseAfterDate(
+        newRecurringExpense: RecurringExpense,
+        date: LocalDate
+    ) = wrappedDB.updateRecurringExpenseAfterDate(newRecurringExpense, date)
+
     override suspend fun deleteRecurringExpense(recurringExpense: RecurringExpense): RestoreAction
         = wrappedDB.deleteRecurringExpense(recurringExpense)
 
@@ -167,15 +172,8 @@ open class CachedDBImpl(
     override suspend fun getOldestExpense(): Expense?
         = wrappedDB.getOldestExpense()
 
-    override suspend fun markAllEntriesAsChecked(beforeDate: LocalDate) {
-        wrappedDB.markAllEntriesAsChecked(beforeDate)
-    }
-
-    override fun close() {
-        wrappedDB.close()
-        wipeCache()
-        cancel()
-    }
+    override suspend fun markAllEntriesAsChecked(beforeDate: LocalDate)
+        = wrappedDB.markAllEntriesAsChecked(beforeDate)
 
     /**
      * Instantly wipe all cached data

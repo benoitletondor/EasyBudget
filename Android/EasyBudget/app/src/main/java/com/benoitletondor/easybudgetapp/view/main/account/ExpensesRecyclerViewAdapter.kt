@@ -36,6 +36,7 @@ import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
+import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.time.LocalDate
 
@@ -155,10 +156,10 @@ class ExpensesRecyclerViewAdapter(
                         }
                         // Edit this one and following ones
                         1 -> {
-                            val startIntent = ExpenseEditActivity.newIntent(
+                            val startIntent = RecurringExpenseEditActivity.newIntent(
                                 context = viewHolder.view.context,
                                 editedExpense = expense,
-                                date = expense.date,
+                                startDate = expense.date,
                             )
 
                             ActivityCompat.startActivityForResult(fragment.requireActivity(), startIntent,

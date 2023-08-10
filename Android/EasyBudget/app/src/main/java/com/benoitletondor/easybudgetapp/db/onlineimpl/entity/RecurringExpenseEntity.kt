@@ -51,38 +51,32 @@ class RecurringExpenseEntity() : RealmObject {
         this.accountSecret = account.secret
     }
 
-    suspend fun toRecurringExpense(): RecurringExpense {
-        return withContext(Dispatchers.IO) {
-            val event = getCal().events.first()
+    fun toRecurringExpense(): RecurringExpense {
+        val event = getCal().events.first()
 
-            val startDate = localDateFromTimestamp(event.dateStart.value.time)
-            val title = event.summary.value
-            val originalAmount = event.getExperimentalProperty(AMOUNT_KEY).value.toLong()
-            val recurrenceExpenseType = event.recurrenceRule.value.toRecurringExpenseType()
+        val startDate = localDateFromTimestamp(event.dateStart.value.time)
+        val title = event.summary.value
+        val originalAmount = event.getExperimentalProperty(AMOUNT_KEY).value.toLong()
+        val recurrenceExpenseType = event.recurrenceRule.value.toRecurringExpenseType()
 
-            return@withContext RecurringExpense(
-                _id,
-                title,
-                originalAmount.getRealValueFromDB(),
-                startDate,
-                modified = false,
-                recurrenceExpenseType,
-            )
-        }
+        return RecurringExpense(
+            _id,
+            title,
+            originalAmount.getRealValueFromDB(),
+            startDate,
+            modified = false,
+            recurrenceExpenseType,
+        )
     }
 
-    suspend fun generateExpenses(from: LocalDate?, to: LocalDate): List<Expense> {
-        return withContext(Dispatchers.IO) {
-            getCal().getExpenses(from, to, toRecurringExpense())
-        }
+    fun generateExpenses(from: LocalDate?, to: LocalDate): List<Expense> {
+        return getCal().getExpenses(from, to, toRecurringExpense())
     }
 
-    suspend fun addExceptionFromExpense(expense: Expense, originalOccurrenceDate: LocalDate) {
-        withContext(Dispatchers.IO) {
-            val cal = getCal()
-            cal.addExceptionFromExpense(expense, originalOccurrenceDate)
-            iCalRepresentation = cal.write()
-        }
+    fun addExceptionFromExpense(expense: Expense, originalOccurrenceDate: LocalDate) {
+        val cal = getCal()
+        cal.addExceptionFromExpense(expense, originalOccurrenceDate)
+        iCalRepresentation = cal.write()
     }
 
     private fun ICalendar.addExceptionFromExpense(expense: Expense, originalOccurrenceDate: LocalDate) {
@@ -92,7 +86,7 @@ class RecurringExpenseEntity() : RealmObject {
         exceptionEvent.status = Status.accepted()
         exceptionEvent.addExperimentalProperty(AMOUNT_KEY, expense.amount.getDBValue().toString())
         exceptionEvent.addExperimentalProperty(CHECKED_KEY, expense.checked.toString())
-        exceptionEvent.uid = events.first().uid
+        exceptionEvent.uid = events.filterExceptions().first { it.dateEnd == null || it.dateEnd.value.after(expense.date.toStartOfDayDate()) }.uid
 
         val recurrenceId = RecurrenceId(ICalDate(originalOccurrenceDate.toStartOfDayDate(), false))
         exceptionEvent.recurrenceId = recurrenceId
@@ -100,97 +94,118 @@ class RecurringExpenseEntity() : RealmObject {
         addEvent(exceptionEvent)
     }
 
-    suspend fun deleteOccurrence(occurrenceDate: LocalDate) {
-        withContext(Dispatchers.IO) {
-            val cal = getCal()
+    fun deleteOccurrence(occurrenceDate: LocalDate) {
+        val cal = getCal()
 
-            val exceptionEvent = VEvent()
-            exceptionEvent.dateStart = DateStart(occurrenceDate.toStartOfDayDate(), false)
-            exceptionEvent.uid = cal.events.first().uid
-            exceptionEvent.status = Status.cancelled()
-            val recurrenceId = RecurrenceId(ICalDate(occurrenceDate.toStartOfDayDate(), false))
-            exceptionEvent.recurrenceId = recurrenceId
+        val exceptionEvent = VEvent()
+        exceptionEvent.dateStart = DateStart(occurrenceDate.toStartOfDayDate(), false)
+        exceptionEvent.uid = cal.events.filterExceptions().first { it.dateEnd == null || it.dateEnd.value.after(occurrenceDate.toStartOfDayDate()) }.uid
+        exceptionEvent.status = Status.cancelled()
+        val recurrenceId = RecurrenceId(ICalDate(occurrenceDate.toStartOfDayDate(), false))
+        exceptionEvent.recurrenceId = recurrenceId
 
-            cal.addEvent(exceptionEvent)
+        cal.addEvent(exceptionEvent)
 
-            iCalRepresentation = cal.write()
-        }
+        iCalRepresentation = cal.write()
     }
 
-    suspend fun deleteOccurrencesAfterDate(date: LocalDate) {
-        withContext(Dispatchers.IO) {
-            val cal = getCal()
+    fun deleteOccurrencesAfterDate(date: LocalDate) {
+        val cal = getCal()
 
-            val event = cal.events.first()
-            event.dateEnd = DateEnd(date.toStartOfDayDate(), false)
-
-            iCalRepresentation = cal.write()
-        }
-    }
-
-    suspend fun deleteOccurrencesBeforeDate(date: LocalDate) {
-        withContext(Dispatchers.IO) {
-            val cal = getCal()
-
-            val event = cal.events.first()
-            event.dateStart = DateStart(date.toStartOfDayDate(), false)
-
-            iCalRepresentation = cal.write()
-        }
-    }
-
-    suspend fun getFirstOccurrenceDate(): LocalDate {
-        return withContext(Dispatchers.IO) {
-            val cal = getCal()
-
-            val event = cal.events.first()
-
-            return@withContext localDateFromTimestamp(event.dateStart.value.time)
-        }
-    }
-
-    suspend fun getFirstOccurrence(): Expense {
-        return withContext(Dispatchers.IO) {
-            val cal = getCal()
-            val event = cal.events.first()
-
-            val firstOccurrenceDate = localDateFromTimestamp(event.dateStart.value.time)
-            return@withContext cal.getExpenses(
-                firstOccurrenceDate,
-                firstOccurrenceDate.plusDays(1),
-                toRecurringExpense()
-            ).first()
-        }
-    }
-
-    suspend fun markAllOccurrencesAsChecked(beforeDate: LocalDate) {
-        return withContext(Dispatchers.IO) {
-            val cal = getCal()
-            val expenses = cal.getExpenses(LocalDate.MIN, beforeDate, toRecurringExpense())
-            for (expense in expenses) {
-                if (expense.date == beforeDate) {
-                    continue
+        cal.events
+            .filterExceptions()
+            .forEach { event ->
+                if (event.dateEnd == null || event.dateEnd.value.after(date.toStartOfDayDate())) {
+                    event.dateEnd = DateEnd(date.toStartOfDayDate(), false)
                 }
-
-                cal.addExceptionFromExpense(expense.copy(checked = true), expense.date)
             }
 
-            iCalRepresentation = cal.write()
-        }
+        iCalRepresentation = cal.write()
     }
 
-    private suspend fun getCal(): ICalendar = Biweekly.parse(iCalRepresentation)
+    fun deleteOccurrencesBeforeDate(date: LocalDate) {
+        val cal = getCal()
+
+        cal.events
+            .filterExceptions()
+            .forEach { event ->
+                if (event.dateStart.value.before(date.toStartOfDayDate())) {
+                    event.dateStart = DateStart(date.toStartOfDayDate(), false)
+                }
+            }
+
+        iCalRepresentation = cal.write()
+    }
+
+    fun updateAllOccurrencesAfterDate(
+        date: LocalDate,
+        newRecurringExpense: RecurringExpense,
+    ) {
+        val cal = getCal()
+
+        cal.events
+            .filterExceptions()
+            .filter { it.dateEnd == null || it.dateEnd.value.after(date.toStartOfDayDate()) }
+            .forEach { it.dateEnd = DateEnd(date.minusDays(1).toStartOfDayDate(), false) }
+
+        val exceptionEvent = VEvent()
+        exceptionEvent.dateStart = DateStart(date.toStartOfDayDate(), false)
+        exceptionEvent.summary = Summary(newRecurringExpense.title)
+        exceptionEvent.addExperimentalProperty(AMOUNT_KEY, newRecurringExpense.amount.getDBValue().toString())
+        exceptionEvent.addExperimentalProperty(CHECKED_KEY, false.toString())
+        exceptionEvent.status = Status.accepted()
+        exceptionEvent.recurrenceRule = RecurrenceRule(newRecurringExpense.type.toRecurrence())
+
+        cal.addEvent(exceptionEvent)
+
+        iCalRepresentation = cal.write()
+    }
+
+    fun getFirstOccurrenceDate(): LocalDate {
+        val cal = getCal()
+
+        val event = cal.events.first()
+
+        return localDateFromTimestamp(event.dateStart.value.time)
+    }
+
+    fun getFirstOccurrence(): Expense {
+        val cal = getCal()
+        val event = cal.events.first()
+
+        val firstOccurrenceDate = localDateFromTimestamp(event.dateStart.value.time)
+        return cal.getExpenses(
+            firstOccurrenceDate,
+            firstOccurrenceDate.plusDays(1),
+            toRecurringExpense()
+        ).first()
+    }
+
+    fun markAllOccurrencesAsChecked(beforeDate: LocalDate) {
+        val cal = getCal()
+        val expenses = cal.getExpenses(from = null, beforeDate, toRecurringExpense())
+        for (expense in expenses) {
+            if (expense.date == beforeDate) {
+                continue
+            }
+
+            cal.addExceptionFromExpense(expense.copy(checked = true), expense.date)
+        }
+
+        iCalRepresentation = cal.write()
+    }
+
+    private fun getCal(): ICalendar = Biweekly.parse(iCalRepresentation)
         .first()
         .apply {
             setProductId(null as String?)
         }
 
-    private suspend fun ICalendar.getExpenses(from: LocalDate?, to: LocalDate, recurringExpense: RecurringExpense): List<Expense> {
+    private fun ICalendar.getExpenses(from: LocalDate?, to: LocalDate, recurringExpense: RecurringExpense): List<Expense> {
         val startDate = from?.toStartOfDayDate()
         val endDate = to.toStartOfDayDate()
 
         val exceptions: MutableMap<Date, VEvent> = mutableMapOf()
-        val recurrentEvent = events.first()
 
         for (event in events) {
             val recurrenceId = event.recurrenceId
@@ -200,35 +215,46 @@ class RecurringExpenseEntity() : RealmObject {
             }
         }
 
-        val eventsInRange = mutableListOf<Pair<VEvent, Date>>()
-        val eventDateIterator = recurrentEvent.getDateIterator(TimeZone.getDefault())
-        if (startDate != null) {
-            eventDateIterator.advanceTo(startDate)
+        val eventsInRange = mutableListOf<Triple<VEvent, Date, Date>>()
+
+        exceptions.forEach { (date, event) ->
+            if (!event.status.isCancelled && !event.dateStart.value.after(endDate) && (startDate == null || !event.dateStart.value.before(startDate))) {
+                eventsInRange.add(Triple(event, event.dateStart.value, date))
+            }
         }
 
-        while (eventDateIterator.hasNext()) {
-            val eventOccurrenceDate = eventDateIterator.next()
-            if (eventOccurrenceDate.after(endDate)) {
-                break
-            }
+        events
+            .filterExceptions()
+            .forEach { recurrentEvent ->
+                val eventDateIterator = recurrentEvent.getDateIterator(TimeZone.getDefault())
+                if (startDate != null) {
+                    eventDateIterator.advanceTo(startDate)
+                }
 
-            if ((startDate == null || !eventOccurrenceDate.before(startDate)) && !eventOccurrenceDate.after(endDate)) {
-                // Check if there is an exception for this instance
-                val eventException = exceptions[eventOccurrenceDate]
-                if (eventException != null) {
-                    if (!eventException.status.isCancelled) {
-                        // This instance has been replaced by an exception and isn't cancelled
-                        eventsInRange.add(Pair(eventException, eventOccurrenceDate))
+                while (eventDateIterator.hasNext()) {
+                    val eventOccurrenceDate = eventDateIterator.next()
+                    if (eventOccurrenceDate.after(endDate)) {
+                        break
                     }
-                } else {
-                    // No exception for this instance, use the original event
-                    eventsInRange.add(Pair(recurrentEvent, eventOccurrenceDate))
+
+                    val dateEnd = recurrentEvent.dateEnd
+                    if (dateEnd != null && eventOccurrenceDate.after(dateEnd.value)) {
+                        break
+                    }
+
+                    if ((startDate == null || !eventOccurrenceDate.before(startDate)) && !eventOccurrenceDate.after(endDate)) {
+                        // Check if there is an exception for this instance
+                        val eventException = exceptions[eventOccurrenceDate]
+                        if (eventException == null) {
+                            // No exception for this instance, use the original event
+                            eventsInRange.add(Triple(recurrentEvent, eventOccurrenceDate, eventOccurrenceDate))
+                        }
+                    }
                 }
             }
-        }
 
         return eventsInRange
-            .map { (event, date) ->
+            .map { (event, date, originalDate) ->
                 Expense(
                     id = event.uid.value.hashCode() + date.time,
                     title = event.summary.value,
@@ -237,11 +263,13 @@ class RecurringExpenseEntity() : RealmObject {
                     checked = event.getExperimentalProperty(CHECKED_KEY)?.value == "true",
                     associatedRecurringExpense = AssociatedRecurringExpense(
                         recurringExpense = recurringExpense,
-                        originalDate = localDateFromTimestamp(event.dateStart.value.time)
+                        originalDate = localDateFromTimestamp(originalDate.time),
                     ),
                 )
             }
     }
+
+    private fun List<VEvent>.filterExceptions() = filter { it.recurrenceId == null }
 
     companion object {
         fun newFromRecurringExpense(recurringExpense: RecurringExpense, account: Account): RecurringExpenseEntity {

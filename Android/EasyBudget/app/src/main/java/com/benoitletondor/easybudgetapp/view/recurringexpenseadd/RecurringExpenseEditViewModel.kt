@@ -30,6 +30,7 @@ import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.getInitDate
 import com.benoitletondor.easybudgetapp.view.main.account.AccountViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -138,28 +139,32 @@ class RecurringExpenseEditViewModel @Inject constructor(
                         try {
                             db.persistRecurringExpense(RecurringExpense(description, if (isRevenue) -value else value, date, recurringExpenseType))
                             return@withContext true
-                        } catch (t: Throwable) {
-                            Logger.error(false, "Error while inserting recurring expense into DB: addRecurringExpense returned false")
+                        } catch (e: Exception) {
+                            if (e is CancellationException) throw e
+
+                            Logger.error(false, "Error while inserting recurring expense into DB", e)
                             return@withContext false
                         }
 
                     } else {
                         try {
                             val recurringExpense = editedExpense.associatedRecurringExpense!!.recurringExpense
-                            db.deleteAllExpenseForRecurringExpenseAfterDate(recurringExpense, editedExpense.date)
-                            db.deleteExpense(editedExpense)
-
-                            val newRecurringExpense = recurringExpense.copy(
-                                modified = true,
-                                type = recurringExpenseType,
-                                recurringDate = date,
-                                title = description,
-                                amount = if (isRevenue) -value else value
+                            db.updateRecurringExpenseAfterDate(
+                                recurringExpense.copy(
+                                    modified = true,
+                                    type = recurringExpenseType,
+                                    recurringDate = date,
+                                    title = description,
+                                    amount = if (isRevenue) -value else value
+                                ),
+                                date,
                             )
-                            db.persistRecurringExpense(newRecurringExpense)
+
                             return@withContext true
-                        } catch (t: Throwable) {
-                            Logger.error(false, "Error while editing recurring expense into DB: addRecurringExpense returned false")
+                        } catch (e: Exception) {
+                            if (e is CancellationException) throw e
+
+                            Logger.error(false, "Error while editing recurring expense into DB", e)
                             return@withContext false
                         }
                     }

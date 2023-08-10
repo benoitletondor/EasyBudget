@@ -18,6 +18,7 @@ package com.benoitletondor.easybudgetapp.db.cacheimpl
 
 import com.benoitletondor.easybudgetapp.db.onlineimpl.Account
 import com.benoitletondor.easybudgetapp.db.onlineimpl.OnlineDB
+import kotlinx.coroutines.cancel
 import java.util.concurrent.Executor
 
 class CachedOnlineDBImpl(
@@ -34,5 +35,11 @@ class CachedOnlineDBImpl(
         wrappedDB.deleteAllEntries()
 
         wipeCache()
+    }
+
+    override fun close() {
+        wrappedDB.close()
+        wipeCache()
+        cancel()
     }
 }

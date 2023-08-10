@@ -16,6 +16,7 @@
 
 package com.benoitletondor.easybudgetapp.db.offlineimpl
 
+import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
@@ -25,9 +26,12 @@ import com.benoitletondor.easybudgetapp.db.offlineimpl.entity.ExpenseEntity
 import com.benoitletondor.easybudgetapp.db.offlineimpl.entity.RecurringExpenseEntity
 import com.benoitletondor.easybudgetapp.helper.getDBValue
 import com.benoitletondor.easybudgetapp.helper.getRealValueFromDB
+import com.benoitletondor.easybudgetapp.model.AssociatedRecurringExpense
+import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 class OfflineDBImpl(private val roomDB: RoomDB) : DB {
     private val onChangeMutableFlow = MutableSharedFlow<Unit>()
@@ -78,11 +82,255 @@ class OfflineDBImpl(private val roomDB: RoomDB) : DB {
     }
 
     override suspend fun persistRecurringExpense(recurringExpense: RecurringExpense): RecurringExpense {
-        val newId = roomDB.expenseDao().persistRecurringExpense(recurringExpense.toRecurringExpenseEntity())
+        return if (recurringExpense.id == null) {
+            val persistedExpense = persistNewRecurringExpenseAndFlattenExpenses(recurringExpense)
+
+            onChangeMutableFlow.emit(Unit)
+
+            persistedExpense
+        } else {
+            val newId = roomDB.expenseDao().persistRecurringExpense(recurringExpense.toRecurringExpenseEntity())
+
+            onChangeMutableFlow.emit(Unit)
+
+            recurringExpense.copy(id = newId)
+        }
+    }
+
+    override suspend fun updateRecurringExpenseAfterDate(
+        newRecurringExpense: RecurringExpense,
+        date: LocalDate
+    ) {
+        val recurringExpenseId = newRecurringExpense.id ?: throw IllegalArgumentException("updateRecurringExpenseAfterDate called with a recurring expense that has no id")
+
+        roomDB.withTransaction {
+            roomDB.expenseDao().deleteAllExpenseForRecurringExpenseAfterDateInclusive(recurringExpenseId, date)
+            persistRecurringExpense(newRecurringExpense)
+            flattenExpenses(date, newRecurringExpense)
+        }
 
         onChangeMutableFlow.emit(Unit)
+    }
 
-        return recurringExpense.copy(id = newId)
+    private suspend fun persistNewRecurringExpenseAndFlattenExpenses(recurringExpense: RecurringExpense): RecurringExpense {
+        return roomDB.withTransaction {
+            val newId = roomDB.expenseDao().persistRecurringExpense(recurringExpense.toRecurringExpenseEntity())
+            val persistedRecurringExpense = recurringExpense.copy(
+                id = newId,
+            )
+
+            flattenExpenses(persistedRecurringExpense.recurringDate, persistedRecurringExpense)
+
+            return@withTransaction persistedRecurringExpense
+        }
+    }
+
+    private suspend fun flattenExpenses(
+        startDate: LocalDate,
+        persistedRecurringExpense: RecurringExpense
+    ) {
+        var currentDate = startDate
+        when (persistedRecurringExpense.type) {
+            RecurringExpenseType.DAILY -> {
+                // Add up to 5 years of expenses
+                for (i in 0 until 365 * 5) {
+                    roomDB.expenseDao().persistExpense(
+                        Expense(
+                            persistedRecurringExpense.title,
+                            persistedRecurringExpense.amount,
+                            currentDate,
+                            false,
+                            AssociatedRecurringExpense(
+                                persistedRecurringExpense,
+                                persistedRecurringExpense.recurringDate
+                            )
+                        ).toExpenseEntity()
+                    )
+
+                    currentDate = currentDate.plusDays(1)
+                }
+            }
+
+            RecurringExpenseType.WEEKLY -> {
+                // Add up to 5 years of expenses
+                for (i in 0 until 12 * 4 * 5) {
+                    roomDB.expenseDao().persistExpense(
+                        Expense(
+                            persistedRecurringExpense.title,
+                            persistedRecurringExpense.amount,
+                            currentDate,
+                            false,
+                            AssociatedRecurringExpense(
+                                persistedRecurringExpense,
+                                persistedRecurringExpense.recurringDate
+                            )
+                        ).toExpenseEntity()
+                    )
+
+                    currentDate = currentDate.plus(1, ChronoUnit.WEEKS)
+                }
+            }
+
+            RecurringExpenseType.BI_WEEKLY -> {
+                // Add up to 5 years of expenses
+                for (i in 0 until 12 * 4 * 5) {
+                    roomDB.expenseDao().persistExpense(
+                        Expense(
+                            persistedRecurringExpense.title,
+                            persistedRecurringExpense.amount,
+                            currentDate,
+                            false,
+                            AssociatedRecurringExpense(
+                                persistedRecurringExpense,
+                                persistedRecurringExpense.recurringDate
+                            )
+                        ).toExpenseEntity()
+                    )
+
+                    currentDate = currentDate.plus(2, ChronoUnit.WEEKS)
+                }
+            }
+
+            RecurringExpenseType.TER_WEEKLY -> {
+                // Add up to 5 years of expenses
+                for (i in 0 until 12 * 4 * 5) {
+                    roomDB.expenseDao().persistExpense(
+                        Expense(
+                            persistedRecurringExpense.title,
+                            persistedRecurringExpense.amount,
+                            currentDate,
+                            false,
+                            AssociatedRecurringExpense(
+                                persistedRecurringExpense,
+                                persistedRecurringExpense.recurringDate
+                            )
+                        ).toExpenseEntity()
+                    )
+
+                    currentDate = currentDate.plus(3, ChronoUnit.WEEKS)
+                }
+            }
+
+            RecurringExpenseType.FOUR_WEEKLY -> {
+                // Add up to 5 years of expenses
+                for (i in 0 until 12 * 4 * 5) {
+                    roomDB.expenseDao().persistExpense(
+                        Expense(
+                            persistedRecurringExpense.title,
+                            persistedRecurringExpense.amount,
+                            currentDate,
+                            false,
+                            AssociatedRecurringExpense(
+                                persistedRecurringExpense,
+                                persistedRecurringExpense.recurringDate
+                            )
+                        ).toExpenseEntity()
+                    )
+
+                    currentDate = currentDate.plus(4, ChronoUnit.WEEKS)
+                }
+            }
+
+            RecurringExpenseType.MONTHLY -> {
+                // Add up to 10 years of expenses
+                for (i in 0 until 12 * 10) {
+                    roomDB.expenseDao().persistExpense(
+                        Expense(
+                            persistedRecurringExpense.title,
+                            persistedRecurringExpense.amount,
+                            currentDate,
+                            false,
+                            AssociatedRecurringExpense(
+                                persistedRecurringExpense,
+                                persistedRecurringExpense.recurringDate
+                            )
+                        ).toExpenseEntity()
+                    )
+
+                    currentDate = currentDate.plusMonths(1)
+                }
+            }
+
+            RecurringExpenseType.BI_MONTHLY -> {
+                // Add up to 25 years of expenses
+                for (i in 0 until 6 * 25) {
+                    roomDB.expenseDao().persistExpense(
+                        Expense(
+                            persistedRecurringExpense.title,
+                            persistedRecurringExpense.amount,
+                            currentDate,
+                            false,
+                            AssociatedRecurringExpense(
+                                persistedRecurringExpense,
+                                persistedRecurringExpense.recurringDate
+                            )
+                        ).toExpenseEntity()
+                    )
+
+                    currentDate = currentDate.plusMonths(2)
+                }
+            }
+
+            RecurringExpenseType.TER_MONTHLY -> {
+                // Add up to 25 years of expenses
+                for (i in 0 until 4 * 25) {
+                    roomDB.expenseDao().persistExpense(
+                        Expense(
+                            persistedRecurringExpense.title,
+                            persistedRecurringExpense.amount,
+                            currentDate,
+                            false,
+                            AssociatedRecurringExpense(
+                                persistedRecurringExpense,
+                                persistedRecurringExpense.recurringDate
+                            )
+                        ).toExpenseEntity()
+                    )
+
+                    currentDate = currentDate.plusMonths(3)
+                }
+            }
+
+            RecurringExpenseType.SIX_MONTHLY -> {
+                // Add up to 25 years of expenses
+                for (i in 0 until 2 * 25) {
+                    roomDB.expenseDao().persistExpense(
+                        Expense(
+                            persistedRecurringExpense.title,
+                            persistedRecurringExpense.amount,
+                            currentDate,
+                            false,
+                            AssociatedRecurringExpense(
+                                persistedRecurringExpense,
+                                persistedRecurringExpense.recurringDate
+                            )
+                        ).toExpenseEntity()
+                    )
+
+                    currentDate = currentDate.plusMonths(6)
+                }
+            }
+
+            RecurringExpenseType.YEARLY -> {
+                // Add up to 100 years of expenses
+                for (i in 0 until 100) {
+                    roomDB.expenseDao().persistExpense(
+                        Expense(
+                            persistedRecurringExpense.title,
+                            persistedRecurringExpense.amount,
+                            currentDate,
+                            false,
+                            AssociatedRecurringExpense(
+                                persistedRecurringExpense,
+                                persistedRecurringExpense.recurringDate
+                            )
+                        ).toExpenseEntity()
+                    )
+
+                    currentDate = currentDate.plusYears(1)
+                }
+            }
+        }
     }
 
     override suspend fun deleteRecurringExpense(recurringExpense: RecurringExpense): RestoreAction {
@@ -90,17 +338,23 @@ class OfflineDBImpl(private val roomDB: RoomDB) : DB {
             throw IllegalArgumentException("deleteRecurringExpense called with a recurring expense that has no id")
         }
 
-        val allExpenses = getAllExpenseForRecurringExpense(recurringExpense)
+        val allExpenses = roomDB.withTransaction {
+            val expenses = getAllExpenseForRecurringExpense(recurringExpense)
 
-        deleteAllExpenseForRecurringExpense(recurringExpense)
-        roomDB.expenseDao().deleteRecurringExpense(recurringExpense.toRecurringExpenseEntity())
+            deleteAllExpenseForRecurringExpense(recurringExpense)
+            roomDB.expenseDao().deleteRecurringExpense(recurringExpense.toRecurringExpenseEntity())
+
+            return@withTransaction expenses
+        }
 
         onChangeMutableFlow.emit(Unit)
 
         return {
-            persistRecurringExpense(recurringExpense)
-            for(expense in allExpenses) {
-                persistExpense(expense)
+            roomDB.withTransaction {
+                roomDB.expenseDao().persistRecurringExpense(recurringExpense.toRecurringExpenseEntity())
+                for(expense in allExpenses) {
+                    roomDB.expenseDao().persistExpense(expense.toExpenseEntity())
+                }
             }
 
             onChangeMutableFlow.emit(Unit)
@@ -117,7 +371,8 @@ class OfflineDBImpl(private val roomDB: RoomDB) : DB {
         onChangeMutableFlow.emit(Unit)
 
         return {
-            persistExpense(expense)
+            roomDB.expenseDao().persistExpense(expense.toExpenseEntity())
+
             onChangeMutableFlow.emit(Unit)
         }
     }
@@ -137,15 +392,21 @@ class OfflineDBImpl(private val roomDB: RoomDB) : DB {
     override suspend fun deleteAllExpenseForRecurringExpenseAfterDate(recurringExpense: RecurringExpense, afterDate: LocalDate): RestoreAction {
         val recurringExpenseId = recurringExpense.id ?: throw IllegalArgumentException("deleteAllExpenseForRecurringExpenseFromDate called with a recurring expense that has no id")
 
-        val allExpenses = getAllExpensesForRecurringExpenseAfterDate(recurringExpense, afterDate)
+        val allExpenses = roomDB.withTransaction {
+            val expenses = getAllExpensesForRecurringExpenseAfterDate(recurringExpense, afterDate)
 
-        roomDB.expenseDao().deleteAllExpenseForRecurringExpenseAfterDate(recurringExpenseId, afterDate)
+            roomDB.expenseDao().deleteAllExpenseForRecurringExpenseAfterDate(recurringExpenseId, afterDate)
+
+            return@withTransaction expenses
+        }
 
         onChangeMutableFlow.emit(Unit)
 
         return {
-            for(expense in allExpenses) {
-                persistExpense(expense)
+            roomDB.withTransaction {
+                for(expense in allExpenses) {
+                    roomDB.expenseDao().persistExpense(expense.toExpenseEntity())
+                }
             }
 
             onChangeMutableFlow.emit(Unit)
@@ -161,15 +422,21 @@ class OfflineDBImpl(private val roomDB: RoomDB) : DB {
     override suspend fun deleteAllExpenseForRecurringExpenseBeforeDate(recurringExpense: RecurringExpense, beforeDate: LocalDate): RestoreAction {
         val recurringExpenseId = recurringExpense.id ?: throw IllegalArgumentException("deleteAllExpenseForRecurringExpenseBeforeDate called with a recurring expense that has no id")
 
-        val allExpenses = getAllExpensesForRecurringExpenseBeforeDate(recurringExpense, beforeDate)
+        val allExpenses = roomDB.withTransaction {
+            val expenses = getAllExpensesForRecurringExpenseBeforeDate(recurringExpense, beforeDate)
 
-        roomDB.expenseDao().deleteAllExpenseForRecurringExpenseBeforeDate(recurringExpenseId, beforeDate)
+            roomDB.expenseDao().deleteAllExpenseForRecurringExpenseBeforeDate(recurringExpenseId, beforeDate)
+
+            return@withTransaction expenses
+        }
 
         onChangeMutableFlow.emit(Unit)
 
         return {
-            for(expense in allExpenses) {
-                persistExpense(expense)
+            roomDB.withTransaction {
+                for(expense in allExpenses) {
+                    roomDB.expenseDao().persistExpense(expense.toExpenseEntity())
+                }
             }
 
             onChangeMutableFlow.emit(Unit)
@@ -200,10 +467,6 @@ class OfflineDBImpl(private val roomDB: RoomDB) : DB {
         roomDB.expenseDao().markAllEntriesAsChecked(beforeDate)
 
         onChangeMutableFlow.emit(Unit)
-    }
-
-    override fun close() {
-        roomDB.close()
     }
 }
 

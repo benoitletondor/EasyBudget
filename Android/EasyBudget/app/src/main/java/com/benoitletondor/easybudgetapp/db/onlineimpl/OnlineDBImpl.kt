@@ -146,13 +146,14 @@ class OnlineDBImpl(
             val recurringExpenseEntity = recurringExpenses.firstOrNull { it._id == expense.associatedRecurringExpense.recurringExpense.id }
                 ?: throw IllegalStateException("Unable to persist exception for recurring expense id ${expense.associatedRecurringExpense.recurringExpense.id}, not found")
 
-            recurringExpenseEntity.addExceptionFromExpense(
-                expense = expense,
-                originalOccurrenceDate = expense.associatedRecurringExpense.originalDate
-            )
-
             return realm.write {
-                copyToRealm(recurringExpenseEntity, updatePolicy = UpdatePolicy.ALL)
+                findLatest(recurringExpenseEntity)?.let {
+                    it.addExceptionFromExpense(
+                        expense = expense,
+                        originalOccurrenceDate = expense.associatedRecurringExpense.originalDate,
+                    )
+                }
+
                 return@write expense
             }
         } else {
@@ -189,16 +190,16 @@ class OnlineDBImpl(
     override suspend fun hasUncheckedExpenseForDay(dayDate: LocalDate): Boolean {
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
 
-        val recurringExpensesOfTheDayChecked = recurringExpenses
+        val hasRecurringExpensesOfTheDayChecked = recurringExpenses
             .map { it.generateExpenses(dayDate, dayDate) }
             .flatten()
-            .firstOrNull { it.checked }
+            .any { !it.checked }
 
-        if (recurringExpensesOfTheDayChecked != null) {
+        if (hasRecurringExpensesOfTheDayChecked) {
             return true
         }
 
-        val expenses = realm.query<ExpenseEntity>("${account.generateQuery()} AND ${generateQueryForDay(dayDate)} AND checked == true")
+        val expenses = realm.query<ExpenseEntity>("${account.generateQuery()} AND ${generateQueryForDay(dayDate)} AND checked == false")
             .limit(1)
             .count()
             .asFlow()
@@ -290,6 +291,25 @@ class OnlineDBImpl(
         }
     }
 
+    override suspend fun updateRecurringExpenseAfterDate(
+        newRecurringExpense: RecurringExpense,
+        date: LocalDate
+    ) {
+        val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
+
+        val recurringExpenseId = newRecurringExpense.id ?: throw IllegalStateException("Editing recurring expense occurrence without id")
+        val entity = recurringExpenses.firstOrNull { it._id == recurringExpenseId } ?: throw IllegalStateException("Editing recurring expense occurrence but can't find it for id: $recurringExpenseId")
+
+        realm.write {
+            findLatest(entity)?.let {
+                it.updateAllOccurrencesAfterDate(
+                    date,
+                    newRecurringExpense,
+                )
+            }
+        }
+    }
+
     override suspend fun deleteRecurringExpense(recurringExpense: RecurringExpense): RestoreAction {
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
 
@@ -302,7 +322,11 @@ class OnlineDBImpl(
 
         return {
             realm.write {
-                copyToRealm(entity, UpdatePolicy.ALL)
+                copyToRealm(RecurringExpenseEntity(
+                    id = null,
+                    representation = entity.iCalRepresentation,
+                    account = account,
+                ), UpdatePolicy.ALL)
             }
         }
     }
@@ -313,18 +337,20 @@ class OnlineDBImpl(
 
         if (expense.associatedRecurringExpense != null) {
             val recurringExpenseId = expense.associatedRecurringExpense.recurringExpense.id ?: throw IllegalStateException("Deleting recurring expense occurrence without id")
-            val entity = recurringExpenses.firstOrNull { it._id == recurringExpenseId } ?: throw IllegalStateException("Deleting recurring expense occurrence but can't find it for id: $recurringExpenseId")
+            var entity = recurringExpenses.firstOrNull { it._id == recurringExpenseId } ?: throw IllegalStateException("Deleting recurring expense occurrence but can't find it for id: $recurringExpenseId")
             val icalBeforeDeletion = entity.iCalRepresentation
-            entity.deleteOccurrence(expense.associatedRecurringExpense.originalDate)
 
             realm.write {
-                copyToRealm(entity, UpdatePolicy.ALL)
+                findLatest(entity)?.let {
+                    it.deleteOccurrence(expense.date)
+                }
             }
 
             return {
-                entity.iCalRepresentation = icalBeforeDeletion
                 realm.write {
-                    copyToRealm(entity, UpdatePolicy.ALL)
+                    findLatest(entity)?.let {
+                        it.iCalRepresentation = icalBeforeDeletion
+                    }
                 }
             }
         } else {
@@ -336,7 +362,8 @@ class OnlineDBImpl(
 
             return {
                 realm.write {
-                    copyToRealm(expenseEntity, UpdatePolicy.ALL)
+                    val entityToRestore = ExpenseEntity.fromExpense(expense, account)
+                    copyToRealm(entityToRestore, UpdatePolicy.ALL)
                 }
             }
         }
@@ -352,16 +379,17 @@ class OnlineDBImpl(
         val entity = recurringExpenses.firstOrNull { it._id == recurringExpenseId } ?: throw IllegalStateException("Editing recurring expense occurrence but can't find it for id: $recurringExpenseId")
         val icalBeforeEdit = entity.iCalRepresentation
 
-        entity.deleteOccurrencesAfterDate(afterDate)
-
         realm.write {
-            copyToRealm(entity, UpdatePolicy.ALL)
+            findLatest(entity)?.let {
+                it.deleteOccurrencesAfterDate(afterDate)
+            }
         }
 
         return {
-            entity.iCalRepresentation = icalBeforeEdit
             realm.write {
-                copyToRealm(entity, UpdatePolicy.ALL)
+                findLatest(entity)?.let {
+                    it.iCalRepresentation = icalBeforeEdit
+                }
             }
         }
     }
@@ -376,16 +404,17 @@ class OnlineDBImpl(
         val entity = recurringExpenses.firstOrNull { it._id == recurringExpenseId } ?: throw IllegalStateException("Editing recurring expense occurrence but can't find it for id: $recurringExpenseId")
         val icalBeforeEdit = entity.iCalRepresentation
 
-        entity.deleteOccurrencesBeforeDate(beforeDate)
-
         realm.write {
-            copyToRealm(entity, UpdatePolicy.ALL)
+            findLatest(entity)?.let {
+                it.deleteOccurrencesBeforeDate(beforeDate)
+            }
         }
 
         return {
-            entity.iCalRepresentation = icalBeforeEdit
             realm.write {
-                copyToRealm(entity, UpdatePolicy.ALL)
+                findLatest(entity)?.let {
+                    it.iCalRepresentation = icalBeforeEdit
+                }
             }
         }
     }
@@ -436,22 +465,24 @@ class OnlineDBImpl(
     override suspend fun markAllEntriesAsChecked(beforeDate: LocalDate) {
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
 
-        val expenses = realm.query<ExpenseEntity>("${account.generateQuery()} AND date < ${beforeDate.toStartOfDayDate()}")
+        val expenses = realm.query<ExpenseEntity>("${account.generateQuery()} AND date < ${beforeDate.toEpochDay()}")
             .asFlow()
             .first()
             .list
 
         realm.write {
             for(expense in expenses) {
-                findLatest(expense)?.checked = true
+                findLatest(expense)?.let {
+                    it.checked = true
+                }
             }
         }
 
         for (recurringExpense in recurringExpenses) {
-            recurringExpense.markAllOccurrencesAsChecked(beforeDate)
-
             realm.write {
-                copyToRealm(recurringExpense, UpdatePolicy.ALL)
+                findLatest(recurringExpense)?.let {
+                    it.markAllOccurrencesAsChecked(beforeDate)
+                }
             }
         }
     }

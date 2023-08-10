@@ -163,6 +163,7 @@ class RecurringExpenseEditActivity : BaseActivity<ActivityRecurringExpenseAddBin
                     setResult(Activity.RESULT_CANCELED)
                     finish()
                 }
+                .setCancelable(false)
                 .show()
         }
     }

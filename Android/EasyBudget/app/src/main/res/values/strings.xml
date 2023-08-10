@@ -388,6 +388,10 @@
     <string name="account_management_account_deleted">Account deleted successfully</string>
     <string name="account_management_error_deleting_account">An error occurred while deleting the account. Please try again.\n(%s)</string>
 
+    <string name="monthly_report_unable_to_load_db_error_title">Unable to access the database</string>
+    <string name="monthly_report_unable_to_load_db_error_message">Cannot access the database to generate your monthly report. Please check your network and relaunch the app.</string>
+    <string name="monthly_report_unable_to_load_db_error_cta">Cancel</string>
+
     <!-- Keys, not for translations. -->
     <string name="setting_category_bug_report_send_button_key" translatable="false">send_bug_report</string>
     <string name="setting_category_show_welcome_screen_button_key" translatable="false">show_welcome_screen</string>

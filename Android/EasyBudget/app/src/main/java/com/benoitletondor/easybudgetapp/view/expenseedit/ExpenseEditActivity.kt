@@ -102,6 +102,7 @@ class ExpenseEditActivity : BaseActivity<ActivityExpenseEditBinding>() {
                     setResult(Activity.RESULT_CANCELED)
                     finish()
                 }
+                .setCancelable(false)
                 .show()
         }
 
