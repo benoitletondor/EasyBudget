@@ -147,12 +147,10 @@ class OnlineDBImpl(
                 ?: throw IllegalStateException("Unable to persist exception for recurring expense id ${expense.associatedRecurringExpense.recurringExpense.id}, not found")
 
             return realm.write {
-                findLatest(recurringExpenseEntity)?.let {
-                    it.addExceptionFromExpense(
-                        expense = expense,
-                        originalOccurrenceDate = expense.associatedRecurringExpense.originalDate,
-                    )
-                }
+                findLatest(recurringExpenseEntity)?.addExceptionFromExpense(
+                    expense = expense,
+                    originalOccurrenceDate = expense.associatedRecurringExpense.originalDate,
+                )
 
                 return@write expense
             }
@@ -169,12 +167,11 @@ class OnlineDBImpl(
     override suspend fun hasExpenseForDay(dayDate: LocalDate): Boolean {
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
 
-        val recurringExpensesOfTheDay = recurringExpenses
+        val hasRecurringExpensesThisDay = recurringExpenses
             .map { it.generateExpenses(dayDate, dayDate) }
-            .flatten()
-            .firstOrNull()
+            .any { it.isNotEmpty() }
 
-        if (recurringExpensesOfTheDay != null) {
+        if (hasRecurringExpensesThisDay) {
             return true
         }
 
@@ -263,6 +260,7 @@ class OnlineDBImpl(
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
 
         val sumOfRecurringCheckedExpenseUpToTheDay = recurringExpenses
+            .asSequence()
             .map { it.generateExpenses(from = null, to = dayDate) }
             .flatten()
             .filter { it.checked }
@@ -301,12 +299,10 @@ class OnlineDBImpl(
         val entity = recurringExpenses.firstOrNull { it._id == recurringExpenseId } ?: throw IllegalStateException("Editing recurring expense occurrence but can't find it for id: $recurringExpenseId")
 
         realm.write {
-            findLatest(entity)?.let {
-                it.updateAllOccurrencesAfterDate(
-                    date,
-                    newRecurringExpense,
-                )
-            }
+            findLatest(entity)?.updateAllOccurrencesAfterDate(
+                date,
+                newRecurringExpense,
+            )
         }
     }
 
@@ -337,13 +333,11 @@ class OnlineDBImpl(
 
         if (expense.associatedRecurringExpense != null) {
             val recurringExpenseId = expense.associatedRecurringExpense.recurringExpense.id ?: throw IllegalStateException("Deleting recurring expense occurrence without id")
-            var entity = recurringExpenses.firstOrNull { it._id == recurringExpenseId } ?: throw IllegalStateException("Deleting recurring expense occurrence but can't find it for id: $recurringExpenseId")
+            val entity = recurringExpenses.firstOrNull { it._id == recurringExpenseId } ?: throw IllegalStateException("Deleting recurring expense occurrence but can't find it for id: $recurringExpenseId")
             val icalBeforeDeletion = entity.iCalRepresentation
 
             realm.write {
-                findLatest(entity)?.let {
-                    it.deleteOccurrence(expense.date)
-                }
+                findLatest(entity)?.deleteOccurrence(expense.date)
             }
 
             return {
@@ -380,9 +374,7 @@ class OnlineDBImpl(
         val icalBeforeEdit = entity.iCalRepresentation
 
         realm.write {
-            findLatest(entity)?.let {
-                it.deleteOccurrencesAfterDate(afterDate)
-            }
+            findLatest(entity)?.deleteOccurrencesAfterDate(afterDate)
         }
 
         return {
@@ -405,9 +397,7 @@ class OnlineDBImpl(
         val icalBeforeEdit = entity.iCalRepresentation
 
         realm.write {
-            findLatest(entity)?.let {
-                it.deleteOccurrencesBeforeDate(beforeDate)
-            }
+            findLatest(entity)?.deleteOccurrencesBeforeDate(beforeDate)
         }
 
         return {
@@ -480,9 +470,7 @@ class OnlineDBImpl(
 
         for (recurringExpense in recurringExpenses) {
             realm.write {
-                findLatest(recurringExpense)?.let {
-                    it.markAllOccurrencesAsChecked(beforeDate)
-                }
+                findLatest(recurringExpense)?.markAllOccurrencesAsChecked(beforeDate)
             }
         }
     }
@@ -592,10 +580,14 @@ class OnlineDBImpl(
                 .build()
             )
 
-            return OnlineDBImpl(
+            val db = OnlineDBImpl(
                 realm,
                 account,
             )
+
+            db.awaitSyncDone()
+
+            return db
         }
     }
 }
