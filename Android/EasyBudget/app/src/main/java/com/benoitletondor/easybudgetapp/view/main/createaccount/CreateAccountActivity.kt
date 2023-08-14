@@ -29,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.lifecycleScope
 import com.benoitletondor.easybudgetapp.R
@@ -133,7 +134,7 @@ private fun CreateAccountView(
     ) {
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "Account name:",
+            text = stringResource(R.string.create_account_account_name_title),
             fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold,
         )
@@ -146,14 +147,14 @@ private fun CreateAccountView(
                 accountName = newValue
             },
             placeholder = {
-                Text("Savings account, joint account, ...")
+                Text(stringResource(R.string.create_account_account_name_placeholder))
             },
             isError = shouldDisplayError,
             supportingText = {
                 if (shouldDisplayError) {
                     Text(
                         modifier = Modifier.fillMaxWidth(),
-                        text = "Name should be less than 50 chars",
+                        text = stringResource(R.string.create_account_account_name_too_large_error),
                         color = MaterialTheme.colorScheme.error,
                     )
                 }
@@ -173,7 +174,7 @@ private fun CreateAccountView(
             },
             enabled = isValid,
         ) {
-            Text("Create")
+            Text(stringResource(R.string.create_account_create_cta))
         }
     }
 }
@@ -190,7 +191,7 @@ private fun NotAuthenticatedView(
         Text(
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
-            text = "Unable to authenticate",
+            text = stringResource(R.string.create_account_auth_error_title),
             fontSize = 18.sp,
         )
 
@@ -199,7 +200,7 @@ private fun NotAuthenticatedView(
         Text(
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
-            text = "Unable to connect to your Google account. Please make sure you're logged in correctly and try again.",
+            text = stringResource(R.string.create_account_auth_error_desc),
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -207,7 +208,7 @@ private fun NotAuthenticatedView(
         Button(
             onClick = onFinishButtonClicked,
         ) {
-            Text("Go back")
+            Text(stringResource(R.string.create_account_go_back_cta))
         }
     }
 }
@@ -229,7 +230,7 @@ private fun LoadingView(
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
-                text = "Creating your new online account...",
+                text = stringResource(R.string.create_account_creating_placeholder),
             )
         }
     }

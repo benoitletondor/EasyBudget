@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -89,7 +90,7 @@ private fun AccountsView(
             .verticalScroll(rememberScrollState()),
     ) {
         Text(
-            text = "Accounts",
+            text = stringResource(R.string.accounts_screen_title),
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
         )
@@ -97,7 +98,7 @@ private fun AccountsView(
         Spacer(modifier = Modifier.height(26.dp))
 
         AccountButton(
-            title = "Default (Offline)",
+            title = stringResource(R.string.accounts_offline_account_title),
             subtitle = null,
             enabled = !isLoading,
             selected = offlineAccountSelected,
@@ -108,7 +109,7 @@ private fun AccountsView(
             Spacer(modifier = Modifier.height(6.dp))
 
             Text(
-                text = "Automatic cloud backup enabled.",
+                text = stringResource(R.string.accounts_offline_backup_activated),
                 fontSize = 15.sp,
                 modifier = Modifier.padding(horizontal = 4.dp),
                 color = colorResource(R.color.secondary_text),
@@ -118,7 +119,7 @@ private fun AccountsView(
         Spacer(modifier = Modifier.height(30.dp))
 
         Text(
-            text = "Online",
+            text = stringResource(R.string.accounts_online_section_title),
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold,
         )
@@ -179,7 +180,7 @@ private fun ColumnScope.NotAuthenticatedView(
 ) {
     Text(
         modifier = Modifier.fillMaxWidth(),
-        text = "Login with your Google account",
+        text = stringResource(R.string.accounts_online_login_title),
         textAlign = TextAlign.Center,
         fontWeight = FontWeight.SemiBold,
         fontSize = 16.sp,
@@ -189,7 +190,7 @@ private fun ColumnScope.NotAuthenticatedView(
 
     Text(
         modifier = Modifier.fillMaxWidth(),
-        text = "To create or retrieve your online accounts, login with your Google account.",
+        text = stringResource(R.string.accounts_online_login_desc),
         fontSize = 16.sp,
     )
 
@@ -199,7 +200,7 @@ private fun ColumnScope.NotAuthenticatedView(
         modifier = Modifier.align(Alignment.CenterHorizontally),
         onClick = onLoginButtonPressed,
     ) {
-        Text("Login with Google")
+        Text(stringResource(R.string.accounts_online_login_cta))
     }
 }
 
@@ -216,7 +217,7 @@ private fun ColumnScope.OnlineAccountsView(
 ) {
     if (pendingInvitations.isNotEmpty()) {
         Text(
-            text = "Pending invitations",
+            text = stringResource(R.string.accounts_online_pending_invitations),
             fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold,
         )
@@ -235,7 +236,7 @@ private fun ColumnScope.OnlineAccountsView(
     }
 
     Text(
-        text = "Your accounts",
+        text = stringResource(R.string.accounts_online_own_accounts),
         fontSize = 16.sp,
         fontWeight = FontWeight.SemiBold,
     )
@@ -272,7 +273,7 @@ private fun ColumnScope.OnlineAccountsView(
 
     if (invitedAccounts.isNotEmpty()) {
         Text(
-            text = "Other accounts",
+            text = stringResource(R.string.accounts_online_other_accounts),
             fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold,
         )
@@ -299,7 +300,7 @@ private fun ColumnScope.NotProView(
 ) {
     Text(
         modifier = Modifier.fillMaxWidth(),
-        text = "Want to unlock more accounts?",
+        text = stringResource(R.string.accounts_online_not_pro_title),
         textAlign = TextAlign.Center,
         fontWeight = FontWeight.SemiBold,
         fontSize = 16.sp,
@@ -309,7 +310,7 @@ private fun ColumnScope.NotProView(
 
     Text(
         modifier = Modifier.fillMaxWidth(),
-        text = "Add online accounts, always in sync and sharable in real-time with your friends/family/coworkers, by upgrading to Pro.",
+        text = stringResource(R.string.accounts_online_not_pro_desc),
         fontSize = 16.sp,
     )
 
@@ -319,7 +320,7 @@ private fun ColumnScope.NotProView(
         modifier = Modifier.align(Alignment.CenterHorizontally),
         onClick = onBecomeProButtonClicked,
     ) {
-        Text("Discover EasyBudget Pro")
+        Text(stringResource(R.string.accounts_online_not_pro_cta))
     }
 }
 
@@ -329,7 +330,7 @@ private fun ColumnScope.IabErrorView(
 ) {
     Text(
         modifier = Modifier.fillMaxWidth(),
-        text = "Unable to connect to the PlayStore",
+        text = stringResource(R.string.accounts_online_iab_error_title),
         textAlign = TextAlign.Center,
         fontWeight = FontWeight.SemiBold,
         fontSize = 16.sp,
@@ -339,7 +340,7 @@ private fun ColumnScope.IabErrorView(
 
     Text(
         modifier = Modifier.fillMaxWidth(),
-        text = "An error occurred while checking your membership status, please try again and try to restart your phone if the error persists.",
+        text = stringResource(R.string.accounts_online_iab_error_desc),
         fontSize = 16.sp,
     )
 
@@ -349,7 +350,7 @@ private fun ColumnScope.IabErrorView(
         modifier = Modifier.align(Alignment.CenterHorizontally),
         onClick = onRetryButtonClicked,
     ) {
-        Text("Retry")
+        Text(stringResource(R.string.accounts_online_iab_error_cta))
     }
 }
 
@@ -360,7 +361,7 @@ private fun ColumnScope.ErrorView(
 ) {
     Text(
         modifier = Modifier.fillMaxWidth(),
-        text = "Unable to fetch online accounts",
+        text = stringResource(R.string.accounts_online_fetch_error_title),
         textAlign = TextAlign.Center,
         fontWeight = FontWeight.SemiBold,
         fontSize = 16.sp,
@@ -370,7 +371,7 @@ private fun ColumnScope.ErrorView(
 
     Text(
         modifier = Modifier.fillMaxWidth(),
-        text = "An error occurred while fetching your online accounts. Please check your network and try again.\n(${error.localizedMessage})",
+        text = stringResource(R.string.accounts_online_fetch_error_desc, error.localizedMessage ?: error.toString()),
         fontSize = 16.sp,
     )
 
@@ -380,7 +381,7 @@ private fun ColumnScope.ErrorView(
         modifier = Modifier.align(Alignment.CenterHorizontally),
         onClick = onRetryButtonClicked,
     ) {
-        Text("Retry")
+        Text(stringResource(R.string.accounts_online_fetch_error_cta))
     }
 }
 
@@ -482,12 +483,12 @@ private fun InvitationView(
                     Button(
                         onClick = {
                             MaterialAlertDialogBuilder(context)
-                                .setTitle("Reject invitation")
-                                .setMessage("Are you sure you want to reject this account invitation? You'll need to be invited again to be able to access it.")
-                                .setNegativeButton("Cancel") { dialog, _ ->
+                                .setTitle(R.string.accounts_invitation_reject_confirm_title)
+                                .setMessage(R.string.accounts_invitation_reject_confirm_desc)
+                                .setNegativeButton(R.string.cancel) { dialog, _ ->
                                     dialog.dismiss()
                                 }
-                                .setPositiveButton("Reject") { dialog, _ ->
+                                .setPositiveButton(R.string.accounts_invitation_reject_confirm_cta) { dialog, _ ->
                                     onRejectInvitationConfirmed(invitation)
                                     dialog.dismiss()
                                 }
@@ -499,7 +500,7 @@ private fun InvitationView(
                         ),
                     ) {
                         Text(
-                            text = "Reject",
+                            text = stringResource(R.string.accounts_invitation_reject_cta),
                             color = MaterialTheme.colorScheme.onError,
                         )
                     }
@@ -512,7 +513,7 @@ private fun InvitationView(
                         },
                         modifier = Modifier.weight(1f),
                     ) {
-                        Text("Accept")
+                        Text(stringResource(R.string.accounts_invitation_accept_cta))
                     }
                 }
             }

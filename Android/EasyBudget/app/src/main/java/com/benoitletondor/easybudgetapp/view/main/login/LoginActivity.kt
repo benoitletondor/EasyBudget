@@ -1,5 +1,6 @@
 package com.benoitletondor.easybudgetapp.view.main.login
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
@@ -22,12 +23,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
+import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.benoitletondor.easybudgetapp.databinding.ActivityLoginBinding
 import com.benoitletondor.easybudgetapp.helper.BaseActivity
@@ -87,6 +90,16 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>() {
 
         return super.onOptionsItemSelected(item)
     }
+
+    companion object {
+        const val SHOULD_DISMISS_AFTER_AUTH_EXTRA = "shouldDismissAfterAuth"
+
+        fun newIntent(context: Context, shouldDismissAfterAuth: Boolean): Intent {
+            return Intent(context, LoginActivity::class.java).apply {
+                putExtra(SHOULD_DISMISS_AFTER_AUTH_EXTRA, shouldDismissAfterAuth)
+            }
+        }
+    }
 }
 
 @Composable
@@ -120,7 +133,7 @@ private fun NotAuthenticatedView(
     ){
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "Not authenticated",
+            text = stringResource(R.string.login_not_auth_title),
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.SemiBold,
             fontSize = 18.sp,
@@ -130,7 +143,7 @@ private fun NotAuthenticatedView(
 
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "Login to create or retrieve your online accounts.",
+            text = stringResource(R.string.login_not_auth_desc),
             fontSize = 16.sp,
         )
 
@@ -138,7 +151,7 @@ private fun NotAuthenticatedView(
 
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "Other Pro users will also be able to invite you to view/edit their account using your account's email address.",
+            text = stringResource(R.string.login_not_auth_desc_2),
             fontSize = 16.sp,
         )
 
@@ -148,7 +161,7 @@ private fun NotAuthenticatedView(
             modifier = Modifier.align(Alignment.CenterHorizontally),
             onClick = onLoginButtonPressed,
         ) {
-            Text("Login with Google")
+            Text(stringResource(R.string.login_not_auth_cta))
         }
     }
 }
@@ -166,7 +179,7 @@ private fun AuthenticatedView(
     ){
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "You're authenticated",
+            text = stringResource(R.string.login_auth_title),
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.SemiBold,
             fontSize = 18.sp,
@@ -185,7 +198,7 @@ private fun AuthenticatedView(
 
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "Online accounts will be synchronized with your Google account. Other Pro users can invite you to view/edit their account using this email address.",
+            text = stringResource(R.string.login_auth_desc),
             fontSize = 16.sp,
         )
 
@@ -195,14 +208,14 @@ private fun AuthenticatedView(
             modifier = Modifier.align(Alignment.CenterHorizontally),
             onClick = onFinishButtonPressed,
         ) {
-            Text("OK")
+            Text(stringResource(R.string.ok))
         }
 
         Spacer(modifier = Modifier.height(60.dp))
 
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "Logout?",
+            text = stringResource(R.string.login_auth_logout_title),
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.SemiBold,
             fontSize = 16.sp,
@@ -212,7 +225,7 @@ private fun AuthenticatedView(
 
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "Logging-out won't delete your online accounts but you won't be able to access them until your login again.",
+            text = stringResource(R.string.login_auth_logout_desc),
             fontSize = 16.sp,
         )
 
@@ -227,7 +240,7 @@ private fun AuthenticatedView(
             ),
         ) {
             Text(
-                text = "Logout",
+                text = stringResource(R.string.login_auth_logout_cta),
                 color = MaterialTheme.colorScheme.primary,
             )
         }

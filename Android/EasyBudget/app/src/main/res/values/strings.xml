@@ -392,6 +392,90 @@
     <string name="monthly_report_unable_to_load_db_error_message">Cannot access the database to generate your monthly report. Please check your network and relaunch the app.</string>
     <string name="monthly_report_unable_to_load_db_error_cta">Cancel</string>
 
+    <string name="accounts_screen_title">Accounts</string>
+    <string name="accounts_offline_account_title">Default (Offline)</string>
+    <string name="accounts_offline_backup_activated">Automatic cloud backup enabled.</string>
+    <string name="accounts_online_section_title">Online</string>
+    <string name="accounts_online_login_title">Login with your Google account</string>
+    <string name="accounts_online_login_desc">To create or retrieve your online accounts, login with your Google account.</string>
+    <string name="accounts_online_login_cta">Login with Google</string>
+    <string name="accounts_online_pending_invitations">Pending invitations</string>
+    <string name="accounts_online_own_accounts">Your accounts</string>
+    <string name="accounts_online_other_accounts">Other accounts</string>
+    <string name="accounts_online_not_pro_title">Want to unlock more accounts?</string>
+    <string name="accounts_online_not_pro_desc">Add online accounts, always in sync and sharable in real-time with your friends/family/coworkers, by upgrading to Pro.</string>
+    <string name="accounts_online_not_pro_cta">Discover EasyBudget Pro</string>
+    <string name="accounts_online_iab_error_title">Unable to connect to the PlayStore</string>
+    <string name="accounts_online_iab_error_desc">An error occurred while checking your membership status, please try again and try to restart your phone if the error persists.</string>
+    <string name="accounts_online_iab_error_cta">Retry</string>
+    <string name="accounts_online_fetch_error_title">Unable to fetch online accounts</string>
+    <string name="accounts_online_fetch_error_desc">An error occurred while fetching your online accounts. Please check your network and try again.\n(%s)</string>
+    <string name="accounts_online_fetch_error_cta">Retry</string>
+    <string name="accounts_invitation_reject_cta">Reject</string>
+    <string name="accounts_invitation_reject_confirm_title">Reject invitation</string>
+    <string name="accounts_invitation_reject_confirm_desc">Are you sure you want to reject this account invitation? You\'ll need to be invited again to be able to access it.</string>
+    <string name="accounts_invitation_reject_confirm_cta">Reject</string>
+    <string name="accounts_invitation_accept_cta">Accept</string>
+
+    <string name="create_account_account_name_title">Account name:</string>
+    <string name="create_account_account_name_placeholder">Savings account, joint account, …</string>
+    <string name="create_account_account_name_too_large_error">Name should be less than 50 chars</string>
+    <string name="create_account_create_cta">Create</string>
+    <string name="create_account_auth_error_title">Unable to authenticate</string>
+    <string name="create_account_auth_error_desc">Unable to connect to your Google account. Please make sure you\'re logged in correctly and try again.</string>
+    <string name="create_account_go_back_cta">Go back</string>
+    <string name="create_account_creating_placeholder">Creating your new online account…</string>
+
+    <string name="login_not_auth_title">Not authenticated</string>
+    <string name="login_not_auth_desc">Login to create or retrieve your online accounts.</string>
+    <string name="login_not_auth_desc_2">Other Pro users will also be able to invite you to view/edit their account using your account\'s email address.</string>
+    <string name="login_not_auth_cta">Login with Google</string>
+    <string name="login_auth_title">You\'re authenticated</string>
+    <string name="login_auth_desc">Online accounts will be synchronized with your Google account. Other Pro users can invite you to view/edit their account using this email address.</string>
+    <string name="login_auth_logout_title">Logout?</string>
+    <string name="login_auth_logout_desc">Logging-out won\'t delete your online accounts but you won\'t be able to access them until your login again.</string>
+    <string name="login_auth_logout_cta">Logout</string>
+
+    <string name="manage_account_invited_account_name_title">Account name</string>
+    <string name="manage_account_invited_leave_account_cta">Leave account</string>
+    <string name="manage_account_invited_leave_account_confirm_title">Leave account</string>
+    <string name="manage_account_invited_leave_account_confirm_desc">Are you sure you want to leave the account? You won\'t be able to access it anymore until you\'re invited again by the owner.</string>
+    <string name="manage_account_invited_leave_account_confirm_cta">Leave</string>
+    <string name="manage_account_owner_account_name_title">Account name:</string>
+    <string name="manage_account_owner_account_name_cta">Update</string>
+    <string name="manage_account_owner_invitations_title">Invitations</string>
+    <string name="manage_account_owner_invitation_status_sent">Sent</string>
+    <string name="manage_account_owner_invitation_status_accepted">Accepted</string>
+    <string name="manage_account_owner_invitation_delete_cta">Revoke</string>
+    <string name="manage_account_owner_invitation_delete_confirm_title">Revoke invitation</string>
+    <string name="manage_account_owner_invitation_delete_confirm_desc">Are you sure you want to revoke this invitation? %s won\'t be able to access the account anymore.</string>
+    <string name="manage_account_owner_invitation_delete_confirm_cta">Delete</string>
+    <string name="manage_account_owner_invitation_empty_state">No invitations sent yet</string>
+    <string name="manage_account_owner_invitation_send_email">Email</string>
+    <string name="manage_account_owner_invitation_send_error_bad_email">Please enter a valid email</string>
+    <string name="manage_account_owner_invitation_send_title">Invite to account</string>
+    <string name="manage_account_owner_invitation_send_desc">Enter the email of the Google account of the EasyBudget Pro user you want to invite to this account.</string>
+    <string name="manage_account_owner_invitation_send_cta">Invite</string>
+    <string name="manage_account_owner_danger_zone_title">Danger zone</string>
+    <string name="manage_account_owner_delete_account_cta">Delete account</string>
+    <string name="manage_account_owner_delete_account_confirm_title">Delete account</string>
+    <string name="manage_account_owner_delete_account_confirm_desc">Are you sure you want to delete the account? All the data will definitely be deleted, it\'s impossible to cancel.</string>
+    <string name="manage_account_owner_delete_account_confirm_cta">Delete</string>
+    <string name="manage_account_owner_account_full_disclaimer">This account is full, you can invite up to 10 person per online account.</string>
+    <string name="manage_account_error_title">Unable to fetch account details</string>
+    <string name="manage_account_error_desc">An error occurred while fetching account\'s details. Please check your network and try again.\n(%s)</string>
+    <string name="manage_account_error_cta">Retry</string>
+    <string name="manage_account_loading_generic">Loading…</string>
+    <string name="manage_account_loading_deleting_invitation">Deleting invitation…</string>
+    <string name="manage_account_loading_sending_invitation">Sending invitation…</string>
+    <string name="manage_account_loading_updating">Updating…</string>
+    <string name="manage_account_loading_deleting_account">Deleting account…</string>
+    <string name="manage_account_loading_leaving_account">Leaving account…</string>
+
+    <string name="main_account_name">Account: </string>
+    <string name="main_account_default_name">Default (offline)</string>
+    <string name="main_account_online_name">%s (online)</string>
+
     <!-- Keys, not for translations. -->
     <string name="setting_category_bug_report_send_button_key" translatable="false">send_bug_report</string>
     <string name="setting_category_show_welcome_screen_button_key" translatable="false">show_welcome_screen</string>

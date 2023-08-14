@@ -142,7 +142,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
                                             modifier = Modifier.fillMaxWidth(),
                                         ) {
                                             Text(
-                                                text = "Account: ",
+                                                text = stringResource(R.string.main_account_name) + " ",
                                                 fontWeight = FontWeight.SemiBold,
                                                 color = colorResource(R.color.action_bar_text_color),
                                             )
@@ -150,8 +150,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
                                             Text(
                                                 modifier = Modifier.fillMaxWidth(),
                                                 text = when(account) {
-                                                    MainViewModel.SelectedAccount.Selected.Offline -> "Default (offline)"
-                                                    is MainViewModel.SelectedAccount.Selected.Online -> account.name
+                                                    MainViewModel.SelectedAccount.Selected.Offline -> stringResource(R.string.main_account_default_name)
+                                                    is MainViewModel.SelectedAccount.Selected.Online -> stringResource(R.string.main_account_online_name, account.name)
                                                 },
                                                 maxLines = 1,
                                                 color = colorResource(R.color.action_bar_text_color),

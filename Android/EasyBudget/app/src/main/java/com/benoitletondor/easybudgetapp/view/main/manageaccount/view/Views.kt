@@ -41,6 +41,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -53,6 +54,7 @@ import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.accounts.model.Invitation
 import com.benoitletondor.easybudgetapp.accounts.model.InvitationStatus
+import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.benoitletondor.easybudgetapp.theme.AppTheme
 import com.benoitletondor.easybudgetapp.view.main.manageaccount.LoadingKind
 import com.benoitletondor.easybudgetapp.view.main.manageaccount.ManageAccountViewModel
@@ -109,7 +111,7 @@ private fun ManageAccountAsInvitedView(
     ) {
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "Account name",
+            text = stringResource(R.string.manage_account_invited_account_name_title),
             fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold,
         )
@@ -128,12 +130,12 @@ private fun ManageAccountAsInvitedView(
             modifier = Modifier.align(Alignment.CenterHorizontally),
             onClick = {
                 MaterialAlertDialogBuilder(context)
-                    .setTitle("Leave account")
-                    .setMessage("Are you sure you want to leave the account? You won't be able to access it anymore until you're invited again by the owner.")
-                    .setNegativeButton("Cancel") { dialog, _ ->
+                    .setTitle(R.string.manage_account_invited_leave_account_confirm_title)
+                    .setMessage(R.string.manage_account_invited_leave_account_confirm_desc)
+                    .setNegativeButton(R.string.cancel) { dialog, _ ->
                         dialog.dismiss()
                     }
-                    .setPositiveButton("Leave") { dialog, _ ->
+                    .setPositiveButton(R.string.manage_account_invited_leave_account_confirm_cta) { dialog, _ ->
                         onLeaveAccountConfirmed()
                         dialog.dismiss()
                     }
@@ -143,7 +145,7 @@ private fun ManageAccountAsInvitedView(
                 containerColor = colorResource(R.color.budget_red),
             )
         ) {
-            Text("Leave account")
+            Text(stringResource(R.string.manage_account_invited_leave_account_cta))
         }
     }
 }
@@ -163,7 +165,7 @@ private fun ManageAccountAsOwnerView(
     val shouldDisplayAccountNameError = accountName.length >= 50
 
     val context = LocalContext.current
-    val activity = context as AppCompatActivity
+    val activity = context as? AppCompatActivity
 
     Column(
         modifier = Modifier
@@ -172,7 +174,7 @@ private fun ManageAccountAsOwnerView(
     ) {
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "Account name:",
+            text = stringResource(R.string.manage_account_owner_account_name_title),
             fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold,
         )
@@ -185,14 +187,14 @@ private fun ManageAccountAsOwnerView(
                 accountName = newValue
             },
             placeholder = {
-                Text("Savings account, joint account, ...")
+                Text(stringResource(R.string.create_account_account_name_placeholder))
             },
             isError = shouldDisplayAccountNameError,
             supportingText = {
                 if (shouldDisplayAccountNameError) {
                     Text(
                         modifier = Modifier.fillMaxWidth(),
-                        text = "Name should be less than 50 chars",
+                        text = stringResource(R.string.create_account_account_name_too_large_error),
                         color = MaterialTheme.colorScheme.error,
                     )
                 }
@@ -212,14 +214,14 @@ private fun ManageAccountAsOwnerView(
             },
             enabled = isAccountNameValid,
         ) {
-            Text("Update")
+            Text(stringResource(R.string.manage_account_owner_account_name_cta))
         }
 
         Spacer(modifier = Modifier.height(30.dp))
 
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "Invitations",
+            text = stringResource(R.string.manage_account_owner_invitations_title),
             fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold,
         )
@@ -242,7 +244,7 @@ private fun ManageAccountAsOwnerView(
             }
         } else {
             Text(
-                text = "No invitations sent yet",
+                text = stringResource(R.string.manage_account_owner_invitation_empty_state),
                 modifier = Modifier.fillMaxWidth(),
                 color = colorResource(R.color.secondary_text),
             )
@@ -280,14 +282,14 @@ private fun ManageAccountAsOwnerView(
                                         capitalization = KeyboardCapitalization.None,
                                     ),
                                     label = {
-                                        Text("Email")
+                                        Text(stringResource(R.string.manage_account_owner_invitation_send_email))
                                     },
                                     isError = shouldDisplayEmailError,
                                     supportingText = {
                                         if (shouldDisplayEmailError) {
                                             Text(
                                                 modifier = Modifier.fillMaxWidth(),
-                                                text = "Please enter a valid email",
+                                                text = stringResource(R.string.manage_account_owner_invitation_send_error_bad_email),
                                                 color = MaterialTheme.colorScheme.error,
                                             )
                                         }
@@ -302,13 +304,13 @@ private fun ManageAccountAsOwnerView(
                     }
 
                     val dialog = MaterialAlertDialogBuilder(context)
-                        .setTitle("Invite to account")
-                        .setMessage("Enter the email of the Google account of the EasyBudget Pro user you want to invite to this account.")
+                        .setTitle(R.string.manage_account_owner_invitation_send_title)
+                        .setMessage(R.string.manage_account_owner_invitation_send_desc)
                         .setView(composeView)
-                        .setNegativeButton("Cancel") { dialog, _ ->
+                        .setNegativeButton(R.string.cancel) { dialog, _ ->
                             dialog.dismiss()
                         }
-                        .setPositiveButton("Invite") { dialog, _ ->
+                        .setPositiveButton(R.string.manage_account_owner_invitation_send_cta) { dialog, _ ->
                             onInviteEmailToAccount(email)
                             dialog.dismiss()
                         }
@@ -337,7 +339,7 @@ private fun ManageAccountAsOwnerView(
 
             Text(
                 modifier = Modifier.fillMaxWidth(),
-                text = "Danger zone",
+                text = stringResource(R.string.manage_account_owner_danger_zone_title),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
             )
@@ -348,12 +350,12 @@ private fun ManageAccountAsOwnerView(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 onClick = {
                     MaterialAlertDialogBuilder(context)
-                        .setTitle("Delete account")
-                        .setMessage("Are you sure you want to delete the account? All the data will definitely be deleted, it's impossible to cancel.")
-                        .setNegativeButton("Cancel") { dialog, _ ->
+                        .setTitle(R.string.manage_account_owner_delete_account_confirm_title)
+                        .setMessage(R.string.manage_account_owner_delete_account_confirm_desc)
+                        .setNegativeButton(R.string.cancel) { dialog, _ ->
                             dialog.dismiss()
                         }
-                        .setPositiveButton("Delete") { dialog, _ ->
+                        .setPositiveButton(R.string.manage_account_owner_delete_account_confirm_cta) { dialog, _ ->
                             onDeleteAccountConfirmed()
                             dialog.dismiss()
                         }
@@ -363,11 +365,11 @@ private fun ManageAccountAsOwnerView(
                     containerColor = colorResource(R.color.budget_red),
                 )
             ) {
-                Text("Delete account")
+                Text(stringResource(R.string.manage_account_owner_delete_account_cta))
             }
         } else {
             Text(
-                text = "This account is full, you can invite up to 5 person per online account.",
+                text = stringResource(R.string.manage_account_owner_account_full_disclaimer),
                 modifier = Modifier.fillMaxWidth(),
                 color = colorResource(id = R.color.secondary_text),
             )
@@ -404,8 +406,8 @@ private fun InvitationRow(
 
                 Text(
                     text = when(invitation.status) {
-                        InvitationStatus.SENT -> "Sent"
-                        InvitationStatus.ACCEPTED -> "Accepted"
+                        InvitationStatus.SENT -> stringResource(R.string.manage_account_owner_invitation_status_sent)
+                        InvitationStatus.ACCEPTED -> stringResource(R.string.manage_account_owner_invitation_status_accepted)
                     },
                     fontSize = 15.sp,
                     color = colorResource(R.color.secondary_text),
@@ -416,17 +418,17 @@ private fun InvitationRow(
 
             Image(
                 painter = painterResource(R.drawable.ic_baseline_delete_24),
-                contentDescription = "Delete",
+                contentDescription = stringResource(R.string.manage_account_owner_invitation_delete_cta),
                 colorFilter = ColorFilter.tint(colorResource(R.color.budget_red)),
                 modifier = Modifier
                     .clickable {
                         MaterialAlertDialogBuilder(context)
-                            .setTitle("Revoke invitation")
-                            .setMessage("Are you sure you want to revoke this invitation? ${invitation.receiverEmail} won't be able to access the account anymore.")
-                            .setNegativeButton("Cancel") { dialog, _ ->
+                            .setTitle(R.string.manage_account_owner_invitation_delete_confirm_title)
+                            .setMessage(context.getString(R.string.manage_account_owner_invitation_delete_confirm_desc, invitation.receiverEmail))
+                            .setNegativeButton(R.string.cancel) { dialog, _ ->
                                 dialog.dismiss()
                             }
-                            .setPositiveButton("Delete") { dialog, _ ->
+                            .setPositiveButton(R.string.manage_account_owner_invitation_delete_confirm_cta) { dialog, _ ->
                                 onDeleteConfirmed(invitation)
                                 dialog.dismiss()
                             }
@@ -452,7 +454,7 @@ private fun ErrorView(
     ) {
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "Unable to account details",
+            text = stringResource(R.string.manage_account_error_title),
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.SemiBold,
             fontSize = 16.sp,
@@ -462,7 +464,7 @@ private fun ErrorView(
 
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "An error occurred while fetching account's details. Please check your network and try again.\n(${error.localizedMessage})",
+            text = stringResource(R.string.manage_account_error_desc, error.localizedMessage ?: error.toString()),
             fontSize = 16.sp,
         )
 
@@ -472,7 +474,7 @@ private fun ErrorView(
             modifier = Modifier.align(Alignment.CenterHorizontally),
             onClick = onRetryButtonClicked,
         ) {
-            Text("Retry")
+            Text(stringResource(R.string.manage_account_error_cta))
         }
     }
 
@@ -494,14 +496,14 @@ private fun LoadingView(
         Text(
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
-            text = when(kind) {
-                LoadingKind.LOADING_DATA -> "Loading..."
-                LoadingKind.DELETING_INVITATION -> "Deleting invitation..."
-                LoadingKind.SENDING_INVITATION -> "Sending invitation..."
-                LoadingKind.UPDATING_NAME -> "Updating..."
-                LoadingKind.DELETING_ACCOUNT -> "Deleting account..."
-                LoadingKind.LEAVING_ACCOUNT -> "Leaving account..."
-            },
+            text = stringResource(when(kind) {
+                LoadingKind.LOADING_DATA -> R.string.manage_account_loading_generic
+                LoadingKind.DELETING_INVITATION -> R.string.manage_account_loading_deleting_invitation
+                LoadingKind.SENDING_INVITATION -> R.string.manage_account_loading_sending_invitation
+                LoadingKind.UPDATING_NAME -> R.string.manage_account_loading_updating
+                LoadingKind.DELETING_ACCOUNT -> R.string.manage_account_loading_deleting_account
+                LoadingKind.LEAVING_ACCOUNT -> R.string.manage_account_loading_leaving_account
+            }),
         )
     }
 }
@@ -524,10 +526,15 @@ private fun LoadingStatePreview() {
 
 @Composable
 @Preview(showSystemUi = true)
-private fun UpdatingStatePreview() {
+private fun OwnerStateEmptyInvitationsPreview() {
     AppTheme {
         ContentView(
-            state = ManageAccountViewModel.State.Updating,
+            state = ManageAccountViewModel.State.Ready.Owner(
+                "accountName",
+                CurrentUser("", "", ""),
+                emptyList(),
+                emptyList(),
+            ),
             onUpdateAccountNameClicked = {},
             onInvitationDeleteConfirmed = {},
             onRetryButtonClicked = {},
@@ -540,26 +547,97 @@ private fun UpdatingStatePreview() {
 
 @Composable
 @Preview(showSystemUi = true)
-private fun DeletingInvitationStatePreview() {
+private fun OwnerStateFullInvitationsPreview() {
     AppTheme {
         ContentView(
-            state = ManageAccountViewModel.State.DeletingInvitation,
-            onUpdateAccountNameClicked = {},
-            onInvitationDeleteConfirmed = {},
-            onRetryButtonClicked = {},
-            onLeaveAccountConfirmed = {},
-            onInviteEmailToAccount = {},
-            onDeleteAccountConfirmed = {},
-        )
-    }
-}
-
-@Composable
-@Preview(showSystemUi = true)
-private fun SendingInvitationStatePreview() {
-    AppTheme {
-        ContentView(
-            state = ManageAccountViewModel.State.SendingInvitation,
+            state = ManageAccountViewModel.State.Ready.Owner(
+                "accountName",
+                CurrentUser("", "", ""),
+                listOf(
+                    Invitation(
+                        "id",
+                        "sender@email.com",
+                        "senderId",
+                        "receiver@email.com",
+                        "accountId",
+                        InvitationStatus.SENT,
+                    ),
+                    Invitation(
+                        "id",
+                        "sender@email.com",
+                        "senderId",
+                        "receiver@email.com",
+                        "accountId",
+                        InvitationStatus.SENT,
+                    ),
+                    Invitation(
+                        "id",
+                        "sender@email.com",
+                        "senderId",
+                        "receiver@email.com",
+                        "accountId",
+                        InvitationStatus.SENT,
+                    ),
+                    Invitation(
+                        "id",
+                        "sender@email.com",
+                        "senderId",
+                        "receiver@email.com",
+                        "accountId",
+                        InvitationStatus.SENT,
+                    ),
+                    Invitation(
+                        "id",
+                        "sender@email.com",
+                        "senderId",
+                        "receiver@email.com",
+                        "accountId",
+                        InvitationStatus.SENT,
+                    ),
+                ),
+                listOf(
+                    Invitation(
+                        "id",
+                        "sender@email.com",
+                        "senderId",
+                        "receiver@email.com",
+                        "accountId",
+                        InvitationStatus.ACCEPTED,
+                    ),
+                    Invitation(
+                        "id",
+                        "sender@email.com",
+                        "senderId",
+                        "receiver@email.com",
+                        "accountId",
+                        InvitationStatus.ACCEPTED,
+                    ),
+                    Invitation(
+                        "id",
+                        "sender@email.com",
+                        "senderId",
+                        "receiver@email.com",
+                        "accountId",
+                        InvitationStatus.ACCEPTED,
+                    ),
+                    Invitation(
+                        "id",
+                        "sender@email.com",
+                        "senderId",
+                        "receiver@email.com",
+                        "accountId",
+                        InvitationStatus.ACCEPTED,
+                    ),
+                    Invitation(
+                        "id",
+                        "sender@email.com",
+                        "senderId",
+                        "receiver@email.com",
+                        "accountId",
+                        InvitationStatus.ACCEPTED,
+                    ),
+                ),
+            ),
             onUpdateAccountNameClicked = {},
             onInvitationDeleteConfirmed = {},
             onRetryButtonClicked = {},

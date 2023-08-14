@@ -351,7 +351,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
 
             findPreference<Preference>(getString(R.string.setting_category_dev_show_login))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                 activity?.let { activity ->
-                    val intent = Intent(activity, LoginActivity::class.java)
+                    val intent = LoginActivity.newIntent(activity, shouldDismissAfterAuth = false)
                     activity.startActivity(intent)
                 }
                 false

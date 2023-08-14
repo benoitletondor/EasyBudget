@@ -2,6 +2,7 @@ package com.benoitletondor.easybudgetapp.view.main.login
 
 import android.app.Activity
 import android.content.Intent
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.auth.Auth
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,7 +22,14 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val auth: Auth,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+    private val shouldDismissAfterAuth = savedStateHandle.get<Boolean>(LoginActivity.SHOULD_DISMISS_AFTER_AUTH_EXTRA)
+        ?: throw IllegalStateException("Missing SHOULD_DISMISS_AFTER_AUTH_EXTRA extra")
+
+    private val eventMutableFlow = MutableLiveFlow<Event>()
+    val eventFlow: Flow<Event> = eventMutableFlow
+
     val stateFlow: StateFlow<State> = auth.state
         .map {
             when(it) {
@@ -29,10 +38,12 @@ class LoginViewModel @Inject constructor(
                 AuthState.NotAuthenticated -> State.NotAuthenticated
             }
         }
+        .onEach {
+            if (it is State.Authenticated && shouldDismissAfterAuth) {
+                eventMutableFlow.emit(Event.Finish)
+            }
+        }
         .stateIn(viewModelScope, SharingStarted.Eagerly, State.Loading)
-
-    private val eventMutableFlow = MutableLiveFlow<Event>()
-    val eventFlow: Flow<Event> = eventMutableFlow
 
     fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         auth.handleActivityResult(requestCode, resultCode, data)

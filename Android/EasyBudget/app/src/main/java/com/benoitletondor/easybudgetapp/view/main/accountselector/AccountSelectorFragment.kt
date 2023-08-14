@@ -63,7 +63,7 @@ class AccountSelectorFragment : BottomSheetDialogFragment() {
                 }
                 AccountSelectorViewModel.Event.OpenLoginScreen -> {
                     activity?.let {
-                        it.startActivity(Intent(it, LoginActivity::class.java))
+                        it.startActivity(LoginActivity.newIntent(it, shouldDismissAfterAuth = true))
                     }
                 }
                 AccountSelectorViewModel.Event.OpenCreateAccountScreen -> {
