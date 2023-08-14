@@ -208,7 +208,7 @@
     <string name="setting_theme_platform">System default</string>
 
     <string name="pro_popup_title">You are pro!</string>
-    <string name="pro_popup_message">You have access to all features! Thanks for your support.</string>
+    <string name="pro_popup_message">You have access to all features!</string>
     <string name="premium_popup_not_premium_title">Become a premium user</string>
     <string name="premium_popup_not_premium_message">Access all the premium features!</string>
     <string name="premium_popup_premium_description">Unlock the next level of EasyBudget with all the features you need to manage one account in depth:</string>
@@ -225,7 +225,7 @@
     <string name="premium_popup_not_premium_feature_more_backup_message">Automatic backup of your data in the cloud! No need to worry about losing your budget anymore.</string>
     <string name="premium_popup_not_premium_feature_more_title">… and more premium features that will be added soon!</string>
     <string name="premium_popup_pro_description">Do more with EasyBudget, everything included in Premium plus advanced features to handle multiple sharable accounts:</string>
-    <string name="premium_popup_pro_unlocked_description">You are pro! You have access to everything included in premium, plus:</string>
+    <string name="premium_popup_pro_unlocked_description">You are Pro! You have access to everything included with Premium, plus:</string>
     <string name="premium_popup_not_pro_feature1_title">1. Multiple accounts</string>
     <string name="premium_popup_not_pro_feature1_message">Add up to 5 online accounts to manage your joint account, savings or a professional account.</string>
     <string name="premium_popup_not_pro_feature2_title">2. Share your accounts</string>
@@ -353,8 +353,8 @@
     <string name="backup_wipe_data_error_title">Unable to delete cloud backup</string>
     <string name="backup_wipe_data_error_message">An error occurred while deleting your backup data. Please check your connexion and try again later.</string>
 
-    <string name="settings_subscribe_premium">Premium</string>
-    <string name="settings_subscribe_pro">Pro</string>
+    <string name="settings_subscribe_premium" translatable="false">Premium</string>
+    <string name="settings_subscribe_pro" translatable="false">Pro</string>
 
     <string name="account_error_loading_title">Oops</string>
     <string name="account_error_loading_message">Unable to load your account data.\n(%s)\n\nPlease check your network and try again.</string>

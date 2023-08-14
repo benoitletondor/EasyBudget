@@ -19,6 +19,7 @@
     <string name="action_settings">Impostazioni</string>
     <string name="action_balance">Correggi il saldo</string>
     <string name="action_go_to_current_month">Torna al mese corrente</string>
+    <string name="action_manage_account">Gestisci conto</string>
     <string name="action_become_premium">Diventa premium</string>
     <string name="action_mark_all_past_entries_as_checked">Contrassegna tutte le voci precedenti</string>
     <string name="fab_add_expense">Aggiungi un’entrata/uscita</string>
@@ -34,6 +35,9 @@
     <string name="title_activity_settings">Impostazioni</string>
     <string name="title_activity_welcome">EasyBudget</string>
     <string name="title_activity_premium">Premium</string>
+    <string name="title_activity_login">Accedi con Google</string>
+    <string name="title_activity_create_account">Crea un conto in linea</string>
+    <string name="title_activity_manage_account">Gestisci conto online</string>
     <string name="title_activity_monthly_report">Rapporto mensile</string>
     <string name="cancel">Annulla</string>
     <string name="undo">ANNULLA</string>
@@ -171,7 +175,9 @@
     <string name="setting_category_share_app_message">EasyBudget è gratis! Non c’è motivo di non farla conoscere ai tuoi amici!</string>
     <string name="setting_category_premium_title">Sottoscrizione</string>
     <string name="setting_category_premium_status_title">Sei… premium!</string>
+    <string name="setting_category_pro_status_title">Sei… pro!</string>
     <string name="setting_category_premium_status_message">Hai ora accesso alle funzionalità premium</string>
+    <string name="setting_category_pro_status_message">Hai accesso a funzionalità pro e premium</string>
     <string name="setting_category_premium_redeem_title">Codice promozionale</string>
     <string name="setting_category_premium_redeem_message">Utilizza un codice promozionale</string>
     <string name="setting_category_notifications_update_title">Aggiornamenti</string>
@@ -189,10 +195,12 @@
     <string name="setting_theme_dark">Scuro</string>
     <string name="setting_theme_platform">Default del sistema</string>
 
-    <string name="premium_popup_premium_title">Sei… premium!</string>
-    <string name="premium_popup_premium_message">Hai ora accesso alle funzionalità premium:\n\n- Rapporto mensile: Ricevi un rapporto delle entrate e delle uscite del mese\n- Allerta quotidiana se hai dimenticato di inserire le uscite del giorno\n- Tema scuro\n- Backup su cloud\n- Contrassegna entrate e uscite\n…moltissime altre funzioni che si aggiungeranno poco a poco!</string>
+    <string name="pro_popup_title">Sei… pro!</string>
+    <string name="pro_popup_message">Hai accesso a tutte le funzionalità!</string>
     <string name="premium_popup_not_premium_title">Diventa premium</string>
     <string name="premium_popup_not_premium_message">Accedi a tutte le funzionalità premium!</string>
+    <string name="premium_popup_premium_description">Sblocca il livello successivo di EasyBudget con tutte le funzionalità necessarie per gestire un account in profondità:</string>
+    <string name="premium_popup_premium_unlocked_description">Sei Premium! Ecco cosa è incluso:</string>
     <string name="premium_popup_not_premium_feature1_title">3. Allerta quotidiana</string>
     <string name="premium_popup_not_premium_feature1_message">Ricevi una notifica alla fine della giornata se non hai inserito le tue spese.</string>
     <string name="premium_popup_not_premium_feature2_title">1. Rapporto mensile</string>
@@ -200,9 +208,18 @@
     <string name="premium_popup_not_premium_feature_more_expense_check">4. Contrassegna entrate e uscite</string>
     <string name="premium_popup_not_premium_feature_more_expense_check_desc">Possibilità di contrassegnare una voce quando ha raggiunto il tuo conto bancario per tenere traccia di cosa sta succedendo</string>
     <string name="premium_popup_not_premium_feature_more_dark_theme">5. Tema scuro!</string>
+    <string name="premium_popup_not_premium_feature_more_dark_theme_desc">Sblocca il tema scuro per l\'app e attivalo automaticamente o quando lo desideri.</string>
     <string name="premium_popup_not_premium_feature_more_backup_title">2. Backup</string>
     <string name="premium_popup_not_premium_feature_more_backup_message">Backup automatico dei tuoi dati nel cloud! Non devi più preoccuparti di perdere il budget.</string>
     <string name="premium_popup_not_premium_feature_more_title">…moltissime altre funzioni che si aggiungeranno poco a poco!</string>
+    <string name="premium_popup_pro_description">Fai di più con EasyBudget, tutto ciò che è incluso in Premium più funzionalità avanzate per gestire più account condivisibili:</string>
+    <string name="premium_popup_pro_unlocked_description">Sei Pro! Hai accesso a tutto ciò che è incluso con Premium, più:</string>
+    <string name="premium_popup_not_pro_feature1_title">1. Conti multipli</string>
+    <string name="premium_popup_not_pro_feature1_message">Aggiungi fino a 5 conti online per gestire il tuo conto cointestato, i risparmi o un conto professionale.</string>
+    <string name="premium_popup_not_pro_feature2_title">2. Condividi i tuoi account</string>
+    <string name="premium_popup_not_pro_feature2_message">Puoi invitare altri utenti Pro ai tuoi account online in modo che possano vedere e aggiungere/modificare voci.</string>
+    <string name="premium_popup_not_pro_feature3_title">3. Esporta o stampa i tuoi dati</string>
+    <string name="premium_popup_not_pro_feature3_message">Esporta i tuoi rapporti mensili come CSV per utilizzare i dati su un\'altra app o in PDF per stamparli.</string>
     <string name="premium_popup_not_premium_cta">Acquista</string>
     <string name="premium_popup_become_title">Diventa premium</string>
     <string name="premium_popup_become_message">Si direbbe che EasyBudget ti piace!\nVuoi passare al livello successivo e scoprire le funzionalità premium?</string>
@@ -321,6 +338,20 @@
     <string name="backup_wipe_data_error_title">Impossibile eliminare il backup su cloud</string>
     <string name="backup_wipe_data_error_message">Si è verificato un errore durante l\'eliminazione dei dati di backup. Verifica la connessione e riprova più tardi.</string>
 
+    <string name="account_error_loading_title">OPS!</string>
+    <string name="account_error_loading_message">Impossibile caricare i dati del tuo account.\n(%s)\n\nControlla la tua rete e riprova.</string>
+    <string name="account_error_loading_retry_cta">Riprova</string>
+    <string name="account_creation_success_toast">Account creato con successo!</string>
+    <string name="account_creation_success_error_title">OPS!</string>
+    <string name="account_creation_success_error_message">Si è verificato un errore durante la creazione del tuo account. Controlla la tua rete e riprova.\n(%s)</string>
+    <string name="account_pending_invitation_description">Invito all\'account in attesa</string>
+    <string name="account_invitation_error_accepting_title">OPS!</string>
+    <string name="account_invitation_error_accepting_message">Si è verificato un errore durante la creazione del tuo account. Controlla la tua rete e riprova.\n(%s)</string>
+    <string name="account_invitation_error_rejecting_title">OPS!</string>
+    <string name="account_invitation_error_rejecting_message">Si è verificato un errore durante il rifiuto dell\'invito. Controlla la tua rete e riprova.\n(%s)</string>
+    <string name="account_invitation_accepted_message">Invito accettato</string>
+    <string name="account_invitation_rejected_message">Invito respinto</string>
+    <string name="account_management_error_title">OPS!</string>
     <string name="setting_notification_permission_rejected_dialog_title">Autorizzazione notifiche negata</string>
     <string name="setting_notification_permission_rejected_dialog_description">Per ricevere i tuoi promemoria giornalieri e mensili premium, devi consentire le notifiche. Vuoi ricevere le notifiche?</string>
     <string name="setting_notification_permission_rejected_dialog_accept_cta">Permettere</string>

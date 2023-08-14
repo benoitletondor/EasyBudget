@@ -19,6 +19,7 @@
     <string name="action_settings">Einstellungen</string>
     <string name="action_balance">Kontostand anpassen</string>
     <string name="action_go_to_current_month">Zurück zum aktuellen Monat</string>
+    <string name="action_manage_account">Konto verwalten</string>
     <string name="action_become_premium">Premium-Nutzer werden</string>
     <string name="action_mark_all_past_entries_as_checked">Markieren Sie alle vergangenen Einträge</string>
     <string name="fab_add_expense">Neue Ausgabe/Einnahme</string>
@@ -34,6 +35,9 @@
     <string name="title_activity_settings">Einstellungen</string>
     <string name="title_activity_welcome">EasyBudget</string>
     <string name="title_activity_premium">Premium</string>
+    <string name="title_activity_login">Google-Login</string>
+    <string name="title_activity_create_account">Online-Konto erstellen</string>
+    <string name="title_activity_manage_account">Online-Konto verwalten</string>
     <string name="title_activity_monthly_report">Monatliche Zusammenfassung</string>
     <string name="cancel">Abbrechen</string>
     <string name="undo">RÜCKGÄNGIG</string>
@@ -171,7 +175,9 @@
     <string name="setting_category_share_app_message">EasyBudget ist gratis, warum sie also nicht mit Ihren Freunden teilen!</string>
     <string name="setting_category_premium_title">Abonnement</string>
     <string name="setting_category_premium_status_title">Sie sind Premium-Nutzer!</string>
+    <string name="setting_category_pro_status_title">Sie sind Pro-Nutzer!</string>
     <string name="setting_category_premium_status_message">Sie haben Zugriff auf Premium-Features</string>
+    <string name="setting_category_pro_status_message">Sie haben Zugriff auf Pro- und Premium-Funktionen</string>
     <string name="setting_category_premium_redeem_title">Promocode</string>
     <string name="setting_category_premium_redeem_message">Einen Promocode verwenden</string>
     <string name="setting_category_notifications_update_title">Updates</string>
@@ -189,10 +195,12 @@
     <string name="setting_theme_dark">Dunkles</string>
     <string name="setting_theme_platform">Systemfehler</string>
 
-    <string name="premium_popup_premium_title">Sie sind Premium-Nutzer!</string>
-    <string name="premium_popup_premium_message">Sie haben Zugriff auf Premium-Features:\n\n- Monatliche Zusammenfassung: Erhalten Sie eine Zusammenfassung Ihrer monatl. Einnahmen und Ausgaben.\n- Tägliche Erinnerungen, wenn Sie vergessen Ihre Ausgaben einzutragen\n- Dunkles Theme\n- Cloud-Sicherung\n- Einträge markieren\n… und mehr Premium-Features, die in Kürze hinzugefügt werden!</string>
+    <string name="pro_popup_title">Sie sind Pro-Nutzer!</string>
+    <string name="pro_popup_message">Sie haben Zugriff auf alle Funktionen!</string>
     <string name="premium_popup_not_premium_title">Premium-Nutzer werden</string>
     <string name="premium_popup_not_premium_message">Auf alle Premium-Features zugreifen!</string>
+    <string name="premium_popup_premium_description">Schalten Sie die nächste Stufe von EasyBudget frei, mit allen Funktionen, die Sie für die umfassende Verwaltung eines Kontos benötigen:</string>
+    <string name="premium_popup_premium_unlocked_description">Du bist Premium! Folgendes ist enthalten:</string>
     <string name="premium_popup_not_premium_feature1_title">3. Tägliche Erinnerung</string>
     <string name="premium_popup_not_premium_feature1_message">Erhalten Sie eine Benachrichtigung am Ende des Tages, wenn Sie Ihre Ausgaben noch nicht eingetragen haben.</string>
     <string name="premium_popup_not_premium_feature2_title">1. Monatliche Zusammenfassung</string>
@@ -200,9 +208,18 @@
     <string name="premium_popup_not_premium_feature_more_expense_check">4. Einträge markieren</string>
     <string name="premium_popup_not_premium_feature_more_expense_check_desc">Möglichkeit, einen Eintrag zu markieren, wenn er Ihr Bankkonto erreicht hat, um zu verfolgen, was gerade passiert</string>
     <string name="premium_popup_not_premium_feature_more_dark_theme">5. Dunkles Theme!</string>
+    <string name="premium_popup_not_premium_feature_more_dark_theme_desc">Schalten Sie das dunkle Design für die App frei und aktivieren Sie es automatisch oder wann immer Sie möchten.</string>
     <string name="premium_popup_not_premium_feature_more_backup_title">2. Sicherung</string>
     <string name="premium_popup_not_premium_feature_more_backup_message">Automatische Sicherung Ihrer Daten in der Cloud! Sie müssen sich keine Sorgen mehr machen, dass Sie Ihr Budget verlieren.</string>
     <string name="premium_popup_not_premium_feature_more_title">… und mehr Premium-Features, die in Kürze hinzugefügt werden!</string>
+    <string name="premium_popup_pro_description">Machen Sie mehr mit EasyBudget, alles, was in Premium enthalten ist, plus erweiterte Funktionen zur Verwaltung mehrerer gemeinsam nutzbarer Konten:</string>
+    <string name="premium_popup_pro_unlocked_description">Sie sind Pro-Nutzer! Sie haben Zugriff auf alles, was in Premium enthalten ist, plus:</string>
+    <string name="premium_popup_not_pro_feature1_title">1. Mehrere Konten</string>
+    <string name="premium_popup_not_pro_feature1_message">Fügen Sie bis zu 5 Online-Konten hinzu, um Ihr Gemeinschaftskonto, Ihr Sparkonto oder ein Geschäftskonto zu verwalten.</string>
+    <string name="premium_popup_not_pro_feature2_title">2. Teilen Sie Ihre Konten</string>
+    <string name="premium_popup_not_pro_feature2_message">Sie können andere Pro-Benutzer zu Ihren Online-Konten einladen, damit diese Einträge anzeigen und hinzufügen/bearbeiten können.</string>
+    <string name="premium_popup_not_pro_feature3_title">3. Exportieren oder drucken Sie Ihre Daten</string>
+    <string name="premium_popup_not_pro_feature3_message">Exportieren Sie Ihre monatlichen Berichte als CSV, um die Daten in einer anderen App zu verwenden, oder als PDF, um sie auszudrucken.</string>
     <string name="premium_popup_not_premium_cta">Kaufen</string>
     <string name="premium_popup_become_title">Premium-Nutzer werden</string>
     <string name="premium_popup_become_message">Es sieht so aus als würde Ihnen EasyBudget gefallen!\nWürden Sie gerne in den nächsten Gang schalten und die Premium-Features entdecken?</string>
@@ -321,6 +338,20 @@
     <string name="backup_wipe_data_error_title">Cloud-Sicherung kann nicht gelöscht werden</string>
     <string name="backup_wipe_data_error_message">Beim Löschen Ihrer Sicherungsdaten ist ein Fehler aufgetreten. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es später erneut.</string>
 
+    <string name="account_error_loading_title">Oops</string>
+    <string name="account_error_loading_message">Ihre Kontodaten können nicht geladen werden.\n(%s)\n\nBitte überprüfen Sie Ihr Netzwerk und versuchen Sie es erneut.</string>
+    <string name="account_error_loading_retry_cta">Wiederholen</string>
+    <string name="account_creation_success_toast">Konto erfolgreich erstellt!</string>
+    <string name="account_creation_success_error_title">Oops</string>
+    <string name="account_creation_success_error_message">Beim Erstellen Ihres Kontos ist ein Fehler aufgetreten. Überprüfen Sie Ihr Netzwerk und versuchen Sie es erneut.\n(%s)</string>
+    <string name="account_pending_invitation_description">Ausstehende Kontoeinladung</string>
+    <string name="account_invitation_error_accepting_title">Oops</string>
+    <string name="account_invitation_error_accepting_message">Beim Erstellen Ihres Kontos ist ein Fehler aufgetreten. Überprüfen Sie Ihr Netzwerk und versuchen Sie es erneut.\n(%s)</string>
+    <string name="account_invitation_error_rejecting_title">Oops</string>
+    <string name="account_invitation_error_rejecting_message">Beim Ablehnen der Einladung ist ein Fehler aufgetreten. Überprüfen Sie Ihr Netzwerk und versuchen Sie es erneut.\n(%s)</string>
+    <string name="account_invitation_accepted_message">Einladung angenommen</string>
+    <string name="account_invitation_rejected_message">Einladung abgelehnt</string>
+    <string name="account_management_error_title">Oops</string>
     <string name="setting_notification_permission_rejected_dialog_title">Berechtigung für Benachrichtigungen verweigert</string>
     <string name="setting_notification_permission_rejected_dialog_description">Um Ihre täglichen und monatlichen Prämienerinnerungen zu erhalten, müssen Sie Benachrichtigungen zulassen. Möchten Sie Benachrichtigungen erhalten?</string>
     <string name="setting_notification_permission_rejected_dialog_accept_cta">Erlauben</string>

@@ -19,6 +19,7 @@
     <string name="action_settings">Настройки</string>
     <string name="action_balance">Отрегулировать текущий баланс</string>
     <string name="action_go_to_current_month">Вернуться к текущему месяцу</string>
+    <string name="action_manage_account">Управление учетной записью</string>
     <string name="action_become_premium">Стать премиум-пользователем</string>
     <string name="action_mark_all_past_entries_as_checked">Отметить все прошлые записи</string>
     <string name="fab_add_expense">Добавить расход/доход</string>
@@ -34,6 +35,9 @@
     <string name="title_activity_settings">Настройки</string>
     <string name="title_activity_welcome">EasyBudget</string>
     <string name="title_activity_premium">Премиум</string>
+    <string name="title_activity_login">Вход через Google</string>
+    <string name="title_activity_create_account">Создать онлайн-аккаунт</string>
+    <string name="title_activity_manage_account">Управление онлайн-аккаунтом</string>
     <string name="title_activity_monthly_report">Месячный отчет</string>
     <string name="cancel">Отменить</string>
     <string name="undo">ОТМЕНИТЬ</string>
@@ -172,7 +176,9 @@
     <string name="setting_category_share_app_message">Приложение EasyBudget бесплатно, так почему бы не поделиться им с друзьями!</string>
     <string name="setting_category_premium_title">Подписка</string>
     <string name="setting_category_premium_status_title">Вы премиум-пользователь!</string>
+    <string name="setting_category_pro_status_title">Вы про-пользователь!</string>
     <string name="setting_category_premium_status_message">У Вас есть доступ к функциям премиум</string>
+    <string name="setting_category_pro_status_message">У вас есть доступ к функциям Pro и Premium</string>
     <string name="setting_category_premium_redeem_title">Промокод</string>
     <string name="setting_category_premium_redeem_message">Использовать промокод</string>
     <string name="setting_category_notifications_update_title">Обновления</string>
@@ -190,10 +196,12 @@
     <string name="setting_theme_dark">Темная</string>
     <string name="setting_theme_platform">Системные установки по умолчанию</string>
 
-    <string name="premium_popup_premium_title">Вы премиум-пользователь!</string>
-    <string name="premium_popup_premium_message">У Вас есть доступ к премиум-функциям:\n\n- Ежемесячный отчет: Подбейте итог Ваших расходов и доходов за месяц\n- Ежедневное напоминание, если Вы забыли внести свои расходы в течение дня\n- Облачное резервное копирование\n- Отметить записи\n… больше премиум-функций будут добавлены в ближайшее время!</string>
+    <string name="pro_popup_title">Вы про-пользователь!</string>
+    <string name="pro_popup_message">У вас есть доступ ко всем функциям!</string>
     <string name="premium_popup_not_premium_title">Стать премиум-пользователем</string>
     <string name="premium_popup_not_premium_message">Получить доступ ко всем премиум-функциям!</string>
+    <string name="premium_popup_premium_description">Получите доступ к следующему уровню EasyBudget со всеми функциями, необходимыми для глубокого управления одной учетной записью:</string>
+    <string name="premium_popup_premium_unlocked_description">Вы Премиум! Вот что включено:</string>
     <string name="premium_popup_not_premium_feature1_title">3. Ежедневное напоминание</string>
     <string name="premium_popup_not_premium_feature1_message">Получите уведомление в конце дня, если Вы не указали свои расходы.</string>
     <string name="premium_popup_not_premium_feature2_title">1. Месячный отчет</string>
@@ -201,9 +209,18 @@
     <string name="premium_popup_not_premium_feature_more_expense_check">4. Отметить записи</string>
     <string name="premium_popup_not_premium_feature_more_expense_check_desc">Возможность отмечать запись, когда она поступает на ваш банковский счет, чтобы отслеживать, что происходит</string>
     <string name="premium_popup_not_premium_feature_more_dark_theme">5. Темная поддержка тем!</string>
+    <string name="premium_popup_not_premium_feature_more_dark_theme_desc">Разблокируйте темную тему для приложения и активируйте ее автоматически или когда захотите.</string>
     <string name="premium_popup_not_premium_feature_more_backup_title">2. Резервный</string>
     <string name="premium_popup_not_premium_feature_more_backup_message">Автоматическое резервное копирование ваших данных в облаке! Не нужно больше беспокоиться о потере бюджета.</string>
     <string name="premium_popup_not_premium_feature_more_title">…больше премиум-функций в ближайшее время!</string>
+    <string name="premium_popup_pro_description">Делайте больше с EasyBudget, всем, что включено в Premium, а также с расширенными функциями для работы с несколькими общими учетными записями:</string>
+    <string name="premium_popup_pro_unlocked_description">Вы Профи! У вас есть доступ ко всему, что включено в Premium, а также:</string>
+    <string name="premium_popup_not_pro_feature1_title">1. Несколько учетных записей</string>
+    <string name="premium_popup_not_pro_feature1_message">Добавьте до 5 онлайн-аккаунтов для управления совместной учетной записью, сберегательной или профессиональной учетной записью.</string>
+    <string name="premium_popup_not_pro_feature2_title">2. Поделитесь своими аккаунтами</string>
+    <string name="premium_popup_not_pro_feature2_message">Вы можете приглашать других пользователей Pro в свои онлайн-аккаунты, чтобы они могли просматривать и добавлять/редактировать записи.</string>
+    <string name="premium_popup_not_pro_feature3_title">3. Экспортируйте или распечатайте свои данные</string>
+    <string name="premium_popup_not_pro_feature3_message">Экспортируйте ежемесячные отчеты в формате CSV, чтобы использовать данные в другом приложении, или в формате PDF, чтобы распечатать их.</string>
     <string name="premium_popup_not_premium_cta">Купить</string>
     <string name="premium_popup_become_title">Стать премиум-пользователем</string>
     <string name="premium_popup_become_message">Похоже, Вам нравится использовать EasyBudget!\nВы бы хотели перейти на следующий уровень и открыть для себя премиум-функции?</string>
@@ -323,6 +340,20 @@
     <string name="backup_wipe_data_error_title">Невозможно удалить облачную резервную копию</string>
     <string name="backup_wipe_data_error_message">Произошла ошибка при удалении ваших резервных данных. Пожалуйста, проверьте вашу связь и повторите попытку позже.</string>
 
+    <string name="account_error_loading_title">Ой…</string>
+    <string name="account_error_loading_message">Не удалось загрузить данные вашей учетной записи.\n(%s)\n\nПроверьте свою сеть и повторите попытку.</string>
+    <string name="account_error_loading_retry_cta">Повторить попытку</string>
+    <string name="account_creation_success_toast">Аккаунт успешно создан!</string>
+    <string name="account_creation_success_error_title">Ой…</string>
+    <string name="account_creation_success_error_message">При создании учетной записи произошла ошибка. Проверьте свою сеть и повторите попытку.\n(%s)</string>
+    <string name="account_pending_invitation_description">Ожидающее приглашение аккаунта</string>
+    <string name="account_invitation_error_accepting_title">Ой…</string>
+    <string name="account_invitation_error_accepting_message">При создании учетной записи произошла ошибка. Проверьте свою сеть и повторите попытку.\n(%s)</string>
+    <string name="account_invitation_error_rejecting_title">Ой…</string>
+    <string name="account_invitation_error_rejecting_message">Произошла ошибка при отклонении приглашения. Проверьте свою сеть и повторите попытку.\n(%s)</string>
+    <string name="account_invitation_accepted_message">Приглашение принято</string>
+    <string name="account_invitation_rejected_message">Приглашение отклонено</string>
+    <string name="account_management_error_title">Ой…</string>
     <string name="setting_notification_permission_rejected_dialog_title">Notifications permission denied</string>
     <string name="setting_notification_permission_rejected_dialog_description">To receive your premium daily and monthly reminders, you need to allow notifications. Do you want to receive notifications?</string>
     <string name="setting_notification_permission_rejected_dialog_accept_cta">Разрешать</string>
