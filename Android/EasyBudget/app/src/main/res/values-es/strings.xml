@@ -220,12 +220,13 @@
     <string name="premium_popup_not_pro_feature2_message">Puede invitar a otros usuarios Pro a sus cuentas en línea para que puedan ver y agregar/editar entradas.</string>
     <string name="premium_popup_not_pro_feature3_title">3. Exporta o imprime tus datos</string>
     <string name="premium_popup_not_pro_feature3_message">Exporte sus informes mensuales como CSV para usar los datos en otra aplicación o en PDF para imprimirlos.</string>
-    <string name="premium_popup_not_premium_cta">Comprar</string>
+    <string name="premium_popup_buy_cta">Comprar</string>
     <string name="premium_popup_become_title">Vuélvete premium</string>
     <string name="premium_popup_become_message">¡Parece que te gusta usar EasyBudget!\n¿Quieres descubrir las funcionalidades premium?</string>
     <string name="premium_popup_become_cta">Descubrir</string>
     <string name="premium_popup_become_not_now">Ahora no</string>
     <string name="premium_popup_become_not_ask_again">No preguntar más</string>
+    <string name="premium_settings_coming_soon">Muy pronto…</string>
 
     <string name="iab_purchase_success_title">Gracias</string>
     <string name="iab_purchase_success_message">¡Muchas gracias por su apoyo! Ahora puede disfrutar de las funciones desbloqueadas.</string>
@@ -403,7 +404,7 @@
     <string name="create_account_auth_error_title">No se puede autenticar</string>
     <string name="create_account_auth_error_desc">No se puede conectar a su cuenta de Google. Asegúrate de haber iniciado sesión correctamente e inténtalo de nuevo.</string>
     <string name="create_account_go_back_cta">Regresa</string>
-    <string name="create_account_creating_placeholder">Creando su nueva cuenta en línea...</string>
+    <string name="create_account_creating_placeholder">Creando su nueva cuenta en línea…</string>
     <string name="login_not_auth_title">no autenticado</string>
     <string name="login_not_auth_desc">Inicie sesión para crear o recuperar sus cuentas en línea.</string>
     <string name="login_not_auth_desc_2">Otros usuarios Pro también podrán invitarlo a ver/editar su cuenta utilizando la dirección de correo electrónico de su cuenta.</string>
@@ -451,4 +452,6 @@
     <string name="main_account_name">Cuenta:</string>
     <string name="main_account_default_name">Predeterminado (sin conexión)</string>
     <string name="main_account_online_name">%s (en línea)</string>
+    <string name="premium_popup_upgrade_cta">Mejora</string>
+    <string name="premium_popup_become_go_back">Atrás</string>
 </resources>

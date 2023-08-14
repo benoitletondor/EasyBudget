@@ -220,12 +220,13 @@
     <string name="premium_popup_not_pro_feature2_message">Sie können andere Pro-Benutzer zu Ihren Online-Konten einladen, damit diese Einträge anzeigen und hinzufügen/bearbeiten können.</string>
     <string name="premium_popup_not_pro_feature3_title">3. Exportieren oder drucken Sie Ihre Daten</string>
     <string name="premium_popup_not_pro_feature3_message">Exportieren Sie Ihre monatlichen Berichte als CSV, um die Daten in einer anderen App zu verwenden, oder als PDF, um sie auszudrucken.</string>
-    <string name="premium_popup_not_premium_cta">Kaufen</string>
+    <string name="premium_popup_buy_cta">Kaufen</string>
     <string name="premium_popup_become_title">Premium-Nutzer werden</string>
     <string name="premium_popup_become_message">Es sieht so aus als würde Ihnen EasyBudget gefallen!\nWürden Sie gerne in den nächsten Gang schalten und die Premium-Features entdecken?</string>
     <string name="premium_popup_become_cta">Entdecken</string>
     <string name="premium_popup_become_not_now">Nicht jetzt</string>
     <string name="premium_popup_become_not_ask_again">Nicht wieder fragen</string>
+    <string name="premium_settings_coming_soon">Demnächst…</string>
 
     <string name="iab_purchase_success_title">Danke</string>
     <string name="iab_purchase_success_message">Vielen dank für Ihre Hilfe! Sie können jetzt die freigeschalteten Funktionen genießen.</string>
@@ -451,4 +452,6 @@
     <string name="main_account_name">Konto:</string>
     <string name="main_account_default_name">Standard (offline)</string>
     <string name="main_account_online_name">%s (online)</string>
+    <string name="premium_popup_upgrade_cta">Aktualisierung</string>
+    <string name="premium_popup_become_go_back">Zurück</string>
 </resources>

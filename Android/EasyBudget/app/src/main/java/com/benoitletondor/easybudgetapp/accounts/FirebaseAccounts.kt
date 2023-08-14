@@ -152,10 +152,24 @@ class FirebaseAccounts(
     }
 
     override suspend fun deleteAccount(currentUser: CurrentUser, accountCredentials: AccountCredentials) {
-        db.collection(ACCOUNTS_COLLECTION)
+        val accountDocRef = db.collection(ACCOUNTS_COLLECTION)
             .document(accountCredentials.id)
-            .delete()
+
+        val invitations = db.collection(INVITATIONS_COLLECTION)
+            .whereEqualTo(INVITATION_DOCUMENT_ACCOUNT_ID, accountCredentials.id)
+            .whereEqualTo(INVITATION_DOCUMENT_SENDER_ID, currentUser.id)
+            .get()
             .await()
+
+        db.runTransaction { transaction ->
+            transaction.delete(accountDocRef)
+
+            if (!invitations.isEmpty) {
+                for (invitationRef in invitations.documents) {
+                    transaction.delete(invitationRef.reference)
+                }
+            }
+        }
     }
 
     private fun watchOwnAccounts(currentUser: CurrentUser): Flow<List<Account>> = db.collection(ACCOUNTS_COLLECTION)

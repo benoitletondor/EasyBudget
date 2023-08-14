@@ -232,12 +232,15 @@
     <string name="premium_popup_not_pro_feature2_message">You can invite other pro users to your online accounts so that they can see and add/edit entries.</string>
     <string name="premium_popup_not_pro_feature3_title">3. Export or print your data</string>
     <string name="premium_popup_not_pro_feature3_message">Export your monthly reports as CSV to use the data on another app or to PDF to print it.</string>
-    <string name="premium_popup_not_premium_cta">Purchase</string>
+    <string name="premium_popup_buy_cta">Purchase</string>
+    <string name="premium_popup_upgrade_cta">Upgrade</string>
     <string name="premium_popup_become_title">Become a premium user</string>
     <string name="premium_popup_become_message">It seems that you like using EasyBudget!\nWould you like to take it to next level and discover premium features?</string>
     <string name="premium_popup_become_cta">Discover</string>
     <string name="premium_popup_become_not_now">Not now</string>
+    <string name="premium_popup_become_go_back">Back</string>
     <string name="premium_popup_become_not_ask_again">Don\'t ask me again</string>
+    <string name="premium_settings_coming_soon">Coming soon…</string>
 
     <string name="iab_purchase_success_title">Thank you</string>
     <string name="iab_purchase_success_message">Thank you so much for your support! You can now enjoy the unlocked features.</string>

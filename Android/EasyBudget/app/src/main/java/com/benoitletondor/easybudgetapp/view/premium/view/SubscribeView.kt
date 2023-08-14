@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -211,7 +212,11 @@ private fun BoxScope.SubscribeView(
                 modifier = Modifier.weight(0.5f),
             ) {
                 Text(
-                    text = if ((selectedIndex == 0 && premiumSubscribed) || (selectedIndex == 1 && proSubscribed)) { "Back" } else { "Not now" },
+                    text = if ((selectedIndex == 0 && premiumSubscribed) || (selectedIndex == 1 && proSubscribed)) {
+                        stringResource(R.string.premium_popup_become_go_back)
+                    } else {
+                        stringResource(R.string.premium_popup_become_not_now)
+                    },
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 18.sp,
@@ -237,11 +242,11 @@ private fun BoxScope.SubscribeView(
                     modifier = Modifier.weight(0.5f),
                 ) {
                     Text(
-                        text = if (premiumSubscribed) {
-                            "Upgrade"
+                        text = stringResource(if (premiumSubscribed) {
+                            R.string.premium_popup_upgrade_cta
                         } else {
-                            "Purchase"
-                        },
+                            R.string.premium_popup_buy_cta
+                        }),
                         textAlign = TextAlign.Center,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 18.sp,
@@ -413,16 +418,28 @@ private fun ColumnScope.ProSubscriptionView(proSubscribed: Boolean) {
         )
 
         Text(
-            modifier = Modifier.padding(bottom = 10.dp),
-            text = stringResource(R.string.premium_popup_not_pro_feature3_title),
+            modifier = Modifier
+                .padding(bottom = 10.dp)
+                .fillMaxWidth(),
+            text = stringResource(R.string.premium_settings_coming_soon),
             color = Color.White,
             fontSize = 20.sp,
+            textAlign = TextAlign.Center,
+        )
+
+        Text(
+            modifier = Modifier.padding(bottom = 10.dp),
+            text = stringResource(R.string.premium_popup_not_pro_feature3_title),
+            color = Color.White.copy(alpha = 0.9f),
+            fontSize = 20.sp,
+            fontStyle = FontStyle.Italic,
         )
 
         Text(
             text = stringResource(R.string.premium_popup_not_pro_feature3_message),
-            color = Color.White,
+            color = Color.White.copy(alpha = 0.9f),
             fontSize = 16.sp,
+            fontStyle = FontStyle.Italic,
         )
 
     }

@@ -220,12 +220,13 @@
     <string name="premium_popup_not_pro_feature2_message">Você pode convidar outros usuários Pro para suas contas online para que possam ver e adicionar/editar entradas.</string>
     <string name="premium_popup_not_pro_feature3_title">3. Exporte ou imprima seus dados</string>
     <string name="premium_popup_not_pro_feature3_message">Exporte seus relatórios mensais como CSV para usar os dados em outro aplicativo ou para PDF para imprimi-los.</string>
-    <string name="premium_popup_not_premium_cta">Comprar</string>
+    <string name="premium_popup_buy_cta">Comprar</string>
     <string name="premium_popup_become_title">Torne-se premium</string>
     <string name="premium_popup_become_message">Parece que você gosta de usar EasyBudget!\nVocê gostaria de passar ao próximo nível e descobrir as funções premium?</string>
     <string name="premium_popup_become_cta">Descobrir</string>
     <string name="premium_popup_become_not_now">Agora não</string>
     <string name="premium_popup_become_not_ask_again">Não perguntar novamente</string>
+    <string name="premium_settings_coming_soon">Em breve…</string>
 
     <string name="iab_purchase_success_title">Obrigado</string>
     <string name="iab_purchase_success_message">Muito obrigado pelo seu apoio! Agora você pode aproveitar os recursos desbloqueados.</string>
@@ -403,7 +404,7 @@
     <string name="create_account_auth_error_title">Não é possível autenticar-se</string>
     <string name="create_account_auth_error_desc">Não foi possível conectar-se à sua conta do Google. Verifique se você está conectado corretamente e tente novamente.</string>
     <string name="create_account_go_back_cta">Volte</string>
-    <string name="create_account_creating_placeholder">Criando sua nova conta online...</string>
+    <string name="create_account_creating_placeholder">Criando sua nova conta online…</string>
     <string name="login_not_auth_title">não autenticado</string>
     <string name="login_not_auth_desc">Faça login para criar ou recuperar suas contas online.</string>
     <string name="login_not_auth_desc_2">Outros usuários do Pro também poderão convidá-lo para visualizar/editar a conta deles usando o endereço de e-mail da sua conta.</string>
@@ -447,8 +448,10 @@
     <string name="manage_account_loading_sending_invitation">Enviando convite…</string>
     <string name="manage_account_loading_updating">Atualizando…</string>
     <string name="manage_account_loading_deleting_account">Excluindo conta…</string>
-    <string name="manage_account_loading_leaving_account">Saindo da conta...</string>
+    <string name="manage_account_loading_leaving_account">Saindo da conta…</string>
     <string name="main_account_name">Conta:</string>
     <string name="main_account_default_name">Padrão (off-line)</string>
     <string name="main_account_online_name">%s (on-line)</string>
+    <string name="premium_popup_upgrade_cta">Atualizar</string>
+    <string name="premium_popup_become_go_back">Voltar</string>
 </resources>

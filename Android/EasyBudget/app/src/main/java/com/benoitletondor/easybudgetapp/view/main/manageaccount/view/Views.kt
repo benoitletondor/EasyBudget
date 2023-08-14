@@ -203,7 +203,7 @@ private fun ManageAccountAsOwnerView(
             modifier = Modifier.fillMaxWidth(),
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         Button(
             modifier = Modifier.align(Alignment.End),
@@ -234,6 +234,8 @@ private fun ManageAccountAsOwnerView(
                     invitation = invitation,
                     onDeleteConfirmed = onInvitationDeleteConfirmed,
                 )
+
+                Spacer(modifier = Modifier.height(5.dp))
             }
 
             for(invitation in invitationsAccepted) {
@@ -241,6 +243,8 @@ private fun ManageAccountAsOwnerView(
                     invitation = invitation,
                     onDeleteConfirmed = onInvitationDeleteConfirmed,
                 )
+
+                Spacer(modifier = Modifier.height(5.dp))
             }
         } else {
             Text(
@@ -334,45 +338,45 @@ private fun ManageAccountAsOwnerView(
             ) {
                 Text("+")
             }
-
-            Spacer(modifier = Modifier.height(40.dp))
-
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = stringResource(R.string.manage_account_owner_danger_zone_title),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Button(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                onClick = {
-                    MaterialAlertDialogBuilder(context)
-                        .setTitle(R.string.manage_account_owner_delete_account_confirm_title)
-                        .setMessage(R.string.manage_account_owner_delete_account_confirm_desc)
-                        .setNegativeButton(R.string.cancel) { dialog, _ ->
-                            dialog.dismiss()
-                        }
-                        .setPositiveButton(R.string.manage_account_owner_delete_account_confirm_cta) { dialog, _ ->
-                            onDeleteAccountConfirmed()
-                            dialog.dismiss()
-                        }
-                        .show()
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = colorResource(R.color.budget_red),
-                )
-            ) {
-                Text(stringResource(R.string.manage_account_owner_delete_account_cta))
-            }
         } else {
             Text(
                 text = stringResource(R.string.manage_account_owner_account_full_disclaimer),
                 modifier = Modifier.fillMaxWidth(),
                 color = colorResource(id = R.color.secondary_text),
             )
+        }
+
+        Spacer(modifier = Modifier.height(40.dp))
+
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = stringResource(R.string.manage_account_owner_danger_zone_title),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.SemiBold,
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Button(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            onClick = {
+                MaterialAlertDialogBuilder(context)
+                    .setTitle(R.string.manage_account_owner_delete_account_confirm_title)
+                    .setMessage(R.string.manage_account_owner_delete_account_confirm_desc)
+                    .setNegativeButton(R.string.cancel) { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .setPositiveButton(R.string.manage_account_owner_delete_account_confirm_cta) { dialog, _ ->
+                        onDeleteAccountConfirmed()
+                        dialog.dismiss()
+                    }
+                    .show()
+            },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = colorResource(R.color.budget_red),
+            )
+        ) {
+            Text(stringResource(R.string.manage_account_owner_delete_account_cta))
         }
     }
 }

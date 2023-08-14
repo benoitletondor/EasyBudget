@@ -220,12 +220,13 @@
     <string name="premium_popup_not_pro_feature2_message">Vous pouvez inviter d\'autres utilisateurs Pro sur vos comptes en ligne afin qu\'ils puissent voir et ajouter/modifier des entrées.</string>
     <string name="premium_popup_not_pro_feature3_title">3. Exportez ou imprimez vos données</string>
     <string name="premium_popup_not_pro_feature3_message">Exportez vos rapports mensuels au format CSV pour utiliser les données sur une autre application ou au format PDF pour les imprimer.</string>
-    <string name="premium_popup_not_premium_cta">Acheter</string>
+    <string name="premium_popup_buy_cta">Acheter</string>
     <string name="premium_popup_become_title">Devenez utilisateur premium</string>
     <string name="premium_popup_become_message">On dirait que vous aimez utiliser EasyBudget !\nVoulez vous passer à la vitesse supérieure et découvrir les fonctionnalités premium ?</string>
     <string name="premium_popup_become_cta">Découvrir</string>
     <string name="premium_popup_become_not_now">Pas maintenant</string>
     <string name="premium_popup_become_not_ask_again">Ne plus me demander</string>
+    <string name="premium_settings_coming_soon">À venir…</string>
 
     <string name="iab_purchase_success_title">Merci</string>
     <string name="iab_purchase_success_message">Merci beaucoup pour votre soutient! Vous avez maintenant accès aux fonctionnalités débloquées.</string>
@@ -382,7 +383,7 @@
     <string name="accounts_online_pending_invitations">Invitations en attente</string>
     <string name="accounts_online_own_accounts">Vos comptes</string>
     <string name="accounts_online_other_accounts">Autres comptes</string>
-    <string name="accounts_online_not_pro_title">Vous voulez débloquer plus de comptes ?</string>
+    <string name="accounts_online_not_pro_title">Besoin de plus de comptes ?</string>
     <string name="accounts_online_not_pro_desc">Ajoutez des comptes en ligne, toujours synchronisés et partageables en temps réel avec vos amis/famille/collègues, en passant à Pro.</string>
     <string name="accounts_online_not_pro_cta">Découvrir EasyBudget Pro</string>
     <string name="accounts_online_iab_error_title">Impossible de se connecter au PlayStore</string>
@@ -419,7 +420,7 @@
     <string name="manage_account_invited_leave_account_confirm_desc">Voulez-vous vraiment quitter le compte ? Vous ne pourrez plus y accéder tant que vous n\'aurez pas été invité à nouveau par le propriétaire.</string>
     <string name="manage_account_invited_leave_account_confirm_cta">Quitter</string>
     <string name="manage_account_owner_account_name_title">Nom du compte:</string>
-    <string name="manage_account_owner_account_name_cta">Mettre à jour</string>
+    <string name="manage_account_owner_account_name_cta">Modifier</string>
     <string name="manage_account_owner_invitations_title">Invitations</string>
     <string name="manage_account_owner_invitation_status_sent">Envoyé</string>
     <string name="manage_account_owner_invitation_status_accepted">Accepté</string>
@@ -451,4 +452,6 @@
     <string name="main_account_name">Compte:</string>
     <string name="main_account_default_name">Par défaut (hors ligne)</string>
     <string name="main_account_online_name">%s (en ligne)</string>
+    <string name="premium_popup_upgrade_cta">Mettre à niveau</string>
+    <string name="premium_popup_become_go_back">Retour</string>
 </resources>

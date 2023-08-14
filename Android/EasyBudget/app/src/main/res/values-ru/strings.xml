@@ -221,12 +221,13 @@
     <string name="premium_popup_not_pro_feature2_message">Вы можете приглашать других пользователей Pro в свои онлайн-аккаунты, чтобы они могли просматривать и добавлять/редактировать записи.</string>
     <string name="premium_popup_not_pro_feature3_title">3. Экспортируйте или распечатайте свои данные</string>
     <string name="premium_popup_not_pro_feature3_message">Экспортируйте ежемесячные отчеты в формате CSV, чтобы использовать данные в другом приложении, или в формате PDF, чтобы распечатать их.</string>
-    <string name="premium_popup_not_premium_cta">Купить</string>
+    <string name="premium_popup_buy_cta">Купить</string>
     <string name="premium_popup_become_title">Стать премиум-пользователем</string>
     <string name="premium_popup_become_message">Похоже, Вам нравится использовать EasyBudget!\nВы бы хотели перейти на следующий уровень и открыть для себя премиум-функции?</string>
     <string name="premium_popup_become_cta">Открыть</string>
     <string name="premium_popup_become_not_now">Не сейчас</string>
     <string name="premium_popup_become_not_ask_again">Не спрашивать в дальнейшем</string>
+    <string name="premium_settings_coming_soon">Вскоре…</string>
 
     <string name="iab_purchase_success_title">Спасибо</string>
     <string name="iab_purchase_success_message">Большое спасибо за вашу поддержку! Теперь вы можете наслаждаться разблокированными функциями.</string>
@@ -453,4 +454,6 @@
     <string name="main_account_name">Счет:</string>
     <string name="main_account_default_name">По умолчанию (офлайн)</string>
     <string name="main_account_online_name">%s (онлайн)</string>
+    <string name="premium_popup_upgrade_cta">Обновление</string>
+    <string name="premium_popup_become_go_back">Назад</string>
 </resources>
