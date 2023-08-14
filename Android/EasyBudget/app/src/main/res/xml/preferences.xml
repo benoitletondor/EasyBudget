@@ -80,7 +80,7 @@
 
     <PreferenceCategory
         app:key="@string/setting_category_not_premium_key"
-        app:title="@string/setting_category_premium_title">
+        app:title="@string/setting_category_not_premium_title">
 
         <Preference
             app:key="@string/setting_category_not_premium_status_key"
@@ -135,6 +135,14 @@
         <Preference
             app:title="@string/setting_category_show_premium"
             app:key="@string/setting_category_dev_show_premium_key" />
+
+        <Preference
+            app:title="@string/setting_category_show_login"
+            app:key="@string/setting_category_dev_show_login" />
+
+        <Preference
+            app:title="@string/setting_category_show_create_account"
+            app:key="@string/setting_category_dev_show_create_account" />
 
     </PreferenceCategory>
 

@@ -25,7 +25,7 @@ data class Expense(val id: Long?,
                    val amount: Double,
                    val date: LocalDate,
                    val checked: Boolean,
-                   val associatedRecurringExpense: RecurringExpense?) : Parcelable {
+                   val associatedRecurringExpense: AssociatedRecurringExpense?) : Parcelable {
 
     constructor(title: String,
                 amount: Double,
@@ -42,7 +42,7 @@ data class Expense(val id: Long?,
                 amount: Double,
                 date: LocalDate,
                 checked: Boolean,
-                associatedRecurringExpense: RecurringExpense) : this(null, title, amount, date, checked, associatedRecurringExpense)
+                associatedRecurringExpense: AssociatedRecurringExpense) : this(null, title, amount, date, checked, associatedRecurringExpense)
 
     private constructor(parcel: Parcel) : this(
         parcel.readValue(Long::class.java.classLoader) as? Long,
@@ -50,7 +50,7 @@ data class Expense(val id: Long?,
         parcel.readDouble(),
         LocalDate.ofEpochDay(parcel.readLong()),
         parcel.readInt() == 1,
-        parcel.readParcelable(RecurringExpense::class.java.classLoader)
+        parcel.readParcelable(AssociatedRecurringExpense::class.java.classLoader)
     )
 
     init {

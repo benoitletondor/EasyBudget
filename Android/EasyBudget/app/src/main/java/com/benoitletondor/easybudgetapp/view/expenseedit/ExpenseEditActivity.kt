@@ -19,6 +19,8 @@ package com.benoitletondor.easybudgetapp.view.expenseedit
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.app.Activity
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.viewModels
@@ -27,6 +29,7 @@ import androidx.lifecycle.lifecycleScope
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.databinding.ActivityExpenseEditBinding
 import com.benoitletondor.easybudgetapp.helper.*
+import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.view.DatePickerDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -89,6 +92,18 @@ class ExpenseEditActivity : BaseActivity<ActivityExpenseEditBinding>() {
 
         lifecycleScope.launchCollect(viewModel.expenseDateFlow) { date ->
             setUpDateButton(date)
+        }
+
+        lifecycleScope.launchCollect(viewModel.unableToLoadDBEventFlow) {
+            MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.expense_edit_unable_to_load_db_error_title)
+                .setMessage(R.string.expense_edit_unable_to_load_db_error_message)
+                .setPositiveButton(R.string.expense_edit_unable_to_load_db_error_cta) { _, _ ->
+                    setResult(Activity.RESULT_CANCELED)
+                    finish()
+                }
+                .setCancelable(false)
+                .show()
         }
 
         lifecycleScope.launchCollect(viewModel.finishFlow) {
@@ -236,5 +251,23 @@ class ExpenseEditActivity : BaseActivity<ActivityExpenseEditBinding>() {
 
     private fun getCurrentAmount(): Double {
         return java.lang.Double.parseDouble(binding.amountEdittext.text.toString())
+    }
+
+    companion object {
+        const val ARG_EDITED_EXPENSE = "expense"
+        const val ARG_DATE = "date"
+
+        fun newIntent(
+            context: Context,
+            editedExpense: Expense?,
+            date: LocalDate,
+        ): Intent {
+            return Intent(context, ExpenseEditActivity::class.java).apply {
+                putExtra(ARG_DATE, date.toEpochDay())
+                if (editedExpense != null) {
+                    putExtra(ARG_EDITED_EXPENSE, editedExpense)
+                }
+            }
+        }
     }
 }

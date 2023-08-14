@@ -25,6 +25,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.benoitletondor.easybudgetapp.R
@@ -32,6 +33,7 @@ import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
 import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.helper.viewLifecycleScope
 import com.benoitletondor.easybudgetapp.parameters.Parameters
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
 import javax.inject.Inject
@@ -54,6 +56,21 @@ class MonthlyReportFragment : Fragment() {
     @Inject lateinit var parameters: Parameters
 
 // ---------------------------------->
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        lifecycleScope.launchCollect(viewModel.unableToLoadDBEventFlow) {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.monthly_report_unable_to_load_db_error_title)
+                .setMessage(R.string.monthly_report_unable_to_load_db_error_message)
+                .setPositiveButton(R.string.monthly_report_unable_to_load_db_error_cta) { _, _ ->
+                    requireActivity().finish()
+                }
+                .setCancelable(false)
+                .show()
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         firstDayOfMonth = requireArguments().getSerializable(ARG_FIRST_DAY_OF_MONTH_DATE) as LocalDate

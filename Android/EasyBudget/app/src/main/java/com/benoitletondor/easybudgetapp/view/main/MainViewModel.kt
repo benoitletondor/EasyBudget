@@ -16,489 +16,187 @@
 
 package com.benoitletondor.easybudgetapp.view.main
 
+import android.os.Parcelable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.benoitletondor.easybudgetapp.iab.Iab
-import com.benoitletondor.easybudgetapp.model.Expense
-import com.benoitletondor.easybudgetapp.model.RecurringExpense
-import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType
-import com.benoitletondor.easybudgetapp.db.DB
+import com.benoitletondor.easybudgetapp.accounts.Accounts
+import com.benoitletondor.easybudgetapp.accounts.model.Account
+import com.benoitletondor.easybudgetapp.accounts.model.AccountCredentials
+import com.benoitletondor.easybudgetapp.auth.Auth
+import com.benoitletondor.easybudgetapp.auth.AuthState
 import com.benoitletondor.easybudgetapp.helper.Logger
+import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
+import com.benoitletondor.easybudgetapp.iab.PremiumCheckStatus
 import com.benoitletondor.easybudgetapp.parameters.Parameters
-import com.benoitletondor.easybudgetapp.parameters.getShouldShowCheckedBalance
+import com.benoitletondor.easybudgetapp.parameters.getLatestSelectedOnlineAccountId
+import com.benoitletondor.easybudgetapp.parameters.setLatestSelectedOnlineAccountId
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.lang.Exception
-import java.time.LocalDate
-import java.util.*
+import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val db: DB,
     private val iab: Iab,
     private val parameters: Parameters,
+    private val accounts: Accounts,
+    private val auth: Auth,
 ) : ViewModel() {
-    private val selectDateMutableStateFlow = MutableStateFlow(LocalDate.now())
-
-    private val premiumStatusMutableStateFlow = MutableStateFlow(if (!iab.isIabReady()) null else iab.isUserPremium())
-    val premiumStatusFlow: StateFlow<Boolean?> = premiumStatusMutableStateFlow
-
-    private val expenseDeletionSuccessEventMutableFlow = MutableLiveFlow<ExpenseDeletionSuccessData>()
-    val expenseDeletionSuccessEventFlow: Flow<ExpenseDeletionSuccessData> = expenseDeletionSuccessEventMutableFlow
-
-    private val expenseDeletionErrorEventMutableFlow = MutableLiveFlow<Expense>()
-    val expenseDeletionErrorEventFlow: Flow<Expense> = expenseDeletionErrorEventMutableFlow
-
-    private val recurringExpenseDeletionProgressStateMutableFlow = MutableStateFlow<RecurringExpenseDeleteProgressState>(RecurringExpenseDeleteProgressState.Idle)
-    val recurringExpenseDeletionProgressStateFlow: Flow<RecurringExpenseDeleteProgressState> = recurringExpenseDeletionProgressStateMutableFlow
-
-    private val recurringExpenseDeletionEventMutableFlow = MutableLiveFlow<RecurringExpenseDeletionEvent>()
-    val recurringExpenseDeletionEventFlow: Flow<RecurringExpenseDeletionEvent> = recurringExpenseDeletionEventMutableFlow
-
-    private val recurringExpenseRestoreProgressStateMutableFlow = MutableStateFlow<RecurringExpenseRestoreProgressState>(RecurringExpenseRestoreProgressState.Idle)
-    val recurringExpenseRestoreProgressStateFlow: Flow<RecurringExpenseRestoreProgressState> = recurringExpenseRestoreProgressStateMutableFlow
-
-    private val recurringExpenseRestoreEventMutableFlow = MutableLiveFlow<RecurringExpenseRestoreEvent>()
-    val recurringExpenseRestoreEventFlow: Flow<RecurringExpenseRestoreEvent> = recurringExpenseRestoreEventMutableFlow
-
-    private val startCurrentBalanceEditorEventMutableFlow = MutableLiveFlow<Double>()
-    val startCurrentBalanceEditorEventFlow: Flow<Double> = startCurrentBalanceEditorEventMutableFlow
-
-    private val showGoToCurrentMonthButtonStateMutableFlow = MutableStateFlow(false)
-    val showGoToCurrentMonthButtonStateFlow: StateFlow<Boolean> = showGoToCurrentMonthButtonStateMutableFlow
-
-    private val currentBalanceEditingErrorEventMutableFlow = MutableLiveFlow<Exception>()
-    val currentBalanceEditingErrorEventFlow: Flow<Exception> = currentBalanceEditingErrorEventMutableFlow
-
-    private val currentBalanceEditedEventMutableFlow = MutableLiveFlow<BalanceAdjustedData>()
-    val currentBalanceEditedEventFlow: Flow<BalanceAdjustedData> = currentBalanceEditedEventMutableFlow
-
-    private val currentBalanceRestoringErrorEventMutableFlow = MutableLiveFlow<Exception>()
-    val currentBalanceRestoringErrorEventFlow: Flow<Exception> = currentBalanceRestoringErrorEventMutableFlow
-
-    private val expenseCheckedErrorEventMutableFlow = MutableLiveFlow<Exception>()
-    val expenseCheckedErrorEventFlow: Flow<Exception> = expenseCheckedErrorEventMutableFlow
-
-    private val goBackToCurrentMonthEventMutableFlow = MutableLiveFlow<Unit>()
-    val goBackToCurrentMonthEventFlow: Flow<Unit> = goBackToCurrentMonthEventMutableFlow
-
-    private val confirmCheckAllPastEntriesEventMutableFlow = MutableLiveFlow<Unit>()
-    val confirmCheckAllPastEntriesEventFlow: Flow<Unit> = confirmCheckAllPastEntriesEventMutableFlow
-
-    private val checkAllPastEntriesErrorEventMutableFlow = MutableLiveFlow<Throwable>()
-    val checkAllPastEntriesErrorEventFlow: Flow<Throwable> = checkAllPastEntriesErrorEventMutableFlow
-
-    private val forceRefreshMutableFlow = MutableSharedFlow<Unit>()
-    val refreshDatesFlow: Flow<Unit> = forceRefreshMutableFlow
+    val premiumStatusFlow: StateFlow<PremiumCheckStatus> = iab.iabStatusFlow
+        .stateIn(viewModelScope, SharingStarted.Eagerly, PremiumCheckStatus.INITIALIZING)
 
     private val openPremiumEventMutableFlow = MutableLiveFlow<Unit>()
     val openPremiumEventFlow: Flow<Unit> = openPremiumEventMutableFlow
 
-    val selectedDateDataFlow = combine(
-        selectDateMutableStateFlow,
-        forceRefreshMutableFlow,
-    ) { date, _ ->
-        val (balance, expenses, checkedBalance) = withContext(Dispatchers.Default) {
-            Triple(
-                getBalanceForDay(date),
-                db.getExpensesForDay(date),
-                if (parameters.getShouldShowCheckedBalance()) {
-                    getCheckedBalanceForDay(date)
-                } else {
-                    null
-                },
-            )
-        }
+    private val selectedOnlineAccountIdMutableStateFlow: MutableStateFlow<String?>
+        = MutableStateFlow(parameters.getLatestSelectedOnlineAccountId())
 
-        SelectedDateExpensesData(date, balance, checkedBalance, expenses)
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, SelectedDateExpensesData(selectDateMutableStateFlow.value, 0.0, null, emptyList()))
+    private val eventMutableFlow = MutableLiveFlow<Event>()
+    val eventFlow: Flow<Event> = eventMutableFlow
 
-    init {
-        viewModelScope.launch {
-            forceRefreshMutableFlow.emit(Unit)
+    val hasPendingInvitationsFlow: StateFlow<Boolean> = iab.iabStatusFlow.flatMapLatest { iabStatus ->
+        when(iabStatus) {
+            PremiumCheckStatus.PRO_SUBSCRIBED -> auth.state
+                .flatMapLatest { authState ->
+                    when(authState) {
+                        is AuthState.Authenticated -> accounts.watchHasPendingInvitedAccounts(authState.currentUser)
+                        AuthState.Authenticating,
+                        AuthState.NotAuthenticated -> flowOf(false)
+                    }
+                }
+            else -> flowOf(false)
         }
     }
+    .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
-    sealed class RecurringExpenseDeleteProgressState {
-        object Idle : RecurringExpenseDeleteProgressState()
-        class Deleting(val expense: Expense): RecurringExpenseDeleteProgressState()
-    }
+    private val retryEventMutableFlow = MutableSharedFlow<Unit>()
 
-    sealed class RecurringExpenseDeletionEvent {
-        class ErrorRecurringExpenseDeleteNotAssociated(val expense: Expense): RecurringExpenseDeletionEvent()
-        class ErrorCantDeleteBeforeFirstOccurrence(val expense: Expense): RecurringExpenseDeletionEvent()
-        class ErrorIO(val expense: Expense): RecurringExpenseDeletionEvent()
-        class Success(val recurringExpense: RecurringExpense, val restoreRecurring: Boolean, val expensesToRestore: List<Expense>): RecurringExpenseDeletionEvent()
-    }
-
-    sealed class RecurringExpenseRestoreProgressState {
-        object Idle : RecurringExpenseRestoreProgressState()
-        class Restoring(val recurringExpense: RecurringExpense): RecurringExpenseRestoreProgressState()
-    }
-
-    sealed class RecurringExpenseRestoreEvent {
-        class ErrorIO(val recurringExpense: RecurringExpense): RecurringExpenseRestoreEvent()
-        class Success(val recurringExpense: RecurringExpense): RecurringExpenseRestoreEvent()
-    }
-
-    fun onDeleteExpenseClicked(expense: Expense) {
-        viewModelScope.launch {
-            try {
-                withContext(Dispatchers.Default) {
-                    db.deleteExpense(expense)
-                }
-
-                val selectedDate = selectDateMutableStateFlow.value
-                expenseDeletionSuccessEventMutableFlow.emit(ExpenseDeletionSuccessData(
-                    expense,
-                    getBalanceForDay(selectedDate),
-                    if (parameters.getShouldShowCheckedBalance()) { db.getCheckedBalanceForDay(selectedDate) } else { null },
-                ))
-
-                forceRefreshMutableFlow.emit(Unit)
-            } catch (t: Throwable) {
-                Logger.error("Error while deleting expense", t)
-                expenseDeletionErrorEventMutableFlow.emit(expense)
-            }
-        }
-    }
-
-    fun onExpenseDeletionCancelled(expense: Expense) {
-        viewModelScope.launch {
-            try {
-                withContext(Dispatchers.Default) {
-                    db.persistExpense(expense)
-                }
-
-                forceRefreshMutableFlow.emit(Unit)
-            } catch (t: Throwable) {
-                Logger.error("Error while restoring expense", t)
-            }
-        }
-    }
-
-    fun onDeleteRecurringExpenseClicked(expense: Expense, deleteType: RecurringExpenseDeleteType) {
-        viewModelScope.launch {
-            recurringExpenseDeletionProgressStateMutableFlow.value = RecurringExpenseDeleteProgressState.Deleting(expense)
-
-            try {
-                val associatedRecurringExpense = expense.associatedRecurringExpense
-                if( associatedRecurringExpense == null ) {
-                    recurringExpenseDeletionEventMutableFlow.emit(RecurringExpenseDeletionEvent.ErrorRecurringExpenseDeleteNotAssociated(expense))
-                    return@launch
-                }
-
-                val firstOccurrenceError = withContext(Dispatchers.Default) {
-                    deleteType == RecurringExpenseDeleteType.TO && !db.hasExpensesForRecurringExpenseBeforeDate(associatedRecurringExpense, expense.date)
-                }
-
-                if ( firstOccurrenceError ) {
-                    recurringExpenseDeletionEventMutableFlow.emit(RecurringExpenseDeletionEvent.ErrorCantDeleteBeforeFirstOccurrence(expense))
-                    return@launch
-                }
-
-                val expensesToRestore: List<Expense>? = withContext(Dispatchers.Default) {
-                    when (deleteType) {
-                        RecurringExpenseDeleteType.ALL -> {
-                            val expensesToRestore = db.getAllExpenseForRecurringExpense(associatedRecurringExpense)
-
-                            try {
-                                db.deleteAllExpenseForRecurringExpense(associatedRecurringExpense)
-                            } catch (t: Throwable) {
-                                return@withContext null
+    val accountSelectionFlow: StateFlow<SelectedAccount> = combine(
+        selectedOnlineAccountIdMutableStateFlow,
+        iab.iabStatusFlow,
+        iab.iabStatusFlow
+            .flatMapLatest { iabStatus ->
+                when(iabStatus) {
+                    PremiumCheckStatus.PRO_SUBSCRIBED -> auth.state
+                        .flatMapLatest { authState ->
+                            when(authState) {
+                                is AuthState.Authenticated -> accounts.watchAccounts(authState.currentUser)
+                                    .map { OnlineAccountResponse.Available(it) }
+                                AuthState.Authenticating,
+                                AuthState.NotAuthenticated -> flowOf(OnlineAccountResponse.Loading)
                             }
-
-                            try {
-                                db.deleteRecurringExpense(associatedRecurringExpense)
-                            } catch (t: Throwable) {
-                                return@withContext null
-                            }
-
-                            expensesToRestore
                         }
-                        RecurringExpenseDeleteType.FROM -> {
-                            val expensesToRestore = db.getAllExpensesForRecurringExpenseAfterDate(associatedRecurringExpense, expense.date)
-
-                            try {
-                                db.deleteAllExpenseForRecurringExpenseAfterDate(associatedRecurringExpense, expense.date)
-                            } catch (t: Throwable) {
-                                return@withContext null
-                            }
-
-                            expensesToRestore
-                        }
-                        RecurringExpenseDeleteType.TO -> {
-                            val expensesToRestore = db.getAllExpensesForRecurringExpenseBeforeDate(associatedRecurringExpense, expense.date)
-
-                            try {
-                                db.deleteAllExpenseForRecurringExpenseBeforeDate(associatedRecurringExpense, expense.date)
-                            } catch (t: Throwable) {
-                                return@withContext null
-                            }
-
-                            expensesToRestore
-                        }
-                        RecurringExpenseDeleteType.ONE -> {
-                            val expensesToRestore = listOf(expense)
-
-                            try {
-                                db.deleteExpense(expense)
-                            } catch (t: Throwable) {
-                                return@withContext null
-                            }
-
-                            expensesToRestore
-                        }
-                    }
+                    else -> flowOf(OnlineAccountResponse.Loading)
                 }
-
-                if( expensesToRestore == null ) {
-                    recurringExpenseDeletionEventMutableFlow.emit(RecurringExpenseDeletionEvent.ErrorIO(expense))
-                    return@launch
-                }
-
-                recurringExpenseDeletionEventMutableFlow.emit(RecurringExpenseDeletionEvent.Success(associatedRecurringExpense, deleteType == RecurringExpenseDeleteType.ALL, expensesToRestore))
-            } finally {
-                recurringExpenseDeletionProgressStateMutableFlow.value = RecurringExpenseDeleteProgressState.Idle
             }
-
-            forceRefreshMutableFlow.emit(Unit)
+    ) { selectedOnlineAccountId, iabStatus, onlineAccountsResponse ->
+        if (selectedOnlineAccountId == null) {
+            return@combine SelectedAccount.Selected.Offline
         }
 
-    }
-
-    fun onRestoreRecurringExpenseClicked(recurringExpense: RecurringExpense, restoreRecurring: Boolean, expensesToRestore: List<Expense>) {
-        viewModelScope.launch {
-            recurringExpenseRestoreProgressStateMutableFlow.value = RecurringExpenseRestoreProgressState.Restoring(recurringExpense)
-
-            try {
-                if( restoreRecurring ) {
-                    try {
-                        withContext(Dispatchers.Default) {
-                            db.persistRecurringExpense(recurringExpense)
-                        }
-                    } catch (t: Throwable) {
-                        recurringExpenseRestoreEventMutableFlow.emit(RecurringExpenseRestoreEvent.ErrorIO(recurringExpense))
-                        return@launch
-                    }
-                }
-
-                val expensesAdd = withContext(Dispatchers.Default) {
-                    for (expense in expensesToRestore) {
-                        try {
-                            db.persistExpense(expense)
-                        } catch (t: Throwable) {
-                            return@withContext false
-                        }
-                    }
-
-                    return@withContext true
-                }
-
-                if( !expensesAdd ) {
-                    recurringExpenseRestoreEventMutableFlow.emit(RecurringExpenseRestoreEvent.ErrorIO(recurringExpense))
-                    return@launch
-                }
-
-                recurringExpenseRestoreEventMutableFlow.emit(RecurringExpenseRestoreEvent.Success(recurringExpense))
-            } finally {
-                recurringExpenseRestoreProgressStateMutableFlow.value = RecurringExpenseRestoreProgressState.Idle
-            }
-
-            forceRefreshMutableFlow.emit(Unit)
-        }
-    }
-
-    fun onAdjustCurrentBalanceClicked() {
-        viewModelScope.launch {
-            val balance = withContext(Dispatchers.Default) {
-                -db.getBalanceForDay(LocalDate.now())
-            }
-
-            startCurrentBalanceEditorEventMutableFlow.emit(balance)
-        }
-    }
-
-    fun onNewBalanceSelected(newBalance: Double, balanceExpenseTitle: String) {
-        viewModelScope.launch {
-            try {
-                val currentBalance = withContext(Dispatchers.Default) {
-                    -db.getBalanceForDay(LocalDate.now())
-                }
-
-                if (newBalance == currentBalance) {
-                    // Nothing to do, balance hasn't change
-                    return@launch
-                }
-
-                val diff = newBalance - currentBalance
-
-                // Look for an existing balance for the day
-                val existingExpense = withContext(Dispatchers.Default) {
-                    db.getExpensesForDay(LocalDate.now()).find { it.title == balanceExpenseTitle }
-                }
-
-                if (existingExpense != null) { // If the adjust balance exists, just add the diff and persist it
-                    val newExpense = withContext(Dispatchers.Default) {
-                        db.persistExpense(existingExpense.copy(amount = existingExpense.amount - diff))
-                    }
-
-                    currentBalanceEditedEventMutableFlow.emit(BalanceAdjustedData(newExpense, diff, newBalance))
-                } else { // If no adjust balance yet, create a new one
-                    val persistedExpense = withContext(Dispatchers.Default) {
-                        db.persistExpense(Expense(balanceExpenseTitle, -diff, LocalDate.now(), true))
-                    }
-
-                    currentBalanceEditedEventMutableFlow.emit(BalanceAdjustedData(persistedExpense, diff, newBalance))
-                }
-
-                forceRefreshMutableFlow.emit(Unit)
-            } catch (e: Exception) {
-                Logger.error("Error while editing balance", e)
-                currentBalanceEditingErrorEventMutableFlow.emit(e)
+        return@combine when(iabStatus) {
+            PremiumCheckStatus.INITIALIZING,
+            PremiumCheckStatus.CHECKING -> SelectedAccount.Loading
+            PremiumCheckStatus.ERROR -> SelectedAccount.Selected.Offline
+            PremiumCheckStatus.NOT_PREMIUM,
+            PremiumCheckStatus.LEGACY_PREMIUM,
+            PremiumCheckStatus.PREMIUM_SUBSCRIBED -> SelectedAccount.Selected.Offline
+            PremiumCheckStatus.PRO_SUBSCRIBED -> when(onlineAccountsResponse) {
+                is OnlineAccountResponse.Available -> onlineAccountsResponse.accounts
+                    .firstOrNull { it.id == selectedOnlineAccountId }
+                    ?.let { account ->
+                        SelectedAccount.Selected.Online(
+                            name = account.name,
+                            isOwner = account.isUserOwner,
+                            ownerEmail = account.ownerEmail,
+                            accountId = account.id,
+                            accountSecret = account.secret,
+                        )
+                    } ?: SelectedAccount.Selected.Offline
+                OnlineAccountResponse.Loading -> SelectedAccount.Loading
             }
         }
-    }
+    }.retryWhen { cause, _ ->
+        Logger.error("Error while building accountSelectionFlow", cause)
+        emit(SelectedAccount.Selected.Offline)
 
-    fun onCurrentBalanceEditedCancelled(expense: Expense, diff: Double) {
-        viewModelScope.launch {
-            try {
-                withContext(Dispatchers.Default) {
-                    if( expense.amount + diff == 0.0 ) {
-                        db.deleteExpense(expense)
-                    } else {
-                        val newExpense = expense.copy(amount = expense.amount + diff)
-                        db.persistExpense(newExpense)
-                    }
-                }
+        retryEventMutableFlow.first()
 
-                forceRefreshMutableFlow.emit(Unit)
-            } catch (e: Exception) {
-                Logger.error("Error while restoring balance", e)
-                currentBalanceRestoringErrorEventMutableFlow.emit(e)
-            }
-        }
-    }
-
-    fun onIabStatusChanged() {
-        premiumStatusMutableStateFlow.value = if (!iab.isIabReady()) null else iab.isUserPremium()
-        viewModelScope.launch {
-            forceRefreshMutableFlow.emit(Unit)
-        }
-    }
-
-    fun onSelectDate(date: LocalDate) {
-        selectDateMutableStateFlow.value = date
-    }
-
-    fun onCurrencySelected() {
-        viewModelScope.launch {
-            forceRefreshMutableFlow.emit(Unit)
-        }
-    }
-
-    private suspend fun getBalanceForDay(date: LocalDate): Double {
-        var balance = 0.0 // Just to keep a positive number if balance == 0
-        balance -= db.getBalanceForDay(date)
-
-        return balance
-    }
-
-    private suspend fun getCheckedBalanceForDay(date: LocalDate): Double {
-        var balance = 0.0 // Just to keep a positive number if balance == 0
-        balance -= db.getCheckedBalanceForDay(date)
-
-        return balance
-    }
-
-    fun onDayChanged() {
-        selectDateMutableStateFlow.value = LocalDate.now()
-    }
-
-    fun onExpenseAdded() {
-        viewModelScope.launch {
-            forceRefreshMutableFlow.emit(Unit)
-        }
-    }
-
-    fun onWelcomeScreenFinished() {
-        viewModelScope.launch {
-            forceRefreshMutableFlow.emit(Unit)
-        }
-    }
-
-    fun onExpenseChecked(expense: Expense, checked: Boolean) {
-        viewModelScope.launch {
-            try {
-                withContext(Dispatchers.Default) {
-                    db.persistExpense(expense.copy(checked = checked))
-                }
-
-                forceRefreshMutableFlow.emit(Unit)
-            } catch (e: Exception) {
-                Logger.error("Error while checking expense", e)
-                expenseCheckedErrorEventMutableFlow.emit(e)
-            }
-        }
-    }
-
-    fun onMonthChanged(month: Int, year: Int) {
-        val cal = Calendar.getInstance()
-        showGoToCurrentMonthButtonStateMutableFlow.value = cal.get(Calendar.MONTH) != month || cal.get(Calendar.YEAR) != year
-    }
-
-    fun onGoBackToCurrentMonthButtonPressed() {
-        viewModelScope.launch {
-            goBackToCurrentMonthEventMutableFlow.emit(Unit)
-            selectDateMutableStateFlow.value = LocalDate.now()
-        }
-    }
-
-    fun onShowCheckedBalanceChanged() {
-        viewModelScope.launch {
-            forceRefreshMutableFlow.emit(Unit)
-        }
-    }
-
-    fun onCheckAllPastEntriesPressed() {
-        viewModelScope.launch {
-            confirmCheckAllPastEntriesEventMutableFlow.emit(Unit)
-        }
-    }
-
-    fun onCheckAllPastEntriesConfirmPressed() {
-        viewModelScope.launch {
-            try {
-                withContext(Dispatchers.Default) {
-                    db.markAllEntriesAsChecked(LocalDate.now())
-                }
-
-                forceRefreshMutableFlow.emit(Unit)
-            } catch (e: Exception) {
-                Logger.error("Error while checking all past entries", e)
-                checkAllPastEntriesErrorEventMutableFlow.emit(e)
-            }
-        }
-    }
-
-    fun onLowMoneyWarningThresholdChanged() {
-        viewModelScope.launch {
-            forceRefreshMutableFlow.emit(Unit)
-        }
-    }
+        true
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, SelectedAccount.Loading)
 
     fun onBecomePremiumButtonPressed() {
         viewModelScope.launch {
             openPremiumEventMutableFlow.emit(Unit)
         }
     }
-}
 
-data class SelectedDateExpensesData(val date: LocalDate, val balance: Double, val checkedBalance: Double?, val expenses: List<Expense>)
-data class ExpenseDeletionSuccessData(val deletedExpense: Expense, val newDayBalance: Double, val newCheckedBalance: Double?)
-data class BalanceAdjustedData(val balanceExpense: Expense, val diffWithOldBalance: Double, val newBalance: Double)
+    fun onWelcomeScreenFinished() {
+        // TODO
+    }
+
+    fun onAccountTapped() {
+        viewModelScope.launch {
+            retryEventMutableFlow.emit(Unit)
+            eventMutableFlow.emit(Event.ShowAccountSelect)
+        }
+    }
+
+    fun onAccountSelected(account: SelectedAccount.Selected) {
+        viewModelScope.launch {
+            retryEventMutableFlow.emit(Unit)
+        }
+
+        val onlineAccountId = when(account) {
+            SelectedAccount.Selected.Offline -> null
+            is SelectedAccount.Selected.Online -> account.accountId
+        }
+
+        parameters.setLatestSelectedOnlineAccountId(onlineAccountId)
+        selectedOnlineAccountIdMutableStateFlow.value = onlineAccountId
+    }
+
+    fun shouldShowMenuButtons(): Boolean = iab.isIabReady() && accountSelectionFlow.value is SelectedAccount.Selected
+
+    fun showPremiumMenuButtons(): Boolean = when(iab.iabStatusFlow.value) {
+        PremiumCheckStatus.INITIALIZING,
+        PremiumCheckStatus.CHECKING,
+        PremiumCheckStatus.ERROR,
+        PremiumCheckStatus.NOT_PREMIUM -> false
+        PremiumCheckStatus.LEGACY_PREMIUM,
+        PremiumCheckStatus.PREMIUM_SUBSCRIBED,
+        PremiumCheckStatus.PRO_SUBSCRIBED -> true
+    }
+
+    private sealed class OnlineAccountResponse {
+        object Loading : OnlineAccountResponse()
+        data class Available(val accounts: List<Account>) : OnlineAccountResponse()
+    }
+
+    sealed class SelectedAccount {
+        object Loading : SelectedAccount()
+        sealed class Selected : SelectedAccount(), Parcelable {
+            @Parcelize
+            object Offline : Selected()
+            @Parcelize
+            data class Online(
+                val name: String,
+                val isOwner: Boolean,
+                val ownerEmail: String,
+                val accountId: String,
+                val accountSecret: String,
+            ) : Selected() {
+                fun toAccountCredentials() = AccountCredentials(
+                    id = accountId,
+                    secret = accountSecret,
+                )
+            }
+        }
+    }
+
+    sealed class Event {
+        object ShowAccountSelect : Event()
+    }
+}

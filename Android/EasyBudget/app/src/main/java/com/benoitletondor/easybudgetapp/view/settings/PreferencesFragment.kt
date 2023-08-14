@@ -35,6 +35,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.preference.*
 import com.benoitletondor.easybudgetapp.BuildConfig
@@ -46,6 +47,8 @@ import com.benoitletondor.easybudgetapp.parameters.*
 import com.benoitletondor.easybudgetapp.view.RatingPopup
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.USER_GONE_PREMIUM_INTENT
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
+import com.benoitletondor.easybudgetapp.view.main.createaccount.CreateAccountActivity
+import com.benoitletondor.easybudgetapp.view.main.login.LoginActivity
 import com.benoitletondor.easybudgetapp.view.premium.PremiumActivity
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.SHOW_BACKUP_INTENT_KEY
@@ -53,6 +56,7 @@ import com.benoitletondor.easybudgetapp.view.settings.backup.BackupSettingsActiv
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.roomorama.caldroid.CaldroidFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.net.URLEncoder
 import javax.inject.Inject
 
@@ -341,7 +345,23 @@ class PreferencesFragment : PreferenceFragmentCompat() {
              * Show premium screen
              */
             findPreference<Preference>(resources.getString(R.string.setting_category_dev_show_premium_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                showBecomePremiumDialog()
+                showBecomePremiumActivity()
+                false
+            }
+
+            findPreference<Preference>(getString(R.string.setting_category_dev_show_login))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                activity?.let { activity ->
+                    val intent = LoginActivity.newIntent(activity, shouldDismissAfterAuth = false)
+                    activity.startActivity(intent)
+                }
+                false
+            }
+
+            findPreference<Preference>(getString(R.string.setting_category_dev_show_create_account))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                activity?.let { activity ->
+                    val intent = Intent(activity, CreateAccountActivity::class.java)
+                    activity.startActivity(intent)
+                }
                 false
             }
         }
@@ -394,7 +414,15 @@ class PreferencesFragment : PreferenceFragmentCompat() {
          */
         if (activity?.intent?.getBooleanExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, false) == true) {
             activity?.intent?.putExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, false)
-            showBecomePremiumDialog()
+            showBecomePremiumActivity()
+        }
+
+        /*
+         * Check if we should show pro popup
+         */
+        if (activity?.intent?.getBooleanExtra(SettingsActivity.SHOW_PRO_INTENT_KEY, false) == true) {
+            activity?.intent?.putExtra(SettingsActivity.SHOW_PRO_INTENT_KEY, false)
+            showBecomeProActivity()
         }
 
         /*
@@ -452,145 +480,164 @@ class PreferencesFragment : PreferenceFragmentCompat() {
      * Show the right premium preference depending on the user state
      */
     private fun refreshPremiumPreference() {
-        val isPremium = iab.isUserPremium()
+        lifecycleScope.launch {
+            val isPremium = iab.isUserPremium()
+            val isPro = iab.isUserPro()
 
-        if (isPremium) {
-            if (notPremiumShown) {
-                preferenceScreen.removePreference(notPremiumCategory)
-                notPremiumShown = false
-            }
-
-            if (!premiumShown) {
-                preferenceScreen.addPreference(premiumCategory)
-                premiumShown = true
-            }
-
-            // Premium preference
-            findPreference<Preference>(resources.getString(R.string.setting_category_premium_status_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                context?.let {context ->
-                    MaterialAlertDialogBuilder(context)
-                        .setTitle(R.string.premium_popup_premium_title)
-                        .setMessage(R.string.premium_popup_premium_message)
-                        .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
-                        .show()
+            if (isPremium) {
+                if (notPremiumShown) {
+                    preferenceScreen.removePreference(notPremiumCategory)
+                    notPremiumShown = false
                 }
 
-                false
-            }
-
-            // Daily reminder notif preference
-            val dailyNotifPref = findPreference<CheckBoxPreference>(resources.getString(R.string.setting_category_notifications_daily_key))
-            dailyNotifPref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                val checked = (it as CheckBoxPreference).isChecked
-                parameters.setUserAllowDailyReminderPushes(checked)
-
-                if (checked) {
-                    showNotificationPermissionIfNeeded()
+                if (!premiumShown) {
+                    preferenceScreen.addPreference(premiumCategory)
+                    premiumShown = true
                 }
 
-                true
-            }
-            dailyNotifPref?.isChecked = parameters.isUserAllowingDailyReminderPushes()
-
-            // Monthly reminder for reports
-            val monthlyNotifPref = findPreference<CheckBoxPreference>(resources.getString(R.string.setting_category_notifications_monthly_key))
-            monthlyNotifPref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                val checked = (it as CheckBoxPreference).isChecked
-                parameters.setUserAllowMonthlyReminderPushes(checked)
-
-                if (checked) {
-                    showNotificationPermissionIfNeeded()
-                }
-
-                true
-            }
-            monthlyNotifPref?.isChecked = parameters.isUserAllowingMonthlyReminderPushes()
-
-            // Theme
-            findPreference<ListPreference>(getString(R.string.setting_category_app_theme_key))?.let { themePref ->
-                val currentTheme = parameters.getTheme()
-
-                themePref.value = currentTheme.value.toString()
-                themePref.summary = themePref.entries[themePref.findIndexOfValue(themePref.value)]
-                themePref.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
-                    themePref.summary = themePref.entries[themePref.findIndexOfValue(newValue as String)]
-
-                    val newTheme = AppTheme.values().first { it.value == newValue.toInt() }
-
-                    parameters.setTheme(newTheme)
-                    AppCompatDelegate.setDefaultNightMode(newTheme.toPlatformValue())
-
-                    true
-                }
-            }
-        } else {
-            if (premiumShown) {
-                preferenceScreen.removePreference(premiumCategory)
-                premiumShown = false
-            }
-
-            if (!notPremiumShown) {
-                preferenceScreen.addPreference(notPremiumCategory)
-                notPremiumShown = true
-            }
-
-            // Not premium preference
-            findPreference<Preference>(resources.getString(R.string.setting_category_not_premium_status_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                showBecomePremiumDialog()
-                false
-            }
-
-            // Redeem promo code pref
-            findPreference<Preference>(resources.getString(R.string.setting_category_premium_redeem_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                activity?.let { activity ->
-                    val dialogView = activity.layoutInflater.inflate(R.layout.dialog_redeem_voucher, null)
-                    val voucherEditText = dialogView.findViewById<View>(R.id.voucher) as EditText
-
-                    val builder = MaterialAlertDialogBuilder(activity)
-                        .setTitle(R.string.voucher_redeem_dialog_title)
-                        .setMessage(R.string.voucher_redeem_dialog_message)
-                        .setView(dialogView)
-                        .setPositiveButton(R.string.voucher_redeem_dialog_cta) { dialog, _ ->
-                            dialog.dismiss()
-
-                            val promocode = voucherEditText.text.toString()
-                            if (promocode.trim { it <= ' ' }.isEmpty()) {
-                                MaterialAlertDialogBuilder(activity)
-                                    .setTitle(R.string.voucher_redeem_error_dialog_title)
-                                    .setMessage(R.string.voucher_redeem_error_code_invalid_dialog_message)
-                                    .setPositiveButton(R.string.ok) { dialog12, _ -> dialog12.dismiss() }
+                // Premium/Pro preference
+                findPreference<Preference>(resources.getString(R.string.setting_category_premium_status_key))?.let {
+                    it.title = if (isPro) { getString(R.string.setting_category_pro_status_title)} else { getString(R.string.setting_category_premium_status_title) }
+                    it.summary = if (isPro) { getString(R.string.setting_category_pro_status_message)} else { getString(R.string.setting_category_premium_status_message) }
+                    it.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                        context?.let { context ->
+                            if (!isPro) {
+                                showBecomeProActivity()
+                            } else {
+                                MaterialAlertDialogBuilder(context)
+                                    .setTitle(R.string.pro_popup_title)
+                                    .setMessage(R.string.pro_popup_message)
+                                    .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
                                     .show()
                             }
 
-                            if (!launchRedeemPromocodeFlow(promocode)) {
-                                MaterialAlertDialogBuilder(activity)
-                                    .setTitle(R.string.iab_purchase_error_title)
-                                    .setMessage(resources.getString(R.string.iab_purchase_error_message, "Error redeeming promo code"))
-                                    .setPositiveButton(R.string.ok) { dialog1, _ -> dialog1.dismiss() }
-                                    .show()
-                            }
                         }
-                        .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
 
-                    val dialog = builder.show()
-
-                    // Directly show keyboard when the dialog pops
-                    voucherEditText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
-                        // Check if the device doesn't have a physical keyboard
-                        if (hasFocus && resources.configuration.keyboard == Configuration.KEYBOARD_NOKEYS) {
-                            dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-                        }
+                        false
                     }
                 }
 
-                false
+                // Daily reminder notif preference
+                val dailyNotifPref = findPreference<CheckBoxPreference>(resources.getString(R.string.setting_category_notifications_daily_key))
+                dailyNotifPref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                    val checked = (it as CheckBoxPreference).isChecked
+                    parameters.setUserAllowDailyReminderPushes(checked)
+
+                    if (checked) {
+                        showNotificationPermissionIfNeeded()
+                    }
+
+                    true
+                }
+                dailyNotifPref?.isChecked = parameters.isUserAllowingDailyReminderPushes()
+
+                // Monthly reminder for reports
+                val monthlyNotifPref = findPreference<CheckBoxPreference>(resources.getString(R.string.setting_category_notifications_monthly_key))
+                monthlyNotifPref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                    val checked = (it as CheckBoxPreference).isChecked
+                    parameters.setUserAllowMonthlyReminderPushes(checked)
+
+                    if (checked) {
+                        showNotificationPermissionIfNeeded()
+                    }
+
+                    true
+                }
+                monthlyNotifPref?.isChecked = parameters.isUserAllowingMonthlyReminderPushes()
+
+                // Theme
+                findPreference<ListPreference>(getString(R.string.setting_category_app_theme_key))?.let { themePref ->
+                    val currentTheme = parameters.getTheme()
+
+                    themePref.value = currentTheme.value.toString()
+                    themePref.summary = themePref.entries[themePref.findIndexOfValue(themePref.value)]
+                    themePref.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+                        themePref.summary = themePref.entries[themePref.findIndexOfValue(newValue as String)]
+
+                        val newTheme = AppTheme.values().first { it.value == newValue.toInt() }
+
+                        parameters.setTheme(newTheme)
+                        AppCompatDelegate.setDefaultNightMode(newTheme.toPlatformValue())
+
+                        true
+                    }
+                }
+            } else {
+                if (premiumShown) {
+                    preferenceScreen.removePreference(premiumCategory)
+                    premiumShown = false
+                }
+
+                if (!notPremiumShown) {
+                    preferenceScreen.addPreference(notPremiumCategory)
+                    notPremiumShown = true
+                }
+
+                // Not premium preference
+                findPreference<Preference>(resources.getString(R.string.setting_category_not_premium_status_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                    showBecomePremiumActivity()
+                    false
+                }
+
+                // Redeem promo code pref
+                findPreference<Preference>(resources.getString(R.string.setting_category_premium_redeem_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                    activity?.let { activity ->
+                        val dialogView = activity.layoutInflater.inflate(R.layout.dialog_redeem_voucher, null)
+                        val voucherEditText = dialogView.findViewById<View>(R.id.voucher) as EditText
+
+                        val builder = MaterialAlertDialogBuilder(activity)
+                            .setTitle(R.string.voucher_redeem_dialog_title)
+                            .setMessage(R.string.voucher_redeem_dialog_message)
+                            .setView(dialogView)
+                            .setPositiveButton(R.string.voucher_redeem_dialog_cta) { dialog, _ ->
+                                dialog.dismiss()
+
+                                val promocode = voucherEditText.text.toString()
+                                if (promocode.trim { it <= ' ' }.isEmpty()) {
+                                    MaterialAlertDialogBuilder(activity)
+                                        .setTitle(R.string.voucher_redeem_error_dialog_title)
+                                        .setMessage(R.string.voucher_redeem_error_code_invalid_dialog_message)
+                                        .setPositiveButton(R.string.ok) { dialog12, _ -> dialog12.dismiss() }
+                                        .show()
+                                }
+
+                                if (!launchRedeemPromocodeFlow(promocode)) {
+                                    MaterialAlertDialogBuilder(activity)
+                                        .setTitle(R.string.iab_purchase_error_title)
+                                        .setMessage(resources.getString(R.string.iab_purchase_error_message, "Error redeeming promo code"))
+                                        .setPositiveButton(R.string.ok) { dialog1, _ -> dialog1.dismiss() }
+                                        .show()
+                                }
+                            }
+                            .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
+
+                        val dialog = builder.show()
+
+                        // Directly show keyboard when the dialog pops
+                        voucherEditText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+                            // Check if the device doesn't have a physical keyboard
+                            if (hasFocus && resources.configuration.keyboard == Configuration.KEYBOARD_NOKEYS) {
+                                dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+                            }
+                        }
+                    }
+
+                    false
+                }
             }
         }
     }
 
-    private fun showBecomePremiumDialog() {
+    private fun showBecomePremiumActivity() {
         activity?.let { activity ->
-            val intent = Intent(activity, PremiumActivity::class.java)
+            val intent = PremiumActivity.createIntent(activity, shouldShowProByDefault = false)
+            ActivityCompat.startActivityForResult(activity, intent, SettingsActivity.PREMIUM_ACTIVITY, null)
+        }
+    }
+
+    private fun showBecomeProActivity() {
+        activity?.let { activity ->
+            val intent = PremiumActivity.createIntent(activity, shouldShowProByDefault = true)
             ActivityCompat.startActivityForResult(activity, intent, SettingsActivity.PREMIUM_ACTIVITY, null)
         }
     }

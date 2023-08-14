@@ -24,6 +24,7 @@ import com.benoitletondor.easybudgetapp.parameters.*
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.runBlocking
 
 import java.util.Calendar
 import java.util.Date
@@ -47,7 +48,7 @@ class PushService : FirebaseMessagingService() {
 
         // Check that the push is valid
         if (Batch.Push.shouldDisplayPush(this, remoteMessage)) {
-            if (!shouldDisplayPush(remoteMessage)) {
+            if (!runBlocking { shouldDisplayPush(remoteMessage) } ) {
                 Logger.debug("Not displaying push cause conditions are not matching")
                 return
             }
@@ -63,7 +64,7 @@ class PushService : FirebaseMessagingService() {
      * @param remoteMessage
      * @return true if should display the push, false otherwise
      */
-    private fun shouldDisplayPush(remoteMessage: RemoteMessage): Boolean {
+    private suspend fun shouldDisplayPush(remoteMessage: RemoteMessage): Boolean {
         return isUserOk(remoteMessage) && isVersionCompatible(remoteMessage) && isPremiumCompatible(remoteMessage)
     }
 
@@ -73,7 +74,7 @@ class PushService : FirebaseMessagingService() {
      * @param remoteMessage
      * @return true if should display the push, false otherwise
      */
-    private fun isUserOk(remoteMessage: RemoteMessage): Boolean {
+    private suspend fun isUserOk(remoteMessage: RemoteMessage): Boolean {
         try {
             // Check if it's a daily reminder
             if (remoteMessage.data.containsKey(DAILY_REMINDER_KEY) && "true" == remoteMessage.data[DAILY_REMINDER_KEY]) {
@@ -146,7 +147,7 @@ class PushService : FirebaseMessagingService() {
      * @param remoteMessage push intent
      * @return true if compatible, false otherwise
      */
-    private fun isPremiumCompatible(remoteMessage: RemoteMessage): Boolean {
+    private suspend fun isPremiumCompatible(remoteMessage: RemoteMessage): Boolean {
         try {
             if (remoteMessage.data.containsKey(INTENT_PREMIUM_KEY)) {
                 val isForPremium = "true" == remoteMessage.data[INTENT_PREMIUM_KEY]

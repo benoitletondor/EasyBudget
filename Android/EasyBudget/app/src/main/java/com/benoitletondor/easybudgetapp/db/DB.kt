@@ -18,10 +18,15 @@ package com.benoitletondor.easybudgetapp.db
 
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
+import kotlinx.coroutines.flow.Flow
+import java.io.Closeable
 import java.time.LocalDate
 
 interface DB {
+    val onChangeFlow: Flow<Unit>
+
     fun ensureDBCreated()
+
     suspend fun triggerForceWriteToDisk()
 
     suspend fun persistExpense(expense: Expense): Expense
@@ -40,21 +45,15 @@ interface DB {
 
     suspend fun persistRecurringExpense(recurringExpense: RecurringExpense): RecurringExpense
 
-    suspend fun deleteRecurringExpense(recurringExpense: RecurringExpense)
+    suspend fun updateRecurringExpenseAfterDate(newRecurringExpense: RecurringExpense, date: LocalDate)
 
-    suspend fun deleteExpense(expense: Expense)
+    suspend fun deleteRecurringExpense(recurringExpense: RecurringExpense): RestoreAction
 
-    suspend fun deleteAllExpenseForRecurringExpense(recurringExpense: RecurringExpense)
+    suspend fun deleteExpense(expense: Expense): RestoreAction
 
-    suspend fun getAllExpenseForRecurringExpense(recurringExpense: RecurringExpense): List<Expense>
+    suspend fun deleteAllExpenseForRecurringExpenseAfterDate(recurringExpense: RecurringExpense, afterDate: LocalDate): RestoreAction
 
-    suspend fun deleteAllExpenseForRecurringExpenseAfterDate(recurringExpense: RecurringExpense, afterDate: LocalDate)
-
-    suspend fun getAllExpensesForRecurringExpenseAfterDate(recurringExpense: RecurringExpense, afterDate: LocalDate): List<Expense>
-
-    suspend fun deleteAllExpenseForRecurringExpenseBeforeDate(recurringExpense: RecurringExpense, beforeDate: LocalDate)
-
-    suspend fun getAllExpensesForRecurringExpenseBeforeDate(recurringExpense: RecurringExpense, beforeDate: LocalDate): List<Expense>
+    suspend fun deleteAllExpenseForRecurringExpenseBeforeDate(recurringExpense: RecurringExpense, beforeDate: LocalDate): RestoreAction
 
     suspend fun hasExpensesForRecurringExpenseBeforeDate(recurringExpense: RecurringExpense, beforeDate: LocalDate): Boolean
 

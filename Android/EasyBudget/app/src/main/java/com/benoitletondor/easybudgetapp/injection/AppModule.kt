@@ -17,19 +17,27 @@
 package com.benoitletondor.easybudgetapp.injection
 
 import android.content.Context
+import com.benoitletondor.easybudgetapp.BuildConfig
+import com.benoitletondor.easybudgetapp.accounts.Accounts
+import com.benoitletondor.easybudgetapp.accounts.FirebaseAccounts
 import com.benoitletondor.easybudgetapp.auth.Auth
+import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.benoitletondor.easybudgetapp.auth.FirebaseAuth
 import com.benoitletondor.easybudgetapp.cloudstorage.CloudStorage
 import com.benoitletondor.easybudgetapp.cloudstorage.FirebaseStorage
-import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.iab.IabImpl
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.db.DB
-import com.benoitletondor.easybudgetapp.db.impl.CachedDBImpl
-import com.benoitletondor.easybudgetapp.db.impl.CacheDBStorage
-import com.benoitletondor.easybudgetapp.db.impl.DBImpl
-import com.benoitletondor.easybudgetapp.db.impl.RoomDB
+import com.benoitletondor.easybudgetapp.db.cacheimpl.CachedDBImpl
+import com.benoitletondor.easybudgetapp.db.cacheimpl.CacheDBStorage
+import com.benoitletondor.easybudgetapp.db.cacheimpl.CachedOnlineDBImpl
+import com.benoitletondor.easybudgetapp.db.offlineimpl.OfflineDBImpl
+import com.benoitletondor.easybudgetapp.db.offlineimpl.RoomDB
+import com.benoitletondor.easybudgetapp.db.onlineimpl.OnlineDB
+import com.benoitletondor.easybudgetapp.db.onlineimpl.OnlineDBImpl
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -47,12 +55,15 @@ object AppModule {
     @Singleton
     fun provideIab(
         @ApplicationContext context: Context,
-        parameters: Parameters,
-    ): Iab = IabImpl(context, parameters)
+    ): Iab = IabImpl(context)
 
     @Provides
     @Singleton
     fun provideFirebaseAuth(): Auth = FirebaseAuth(com.google.firebase.auth.FirebaseAuth.getInstance())
+
+    @Provides
+    @Singleton
+    fun provideAccounts(): Accounts = FirebaseAccounts(Firebase.firestore)
 
     @Provides
     @Singleton
@@ -67,7 +78,26 @@ object AppModule {
     fun provideDB(
         @ApplicationContext context: Context,
     ): DB = CachedDBImpl(
-        DBImpl(RoomDB.create(context)),
+        OfflineDBImpl(RoomDB.create(context)),
+        object : CacheDBStorage {
+            override val expenses: MutableMap<LocalDate, List<Expense>> = mutableMapOf()
+            override val balances: MutableMap<LocalDate, Double> = mutableMapOf()
+            override val checkedBalances: MutableMap<LocalDate, Double> = mutableMapOf()
+        },
+        Executors.newSingleThreadExecutor(),
+    )
+
+    suspend fun provideSyncedOnlineDBOrThrow(
+        currentUser: CurrentUser,
+        accountId: String,
+        accountSecret: String,
+    ): OnlineDB = CachedOnlineDBImpl(
+        OnlineDBImpl.provideFor(
+            atlasAppId = BuildConfig.ATLAS_APP_ID,
+            currentUser = currentUser,
+            accountId = accountId,
+            accountSecret = accountSecret
+        ),
         object : CacheDBStorage {
             override val expenses: MutableMap<LocalDate, List<Expense>> = mutableMapOf()
             override val balances: MutableMap<LocalDate, Double> = mutableMapOf()

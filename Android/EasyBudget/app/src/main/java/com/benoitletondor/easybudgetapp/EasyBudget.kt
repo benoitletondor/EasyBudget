@@ -216,7 +216,7 @@ class EasyBudget : Application(), Configuration.Provider {
                     return@launch
                 }
 
-                if ( iab.waitForIsUserPremiumResponse() ) {
+                if ( iab.isUserPremium() ) {
                     return@launch
                 }
 

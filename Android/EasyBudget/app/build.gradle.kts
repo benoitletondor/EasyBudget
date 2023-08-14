@@ -21,11 +21,14 @@ plugins {
     id("dagger.hilt.android.plugin")
     id("com.google.devtools.ksp")
     id("com.google.gms.google-services")
+    id("io.realm.kotlin")
+    id("kotlin-parcelize")
 }
 
 apply {
     from("batch.gradle.kts")
     from("iap.gradle.kts")
+    from("atlas.gradle.kts")
 }
 
 android {
@@ -53,6 +56,7 @@ android {
         debug {
             val batchDevKey = rootProject.extra["batchDevKey"] as String
             val licenceKey = rootProject.extra["licenceKey"] as String
+            val atlasAppId = rootProject.extra["atlasAppId"] as String
 
             buildConfigField("boolean", "DEBUG_LOG", "true")
             buildConfigField("boolean", "CRASHLYTICS_ACTIVATED", "false")
@@ -60,12 +64,14 @@ android {
             buildConfigField("boolean", "ANALYTICS_ACTIVATED", "false")
             buildConfigField("boolean", "DEV_PREFERENCES", "true")
             buildConfigField("String", "LICENCE_KEY", "\"$licenceKey\"")
+            buildConfigField("String", "ATLAS_APP_ID", "\"$atlasAppId\"")
 
             signingConfig = signingConfigs.getByName("debug")
         }
         release {
             val batchLiveKey = rootProject.extra["batchLiveKey"] as String
             val licenceKey = rootProject.extra["licenceKey"] as String
+            val atlasAppId = rootProject.extra["atlasAppId"] as String
 
             buildConfigField("boolean", "DEBUG_LOG", "false")
             buildConfigField("boolean", "CRASHLYTICS_ACTIVATED", "true")
@@ -73,6 +79,7 @@ android {
             buildConfigField("boolean", "ANALYTICS_ACTIVATED", "true")
             buildConfigField("boolean", "DEV_PREFERENCES", "false")
             buildConfigField("String", "LICENCE_KEY", "\"$licenceKey\"")
+            buildConfigField("String", "ATLAS_APP_ID", "\"$atlasAppId\"")
 
             isMinifyEnabled = true
             isShrinkResources = true
@@ -118,6 +125,7 @@ java {
 dependencies {
     val kotlinVersion: String by rootProject.extra
     val hiltVersion: String by rootProject.extra
+    val realmVersion: String by rootProject.extra
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion")
 
@@ -141,19 +149,23 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.2")
 
-    implementation(platform("com.google.firebase:firebase-bom:32.1.1"))
+    implementation(platform("com.google.firebase:firebase-bom:32.2.2"))
     implementation("com.google.firebase:firebase-messaging-ktx")
     implementation("com.google.firebase:firebase-storage")
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.firebaseui:firebase-ui-auth:8.0.2")
 
     val composeBom = platform("androidx.compose:compose-bom:2023.06.01")
     implementation(composeBom)
     androidTestImplementation(composeBom)
+    debugImplementation("androidx.compose.ui:ui-tooling")
     implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.ui:ui")
     implementation("androidx.activity:activity-compose:1.7.2")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
+    implementation("com.google.accompanist:accompanist-themeadapter-material3:0.31.5-beta")
 
     implementation("com.android.billingclient:billing-ktx:6.0.1")
 
@@ -169,6 +181,10 @@ dependencies {
     ksp("androidx.room:room-compiler:2.5.2")
     implementation("androidx.room:room-runtime:2.5.2")
     implementation("androidx.room:room-ktx:2.5.2")
+
+    implementation("io.realm.kotlin:library-sync:$realmVersion")
+
+    implementation("net.sf.biweekly:biweekly:0.6.7")
 
     implementation("net.lingala.zip4j:zip4j:2.11.5")
 }
