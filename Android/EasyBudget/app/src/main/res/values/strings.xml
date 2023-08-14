@@ -403,7 +403,7 @@
     <string name="accounts_online_own_accounts">Your accounts</string>
     <string name="accounts_online_other_accounts">Other accounts</string>
     <string name="accounts_online_not_pro_title">Want to unlock more accounts?</string>
-    <string name="accounts_online_not_pro_desc">Add online accounts, always in sync and sharable in real-time with your friends/family/coworkers, by upgrading to Pro.</string>
+    <string name="accounts_online_not_pro_desc">Add online accounts, always in sync and shareable in real-time with your friends/family/coworkers, by upgrading to Pro.</string>
     <string name="accounts_online_not_pro_cta">Discover EasyBudget Pro</string>
     <string name="accounts_online_iab_error_title">Unable to connect to the PlayStore</string>
     <string name="accounts_online_iab_error_desc">An error occurred while checking your membership status, please try again and try to restart your phone if the error persists.</string>
