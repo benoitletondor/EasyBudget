@@ -449,7 +449,7 @@
     <string name="manage_account_owner_invitation_delete_cta">Revoke</string>
     <string name="manage_account_owner_invitation_delete_confirm_title">Revoke invitation</string>
     <string name="manage_account_owner_invitation_delete_confirm_desc">Are you sure you want to revoke this invitation? %s won\'t be able to access the account anymore.</string>
-    <string name="manage_account_owner_invitation_delete_confirm_cta">Delete</string>
+    <string name="manage_account_owner_invitation_delete_confirm_cta">Revoke</string>
     <string name="manage_account_owner_invitation_empty_state">No invitations sent yet</string>
     <string name="manage_account_owner_invitation_send_email">Email</string>
     <string name="manage_account_owner_invitation_send_error_bad_email">Please enter a valid email</string>
