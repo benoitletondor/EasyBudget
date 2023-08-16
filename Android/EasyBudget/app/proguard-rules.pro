@@ -17,3 +17,7 @@
 #}
 
 -keep class * extends androidx.fragment.app.Fragment {}
+
+# This is generated automatically by the Android Gradle plugin.
+-dontwarn org.slf4j.impl.StaticLoggerBinder
+-dontwarn org.slf4j.impl.StaticMDCBinder
