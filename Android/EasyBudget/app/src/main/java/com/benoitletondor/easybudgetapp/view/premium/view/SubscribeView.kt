@@ -419,6 +419,14 @@ private fun ColumnScope.ProSubscriptionView(proSubscribed: Boolean) {
             fontSize = 16.sp,
         )
 
+        Image(
+            painter = painterResource(R.drawable.savings),
+            contentDescription = null,
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
         Text(
             modifier = Modifier.padding(bottom = 10.dp),
             text = stringResource(R.string.premium_popup_not_pro_feature2_title),
@@ -432,6 +440,14 @@ private fun ColumnScope.ProSubscriptionView(proSubscribed: Boolean) {
             color = Color.White,
             fontSize = 16.sp,
         )
+
+        Image(
+            painter = painterResource(R.drawable.users),
+            contentDescription = null,
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+        )
+
+        Spacer(modifier = Modifier.height(30.dp))
 
         Text(
             modifier = Modifier
