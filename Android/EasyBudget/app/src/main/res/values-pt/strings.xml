@@ -358,6 +358,9 @@
     <string name="account_management_account_left_confirmation">Conta encerrada com sucesso</string>
     <string name="account_management_account_name_updated_confirmation">Nome da conta atualizado com sucesso</string>
     <string name="account_management_error_title">Ops</string>
+    <string name="update_three_dot_zero_notification_title">Novidade no EasyBudget</string>
+    <string name="update_three_dot_zero_notification_message">Gerencie várias contas e compartilhe-as com outras pessoas, disponível com o EasyBudget Pro!</string>
+    <string name="update_three_dot_zero_notification_cta">Descobrir</string>
     <string name="setting_notification_permission_rejected_dialog_title">Permissão de notificações negada</string>
     <string name="setting_notification_permission_rejected_dialog_description">Para receber seus lembretes premium diários e mensais, você precisa permitir notificações. Deseja receber notificações?</string>
     <string name="setting_notification_permission_rejected_dialog_accept_cta">Permitir</string>

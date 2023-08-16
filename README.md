@@ -6,11 +6,9 @@ EasyBudget is a **simple** budget management Android application.
 
 ### Project idea
 
-I got the idea of this app by trying to find one really easy to use budget management app on my phone, the conclusion was simple: I cannot find an app on the PlayStore that fits my needs.
+I got the idea of this app by trying to find one really easy to use budget management app on the PlayStore, the conclusion was simple: There was no app on the PlayStore that fitted my needs.
 
-I want a simpler app to manage budget on Android. Only 1 account, no export-import features, no stats/graph, simple interface, quick and efficient.
-
-I simply decided to create my own app in my free time, with the hope that I'm not the only one looking for an easiest way to manage my budget.
+I wanted a simpler app to manage budget on Android: No stats/graph, simple interface, quick and efficient. so I simply decided to create it in my free time, with the hope that I'm not the only one looking for an easiest way to manage my budget.
 
 ### Available on PlayStore
 
@@ -18,15 +16,11 @@ You can download EasyBudget on the PlayStore: [https://play.google.com/store/app
 
 ### Technical details
 
-EasyBudget is a simple Android app build with Android Studio that supports Android 4+. 
+EasyBudget is a simple Android app built with Android Studio that supports Android 5+. 
 
-The app adopt material design as much as possible using appcompat and some imagination/magic.
+The app adopt material design as much as possible using Androidx, Compose and some other libraries.
 
-The project is made possible by some external libraries made by awesome guys that I want to thanks here:
-
-- Caldroid: a library to display a customizable Calendar [https://github.com/roomorama/Caldroid](https://github.com/roomorama/Caldroid)
-- FloatingActionButton: library to display a FAB with actions [https://github.com/futuresimple/android-floating-action-button](https://github.com/futuresimple/android-floating-action-button)
-- CircleIndicator: library to display a circle indicator on the onboarding view pager [https://github.com/ongakuer/CircleIndicator](https://github.com/ongakuer/CircleIndicator)
+The project also uses some external libraries, especially Caldroid: a library to display a customizable Calendar [https://github.com/roomorama/Caldroid](https://github.com/roomorama/Caldroid).
 
 ### Contact
 

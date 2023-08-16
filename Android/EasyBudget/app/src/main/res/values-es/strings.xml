@@ -358,6 +358,9 @@
     <string name="account_management_account_left_confirmation">Cuenta abandonada con éxito</string>
     <string name="account_management_account_name_updated_confirmation">Nombre de cuenta actualizado con éxito</string>
     <string name="account_management_error_title">¡Ups</string>
+    <string name="update_three_dot_zero_notification_title">Nuevo en EasyBudget</string>
+    <string name="update_three_dot_zero_notification_message">Administre varias cuentas y compártalas con otros, ¡disponible con EasyBudget Pro!</string>
+    <string name="update_three_dot_zero_notification_cta">Descubrir</string>
     <string name="setting_notification_permission_rejected_dialog_title">Permiso de notificaciones denegado</string>
     <string name="setting_notification_permission_rejected_dialog_description">Para recibir los recordatorios diarios y mensuales de su prima, debe permitir las notificaciones. ¿Quieres recibir notificaciones?</string>
     <string name="setting_notification_permission_rejected_dialog_accept_cta">Permitir</string>

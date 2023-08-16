@@ -77,9 +77,9 @@ class AccountSelectorFragment : BottomSheetDialogFragment() {
                     }
                     dismiss()
                 }
-                AccountSelectorViewModel.Event.OpenLoginScreen -> {
+                is AccountSelectorViewModel.Event.OpenLoginScreen -> {
                     activity?.let {
-                        it.startActivity(LoginActivity.newIntent(it, shouldDismissAfterAuth = true))
+                        it.startActivity(LoginActivity.newIntent(it, shouldDismissAfterAuth = event.shouldDismissAfterAuth))
                     }
                 }
                 AccountSelectorViewModel.Event.OpenCreateAccountScreen -> {

@@ -24,8 +24,8 @@ import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * Simple Broadcast receiver that is just here to receive events when a package is updated. This is
- * made to awake our application on an update (especially EasyBudget ones) to perform action. Those
- * actions are made on {EasyBudget#onUpdate(int, int)}.
+ * made to awake our application on an update to perform action. Those actions are made on
+ * {EasyBudget#onUpdate(int, int)}.
  *
  * @author Benoit LETONDOR
  */

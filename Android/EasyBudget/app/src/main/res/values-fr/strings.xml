@@ -212,7 +212,7 @@
     <string name="premium_popup_not_premium_feature_more_backup_title">2. Sauvegarde</string>
     <string name="premium_popup_not_premium_feature_more_backup_message">Sauvegarde automatique de vos données dans le cloud ! Fini la peur de perdre le détail de votre budget.</string>
     <string name="premium_popup_not_premium_feature_more_title">… et plus de fonctionnalités premium qui seront ajoutées très bientôt !</string>
-    <string name="premium_popup_pro_description">Faites-en plus avec EasyBudget, tout ce qui est inclus avec Premium plus des fonctionnalités avancées pour gérer plusieurs comptes partageables :</string>
+    <string name="premium_popup_pro_description">Faites-en plus avec EasyBudget, comprend tout ce qui est inclus avec Premium plus des fonctionnalités avancées pour gérer plusieurs comptes partageables :</string>
     <string name="premium_popup_pro_unlocked_description">Vous êtes Pro ! Vous avez accès à tout ce qui est inclus avec Premium, plus :</string>
     <string name="premium_popup_not_pro_feature1_title">1. Plusieurs comptes</string>
     <string name="premium_popup_not_pro_feature1_message">Ajoutez jusqu\'à 5 comptes en ligne pour gérer votre compte joint, épargne ou un compte professionnel.</string>
@@ -358,6 +358,9 @@
     <string name="account_management_account_left_confirmation">Compte quitté avec succès</string>
     <string name="account_management_account_name_updated_confirmation">Nom du compte mis à jour avec succès</string>
     <string name="account_management_error_title">Oups</string>
+    <string name="update_three_dot_zero_notification_title">Nouveau dans EasyBudget</string>
+    <string name="update_three_dot_zero_notification_message">Gérez plusieurs comptes et partagez-les avec d\'autres, disponible avec EasyBudget Pro !</string>
+    <string name="update_three_dot_zero_notification_cta">Découvrir</string>
     <string name="setting_notification_permission_rejected_dialog_title">Permission de notification refusée</string>
     <string name="setting_notification_permission_rejected_dialog_description">Pour recevoir vos rappels quotidiens et mensuels premium, vous devez autoriser les notifications. Voulez-vous recevoir les notifications?</string>
     <string name="setting_notification_permission_rejected_dialog_accept_cta">Autoriser</string>

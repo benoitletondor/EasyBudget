@@ -169,7 +169,13 @@ class AccountSelectorViewModel @Inject constructor(
 
     fun onLoginButtonPressed() {
         viewModelScope.launch {
-            eventMutableFlow.emit(Event.OpenLoginScreen)
+            eventMutableFlow.emit(Event.OpenLoginScreen(shouldDismissAfterAuth = true))
+        }
+    }
+
+    fun onEmailTapped() {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.OpenLoginScreen(shouldDismissAfterAuth = false))
         }
     }
 
@@ -288,7 +294,7 @@ class AccountSelectorViewModel @Inject constructor(
         class ErrorRejectingInvitation(val error: Throwable) : Event()
         object InvitationRejected : Event()
         object OpenProScreen : Event()
-        object OpenLoginScreen : Event()
+        data class OpenLoginScreen(val shouldDismissAfterAuth: Boolean) : Event()
         object OpenCreateAccountScreen : Event()
     }
 }

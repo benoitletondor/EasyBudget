@@ -68,6 +68,7 @@ fun AccountsView(viewModel: AccountSelectorViewModel) {
         onAccountSelected = viewModel::onAccountSelected,
         onBecomeProButtonClicked = viewModel::onBecomeProButtonClicked,
         onLoginButtonPressed = viewModel::onLoginButtonPressed,
+        onEmailTapped = viewModel::onEmailTapped,
         onCreateAccountClicked = viewModel::onCreateAccountClicked,
         onAcceptInvitationConfirmed = viewModel::onAcceptInvitationConfirmed,
         onRejectInvitationConfirmed = viewModel::onRejectInvitationConfirmed,
@@ -82,6 +83,7 @@ private fun AccountsView(
     onAccountSelected: (MainViewModel.SelectedAccount.Selected) -> Unit,
     onBecomeProButtonClicked: () -> Unit,
     onLoginButtonPressed: () -> Unit,
+    onEmailTapped: () -> Unit,
     onCreateAccountClicked: () -> Unit,
     onAcceptInvitationConfirmed: (AccountSelectorViewModel.Invitation) -> Unit,
     onRejectInvitationConfirmed: (AccountSelectorViewModel.Invitation) -> Unit,
@@ -144,6 +146,9 @@ private fun AccountsView(
             Text(
                 text = state.userEmail,
                 fontSize = 15.sp,
+                modifier = Modifier.clickable(
+                    onClick = onEmailTapped,
+                )
             )
         }
 
@@ -548,6 +553,7 @@ fun AccountsLoadingViewPreview() {
             onAccountSelected = {},
             onBecomeProButtonClicked = {},
             onLoginButtonPressed = {},
+            onEmailTapped = {},
             onCreateAccountClicked = {},
             onRejectInvitationConfirmed = {},
             onAcceptInvitationConfirmed = {},
@@ -566,6 +572,7 @@ fun AccountsIabErrorViewPreview() {
             onAccountSelected = {},
             onBecomeProButtonClicked = {},
             onLoginButtonPressed = {},
+            onEmailTapped = {},
             onCreateAccountClicked = {},
             onRejectInvitationConfirmed = {},
             onAcceptInvitationConfirmed = {},
@@ -586,6 +593,7 @@ fun AccountsNotProViewPreview() {
             onAccountSelected = {},
             onBecomeProButtonClicked = {},
             onLoginButtonPressed = {},
+            onEmailTapped = {},
             onCreateAccountClicked = {},
             onRejectInvitationConfirmed = {},
             onAcceptInvitationConfirmed = {},
@@ -606,6 +614,7 @@ fun AccountsNotAuthenticatedViewPreview() {
             onAccountSelected = {},
             onBecomeProButtonClicked = {},
             onLoginButtonPressed = {},
+            onEmailTapped = {},
             onCreateAccountClicked = {},
             onRejectInvitationConfirmed = {},
             onAcceptInvitationConfirmed = {},
@@ -662,6 +671,7 @@ fun AccountsAvailableViewPreview() {
             onAccountSelected = {},
             onBecomeProButtonClicked = {},
             onLoginButtonPressed = {},
+            onEmailTapped = {},
             onCreateAccountClicked = {},
             onRejectInvitationConfirmed = {},
             onAcceptInvitationConfirmed = {},
@@ -738,6 +748,7 @@ fun AccountsAvailableFullViewPreview() {
             onAccountSelected = {},
             onBecomeProButtonClicked = {},
             onLoginButtonPressed = {},
+            onEmailTapped = {},
             onCreateAccountClicked = {},
             onRejectInvitationConfirmed = {},
             onAcceptInvitationConfirmed = {},

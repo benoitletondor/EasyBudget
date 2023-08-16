@@ -258,6 +258,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
             openAddExpenseIfNeeded(intent)
             openAddRecurringExpenseIfNeeded(intent)
             openSettingsForBackupIfNeeded(intent)
+            openAccountsTrayIfNeeded(intent)
             intent = null
         }
     }
@@ -342,6 +343,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
                 putExtra(SHOW_BACKUP_INTENT_KEY, true)
             }
             ActivityCompat.startActivityForResult(this@MainActivity, startIntent, SETTINGS_SCREEN_ACTIVITY_CODE, null)
+        }
+    }
+
+    private fun openAccountsTrayIfNeeded(intent: Intent) {
+        if( intent.getBooleanExtra(INTENT_OPEN_ACCOUNTS_TRAY_EXTRA, false) ) {
+            AccountSelectorFragment().show(supportFragmentManager, "accountSelector")
         }
     }
 
@@ -431,6 +438,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
         const val INTENT_REDIRECT_TO_PREMIUM_EXTRA = "intent.extra.premiumshow"
         const val INTENT_REDIRECT_TO_SETTINGS_EXTRA = "intent.extra.redirecttosettings"
         const val INTENT_REDIRECT_TO_SETTINGS_FOR_BACKUP_EXTRA = "intent.extra.redirecttosettingsforbackup"
+        const val INTENT_OPEN_ACCOUNTS_TRAY_EXTRA = "intent.extra.openaccountstray"
 
         const val ANIMATE_TRANSITION_KEY = "animate"
         const val CENTER_X_KEY = "centerX"
