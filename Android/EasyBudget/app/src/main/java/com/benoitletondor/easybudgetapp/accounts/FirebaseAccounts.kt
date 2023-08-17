@@ -324,12 +324,12 @@ class FirebaseAccounts(
     }
 
     private fun DocumentSnapshot.toAccountOrThrow(currentUser: CurrentUser): Account {
-        val ownerEmail = getString(ACCOUNT_DOCUMENT_OWNER_EMAIL)!!
+        val ownerEmail = getString(ACCOUNT_DOCUMENT_OWNER_EMAIL) ?: throw IllegalStateException("Missing $ACCOUNT_DOCUMENT_OWNER_EMAIL to create account")
 
         return Account(
             id = id,
-            secret = getString(ACCOUNT_DOCUMENT_SECRET)!!,
-            name = getString(ACCOUNT_DOCUMENT_NAME)!!,
+            secret = getString(ACCOUNT_DOCUMENT_SECRET) ?: throw IllegalStateException("Missing $ACCOUNT_DOCUMENT_SECRET to create account"),
+            name = getString(ACCOUNT_DOCUMENT_NAME) ?: throw IllegalStateException("Missing $ACCOUNT_DOCUMENT_NAME to create account"),
             ownerEmail = ownerEmail,
             isUserOwner = ownerEmail == currentUser.email,
         )
@@ -338,13 +338,13 @@ class FirebaseAccounts(
     private fun DocumentSnapshot.toInvitationOrThrow(): Invitation {
         return Invitation(
             id = id,
-            senderEmail = getString(INVITATION_DOCUMENT_SENDER_EMAIL)!!,
-            senderId = getString(INVITATION_DOCUMENT_SENDER_ID)!!,
-            receiverEmail = getString(INVITATION_DOCUMENT_RECEIVER_EMAIL)!!,
-            accountId = getString(INVITATION_DOCUMENT_ACCOUNT_ID)!!,
-            status = InvitationStatus.values().first {
+            senderEmail = getString(INVITATION_DOCUMENT_SENDER_EMAIL) ?: throw IllegalStateException("Missing $INVITATION_DOCUMENT_SENDER_EMAIL to create invitation"),
+            senderId = getString(INVITATION_DOCUMENT_SENDER_ID) ?: throw IllegalStateException("Missing $INVITATION_DOCUMENT_SENDER_ID to create invitation"),
+            receiverEmail = getString(INVITATION_DOCUMENT_RECEIVER_EMAIL) ?: throw IllegalStateException("Missing $INVITATION_DOCUMENT_RECEIVER_EMAIL to create invitation"),
+            accountId = getString(INVITATION_DOCUMENT_ACCOUNT_ID) ?: throw IllegalStateException("Missing $INVITATION_DOCUMENT_ACCOUNT_ID to create invitation"),
+            status = InvitationStatus.values().firstOrNull {
                 it.dbValue.toLong() == getLong(INVITATION_DOCUMENT_STATUS)
-            },
+            } ?: throw IllegalStateException("Invalid $INVITATION_DOCUMENT_STATUS (${getLong(INVITATION_DOCUMENT_STATUS)}) to create invitation"),
         )
     }
 

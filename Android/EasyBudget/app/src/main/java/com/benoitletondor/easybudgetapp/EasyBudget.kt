@@ -389,7 +389,7 @@ class EasyBudget : Application(), Configuration.Provider {
     private fun onUpdate(previousVersion: Int, @Suppress("SameParameterValue") newVersion: Int) {
         Logger.debug("Update detected, from $previousVersion to $newVersion")
 
-        if (previousVersion < 90 && newVersion == 90) {
+        if (previousVersion < 90) {
             try {
                 if (Build.VERSION.SDK_INT >= 33 && ActivityCompat.checkSelfPermission(this@EasyBudget, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                     return

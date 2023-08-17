@@ -653,7 +653,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             activity?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
             true
         } catch (e: Exception) {
-            Logger.error(false, "Error while redeeming promocode", e)
+            Logger.error("Error while redeeming promocode", e)
             false
         }
 

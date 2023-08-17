@@ -581,10 +581,10 @@ class OnlineDBImpl(
                         ) {
                             when (level) {
                                 LogLevel.WARN -> {
-                                    Logger.warning(message, throwable)
+                                    Logger.warning(message ?: "Realm warning", throwable)
                                 }
                                 LogLevel.ERROR -> {
-                                    Logger.error(message, throwable)
+                                    Logger.error(message ?: "Realm error", throwable)
                                 }
 
                                 else -> Unit // No-op

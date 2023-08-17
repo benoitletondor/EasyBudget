@@ -142,7 +142,7 @@ class RecurringExpenseEditViewModel @Inject constructor(
                         } catch (e: Exception) {
                             if (e is CancellationException) throw e
 
-                            Logger.error(false, "Error while inserting recurring expense into DB", e)
+                            Logger.error("Error while inserting recurring expense into DB", e)
                             return@withContext false
                         }
 
@@ -164,7 +164,7 @@ class RecurringExpenseEditViewModel @Inject constructor(
                         } catch (e: Exception) {
                             if (e is CancellationException) throw e
 
-                            Logger.error(false, "Error while editing recurring expense into DB", e)
+                            Logger.error("Error while editing recurring expense into DB", e)
                             return@withContext false
                         }
                     }
