@@ -60,6 +60,7 @@ import kotlin.time.toDuration
 class OnlineDBImpl(
     private val realm: Realm,
     override val account: Account,
+    private val app: App,
 ) : OnlineDB, CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.IO) {
     private var recurringExpenseWatchingJob: Job? = null
     private var changesWatchingJob: Job? = null
@@ -502,6 +503,7 @@ class OnlineDBImpl(
 
     override fun close() {
         realm.close()
+        app.close()
         cancel()
     }
 
@@ -606,6 +608,7 @@ class OnlineDBImpl(
             val db = OnlineDBImpl(
                 realm,
                 account,
+                app,
             )
 
             db.awaitSyncDone()

@@ -179,14 +179,8 @@ class AccountViewModel @Inject constructor(
         viewModelScope.launch {
             // Make sure to close any previous DB
             try {
-                (currentDBRef?.get() as? OnlineDB)?.let {
-                    currentDBRef = null
-                    it.close()
-
-                    // This should leave enough time for the previous DB to close on real device
-                    // otherwise a "MultipleSyncAgents" is thrown
-                    delay(500)
-                }
+                (currentDBRef?.get() as? OnlineDB)?.close()
+                currentDBRef = null
             } catch (e: Exception) {
                 Logger.warning("Error while trying to close online DB when loading, continuing")
             }
