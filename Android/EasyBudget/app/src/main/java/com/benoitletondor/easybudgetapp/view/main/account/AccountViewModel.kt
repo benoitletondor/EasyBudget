@@ -42,6 +42,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -175,18 +176,24 @@ class AccountViewModel @Inject constructor(
     }
 
     private fun loadDB() {
-        // Make sure to close any previous DB
-        try {
-            (currentDBRef?.get() as? OnlineDB)?.close()
-            currentDBRef = null
-        } catch (e: Exception) {
-            Logger.warning("Error while trying to close online DB when loading, continuing")
-        }
-
-        dbAvailableMutableStateFlow.value = DBState.Loading
-        showManageAccountMenuItemMutableFlow.value = false
-
         viewModelScope.launch {
+            // Make sure to close any previous DB
+            try {
+                (currentDBRef?.get() as? OnlineDB)?.let {
+                    currentDBRef = null
+                    it.close()
+
+                    // This should leave enough time for the previous DB to close on real device
+                    // otherwise a "MultipleSyncAgents" is thrown
+                    delay(500)
+                }
+            } catch (e: Exception) {
+                Logger.warning("Error while trying to close online DB when loading, continuing")
+            }
+
+            dbAvailableMutableStateFlow.value = DBState.Loading
+            showManageAccountMenuItemMutableFlow.value = false
+
             try {
                 val db = when(account) {
                     MainViewModel.SelectedAccount.Selected.Offline -> AppModule.provideDB(appContext)
