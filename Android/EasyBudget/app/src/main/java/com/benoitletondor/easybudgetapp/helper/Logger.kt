@@ -66,7 +66,7 @@ object Logger {
         if (BuildConfig.CRASHLYTICS_ACTIVATED) {
             FirebaseCrashlytics.getInstance().log("W/$tag: $message")
 
-            if (error != null) {
+            if (error != null && !error.isNetworkError()) {
                 FirebaseCrashlytics.getInstance().recordException(error)
             }
         }
@@ -90,14 +90,8 @@ object Logger {
         if (BuildConfig.CRASHLYTICS_ACTIVATED) {
             FirebaseCrashlytics.getInstance().log("E/$tag: $message")
 
-            if (error != null) {
+            if (error != null && !error.isNetworkError()) {
                 FirebaseCrashlytics.getInstance().recordException(error)
-            } else {
-                FirebaseCrashlytics.getInstance().recordException(
-                    Throwable("Caught error: $message").apply {
-                        stackTrace = emptyArray()
-                    }
-                )
             }
         }
     }
