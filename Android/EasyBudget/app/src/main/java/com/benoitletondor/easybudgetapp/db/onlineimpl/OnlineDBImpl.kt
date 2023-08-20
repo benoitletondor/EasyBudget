@@ -579,12 +579,18 @@ class OnlineDBImpl(
                             message: String?,
                             vararg args: Any?
                         ) {
+                            val argsString = args
+                                .mapNotNull {
+                                    it?.toString()
+                                }
+                                .joinToString { ", " }
+
                             when (level) {
                                 LogLevel.WARN -> {
-                                    Logger.warning(message ?: "Realm warning", throwable)
+                                    Logger.warning((message ?: "Realm warning") + " $argsString", throwable)
                                 }
                                 LogLevel.ERROR -> {
-                                    Logger.error(message ?: "Realm error", throwable)
+                                    Logger.error((message ?: "Realm error") + " $argsString", throwable)
                                 }
 
                                 else -> Unit // No-op

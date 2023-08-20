@@ -37,6 +37,7 @@ import com.batch.android.PushNotificationType
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.iab.Iab
+import com.benoitletondor.easybudgetapp.iab.PremiumCheckStatus
 import com.benoitletondor.easybudgetapp.notif.*
 import com.benoitletondor.easybudgetapp.parameters.*
 import com.benoitletondor.easybudgetapp.push.PushService.Companion.DAILY_REMINDER_KEY
@@ -220,7 +221,7 @@ class EasyBudget : Application(), Configuration.Provider {
                     return@launch
                 }
 
-                if ( iab.isUserPremium() ) {
+                if ( iab.isUserPremium() || iab.iabStatusFlow.value == PremiumCheckStatus.ERROR ) {
                     return@launch
                 }
 

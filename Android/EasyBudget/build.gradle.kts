@@ -15,7 +15,7 @@
  */
 val kotlinVersion by extra("1.8.22") // Change in the plugins below too
 val hiltVersion by extra("2.46.1") // Change in the plugins below too
-val realmVersion by extra("1.10.1") // Change in the plugins below too
+val realmVersion by extra("1.10.2") // Change in the plugins below too
 
 plugins {
     id("com.android.application") version "8.1.0" apply false
@@ -25,5 +25,5 @@ plugins {
     id("org.jetbrains.kotlin.android") version "1.8.22" apply false
     id("com.google.dagger.hilt.android") version "2.46.1" apply false
     id("com.google.devtools.ksp") version "1.8.22-1.0.11" apply false
-    id("io.realm.kotlin") version "1.10.1" apply false
+    id("io.realm.kotlin") version "1.10.2" apply false
 }

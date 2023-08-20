@@ -68,7 +68,9 @@ class RecurringExpenseEntity() : RealmObject {
     }
 
     fun toRecurringExpense(): RecurringExpense {
-        val event = getCal().events.first()
+        val event = getCal().events
+            .filterExceptions()
+            .last()
 
         val startDate = localDateFromTimestamp(event.dateStart.value.time)
         val title = event.summary.value

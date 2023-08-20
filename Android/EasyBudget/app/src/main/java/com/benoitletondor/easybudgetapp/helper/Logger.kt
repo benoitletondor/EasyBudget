@@ -93,7 +93,11 @@ object Logger {
             if (error != null) {
                 FirebaseCrashlytics.getInstance().recordException(error)
             } else {
-                FirebaseCrashlytics.getInstance().recordException(Throwable("Caught error: $message"))
+                FirebaseCrashlytics.getInstance().recordException(
+                    Throwable("Caught error: $message").apply {
+                        stackTrace = emptyArray()
+                    }
+                )
             }
         }
     }

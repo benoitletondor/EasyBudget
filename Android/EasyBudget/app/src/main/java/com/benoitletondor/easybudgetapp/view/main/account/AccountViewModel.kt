@@ -24,6 +24,7 @@ import com.benoitletondor.easybudgetapp.auth.Auth
 import com.benoitletondor.easybudgetapp.auth.AuthState
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.db.RestoreAction
+import com.benoitletondor.easybudgetapp.db.onlineimpl.OnlineDB
 import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
 import com.benoitletondor.easybudgetapp.iab.Iab
@@ -174,6 +175,15 @@ class AccountViewModel @Inject constructor(
     }
 
     private fun loadDB() {
+        // Make sure to close any previous DB
+        try {
+            (currentDBRef?.get() as? OnlineDB)?.close()
+            currentDBRef = null
+        } catch (e: Exception) {
+            Logger.warning("Error while trying to close online DB when loading, continuing", e)
+        }
+
+
         dbAvailableMutableStateFlow.value = DBState.Loading
         showManageAccountMenuItemMutableFlow.value = false
 
@@ -192,7 +202,6 @@ class AccountViewModel @Inject constructor(
                             )
                         }
 
-                        addCloseable(onlineDb)
                         showManageAccountMenuItemMutableFlow.value = true
                         onlineDb
                     }
@@ -209,6 +218,8 @@ class AccountViewModel @Inject constructor(
 
                 dbAvailableMutableStateFlow.value = DBState.Loaded(db)
             } catch (e: Exception) {
+                if (e is CancellationException) throw e
+
                 Logger.error("Error while loading DB", e)
                 dbAvailableMutableStateFlow.value = DBState.Error(e);
             }
@@ -220,6 +231,12 @@ class AccountViewModel @Inject constructor(
         val dbState = dbAvailableMutableStateFlow.value as? DBState.Loaded
         if (currentDB != null && dbState != null && dbState.db == currentDB) {
             currentDBRef = null
+        }
+
+        try {
+            (dbState?.db as? OnlineDB)?.close()
+        } catch (e: Exception) {
+            Logger.warning("Error while trying to close online DB when clearing, continuing", e)
         }
 
         super.onCleared()
