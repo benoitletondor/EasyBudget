@@ -180,9 +180,8 @@ class AccountViewModel @Inject constructor(
             (currentDBRef?.get() as? OnlineDB)?.close()
             currentDBRef = null
         } catch (e: Exception) {
-            Logger.warning("Error while trying to close online DB when loading, continuing", e)
+            Logger.warning("Error while trying to close online DB when loading, continuing")
         }
-
 
         dbAvailableMutableStateFlow.value = DBState.Loading
         showManageAccountMenuItemMutableFlow.value = false
@@ -236,7 +235,7 @@ class AccountViewModel @Inject constructor(
         try {
             (dbState?.db as? OnlineDB)?.close()
         } catch (e: Exception) {
-            Logger.warning("Error while trying to close online DB when clearing, continuing", e)
+            Logger.warning("Error while trying to close online DB when clearing, continuing")
         }
 
         super.onCleared()

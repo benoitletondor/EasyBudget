@@ -23,7 +23,6 @@ import com.benoitletondor.easybudgetapp.db.onlineimpl.entity.ExpenseEntity
 import com.benoitletondor.easybudgetapp.db.onlineimpl.entity.RecurringExpenseEntity
 import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.helper.getRealValueFromDB
-import com.benoitletondor.easybudgetapp.helper.toStartOfDayDate
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import io.realm.kotlin.Realm
@@ -558,7 +557,9 @@ class OnlineDBImpl(
                 SyncConfiguration.Builder(
                     user = user,
                     schema = setOf(ExpenseEntity::class, RecurringExpenseEntity::class),
-                ).initialSubscriptions(rerunOnOpen = true) { realm ->
+                )
+                .name("${account.id}.realm")
+                .initialSubscriptions(rerunOnOpen = true) { realm ->
                     add(
                         query = realm.query<ExpenseEntity>(account.generateQuery()),
                         name = "${currentUser.id}:${account.id}:expenses",
