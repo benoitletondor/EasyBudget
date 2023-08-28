@@ -207,24 +207,32 @@ open class CachedDBImpl(
                 }
             }
 
-            // Save the month we wanna load cache for
-            var currentDate = startOfMonthDate
-            val month = currentDate.month
+            try {
+                // Save the month we wanna load cache for
+                var currentDate = startOfMonthDate
+                val month = currentDate.month
 
-            Logger.debug("DBCache: Caching expenses for month: $month")
+                Logger.debug("DBCache: Caching expenses for month: $month")
 
-            // Iterate over day of month (while are still on that month)
-            while (currentDate.month == month) {
-                val expensesForDay = runBlocking { db.getExpensesForDayWithoutCache(currentDate) }
+                // Iterate over day of month (while are still on that month)
+                while (currentDate.month == month) {
+                    val expensesForDay = runBlocking { db.getExpensesForDayWithoutCache(currentDate) }
 
-                synchronized(cacheStorage.expenses) {
-                    cacheStorage.expenses.put(currentDate, expensesForDay)
+                    synchronized(cacheStorage.expenses) {
+                        cacheStorage.expenses.put(currentDate, expensesForDay)
+                    }
+
+                    currentDate = currentDate.plusDays(1)
                 }
 
-                currentDate = currentDate.plusDays(1)
-            }
+                Logger.debug("DBCache: Expenses cached for month: $month")
+            } catch (e: Exception) {
+                Logger.error("Error while caching expenses for month: $startOfMonthDate, clearing cache", e)
 
-            Logger.debug("DBCache: Expenses cached for month: $month")
+                synchronized(cacheStorage.expenses) {
+                    cacheStorage.expenses.clear()
+                }
+            }
         }
 
     }
@@ -242,24 +250,32 @@ open class CachedDBImpl(
                 }
             }
 
-            // Save the month we wanna load cache for
-            var currentDate = startOfMonthDate
-            val month = currentDate.month
+            try {
+                // Save the month we wanna load cache for
+                var currentDate = startOfMonthDate
+                val month = currentDate.month
 
-            Logger.debug("DBCache: Caching balance for month: $month")
+                Logger.debug("DBCache: Caching balance for month: $month")
 
-            // Iterate over day of month (while are still on that month)
-            while (currentDate.month == month) {
-                val balanceForDay = runBlocking { db.getBalanceForDayWithoutCache(currentDate) }
+                // Iterate over day of month (while are still on that month)
+                while (currentDate.month == month) {
+                    val balanceForDay = runBlocking { db.getBalanceForDayWithoutCache(currentDate) }
 
-                synchronized(cacheStorage.balances) {
-                    cacheStorage.balances.put(currentDate, balanceForDay)
+                    synchronized(cacheStorage.balances) {
+                        cacheStorage.balances.put(currentDate, balanceForDay)
+                    }
+
+                    currentDate = currentDate.plusDays(1)
                 }
 
-                currentDate = currentDate.plusDays(1)
-            }
+                Logger.debug("DBCache: Balance cached for month: $month")
+            } catch (e: Exception) {
+                Logger.error("Error while caching balance for month: $startOfMonthDate, clearing cache", e)
 
-            Logger.debug("DBCache: Balance cached for month: $month")
+                synchronized(cacheStorage.balances) {
+                    cacheStorage.balances.clear()
+                }
+            }
         }
     }
 
@@ -276,24 +292,32 @@ open class CachedDBImpl(
                 }
             }
 
-            // Save the month we wanna load cache for
-            var currentDate = startOfMonthDate
-            val month = currentDate.month
+            try {
+                // Save the month we wanna load cache for
+                var currentDate = startOfMonthDate
+                val month = currentDate.month
 
-            Logger.debug("DBCache: Caching checked balance for month: $month")
+                Logger.debug("DBCache: Caching checked balance for month: $month")
 
-            // Iterate over day of month (while are still on that month)
-            while (currentDate.month == month) {
-                val balanceForDay = runBlocking { db.getCheckedBalanceForDayWithoutCache(currentDate) }
+                // Iterate over day of month (while are still on that month)
+                while (currentDate.month == month) {
+                    val balanceForDay = runBlocking { db.getCheckedBalanceForDayWithoutCache(currentDate) }
 
-                synchronized(cacheStorage.checkedBalances) {
-                    cacheStorage.checkedBalances.put(currentDate, balanceForDay)
+                    synchronized(cacheStorage.checkedBalances) {
+                        cacheStorage.checkedBalances.put(currentDate, balanceForDay)
+                    }
+
+                    currentDate = currentDate.plusDays(1)
                 }
 
-                currentDate = currentDate.plusDays(1)
-            }
+                Logger.debug("DBCache: Checked balance cached for month: $month")
+            } catch (e: Exception) {
+                Logger.error("Error while caching checked balance for month: $startOfMonthDate, clearing cache", e)
 
-            Logger.debug("DBCache: Checked balance cached for month: $month")
+                synchronized(cacheStorage.checkedBalances) {
+                    cacheStorage.checkedBalances.clear()
+                }
+            }
         }
     }
 }
