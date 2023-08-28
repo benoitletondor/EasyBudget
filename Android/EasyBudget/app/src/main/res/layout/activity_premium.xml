@@ -123,7 +123,7 @@
             android:layout_height="wrap_content"
             android:textSize="20sp"
             android:theme="@style/Theme.MaterialComponents.NoActionBar"
-            android:text="@string/premium_popup_not_premium_cta"
+            android:text="@string/premium_popup_buy_cta"
             android:layout_marginStart="5dp"
             android:textAllCaps="false"
             android:maxLines="1"

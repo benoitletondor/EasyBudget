@@ -107,6 +107,10 @@ private const val SHOULD_RESET_INIT_DATE = "should_reset_init_date"
  * Should show the checked balance in main screen
  */
 private const val SHOULD_SHOW_CHECKED_BALANCE = "should_show_checked_balance"
+/**
+ * Id of the last selected online account
+ */
+private const val SELECTED_ACCOUNT_ID_KEY = "selectedAccountId";
 
 fun Parameters.getInitDate(): LocalDate? {
     val timestamp = getLong(INIT_TIMESTAMP_PARAMETERS_KEY, 0L)
@@ -348,4 +352,16 @@ fun Parameters.getShouldShowCheckedBalance(): Boolean {
 
 fun Parameters.setShouldShowCheckedBalance(shouldShow: Boolean) {
     putBoolean(SHOULD_SHOW_CHECKED_BALANCE, shouldShow)
+}
+
+fun Parameters.getLatestSelectedOnlineAccountId(): String? {
+    return getString(SELECTED_ACCOUNT_ID_KEY)
+}
+
+fun Parameters.setLatestSelectedOnlineAccountId(accountId: String?) {
+    if (accountId != null) {
+        putString(SELECTED_ACCOUNT_ID_KEY, accountId)
+    } else {
+        remove(SELECTED_ACCOUNT_ID_KEY)
+    }
 }

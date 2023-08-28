@@ -20,6 +20,8 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.app.Activity
 import android.app.ProgressDialog
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.ArrayAdapter
@@ -29,6 +31,7 @@ import androidx.lifecycle.lifecycleScope
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.databinding.ActivityRecurringExpenseAddBinding
 import com.benoitletondor.easybudgetapp.helper.*
+import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import com.benoitletondor.easybudgetapp.view.DatePickerDialogFragment
@@ -149,6 +152,18 @@ class RecurringExpenseEditActivity : BaseActivity<ActivityRecurringExpenseAddBin
                 .setNegativeButton(R.string.expense_add_before_init_date_dialog_negative_cta) { _, _ ->
                     viewModel.onAddExpenseBeforeInitDateCancelled()
                 }
+                .show()
+        }
+
+        lifecycleScope.launchCollect(viewModel.unableToLoadDBEventFlow) {
+            MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.expense_edit_unable_to_load_db_error_title)
+                .setMessage(R.string.expense_edit_unable_to_load_db_error_message)
+                .setPositiveButton(R.string.expense_edit_unable_to_load_db_error_cta) { _, _ ->
+                    setResult(Activity.RESULT_CANCELED)
+                    finish()
+                }
+                .setCancelable(false)
                 .show()
         }
     }
@@ -354,4 +369,21 @@ class RecurringExpenseEditActivity : BaseActivity<ActivityRecurringExpenseAddBin
         return java.lang.Double.parseDouble(binding.amountEdittext.text.toString())
     }
 
+    companion object {
+        const val ARG_EXPENSE = "expense"
+        const val ARG_START_DATE = "dateStart"
+
+        fun newIntent(
+            context: Context,
+            editedExpense: Expense?,
+            startDate: LocalDate,
+        ): Intent {
+            return Intent(context, RecurringExpenseEditActivity::class.java).apply {
+                putExtra(ARG_START_DATE, startDate.toEpochDay())
+                if (editedExpense != null) {
+                    putExtra(ARG_EXPENSE, editedExpense)
+                }
+            }
+        }
+    }
 }

@@ -17,3 +17,17 @@
 #}
 
 -keep class * extends androidx.fragment.app.Fragment {}
+
+# This is generated automatically by the Android Gradle plugin.
+-dontwarn org.slf4j.impl.StaticLoggerBinder
+-dontwarn org.slf4j.impl.StaticMDCBinder
+-dontwarn com.fasterxml.jackson.annotation.JsonFormat
+-dontwarn com.fasterxml.jackson.databind.DeserializationContext
+-dontwarn com.fasterxml.jackson.databind.JsonDeserializer
+-dontwarn com.fasterxml.jackson.databind.JsonSerializer
+-dontwarn com.fasterxml.jackson.databind.SerializerProvider
+-dontwarn com.fasterxml.jackson.databind.module.SimpleModule
+-dontwarn com.fasterxml.jackson.databind.ser.std.StdSerializer
+
+# https://github.com/mangstadt/biweekly/issues/98
+-keep class biweekly.** { *; }

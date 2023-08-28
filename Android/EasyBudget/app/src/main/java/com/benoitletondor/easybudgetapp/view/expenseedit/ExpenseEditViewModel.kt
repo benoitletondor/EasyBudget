@@ -19,11 +19,12 @@ package com.benoitletondor.easybudgetapp.view.expenseedit
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.db.DB
+import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.getInitDate
+import com.benoitletondor.easybudgetapp.view.main.account.AccountViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -35,16 +36,16 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ExpenseEditViewModel @Inject constructor(
-    private val db: DB,
     private val parameters: Parameters,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     /**
      * Expense that is being edited (will be null if it's a new one)
      */
-    private val editedExpense: Expense? = savedStateHandle.get<Expense>("expense")
+    private val editedExpense: Expense? = savedStateHandle.get<Expense>(ExpenseEditActivity.ARG_EDITED_EXPENSE)
 
-    private val expenseDateMutableStateFlow = MutableStateFlow(LocalDate.ofEpochDay(savedStateHandle.get<Long>("date") ?: 0))
+    private val expenseDateMutableStateFlow = MutableStateFlow(LocalDate.ofEpochDay(
+        savedStateHandle[ExpenseEditActivity.ARG_DATE] ?: throw IllegalStateException("No ARG_DATE arg")))
     val expenseDateFlow: Flow<LocalDate> = expenseDateMutableStateFlow
 
     private val editTypeMutableStateFlow = MutableStateFlow(ExpenseEditType(
@@ -63,8 +64,24 @@ class ExpenseEditViewModel @Inject constructor(
     private val expenseAddBeforeInitDateErrorMutableFlow = MutableLiveFlow<Unit>()
     val expenseAddBeforeInitDateEventFlow: Flow<Unit> = expenseAddBeforeInitDateErrorMutableFlow
 
+    private val unableToLoadDBEventMutableFlow = MutableLiveFlow<Unit>()
+    val unableToLoadDBEventFlow: Flow<Unit> = unableToLoadDBEventMutableFlow
+
     private val finishMutableFlow = MutableLiveFlow<Unit>()
     val finishFlow: Flow<Unit> = finishMutableFlow
+
+    private lateinit var db: DB
+
+    init {
+        val currentDb = AccountViewModel.getCurrentDB()
+        if (currentDb == null) {
+            viewModelScope.launch {
+                unableToLoadDBEventMutableFlow.emit(Unit)
+            }
+        } else {
+            db = currentDb
+        }
+    }
 
     fun onExpenseRevenueValueChanged(isRevenue: Boolean) {
         editTypeMutableStateFlow.value = ExpenseEditType(isRevenue, editedExpense != null)
@@ -104,13 +121,18 @@ class ExpenseEditViewModel @Inject constructor(
                 val expense = editedExpense?.copy(
                     title = description,
                     amount = if (isRevenue) -value else value,
-                    date = date
+                    date = date,
+                    associatedRecurringExpense = editedExpense.associatedRecurringExpense?.copy(
+                        originalDate = editedExpense.date,
+                    )
                 ) ?: Expense(description, if (isRevenue) -value else value, date, false)
 
                 db.persistExpense(expense)
-            }
 
-            finishMutableFlow.emit(Unit)
+                withContext(Dispatchers.Main) {
+                    finishMutableFlow.emit(Unit)
+                }
+            }
         }
     }
 

@@ -92,6 +92,22 @@ class Parameters @Inject constructor(@ApplicationContext context: Context) {
     }
 
     /**
+     * Remove any value for the given key
+     *
+     * @param key
+     */
+    @SuppressLint("ApplySharedPref")
+    fun remove(key: String, forceCommit: Boolean = false) {
+        val edit = preferences.edit()
+        edit.remove(key)
+        if( forceCommit ) {
+            edit.commit()
+        } else {
+            edit.apply()
+        }
+    }
+
+    /**
      * Get the integer value and fallback on default if not found
      *
      * @param key

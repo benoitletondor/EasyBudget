@@ -73,6 +73,10 @@ class SettingsActivity : BaseActivity<ActivitySettingsBinding>() {
          */
         const val SHOW_PREMIUM_INTENT_KEY = "showPremium"
         /**
+         * Key to specify that the pro popup should be shown to the user
+         */
+        const val SHOW_PRO_INTENT_KEY = "showPro"
+        /**
          * Key to specify that the backup options should be shown to the user
          */
         const val SHOW_BACKUP_INTENT_KEY = "showBackup"

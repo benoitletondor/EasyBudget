@@ -17,16 +17,15 @@
 package com.benoitletondor.easybudgetapp.helper
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.Observer
 import androidx.work.*
 import com.benoitletondor.easybudgetapp.auth.Auth
 import com.benoitletondor.easybudgetapp.auth.AuthState
 import com.benoitletondor.easybudgetapp.cloudstorage.CloudStorage
 import com.benoitletondor.easybudgetapp.cloudstorage.FileMetaData
-import com.benoitletondor.easybudgetapp.db.impl.DBImpl
-import com.benoitletondor.easybudgetapp.db.impl.DB_NAME
-import com.benoitletondor.easybudgetapp.db.impl.RoomDB
+import com.benoitletondor.easybudgetapp.db.offlineimpl.OfflineDBImpl
+import com.benoitletondor.easybudgetapp.db.offlineimpl.DB_NAME
+import com.benoitletondor.easybudgetapp.db.offlineimpl.RoomDB
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.job.BackupJob
 import com.benoitletondor.easybudgetapp.parameters.Parameters
@@ -56,7 +55,7 @@ suspend fun backupDB(context: Context,
                      iab: Iab): ListenableWorker.Result {
     val currentUser = (auth.state.value as? AuthState.Authenticated)?.currentUser
     if( currentUser == null ) {
-        Log.e(
+        Logger.error(
             "BackupJob",
             "Not authenticated"
         )
@@ -65,7 +64,7 @@ suspend fun backupDB(context: Context,
     }
 
     if( !iab.isUserPremium() ) {
-        Log.e(
+        Logger.error(
             "BackupJob",
             "Not premium"
         )
@@ -75,10 +74,10 @@ suspend fun backupDB(context: Context,
 
     try {
         val roomDb = RoomDB.create(context)
-        DBImpl(roomDb).triggerForceWriteToDisk()
+        OfflineDBImpl(roomDb).triggerForceWriteToDisk()
         roomDb.close()
     } catch (error: Throwable) {
-        Log.e(
+        Logger.error(
             "BackupJob",
             "Error writing DB to disk",
             error
@@ -92,7 +91,7 @@ suspend fun backupDB(context: Context,
         context.getDatabasePath(DB_NAME)
             .copyTo(dbFileCopy, overwrite = true)
     } catch (error: Throwable) {
-        Log.e(
+        Logger.error(
             "BackupJob",
             "Error copying DB",
             error
@@ -114,7 +113,7 @@ suspend fun backupDB(context: Context,
         cloudStorage.uploadFile(archiveFile, getRemoteBackupPath(currentUser.id))
         parameters.saveLastBackupDate(Date())
     } catch (error: Throwable) {
-        Log.e(
+        Logger.error(
             "BackupJob",
             "Error backuping",
             error
@@ -127,7 +126,7 @@ suspend fun backupDB(context: Context,
             archiveVersionFile.delete()
             archiveFile.delete()
         } catch (error: Throwable) {
-            Log.e(
+            Logger.error(
                 "BackupJob",
                 "Error deleting temp file",
                 error
@@ -180,7 +179,7 @@ suspend fun restoreLatestDBBackup(context: Context,
             backupFile.delete()
             backupFolder.deleteRecursively()
         } catch (error: Throwable) {
-            Log.e(
+            Logger.error(
                 "DB restore",
                 "Error deleting temp file",
                 error
