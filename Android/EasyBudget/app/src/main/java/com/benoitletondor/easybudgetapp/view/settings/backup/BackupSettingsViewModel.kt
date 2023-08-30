@@ -31,6 +31,7 @@ import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.parameters.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -214,7 +215,9 @@ class BackupSettingsViewModel @Inject constructor(
                         throw RuntimeException(result.toString())
                     }
                 }
-            } catch (error: Throwable) {
+            } catch (error: Exception) {
+                if (error is CancellationException) throw error
+
                 Logger.error("Error while backup now", error)
                 backupNowErrorEventMutableFlow.emit(error)
             } finally {
