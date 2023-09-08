@@ -205,18 +205,19 @@ class FirebaseAccounts(
         accountCredentials: AccountCredentials,
         invitedUserEmail: String,
     ) {
+        val email = invitedUserEmail.lowercase()
         val accountRef = db.collection(ACCOUNTS_COLLECTION).document(accountCredentials.id)
         val invitationRef = db.collection(INVITATIONS_COLLECTION).document()
 
         db.runTransaction { transaction ->
             transaction.update(accountRef, mapOf(
-                ACCOUNT_DOCUMENT_MEMBERS to FieldValue.arrayUnion(invitedUserEmail),
+                ACCOUNT_DOCUMENT_MEMBERS to FieldValue.arrayUnion(email),
             ))
 
             transaction.set(invitationRef, mapOf(
                 INVITATION_DOCUMENT_ACCOUNT_ID to accountCredentials.id,
                 INVITATION_DOCUMENT_STATUS to InvitationStatus.SENT.dbValue,
-                INVITATION_DOCUMENT_RECEIVER_EMAIL to invitedUserEmail,
+                INVITATION_DOCUMENT_RECEIVER_EMAIL to email,
                 INVITATION_DOCUMENT_SENDER_ID to currentUser.id,
                 INVITATION_DOCUMENT_SENDER_EMAIL to currentUser.email,
             ))
