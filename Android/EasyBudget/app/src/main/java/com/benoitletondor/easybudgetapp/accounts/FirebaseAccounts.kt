@@ -41,6 +41,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import java.math.BigInteger
 import java.security.SecureRandom
+import java.util.Locale
 
 class FirebaseAccounts(
     private val db: FirebaseFirestore,
@@ -220,6 +221,7 @@ class FirebaseAccounts(
                 INVITATION_DOCUMENT_RECEIVER_EMAIL to email,
                 INVITATION_DOCUMENT_SENDER_ID to currentUser.id,
                 INVITATION_DOCUMENT_SENDER_EMAIL to currentUser.email,
+                INVITATION_DOCUMENT_SENDER_LOCALE to Locale.getDefault()?.toString(),
             ))
         }.await()
     }
@@ -346,6 +348,7 @@ class FirebaseAccounts(
             status = InvitationStatus.values().firstOrNull {
                 it.dbValue.toLong() == getLong(INVITATION_DOCUMENT_STATUS)
             } ?: throw IllegalStateException("Invalid $INVITATION_DOCUMENT_STATUS (${getLong(INVITATION_DOCUMENT_STATUS)}) to create invitation"),
+            senderLocale = getString(INVITATION_DOCUMENT_SENDER_LOCALE),
         )
     }
 
@@ -371,6 +374,7 @@ class FirebaseAccounts(
         private const val INVITATION_DOCUMENT_ACCOUNT_ID = "accountId"
         private const val INVITATION_DOCUMENT_SENDER_ID = "senderId"
         private const val INVITATION_DOCUMENT_SENDER_EMAIL = "senderEmail"
+        private const val INVITATION_DOCUMENT_SENDER_LOCALE = "senderLocale";
 
         private const val ACCOUNTS_COLLECTION = "accounts"
         private const val ACCOUNT_DOCUMENT_SECRET = "secret"

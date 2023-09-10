@@ -581,6 +581,7 @@ private fun OwnerStateFullInvitationsPreview() {
                         "receiver@email.com",
                         "accountId",
                         InvitationStatus.SENT,
+                        "fr_FR",
                     ),
                     Invitation(
                         "id",
@@ -589,6 +590,7 @@ private fun OwnerStateFullInvitationsPreview() {
                         "receiver@email.com",
                         "accountId",
                         InvitationStatus.SENT,
+                        "fr_FR",
                     ),
                     Invitation(
                         "id",
@@ -597,6 +599,7 @@ private fun OwnerStateFullInvitationsPreview() {
                         "receiver@email.com",
                         "accountId",
                         InvitationStatus.SENT,
+                        "fr_FR",
                     ),
                     Invitation(
                         "id",
@@ -605,6 +608,7 @@ private fun OwnerStateFullInvitationsPreview() {
                         "receiver@email.com",
                         "accountId",
                         InvitationStatus.SENT,
+                        "fr_FR",
                     ),
                     Invitation(
                         "id",
@@ -613,6 +617,7 @@ private fun OwnerStateFullInvitationsPreview() {
                         "receiver@email.com",
                         "accountId",
                         InvitationStatus.SENT,
+                        "fr_FR",
                     ),
                 ),
                 listOf(
@@ -623,6 +628,7 @@ private fun OwnerStateFullInvitationsPreview() {
                         "receiver@email.com",
                         "accountId",
                         InvitationStatus.ACCEPTED,
+                        "fr_FR",
                     ),
                     Invitation(
                         "id",
@@ -631,6 +637,7 @@ private fun OwnerStateFullInvitationsPreview() {
                         "receiver@email.com",
                         "accountId",
                         InvitationStatus.ACCEPTED,
+                        "fr_FR",
                     ),
                     Invitation(
                         "id",
@@ -639,6 +646,7 @@ private fun OwnerStateFullInvitationsPreview() {
                         "receiver@email.com",
                         "accountId",
                         InvitationStatus.ACCEPTED,
+                        "fr_FR",
                     ),
                     Invitation(
                         "id",
@@ -647,6 +655,7 @@ private fun OwnerStateFullInvitationsPreview() {
                         "receiver@email.com",
                         "accountId",
                         InvitationStatus.ACCEPTED,
+                        "fr_FR",
                     ),
                     Invitation(
                         "id",
@@ -655,6 +664,7 @@ private fun OwnerStateFullInvitationsPreview() {
                         "receiver@email.com",
                         "accountId",
                         InvitationStatus.ACCEPTED,
+                        "fr_FR",
                     ),
                 ),
             ),
