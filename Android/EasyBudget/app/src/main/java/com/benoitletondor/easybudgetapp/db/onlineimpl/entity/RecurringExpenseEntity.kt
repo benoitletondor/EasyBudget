@@ -169,7 +169,7 @@ class RecurringExpenseEntity() : RealmObject {
 
         cal.events
             .filterExceptions()
-            .filter { it.dateEnd == null || !it.dateEnd.value.before(date.toStartOfDayDate()) }
+            .filter { it.dateEnd == null || it.dateEnd.value.after(date.toStartOfDayDate()) }
             .forEach { it.dateEnd = DateEnd(date.minusDays(1).toStartOfDayDate(), false) }
 
         val exceptionEvent = VEvent()
