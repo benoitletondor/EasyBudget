@@ -117,7 +117,10 @@ class RecurringExpenseEntity() : RealmObject {
 
         val exceptionEvent = VEvent()
         exceptionEvent.dateStart = DateStart(occurrenceDate.toStartOfDayDate(), false)
-        exceptionEvent.uid = cal.events.filterExceptions().first { it.dateEnd == null || it.dateEnd.value.after(occurrenceDate.toStartOfDayDate()) }.uid
+        exceptionEvent.uid = cal.events
+            .filterExceptions()
+            .first { it.dateEnd == null || !it.dateEnd.value.before(occurrenceDate.toStartOfDayDate()) }
+            .uid
         exceptionEvent.status = Status.cancelled()
         val recurrenceId = RecurrenceId(ICalDate(occurrenceDate.toStartOfDayDate(), false))
         exceptionEvent.recurrenceId = recurrenceId
