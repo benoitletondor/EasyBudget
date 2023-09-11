@@ -104,7 +104,10 @@ class RecurringExpenseEntity() : RealmObject {
         exceptionEvent.status = Status.accepted()
         exceptionEvent.addExperimentalProperty(AMOUNT_KEY, expense.amount.getDBValue().toString())
         exceptionEvent.addExperimentalProperty(CHECKED_KEY, expense.checked.toString())
-        exceptionEvent.uid = events.filterExceptions().first { it.dateEnd == null || it.dateEnd.value.after(expense.date.toStartOfDayDate()) }.uid
+        exceptionEvent.uid = events
+            .filterExceptions()
+            .first { it.dateEnd == null || !it.dateEnd.value.before(expense.date.toStartOfDayDate()) }
+            .uid
 
         val recurrenceId = RecurrenceId(ICalDate(originalOccurrenceDate.toStartOfDayDate(), false))
         exceptionEvent.recurrenceId = recurrenceId
@@ -166,7 +169,7 @@ class RecurringExpenseEntity() : RealmObject {
 
         cal.events
             .filterExceptions()
-            .filter { it.dateEnd == null || it.dateEnd.value.after(date.toStartOfDayDate()) }
+            .filter { it.dateEnd == null || !it.dateEnd.value.before(date.toStartOfDayDate()) }
             .forEach { it.dateEnd = DateEnd(date.minusDays(1).toStartOfDayDate(), false) }
 
         val exceptionEvent = VEvent()
