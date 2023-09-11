@@ -1,5 +1,6 @@
 package com.benoitletondor.easybudgetapp.helper
 
+import com.google.firebase.FirebaseNetworkException
 import io.realm.kotlin.mongodb.exceptions.ConnectionException
 import java.io.InterruptedIOException
 import java.net.SocketException
@@ -14,4 +15,5 @@ fun Throwable.isNetworkError(depth: Int = 0): Boolean =
         this is SocketException ||
         this is SSLException ||
         this is ConnectionException ||
+        this is FirebaseNetworkException ||
         (depth <= IS_NETWORK_MAX_DEPTH && cause?.isNetworkError(depth + 1) ?: false)
