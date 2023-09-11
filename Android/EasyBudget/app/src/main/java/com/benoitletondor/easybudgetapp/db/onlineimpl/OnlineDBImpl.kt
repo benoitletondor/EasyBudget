@@ -69,6 +69,8 @@ class OnlineDBImpl(
     private val recurringExpensesLoadingStateMutableFlow = MutableStateFlow<RecurringExpenseLoadingState>(RecurringExpenseLoadingState.NotLoaded)
 
     init {
+        Logger.debug("Opening Online DB: ${account.id}")
+
         watchAllRecurringExpenses()
         watchAllChanges()
     }
@@ -502,6 +504,7 @@ class OnlineDBImpl(
     }
 
     override fun close() {
+        Logger.debug("Closing Online DB: ${account.id}")
         realm.close()
         app.close()
         cancel()
