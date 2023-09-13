@@ -504,6 +504,11 @@ class OnlineDBImpl(
     }
 
     override fun close() {
+        if (realm.isClosed()) {
+            Logger.debug("Ignoring call to close for Online DB: ${account.id}, already closed")
+            return
+        }
+
         Logger.debug("Closing Online DB: ${account.id}")
         realm.close()
         app.close()
