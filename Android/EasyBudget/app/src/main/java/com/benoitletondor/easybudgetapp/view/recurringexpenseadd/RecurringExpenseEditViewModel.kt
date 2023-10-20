@@ -157,7 +157,7 @@ class RecurringExpenseEditViewModel @Inject constructor(
                                     title = description,
                                     amount = if (isRevenue) -value else value
                                 ),
-                                date,
+                                editedExpense.date,
                             )
 
                             return@withContext true

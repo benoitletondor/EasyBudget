@@ -45,7 +45,7 @@ interface DB {
 
     suspend fun persistRecurringExpense(recurringExpense: RecurringExpense): RecurringExpense
 
-    suspend fun updateRecurringExpenseAfterDate(newRecurringExpense: RecurringExpense, date: LocalDate)
+    suspend fun updateRecurringExpenseAfterDate(newRecurringExpense: RecurringExpense, oldOccurrenceDate: LocalDate)
 
     suspend fun deleteRecurringExpense(recurringExpense: RecurringExpense): RestoreAction
 

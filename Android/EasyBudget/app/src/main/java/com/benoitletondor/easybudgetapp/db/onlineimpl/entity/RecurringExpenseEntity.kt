@@ -162,18 +162,18 @@ class RecurringExpenseEntity() : RealmObject {
     }
 
     fun updateAllOccurrencesAfterDate(
-        date: LocalDate,
+        oldOccurrenceDate: LocalDate,
         newRecurringExpense: RecurringExpense,
     ) {
         val cal = getCal()
 
         cal.events
             .filterExceptions()
-            .filter { it.dateEnd == null || it.dateEnd.value.after(date.toStartOfDayDate()) }
-            .forEach { it.dateEnd = DateEnd(date.minusDays(1).toStartOfDayDate(), false) }
+            .filter { it.dateEnd == null || it.dateEnd.value.after(oldOccurrenceDate.toStartOfDayDate()) }
+            .forEach { it.dateEnd = DateEnd(oldOccurrenceDate.minusDays(1).toStartOfDayDate(), false) }
 
         val exceptionEvent = VEvent()
-        exceptionEvent.dateStart = DateStart(date.toStartOfDayDate(), false)
+        exceptionEvent.dateStart = DateStart(newRecurringExpense.recurringDate.toStartOfDayDate(), false)
         exceptionEvent.summary = Summary(newRecurringExpense.title)
         exceptionEvent.addExperimentalProperty(AMOUNT_KEY, newRecurringExpense.amount.getDBValue().toString())
         exceptionEvent.addExperimentalProperty(CHECKED_KEY, false.toString())

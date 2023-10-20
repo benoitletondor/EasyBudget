@@ -147,8 +147,8 @@ open class CachedDBImpl(
 
     override suspend fun updateRecurringExpenseAfterDate(
         newRecurringExpense: RecurringExpense,
-        date: LocalDate
-    ) = wrappedDB.updateRecurringExpenseAfterDate(newRecurringExpense, date)
+        oldOccurrenceDate: LocalDate
+    ) = wrappedDB.updateRecurringExpenseAfterDate(newRecurringExpense, oldOccurrenceDate)
 
     override suspend fun deleteRecurringExpense(recurringExpense: RecurringExpense): RestoreAction
         = wrappedDB.deleteRecurringExpense(recurringExpense)
