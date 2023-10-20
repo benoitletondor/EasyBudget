@@ -23,6 +23,7 @@ data class Invitation(
     val receiverEmail: String,
     val accountId: String,
     val status: InvitationStatus,
+    val senderLocale: String?,
 )
 
 enum class InvitationStatus(val dbValue: Int) {

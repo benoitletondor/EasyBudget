@@ -99,14 +99,14 @@ class OfflineDBImpl(private val roomDB: RoomDB) : DB {
 
     override suspend fun updateRecurringExpenseAfterDate(
         newRecurringExpense: RecurringExpense,
-        date: LocalDate
+        oldOccurrenceDate: LocalDate,
     ) {
         val recurringExpenseId = newRecurringExpense.id ?: throw IllegalArgumentException("updateRecurringExpenseAfterDate called with a recurring expense that has no id")
 
         roomDB.withTransaction {
-            roomDB.expenseDao().deleteAllExpenseForRecurringExpenseAfterDateInclusive(recurringExpenseId, date)
+            roomDB.expenseDao().deleteAllExpenseForRecurringExpenseAfterDateInclusive(recurringExpenseId, oldOccurrenceDate)
             persistRecurringExpense(newRecurringExpense)
-            flattenExpenses(date, newRecurringExpense)
+            flattenExpenses(newRecurringExpense.recurringDate, newRecurringExpense)
         }
 
         onChangeMutableFlow.emit(Unit)

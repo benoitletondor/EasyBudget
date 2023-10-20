@@ -24,18 +24,17 @@ import com.benoitletondor.easybudgetapp.helper.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
-import java.util.concurrent.Executor
+import java.util.concurrent.ExecutorService
 
 open class CachedDBImpl(
     private val wrappedDB: DB,
     private val cacheStorage: CacheDBStorage,
-    private val executor: Executor,
+    private val executor: ExecutorService,
 ) : DB, CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.IO) {
 
     private val onChangeMutableFlow = MutableSharedFlow<Unit>()
@@ -148,8 +147,8 @@ open class CachedDBImpl(
 
     override suspend fun updateRecurringExpenseAfterDate(
         newRecurringExpense: RecurringExpense,
-        date: LocalDate
-    ) = wrappedDB.updateRecurringExpenseAfterDate(newRecurringExpense, date)
+        oldOccurrenceDate: LocalDate
+    ) = wrappedDB.updateRecurringExpenseAfterDate(newRecurringExpense, oldOccurrenceDate)
 
     override suspend fun deleteRecurringExpense(recurringExpense: RecurringExpense): RestoreAction
         = wrappedDB.deleteRecurringExpense(recurringExpense)
@@ -215,7 +214,7 @@ open class CachedDBImpl(
                 Logger.debug("DBCache: Caching expenses for month: $month")
 
                 // Iterate over day of month (while are still on that month)
-                while (currentDate.month == month) {
+                while (currentDate.month == month && !Thread.currentThread().isInterrupted) {
                     val expensesForDay = runBlocking { db.getExpensesForDayWithoutCache(currentDate) }
 
                     synchronized(cacheStorage.expenses) {
@@ -258,7 +257,7 @@ open class CachedDBImpl(
                 Logger.debug("DBCache: Caching balance for month: $month")
 
                 // Iterate over day of month (while are still on that month)
-                while (currentDate.month == month) {
+                while (currentDate.month == month && !Thread.currentThread().isInterrupted) {
                     val balanceForDay = runBlocking { db.getBalanceForDayWithoutCache(currentDate) }
 
                     synchronized(cacheStorage.balances) {
@@ -300,7 +299,7 @@ open class CachedDBImpl(
                 Logger.debug("DBCache: Caching checked balance for month: $month")
 
                 // Iterate over day of month (while are still on that month)
-                while (currentDate.month == month) {
+                while (currentDate.month == month && !Thread.currentThread().isInterrupted) {
                     val balanceForDay = runBlocking { db.getCheckedBalanceForDayWithoutCache(currentDate) }
 
                     synchronized(cacheStorage.checkedBalances) {

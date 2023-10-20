@@ -69,6 +69,8 @@ class OnlineDBImpl(
     private val recurringExpensesLoadingStateMutableFlow = MutableStateFlow<RecurringExpenseLoadingState>(RecurringExpenseLoadingState.NotLoaded)
 
     init {
+        Logger.debug("Opening Online DB: ${account.id}")
+
         watchAllRecurringExpenses()
         watchAllChanges()
     }
@@ -307,7 +309,7 @@ class OnlineDBImpl(
 
     override suspend fun updateRecurringExpenseAfterDate(
         newRecurringExpense: RecurringExpense,
-        date: LocalDate
+        oldOccurrenceDate: LocalDate,
     ) {
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
 
@@ -316,7 +318,7 @@ class OnlineDBImpl(
 
         realm.write {
             findLatest(entity)?.updateAllOccurrencesAfterDate(
-                date,
+                oldOccurrenceDate,
                 newRecurringExpense,
             )
         }
@@ -502,6 +504,12 @@ class OnlineDBImpl(
     }
 
     override fun close() {
+        if (realm.isClosed()) {
+            Logger.debug("Ignoring call to close for Online DB: ${account.id}, already closed")
+            return
+        }
+
+        Logger.debug("Closing Online DB: ${account.id}")
         realm.close()
         app.close()
         cancel()
