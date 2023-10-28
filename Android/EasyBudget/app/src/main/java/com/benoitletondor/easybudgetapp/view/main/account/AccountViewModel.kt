@@ -39,10 +39,10 @@ import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import com.benoitletondor.easybudgetapp.view.main.account.AccountFragment.Companion.ARG_SELECTED_ACCOUNT
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import io.realm.kotlin.mongodb.exceptions.InvalidCredentialsException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -221,6 +221,7 @@ class AccountViewModel @Inject constructor(
                 if (e is CancellationException) throw e
 
                 Logger.error("Error while loading DB", e)
+
                 dbAvailableMutableStateFlow.value = DBState.Error(e);
             }
         }
@@ -243,7 +244,23 @@ class AccountViewModel @Inject constructor(
     }
 
     fun onRetryLoadingButtonPressed() {
-        loadDB()
+        val e = (dbAvailableMutableStateFlow.value as? DBState.Error)?.error
+        if (e != null && e is InvalidCredentialsException) {
+            viewModelScope.launch {
+                try {
+                    Logger.debug("Refreshing user tokens")
+                    auth.refreshUserTokens()
+                } catch (e: Exception) {
+                    if (e is CancellationException) throw e
+
+                    Logger.error("Error while force refreshing user token", e)
+                }
+
+                loadDB()
+            }
+        } else {
+            loadDB()
+        }
     }
 
     fun onMonthlyReportButtonPressed() {
