@@ -110,7 +110,7 @@ private const val SHOULD_SHOW_CHECKED_BALANCE = "should_show_checked_balance"
 /**
  * Id of the last selected online account
  */
-private const val SELECTED_ACCOUNT_ID_KEY = "selectedAccountId";
+private const val SELECTED_ACCOUNT_ID_KEY = "selectedAccountId"
 
 fun Parameters.getInitDate(): LocalDate? {
     val timestamp = getLong(INIT_TIMESTAMP_PARAMETERS_KEY, 0L)

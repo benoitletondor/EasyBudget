@@ -878,7 +878,7 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
         fun newInstance(account: MainViewModel.SelectedAccount.Selected): AccountFragment {
             return AccountFragment().apply {
                 arguments = Bundle().apply {
-                    putParcelable(ARG_SELECTED_ACCOUNT, account);
+                    putParcelable(ARG_SELECTED_ACCOUNT, account)
                 }
             }
         }

@@ -319,8 +319,8 @@ class BackupSettingsViewModel @Inject constructor(
 }
 
 sealed class BackupCloudStorageState {
-    object NotAuthenticated : BackupCloudStorageState()
-    object Authenticating : BackupCloudStorageState()
+    data object NotAuthenticated : BackupCloudStorageState()
+    data object Authenticating : BackupCloudStorageState()
     data class NotActivated(val currentUser: CurrentUser) : BackupCloudStorageState()
     data class Activated(val currentUser: CurrentUser,
                          val lastBackupDate: Date?,

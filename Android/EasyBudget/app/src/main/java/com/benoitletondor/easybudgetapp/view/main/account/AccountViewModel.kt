@@ -222,7 +222,7 @@ class AccountViewModel @Inject constructor(
 
                 Logger.error("Error while loading DB", e)
 
-                dbAvailableMutableStateFlow.value = DBState.Error(e);
+                dbAvailableMutableStateFlow.value = DBState.Error(e)
             }
         }
     }
@@ -272,7 +272,7 @@ class AccountViewModel @Inject constructor(
     }
 
     sealed class RecurringExpenseDeleteProgressState {
-        object Idle : RecurringExpenseDeleteProgressState()
+        data object Idle : RecurringExpenseDeleteProgressState()
         class Deleting(val expense: Expense): RecurringExpenseDeleteProgressState()
     }
 
@@ -284,7 +284,7 @@ class AccountViewModel @Inject constructor(
     }
 
     sealed class RecurringExpenseRestoreProgressState {
-        object Idle : RecurringExpenseRestoreProgressState()
+        data object Idle : RecurringExpenseRestoreProgressState()
         class Restoring(val recurringExpense: RecurringExpense): RecurringExpenseRestoreProgressState()
     }
 
@@ -588,7 +588,7 @@ class AccountViewModel @Inject constructor(
     private suspend fun awaitDB() = dbAvailableMutableStateFlow.filterIsInstance<DBState.Loaded>().first().db
 
     sealed class DBState {
-        object Loading : DBState()
+        data object Loading : DBState()
         class Loaded(val db: DB) : DBState()
         class Error(val error: Exception) : DBState()
     }

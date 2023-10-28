@@ -271,8 +271,8 @@ class AccountSelectorViewModel @Inject constructor(
     }
 
     sealed class State {
-        object Loading : State()
-        object IabError : State()
+        data object Loading : State()
+        data object IabError : State()
         data class Error(val cause: Throwable) : State()
         data class NotPro(override val isOfflineBackupEnabled: Boolean) : State(), OfflineBackStateAvailable
         data class NotAuthenticated(override val isOfflineBackupEnabled: Boolean) : State(), OfflineBackStateAvailable
@@ -290,11 +290,11 @@ class AccountSelectorViewModel @Inject constructor(
     sealed class Event {
         data class AccountSelected(val account: MainViewModel.SelectedAccount.Selected) : Event()
         class ErrorAcceptingInvitation(val error: Throwable) : Event()
-        object InvitationAccepted : Event()
+        data object InvitationAccepted : Event()
         class ErrorRejectingInvitation(val error: Throwable) : Event()
-        object InvitationRejected : Event()
-        object OpenProScreen : Event()
+        data object InvitationRejected : Event()
+        data object OpenProScreen : Event()
         data class OpenLoginScreen(val shouldDismissAfterAuth: Boolean) : Event()
-        object OpenCreateAccountScreen : Event()
+        data object OpenCreateAccountScreen : Event()
     }
 }

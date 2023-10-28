@@ -30,7 +30,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -96,15 +95,15 @@ class CreateAccountViewModel @Inject constructor(
     }
 
     sealed class State {
-        object Loading : State()
+        data object Loading : State()
         data class Ready(val initialNameValue: String, val currentUser: CurrentUser) : State()
-        object NotAuthenticatedError : State()
+        data object NotAuthenticatedError : State()
         data class Creating(val currentUser: CurrentUser) : State()
     }
 
     sealed class Event {
         class ErrorWhileCreatingAccount(val error: Throwable) : Event()
-        object SuccessCreatingAccount : Event()
-        object Finish : Event()
+        data object SuccessCreatingAccount : Event()
+        data object Finish : Event()
     }
 }

@@ -18,13 +18,16 @@ package com.benoitletondor.easybudgetapp.helper
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
-import android.annotation.TargetApi
 import android.app.Activity
 import android.content.Context
 import android.os.Build
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.*
+import android.view.Gravity
+import android.view.View
+import android.view.ViewAnimationUtils
+import android.view.ViewTreeObserver
+import android.view.WindowManager
 import android.view.animation.AccelerateInterpolator
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -39,7 +42,7 @@ import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.Locale
 import kotlin.math.max
 
 /**
