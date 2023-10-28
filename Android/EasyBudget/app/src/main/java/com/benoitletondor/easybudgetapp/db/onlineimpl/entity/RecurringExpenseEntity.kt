@@ -37,6 +37,7 @@ import com.benoitletondor.easybudgetapp.model.AssociatedRecurringExpense
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.Index
 import io.realm.kotlin.types.annotations.PrimaryKey
 import java.security.SecureRandom
 import java.time.LocalDate
@@ -50,7 +51,9 @@ class RecurringExpenseEntity() : RealmObject {
     @PrimaryKey
     var _id: Long = SecureRandom().nextLong()
     var iCalRepresentation: String = ""
+    @Index
     var accountId: String = ""
+    @Index
     var accountSecret: String = ""
 
     constructor(
