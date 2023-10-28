@@ -247,6 +247,8 @@ class AccountViewModel @Inject constructor(
         val e = (dbAvailableMutableStateFlow.value as? DBState.Error)?.error
         if (e != null && e is InvalidCredentialsException) {
             viewModelScope.launch {
+                dbAvailableMutableStateFlow.value = DBState.Loading
+
                 try {
                     Logger.debug("Refreshing user tokens")
                     auth.refreshUserTokens()
