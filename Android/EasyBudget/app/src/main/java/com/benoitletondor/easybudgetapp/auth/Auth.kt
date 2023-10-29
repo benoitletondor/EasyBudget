@@ -26,11 +26,12 @@ interface Auth {
     fun startAuthentication(activity: Activity)
     fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
     fun logout()
+    suspend fun refreshUserTokens()
 }
 
 sealed class AuthState {
-    object NotAuthenticated : AuthState()
-    object Authenticating : AuthState()
+    data object NotAuthenticated : AuthState()
+    data object Authenticating : AuthState()
     data class Authenticated(val currentUser: CurrentUser) : AuthState()
 }
 

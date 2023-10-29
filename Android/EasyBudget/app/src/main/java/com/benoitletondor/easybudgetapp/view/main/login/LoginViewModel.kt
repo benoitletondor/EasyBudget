@@ -80,12 +80,12 @@ class LoginViewModel @Inject constructor(
     }
 
     sealed class State {
-        object Loading : State()
-        object NotAuthenticated : State()
+        data object Loading : State()
+        data object NotAuthenticated : State()
         data class Authenticated(val user: CurrentUser) : State()
     }
 
     sealed class Event {
-        object Finish : Event()
+        data object Finish : Event()
     }
 }

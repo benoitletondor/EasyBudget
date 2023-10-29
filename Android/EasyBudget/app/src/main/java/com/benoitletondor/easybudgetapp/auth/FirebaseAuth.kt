@@ -86,20 +86,26 @@ class FirebaseAuth(
         updateAuthState()
     }
 
+    override suspend fun refreshUserTokens() {
+        currentState.value = getAuthState(forceRefreshToken = true)
+    }
+
     private fun updateAuthState() {
         launch {
-            currentState.value = getAuthState()
+            currentState.value = getAuthState(forceRefreshToken = false)
         }
     }
 
-    private suspend fun getAuthState(): AuthState {
+    private suspend fun getAuthState(forceRefreshToken: Boolean): AuthState {
         val firebaseUser = auth.currentUser
         return if( firebaseUser == null ) {
             AuthState.NotAuthenticated
         } else {
             try {
-                val token = firebaseUser.getIdToken(false).await().token!!
-                AuthState.Authenticated(firebaseUser.toCurrentUser(token))
+                val token = firebaseUser.getIdToken(forceRefreshToken).await().token!!
+                AuthState.Authenticated(
+                    currentUser = firebaseUser.toCurrentUser(token),
+                )
             } catch (e: Exception) {
                 Logger.error("Error while getting firebase token", e)
                 AuthState.NotAuthenticated

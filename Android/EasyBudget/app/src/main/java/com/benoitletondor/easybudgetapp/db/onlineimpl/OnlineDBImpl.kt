@@ -522,15 +522,15 @@ class OnlineDBImpl(
         = "date == ${day.toEpochDay()}"
 
     sealed class SyncSessionState {
-        object NotStarted : SyncSessionState()
-        object Started : SyncSessionState()
-        object Done : SyncSessionState()
+        data object NotStarted : SyncSessionState()
+        data object Started : SyncSessionState()
+        data object Done : SyncSessionState()
         class Error(val exception: Throwable) : SyncSessionState()
     }
 
     private sealed class RecurringExpenseLoadingState {
-        object NotLoaded : RecurringExpenseLoadingState()
-        object Loading : RecurringExpenseLoadingState()
+        data object NotLoaded : RecurringExpenseLoadingState()
+        data object Loading : RecurringExpenseLoadingState()
         data class Loaded(val expenses: List<RecurringExpenseEntity>) : RecurringExpenseLoadingState()
         class Error(val exception: Throwable) : RecurringExpenseLoadingState()
     }
@@ -568,7 +568,7 @@ class OnlineDBImpl(
                     user = user,
                     schema = setOf(ExpenseEntity::class, RecurringExpenseEntity::class),
                 )
-                .name("${account.id}.realm")
+                .name("${account.id}_v2.realm") // v2 == with indexes on properties
                 .initialSubscriptions(rerunOnOpen = true) { realm ->
                     add(
                         query = realm.query<ExpenseEntity>(account.generateQuery()),

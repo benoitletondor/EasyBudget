@@ -88,8 +88,8 @@ class MonthlyReportViewModel @Inject constructor() : ViewModel() {
     }
 
     sealed class MonthlyReportState {
-        object Loading : MonthlyReportState()
-        object Empty: MonthlyReportState()
+        data object Loading : MonthlyReportState()
+        data object Empty: MonthlyReportState()
         class Loaded(val expenses: List<Expense>, val revenues: List<Expense>, val expensesAmount: Double, val revenuesAmount: Double) : MonthlyReportState()
     }
 }

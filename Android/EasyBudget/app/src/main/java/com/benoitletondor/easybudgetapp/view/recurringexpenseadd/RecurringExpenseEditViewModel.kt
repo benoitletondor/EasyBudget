@@ -186,7 +186,7 @@ class RecurringExpenseEditViewModel @Inject constructor(
     }
 
     sealed class SavingState {
-        object Idle : SavingState()
+        data object Idle : SavingState()
         data class Saving(val isRevenue: Boolean): SavingState()
     }
 }

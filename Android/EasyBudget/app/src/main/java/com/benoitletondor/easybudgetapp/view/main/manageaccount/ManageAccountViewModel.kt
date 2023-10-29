@@ -346,7 +346,7 @@ class ManageAccountViewModel @Inject constructor(
     }
 
     sealed class State {
-        object Loading : State()
+        data object Loading : State()
         sealed class Ready : State() {
             abstract val accountName: String
             abstract val currentUser: CurrentUser
@@ -364,24 +364,24 @@ class ManageAccountViewModel @Inject constructor(
             ) : Ready()
         }
         data class Error(val error: Throwable) : State()
-        object Updating : State()
-        object DeletingInvitation : State()
-        object SendingInvitation : State()
-        object LeavingAccount : State()
-        object DeletingAccount : State()
+        data object Updating : State()
+        data object DeletingInvitation : State()
+        data object SendingInvitation : State()
+        data object LeavingAccount : State()
+        data object DeletingAccount : State()
     }
 
     sealed class Event {
         data class ErrorDeletingInvitation(val error: Exception) : Event()
         data class InvitationDeleted(val invitation: Invitation) : Event()
         data class ErrorUpdatingAccountName(val error: Exception) : Event()
-        object AccountNameUpdated : Event()
+        data object AccountNameUpdated : Event()
         data class ErrorWhileLeavingAccount(val error: Exception) : Event()
-        object AccountLeft : Event()
-        object Finish : Event()
+        data object AccountLeft : Event()
+        data object Finish : Event()
         data class ErrorWhileInviting(val error: Exception) : Event()
         data class InvitationSent(val email: String) : Event()
-        object AccountDeleted : Event()
+        data object AccountDeleted : Event()
         data class ErrorWhileDeletingAccount(val error: Exception) : Event()
     }
 }

@@ -19,9 +19,6 @@ package com.benoitletondor.easybudgetapp.view.main
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-
-import com.benoitletondor.easybudgetapp.view.welcome.WelcomeActivity
-import androidx.core.app.ActivityCompat
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -31,21 +28,16 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -53,32 +45,29 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.whenStarted
 import androidx.lifecycle.withStarted
-
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.databinding.ActivityMainBinding
-
 import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.parameters.*
 import com.benoitletondor.easybudgetapp.theme.AppTheme
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.main.account.AccountFragment
-import com.benoitletondor.easybudgetapp.view.main.account.AccountViewModel
 import com.benoitletondor.easybudgetapp.view.main.accountselector.AccountSelectorFragment
 import com.benoitletondor.easybudgetapp.view.main.loading.LoadingFragment
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.SHOW_BACKUP_INTENT_KEY
+import com.benoitletondor.easybudgetapp.view.welcome.WelcomeActivity
 import com.benoitletondor.easybudgetapp.view.welcome.getOnboardingStep
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
-
 import javax.inject.Inject
 
 /**

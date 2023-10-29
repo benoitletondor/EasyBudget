@@ -21,7 +21,6 @@ import biweekly.ICalendar
 import biweekly.component.VEvent
 import biweekly.property.DateEnd
 import biweekly.property.DateStart
-import biweekly.property.ProductId
 import biweekly.property.RecurrenceId
 import biweekly.property.RecurrenceRule
 import biweekly.property.Status
@@ -38,9 +37,8 @@ import com.benoitletondor.easybudgetapp.model.AssociatedRecurringExpense
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.Index
 import io.realm.kotlin.types.annotations.PrimaryKey
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.security.SecureRandom
 import java.time.LocalDate
 import java.util.Date
@@ -53,7 +51,9 @@ class RecurringExpenseEntity() : RealmObject {
     @PrimaryKey
     var _id: Long = SecureRandom().nextLong()
     var iCalRepresentation: String = ""
+    @Index
     var accountId: String = ""
+    @Index
     var accountSecret: String = ""
 
     constructor(

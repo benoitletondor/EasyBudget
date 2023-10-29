@@ -44,7 +44,7 @@ class SelectCurrencyViewModel @Inject constructor() : ViewModel() {
     }
 
     sealed class State {
-        object Loading : State()
+        data object Loading : State()
         data class Loaded(val mainCurrencies: List<Currency>, val otherCurrencies: List<Currency>) : State()
     }
 }

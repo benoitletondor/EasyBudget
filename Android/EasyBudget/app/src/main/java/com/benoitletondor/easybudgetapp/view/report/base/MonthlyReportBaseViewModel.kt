@@ -90,7 +90,7 @@ class MonthlyReportBaseViewModel @Inject constructor(
     }
 
     sealed class State {
-        object Loading : State()
+        data object Loading : State()
         data class Loaded(val dates: List<LocalDate>, val selectedPosition: MonthlyReportSelectedPosition) : State()
     }
 }

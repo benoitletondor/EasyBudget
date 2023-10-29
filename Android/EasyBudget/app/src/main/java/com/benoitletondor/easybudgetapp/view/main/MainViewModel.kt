@@ -171,12 +171,12 @@ class MainViewModel @Inject constructor(
     }
 
     private sealed class OnlineAccountResponse {
-        object Loading : OnlineAccountResponse()
+        data object Loading : OnlineAccountResponse()
         data class Available(val accounts: List<Account>) : OnlineAccountResponse()
     }
 
     sealed class SelectedAccount {
-        object Loading : SelectedAccount()
+        data object Loading : SelectedAccount()
         sealed class Selected : SelectedAccount(), Parcelable {
             @Parcelize
             object Offline : Selected()
@@ -197,6 +197,6 @@ class MainViewModel @Inject constructor(
     }
 
     sealed class Event {
-        object ShowAccountSelect : Event()
+        data object ShowAccountSelect : Event()
     }
 }

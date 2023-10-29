@@ -115,11 +115,11 @@ class PremiumViewModel @Inject constructor(
     }
 
     sealed class SubscriptionStatus {
-        object Verifying : SubscriptionStatus()
-        object Error : SubscriptionStatus()
-        object NotSubscribed : SubscriptionStatus()
-        object PremiumSubscribed : SubscriptionStatus()
-        object ProSubscribed : SubscriptionStatus()
+        data object Verifying : SubscriptionStatus()
+        data object Error : SubscriptionStatus()
+        data object NotSubscribed : SubscriptionStatus()
+        data object PremiumSubscribed : SubscriptionStatus()
+        data object ProSubscribed : SubscriptionStatus()
     }
 }
 

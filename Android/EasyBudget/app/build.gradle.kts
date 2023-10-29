@@ -16,7 +16,6 @@
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    id("kotlin-kapt")
     id("com.google.firebase.crashlytics")
     id("dagger.hilt.android.plugin")
     id("com.google.devtools.ksp")
@@ -36,11 +35,11 @@ android {
 
     defaultConfig {
         applicationId = "com.benoitletondor.easybudgetapp"
-        compileSdk = 33
+        compileSdk = 34
         minSdk = 21
-        targetSdk = 33
-        versionCode = 105
-        versionName = "3.0.6"
+        targetSdk = 34
+        versionCode = 107
+        versionName = "3.0.7"
         vectorDrawables.useSupportLibrary = true
 
         javaCompileOptions {
@@ -94,19 +93,13 @@ android {
             keyPassword = "uFdRPMWz69R28t6m9zV53jmw9hJVK3"
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
 
+    compileOptions {
         isCoreLibraryDesugaringEnabled = true
     }
 
-    kotlinOptions {
-        jvmTarget = "11"
-    }
-
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.8"
+        kotlinCompilerExtensionVersion = "1.5.3"
     }
 
     buildFeatures {
@@ -116,9 +109,21 @@ android {
     }
 }
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(11))
+// Remove this when https://github.com/google/dagger/issues/4049 is merged
+androidComponents {
+    onVariants(selector().all()) { variant ->
+        afterEvaluate {
+            // This is a workaround for https://issuetracker.google.com/301245705 which depends on internal
+            // implementations of the android gradle plugin and the ksp gradle plugin which might change in the future
+            // in an unpredictable way.
+            project.tasks.getByName("ksp" + variant.name.capitalize() + "Kotlin") {
+                val dataBindingTask = project.tasks.getByName ("dataBindingGenBaseClasses" + variant.name.capitalize()) as com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask
+
+                (this as org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompileTool<*>).setSource(
+                    dataBindingTask.sourceOutFolder
+                )
+            }
+        }
     }
 }
 
@@ -132,24 +137,24 @@ dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
 
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.core:core-ktx:1.10.1")
-    implementation("com.google.android.material:material:1.9.0")
-    implementation("androidx.recyclerview:recyclerview:1.3.1")
+    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("com.google.android.material:material:1.10.0")
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.preference:preference-ktx:1.2.1")
-    implementation("androidx.activity:activity-ktx:1.7.2")
+    implementation("androidx.activity:activity-ktx:1.8.0")
     implementation("androidx.fragment:fragment-ktx:1.6.1")
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.work:work-runtime-ktx:2.8.1")
     implementation("androidx.work:work-gcm:2.8.1")
     implementation("com.google.android.play:core:1.10.3")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
-    implementation(platform("com.google.firebase:firebase-bom:32.2.2"))
+    implementation(platform("com.google.firebase:firebase-bom:32.4.1"))
     implementation("com.google.firebase:firebase-messaging-ktx")
     implementation("com.google.firebase:firebase-storage")
     implementation("com.google.firebase:firebase-crashlytics")
@@ -157,15 +162,15 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.firebaseui:firebase-ui-auth:8.0.2")
 
-    val composeBom = platform("androidx.compose:compose-bom:2023.06.01")
+    val composeBom = platform("androidx.compose:compose-bom:2023.10.01")
     implementation(composeBom)
     androidTestImplementation(composeBom)
     debugImplementation("androidx.compose.ui:ui-tooling")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.ui:ui")
-    implementation("androidx.activity:activity-compose:1.7.2")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
+    implementation("androidx.activity:activity-compose:1.8.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
     implementation("com.google.accompanist:accompanist-themeadapter-material3:0.31.5-beta")
 
     implementation("com.android.billingclient:billing-ktx:6.0.1")
@@ -175,13 +180,13 @@ dependencies {
     implementation("com.batch.android:batch-sdk:1.19.4")
 
     implementation("com.google.dagger:hilt-android:$hiltVersion")
-    implementation("androidx.hilt:hilt-work:1.0.0")
-    kapt("androidx.hilt:hilt-compiler:1.0.0")
-    kapt("com.google.dagger:hilt-compiler:$hiltVersion")
+    implementation("androidx.hilt:hilt-work:1.1.0-rc01")
+    ksp("androidx.hilt:hilt-compiler:1.1.0-rc01")
+    ksp("com.google.dagger:hilt-compiler:$hiltVersion")
 
-    ksp("androidx.room:room-compiler:2.5.2")
-    implementation("androidx.room:room-runtime:2.5.2")
-    implementation("androidx.room:room-ktx:2.5.2")
+    ksp("androidx.room:room-compiler:2.6.0")
+    implementation("androidx.room:room-runtime:2.6.0")
+    implementation("androidx.room:room-ktx:2.6.0")
 
     implementation("io.realm.kotlin:library-sync:$realmVersion")
 

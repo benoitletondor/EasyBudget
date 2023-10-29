@@ -147,7 +147,10 @@ class FirebaseAccounts(
             .await()
     }
 
-    override suspend fun leaveAccount(currentUser: CurrentUser, accountCredentials: AccountCredentials,) {
+    override suspend fun leaveAccount(
+        currentUser: CurrentUser,
+        accountCredentials: AccountCredentials,
+    ) {
         val accountRef = db.collection(ACCOUNTS_COLLECTION).document(accountCredentials.id)
 
         val invitationQuery = db.collection(INVITATIONS_COLLECTION)
@@ -374,7 +377,7 @@ class FirebaseAccounts(
         private const val INVITATION_DOCUMENT_ACCOUNT_ID = "accountId"
         private const val INVITATION_DOCUMENT_SENDER_ID = "senderId"
         private const val INVITATION_DOCUMENT_SENDER_EMAIL = "senderEmail"
-        private const val INVITATION_DOCUMENT_SENDER_LOCALE = "senderLocale";
+        private const val INVITATION_DOCUMENT_SENDER_LOCALE = "senderLocale"
 
         private const val ACCOUNTS_COLLECTION = "accounts"
         private const val ACCOUNT_DOCUMENT_SECRET = "secret"

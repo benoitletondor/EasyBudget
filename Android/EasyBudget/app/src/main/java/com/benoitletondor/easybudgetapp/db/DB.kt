@@ -19,7 +19,6 @@ package com.benoitletondor.easybudgetapp.db
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import kotlinx.coroutines.flow.Flow
-import java.io.Closeable
 import java.time.LocalDate
 
 interface DB {

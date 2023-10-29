@@ -48,16 +48,21 @@ private const val BACKUP_VERSION = 1
 private const val BACKUP_VERSION_FILENAME = "version"
 private const val BACKUP_DB_FILENAME = "db_backup"
 
+class BackupException(message: String) : Exception("Backup: $message")
+
 suspend fun backupDB(context: Context,
                      cloudStorage: CloudStorage,
                      auth: Auth,
                      parameters: Parameters,
                      iab: Iab): ListenableWorker.Result {
+    Logger.debug("BackupJob", "Starting backup")
+
     val currentUser = (auth.state.value as? AuthState.Authenticated)?.currentUser
     if( currentUser == null ) {
         Logger.error(
             "BackupJob",
-            "Not authenticated"
+            "Not authenticated",
+            BackupException("Not authenticated"),
         )
 
         return ListenableWorker.Result.failure()
@@ -66,7 +71,8 @@ suspend fun backupDB(context: Context,
     if( !iab.isUserPremium() ) {
         Logger.error(
             "BackupJob",
-            "Not premium"
+            "Not premium",
+            BackupException("Not premium"),
         )
 
         return ListenableWorker.Result.failure()
@@ -133,6 +139,8 @@ suspend fun backupDB(context: Context,
             )
         }
     }
+
+    Logger.debug("BackupJob", "Backup complete")
 
     return ListenableWorker.Result.success()
 }
