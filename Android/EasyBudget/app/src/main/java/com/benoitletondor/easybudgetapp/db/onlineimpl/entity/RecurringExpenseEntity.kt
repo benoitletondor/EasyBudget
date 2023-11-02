@@ -112,6 +112,15 @@ class RecurringExpenseEntity() : RealmObject {
         val recurrenceId = RecurrenceId(ICalDate(originalOccurrenceDate.toStartOfDayDate(), false))
         exceptionEvent.recurrenceId = recurrenceId
 
+        // Cancel any previous exception
+        events.filterNotException()
+            .forEach { exception ->
+                if (exception.dateStart.value.time == originalOccurrenceDate.toStartOfDayDate().time) {
+                    exception.status.value = Status.CANCELLED
+                }
+            }
+
+        // Add exception
         addEvent(exceptionEvent)
     }
 
@@ -144,6 +153,14 @@ class RecurringExpenseEntity() : RealmObject {
                 }
             }
 
+        cal.events
+            .filterNotException()
+            .forEach { exception ->
+                if (exception.dateStart.value.after(date.toStartOfDayDate())) {
+                    exception.status.value = Status.CANCELLED
+                }
+            }
+
         iCalRepresentation = cal.write()
     }
 
@@ -155,6 +172,14 @@ class RecurringExpenseEntity() : RealmObject {
             .forEach { event ->
                 if (event.dateStart.value.before(date.toStartOfDayDate())) {
                     event.dateStart = DateStart(date.toStartOfDayDate(), false)
+                }
+            }
+
+        cal.events
+            .filterNotException()
+            .forEach { exception ->
+                if (exception.dateStart.value.before(date.toStartOfDayDate())) {
+                    exception.status.value = Status.CANCELLED
                 }
             }
 
@@ -294,6 +319,8 @@ class RecurringExpenseEntity() : RealmObject {
     }
 
     private fun List<VEvent>.filterExceptions() = filter { it.recurrenceId == null }
+
+    private fun List<VEvent>.filterNotException() = filter { it.recurrenceId != null }
 
     companion object {
         fun newFromRecurringExpense(recurringExpense: RecurringExpense, account: Account): RecurringExpenseEntity {
