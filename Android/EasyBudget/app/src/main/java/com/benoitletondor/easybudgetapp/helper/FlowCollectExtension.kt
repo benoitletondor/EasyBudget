@@ -35,6 +35,7 @@ fun <T> CoroutineScope.launchCollect(
     }
 }
 
+@Suppress("UNCHECKED_CAST")
 fun <T1, T2, T3, T4, T5, T6, T7, T8, R> combine(
     flow: Flow<T1>,
     flow2: Flow<T2>,

@@ -569,7 +569,7 @@ class OnlineDBImpl(
                     schema = setOf(ExpenseEntity::class, RecurringExpenseEntity::class),
                 )
                 .name("${account.id}_v2.realm") // v2 == with indexes on properties
-                .initialSubscriptions(rerunOnOpen = true) { realm ->
+                .initialSubscriptions { realm ->
                     add(
                         query = realm.query<ExpenseEntity>(account.generateQuery()),
                         name = "${currentUser.id}:${account.id}:expenses",

@@ -60,8 +60,8 @@ private class TimestampConverters {
 }
 
 private val migrateTimestamps = object : Migration(5, 6) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        val cursor = database.query("SELECT _expense_id,date FROM expense")
+    override fun migrate(db: SupportSQLiteDatabase) {
+        val cursor = db.query("SELECT _expense_id,date FROM expense")
         while(cursor.moveToNext()) {
             val id = cursor.getLong(cursor.getColumnIndexOrThrow("_expense_id"))
             val timestamp = cursor.getLong(cursor.getColumnIndexOrThrow("date"))
@@ -69,10 +69,10 @@ private val migrateTimestamps = object : Migration(5, 6) {
             val localDate = localDateFromTimestamp(timestamp)
             val newTimestamp = localDate.toEpochDay()
 
-            database.execSQL("UPDATE expense SET date = $newTimestamp WHERE _expense_id = $id")
+            db.execSQL("UPDATE expense SET date = $newTimestamp WHERE _expense_id = $id")
         }
 
-        val cursorRecurring = database.query("SELECT _expense_id,recurringDate FROM monthlyexpense")
+        val cursorRecurring = db.query("SELECT _expense_id,recurringDate FROM monthlyexpense")
         while(cursorRecurring.moveToNext()) {
             val id = cursorRecurring.getLong(cursorRecurring.getColumnIndexOrThrow("_expense_id"))
             val timestamp = cursorRecurring.getLong(cursorRecurring.getColumnIndexOrThrow("recurringDate"))
@@ -80,32 +80,32 @@ private val migrateTimestamps = object : Migration(5, 6) {
             val localDate = localDateFromTimestamp(timestamp)
             val newTimestamp = localDate.toEpochDay()
 
-            database.execSQL("UPDATE monthlyexpense SET recurringDate = $newTimestamp WHERE _expense_id = $id")
+            db.execSQL("UPDATE monthlyexpense SET recurringDate = $newTimestamp WHERE _expense_id = $id")
         }
     }
 }
 
 private val addCheckedField = object : Migration(4, 5) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("ALTER TABLE expense ADD COLUMN checked INTEGER NOT NULL DEFAULT 0")
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE expense ADD COLUMN checked INTEGER NOT NULL DEFAULT 0")
     }
 }
 
 private val migrationToRoom = object : Migration(3, 4) {
-    override fun migrate(database: SupportSQLiteDatabase) {
+    override fun migrate(db: SupportSQLiteDatabase) {
         // No-op, simple migration from SQLite to Room
     }
 }
 
 private val migrationFrom2To3 = object : Migration(2, 3) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("ALTER TABLE monthlyexpense ADD COLUMN type text not null DEFAULT '"+ RecurringExpenseType.MONTHLY+"'")
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE monthlyexpense ADD COLUMN type text not null DEFAULT '"+ RecurringExpenseType.MONTHLY+"'")
     }
 }
 
 private val migrationFrom1To2 = object : Migration(1, 2) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("UPDATE expense SET amount = amount * 100")
-        database.execSQL("UPDATE monthlyexpense SET amount = amount * 100")
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("UPDATE expense SET amount = amount * 100")
+        db.execSQL("UPDATE monthlyexpense SET amount = amount * 100")
     }
 }
