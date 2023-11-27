@@ -49,8 +49,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -151,16 +154,28 @@ class AccountViewModel @Inject constructor(
 
     val selectedDateDataFlow = combine(
         selectDateMutableStateFlow,
+        premiumStatusFlow
+            .mapNotNull { when(it) {
+                PremiumCheckStatus.INITIALIZING,
+                PremiumCheckStatus.CHECKING -> null
+                PremiumCheckStatus.ERROR,
+                PremiumCheckStatus.NOT_PREMIUM -> false
+                PremiumCheckStatus.LEGACY_PREMIUM,
+                PremiumCheckStatus.PREMIUM_SUBSCRIBED,
+                PremiumCheckStatus.PRO_SUBSCRIBED -> true
+            } }
+            .onStart { emit(false) }
+            .distinctUntilChanged(),
         forceRefreshMutableFlow
             .onStart {
                 emit(Unit)
             },
-    ) { date, _ ->
+    ) { date, isPremium, _ ->
         val (balance, expenses, checkedBalance) = withContext(Dispatchers.Default) {
             Triple(
                 getBalanceForDay(date),
                 awaitDB().getExpensesForDay(date),
-                if (parameters.getShouldShowCheckedBalance()) {
+                if (isPremium && parameters.getShouldShowCheckedBalance()) {
                     getCheckedBalanceForDay(date)
                 } else {
                     null

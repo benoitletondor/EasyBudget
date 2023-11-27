@@ -600,7 +600,7 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
         }
 
         binding.budgetLine.text = formatted
-        binding.budgetLineAmount.text = if (maybeCheckedBalance != null ) {
+        binding.budgetLineAmount.text = if (maybeCheckedBalance != null) {
             resources.getString(
                 R.string.account_balance_checked_format,
                 CurrencyHelper.getFormattedCurrencyString(parameters, balance),
