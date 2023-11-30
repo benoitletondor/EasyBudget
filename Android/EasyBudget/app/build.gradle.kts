@@ -38,8 +38,8 @@ android {
         compileSdk = 34
         minSdk = 21
         targetSdk = 34
-        versionCode = 111
-        versionName = "3.0.11"
+        versionCode = 112
+        versionName = "3.0.12"
         vectorDrawables.useSupportLibrary = true
 
         javaCompileOptions {
@@ -173,13 +173,13 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.activity:activity-compose:1.8.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
-    implementation("com.google.accompanist:accompanist-themeadapter-material3:0.31.5-beta")
+    implementation("com.google.accompanist:accompanist-themeadapter-material3:0.32.0")
 
     implementation("com.android.billingclient:billing-ktx:6.1.0")
 
     implementation(project(":caldroid"))
     implementation("me.relex:circleindicator:2.1.6@aar")
-    implementation("com.batch.android:batch-sdk:1.19.4")
+    implementation("com.batch.android:batch-sdk:1.20.1")
 
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     implementation("androidx.hilt:hilt-work:1.1.0")
