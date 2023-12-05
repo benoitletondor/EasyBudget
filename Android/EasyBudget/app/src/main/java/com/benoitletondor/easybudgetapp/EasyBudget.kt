@@ -114,7 +114,7 @@ class EasyBudget : Application(), Configuration.Provider {
         AppCompatDelegate.setDefaultNightMode(parameters.getTheme().toPlatformValue())
     }
 
-    override fun getWorkManagerConfiguration() =
+    override fun getWorkManagerConfiguration(): Configuration =
         Configuration.Builder()
             .setWorkerFactory(workerFactory)
             .build()
