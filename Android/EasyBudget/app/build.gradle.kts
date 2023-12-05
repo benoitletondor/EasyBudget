@@ -38,8 +38,8 @@ android {
         compileSdk = 34
         minSdk = 21
         targetSdk = 34
-        versionCode = 112
-        versionName = "3.0.12"
+        versionCode = 113
+        versionName = "3.0.13"
         vectorDrawables.useSupportLibrary = true
 
         javaCompileOptions {
@@ -101,7 +101,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.3"
+        kotlinCompilerExtensionVersion = "1.5.5"
     }
 
     buildFeatures {
@@ -186,9 +186,9 @@ dependencies {
     ksp("androidx.hilt:hilt-compiler:1.1.0")
     ksp("com.google.dagger:hilt-compiler:$hiltVersion")
 
-    ksp("androidx.room:room-compiler:2.6.0")
-    implementation("androidx.room:room-runtime:2.6.0")
-    implementation("androidx.room:room-ktx:2.6.0")
+    ksp("androidx.room:room-compiler:2.6.1")
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
 
     implementation("io.realm.kotlin:library-sync:$realmVersion")
 
