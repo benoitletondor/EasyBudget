@@ -153,30 +153,33 @@ class AccountViewModel @Inject constructor(
 
     private var changesWatchingJob: Job? = null
 
+    val includeCheckedBalanceFlow = premiumStatusFlow
+        .mapNotNull { when(it) {
+            PremiumCheckStatus.INITIALIZING,
+            PremiumCheckStatus.CHECKING -> null
+            PremiumCheckStatus.ERROR,
+            PremiumCheckStatus.NOT_PREMIUM -> false
+            PremiumCheckStatus.LEGACY_PREMIUM,
+            PremiumCheckStatus.PREMIUM_SUBSCRIBED,
+            PremiumCheckStatus.PRO_SUBSCRIBED -> true
+        } }
+        .distinctUntilChanged()
+        .map { it && parameters.getShouldShowCheckedBalance() }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
     val selectedDateDataFlow = combine(
         selectDateMutableStateFlow,
-        premiumStatusFlow
-            .mapNotNull { when(it) {
-                PremiumCheckStatus.INITIALIZING,
-                PremiumCheckStatus.CHECKING -> null
-                PremiumCheckStatus.ERROR,
-                PremiumCheckStatus.NOT_PREMIUM -> false
-                PremiumCheckStatus.LEGACY_PREMIUM,
-                PremiumCheckStatus.PREMIUM_SUBSCRIBED,
-                PremiumCheckStatus.PRO_SUBSCRIBED -> true
-            } }
-            .onStart { emit(false) }
-            .distinctUntilChanged(),
+        includeCheckedBalanceFlow,
         forceRefreshMutableFlow
             .onStart {
                 emit(Unit)
             },
-    ) { date, isPremium, _ ->
+    ) { date, includeCheckedBalance, _ ->
         val (balance, expenses, checkedBalance) = withContext(Dispatchers.Default) {
             Triple(
                 getBalanceForDay(date),
                 awaitDB().getExpensesForDay(date),
-                if (isPremium && parameters.getShouldShowCheckedBalance()) {
+                if (includeCheckedBalance) {
                     getCheckedBalanceForDay(date)
                 } else {
                     null

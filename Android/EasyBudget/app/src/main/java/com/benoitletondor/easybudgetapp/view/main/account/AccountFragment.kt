@@ -637,6 +637,7 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
                                     dbAvailableFlow = viewModel.dbAvailableFlow,
                                     selectedDateFlow = viewModel.selectDateFlow,
                                     onDateSelected = viewModel::onSelectDate,
+                                    includeCheckedBalance = viewModel.includeCheckedBalanceFlow,
                                 ) as T
                             }
                         }

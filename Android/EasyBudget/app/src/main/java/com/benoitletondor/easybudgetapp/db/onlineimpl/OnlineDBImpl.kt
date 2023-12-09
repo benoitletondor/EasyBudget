@@ -187,9 +187,9 @@ class OnlineDBImpl(
     }
 
     override suspend fun getDataForMonth(yearMonth: YearMonth, includeCheckedBalance: Boolean): DataForMonth {
-        var balance = getBalanceForDay(yearMonth.atStartOfMonth().minusDays(1))
+        var balance = getBalanceForDay(yearMonth.atStartOfMonth().minusDays(DataForMonth.numberOfLeewayDays + 1))
         var maybeCheckedBalance = if (includeCheckedBalance) {
-            getCheckedBalanceForDay(yearMonth.atStartOfMonth().minusDays(1))
+            getCheckedBalanceForDay(yearMonth.atStartOfMonth().minusDays(DataForMonth.numberOfLeewayDays + 1))
         } else {
             null
         }
@@ -197,8 +197,8 @@ class OnlineDBImpl(
         val expenses = getExpensesForMonth(yearMonth)
         val daysData = mutableMapOf<LocalDate, DataForDay>()
 
-        var dayDate = yearMonth.atStartOfMonth()
-        while (!dayDate.isAfter(yearMonth.atEndOfMonth())) {
+        var dayDate = yearMonth.atStartOfMonth().minusDays(DataForMonth.numberOfLeewayDays)
+        while (!dayDate.isAfter(yearMonth.atEndOfMonth().plusDays(DataForMonth.numberOfLeewayDays))) {
             val dayData = computeDataForDay(dayDate, expenses, balance, maybeCheckedBalance)
 
             daysData[dayDate] = dayData
