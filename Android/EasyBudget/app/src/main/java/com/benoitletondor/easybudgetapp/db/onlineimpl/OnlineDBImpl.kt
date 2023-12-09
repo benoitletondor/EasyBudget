@@ -187,13 +187,16 @@ class OnlineDBImpl(
     }
 
     override suspend fun getDataForMonth(yearMonth: YearMonth, includeCheckedBalance: Boolean): DataForMonth {
-        var balance = getBalanceForDay(yearMonth.atStartOfMonth().minusDays(DataForMonth.numberOfLeewayDays + 1))
+        val startDate = yearMonth.atStartOfMonth().minusDays(DataForMonth.numberOfLeewayDays)
+        val endDate = yearMonth.atEndOfMonth().plusDays(DataForMonth.numberOfLeewayDays)
 
-        val expenses = getExpensesForMonth(yearMonth)
+        var balance = getBalanceForDay(startDate.minusDays(1))
+
+        val expenses = getExpensesBetweenDates(startDate, endDate)
         val daysData = mutableMapOf<LocalDate, DataForDay>()
 
-        var dayDate = yearMonth.atStartOfMonth().minusDays(DataForMonth.numberOfLeewayDays)
-        while (!dayDate.isAfter(yearMonth.atEndOfMonth().plusDays(DataForMonth.numberOfLeewayDays))) {
+        var dayDate = startDate
+        while (!dayDate.isAfter(endDate)) {
             val dayData = computeDataForDay(dayDate, expenses, balance)
 
             daysData[dayDate] = dayData
@@ -280,14 +283,14 @@ class OnlineDBImpl(
         return recurringExpensesOfTheDay + expenses
     }
 
-    private suspend fun getExpensesForMonth(month: YearMonth): List<Expense> {
+    private suspend fun getExpensesBetweenDates(start: LocalDate, end: LocalDate): List<Expense> {
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
 
         val recurringExpensesOfTheDay = recurringExpenses
-            .map { it.generateExpenses(month.atStartOfMonth(), month.atEndOfMonth()) }
+            .map { it.generateExpenses(start, end) }
             .flatten()
 
-        val expenses = realm.query<ExpenseEntity>("${account.generateQuery()} AND ${generateQueryForDateRange(month.atStartOfMonth(), month.atEndOfMonth())}")
+        val expenses = realm.query<ExpenseEntity>("${account.generateQuery()} AND ${generateQueryForDateRange(start, end)}")
             .asFlow()
             .first()
             .list

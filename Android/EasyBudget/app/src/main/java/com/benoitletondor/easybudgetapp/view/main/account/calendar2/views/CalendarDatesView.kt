@@ -14,7 +14,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -37,6 +39,7 @@ import com.kizitonwose.calendar.core.CalendarMonth
 import com.kizitonwose.calendar.core.DayPosition
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
@@ -47,6 +50,8 @@ fun CalendarDatesView(
     calendarState: CalendarState,
     getDataForMonth: suspend (YearMonth) -> DataForMonth,
     includeCheckedBalance: Boolean,
+    selectedDateFlow: StateFlow<LocalDate>,
+    onDateSelected: (LocalDate) -> Unit,
 ) {
     val todayDate = remember { LocalDate.now() }
 
@@ -104,14 +109,20 @@ fun CalendarDatesView(
         dayContent = { calendarDay ->
             val maybeDataForMonth = LocalDataForMonth.current
             val maybeDataForDay = maybeDataForMonth?.daysData?.get(calendarDay.date)
+
+            val selectedDate by selectedDateFlow.collectAsState()
+
             if (maybeDataForDay != null && maybeDataForDay.expenses.isNotEmpty()) {
                 if (calendarDay.position == DayPosition.MonthDate) {
                     InCalendarWithBalanceDayView(
                         dayOfMonth = calendarDay.date.dayOfMonth,
                         balanceToDisplay = maybeDataForDay.balance,
                         displayUncheckedStyle = if (includeCheckedBalance) maybeDataForDay.expenses.any { !it.checked } else false,
-                        selected = false, // TODO
+                        selected = calendarDay.date == selectedDate,
                         today = calendarDay.date == todayDate,
+                        onClick = {
+                            onDateSelected(calendarDay.date)
+                        },
                     )
                 } else {
                     OffCalendarWithBalanceDayView(
@@ -119,19 +130,28 @@ fun CalendarDatesView(
                         balanceToDisplay = maybeDataForDay.balance,
                         displayUncheckedStyle = if (includeCheckedBalance) maybeDataForDay.expenses.any { !it.checked } else false,
                         today = calendarDay.date == todayDate,
+                        onClick = {
+                            onDateSelected(calendarDay.date)
+                        },
                     )
                 }
             } else {
                 if (calendarDay.position == DayPosition.MonthDate) {
                     InCalendarEmptyDayView(
                         dayOfMonth = calendarDay.date.dayOfMonth,
-                        selected = false, // TODO
+                        selected = calendarDay.date == selectedDate,
                         today = calendarDay.date == todayDate,
+                        onClick = {
+                            onDateSelected(calendarDay.date)
+                        },
                     )
                 } else {
                     OffCalendarEmptyDayView(
                         dayOfMonth = calendarDay.date.dayOfMonth,
                         today = calendarDay.date == todayDate,
+                        onClick = {
+                            onDateSelected(calendarDay.date)
+                        },
                     )
                 }
             }

@@ -58,13 +58,16 @@ class OfflineDBImpl(private val roomDB: RoomDB) : DB {
     }
 
     override suspend fun getDataForMonth(yearMonth: YearMonth, includeCheckedBalance: Boolean): DataForMonth {
-        var balance = roomDB.expenseDao().getBalanceForDay(yearMonth.atStartOfMonth().minusDays(DataForMonth.numberOfLeewayDays + 1)).getRealValueFromDB()
+        val startDate = yearMonth.atStartOfMonth().minusDays(DataForMonth.numberOfLeewayDays)
+        val endDate = yearMonth.atEndOfMonth().plusDays(DataForMonth.numberOfLeewayDays)
 
-        val expenses = roomDB.expenseDao().getExpensesBetweenDays(yearMonth.atStartOfMonth(), yearMonth.atEndOfMonth()).toExpenses(this)
+        var balance = roomDB.expenseDao().getBalanceForDay(startDate.minusDays(1)).getRealValueFromDB()
+
+        val expenses = roomDB.expenseDao().getExpensesBetweenDays(startDate, endDate).toExpenses(this)
         val daysData = mutableMapOf<LocalDate, DataForDay>()
 
-        var dayDate = yearMonth.atStartOfMonth().minusDays(DataForMonth.numberOfLeewayDays)
-        while (!dayDate.isAfter(yearMonth.atEndOfMonth().plusDays(DataForMonth.numberOfLeewayDays))) {
+        var dayDate = startDate
+        while (!dayDate.isAfter(endDate)) {
             val dayData = computeDataForDay(dayDate, expenses, balance)
 
             daysData[dayDate] = dayData

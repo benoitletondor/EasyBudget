@@ -11,8 +11,11 @@ import com.benoitletondor.easybudgetapp.model.DataForMonth
 import com.benoitletondor.easybudgetapp.view.main.account.calendar2.views.CalendarDatesView
 import com.benoitletondor.easybudgetapp.view.main.account.calendar2.views.CalendarHeaderView
 import com.kizitonwose.calendar.compose.rememberCalendarState
+import com.kizitonwose.calendar.core.yearMonth
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
+import java.time.LocalDate
 import java.time.YearMonth
 
 @Composable
@@ -28,6 +31,8 @@ fun CalendarView(
             CalendarView(
                 includeCheckedBalance = currentState.includeCheckedBalance,
                 getDataForMonth = currentState.getDataForMonth,
+                selectedDateFlow = currentState.selectedDateFlow,
+                onDateSelected = currentState.onDateSelected,
             )
         }
     }
@@ -37,6 +42,8 @@ fun CalendarView(
 private fun CalendarView(
     includeCheckedBalance: Boolean,
     getDataForMonth: suspend (YearMonth) -> DataForMonth,
+    selectedDateFlow: StateFlow<LocalDate>,
+    onDateSelected: (LocalDate) -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -64,6 +71,16 @@ private fun CalendarView(
             calendarState = calendarState,
             getDataForMonth = getDataForMonth,
             includeCheckedBalance = includeCheckedBalance,
+            selectedDateFlow = selectedDateFlow,
+            onDateSelected = { date ->
+                 if (date.yearMonth !== calendarState.firstVisibleMonth.yearMonth) {
+                     coroutineScope.launch {
+                         calendarState.animateScrollToMonth(date.yearMonth)
+                     }
+                 }
+
+                onDateSelected(date)
+            },
         )
     }
 }

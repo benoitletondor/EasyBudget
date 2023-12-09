@@ -3,6 +3,7 @@ package com.benoitletondor.easybudgetapp.view.main.account.calendar2.views
 import androidx.annotation.ColorRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,6 +30,7 @@ fun InCalendarWithBalanceDayView(
     displayUncheckedStyle: Boolean,
     selected: Boolean,
     today: Boolean,
+    onClick: () -> Unit,
 ) {
     InCalendarDayView(
         dayOfMonth = dayOfMonth,
@@ -36,6 +38,7 @@ fun InCalendarWithBalanceDayView(
         displayUncheckedStyle = displayUncheckedStyle,
         selected = selected,
         today = today,
+        onClick = onClick,
     )
 }
 
@@ -44,6 +47,7 @@ fun InCalendarEmptyDayView(
     dayOfMonth: Int,
     selected: Boolean,
     today: Boolean,
+    onClick: () -> Unit,
 ) {
     InCalendarDayView(
         dayOfMonth = dayOfMonth,
@@ -51,6 +55,7 @@ fun InCalendarEmptyDayView(
         displayUncheckedStyle = false,
         selected = selected,
         today = today,
+        onClick = onClick,
     )
 }
 
@@ -60,12 +65,14 @@ fun OffCalendarWithBalanceDayView(
     balanceToDisplay: Double,
     displayUncheckedStyle: Boolean,
     today: Boolean,
+    onClick: () -> Unit,
 ) {
     OffCalendarDayView(
         dayOfMonth = dayOfMonth,
         maybeBalanceToDisplay = balanceToDisplay,
         displayUncheckedStyle = displayUncheckedStyle,
         today = today,
+        onClick = onClick,
     )
 }
 
@@ -73,12 +80,14 @@ fun OffCalendarWithBalanceDayView(
 fun OffCalendarEmptyDayView(
     dayOfMonth: Int,
     today: Boolean,
+    onClick: () -> Unit,
 ) {
     OffCalendarDayView(
         dayOfMonth = dayOfMonth,
         maybeBalanceToDisplay = null,
         displayUncheckedStyle = false,
         today = today,
+        onClick = onClick,
     )
 }
 
@@ -89,6 +98,7 @@ private fun InCalendarDayView(
     displayUncheckedStyle: Boolean,
     selected: Boolean,
     today: Boolean,
+    onClick: () -> Unit,
 ) {
     CalendarDayView(
         dayOfMonth = dayOfMonth,
@@ -101,6 +111,7 @@ private fun InCalendarDayView(
         balanceColor = colorResource(id = R.color.primary_text),
         selected = selected,
         today = today,
+        onClick = onClick,
     )
 }
 
@@ -110,6 +121,7 @@ private fun OffCalendarDayView(
     maybeBalanceToDisplay: Double?,
     displayUncheckedStyle: Boolean,
     today: Boolean,
+    onClick: () -> Unit,
 ) {
     CalendarDayView(
         dayOfMonth = dayOfMonth,
@@ -122,6 +134,7 @@ private fun OffCalendarDayView(
         balanceColor = colorResource(id = R.color.divider),
         selected = false,
         today = today,
+        onClick = onClick,
     )
 }
 
@@ -149,12 +162,14 @@ private fun CalendarDayView(
     balanceColor: Color,
     selected: Boolean,
     today: Boolean,
+    onClick: () -> Unit,
 ) {
    Column(
        modifier = Modifier
-           .padding(2.dp)
+           .padding(3.dp)
            .fillMaxWidth()
            .aspectRatio(1f)
+           .clip(shape = CircleShape)
            .background(
                color = if (selected) {
                    colorResource(id = R.color.calendar_cell_selected)
@@ -162,33 +177,31 @@ private fun CalendarDayView(
                    Color.Transparent
                }
            )
-           .clip(shape = CircleShape)
            .border(
                width = 2.dp,
                color = if (today) MaterialTheme.colorScheme.primary else Color.Transparent,
                shape = CircleShape
            )
+           .clickable(onClick = onClick)
            .padding(7.dp)
    ) {
         Text(
             text = dayOfMonth.toString(),
             color = dayOfMonthColor,
             fontStyle = dayOfMonthFontStyle,
-            fontSize = 13.sp,
+            fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
         )
 
         Text(
             text = maybeBalanceToDisplay?.toString() ?: "",
             color = balanceColor,
-            fontSize = 10.sp,
+            fontSize = 11.sp,
             maxLines = 1,
             textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
         )
    }
 }

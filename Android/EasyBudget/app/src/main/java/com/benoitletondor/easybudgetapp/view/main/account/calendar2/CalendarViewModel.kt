@@ -34,6 +34,8 @@ class CalendarViewModel(
                     getDataForMonth = { month ->
                         dbState.db.getDataForMonth(month, includeCheckedBalance)
                     },
+                    selectedDateFlow = selectedDateFlow,
+                    onDateSelected = onDateSelected,
                 )
             }
         }
@@ -45,6 +47,8 @@ class CalendarViewModel(
         data class Loaded(
             val includeCheckedBalance: Boolean,
             val getDataForMonth: suspend (YearMonth) -> DataForMonth,
+            val selectedDateFlow: StateFlow<LocalDate>,
+            val onDateSelected: (LocalDate) -> Unit,
         ) : State()
     }
 }
