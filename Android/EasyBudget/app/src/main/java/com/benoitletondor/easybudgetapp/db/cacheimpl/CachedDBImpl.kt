@@ -80,6 +80,7 @@ open class CachedDBImpl(
 
         val dataForMonth = wrappedDB.getDataForMonth(yearMonth, includeCheckedBalance)
         synchronized(cachedDataForMonths) {
+            Logger.debug("DBCache: Caching data for month: $yearMonth")
             cachedDataForMonths[yearMonth] = dataForMonth
         }
 

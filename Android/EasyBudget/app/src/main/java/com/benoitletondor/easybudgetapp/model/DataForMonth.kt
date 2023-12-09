@@ -9,7 +9,7 @@ data class DataForMonth(
     val daysData: Map<LocalDate, DataForDay>,
 ) {
     companion object {
-        val numberOfLeewayDays: Long = 6
+        const val numberOfLeewayDays: Long = 6
     }
 }
 
@@ -17,5 +17,4 @@ data class DataForDay(
     val day: LocalDate,
     val expenses: List<Expense>,
     val balance: Double,
-    val maybeCheckedBalance: Double?,
 )

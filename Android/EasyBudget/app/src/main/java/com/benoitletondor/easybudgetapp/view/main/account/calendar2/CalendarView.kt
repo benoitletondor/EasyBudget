@@ -4,66 +4,66 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.tooling.preview.Preview
-import com.benoitletondor.easybudgetapp.theme.AppTheme
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import com.benoitletondor.easybudgetapp.model.DataForMonth
 import com.benoitletondor.easybudgetapp.view.main.account.calendar2.views.CalendarDatesView
 import com.benoitletondor.easybudgetapp.view.main.account.calendar2.views.CalendarHeaderView
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import com.kizitonwose.calendar.compose.rememberCalendarState
+import kotlinx.coroutines.launch
+import java.time.DayOfWeek
 import java.time.YearMonth
 
 @Composable
 fun CalendarView(
     viewModel: CalendarViewModel,
 ) {
-    CalendarView(
-        displayedMonthFlow = viewModel.displayedMonthFlow,
-        dataForMonthStateFlow = viewModel.dataForMonthState,
-        onMonthChange = viewModel::onMonthChange,
-        onRetryButtonClicked = viewModel::onRetryButtonClicked,
-    )
+    val state by viewModel.stateFlow.collectAsState()
+
+    when(val currentState = state) {
+        is CalendarViewModel.State.Error,
+        CalendarViewModel.State.Loading -> Unit
+        is CalendarViewModel.State.Loaded -> {
+            CalendarView(
+                includeCheckedBalance = currentState.includeCheckedBalance,
+                getDataForMonth = currentState.getDataForMonth,
+            )
+        }
+    }
 }
 
 @Composable
 private fun CalendarView(
-    displayedMonthFlow: StateFlow<YearMonth>,
-    dataForMonthStateFlow: StateFlow<CalendarViewModel.DataForMonthState>,
-    onMonthChange: (YearMonth) -> Unit,
-    onRetryButtonClicked: () -> Unit,
+    includeCheckedBalance: Boolean,
+    getDataForMonth: suspend (YearMonth) -> DataForMonth,
 ) {
-    val month by displayedMonthFlow.collectAsState()
-
     Column(
         modifier = Modifier.fillMaxWidth(),
     ) {
+        val coroutineScope = rememberCoroutineScope()
+        val calendarState = rememberCalendarState(
+            startMonth = YearMonth.now().minusMonths(100), // TODO
+            endMonth = YearMonth.now().plusMonths(100), // TODO
+            firstVisibleMonth = YearMonth.now(),
+            firstDayOfWeek = DayOfWeek.MONDAY, // TODO
+        )
+
         CalendarHeaderView(
-            month = month,
-            canGoBack = true,
-            canGoForward = true,
-            onMonthChange = onMonthChange,
+            month = calendarState.firstVisibleMonth.yearMonth,
+            canGoBack = true, // TODO
+            canGoForward = true, // TODO
+            onMonthChange = { yearMonth ->
+                coroutineScope.launch {
+                    calendarState.animateScrollToMonth(yearMonth)
+                }
+            },
         )
 
         CalendarDatesView(
-            month = month,
-            dataForMonthStateFlow = dataForMonthStateFlow,
-            onRetryButtonClicked = onRetryButtonClicked,
-        )
-    }
-}
-
-
-
-@Preview
-@Composable
-private fun CalendarViewPreview() {
-    AppTheme {
-        CalendarView(
-            displayedMonthFlow = MutableStateFlow(YearMonth.now()),
-            dataForMonthStateFlow = MutableStateFlow(CalendarViewModel.DataForMonthState.Loading),
-            onMonthChange = {},
-            onRetryButtonClicked = {},
+            calendarState = calendarState,
+            getDataForMonth = getDataForMonth,
+            includeCheckedBalance = includeCheckedBalance,
         )
     }
 }

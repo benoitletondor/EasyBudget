@@ -17,15 +17,12 @@ package com.benoitletondor.easybudgetapp.helper
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
-import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
-import kotlinx.coroutines.flow.combine as coroutineCombine
 
 fun <T> CoroutineScope.launchCollect(
     flowToCollect: Flow<T>,
@@ -60,31 +57,4 @@ fun <T1, T2, T3, T4, T5, T6, T7, T8, R> combine(
         args[6] as T7,
         args[7] as T8,
     )
-}
-
-@OptIn(ExperimentalCoroutinesApi::class)
-inline fun <reified T, R> combineTransformLatest(
-    vararg flows: Flow<T>,
-    noinline transform: suspend FlowCollector<R>.(Array<T>) -> Unit
-): Flow<R> {
-    return coroutineCombine(*flows) { it }
-        .transformLatest(transform)
-}
-
-fun <T1, T2, T3, T4, R> combineTransformLatest(
-    flow: Flow<T1>,
-    flow2: Flow<T2>,
-    flow3: Flow<T3>,
-    flow4: Flow<T4>,
-    transform: suspend FlowCollector<R>.(T1, T2, T3, T4) -> Unit
-): Flow<R> {
-    return combineTransformLatest(flow, flow2, flow3, flow4) { args ->
-        @Suppress("UNCHECKED_CAST")
-        transform(
-            args[0] as T1,
-            args[1] as T2,
-            args[2] as T3,
-            args[3] as T4,
-        )
-    }
 }

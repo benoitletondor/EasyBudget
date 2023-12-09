@@ -59,22 +59,16 @@ class OfflineDBImpl(private val roomDB: RoomDB) : DB {
 
     override suspend fun getDataForMonth(yearMonth: YearMonth, includeCheckedBalance: Boolean): DataForMonth {
         var balance = roomDB.expenseDao().getBalanceForDay(yearMonth.atStartOfMonth().minusDays(DataForMonth.numberOfLeewayDays + 1)).getRealValueFromDB()
-        var maybeCheckedBalance = if (includeCheckedBalance) {
-            roomDB.expenseDao().getCheckedBalanceForDay(yearMonth.atStartOfMonth().minusDays(DataForMonth.numberOfLeewayDays + 1)) .getRealValueFromDB()
-        } else {
-            null
-        }
 
         val expenses = roomDB.expenseDao().getExpensesBetweenDays(yearMonth.atStartOfMonth(), yearMonth.atEndOfMonth()).toExpenses(this)
         val daysData = mutableMapOf<LocalDate, DataForDay>()
 
         var dayDate = yearMonth.atStartOfMonth().minusDays(DataForMonth.numberOfLeewayDays)
         while (!dayDate.isAfter(yearMonth.atEndOfMonth().plusDays(DataForMonth.numberOfLeewayDays))) {
-            val dayData = computeDataForDay(dayDate, expenses, balance, maybeCheckedBalance)
+            val dayData = computeDataForDay(dayDate, expenses, balance)
 
             daysData[dayDate] = dayData
             balance = dayData.balance
-            maybeCheckedBalance = dayData.maybeCheckedBalance
 
             dayDate = dayDate.plusDays(1)
         }
@@ -90,7 +84,6 @@ class OfflineDBImpl(private val roomDB: RoomDB) : DB {
         dayDate: LocalDate,
         expensesForMonth: List<Expense>,
         balanceBeforeDay: Double,
-        maybeCheckedBalanceBeforeDay: Double?,
     ): DataForDay {
         val expensesForDay = expensesForMonth.filter { it.date == dayDate }
 
@@ -98,11 +91,6 @@ class OfflineDBImpl(private val roomDB: RoomDB) : DB {
             day = dayDate,
             expenses = expensesForDay,
             balance = balanceBeforeDay + expensesForDay.sumOf { it.amount },
-            maybeCheckedBalance = if (maybeCheckedBalanceBeforeDay != null) {
-                maybeCheckedBalanceBeforeDay + expensesForDay.filter { it.checked }.sumOf { it.amount }
-            } else {
-                null
-            }
         )
     }
 
