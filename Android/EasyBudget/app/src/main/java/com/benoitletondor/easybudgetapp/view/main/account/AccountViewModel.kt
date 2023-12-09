@@ -91,6 +91,7 @@ class AccountViewModel @Inject constructor(
     }
 
     private val selectDateMutableStateFlow = MutableStateFlow(LocalDate.now())
+    val selectDateFlow: StateFlow<LocalDate> = selectDateMutableStateFlow
 
     private val expenseDeletionSuccessEventMutableFlow = MutableLiveFlow<ExpenseDeletionSuccessData>()
     val expenseDeletionSuccessEventFlow: Flow<ExpenseDeletionSuccessData> = expenseDeletionSuccessEventMutableFlow

@@ -21,6 +21,7 @@ import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.db.RestoreAction
 import com.benoitletondor.easybudgetapp.helper.Logger
+import com.benoitletondor.easybudgetapp.model.DataForMonth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -29,6 +30,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
+import java.time.YearMonth
 import java.util.concurrent.ExecutorService
 
 open class CachedDBImpl(
@@ -39,6 +41,8 @@ open class CachedDBImpl(
 
     private val onChangeMutableFlow = MutableSharedFlow<Unit>()
     override val onChangeFlow: Flow<Unit> = onChangeMutableFlow
+
+    private val cachedDataForMonths = mutableMapOf<YearMonth, DataForMonth>()
 
     init {
         launch {
@@ -61,6 +65,26 @@ open class CachedDBImpl(
 
     override suspend fun persistExpense(expense: Expense): Expense
         = wrappedDB.persistExpense(expense)
+
+    override suspend fun getDataForMonth(
+        yearMonth: YearMonth,
+        includeCheckedBalance: Boolean
+    ): DataForMonth {
+        val cachedDataForMonth = synchronized(cachedDataForMonths) {
+            cachedDataForMonths[yearMonth]
+        }
+
+        if (cachedDataForMonth != null && cachedDataForMonth.includesCheckedBalance == includeCheckedBalance) {
+            return cachedDataForMonth
+        }
+
+        val dataForMonth = wrappedDB.getDataForMonth(yearMonth, includeCheckedBalance)
+        synchronized(cachedDataForMonths) {
+            cachedDataForMonths[yearMonth] = dataForMonth
+        }
+
+        return dataForMonth
+    }
 
     override suspend fun hasExpenseForDay(dayDate: LocalDate): Boolean {
         val expensesForDay = synchronized(cacheStorage.expenses) {
@@ -179,6 +203,10 @@ open class CachedDBImpl(
      */
     protected fun wipeCache() {
         Logger.debug("DBCache: Wipe all")
+
+        synchronized(cachedDataForMonths) {
+            cachedDataForMonths.clear()
+        }
 
         synchronized(cacheStorage.balances) {
             cacheStorage.balances.clear()

@@ -192,6 +192,7 @@ dependencies {
 
     implementation("io.realm.kotlin:library-sync:$realmVersion")
 
+    implementation("com.kizitonwose.calendar:compose:2.4.0")
     implementation("net.sf.biweekly:biweekly:0.6.7")
 
     implementation("net.lingala.zip4j:zip4j:2.11.5")

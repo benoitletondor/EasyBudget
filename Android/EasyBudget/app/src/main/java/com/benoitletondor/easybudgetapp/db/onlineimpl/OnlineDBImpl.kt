@@ -23,8 +23,11 @@ import com.benoitletondor.easybudgetapp.db.onlineimpl.entity.ExpenseEntity
 import com.benoitletondor.easybudgetapp.db.onlineimpl.entity.RecurringExpenseEntity
 import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.helper.getRealValueFromDB
+import com.benoitletondor.easybudgetapp.model.DataForDay
+import com.benoitletondor.easybudgetapp.model.DataForMonth
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
+import com.kizitonwose.calendar.core.atStartOfMonth
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
@@ -52,6 +55,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import java.time.LocalDate
+import java.time.YearMonth
 import java.util.concurrent.CancellationException
 import java.util.concurrent.TimeoutException
 import kotlin.time.DurationUnit
@@ -182,6 +186,55 @@ class OnlineDBImpl(
         }
     }
 
+    override suspend fun getDataForMonth(yearMonth: YearMonth, includeCheckedBalance: Boolean): DataForMonth {
+        var balance = getBalanceForDay(yearMonth.atStartOfMonth().minusDays(1))
+        var maybeCheckedBalance = if (includeCheckedBalance) {
+            getCheckedBalanceForDay(yearMonth.atStartOfMonth().minusDays(1))
+        } else {
+            null
+        }
+
+        val expenses = getExpensesForMonth(yearMonth)
+        val daysData = mutableMapOf<LocalDate, DataForDay>()
+
+        var dayDate = yearMonth.atStartOfMonth()
+        while (!dayDate.isAfter(yearMonth.atEndOfMonth())) {
+            val dayData = computeDataForDay(dayDate, expenses, balance, maybeCheckedBalance)
+
+            daysData[dayDate] = dayData
+            balance = dayData.balance
+            maybeCheckedBalance = dayData.maybeCheckedBalance
+
+            dayDate = dayDate.plusDays(1)
+        }
+
+        return DataForMonth(
+            month = yearMonth,
+            includesCheckedBalance = includeCheckedBalance,
+            daysData = daysData,
+        )
+    }
+
+    private fun computeDataForDay(
+        dayDate: LocalDate,
+        expensesForMonth: List<Expense>,
+        balanceBeforeDay: Double,
+        maybeCheckedBalanceBeforeDay: Double?,
+    ): DataForDay {
+        val expensesForDay = expensesForMonth.filter { it.date == dayDate }
+
+        return DataForDay(
+            day = dayDate,
+            expenses = expensesForDay,
+            balance = balanceBeforeDay + expensesForDay.sumOf { it.amount },
+            maybeCheckedBalance = if (maybeCheckedBalanceBeforeDay != null) {
+                maybeCheckedBalanceBeforeDay + expensesForDay.filter { it.checked }.sumOf { it.amount }
+            } else {
+                null
+            }
+        )
+    }
+
     override suspend fun hasExpenseForDay(dayDate: LocalDate): Boolean {
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
 
@@ -231,6 +284,22 @@ class OnlineDBImpl(
             .flatten()
 
         val expenses = realm.query<ExpenseEntity>("${account.generateQuery()} AND ${generateQueryForDay(dayDate)}")
+            .asFlow()
+            .first()
+            .list
+            .map { it.toExpense(associatedRecurringExpense = null) }
+
+        return recurringExpensesOfTheDay + expenses
+    }
+
+    private suspend fun getExpensesForMonth(month: YearMonth): List<Expense> {
+        val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
+
+        val recurringExpensesOfTheDay = recurringExpenses
+            .map { it.generateExpenses(month.atStartOfMonth(), month.atEndOfMonth()) }
+            .flatten()
+
+        val expenses = realm.query<ExpenseEntity>("${account.generateQuery()} AND ${generateQueryForDateRange(month.atStartOfMonth(), month.atEndOfMonth())}")
             .asFlow()
             .first()
             .list

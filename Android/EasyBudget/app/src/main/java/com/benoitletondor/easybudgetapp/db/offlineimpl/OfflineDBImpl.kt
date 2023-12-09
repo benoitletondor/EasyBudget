@@ -27,10 +27,14 @@ import com.benoitletondor.easybudgetapp.db.offlineimpl.entity.RecurringExpenseEn
 import com.benoitletondor.easybudgetapp.helper.getDBValue
 import com.benoitletondor.easybudgetapp.helper.getRealValueFromDB
 import com.benoitletondor.easybudgetapp.model.AssociatedRecurringExpense
+import com.benoitletondor.easybudgetapp.model.DataForDay
+import com.benoitletondor.easybudgetapp.model.DataForMonth
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
+import com.kizitonwose.calendar.core.atStartOfMonth
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import java.time.LocalDate
+import java.time.YearMonth
 import java.time.temporal.ChronoUnit
 
 class OfflineDBImpl(private val roomDB: RoomDB) : DB {
@@ -53,6 +57,55 @@ class OfflineDBImpl(private val roomDB: RoomDB) : DB {
         return expense.copy(id = newId)
     }
 
+    override suspend fun getDataForMonth(yearMonth: YearMonth, includeCheckedBalance: Boolean): DataForMonth {
+        var balance = roomDB.expenseDao().getBalanceForDay(yearMonth.atStartOfMonth().minusDays(1)).getRealValueFromDB()
+        var maybeCheckedBalance = if (includeCheckedBalance) {
+            roomDB.expenseDao().getCheckedBalanceForDay(yearMonth.atStartOfMonth().minusDays(1)) .getRealValueFromDB()
+        } else {
+            null
+        }
+
+        val expenses = roomDB.expenseDao().getExpensesBetweenDays(yearMonth.atStartOfMonth(), yearMonth.atEndOfMonth()).toExpenses(this)
+        val daysData = mutableMapOf<LocalDate, DataForDay>()
+
+        var dayDate = yearMonth.atStartOfMonth()
+        while (!dayDate.isAfter(yearMonth.atEndOfMonth())) {
+            val dayData = computeDataForDay(dayDate, expenses, balance, maybeCheckedBalance)
+
+            daysData[dayDate] = dayData
+            balance = dayData.balance
+            maybeCheckedBalance = dayData.maybeCheckedBalance
+
+            dayDate = dayDate.plusDays(1)
+        }
+
+        return DataForMonth(
+            month = yearMonth,
+            includesCheckedBalance = includeCheckedBalance,
+            daysData = daysData,
+        )
+    }
+
+    private fun computeDataForDay(
+        dayDate: LocalDate,
+        expensesForMonth: List<Expense>,
+        balanceBeforeDay: Double,
+        maybeCheckedBalanceBeforeDay: Double?,
+    ): DataForDay {
+        val expensesForDay = expensesForMonth.filter { it.date == dayDate }
+
+        return DataForDay(
+            day = dayDate,
+            expenses = expensesForDay,
+            balance = balanceBeforeDay + expensesForDay.sumOf { it.amount },
+            maybeCheckedBalance = if (maybeCheckedBalanceBeforeDay != null) {
+                maybeCheckedBalanceBeforeDay + expensesForDay.filter { it.checked }.sumOf { it.amount }
+            } else {
+                null
+            }
+        )
+    }
+
     override suspend fun hasExpenseForDay(dayDate: LocalDate): Boolean {
         return roomDB.expenseDao().hasExpenseForDay(dayDate) > 0
     }
@@ -70,7 +123,7 @@ class OfflineDBImpl(private val roomDB: RoomDB) : DB {
             .plusMonths(1)
             .minusDays(1)
 
-        return roomDB.expenseDao().getExpensesForMonth(monthStartDate, monthEndDate).toExpenses(this)
+        return roomDB.expenseDao().getExpensesBetweenDays(monthStartDate, monthEndDate).toExpenses(this)
     }
 
     override suspend fun getBalanceForDay(dayDate: LocalDate): Double {

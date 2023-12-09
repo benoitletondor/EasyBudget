@@ -43,6 +43,9 @@ import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.benoitletondor.easybudgetapp.R
@@ -62,11 +65,14 @@ import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.getCaldroidFirstDayOfWeek
 import com.benoitletondor.easybudgetapp.parameters.getInitDate
 import com.benoitletondor.easybudgetapp.parameters.getLowMoneyWarningAmount
+import com.benoitletondor.easybudgetapp.theme.AppTheme
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import com.benoitletondor.easybudgetapp.view.main.account.calendar.CalendarFragment
 import com.benoitletondor.easybudgetapp.view.main.account.calendar.CalendarGridAdapterDataProvider
+import com.benoitletondor.easybudgetapp.view.main.account.calendar2.CalendarView
+import com.benoitletondor.easybudgetapp.view.main.account.calendar2.CalendarViewModel
 import com.benoitletondor.easybudgetapp.view.main.manageaccount.ManageAccountActivity
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
@@ -78,6 +84,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.roomorama.caldroid.CaldroidFragment
 import com.roomorama.caldroid.CaldroidListener
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -149,6 +156,7 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
         super.onViewCreated(view, savedInstanceState)
 
         initCalendarFragment(savedInstanceState)
+        initCalendarView()
         initFab()
         initRecyclerView()
         registerBroadcastReceiver()
@@ -617,6 +625,27 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
         }))
     }
 
+    private fun initCalendarView() {
+        binding.calendarView.setContent {
+            AppTheme {
+                CalendarView(
+                    viewModel = viewModel(
+                        factory = object : ViewModelProvider.Factory {
+                            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                                @Suppress("UNCHECKED_CAST")
+                                return CalendarViewModel(
+                                    dbAvailableFlow = viewModel.dbAvailableFlow,
+                                    selectedDateFlow = viewModel.selectDateFlow,
+                                    onDateSelected = viewModel::onSelectDate,
+                                ) as T
+                            }
+                        }
+                    ),
+                )
+            }
+        }
+    }
+
     private fun initCalendarFragment(savedInstanceState: Bundle?) {
         calendarFragment = CalendarFragment()
 
@@ -716,7 +745,7 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
         calendarFragment.caldroidListener = listener
 
         val t = childFragmentManager.beginTransaction()
-        t.replace(R.id.calendarView, calendarFragment)
+        t.replace(R.id.calendarFragment, calendarFragment)
         t.commit()
     }
 
