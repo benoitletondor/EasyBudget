@@ -22,6 +22,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.benoitletondor.easybudgetapp.R
+import com.benoitletondor.easybudgetapp.view.main.account.calendar.NumberFormatter
+import com.benoitletondor.easybudgetapp.view.main.account.calendar.RoundedToIntNumberFormatter
 
 @Composable
 fun InCalendarWithBalanceDayView(
@@ -196,7 +198,7 @@ private fun CalendarDayView(
         )
 
         Text(
-            text = maybeBalanceToDisplay?.toString() ?: "",
+            text = maybeBalanceToDisplay?.let { formatBalance(it) } ?: "",
             color = balanceColor,
             fontSize = 11.sp,
             maxLines = 1,
@@ -204,4 +206,15 @@ private fun CalendarDayView(
             modifier = Modifier.fillMaxWidth()
         )
    }
+}
+
+private val roundingToIntFormatter = RoundedToIntNumberFormatter()
+private val numberFormatter = NumberFormatter.get()
+
+private fun formatBalance(balance: Double): String {
+    val roundedToInt = roundingToIntFormatter.format(-balance)
+    return when {
+        roundedToInt.length <= 4 -> roundedToInt
+        else -> numberFormatter.format(-balance)
+    }
 }
