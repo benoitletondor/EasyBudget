@@ -5,7 +5,6 @@ import java.time.YearMonth
 
 data class DataForMonth(
     val month: YearMonth,
-    val includesCheckedBalance: Boolean,
     val daysData: Map<LocalDate, DataForDay>,
 ) {
     companion object {
@@ -17,4 +16,5 @@ data class DataForDay(
     val day: LocalDate,
     val expenses: List<Expense>,
     val balance: Double,
+    val checkedBalance: Double,
 )

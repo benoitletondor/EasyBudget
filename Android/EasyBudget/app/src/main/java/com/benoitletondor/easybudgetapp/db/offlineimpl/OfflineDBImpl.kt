@@ -57,28 +57,29 @@ class OfflineDBImpl(private val roomDB: RoomDB) : DB {
         return expense.copy(id = newId)
     }
 
-    override suspend fun getDataForMonth(yearMonth: YearMonth, includeCheckedBalance: Boolean): DataForMonth {
+    override suspend fun getDataForMonth(yearMonth: YearMonth): DataForMonth {
         val startDate = yearMonth.atStartOfMonth().minusDays(DataForMonth.numberOfLeewayDays)
         val endDate = yearMonth.atEndOfMonth().plusDays(DataForMonth.numberOfLeewayDays)
 
         var balance = roomDB.expenseDao().getBalanceForDay(startDate.minusDays(1)).getRealValueFromDB()
+        var checkedBalance = roomDB.expenseDao().getCheckedBalanceForDay(startDate.minusDays(1)).getRealValueFromDB()
 
         val expenses = roomDB.expenseDao().getExpensesBetweenDays(startDate, endDate).toExpenses(this)
         val daysData = mutableMapOf<LocalDate, DataForDay>()
 
         var dayDate = startDate
         while (!dayDate.isAfter(endDate)) {
-            val dayData = computeDataForDay(dayDate, expenses, balance)
+            val dayData = computeDataForDay(dayDate, expenses, balance, checkedBalance)
 
             daysData[dayDate] = dayData
             balance = dayData.balance
+            checkedBalance = dayData.checkedBalance
 
             dayDate = dayDate.plusDays(1)
         }
 
         return DataForMonth(
             month = yearMonth,
-            includesCheckedBalance = includeCheckedBalance,
             daysData = daysData,
         )
     }
@@ -87,6 +88,7 @@ class OfflineDBImpl(private val roomDB: RoomDB) : DB {
         dayDate: LocalDate,
         expensesForMonth: List<Expense>,
         balanceBeforeDay: Double,
+        checkedBalanceBeforeDay: Double,
     ): DataForDay {
         val expensesForDay = expensesForMonth.filter { it.date == dayDate }
 
@@ -94,27 +96,16 @@ class OfflineDBImpl(private val roomDB: RoomDB) : DB {
             day = dayDate,
             expenses = expensesForDay,
             balance = balanceBeforeDay + expensesForDay.sumOf { it.amount },
+            checkedBalance = checkedBalanceBeforeDay + expensesForDay.filter { it.checked }.sumOf { it.amount },
         )
-    }
-
-    override suspend fun hasExpenseForDay(dayDate: LocalDate): Boolean {
-        return roomDB.expenseDao().hasExpenseForDay(dayDate) > 0
-    }
-
-    override suspend fun hasUncheckedExpenseForDay(dayDate: LocalDate): Boolean {
-        return roomDB.expenseDao().hasUncheckedExpenseForDay(dayDate) > 0
     }
 
     override suspend fun getExpensesForDay(dayDate: LocalDate): List<Expense> {
         return roomDB.expenseDao().getExpensesForDay(dayDate).toExpenses(this)
     }
 
-    override suspend fun getExpensesForMonth(monthStartDate: LocalDate): List<Expense> {
-        val monthEndDate = monthStartDate
-            .plusMonths(1)
-            .minusDays(1)
-
-        return roomDB.expenseDao().getExpensesBetweenDays(monthStartDate, monthEndDate).toExpenses(this)
+    override suspend fun getExpensesForMonth(month: YearMonth): List<Expense> {
+        return roomDB.expenseDao().getExpensesBetweenDays(month.atStartOfMonth(), month.atEndOfMonth()).toExpenses(this)
     }
 
     override suspend fun getBalanceForDay(dayDate: LocalDate): Double {

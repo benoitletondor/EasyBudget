@@ -324,11 +324,8 @@ class AccountViewModel @Inject constructor(
                     awaitDB().deleteExpense(expense)
                 }
 
-                val selectedDate = selectDateMutableStateFlow.value
                 expenseDeletionSuccessEventMutableFlow.emit(ExpenseDeletionSuccessData(
                     expense,
-                    getBalanceForDay(selectedDate),
-                    if (parameters.getShouldShowCheckedBalance()) { awaitDB().getCheckedBalanceForDay(selectedDate) } else { null },
                     restoreAction,
                 ))
             } catch (t: Throwable) {
@@ -629,5 +626,5 @@ class AccountViewModel @Inject constructor(
 }
 
 data class SelectedDateExpensesData(val date: LocalDate, val balance: Double, val checkedBalance: Double?, val expenses: List<Expense>)
-data class ExpenseDeletionSuccessData(val deletedExpense: Expense, val newDayBalance: Double, val newCheckedBalance: Double?, val restoreAction: RestoreAction)
+data class ExpenseDeletionSuccessData(val deletedExpense: Expense, val restoreAction: RestoreAction)
 data class BalanceAdjustedData(val balanceExpense: Expense, val diffWithOldBalance: Double, val newBalance: Double)

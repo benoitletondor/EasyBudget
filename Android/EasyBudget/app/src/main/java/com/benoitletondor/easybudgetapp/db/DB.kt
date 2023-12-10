@@ -32,15 +32,11 @@ interface DB {
 
     suspend fun persistExpense(expense: Expense): Expense
 
-    suspend fun getDataForMonth(yearMonth: YearMonth, includeCheckedBalance: Boolean): DataForMonth
-
-    suspend fun hasExpenseForDay(dayDate: LocalDate): Boolean
-
-    suspend fun hasUncheckedExpenseForDay(dayDate: LocalDate): Boolean
+    suspend fun getDataForMonth(yearMonth: YearMonth): DataForMonth
 
     suspend fun getExpensesForDay(dayDate: LocalDate): List<Expense>
 
-    suspend fun getExpensesForMonth(monthStartDate: LocalDate): List<Expense>
+    suspend fun getExpensesForMonth(month: YearMonth): List<Expense>
 
     suspend fun getBalanceForDay(dayDate: LocalDate): Double
 

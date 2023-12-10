@@ -240,7 +240,7 @@ class AccountFragment : Fragment(), MenuProvider {
             }
         }
 
-        viewLifecycleScope.launchCollect(viewModel.expenseDeletionSuccessEventFlow) { (deletedExpense, newBalance, maybeNewCheckedBalance, restoreAction) ->
+        viewLifecycleScope.launchCollect(viewModel.expenseDeletionSuccessEventFlow) { (deletedExpense, restoreAction) ->
             val snackbar = Snackbar.make(
                 binding.coordinatorLayout,
                 if (deletedExpense.isRevenue()) R.string.income_delete_snackbar_text else R.string.expense_delete_snackbar_text,

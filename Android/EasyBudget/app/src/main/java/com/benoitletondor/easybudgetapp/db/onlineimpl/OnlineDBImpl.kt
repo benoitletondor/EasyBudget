@@ -40,6 +40,7 @@ import io.realm.kotlin.mongodb.sync.SyncConfiguration
 import io.realm.kotlin.notifications.UpdatedRealm
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
@@ -127,6 +128,7 @@ class OnlineDBImpl(
         }
     }
 
+    @OptIn(FlowPreview::class)
     private fun watchAllChanges() {
         changesWatchingJob?.cancel()
         changesWatchingJob = launch {
@@ -186,28 +188,29 @@ class OnlineDBImpl(
         }
     }
 
-    override suspend fun getDataForMonth(yearMonth: YearMonth, includeCheckedBalance: Boolean): DataForMonth {
+    override suspend fun getDataForMonth(yearMonth: YearMonth): DataForMonth {
         val startDate = yearMonth.atStartOfMonth().minusDays(DataForMonth.numberOfLeewayDays)
         val endDate = yearMonth.atEndOfMonth().plusDays(DataForMonth.numberOfLeewayDays)
 
         var balance = getBalanceForDay(startDate.minusDays(1))
+        var checkedBalance = getCheckedBalanceForDay(startDate.minusDays(1))
 
         val expenses = getExpensesBetweenDates(startDate, endDate)
         val daysData = mutableMapOf<LocalDate, DataForDay>()
 
         var dayDate = startDate
         while (!dayDate.isAfter(endDate)) {
-            val dayData = computeDataForDay(dayDate, expenses, balance)
+            val dayData = computeDataForDay(dayDate, expenses, balance, checkedBalance)
 
             daysData[dayDate] = dayData
             balance = dayData.balance
+            checkedBalance = dayData.checkedBalance
 
             dayDate = dayDate.plusDays(1)
         }
 
         return DataForMonth(
             month = yearMonth,
-            includesCheckedBalance = includeCheckedBalance,
             daysData = daysData,
         )
     }
@@ -216,6 +219,7 @@ class OnlineDBImpl(
         dayDate: LocalDate,
         expensesForMonth: List<Expense>,
         balanceBeforeDay: Double,
+        checkedBalanceBeforeDay: Double,
     ): DataForDay {
         val expensesForDay = expensesForMonth.filter { it.date == dayDate }
 
@@ -223,48 +227,8 @@ class OnlineDBImpl(
             day = dayDate,
             expenses = expensesForDay,
             balance = balanceBeforeDay + expensesForDay.sumOf { it.amount },
+            checkedBalance = checkedBalanceBeforeDay + expensesForDay.filter { it.checked }.sumOf { it.amount },
         )
-    }
-
-    override suspend fun hasExpenseForDay(dayDate: LocalDate): Boolean {
-        val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
-
-        val hasRecurringExpensesThisDay = recurringExpenses
-            .map { it.generateExpenses(dayDate, dayDate) }
-            .any { it.isNotEmpty() }
-
-        if (hasRecurringExpensesThisDay) {
-            return true
-        }
-
-        val expenses = realm.query<ExpenseEntity>("${account.generateQuery()} AND ${generateQueryForDay(dayDate)}")
-            .limit(1)
-            .count()
-            .asFlow()
-            .first()
-
-        return expenses > 0
-    }
-
-    override suspend fun hasUncheckedExpenseForDay(dayDate: LocalDate): Boolean {
-        val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
-
-        val hasRecurringExpensesOfTheDayChecked = recurringExpenses
-            .map { it.generateExpenses(dayDate, dayDate) }
-            .flatten()
-            .any { !it.checked }
-
-        if (hasRecurringExpensesOfTheDayChecked) {
-            return true
-        }
-
-        val expenses = realm.query<ExpenseEntity>("${account.generateQuery()} AND ${generateQueryForDay(dayDate)} AND checked == false")
-            .limit(1)
-            .count()
-            .asFlow()
-            .first()
-
-        return expenses > 0
     }
 
     override suspend fun getExpensesForDay(dayDate: LocalDate): List<Expense> {
@@ -299,15 +263,14 @@ class OnlineDBImpl(
         return recurringExpensesOfTheDay + expenses
     }
 
-    override suspend fun getExpensesForMonth(monthStartDate: LocalDate): List<Expense> {
+    override suspend fun getExpensesForMonth(month: YearMonth): List<Expense> {
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
-        val monthEndDate = monthStartDate.plusMonths(1).minusDays(1)
 
         val recurringExpensesOfTheDay = recurringExpenses
-            .map { it.generateExpenses(monthStartDate, monthEndDate) }
+            .map { it.generateExpenses(month.atStartOfMonth(), month.atEndOfMonth()) }
             .flatten()
 
-        val expenses = realm.query<ExpenseEntity>("${account.generateQuery()} AND ${generateQueryForDateRange(monthStartDate, monthEndDate)}")
+        val expenses = realm.query<ExpenseEntity>("${account.generateQuery()} AND ${generateQueryForDateRange(month.atStartOfMonth(), month.atEndOfMonth())}")
             .asFlow()
             .first()
             .list

@@ -51,9 +51,7 @@ fun CalendarView(
             forceRefreshDataFlow = forceRefreshDataFlow,
             firstDayOfWeekFlow = parameters.watchFirstDayOfWeek(),
             includeCheckedBalanceFlow = includeCheckedBalanceFlow,
-            getDataForMonth = { yearMonth ->
-                currentDbState.db.getDataForMonth(yearMonth, includeCheckedBalanceFlow.value)
-            },
+            getDataForMonth = currentDbState.db::getDataForMonth,
             selectedDateFlow = selectedDateFlow,
             onMonthChanged = onMonthChanged,
             goBackToCurrentMonthEventFlow = goBackToCurrentMonthEventFlow,
