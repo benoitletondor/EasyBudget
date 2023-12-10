@@ -23,7 +23,6 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -161,8 +160,7 @@ class ExpensesRecyclerViewAdapter(
                                 startDate = expense.date,
                             )
 
-                            ActivityCompat.startActivityForResult(fragment.requireActivity(), startIntent,
-                                MainActivity.MANAGE_RECURRING_EXPENSE_ACTIVITY_CODE, null)
+                            fragment.requireActivity().startActivity(startIntent)
                         }
                         // Delete this one
                         2 -> {

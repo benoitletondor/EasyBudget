@@ -1,4 +1,4 @@
-package com.benoitletondor.easybudgetapp.view.main.account.calendar2.views
+package com.benoitletondor.easybudgetapp.view.main.account.calendar.views
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

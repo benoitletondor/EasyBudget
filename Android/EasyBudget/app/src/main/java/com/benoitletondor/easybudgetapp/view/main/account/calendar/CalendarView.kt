@@ -1,4 +1,4 @@
-package com.benoitletondor.easybudgetapp.view.main.account.calendar2
+package com.benoitletondor.easybudgetapp.view.main.account.calendar
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,8 +17,8 @@ import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.getInitDate
 import com.benoitletondor.easybudgetapp.parameters.watchFirstDayOfWeek
 import com.benoitletondor.easybudgetapp.view.main.account.AccountViewModel
-import com.benoitletondor.easybudgetapp.view.main.account.calendar2.views.CalendarDatesView
-import com.benoitletondor.easybudgetapp.view.main.account.calendar2.views.CalendarHeaderView
+import com.benoitletondor.easybudgetapp.view.main.account.calendar.views.CalendarDatesView
+import com.benoitletondor.easybudgetapp.view.main.account.calendar.views.CalendarHeaderView
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.yearMonth
 import kotlinx.coroutines.flow.Flow
@@ -35,6 +35,7 @@ fun CalendarView(
     forceRefreshDataFlow: Flow<Unit>,
     includeCheckedBalanceFlow: StateFlow<Boolean>,
     selectedDateFlow: StateFlow<LocalDate>,
+    onMonthChanged: (YearMonth) -> Unit,
     onDateSelected: (LocalDate) -> Unit,
     onDateLongClicked: (LocalDate) -> Unit,
 ) {
@@ -52,6 +53,7 @@ fun CalendarView(
                 currentDbState.db.getDataForMonth(yearMonth, includeCheckedBalanceFlow.value)
             },
             selectedDateFlow = selectedDateFlow,
+            onMonthChanged = onMonthChanged,
             onDateSelected = onDateSelected,
             onDateLongClicked = onDateLongClicked,
         )
@@ -66,6 +68,7 @@ private fun CalendarView(
     includeCheckedBalanceFlow: StateFlow<Boolean>,
     getDataForMonth: suspend (YearMonth) -> DataForMonth,
     selectedDateFlow: StateFlow<LocalDate>,
+    onMonthChanged: (YearMonth) -> Unit,
     onDateSelected: (LocalDate) -> Unit,
     onDateLongClicked: (LocalDate) -> Unit,
 ) {
@@ -91,6 +94,8 @@ private fun CalendarView(
         LaunchedEffect(calendarState.firstVisibleMonth.yearMonth) {
             canGoBack = calendarState.firstVisibleMonth.yearMonth.isAfter(calendarState.startMonth)
             canGoForward = calendarState.firstVisibleMonth.yearMonth.isBefore(calendarState.endMonth)
+
+            onMonthChanged(calendarState.firstVisibleMonth.yearMonth)
         }
 
         LaunchedEffect("FirstDayOfWeekChange") {

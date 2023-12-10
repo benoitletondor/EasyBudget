@@ -63,14 +63,11 @@
     <color name="status_bar_color">@color/easy_budget_green</color>
     <color name="action_bar_background">@color/status_bar_color</color>
     <color name="action_bar_text_color">@color/white</color>
-    <color name="calendar_header_background">@color/window_background</color>
     <color name="calendar_month_button_background_color">@color/white</color>
     <color name="calendar_month_button_color_disabled">@color/easy_budget_green_light</color>
     <color name="calendar_month_button_color">@color/easy_budget_green</color>
     <color name="calendar_header_month_color">@color/primary_text</color>
-    <color name="calendar_today_background_color">@color/white</color>
     <color name="calendar_today_stroke_color">@color/easy_budget_green_dark</color>
-    <color name="calendar_cell_background">@color/window_background</color>
     <color name="expense_edit_field_accent_color">@color/accent</color>
     <color name="expense_edit_field_accent_color_dark">@color/white</color>
     <color name="expense_edit_field_text_color_dark">@color/white</color>

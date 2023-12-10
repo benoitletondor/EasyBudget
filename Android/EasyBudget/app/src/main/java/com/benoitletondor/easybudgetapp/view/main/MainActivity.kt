@@ -357,7 +357,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
         } catch (e: Exception) {
             Logger.error("Error while opening report activity", e)
         }
-
     }
 
     /**
@@ -412,7 +411,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
     }
 
     companion object {
-        const val MANAGE_RECURRING_EXPENSE_ACTIVITY_CODE = 102
         const val WELCOME_SCREEN_ACTIVITY_CODE = 103
         const val INTENT_EXPENSE_DELETED = "intent.expense.deleted"
         const val INTENT_RECURRING_EXPENSE_DELETED = "intent.expense.monthly.deleted"

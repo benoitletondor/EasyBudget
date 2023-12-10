@@ -1,4 +1,4 @@
-package com.benoitletondor.easybudgetapp.view.main.account.calendar2.views
+package com.benoitletondor.easybudgetapp.view.main.account.calendar.views
 
 import androidx.annotation.ColorRes
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -202,7 +202,7 @@ private fun CalendarDayView(
                 )
                 .border(
                     width = 2.dp,
-                    color = if (today) MaterialTheme.colorScheme.primary else Color.Transparent,
+                    color = if (today) colorResource(id = R.color.calendar_today_stroke_color) else Color.Transparent,
                     shape = CircleShape
                 )
                 .combinedClickable(onClick = onClick, onLongClick = onLongClick)

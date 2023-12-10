@@ -177,7 +177,6 @@ dependencies {
 
     implementation("com.android.billingclient:billing-ktx:6.1.0")
 
-    implementation(project(":caldroid"))
     implementation("me.relex:circleindicator:2.1.6@aar")
     implementation("com.batch.android:batch-sdk:1.20.1")
 

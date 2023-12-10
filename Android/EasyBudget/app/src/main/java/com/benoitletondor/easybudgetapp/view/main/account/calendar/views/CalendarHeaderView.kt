@@ -1,4 +1,4 @@
-package com.benoitletondor.easybudgetapp.view.main.account.calendar2.views
+package com.benoitletondor.easybudgetapp.view.main.account.calendar.views
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
@@ -42,7 +42,7 @@ fun CalendarHeaderView(
                     onMonthChange(month.minusMonths(1))
                 }
                 .padding(vertical = 8.dp, horizontal = 16.dp),
-            color = colorResource(id = if(canGoBack) R.color.calendar_month_button_color else R.color.divider),
+            color = colorResource(id = if(canGoBack) R.color.calendar_month_button_color else R.color.calendar_month_button_color_disabled),
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
         )
@@ -51,6 +51,7 @@ fun CalendarHeaderView(
             text = month.format(monthFormatter).uppercase(),
             textAlign = TextAlign.Center,
             fontSize = 18.sp,
+            color = colorResource(id = R.color.calendar_header_month_color),
             modifier = Modifier.weight(1f),
         )
 
@@ -63,7 +64,7 @@ fun CalendarHeaderView(
                     onMonthChange(month.plusMonths(1))
                 }
                 .padding(vertical = 8.dp, horizontal = 16.dp),
-            color = colorResource(id = if(canGoForward) R.color.calendar_month_button_color else R.color.divider),
+            color = colorResource(id = if(canGoForward) R.color.calendar_month_button_color else R.color.calendar_month_button_color_disabled),
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
         )

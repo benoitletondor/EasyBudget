@@ -53,7 +53,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
@@ -61,7 +60,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.ref.WeakReference
 import java.time.LocalDate
-import java.util.Calendar
+import java.time.YearMonth
 import javax.inject.Inject
 
 @HiltViewModel
@@ -131,9 +130,6 @@ class AccountViewModel @Inject constructor(
     private val expenseCheckedErrorEventMutableFlow = MutableLiveFlow<Exception>()
     val expenseCheckedErrorEventFlow: Flow<Exception> = expenseCheckedErrorEventMutableFlow
 
-    private val goBackToCurrentMonthEventMutableFlow = MutableLiveFlow<Unit>()
-    val goBackToCurrentMonthEventFlow: Flow<Unit> = goBackToCurrentMonthEventMutableFlow
-
     private val confirmCheckAllPastEntriesEventMutableFlow = MutableLiveFlow<Unit>()
     val confirmCheckAllPastEntriesEventFlow: Flow<Unit> = confirmCheckAllPastEntriesEventMutableFlow
 
@@ -150,7 +146,7 @@ class AccountViewModel @Inject constructor(
     val openManageAccountEventFlow: Flow<MainViewModel.SelectedAccount.Selected.Online> = openManageAccountEventMutableFlow
 
     private val forceRefreshMutableFlow = MutableSharedFlow<Unit>()
-    val refreshDatesFlow: Flow<Unit> = forceRefreshMutableFlow
+    val forceRefreshFlow: Flow<Unit> = forceRefreshMutableFlow
 
     private val showManageAccountMenuItemMutableFlow = MutableStateFlow(false)
     val showManageAccountMenuItem: StateFlow<Boolean> = showManageAccountMenuItemMutableFlow
@@ -564,15 +560,12 @@ class AccountViewModel @Inject constructor(
         }
     }
 
-    fun onMonthChanged(month: Int, year: Int) {
-        val cal = Calendar.getInstance()
-        showGoToCurrentMonthButtonStateMutableFlow.value = cal.get(Calendar.MONTH) != month || cal.get(
-            Calendar.YEAR) != year
+    fun onMonthChanged(yearMonth: YearMonth) {
+        showGoToCurrentMonthButtonStateMutableFlow.value = yearMonth != YearMonth.now()
     }
 
     fun onGoBackToCurrentMonthButtonPressed() {
         viewModelScope.launch {
-            goBackToCurrentMonthEventMutableFlow.emit(Unit)
             selectDateMutableStateFlow.value = LocalDate.now()
         }
     }

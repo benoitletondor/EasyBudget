@@ -24,7 +24,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
 import android.os.Bundle
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -35,7 +34,6 @@ import android.view.WindowManager
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.widget.EditText
-import android.widget.LinearLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.invalidateOptionsMenu
 import androidx.core.content.ContextCompat
@@ -49,7 +47,6 @@ import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.databinding.FragmentAccountBinding
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
 import com.benoitletondor.easybudgetapp.helper.Logger
-import com.benoitletondor.easybudgetapp.helper.computeCalendarMinDateFromInitDate
 import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.helper.preventUnsupportedInputForDecimals
 import com.benoitletondor.easybudgetapp.helper.viewLifecycleScope
@@ -59,15 +56,12 @@ import com.benoitletondor.easybudgetapp.iab.PremiumCheckStatus
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType
 import com.benoitletondor.easybudgetapp.parameters.Parameters
-import com.benoitletondor.easybudgetapp.parameters.getInitDate
 import com.benoitletondor.easybudgetapp.parameters.getLowMoneyWarningAmount
 import com.benoitletondor.easybudgetapp.theme.AppTheme
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
-import com.benoitletondor.easybudgetapp.view.main.account.calendar.CalendarFragment
-import com.benoitletondor.easybudgetapp.view.main.account.calendar.CalendarGridAdapterDataProvider
-import com.benoitletondor.easybudgetapp.view.main.account.calendar2.CalendarView
+import com.benoitletondor.easybudgetapp.view.main.account.calendar.CalendarView
 import com.benoitletondor.easybudgetapp.view.main.manageaccount.ManageAccountActivity
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
@@ -76,18 +70,14 @@ import com.benoitletondor.easybudgetapp.view.welcome.WelcomeActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
-import com.roomorama.caldroid.CaldroidFragment
-import com.roomorama.caldroid.CaldroidListener
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.Calendar
 import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvider {
+class AccountFragment : Fragment(), MenuProvider {
     private val viewModel: AccountViewModel by viewModels()
 
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -118,7 +108,6 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
     }
 
     private lateinit var balanceDateFormatter: DateTimeFormatter
-    private lateinit var calendarFragment: CalendarFragment
     private lateinit var expensesViewAdapter: ExpensesRecyclerViewAdapter
 
     private val menuBackgroundAnimationDuration: Long = 150
@@ -152,7 +141,6 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
 
         balanceDateFormatter = DateTimeFormatter.ofPattern(resources.getString(R.string.account_balance_date_format), Locale.getDefault())
 
-        initCalendarFragment(savedInstanceState)
         initCalendarView()
         initFab()
         initRecyclerView()
@@ -231,12 +219,6 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
         super.onStop()
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        calendarFragment.saveStatesToKey(outState, CALENDAR_SAVED_STATE)
-
-        super.onSaveInstanceState(outState)
-    }
-
     override fun onDestroyView() {
         LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(receiver)
         _binding = null
@@ -259,14 +241,6 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
         }
 
         viewLifecycleScope.launchCollect(viewModel.expenseDeletionSuccessEventFlow) { (deletedExpense, newBalance, maybeNewCheckedBalance, restoreAction) ->
-            expensesViewAdapter.removeExpense(deletedExpense)
-            updateBalanceDisplayForDay(
-                expensesViewAdapter.getDate(),
-                newBalance,
-                maybeNewCheckedBalance
-            )
-            calendarFragment.refreshView()
-
             val snackbar = Snackbar.make(
                 binding.coordinatorLayout,
                 if (deletedExpense.isRevenue()) R.string.income_delete_snackbar_text else R.string.expense_delete_snackbar_text,
@@ -481,11 +455,7 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
         }
 
         viewLifecycleScope.launchCollect(viewModel.selectedDateDataFlow) { (date, balance, maybeCheckedBalance, expenses) ->
-            refreshAllForDate(date, balance, maybeCheckedBalance, expenses)
-        }
-
-        viewLifecycleScope.launchCollect(viewModel.refreshDatesFlow) {
-            calendarFragment.refreshView()
+            refreshBalanceAndExpenseListForDate(date, balance, maybeCheckedBalance, expenses)
         }
 
         viewLifecycleScope.launchCollect(viewModel.premiumStatusFlow) {
@@ -521,10 +491,6 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
 
         viewLifecycleScope.launchCollect(viewModel.showManageAccountMenuItem) {
             invalidateOptionsMenu(requireActivity())
-        }
-
-        viewLifecycleScope.launchCollect(viewModel.goBackToCurrentMonthEventFlow) {
-            calendarFragment.goToCurrentMonth()
         }
 
         viewLifecycleScope.launchCollect(viewModel.confirmCheckAllPastEntriesEventFlow) {
@@ -627,108 +593,15 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
                 CalendarView(
                     parameters = parameters,
                     dbAvailableFlow = viewModel.dbAvailableFlow,
-                    forceRefreshDataFlow = viewModel.refreshDatesFlow,
+                    forceRefreshDataFlow = viewModel.forceRefreshFlow,
                     selectedDateFlow = viewModel.selectDateFlow,
                     includeCheckedBalanceFlow = viewModel.includeCheckedBalanceFlow,
+                    onMonthChanged = viewModel::onMonthChanged,
                     onDateSelected = viewModel::onSelectDate,
                     onDateLongClicked = viewModel::onDateLongClicked,
                 )
             }
         }
-    }
-
-    private fun initCalendarFragment(savedInstanceState: Bundle?) {
-        calendarFragment = CalendarFragment()
-
-        if (savedInstanceState != null && savedInstanceState.containsKey(CALENDAR_SAVED_STATE) ) {
-            calendarFragment.restoreStatesFromKey(savedInstanceState,
-                CALENDAR_SAVED_STATE
-            )
-        } else {
-            val args = Bundle()
-            val cal = Calendar.getInstance()
-            args.putInt(CaldroidFragment.MONTH, cal.get(Calendar.MONTH) + 1)
-            args.putInt(CaldroidFragment.YEAR, cal.get(Calendar.YEAR))
-            args.putBoolean(CaldroidFragment.ENABLE_SWIPE, true)
-            args.putBoolean(CaldroidFragment.SIX_WEEKS_IN_CALENDAR, false)
-            args.putInt(CaldroidFragment.START_DAY_OF_WEEK, 1)
-            args.putBoolean(CaldroidFragment.ENABLE_CLICK_ON_DISABLED_DATES, false)
-            args.putInt(CaldroidFragment.THEME_RESOURCE, R.style.caldroid_style)
-
-            calendarFragment.arguments = args
-            calendarFragment.setMinDate((parameters.getInitDate() ?: LocalDate.now()).computeCalendarMinDateFromInitDate())
-        }
-
-        val listener = object : CaldroidListener() {
-            override fun onSelectDate(date: LocalDate, view: View) {
-                viewModel.onSelectDate(date)
-            }
-
-            override fun onLongClickDate(date: LocalDate, view: View?) // Add expense on long press
-            {
-                val startIntent = ExpenseEditActivity.newIntent(
-                    context = requireContext(),
-                    editedExpense = null,
-                    date = date,
-                )
-
-                requireActivity().startActivity(startIntent)
-            }
-
-            override fun onChangeMonth(month: Int, year: Int) {
-                viewModel.onMonthChanged(month - 1, year)
-            }
-
-            override fun onCaldroidViewCreated() {
-                val viewPager = calendarFragment.dateViewPager
-                val leftButton = calendarFragment.leftArrowButton
-                val rightButton = calendarFragment.rightArrowButton
-                val textView = calendarFragment.monthTitleTextView
-                val weekDayGreedView = calendarFragment.weekdayGridView
-                val topLayout = binding.root.findViewById<LinearLayout>(com.caldroid.R.id.calendar_title_view)
-
-                val params = textView.layoutParams as LinearLayout.LayoutParams
-                params.gravity = Gravity.TOP
-                params.setMargins(0, 0, 0, requireContext().resources.getDimensionPixelSize(R.dimen.calendar_month_text_padding_bottom))
-                textView.layoutParams = params
-
-                topLayout.setPadding(0, requireContext().resources.getDimensionPixelSize(R.dimen.calendar_month_padding_top), 0, requireContext().resources.getDimensionPixelSize(R.dimen.calendar_month_padding_bottom))
-
-                val leftButtonParams = leftButton.layoutParams as LinearLayout.LayoutParams
-                leftButtonParams.setMargins(requireContext().resources.getDimensionPixelSize(R.dimen.calendar_month_buttons_margin), 0, 0, 0)
-                leftButton.layoutParams = leftButtonParams
-
-                val rightButtonParams = rightButton.layoutParams as LinearLayout.LayoutParams
-                rightButtonParams.setMargins(0, 0, requireContext().resources.getDimensionPixelSize(R.dimen.calendar_month_buttons_margin), 0)
-                rightButton.layoutParams = rightButtonParams
-
-                textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.calendar_header_month_color))
-                topLayout.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.calendar_header_background))
-
-                leftButton.text = "<"
-                leftButton.textSize = 25f
-                leftButton.gravity = Gravity.CENTER
-                leftButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.calendar_month_button_color))
-                leftButton.setBackgroundResource(R.drawable.calendar_month_switcher_button_drawable)
-
-                rightButton.text = ">"
-                rightButton.textSize = 25f
-                rightButton.gravity = Gravity.CENTER
-                rightButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.calendar_month_button_color))
-                rightButton.setBackgroundResource(R.drawable.calendar_month_switcher_button_drawable)
-
-                weekDayGreedView.setPadding(0, requireContext().resources.getDimensionPixelSize(R.dimen.calendar_weekdays_padding_top), 0, requireContext().resources.getDimensionPixelSize(R.dimen.calendar_weekdays_padding_bottom))
-
-                viewPager.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.calendar_background))
-                (viewPager.parent as View?)?.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.calendar_background))
-            }
-        }
-
-        calendarFragment.caldroidListener = listener
-
-        val t = childFragmentManager.beginTransaction()
-        t.replace(R.id.calendarFragment, calendarFragment)
-        t.commit()
     }
 
     private fun initFab() {
@@ -748,7 +621,7 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
                 val startIntent = ExpenseEditActivity.newIntent(
                     context = requireContext(),
                     editedExpense = null,
-                    date = calendarFragment.getSelectedDate(),
+                    date = viewModel.selectDateFlow.value,
                 )
 
                 requireActivity().startActivity(startIntent)
@@ -761,7 +634,7 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
             it.setOnClickListener {
                 val startIntent = RecurringExpenseEditActivity.newIntent(
                     context = requireContext(),
-                    startDate = calendarFragment.getSelectedDate(),
+                    startDate = viewModel.selectDateFlow.value,
                     editedExpense = null,
                 )
 
@@ -858,11 +731,9 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
         }
     }
 
-    private fun refreshAllForDate(date: LocalDate, balance: Double, maybeCheckedBalance: Double?, expenses: List<Expense>) {
+    private fun refreshBalanceAndExpenseListForDate(date: LocalDate, balance: Double, maybeCheckedBalance: Double?, expenses: List<Expense>) {
         refreshRecyclerViewForDate(date, expenses)
         updateBalanceDisplayForDay(date, balance, maybeCheckedBalance)
-        calendarFragment.setSelectedDate(date)
-        calendarFragment.refreshView()
     }
 
     /**
@@ -878,7 +749,6 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
 
     companion object {
         const val ARG_SELECTED_ACCOUNT = "selected_account"
-        private const val CALENDAR_SAVED_STATE = "calendar_saved_state"
 
         fun newInstance(account: MainViewModel.SelectedAccount.Selected): AccountFragment {
             return AccountFragment().apply {
@@ -887,20 +757,5 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
                 }
             }
         }
-    }
-
-    override fun hasExpenseForDay(dayDate: LocalDate): Boolean {
-        val state = viewModel.dbAvailableFlow.value as? AccountViewModel.DBState.Loaded ?: return false
-        return runBlocking { state.db.hasExpenseForDay(dayDate) }
-    }
-
-    override fun hasUncheckedExpenseForDay(dayDate: LocalDate): Boolean {
-        val state = viewModel.dbAvailableFlow.value as? AccountViewModel.DBState.Loaded ?: return false
-        return runBlocking { state.db.hasUncheckedExpenseForDay(dayDate) }
-    }
-
-    override fun getBalanceForDay(dayDate: LocalDate): Double {
-        val state = viewModel.dbAvailableFlow.value as? AccountViewModel.DBState.Loaded ?: return 0.0
-        return runBlocking { state.db.getBalanceForDay(dayDate) }
     }
 }
