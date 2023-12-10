@@ -18,6 +18,8 @@ package com.benoitletondor.easybudgetapp.parameters
 
 import com.benoitletondor.easybudgetapp.helper.AppTheme
 import com.benoitletondor.easybudgetapp.helper.localDateFromTimestamp
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.util.Date
@@ -197,6 +199,16 @@ fun Parameters.setLowMoneyWarningAmount(amount: Int) {
     putInt(LOW_MONEY_WARNING_AMOUNT_PARAMETERS_KEY, amount)
 }
 
+private lateinit var firstDayOfWeekFlow: MutableStateFlow<DayOfWeek>
+
+fun Parameters.watchFirstDayOfWeek(): StateFlow<DayOfWeek> {
+    if (!::firstDayOfWeekFlow.isInitialized) {
+        firstDayOfWeekFlow = MutableStateFlow(getFirstDayOfWeek())
+    }
+
+    return firstDayOfWeekFlow
+}
+
 /**
  * Get the first day of the week to display to the user
  */
@@ -209,6 +221,11 @@ fun Parameters.getFirstDayOfWeek(): DayOfWeek {
  * Set the first day of week to display to the user
  */
 fun Parameters.setFirstDayOfWeek(dayOfWeek: DayOfWeek) {
+    if (!::firstDayOfWeekFlow.isInitialized) {
+        firstDayOfWeekFlow = MutableStateFlow(dayOfWeek)
+    }
+
+    firstDayOfWeekFlow.value = dayOfWeek
     putInt(FIRST_DAY_OF_WEEK_PARAMETERS_KEY, dayOfWeek.toInt())
 }
 
@@ -364,11 +381,26 @@ fun Parameters.getShouldResetInitDate(): Boolean {
     return getBoolean(SHOULD_RESET_INIT_DATE, false)
 }
 
+private lateinit var shouldShowCheckedBalanceFlow: MutableStateFlow<Boolean>
+
+fun Parameters.watchShouldShowCheckedBalance(): StateFlow<Boolean> {
+    if (!::shouldShowCheckedBalanceFlow.isInitialized) {
+        shouldShowCheckedBalanceFlow = MutableStateFlow(getShouldShowCheckedBalance())
+    }
+
+    return shouldShowCheckedBalanceFlow
+}
+
 fun Parameters.getShouldShowCheckedBalance(): Boolean {
     return getBoolean(SHOULD_SHOW_CHECKED_BALANCE, false)
 }
 
 fun Parameters.setShouldShowCheckedBalance(shouldShow: Boolean) {
+    if (!::shouldShowCheckedBalanceFlow.isInitialized) {
+        shouldShowCheckedBalanceFlow = MutableStateFlow(shouldShow)
+    }
+
+    shouldShowCheckedBalanceFlow.value = shouldShow
     putBoolean(SHOULD_SHOW_CHECKED_BALANCE, shouldShow)
 }
 

@@ -35,6 +35,7 @@ import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.getShouldShowCheckedBalance
+import com.benoitletondor.easybudgetapp.parameters.watchShouldShowCheckedBalance
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import com.benoitletondor.easybudgetapp.view.main.account.AccountFragment.Companion.ARG_SELECTED_ACCOUNT
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -167,7 +168,9 @@ class AccountViewModel @Inject constructor(
             PremiumCheckStatus.PRO_SUBSCRIBED -> true
         } }
         .distinctUntilChanged()
-        .map { it && parameters.getShouldShowCheckedBalance() }
+        .combine(parameters.watchShouldShowCheckedBalance()) { isPremium, shouldShowCheckedBalance ->
+            isPremium && shouldShowCheckedBalance
+        }
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     val selectedDateDataFlow = combine(

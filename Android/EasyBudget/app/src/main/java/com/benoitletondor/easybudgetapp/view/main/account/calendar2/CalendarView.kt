@@ -14,13 +14,14 @@ import androidx.compose.ui.Modifier
 import com.benoitletondor.easybudgetapp.helper.computeCalendarMinDateFromInitDate
 import com.benoitletondor.easybudgetapp.model.DataForMonth
 import com.benoitletondor.easybudgetapp.parameters.Parameters
-import com.benoitletondor.easybudgetapp.parameters.getFirstDayOfWeek
 import com.benoitletondor.easybudgetapp.parameters.getInitDate
+import com.benoitletondor.easybudgetapp.parameters.watchFirstDayOfWeek
 import com.benoitletondor.easybudgetapp.view.main.account.AccountViewModel
 import com.benoitletondor.easybudgetapp.view.main.account.calendar2.views.CalendarDatesView
 import com.benoitletondor.easybudgetapp.view.main.account.calendar2.views.CalendarHeaderView
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.yearMonth
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
@@ -31,6 +32,7 @@ import java.time.YearMonth
 fun CalendarView(
     parameters: Parameters,
     dbAvailableFlow: StateFlow<AccountViewModel.DBState>,
+    forceRefreshDataFlow: Flow<Unit>,
     includeCheckedBalanceFlow: StateFlow<Boolean>,
     selectedDateFlow: StateFlow<LocalDate>,
     onDateSelected: (LocalDate) -> Unit,
@@ -43,7 +45,8 @@ fun CalendarView(
         AccountViewModel.DBState.Loading -> Unit
         is AccountViewModel.DBState.Loaded -> CalendarView(
             appInitDate = parameters.getInitDate() ?: LocalDate.now(),
-            firstDayOfWeek = parameters.getFirstDayOfWeek(),
+            forceRefreshDataFlow = forceRefreshDataFlow,
+            firstDayOfWeekFlow = parameters.watchFirstDayOfWeek(),
             includeCheckedBalanceFlow = includeCheckedBalanceFlow,
             getDataForMonth = { yearMonth ->
                 currentDbState.db.getDataForMonth(yearMonth, includeCheckedBalanceFlow.value)
@@ -58,7 +61,8 @@ fun CalendarView(
 @Composable
 private fun CalendarView(
     appInitDate: LocalDate,
-    firstDayOfWeek: DayOfWeek,
+    forceRefreshDataFlow: Flow<Unit>,
+    firstDayOfWeekFlow: StateFlow<DayOfWeek>,
     includeCheckedBalanceFlow: StateFlow<Boolean>,
     getDataForMonth: suspend (YearMonth) -> DataForMonth,
     selectedDateFlow: StateFlow<LocalDate>,
@@ -69,10 +73,15 @@ private fun CalendarView(
         modifier = Modifier.fillMaxWidth(),
     ) {
         val coroutineScope = rememberCoroutineScope()
+        val firstDayOfWeek = remember { firstDayOfWeekFlow.value }
+        val firstVisibleMonth = remember { selectedDateFlow.value.yearMonth }
+        val startMonth = remember { appInitDate.computeCalendarMinDateFromInitDate().yearMonth }
+        val endMonth = remember { YearMonth.now().plusYears(10) }
+
         val calendarState = rememberCalendarState(
-            startMonth = appInitDate.computeCalendarMinDateFromInitDate().yearMonth,
-            endMonth = YearMonth.now().plusYears(10),
-            firstVisibleMonth = YearMonth.now(),
+            startMonth = startMonth,
+            endMonth = endMonth,
+            firstVisibleMonth = firstVisibleMonth,
             firstDayOfWeek = firstDayOfWeek,
         )
 
@@ -82,6 +91,14 @@ private fun CalendarView(
         LaunchedEffect(calendarState.firstVisibleMonth.yearMonth) {
             canGoBack = calendarState.firstVisibleMonth.yearMonth.isAfter(calendarState.startMonth)
             canGoForward = calendarState.firstVisibleMonth.yearMonth.isBefore(calendarState.endMonth)
+        }
+
+        LaunchedEffect("FirstDayOfWeekChange") {
+            launch {
+                firstDayOfWeekFlow.collect {
+                    calendarState.firstDayOfWeek = it
+                }
+            }
         }
 
         LaunchedEffect("selectedDateChange") {
@@ -108,6 +125,7 @@ private fun CalendarView(
         val includeCheckedBalance by includeCheckedBalanceFlow.collectAsState()
         CalendarDatesView(
             calendarState = calendarState,
+            forceRefreshDataFlow = forceRefreshDataFlow,
             getDataForMonth = getDataForMonth,
             includeCheckedBalance = includeCheckedBalance,
             selectedDateFlow = selectedDateFlow,

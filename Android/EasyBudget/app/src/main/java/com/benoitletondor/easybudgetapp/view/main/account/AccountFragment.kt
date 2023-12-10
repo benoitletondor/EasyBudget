@@ -587,15 +587,6 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
         LocalBroadcastManager.getInstance(requireContext()).registerReceiver(receiver, filter)
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == MainActivity.SETTINGS_SCREEN_ACTIVITY_CODE) {
-            calendarFragment.setFirstDayOfWeek(1)
-        }
-    }
-
 // ------------------------------------------>
 
     /**
@@ -636,6 +627,7 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
                 CalendarView(
                     parameters = parameters,
                     dbAvailableFlow = viewModel.dbAvailableFlow,
+                    forceRefreshDataFlow = viewModel.refreshDatesFlow,
                     selectedDateFlow = viewModel.selectDateFlow,
                     includeCheckedBalanceFlow = viewModel.includeCheckedBalanceFlow,
                     onDateSelected = viewModel::onSelectDate,

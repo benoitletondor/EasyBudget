@@ -73,7 +73,7 @@ class AccountSelectorFragment : BottomSheetDialogFragment() {
                     activity?.let { activity ->
                         val startIntent = Intent(activity, SettingsActivity::class.java)
                         startIntent.putExtra(SettingsActivity.SHOW_PRO_INTENT_KEY, true)
-                        ActivityCompat.startActivityForResult(activity, startIntent, MainActivity.SETTINGS_SCREEN_ACTIVITY_CODE, null)
+                        activity.startActivity(startIntent)
                     }
                     dismiss()
                 }

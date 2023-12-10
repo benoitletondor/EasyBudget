@@ -296,7 +296,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
         return when (menuItem.itemId) {
             R.id.action_settings -> {
                 val startIntent = Intent(this, SettingsActivity::class.java)
-                ActivityCompat.startActivityForResult(this@MainActivity, startIntent, SETTINGS_SCREEN_ACTIVITY_CODE, null)
+                this@MainActivity.startActivity(startIntent)
 
                 true
             }
@@ -318,7 +318,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
     private fun openSettingsIfNeeded(intent: Intent) {
         if (intent.getBooleanExtra(INTENT_REDIRECT_TO_SETTINGS_EXTRA, false)) {
             val startIntent = Intent(this, SettingsActivity::class.java)
-            ActivityCompat.startActivityForResult(this@MainActivity, startIntent, SETTINGS_SCREEN_ACTIVITY_CODE, null)
+            this@MainActivity.startActivity(startIntent)
         }
     }
 
@@ -331,7 +331,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
             val startIntent = Intent(this, SettingsActivity::class.java).apply {
                 putExtra(SHOW_BACKUP_INTENT_KEY, true)
             }
-            ActivityCompat.startActivityForResult(this@MainActivity, startIntent, SETTINGS_SCREEN_ACTIVITY_CODE, null)
+            this@MainActivity.startActivity(startIntent)
         }
     }
 
@@ -371,7 +371,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
             val startIntent = Intent(this, SettingsActivity::class.java)
             startIntent.putExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, true)
 
-            ActivityCompat.startActivityForResult(this, startIntent, SETTINGS_SCREEN_ACTIVITY_CODE, null)
+            this.startActivity(startIntent)
         }
     }
 
@@ -414,7 +414,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
     companion object {
         const val MANAGE_RECURRING_EXPENSE_ACTIVITY_CODE = 102
         const val WELCOME_SCREEN_ACTIVITY_CODE = 103
-        const val SETTINGS_SCREEN_ACTIVITY_CODE = 104
         const val INTENT_EXPENSE_DELETED = "intent.expense.deleted"
         const val INTENT_RECURRING_EXPENSE_DELETED = "intent.expense.monthly.deleted"
         const val INTENT_SHOW_WELCOME_SCREEN = "intent.welcomscreen.show"

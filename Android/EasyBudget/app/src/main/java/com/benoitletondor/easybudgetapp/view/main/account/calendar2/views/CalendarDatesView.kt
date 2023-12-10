@@ -37,6 +37,7 @@ import com.kizitonwose.calendar.core.CalendarMonth
 import com.kizitonwose.calendar.core.DayPosition
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -48,6 +49,7 @@ import java.util.Locale
 @Composable
 fun CalendarDatesView(
     calendarState: CalendarState,
+    forceRefreshDataFlow: Flow<Unit>,
     getDataForMonth: suspend (YearMonth) -> DataForMonth,
     includeCheckedBalance: Boolean,
     selectedDateFlow: StateFlow<LocalDate>,
@@ -72,6 +74,18 @@ fun CalendarDatesView(
                         calendarMonth = calendarMonth,
                         getDataForMonth = getDataForMonth,
                     )
+                }
+            }
+
+            LaunchedEffect("ForceRefresh") {
+                launch(Dispatchers.IO) {
+                    forceRefreshDataFlow.collect {
+                        loadData(
+                            setState = setState,
+                            calendarMonth = calendarMonth,
+                            getDataForMonth = getDataForMonth,
+                        )
+                    }
                 }
             }
 

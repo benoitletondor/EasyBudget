@@ -185,7 +185,7 @@ private fun CalendarDayView(
 ) {
     Box(
         modifier = Modifier
-            .padding(horizontal = 5.dp, vertical = 1.dp)
+            .padding(horizontal = 6.dp, vertical = 1.dp)
             .fillMaxWidth()
     ) {
         Column(
@@ -206,7 +206,7 @@ private fun CalendarDayView(
                     shape = CircleShape
                 )
                 .combinedClickable(onClick = onClick, onLongClick = onLongClick)
-                .padding(horizontal = 7.dp, vertical = 6.dp),
+                .padding(horizontal = 6.dp, vertical = 4.dp),
             verticalArrangement = Arrangement.Top,
         ) {
             Text(
