@@ -8,6 +8,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -184,7 +185,7 @@ private fun CalendarDayView(
 ) {
     Box(
         modifier = Modifier
-            .padding(horizontal = 6.dp, vertical = 1.dp)
+            .padding(horizontal = 8.dp, vertical = 1.dp)
             .fillMaxWidth()
     ) {
         Column(
@@ -205,26 +206,31 @@ private fun CalendarDayView(
                     shape = CircleShape
                 )
                 .combinedClickable(onClick = onClick, onLongClick = onLongClick)
-                .padding(horizontal = 6.dp, vertical = 4.dp),
-            verticalArrangement = Arrangement.Top,
+                .padding(vertical = 3.dp),
+            verticalArrangement = Arrangement.Center,
         ) {
             Text(
                 text = dayOfMonth.toString(),
                 color = dayOfMonthColor,
                 fontStyle = dayOfMonthFontStyle,
-                fontSize = 14.sp,
+                fontSize = 13.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
             )
+
 
             Text(
                 text = maybeBalanceToDisplay?.let { formatBalance(it) } ?: "",
                 color = balanceColor,
-                fontSize = 11.sp,
+                fontSize = 10.sp,
                 maxLines = 1,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
             )
         }
     }
