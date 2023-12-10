@@ -12,6 +12,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.benoitletondor.easybudgetapp.helper.computeCalendarMinDateFromInitDate
+import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.model.DataForMonth
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.getInitDate
@@ -36,6 +37,7 @@ fun CalendarView(
     includeCheckedBalanceFlow: StateFlow<Boolean>,
     selectedDateFlow: StateFlow<LocalDate>,
     onMonthChanged: (YearMonth) -> Unit,
+    goBackToCurrentMonthEventFlow: Flow<Unit>,
     onDateSelected: (LocalDate) -> Unit,
     onDateLongClicked: (LocalDate) -> Unit,
 ) {
@@ -54,6 +56,7 @@ fun CalendarView(
             },
             selectedDateFlow = selectedDateFlow,
             onMonthChanged = onMonthChanged,
+            goBackToCurrentMonthEventFlow = goBackToCurrentMonthEventFlow,
             onDateSelected = onDateSelected,
             onDateLongClicked = onDateLongClicked,
         )
@@ -69,6 +72,7 @@ private fun CalendarView(
     getDataForMonth: suspend (YearMonth) -> DataForMonth,
     selectedDateFlow: StateFlow<LocalDate>,
     onMonthChanged: (YearMonth) -> Unit,
+    goBackToCurrentMonthEventFlow: Flow<Unit>,
     onDateSelected: (LocalDate) -> Unit,
     onDateLongClicked: (LocalDate) -> Unit,
 ) {
@@ -99,20 +103,22 @@ private fun CalendarView(
         }
 
         LaunchedEffect("FirstDayOfWeekChange") {
-            launch {
-                firstDayOfWeekFlow.collect {
-                    calendarState.firstDayOfWeek = it
-                }
+            launchCollect(firstDayOfWeekFlow) {
+                calendarState.firstDayOfWeek = it
             }
         }
 
         LaunchedEffect("selectedDateChange") {
-            launch {
-                selectedDateFlow.collect { date ->
-                    if (date.yearMonth !== calendarState.firstVisibleMonth.yearMonth) {
-                        calendarState.animateScrollToMonth(date.yearMonth)
-                    }
+            launchCollect(selectedDateFlow) { date ->
+                if (date.yearMonth !== calendarState.firstVisibleMonth.yearMonth) {
+                    calendarState.animateScrollToMonth(date.yearMonth)
                 }
+            }
+        }
+
+        LaunchedEffect("goBackToCurrentMonthListener") {
+            launchCollect(goBackToCurrentMonthEventFlow) {
+                calendarState.animateScrollToMonth(YearMonth.now())
             }
         }
 

@@ -93,6 +93,9 @@ class AccountViewModel @Inject constructor(
     private val selectDateMutableStateFlow = MutableStateFlow(LocalDate.now())
     val selectDateFlow: StateFlow<LocalDate> = selectDateMutableStateFlow
 
+    private val goBackToCurrentMonthEventMutableFlow = MutableSharedFlow<Unit>()
+    val goBackToCurrentMonthEventFlow: Flow<Unit> = goBackToCurrentMonthEventMutableFlow
+
     private val expenseDeletionSuccessEventMutableFlow = MutableLiveFlow<ExpenseDeletionSuccessData>()
     val expenseDeletionSuccessEventFlow: Flow<ExpenseDeletionSuccessData> = expenseDeletionSuccessEventMutableFlow
 
@@ -567,6 +570,7 @@ class AccountViewModel @Inject constructor(
     fun onGoBackToCurrentMonthButtonPressed() {
         viewModelScope.launch {
             selectDateMutableStateFlow.value = LocalDate.now()
+            goBackToCurrentMonthEventMutableFlow.emit(Unit)
         }
     }
 

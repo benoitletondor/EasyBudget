@@ -597,6 +597,7 @@ class AccountFragment : Fragment(), MenuProvider {
                     selectedDateFlow = viewModel.selectDateFlow,
                     includeCheckedBalanceFlow = viewModel.includeCheckedBalanceFlow,
                     onMonthChanged = viewModel::onMonthChanged,
+                    goBackToCurrentMonthEventFlow = viewModel.goBackToCurrentMonthEventFlow,
                     onDateSelected = viewModel::onSelectDate,
                     onDateLongClicked = viewModel::onDateLongClicked,
                 )

@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.Logger
+import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.model.DataForMonth
 import com.kizitonwose.calendar.compose.CalendarState
 import com.kizitonwose.calendar.compose.HorizontalCalendar
@@ -78,14 +79,12 @@ fun CalendarDatesView(
             }
 
             LaunchedEffect("ForceRefresh") {
-                launch(Dispatchers.IO) {
-                    forceRefreshDataFlow.collect {
-                        loadData(
-                            setState = setState,
-                            calendarMonth = calendarMonth,
-                            getDataForMonth = getDataForMonth,
-                        )
-                    }
+                launchCollect(forceRefreshDataFlow, Dispatchers.IO) {
+                    loadData(
+                        setState = setState,
+                        calendarMonth = calendarMonth,
+                        getDataForMonth = getDataForMonth,
+                    )
                 }
             }
 
