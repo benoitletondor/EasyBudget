@@ -32,6 +32,7 @@ import com.benoitletondor.easybudgetapp.view.main.account.calendar.RoundedToIntN
 fun InCalendarWithBalanceDayView(
     dayOfMonth: Int,
     balanceToDisplay: Double,
+    lowMoneyWarningAmount: Int,
     displayUncheckedStyle: Boolean,
     selected: Boolean,
     today: Boolean,
@@ -41,6 +42,7 @@ fun InCalendarWithBalanceDayView(
     InCalendarDayView(
         dayOfMonth = dayOfMonth,
         maybeBalanceToDisplay = balanceToDisplay,
+        lowMoneyWarningAmount = lowMoneyWarningAmount,
         displayUncheckedStyle = displayUncheckedStyle,
         selected = selected,
         today = today,
@@ -60,6 +62,7 @@ fun InCalendarEmptyDayView(
     InCalendarDayView(
         dayOfMonth = dayOfMonth,
         maybeBalanceToDisplay = null,
+        lowMoneyWarningAmount = null,
         displayUncheckedStyle = false,
         selected = selected,
         today = today,
@@ -72,6 +75,7 @@ fun InCalendarEmptyDayView(
 fun OffCalendarWithBalanceDayView(
     dayOfMonth: Int,
     balanceToDisplay: Double,
+    lowMoneyWarningAmount: Int,
     displayUncheckedStyle: Boolean,
     today: Boolean,
     onClick: () -> Unit,
@@ -80,6 +84,7 @@ fun OffCalendarWithBalanceDayView(
     OffCalendarDayView(
         dayOfMonth = dayOfMonth,
         maybeBalanceToDisplay = balanceToDisplay,
+        lowMoneyWarningAmount = lowMoneyWarningAmount,
         displayUncheckedStyle = displayUncheckedStyle,
         today = today,
         onClick = onClick,
@@ -97,6 +102,7 @@ fun OffCalendarEmptyDayView(
     OffCalendarDayView(
         dayOfMonth = dayOfMonth,
         maybeBalanceToDisplay = null,
+        lowMoneyWarningAmount = null,
         displayUncheckedStyle = false,
         today = today,
         onClick = onClick,
@@ -108,6 +114,7 @@ fun OffCalendarEmptyDayView(
 private fun InCalendarDayView(
     dayOfMonth: Int,
     maybeBalanceToDisplay: Double?,
+    lowMoneyWarningAmount: Int?,
     displayUncheckedStyle: Boolean,
     selected: Boolean,
     today: Boolean,
@@ -119,6 +126,7 @@ private fun InCalendarDayView(
         maybeBalanceToDisplay = maybeBalanceToDisplay,
         dayOfMonthColor = colorResource(id = getDayOfMonthColor(
             maybeBalance = maybeBalanceToDisplay,
+            lowMoneyWarningAmount = lowMoneyWarningAmount ?: 0,
             isInMonth = true,
         )),
         dayOfMonthFontStyle = if (displayUncheckedStyle) FontStyle.Italic else FontStyle.Normal,
@@ -134,6 +142,7 @@ private fun InCalendarDayView(
 private fun OffCalendarDayView(
     dayOfMonth: Int,
     maybeBalanceToDisplay: Double?,
+    lowMoneyWarningAmount: Int?,
     displayUncheckedStyle: Boolean,
     today: Boolean,
     onClick: () -> Unit,
@@ -144,6 +153,7 @@ private fun OffCalendarDayView(
         maybeBalanceToDisplay = maybeBalanceToDisplay,
         dayOfMonthColor = colorResource(id = getDayOfMonthColor(
             maybeBalance = maybeBalanceToDisplay,
+            lowMoneyWarningAmount = lowMoneyWarningAmount ?: 0,
             isInMonth = false,
         )),
         dayOfMonthFontStyle = if (displayUncheckedStyle) FontStyle.Italic else FontStyle.Normal,
@@ -158,10 +168,9 @@ private fun OffCalendarDayView(
 @ColorRes
 private fun getDayOfMonthColor(
     maybeBalance: Double?,
+    lowMoneyWarningAmount: Int,
     isInMonth: Boolean,
 ): Int {
-    val lowMoneyWarningAmount = 500 // FIXME parameters.getLowMoneyWarningAmount()
-
     return when{
         maybeBalance == null -> if (isInMonth) { R.color.primary_text } else { R.color.divider }
         -maybeBalance <= 0 -> R.color.budget_red

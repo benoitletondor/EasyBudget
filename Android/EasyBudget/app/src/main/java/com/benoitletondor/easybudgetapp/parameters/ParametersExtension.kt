@@ -191,11 +191,26 @@ fun Parameters.setLastOpenTimestamp(timestamp: Long) {
     putLong(LAST_OPEN_DATE_PARAMETERS_KEY, timestamp)
 }
 
+private lateinit var lowMoneyWarningAmountFlow: MutableStateFlow<Int>
+
+fun Parameters.watchLowMoneyWarningAmount(): StateFlow<Int> {
+    if (!::lowMoneyWarningAmountFlow.isInitialized) {
+        lowMoneyWarningAmountFlow = MutableStateFlow(getLowMoneyWarningAmount())
+    }
+
+    return lowMoneyWarningAmountFlow
+}
+
 fun Parameters.getLowMoneyWarningAmount(): Int {
     return getInt(LOW_MONEY_WARNING_AMOUNT_PARAMETERS_KEY, DEFAULT_LOW_MONEY_WARNING_AMOUNT)
 }
 
 fun Parameters.setLowMoneyWarningAmount(amount: Int) {
+    if (!::lowMoneyWarningAmountFlow.isInitialized) {
+        lowMoneyWarningAmountFlow = MutableStateFlow(amount)
+    }
+
+    lowMoneyWarningAmountFlow.value = amount
     putInt(LOW_MONEY_WARNING_AMOUNT_PARAMETERS_KEY, amount)
 }
 

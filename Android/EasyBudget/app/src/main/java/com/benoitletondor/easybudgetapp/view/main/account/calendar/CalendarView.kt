@@ -16,7 +16,9 @@ import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.model.DataForMonth
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.getInitDate
+import com.benoitletondor.easybudgetapp.parameters.getLowMoneyWarningAmount
 import com.benoitletondor.easybudgetapp.parameters.watchFirstDayOfWeek
+import com.benoitletondor.easybudgetapp.parameters.watchLowMoneyWarningAmount
 import com.benoitletondor.easybudgetapp.view.main.account.AccountViewModel
 import com.benoitletondor.easybudgetapp.view.main.account.calendar.views.CalendarDatesView
 import com.benoitletondor.easybudgetapp.view.main.account.calendar.views.CalendarHeaderView
@@ -53,6 +55,7 @@ fun CalendarView(
             includeCheckedBalanceFlow = includeCheckedBalanceFlow,
             getDataForMonth = currentDbState.db::getDataForMonth,
             selectedDateFlow = selectedDateFlow,
+            lowMoneyAmountWarningFlow = parameters.watchLowMoneyWarningAmount(),
             onMonthChanged = onMonthChanged,
             goBackToCurrentMonthEventFlow = goBackToCurrentMonthEventFlow,
             onDateSelected = onDateSelected,
@@ -69,6 +72,7 @@ private fun CalendarView(
     includeCheckedBalanceFlow: StateFlow<Boolean>,
     getDataForMonth: suspend (YearMonth) -> DataForMonth,
     selectedDateFlow: StateFlow<LocalDate>,
+    lowMoneyAmountWarningFlow: StateFlow<Int>,
     onMonthChanged: (YearMonth) -> Unit,
     goBackToCurrentMonthEventFlow: Flow<Unit>,
     onDateSelected: (LocalDate) -> Unit,
@@ -138,6 +142,7 @@ private fun CalendarView(
             getDataForMonth = getDataForMonth,
             includeCheckedBalance = includeCheckedBalance,
             selectedDateFlow = selectedDateFlow,
+            lowMoneyAmountWarningFlow = lowMoneyAmountWarningFlow,
             onDateSelected = onDateSelected,
             onDateLongClicked = onDateLongClicked,
         )

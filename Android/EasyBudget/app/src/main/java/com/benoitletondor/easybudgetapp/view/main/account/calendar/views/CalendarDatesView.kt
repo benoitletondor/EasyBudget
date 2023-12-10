@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -23,6 +24,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -54,6 +56,7 @@ fun CalendarDatesView(
     getDataForMonth: suspend (YearMonth) -> DataForMonth,
     includeCheckedBalance: Boolean,
     selectedDateFlow: StateFlow<LocalDate>,
+    lowMoneyAmountWarningFlow: StateFlow<Int>,
     onDateSelected: (LocalDate) -> Unit,
     onDateLongClicked: (LocalDate) -> Unit,
 ) {
@@ -128,12 +131,14 @@ fun CalendarDatesView(
             val maybeDataForDay = maybeDataForMonth?.daysData?.get(calendarDay.date)
 
             val selectedDate by selectedDateFlow.collectAsState()
+            val lowMoneyWarningAmount by lowMoneyAmountWarningFlow.collectAsState()
 
             if (maybeDataForDay != null && maybeDataForDay.expenses.isNotEmpty()) {
                 if (calendarDay.position == DayPosition.MonthDate) {
                     InCalendarWithBalanceDayView(
                         dayOfMonth = calendarDay.date.dayOfMonth,
                         balanceToDisplay = maybeDataForDay.balance,
+                        lowMoneyWarningAmount = lowMoneyWarningAmount,
                         displayUncheckedStyle = if (includeCheckedBalance) maybeDataForDay.expenses.any { !it.checked } else false,
                         selected = calendarDay.date == selectedDate,
                         today = calendarDay.date == LocalDate.now(),
@@ -148,6 +153,7 @@ fun CalendarDatesView(
                     OffCalendarWithBalanceDayView(
                         dayOfMonth = calendarDay.date.dayOfMonth,
                         balanceToDisplay = maybeDataForDay.balance,
+                        lowMoneyWarningAmount = lowMoneyWarningAmount,
                         displayUncheckedStyle = if (includeCheckedBalance) maybeDataForDay.expenses.any { !it.checked } else false,
                         today = calendarDay.date == LocalDate.now(),
                         onClick = {
@@ -192,7 +198,8 @@ fun CalendarDatesView(
 private fun DaysOfWeekTitle(
     month: CalendarMonth,
 ) {
-    val daysOfWeek = month.weekDays.first().map { it.date.dayOfWeek }
+    val daysOfWeek = remember(month) { month.weekDays.first().map { it.date.dayOfWeek } }
+
     Row(
         horizontalArrangement = Arrangement.SpaceAround,
         modifier = Modifier
@@ -201,10 +208,11 @@ private fun DaysOfWeekTitle(
     ) {
         for (dayOfWeek in daysOfWeek) {
             Text(
-                text = dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
+                text = dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()).uppercase(),
                 textAlign = TextAlign.Center,
                 modifier = Modifier.weight(1f),
-                fontSize = 14.sp,
+                fontSize = 12.sp,
+                color = colorResource(id = R.color.secondary_text),
             )
         }
     }
