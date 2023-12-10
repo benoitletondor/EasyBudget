@@ -134,7 +134,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun onWelcomeScreenFinished() {
-        // TODO
+        // No-op
     }
 
     fun onAccountTapped() {

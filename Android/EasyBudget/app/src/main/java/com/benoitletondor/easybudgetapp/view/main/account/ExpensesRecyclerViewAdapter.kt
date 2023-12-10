@@ -54,8 +54,6 @@ class ExpensesRecyclerViewAdapter(
     private var expenses = mutableListOf<Expense>()
     private var isUserPremium = false
 
-    fun getDate(): LocalDate = date
-
     fun setUserPremium(isPremium: Boolean) {
         if (isPremium == isUserPremium) {
             return
@@ -73,29 +71,6 @@ class ExpensesRecyclerViewAdapter(
         this.expenses.clear()
         this.expenses.addAll(expenses)
         notifyDataSetChanged()
-    }
-
-    /**
-     * Remove given expense
-     *
-     * @param expense the expense to remove
-     * @return position of the deleted expense (-1 if not found)
-     */
-    fun removeExpense(expense: Expense): Int {
-        val expenseIterator = expenses.iterator()
-        var position = 0
-        while (expenseIterator.hasNext()) {
-            val (id) = expenseIterator.next()
-            if (expense.id != null && expense.id == id) {
-                expenseIterator.remove()
-                notifyItemRemoved(position)
-                return position
-            }
-
-            position++
-        }
-
-        return -1
     }
 
 // ------------------------------------------>

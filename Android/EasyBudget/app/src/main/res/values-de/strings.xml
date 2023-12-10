@@ -457,4 +457,6 @@
     <string name="main_account_online_name">%s (online)</string>
     <string name="premium_popup_upgrade_cta">Aktualisierung</string>
     <string name="premium_popup_become_go_back">Zurück</string>
+    <string name="calendar_month_loading_error_title">Daten können nicht geladen werden</string>
+    <string name="calendar_month_loading_error_description">Beim Laden der Kalenderdaten ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.\n(%s)</string>
 </resources>

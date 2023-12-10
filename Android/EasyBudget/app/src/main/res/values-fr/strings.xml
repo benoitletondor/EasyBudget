@@ -457,4 +457,6 @@
     <string name="main_account_online_name">%s (en ligne)</string>
     <string name="premium_popup_upgrade_cta">Mettre à niveau</string>
     <string name="premium_popup_become_go_back">Retour</string>
+    <string name="calendar_month_loading_error_title">Impossible de charger les données</string>
+    <string name="calendar_month_loading_error_description">Une erreur est survenue lors du chargement des données du calendrier. Veuillez réessayer.\n(%s)</string>
 </resources>

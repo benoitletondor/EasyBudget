@@ -27,8 +27,6 @@ class CachedOnlineDBImpl(
 
     override suspend fun deleteAllEntries() {
         wrappedDB.deleteAllEntries()
-
-        wipeCache()
     }
 
     override fun close() {

@@ -29,12 +29,10 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.time.LocalDate
 import java.time.YearMonth
-import java.util.concurrent.ExecutorService
 
 open class CachedDBImpl(
     private val wrappedDB: DB,
@@ -149,13 +147,9 @@ open class CachedDBImpl(
     override suspend fun markAllEntriesAsChecked(beforeDate: LocalDate)
         = wrappedDB.markAllEntriesAsChecked(beforeDate)
 
-    /**
-     * Instantly wipe all cached data
-     */
-    protected suspend fun wipeCache() {
-        Logger.debug("DBCache: Wipe all")
-
+    private suspend fun wipeCache() {
         cacheMutex.withLock {
+            Logger.debug("DBCache: Wipe all")
             cachedDataForMonths.clear()
         }
     }

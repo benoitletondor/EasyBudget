@@ -104,6 +104,8 @@ fun CalendarDatesView(
                             ErrorView(
                                 error = state.error,
                                 onRetryButtonClicked = {
+                                    setState(State.NotAvailable)
+
                                     coroutineScope.launch(Dispatchers.IO) {
                                         loadData(
                                             setState = setState,
@@ -115,7 +117,7 @@ fun CalendarDatesView(
                             )
                         }
                         is State.Loaded -> Unit
-                        State.Loading, State.NotAvailable -> {
+                        State.NotAvailable -> {
                             LoadingView()
                         }
                     }
@@ -228,9 +230,6 @@ private sealed class State {
     data object NotAvailable : State() {
         override val maybeDataForMonth = null
     }
-    data object Loading : State() {
-        override val maybeDataForMonth = null
-    }
     data class Error(val error: Exception) : State() {
         override val maybeDataForMonth = null
     }
@@ -244,7 +243,6 @@ private suspend fun loadData(
     calendarMonth: CalendarMonth,
     getDataForMonth: suspend (YearMonth) -> DataForMonth,
 ) {
-    setState(State.Loading)
     setState(
         try {
             State.Loaded(dataForMonth = getDataForMonth(calendarMonth.yearMonth))
@@ -280,7 +278,7 @@ private fun ErrorView(
     ) {
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "TODO", // TODO
+            text = stringResource(id = R.string.calendar_month_loading_error_title),
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.SemiBold,
             fontSize = 16.sp,
@@ -290,7 +288,7 @@ private fun ErrorView(
 
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = error.localizedMessage ?: "Exception", // TODO
+            text = stringResource(id = R.string.calendar_month_loading_error_description, error.localizedMessage ?: "No error message"),
             fontSize = 16.sp,
         )
 
