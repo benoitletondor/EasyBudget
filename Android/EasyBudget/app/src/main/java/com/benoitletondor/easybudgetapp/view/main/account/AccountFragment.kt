@@ -116,8 +116,6 @@ class AccountFragment : Fragment(), MenuProvider {
 
     private var isMenuExpended = false
 
-    private var lastStopDate: LocalDate? = null
-
     @Inject
     lateinit var parameters: Parameters
     @Inject
@@ -148,19 +146,6 @@ class AccountFragment : Fragment(), MenuProvider {
         observeViewModel()
 
         requireActivity().addMenuProvider(this, viewLifecycleOwner)
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-        // If the last stop happened yesterday (or another day), set and refresh to the current date
-        if (lastStopDate != null) {
-            if (LocalDate.now() != lastStopDate) {
-                viewModel.onDayChanged()
-            }
-
-            lastStopDate = null
-        }
     }
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -212,13 +197,7 @@ class AccountFragment : Fragment(), MenuProvider {
             else -> false
         }
     }
-
-    override fun onStop() {
-        lastStopDate = LocalDate.now()
-
-        super.onStop()
-    }
-
+    
     override fun onDestroyView() {
         LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(receiver)
         _binding = null

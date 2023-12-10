@@ -57,8 +57,6 @@ fun CalendarDatesView(
     onDateSelected: (LocalDate) -> Unit,
     onDateLongClicked: (LocalDate) -> Unit,
 ) {
-    val todayDate = remember { LocalDate.now() }
-
     HorizontalCalendar(
         state = calendarState,
         monthHeader = { month ->
@@ -138,7 +136,7 @@ fun CalendarDatesView(
                         balanceToDisplay = maybeDataForDay.balance,
                         displayUncheckedStyle = if (includeCheckedBalance) maybeDataForDay.expenses.any { !it.checked } else false,
                         selected = calendarDay.date == selectedDate,
-                        today = calendarDay.date == todayDate,
+                        today = calendarDay.date == LocalDate.now(),
                         onClick = {
                             onDateSelected(calendarDay.date)
                         },
@@ -151,7 +149,7 @@ fun CalendarDatesView(
                         dayOfMonth = calendarDay.date.dayOfMonth,
                         balanceToDisplay = maybeDataForDay.balance,
                         displayUncheckedStyle = if (includeCheckedBalance) maybeDataForDay.expenses.any { !it.checked } else false,
-                        today = calendarDay.date == todayDate,
+                        today = calendarDay.date == LocalDate.now(),
                         onClick = {
                             onDateSelected(calendarDay.date)
                         },
@@ -165,7 +163,7 @@ fun CalendarDatesView(
                     InCalendarEmptyDayView(
                         dayOfMonth = calendarDay.date.dayOfMonth,
                         selected = calendarDay.date == selectedDate,
-                        today = calendarDay.date == todayDate,
+                        today = calendarDay.date == LocalDate.now(),
                         onClick = {
                             onDateSelected(calendarDay.date)
                         },
@@ -176,7 +174,7 @@ fun CalendarDatesView(
                 } else {
                     OffCalendarEmptyDayView(
                         dayOfMonth = calendarDay.date.dayOfMonth,
-                        today = calendarDay.date == todayDate,
+                        today = calendarDay.date == LocalDate.now(),
                         onClick = {
                             onDateSelected(calendarDay.date)
                         },

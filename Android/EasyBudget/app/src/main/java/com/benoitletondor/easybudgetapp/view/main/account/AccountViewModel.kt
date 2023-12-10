@@ -542,10 +542,6 @@ class AccountViewModel @Inject constructor(
         return balance
     }
 
-    fun onDayChanged() {
-        selectDateMutableStateFlow.value = LocalDate.now()
-    }
-
     fun onExpenseChecked(expense: Expense, checked: Boolean) {
         viewModelScope.launch {
             try {
