@@ -117,8 +117,7 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
         }
     }
 
-    private val balanceDateFormatter = DateTimeFormatter.ofPattern(resources.getString(R.string.account_balance_date_format), Locale.getDefault())
-
+    private lateinit var balanceDateFormatter: DateTimeFormatter
     private lateinit var calendarFragment: CalendarFragment
     private lateinit var expensesViewAdapter: ExpensesRecyclerViewAdapter
 
@@ -150,6 +149,8 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        balanceDateFormatter = DateTimeFormatter.ofPattern(resources.getString(R.string.account_balance_date_format), Locale.getDefault())
 
         initCalendarFragment(savedInstanceState)
         initCalendarView()

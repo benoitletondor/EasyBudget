@@ -185,7 +185,7 @@ private fun CalendarDayView(
 ) {
     Box(
         modifier = Modifier
-            .padding(horizontal = 5.dp)
+            .padding(horizontal = 5.dp, vertical = 1.dp)
             .fillMaxWidth()
     ) {
         Column(

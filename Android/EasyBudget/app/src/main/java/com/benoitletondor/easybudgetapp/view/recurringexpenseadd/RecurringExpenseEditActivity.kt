@@ -16,7 +16,6 @@
 
 package com.benoitletondor.easybudgetapp.view.recurringexpenseadd
 
-import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
@@ -60,8 +59,6 @@ class RecurringExpenseEditActivity : BaseActivity<ActivityRecurringExpenseAddBin
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         setUpButtons()
-
-        setResult(Activity.RESULT_CANCELED)
 
         binding.descriptionEdittext.setFocus()
         binding.saveExpenseFab.animateFABAppearance()
@@ -115,7 +112,6 @@ class RecurringExpenseEditActivity : BaseActivity<ActivityRecurringExpenseAddBin
             progressDialog?.dismiss()
             progressDialog = null
 
-            setResult(Activity.RESULT_OK)
             finish()
         }
 
@@ -149,7 +145,6 @@ class RecurringExpenseEditActivity : BaseActivity<ActivityRecurringExpenseAddBin
                 .setTitle(R.string.expense_edit_unable_to_load_db_error_title)
                 .setMessage(R.string.expense_edit_unable_to_load_db_error_message)
                 .setPositiveButton(R.string.expense_edit_unable_to_load_db_error_cta) { _, _ ->
-                    setResult(Activity.RESULT_CANCELED)
                     finish()
                 }
                 .setCancelable(false)

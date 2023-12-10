@@ -183,7 +183,7 @@ private fun DaysOfWeekTitle(
     Row(
         horizontalArrangement = Arrangement.SpaceAround,
         modifier = Modifier
-            .padding(vertical = 5.dp)
+            .padding(top = 2.dp, bottom = 3.dp)
             .fillMaxWidth()
     ) {
         for (dayOfWeek in daysOfWeek) {
