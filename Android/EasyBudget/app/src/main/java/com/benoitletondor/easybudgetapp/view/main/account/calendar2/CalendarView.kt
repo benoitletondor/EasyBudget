@@ -3,11 +3,20 @@ package com.benoitletondor.easybudgetapp.view.main.account.calendar2
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.benoitletondor.easybudgetapp.helper.computeCalendarMinDateFromInitDate
 import com.benoitletondor.easybudgetapp.model.DataForMonth
+import com.benoitletondor.easybudgetapp.parameters.Parameters
+import com.benoitletondor.easybudgetapp.parameters.getFirstDayOfWeek
+import com.benoitletondor.easybudgetapp.parameters.getInitDate
+import com.benoitletondor.easybudgetapp.view.main.account.AccountViewModel
 import com.benoitletondor.easybudgetapp.view.main.account.calendar2.views.CalendarDatesView
 import com.benoitletondor.easybudgetapp.view.main.account.calendar2.views.CalendarHeaderView
 import com.kizitonwose.calendar.compose.rememberCalendarState
@@ -20,46 +29,75 @@ import java.time.YearMonth
 
 @Composable
 fun CalendarView(
-    viewModel: CalendarViewModel,
+    parameters: Parameters,
+    dbAvailableFlow: StateFlow<AccountViewModel.DBState>,
+    includeCheckedBalanceFlow: StateFlow<Boolean>,
+    selectedDateFlow: StateFlow<LocalDate>,
+    onDateSelected: (LocalDate) -> Unit,
+    onDateLongClicked: (LocalDate) -> Unit,
 ) {
-    val state by viewModel.stateFlow.collectAsState()
+    val dbState by dbAvailableFlow.collectAsState()
 
-    when(val currentState = state) {
-        is CalendarViewModel.State.Error,
-        CalendarViewModel.State.Loading -> Unit
-        is CalendarViewModel.State.Loaded -> {
-            CalendarView(
-                includeCheckedBalance = currentState.includeCheckedBalance,
-                getDataForMonth = currentState.getDataForMonth,
-                selectedDateFlow = currentState.selectedDateFlow,
-                onDateSelected = currentState.onDateSelected,
-            )
-        }
+    when(val currentDbState = dbState) {
+        is AccountViewModel.DBState.Error,
+        AccountViewModel.DBState.Loading -> Unit
+        is AccountViewModel.DBState.Loaded -> CalendarView(
+            appInitDate = parameters.getInitDate() ?: LocalDate.now(),
+            firstDayOfWeek = parameters.getFirstDayOfWeek(),
+            includeCheckedBalanceFlow = includeCheckedBalanceFlow,
+            getDataForMonth = { yearMonth ->
+                currentDbState.db.getDataForMonth(yearMonth, includeCheckedBalanceFlow.value)
+            },
+            selectedDateFlow = selectedDateFlow,
+            onDateSelected = onDateSelected,
+            onDateLongClicked = onDateLongClicked,
+        )
     }
 }
 
 @Composable
 private fun CalendarView(
-    includeCheckedBalance: Boolean,
+    appInitDate: LocalDate,
+    firstDayOfWeek: DayOfWeek,
+    includeCheckedBalanceFlow: StateFlow<Boolean>,
     getDataForMonth: suspend (YearMonth) -> DataForMonth,
     selectedDateFlow: StateFlow<LocalDate>,
     onDateSelected: (LocalDate) -> Unit,
+    onDateLongClicked: (LocalDate) -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
     ) {
         val coroutineScope = rememberCoroutineScope()
         val calendarState = rememberCalendarState(
-            startMonth = YearMonth.now().minusMonths(100), // TODO
-            endMonth = YearMonth.now().plusMonths(100), // TODO
+            startMonth = appInitDate.computeCalendarMinDateFromInitDate().yearMonth,
+            endMonth = YearMonth.now().plusYears(10),
             firstVisibleMonth = YearMonth.now(),
-            firstDayOfWeek = DayOfWeek.MONDAY, // TODO
+            firstDayOfWeek = firstDayOfWeek,
         )
+
+        var canGoBack by remember { mutableStateOf(true) }
+        var canGoForward by remember { mutableStateOf(true) }
+
+        LaunchedEffect(calendarState.firstVisibleMonth.yearMonth) {
+            canGoBack = calendarState.firstVisibleMonth.yearMonth.isAfter(calendarState.startMonth)
+            canGoForward = calendarState.firstVisibleMonth.yearMonth.isBefore(calendarState.endMonth)
+        }
+
+        LaunchedEffect("selectedDateChange") {
+            launch {
+                selectedDateFlow.collect { date ->
+                    if (date.yearMonth !== calendarState.firstVisibleMonth.yearMonth) {
+                        calendarState.animateScrollToMonth(date.yearMonth)
+                    }
+                }
+            }
+        }
 
         CalendarHeaderView(
             month = calendarState.firstVisibleMonth.yearMonth,
-            canGoBack = true, // TODO
-            canGoForward = true, // TODO
+            canGoBack = canGoBack,
+            canGoForward = canGoForward,
             onMonthChange = { yearMonth ->
                 coroutineScope.launch {
                     calendarState.animateScrollToMonth(yearMonth)
@@ -67,20 +105,14 @@ private fun CalendarView(
             },
         )
 
+        val includeCheckedBalance by includeCheckedBalanceFlow.collectAsState()
         CalendarDatesView(
             calendarState = calendarState,
             getDataForMonth = getDataForMonth,
             includeCheckedBalance = includeCheckedBalance,
             selectedDateFlow = selectedDateFlow,
-            onDateSelected = { date ->
-                 if (date.yearMonth !== calendarState.firstVisibleMonth.yearMonth) {
-                     coroutineScope.launch {
-                         calendarState.animateScrollToMonth(date.yearMonth)
-                     }
-                 }
-
-                onDateSelected(date)
-            },
+            onDateSelected = onDateSelected,
+            onDateLongClicked = onDateLongClicked,
         )
     }
 }

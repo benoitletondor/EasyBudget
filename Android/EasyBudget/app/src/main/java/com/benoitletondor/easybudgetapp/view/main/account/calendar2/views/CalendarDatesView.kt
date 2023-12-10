@@ -3,8 +3,8 @@ package com.benoitletondor.easybudgetapp.view.main.account.calendar2.views
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -23,7 +23,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -31,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.Logger
-import com.benoitletondor.easybudgetapp.model.DataForDay
 import com.benoitletondor.easybudgetapp.model.DataForMonth
 import com.kizitonwose.calendar.compose.CalendarState
 import com.kizitonwose.calendar.compose.HorizontalCalendar
@@ -44,6 +42,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.YearMonth
+import java.time.format.TextStyle
+import java.util.Locale
 
 @Composable
 fun CalendarDatesView(
@@ -52,11 +52,15 @@ fun CalendarDatesView(
     includeCheckedBalance: Boolean,
     selectedDateFlow: StateFlow<LocalDate>,
     onDateSelected: (LocalDate) -> Unit,
+    onDateLongClicked: (LocalDate) -> Unit,
 ) {
     val todayDate = remember { LocalDate.now() }
 
     HorizontalCalendar(
         state = calendarState,
+        monthHeader = { month ->
+            DaysOfWeekTitle(month = month)
+        },
         monthBody = { calendarMonth, content ->
             val (state, setState) = remember { mutableStateOf<State>(State.NotAvailable) }
             val coroutineScope = rememberCoroutineScope()
@@ -123,6 +127,9 @@ fun CalendarDatesView(
                         onClick = {
                             onDateSelected(calendarDay.date)
                         },
+                        onLongClick = {
+                            onDateLongClicked(calendarDay.date)
+                        },
                     )
                 } else {
                     OffCalendarWithBalanceDayView(
@@ -132,6 +139,9 @@ fun CalendarDatesView(
                         today = calendarDay.date == todayDate,
                         onClick = {
                             onDateSelected(calendarDay.date)
+                        },
+                        onLongClick = {
+                            onDateLongClicked(calendarDay.date)
                         },
                     )
                 }
@@ -144,6 +154,9 @@ fun CalendarDatesView(
                         onClick = {
                             onDateSelected(calendarDay.date)
                         },
+                        onLongClick = {
+                            onDateLongClicked(calendarDay.date)
+                        },
                     )
                 } else {
                     OffCalendarEmptyDayView(
@@ -152,11 +165,36 @@ fun CalendarDatesView(
                         onClick = {
                             onDateSelected(calendarDay.date)
                         },
+                        onLongClick = {
+                            onDateLongClicked(calendarDay.date)
+                        },
                     )
                 }
             }
         }
     )
+}
+
+@Composable
+private fun DaysOfWeekTitle(
+    month: CalendarMonth,
+) {
+    val daysOfWeek = month.weekDays.first().map { it.date.dayOfWeek }
+    Row(
+        horizontalArrangement = Arrangement.SpaceAround,
+        modifier = Modifier
+            .padding(vertical = 5.dp)
+            .fillMaxWidth()
+    ) {
+        for (dayOfWeek in daysOfWeek) {
+            Text(
+                text = dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
+                textAlign = TextAlign.Center,
+                modifier = Modifier.weight(1f),
+                fontSize = 14.sp,
+            )
+        }
+    }
 }
 
 private val LocalDataForMonth = compositionLocalOf<DataForMonth?> { null }

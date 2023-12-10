@@ -1,9 +1,12 @@
 package com.benoitletondor.easybudgetapp.view.main.account.calendar2.views
 
 import androidx.annotation.ColorRes
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,6 +36,7 @@ fun InCalendarWithBalanceDayView(
     selected: Boolean,
     today: Boolean,
     onClick: () -> Unit,
+    onLongClick: () -> Unit,
 ) {
     InCalendarDayView(
         dayOfMonth = dayOfMonth,
@@ -41,6 +45,7 @@ fun InCalendarWithBalanceDayView(
         selected = selected,
         today = today,
         onClick = onClick,
+        onLongClick = onLongClick,
     )
 }
 
@@ -50,6 +55,7 @@ fun InCalendarEmptyDayView(
     selected: Boolean,
     today: Boolean,
     onClick: () -> Unit,
+    onLongClick: () -> Unit,
 ) {
     InCalendarDayView(
         dayOfMonth = dayOfMonth,
@@ -58,6 +64,7 @@ fun InCalendarEmptyDayView(
         selected = selected,
         today = today,
         onClick = onClick,
+        onLongClick = onLongClick,
     )
 }
 
@@ -68,6 +75,7 @@ fun OffCalendarWithBalanceDayView(
     displayUncheckedStyle: Boolean,
     today: Boolean,
     onClick: () -> Unit,
+    onLongClick: () -> Unit,
 ) {
     OffCalendarDayView(
         dayOfMonth = dayOfMonth,
@@ -75,6 +83,7 @@ fun OffCalendarWithBalanceDayView(
         displayUncheckedStyle = displayUncheckedStyle,
         today = today,
         onClick = onClick,
+        onLongClick = onLongClick,
     )
 }
 
@@ -83,6 +92,7 @@ fun OffCalendarEmptyDayView(
     dayOfMonth: Int,
     today: Boolean,
     onClick: () -> Unit,
+    onLongClick: () -> Unit,
 ) {
     OffCalendarDayView(
         dayOfMonth = dayOfMonth,
@@ -90,6 +100,7 @@ fun OffCalendarEmptyDayView(
         displayUncheckedStyle = false,
         today = today,
         onClick = onClick,
+        onLongClick = onLongClick,
     )
 }
 
@@ -101,6 +112,7 @@ private fun InCalendarDayView(
     selected: Boolean,
     today: Boolean,
     onClick: () -> Unit,
+    onLongClick: () -> Unit,
 ) {
     CalendarDayView(
         dayOfMonth = dayOfMonth,
@@ -114,6 +126,7 @@ private fun InCalendarDayView(
         selected = selected,
         today = today,
         onClick = onClick,
+        onLongClick = onLongClick,
     )
 }
 
@@ -124,6 +137,7 @@ private fun OffCalendarDayView(
     displayUncheckedStyle: Boolean,
     today: Boolean,
     onClick: () -> Unit,
+    onLongClick: () -> Unit,
 ) {
     CalendarDayView(
         dayOfMonth = dayOfMonth,
@@ -137,6 +151,7 @@ private fun OffCalendarDayView(
         selected = false,
         today = today,
         onClick = onClick,
+        onLongClick = onLongClick,
     )
 }
 
@@ -155,6 +170,7 @@ private fun getDayOfMonthColor(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun CalendarDayView(
     dayOfMonth: Int,
@@ -165,47 +181,54 @@ private fun CalendarDayView(
     selected: Boolean,
     today: Boolean,
     onClick: () -> Unit,
+    onLongClick: () -> Unit,
 ) {
-   Column(
-       modifier = Modifier
-           .padding(3.dp)
-           .fillMaxWidth()
-           .aspectRatio(1f)
-           .clip(shape = CircleShape)
-           .background(
-               color = if (selected) {
-                   colorResource(id = R.color.calendar_cell_selected)
-               } else {
-                   Color.Transparent
-               }
-           )
-           .border(
-               width = 2.dp,
-               color = if (today) MaterialTheme.colorScheme.primary else Color.Transparent,
-               shape = CircleShape
-           )
-           .clickable(onClick = onClick)
-           .padding(7.dp)
-   ) {
-        Text(
-            text = dayOfMonth.toString(),
-            color = dayOfMonthColor,
-            fontStyle = dayOfMonthFontStyle,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        )
+    Box(
+        modifier = Modifier
+            .padding(horizontal = 5.dp)
+            .fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(1f)
+                .clip(shape = CircleShape)
+                .background(
+                    color = if (selected) {
+                        colorResource(id = R.color.calendar_cell_selected)
+                    } else {
+                        Color.Transparent
+                    }
+                )
+                .border(
+                    width = 2.dp,
+                    color = if (today) MaterialTheme.colorScheme.primary else Color.Transparent,
+                    shape = CircleShape
+                )
+                .combinedClickable(onClick = onClick, onLongClick = onLongClick)
+                .padding(horizontal = 7.dp, vertical = 6.dp),
+            verticalArrangement = Arrangement.Top,
+        ) {
+            Text(
+                text = dayOfMonth.toString(),
+                color = dayOfMonthColor,
+                fontStyle = dayOfMonthFontStyle,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
 
-        Text(
-            text = maybeBalanceToDisplay?.let { formatBalance(it) } ?: "",
-            color = balanceColor,
-            fontSize = 11.sp,
-            maxLines = 1,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        )
-   }
+            Text(
+                text = maybeBalanceToDisplay?.let { formatBalance(it) } ?: "",
+                color = balanceColor,
+                fontSize = 11.sp,
+                maxLines = 1,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
 }
 
 private val roundingToIntFormatter = RoundedToIntNumberFormatter()

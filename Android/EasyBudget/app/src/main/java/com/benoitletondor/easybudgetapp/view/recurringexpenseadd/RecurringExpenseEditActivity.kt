@@ -16,8 +16,6 @@
 
 package com.benoitletondor.easybudgetapp.view.recurringexpenseadd
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
 import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Context
@@ -65,17 +63,8 @@ class RecurringExpenseEditActivity : BaseActivity<ActivityRecurringExpenseAddBin
 
         setResult(Activity.RESULT_CANCELED)
 
-        if ( willAnimateActivityEnter() ) {
-            animateActivityEnter(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    binding.descriptionEdittext.setFocus()
-                    binding.saveExpenseFab.animateFABAppearance()
-                }
-            })
-        } else {
-            binding.descriptionEdittext.setFocus()
-            binding.saveExpenseFab.animateFABAppearance()
-        }
+        binding.descriptionEdittext.setFocus()
+        binding.saveExpenseFab.animateFABAppearance()
 
         lifecycleScope.launchCollect(viewModel.editTypeFlow) { (isRevenue, isEditing) ->
             setExpenseTypeTextViewLayout(isRevenue, isEditing)

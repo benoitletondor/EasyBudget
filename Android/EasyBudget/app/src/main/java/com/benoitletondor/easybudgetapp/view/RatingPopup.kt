@@ -239,7 +239,7 @@ class RatingPopup(private val activity: Activity,
              * @return the enum if found, null otherwise
              */
             fun fromValue(value: Int): RatingPopupStep? {
-                for (step in values()) {
+                for (step in entries) {
                     if (step.value == value) {
                         return step
                     }

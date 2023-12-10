@@ -37,27 +37,51 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.preference.*
+import androidx.preference.CheckBoxPreference
+import androidx.preference.ListPreference
+import androidx.preference.Preference
+import androidx.preference.PreferenceCategory
+import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SwitchPreferenceCompat
 import com.benoitletondor.easybudgetapp.BuildConfig
 import com.benoitletondor.easybudgetapp.R
-import com.benoitletondor.easybudgetapp.helper.*
+import com.benoitletondor.easybudgetapp.helper.AppTheme
+import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
+import com.benoitletondor.easybudgetapp.helper.Logger
+import com.benoitletondor.easybudgetapp.helper.getUserCurrency
 import com.benoitletondor.easybudgetapp.iab.INTENT_IAB_STATUS_CHANGED
 import com.benoitletondor.easybudgetapp.iab.Iab
-import com.benoitletondor.easybudgetapp.parameters.*
+import com.benoitletondor.easybudgetapp.parameters.Parameters
+import com.benoitletondor.easybudgetapp.parameters.getFirstDayOfWeek
+import com.benoitletondor.easybudgetapp.parameters.getLocalId
+import com.benoitletondor.easybudgetapp.parameters.getLowMoneyWarningAmount
+import com.benoitletondor.easybudgetapp.parameters.getShouldShowCheckedBalance
+import com.benoitletondor.easybudgetapp.parameters.getTheme
+import com.benoitletondor.easybudgetapp.parameters.isBackupEnabled
+import com.benoitletondor.easybudgetapp.parameters.isUserAllowingDailyReminderPushes
+import com.benoitletondor.easybudgetapp.parameters.isUserAllowingMonthlyReminderPushes
+import com.benoitletondor.easybudgetapp.parameters.isUserAllowingUpdatePushes
+import com.benoitletondor.easybudgetapp.parameters.setFirstDayOfWeek
+import com.benoitletondor.easybudgetapp.parameters.setLowMoneyWarningAmount
+import com.benoitletondor.easybudgetapp.parameters.setShouldShowCheckedBalance
+import com.benoitletondor.easybudgetapp.parameters.setTheme
+import com.benoitletondor.easybudgetapp.parameters.setUserAllowDailyReminderPushes
+import com.benoitletondor.easybudgetapp.parameters.setUserAllowMonthlyReminderPushes
+import com.benoitletondor.easybudgetapp.parameters.setUserAllowUpdatePushes
 import com.benoitletondor.easybudgetapp.view.RatingPopup
-import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.USER_GONE_PREMIUM_INTENT
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
 import com.benoitletondor.easybudgetapp.view.main.createaccount.CreateAccountActivity
 import com.benoitletondor.easybudgetapp.view.main.login.LoginActivity
 import com.benoitletondor.easybudgetapp.view.premium.PremiumActivity
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.SHOW_BACKUP_INTENT_KEY
+import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.USER_GONE_PREMIUM_INTENT
 import com.benoitletondor.easybudgetapp.view.settings.backup.BackupSettingsActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.roomorama.caldroid.CaldroidFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.net.URLEncoder
+import java.time.DayOfWeek
 import javax.inject.Inject
 
 /**
@@ -142,9 +166,9 @@ class PreferencesFragment : PreferenceFragmentCompat() {
          * Start day of week
          */
         val firstDayOfWeekPref = findPreference<SwitchPreferenceCompat>(getString(R.string.setting_category_start_day_of_week_key))
-        firstDayOfWeekPref?.isChecked = parameters.getCaldroidFirstDayOfWeek() == CaldroidFragment.SUNDAY
+        firstDayOfWeekPref?.isChecked = parameters.getFirstDayOfWeek() == DayOfWeek.SUNDAY
         firstDayOfWeekPref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-            parameters.setCaldroidFirstDayOfWeek(if ((firstDayOfWeekPref?.isChecked) == true) CaldroidFragment.SUNDAY else CaldroidFragment.MONDAY)
+            parameters.setFirstDayOfWeek(if ((firstDayOfWeekPref?.isChecked) == true) DayOfWeek.SUNDAY else DayOfWeek.MONDAY)
             true
         }
 
@@ -554,7 +578,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                     themePref.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
                         themePref.summary = themePref.entries[themePref.findIndexOfValue(newValue as String)]
 
-                        val newTheme = AppTheme.values().first { it.value == newValue.toInt() }
+                        val newTheme = AppTheme.entries.first { it.value == newValue.toInt() }
 
                         parameters.setTheme(newTheme)
                         AppCompatDelegate.setDefaultNightMode(newTheme.toPlatformValue())

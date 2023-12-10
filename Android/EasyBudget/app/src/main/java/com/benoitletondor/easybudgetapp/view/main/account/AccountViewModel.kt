@@ -142,6 +142,9 @@ class AccountViewModel @Inject constructor(
     private val openMonthlyReportEventMutableFlow = MutableLiveFlow<Unit>()
     val openMonthlyReportEventFlow: Flow<Unit> = openMonthlyReportEventMutableFlow
 
+    private val openExpenseAddEventMutableFlow = MutableLiveFlow<LocalDate>()
+    val openExpenseAddEventFlow: Flow<LocalDate> = openExpenseAddEventMutableFlow
+
     private val openManageAccountEventMutableFlow = MutableLiveFlow<MainViewModel.SelectedAccount.Selected.Online>()
     val openManageAccountEventFlow: Flow<MainViewModel.SelectedAccount.Selected.Online> = openManageAccountEventMutableFlow
 
@@ -513,6 +516,12 @@ class AccountViewModel @Inject constructor(
 
     fun onSelectDate(date: LocalDate) {
         selectDateMutableStateFlow.value = date
+    }
+
+    fun onDateLongClicked(date: LocalDate) {
+        viewModelScope.launch {
+            openExpenseAddEventMutableFlow.emit(date)
+        }
     }
 
     fun onCurrencySelected() {

@@ -33,7 +33,7 @@ data class RecurringExpense(val id: Long?,
         parcel.readDouble(),
         LocalDate.ofEpochDay(parcel.readLong()),
         parcel.readByte() != 0.toByte(),
-        RecurringExpenseType.values()[parcel.readInt()]
+        RecurringExpenseType.entries[parcel.readInt()]
     )
 
     constructor(title: String,

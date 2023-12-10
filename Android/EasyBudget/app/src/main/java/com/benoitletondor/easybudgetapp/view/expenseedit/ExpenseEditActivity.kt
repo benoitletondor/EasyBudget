@@ -16,8 +16,6 @@
 
 package com.benoitletondor.easybudgetapp.view.expenseedit
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -74,17 +72,8 @@ class ExpenseEditActivity : BaseActivity<ActivityExpenseEditBinding>() {
 
         setResult(Activity.RESULT_CANCELED)
 
-        if ( willAnimateActivityEnter() ) {
-            animateActivityEnter(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    binding.descriptionEdittext.setFocus()
-                    binding.saveExpenseFab.animateFABAppearance()
-                }
-            })
-        } else {
-            binding.descriptionEdittext.setFocus()
-            binding.saveExpenseFab.animateFABAppearance()
-        }
+        binding.descriptionEdittext.setFocus()
+        binding.saveExpenseFab.animateFABAppearance()
 
         lifecycleScope.launchCollect(viewModel.editTypeFlow) { (isRevenue, isEdit) ->
             setExpenseTypeTextViewLayout(isRevenue, isEdit)

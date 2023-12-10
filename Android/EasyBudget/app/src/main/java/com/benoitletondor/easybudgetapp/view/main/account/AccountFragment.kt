@@ -43,9 +43,6 @@ import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.benoitletondor.easybudgetapp.R
@@ -62,7 +59,6 @@ import com.benoitletondor.easybudgetapp.iab.PremiumCheckStatus
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType
 import com.benoitletondor.easybudgetapp.parameters.Parameters
-import com.benoitletondor.easybudgetapp.parameters.getCaldroidFirstDayOfWeek
 import com.benoitletondor.easybudgetapp.parameters.getInitDate
 import com.benoitletondor.easybudgetapp.parameters.getLowMoneyWarningAmount
 import com.benoitletondor.easybudgetapp.theme.AppTheme
@@ -72,7 +68,6 @@ import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import com.benoitletondor.easybudgetapp.view.main.account.calendar.CalendarFragment
 import com.benoitletondor.easybudgetapp.view.main.account.calendar.CalendarGridAdapterDataProvider
 import com.benoitletondor.easybudgetapp.view.main.account.calendar2.CalendarView
-import com.benoitletondor.easybudgetapp.view.main.account.calendar2.CalendarViewModel
 import com.benoitletondor.easybudgetapp.view.main.manageaccount.ManageAccountActivity
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
@@ -84,7 +79,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.roomorama.caldroid.CaldroidFragment
 import com.roomorama.caldroid.CaldroidListener
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -122,6 +116,8 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
             }
         }
     }
+
+    private val balanceDateFormatter = DateTimeFormatter.ofPattern(resources.getString(R.string.account_balance_date_format), Locale.getDefault())
 
     private lateinit var calendarFragment: CalendarFragment
     private lateinit var expensesViewAdapter: ExpensesRecyclerViewAdapter
@@ -563,6 +559,16 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
         viewLifecycleScope.launchCollect(viewModel.openManageAccountEventFlow) { account ->
             startActivity(ManageAccountActivity.newIntent(requireContext(), account))
         }
+
+        viewLifecycleScope.launchCollect(viewModel.openExpenseAddEventFlow) { date ->
+            val startIntent = ExpenseEditActivity.newIntent(
+                context = requireContext(),
+                editedExpense = null,
+                date = date,
+            )
+
+            requireActivity().startActivity(startIntent)
+        }
     }
 
     private fun registerBroadcastReceiver() {
@@ -585,7 +591,7 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == MainActivity.SETTINGS_SCREEN_ACTIVITY_CODE) {
-            calendarFragment.setFirstDayOfWeek(parameters.getCaldroidFirstDayOfWeek())
+            calendarFragment.setFirstDayOfWeek(1)
         }
     }
 
@@ -596,9 +602,7 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
      * TODO optimization
      */
     private fun updateBalanceDisplayForDay(day: LocalDate, balance: Double, maybeCheckedBalance: Double?) {
-        val format = DateTimeFormatter.ofPattern(resources.getString(R.string.account_balance_date_format), Locale.getDefault())
-
-        var formatted = resources.getString(R.string.account_balance_format, format.format(day))
+        var formatted = resources.getString(R.string.account_balance_format, balanceDateFormatter.format(day))
 
         // FIXME it's ugly!!
         if (formatted.endsWith(".:")) {
@@ -629,19 +633,12 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
         binding.calendarView.setContent {
             AppTheme {
                 CalendarView(
-                    viewModel = viewModel(
-                        factory = object : ViewModelProvider.Factory {
-                            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                                @Suppress("UNCHECKED_CAST")
-                                return CalendarViewModel(
-                                    dbAvailableFlow = viewModel.dbAvailableFlow,
-                                    selectedDateFlow = viewModel.selectDateFlow,
-                                    onDateSelected = viewModel::onSelectDate,
-                                    includeCheckedBalance = viewModel.includeCheckedBalanceFlow,
-                                ) as T
-                            }
-                        }
-                    ),
+                    parameters = parameters,
+                    dbAvailableFlow = viewModel.dbAvailableFlow,
+                    selectedDateFlow = viewModel.selectDateFlow,
+                    includeCheckedBalanceFlow = viewModel.includeCheckedBalanceFlow,
+                    onDateSelected = viewModel::onSelectDate,
+                    onDateLongClicked = viewModel::onDateLongClicked,
                 )
             }
         }
@@ -661,7 +658,7 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
             args.putInt(CaldroidFragment.YEAR, cal.get(Calendar.YEAR))
             args.putBoolean(CaldroidFragment.ENABLE_SWIPE, true)
             args.putBoolean(CaldroidFragment.SIX_WEEKS_IN_CALENDAR, false)
-            args.putInt(CaldroidFragment.START_DAY_OF_WEEK, parameters.getCaldroidFirstDayOfWeek())
+            args.putInt(CaldroidFragment.START_DAY_OF_WEEK, 1)
             args.putBoolean(CaldroidFragment.ENABLE_CLICK_ON_DISABLED_DATES, false)
             args.putInt(CaldroidFragment.THEME_RESOURCE, R.style.caldroid_style)
 
@@ -682,16 +679,7 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
                     date = date,
                 )
 
-                // Get the absolute location on window for Y value
-                val viewLocation = IntArray(2)
-                view!!.getLocationInWindow(viewLocation)
-
-                startIntent.putExtra(MainActivity.ANIMATE_TRANSITION_KEY, true)
-                startIntent.putExtra(MainActivity.CENTER_X_KEY, view.x.toInt() + view.width / 2)
-                startIntent.putExtra(MainActivity.CENTER_Y_KEY, viewLocation[1] + view.height / 2)
-
-                ActivityCompat.startActivityForResult(requireActivity(), startIntent,
-                    MainActivity.ADD_EXPENSE_ACTIVITY_CODE, null)
+                requireActivity().startActivity(startIntent)
             }
 
             override fun onChangeMonth(month: Int, year: Int) {
@@ -770,10 +758,7 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
                     date = calendarFragment.getSelectedDate(),
                 )
 
-                startIntent.putExtra(MainActivity.ANIMATE_TRANSITION_KEY, true)
-
-                ActivityCompat.startActivityForResult(requireActivity(), startIntent,
-                    MainActivity.ADD_EXPENSE_ACTIVITY_CODE, null)
+                requireActivity().startActivity(startIntent)
 
                 collapseMenu()
             }
@@ -787,10 +772,7 @@ class AccountFragment : Fragment(), MenuProvider, CalendarGridAdapterDataProvide
                     editedExpense = null,
                 )
 
-                startIntent.putExtra(MainActivity.ANIMATE_TRANSITION_KEY, true)
-
-                ActivityCompat.startActivityForResult(requireActivity(), startIntent,
-                    MainActivity.ADD_EXPENSE_ACTIVITY_CODE, null)
+                requireActivity().startActivity(startIntent)
 
                 collapseMenu()
             }

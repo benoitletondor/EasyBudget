@@ -389,7 +389,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
                 editedExpense = null,
             )
 
-            ActivityCompat.startActivityForResult(this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null)
+            startActivity(startIntent)
         }
     }
 
@@ -407,12 +407,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
                 editedExpense = null,
             )
 
-            ActivityCompat.startActivityForResult(this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null)
+            startActivity(startIntent)
         }
     }
 
     companion object {
-        const val ADD_EXPENSE_ACTIVITY_CODE = 101
         const val MANAGE_RECURRING_EXPENSE_ACTIVITY_CODE = 102
         const val WELCOME_SCREEN_ACTIVITY_CODE = 103
         const val SETTINGS_SCREEN_ACTIVITY_CODE = 104
@@ -428,9 +427,5 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
         const val INTENT_REDIRECT_TO_SETTINGS_EXTRA = "intent.extra.redirecttosettings"
         const val INTENT_REDIRECT_TO_SETTINGS_FOR_BACKUP_EXTRA = "intent.extra.redirecttosettingsforbackup"
         const val INTENT_OPEN_ACCOUNTS_TRAY_EXTRA = "intent.extra.openaccountstray"
-
-        const val ANIMATE_TRANSITION_KEY = "animate"
-        const val CENTER_X_KEY = "centerX"
-        const val CENTER_Y_KEY = "centerY"
     }
 }

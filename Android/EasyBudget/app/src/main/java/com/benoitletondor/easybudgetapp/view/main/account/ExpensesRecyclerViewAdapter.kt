@@ -151,8 +151,7 @@ class ExpensesRecyclerViewAdapter(
                                 date = expense.date,
                             )
 
-                            ActivityCompat.startActivityForResult(fragment.requireActivity(), startIntent,
-                                MainActivity.ADD_EXPENSE_ACTIVITY_CODE, null)
+                            fragment.requireActivity().startActivity(startIntent)
                         }
                         // Edit this one and following ones
                         1 -> {
@@ -213,8 +212,7 @@ class ExpensesRecyclerViewAdapter(
                                 date = expense.date,
                             )
 
-                            ActivityCompat.startActivityForResult(fragment.requireActivity(), startIntent,
-                                MainActivity.ADD_EXPENSE_ACTIVITY_CODE, null)
+                            fragment.requireActivity().startActivity(startIntent)
                         }
                         1 // Delete
                         -> {

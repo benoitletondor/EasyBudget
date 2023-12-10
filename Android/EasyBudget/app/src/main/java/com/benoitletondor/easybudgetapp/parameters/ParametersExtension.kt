@@ -18,9 +18,9 @@ package com.benoitletondor.easybudgetapp.parameters
 
 import com.benoitletondor.easybudgetapp.helper.AppTheme
 import com.benoitletondor.easybudgetapp.helper.localDateFromTimestamp
-import com.roomorama.caldroid.CaldroidFragment
+import java.time.DayOfWeek
 import java.time.LocalDate
-import java.util.*
+import java.util.Date
 
 private const val DEFAULT_LOW_MONEY_WARNING_AMOUNT = 100
 /**
@@ -199,23 +199,41 @@ fun Parameters.setLowMoneyWarningAmount(amount: Int) {
 
 /**
  * Get the first day of the week to display to the user
- *
- * @return the id of the first day of week to display
  */
-fun Parameters.getCaldroidFirstDayOfWeek(): Int {
+fun Parameters.getFirstDayOfWeek(): DayOfWeek {
     val currentValue = getInt(FIRST_DAY_OF_WEEK_PARAMETERS_KEY, -1)
-    return if (currentValue < 1 || currentValue > 7) {
-        CaldroidFragment.MONDAY
-    } else currentValue
+    return currentValue.toDayOfWeek()
 }
 
 /**
  * Set the first day of week to display to the user
- *
- * @param firstDayOfWeek the id of the first day of week to display
  */
-fun Parameters.setCaldroidFirstDayOfWeek(firstDayOfWeek: Int) {
-    putInt(FIRST_DAY_OF_WEEK_PARAMETERS_KEY, firstDayOfWeek)
+fun Parameters.setFirstDayOfWeek(dayOfWeek: DayOfWeek) {
+    putInt(FIRST_DAY_OF_WEEK_PARAMETERS_KEY, dayOfWeek.toInt())
+}
+
+private fun DayOfWeek.toInt(): Int {
+    return when(this) {
+        DayOfWeek.MONDAY -> 2
+        DayOfWeek.TUESDAY -> 3
+        DayOfWeek.WEDNESDAY -> 4
+        DayOfWeek.THURSDAY -> 5
+        DayOfWeek.FRIDAY -> 6
+        DayOfWeek.SATURDAY -> 7
+        DayOfWeek.SUNDAY -> 1
+    }
+}
+
+private fun Int.toDayOfWeek(): DayOfWeek {
+    return when(this){
+        1 -> DayOfWeek.SUNDAY
+        3 -> DayOfWeek.TUESDAY
+        4 -> DayOfWeek.WEDNESDAY
+        5 -> DayOfWeek.THURSDAY
+        6 -> DayOfWeek.FRIDAY
+        7 -> DayOfWeek.SATURDAY
+        else -> DayOfWeek.MONDAY
+    }
 }
 
 /**
@@ -306,7 +324,7 @@ fun Parameters.setUserSawMonthlyReportHint() {
 
 fun Parameters.getTheme(): AppTheme {
     val value = getInt(APP_THEME_PARAMETERS_KEY, AppTheme.LIGHT.value)
-    return AppTheme.values().first { it.value == value }
+    return AppTheme.entries.first { it.value == value }
 }
 
 fun Parameters.setTheme(theme: AppTheme) {
