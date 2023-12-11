@@ -8,7 +8,6 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -214,10 +213,15 @@ private fun CalendarDayView(
                     color = if (today) colorResource(id = R.color.calendar_today_stroke_color) else Color.Transparent,
                     shape = CircleShape
                 )
-                .combinedClickable(onClick = onClick, onLongClick = onLongClick)
-                .padding(vertical = 3.dp),
+                .combinedClickable(onClick = onClick, onLongClick = onLongClick),
             verticalArrangement = Arrangement.Center,
         ) {
+            // Manage padding with SP so that it grows with font size
+            Text(
+                text = " ",
+                fontSize = 2.sp,
+            )
+
             Text(
                 text = dayOfMonth.toString(),
                 color = dayOfMonthColor,
@@ -227,9 +231,7 @@ private fun CalendarDayView(
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
             )
-
 
             Text(
                 text = maybeBalanceToDisplay?.let { formatBalance(it) } ?: "",
@@ -239,7 +241,12 @@ private fun CalendarDayView(
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+            )
+
+            // Manage padding with SP so that it grows with font size
+            Text(
+                text = " ",
+                fontSize = 5.sp,
             )
         }
     }
