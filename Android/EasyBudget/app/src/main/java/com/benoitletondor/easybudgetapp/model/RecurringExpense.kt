@@ -18,8 +18,10 @@ package com.benoitletondor.easybudgetapp.model
 
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.compose.runtime.Immutable
 import java.time.LocalDate
 
+@Immutable
 data class RecurringExpense(val id: Long?,
                             val title: String,
                             val amount: Double,
@@ -33,7 +35,7 @@ data class RecurringExpense(val id: Long?,
         parcel.readDouble(),
         LocalDate.ofEpochDay(parcel.readLong()),
         parcel.readByte() != 0.toByte(),
-        RecurringExpenseType.values()[parcel.readInt()]
+        RecurringExpenseType.entries[parcel.readInt()]
     )
 
     constructor(title: String,

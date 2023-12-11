@@ -21,24 +21,28 @@ import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.db.RestoreAction
 import com.benoitletondor.easybudgetapp.helper.Logger
+import com.benoitletondor.easybudgetapp.model.DataForMonth
+import com.kizitonwose.calendar.core.yearMonth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.time.LocalDate
-import java.util.concurrent.ExecutorService
+import java.time.YearMonth
 
 open class CachedDBImpl(
     private val wrappedDB: DB,
-    private val cacheStorage: CacheDBStorage,
-    private val executor: ExecutorService,
 ) : DB, CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.IO) {
 
     private val onChangeMutableFlow = MutableSharedFlow<Unit>()
     override val onChangeFlow: Flow<Unit> = onChangeMutableFlow
+
+    private val cacheMutex = Mutex()
+    private val cachedDataForMonths = mutableMapOf<YearMonth, DataForMonth>()
 
     init {
         launch {
@@ -49,7 +53,6 @@ open class CachedDBImpl(
                 }
         }
     }
-
 
     override fun ensureDBCreated() {
         wrappedDB.ensureDBCreated()
@@ -62,85 +65,55 @@ open class CachedDBImpl(
     override suspend fun persistExpense(expense: Expense): Expense
         = wrappedDB.persistExpense(expense)
 
-    override suspend fun hasExpenseForDay(dayDate: LocalDate): Boolean {
-        val expensesForDay = synchronized(cacheStorage.expenses) {
-            cacheStorage.expenses[dayDate]
-        }
+    override suspend fun getDataForMonth(
+        yearMonth: YearMonth,
+    ): DataForMonth {
+        cacheMutex.withLock {
+            val cachedDataForMonth = cachedDataForMonths[yearMonth]
 
-        return if (expensesForDay == null) {
-            executor.execute(CacheExpensesForMonthRunnable(dayDate.startOfMonth(), this, cacheStorage))
-            wrappedDB.hasExpenseForDay(dayDate)
-        } else {
-            expensesForDay.isNotEmpty()
-        }
-    }
+            if (cachedDataForMonth != null) {
+                return cachedDataForMonth
+            }
 
-    override suspend fun hasUncheckedExpenseForDay(dayDate: LocalDate): Boolean {
-        val expensesForDay = synchronized(cacheStorage.expenses) {
-            cacheStorage.expenses[dayDate]
-        }
+            Logger.debug("DBCache: Caching data for month: $yearMonth")
 
-        return if (expensesForDay == null) {
-            executor.execute(CacheExpensesForMonthRunnable(dayDate.startOfMonth(), this, cacheStorage))
-            wrappedDB.hasUncheckedExpenseForDay(dayDate)
-        } else {
-            expensesForDay.any { !it.checked }
+            val dataForMonth = wrappedDB.getDataForMonth(yearMonth)
+            cachedDataForMonths[yearMonth] = dataForMonth
+
+            return dataForMonth
         }
     }
 
     override suspend fun getExpensesForDay(dayDate: LocalDate): List<Expense> {
-        val cached = synchronized(cacheStorage.expenses) {
-            cacheStorage.expenses[dayDate]
-        }
+        val dateForMonth = getDataForMonth(dayDate.yearMonth)
 
-        if( cached != null ) {
-            return cached
-        } else {
-            executor.execute(CacheExpensesForMonthRunnable(dayDate.startOfMonth(), this, cacheStorage))
-        }
-
-        return wrappedDB.getExpensesForDay(dayDate)
+        return dateForMonth.daysData[dayDate]?.expenses ?: emptyList()
     }
 
-    private suspend fun getExpensesForDayWithoutCache(dayDate: LocalDate)
-        = wrappedDB.getExpensesForDay(dayDate)
+    override suspend fun getExpensesForMonth(month: YearMonth): List<Expense> {
+        val dateForMonth = getDataForMonth(month)
 
-    override suspend fun getExpensesForMonth(monthStartDate: LocalDate): List<Expense>
-        = wrappedDB.getExpensesForMonth(monthStartDate)
+        return dateForMonth.daysData
+            .flatMap { (day, dataForDay) ->
+                if (day.yearMonth == month) {
+                    dataForDay.expenses
+                } else {
+                    emptyList()
+                }
+            }
+    }
 
     override suspend fun getBalanceForDay(dayDate: LocalDate): Double {
-        val cached = synchronized(cacheStorage.balances) {
-            cacheStorage.balances[dayDate]
-        }
+        val dateForMonth = getDataForMonth(dayDate.yearMonth)
 
-        if( cached != null ) {
-            return cached
-        } else {
-            executor.execute(CacheBalanceForMonthRunnable(dayDate.startOfMonth(), this, cacheStorage))
-        }
-
-        return wrappedDB.getBalanceForDay(dayDate)
+        return dateForMonth.daysData[dayDate]?.balance ?: 0.0
     }
 
     override suspend fun getCheckedBalanceForDay(dayDate: LocalDate): Double {
-        val cached = synchronized(cacheStorage.checkedBalances) {
-            cacheStorage.checkedBalances[dayDate]
-        }
+        val dateForMonth = getDataForMonth(dayDate.yearMonth)
 
-        if( cached != null ) {
-            return cached
-        } else {
-            executor.execute(CacheCheckedBalanceForMonthRunnable(dayDate.startOfMonth(), this, cacheStorage))
-        }
-
-        return wrappedDB.getCheckedBalanceForDay(dayDate)
+        return dateForMonth.daysData[dayDate]?.checkedBalance ?: 0.0
     }
-
-    private suspend fun getBalanceForDayWithoutCache(dayDate: LocalDate): Double
-        = wrappedDB.getBalanceForDay(dayDate)
-
-    private suspend fun getCheckedBalanceForDayWithoutCache(dayDate: LocalDate): Double
-        = wrappedDB.getCheckedBalanceForDay(dayDate)
 
     override suspend fun persistRecurringExpense(recurringExpense: RecurringExpense): RecurringExpense
         = wrappedDB.persistRecurringExpense(recurringExpense)
@@ -174,157 +147,10 @@ open class CachedDBImpl(
     override suspend fun markAllEntriesAsChecked(beforeDate: LocalDate)
         = wrappedDB.markAllEntriesAsChecked(beforeDate)
 
-    /**
-     * Instantly wipe all cached data
-     */
-    protected fun wipeCache() {
-        Logger.debug("DBCache: Wipe all")
-
-        synchronized(cacheStorage.balances) {
-            cacheStorage.balances.clear()
-        }
-
-        synchronized(cacheStorage.expenses) {
-            cacheStorage.expenses.clear()
-        }
-
-        synchronized(cacheStorage.checkedBalances) {
-            cacheStorage.checkedBalances.clear()
-        }
-    }
-
-    private class CacheExpensesForMonthRunnable(
-        private val startOfMonthDate: LocalDate,
-        private val db: CachedDBImpl,
-        private val cacheStorage: CacheDBStorage,
-    ) : Runnable {
-
-        override fun run() {
-            synchronized(cacheStorage.expenses) {
-                if (cacheStorage.expenses.containsKey(startOfMonthDate)) {
-                    return
-                }
-            }
-
-            try {
-                // Save the month we wanna load cache for
-                var currentDate = startOfMonthDate
-                val month = currentDate.month
-
-                Logger.debug("DBCache: Caching expenses for month: $month")
-
-                // Iterate over day of month (while are still on that month)
-                while (currentDate.month == month && !Thread.currentThread().isInterrupted) {
-                    val expensesForDay = runBlocking { db.getExpensesForDayWithoutCache(currentDate) }
-
-                    synchronized(cacheStorage.expenses) {
-                        cacheStorage.expenses.put(currentDate, expensesForDay)
-                    }
-
-                    currentDate = currentDate.plusDays(1)
-                }
-
-                Logger.debug("DBCache: Expenses cached for month: $month")
-            } catch (e: Exception) {
-                Logger.error("Error while caching expenses for month: $startOfMonthDate, clearing cache", e)
-
-                synchronized(cacheStorage.expenses) {
-                    cacheStorage.expenses.clear()
-                }
-            }
-        }
-
-    }
-
-    private class CacheBalanceForMonthRunnable(
-        private val startOfMonthDate: LocalDate,
-        private val db: CachedDBImpl,
-        private val cacheStorage: CacheDBStorage,
-    ) : Runnable {
-
-        override fun run() {
-            synchronized(cacheStorage.balances) {
-                if (cacheStorage.balances.containsKey(startOfMonthDate)) {
-                    return
-                }
-            }
-
-            try {
-                // Save the month we wanna load cache for
-                var currentDate = startOfMonthDate
-                val month = currentDate.month
-
-                Logger.debug("DBCache: Caching balance for month: $month")
-
-                // Iterate over day of month (while are still on that month)
-                while (currentDate.month == month && !Thread.currentThread().isInterrupted) {
-                    val balanceForDay = runBlocking { db.getBalanceForDayWithoutCache(currentDate) }
-
-                    synchronized(cacheStorage.balances) {
-                        cacheStorage.balances.put(currentDate, balanceForDay)
-                    }
-
-                    currentDate = currentDate.plusDays(1)
-                }
-
-                Logger.debug("DBCache: Balance cached for month: $month")
-            } catch (e: Exception) {
-                Logger.error("Error while caching balance for month: $startOfMonthDate, clearing cache", e)
-
-                synchronized(cacheStorage.balances) {
-                    cacheStorage.balances.clear()
-                }
-            }
-        }
-    }
-
-    private class CacheCheckedBalanceForMonthRunnable(
-        private val startOfMonthDate: LocalDate,
-        private val db: CachedDBImpl,
-        private val cacheStorage: CacheDBStorage,
-    ) : Runnable {
-
-        override fun run() {
-            synchronized(cacheStorage.checkedBalances) {
-                if (cacheStorage.checkedBalances.containsKey(startOfMonthDate)) {
-                    return
-                }
-            }
-
-            try {
-                // Save the month we wanna load cache for
-                var currentDate = startOfMonthDate
-                val month = currentDate.month
-
-                Logger.debug("DBCache: Caching checked balance for month: $month")
-
-                // Iterate over day of month (while are still on that month)
-                while (currentDate.month == month && !Thread.currentThread().isInterrupted) {
-                    val balanceForDay = runBlocking { db.getCheckedBalanceForDayWithoutCache(currentDate) }
-
-                    synchronized(cacheStorage.checkedBalances) {
-                        cacheStorage.checkedBalances.put(currentDate, balanceForDay)
-                    }
-
-                    currentDate = currentDate.plusDays(1)
-                }
-
-                Logger.debug("DBCache: Checked balance cached for month: $month")
-            } catch (e: Exception) {
-                Logger.error("Error while caching checked balance for month: $startOfMonthDate, clearing cache", e)
-
-                synchronized(cacheStorage.checkedBalances) {
-                    cacheStorage.checkedBalances.clear()
-                }
-            }
+    private suspend fun wipeCache() {
+        cacheMutex.withLock {
+            Logger.debug("DBCache: Wipe all")
+            cachedDataForMonths.clear()
         }
     }
 }
-
-interface CacheDBStorage {
-    val expenses: MutableMap<LocalDate, List<Expense>>
-    val balances: MutableMap<LocalDate, Double>
-    val checkedBalances: MutableMap<LocalDate, Double>
-}
-
-private fun LocalDate.startOfMonth() = LocalDate.of(year, month, 1)

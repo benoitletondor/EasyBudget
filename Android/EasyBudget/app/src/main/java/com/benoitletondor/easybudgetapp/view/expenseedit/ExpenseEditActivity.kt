@@ -16,9 +16,6 @@
 
 package com.benoitletondor.easybudgetapp.view.expenseedit
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -72,19 +69,9 @@ class ExpenseEditActivity : BaseActivity<ActivityExpenseEditBinding>() {
 
         setUpButtons()
 
-        setResult(Activity.RESULT_CANCELED)
 
-        if ( willAnimateActivityEnter() ) {
-            animateActivityEnter(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    binding.descriptionEdittext.setFocus()
-                    binding.saveExpenseFab.animateFABAppearance()
-                }
-            })
-        } else {
-            binding.descriptionEdittext.setFocus()
-            binding.saveExpenseFab.animateFABAppearance()
-        }
+        binding.descriptionEdittext.setFocus()
+        binding.saveExpenseFab.animateFABAppearance()
 
         lifecycleScope.launchCollect(viewModel.editTypeFlow) { (isRevenue, isEdit) ->
             setExpenseTypeTextViewLayout(isRevenue, isEdit)
@@ -99,7 +86,6 @@ class ExpenseEditActivity : BaseActivity<ActivityExpenseEditBinding>() {
                 .setTitle(R.string.expense_edit_unable_to_load_db_error_title)
                 .setMessage(R.string.expense_edit_unable_to_load_db_error_message)
                 .setPositiveButton(R.string.expense_edit_unable_to_load_db_error_cta) { _, _ ->
-                    setResult(Activity.RESULT_CANCELED)
                     finish()
                 }
                 .setCancelable(false)
@@ -107,7 +93,6 @@ class ExpenseEditActivity : BaseActivity<ActivityExpenseEditBinding>() {
         }
 
         lifecycleScope.launchCollect(viewModel.finishFlow) {
-            setResult(Activity.RESULT_OK)
             finish()
         }
 

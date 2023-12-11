@@ -20,7 +20,7 @@ EasyBudget is a simple Android app built with Android Studio that supports Andro
 
 The app adopt material design as much as possible using Androidx, Compose and some other libraries.
 
-The project also uses some external libraries, especially Caldroid: a library to display a customizable Calendar [https://github.com/roomorama/Caldroid](https://github.com/roomorama/Caldroid).
+The project also uses some external libraries, especially Calendar: a library to display a customizable Calendar using Compose [https://github.com/kizitonwose/Calendar](https://github.com/kizitonwose/Calendar).
 
 ### Contact
 

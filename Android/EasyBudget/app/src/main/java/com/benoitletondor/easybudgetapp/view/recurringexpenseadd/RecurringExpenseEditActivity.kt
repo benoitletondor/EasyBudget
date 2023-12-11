@@ -16,9 +16,6 @@
 
 package com.benoitletondor.easybudgetapp.view.recurringexpenseadd
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
@@ -63,19 +60,8 @@ class RecurringExpenseEditActivity : BaseActivity<ActivityRecurringExpenseAddBin
 
         setUpButtons()
 
-        setResult(Activity.RESULT_CANCELED)
-
-        if ( willAnimateActivityEnter() ) {
-            animateActivityEnter(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    binding.descriptionEdittext.setFocus()
-                    binding.saveExpenseFab.animateFABAppearance()
-                }
-            })
-        } else {
-            binding.descriptionEdittext.setFocus()
-            binding.saveExpenseFab.animateFABAppearance()
-        }
+        binding.descriptionEdittext.setFocus()
+        binding.saveExpenseFab.animateFABAppearance()
 
         lifecycleScope.launchCollect(viewModel.editTypeFlow) { (isRevenue, isEditing) ->
             setExpenseTypeTextViewLayout(isRevenue, isEditing)
@@ -126,7 +112,6 @@ class RecurringExpenseEditActivity : BaseActivity<ActivityRecurringExpenseAddBin
             progressDialog?.dismiss()
             progressDialog = null
 
-            setResult(Activity.RESULT_OK)
             finish()
         }
 
@@ -160,7 +145,6 @@ class RecurringExpenseEditActivity : BaseActivity<ActivityRecurringExpenseAddBin
                 .setTitle(R.string.expense_edit_unable_to_load_db_error_title)
                 .setMessage(R.string.expense_edit_unable_to_load_db_error_message)
                 .setPositiveButton(R.string.expense_edit_unable_to_load_db_error_cta) { _, _ ->
-                    setResult(Activity.RESULT_CANCELED)
                     finish()
                 }
                 .setCancelable(false)

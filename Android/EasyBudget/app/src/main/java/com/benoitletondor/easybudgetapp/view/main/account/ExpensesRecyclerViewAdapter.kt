@@ -23,7 +23,6 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -55,8 +54,6 @@ class ExpensesRecyclerViewAdapter(
     private var expenses = mutableListOf<Expense>()
     private var isUserPremium = false
 
-    fun getDate(): LocalDate = date
-
     fun setUserPremium(isPremium: Boolean) {
         if (isPremium == isUserPremium) {
             return
@@ -74,29 +71,6 @@ class ExpensesRecyclerViewAdapter(
         this.expenses.clear()
         this.expenses.addAll(expenses)
         notifyDataSetChanged()
-    }
-
-    /**
-     * Remove given expense
-     *
-     * @param expense the expense to remove
-     * @return position of the deleted expense (-1 if not found)
-     */
-    fun removeExpense(expense: Expense): Int {
-        val expenseIterator = expenses.iterator()
-        var position = 0
-        while (expenseIterator.hasNext()) {
-            val (id) = expenseIterator.next()
-            if (expense.id != null && expense.id == id) {
-                expenseIterator.remove()
-                notifyItemRemoved(position)
-                return position
-            }
-
-            position++
-        }
-
-        return -1
     }
 
 // ------------------------------------------>
@@ -151,8 +125,7 @@ class ExpensesRecyclerViewAdapter(
                                 date = expense.date,
                             )
 
-                            ActivityCompat.startActivityForResult(fragment.requireActivity(), startIntent,
-                                MainActivity.ADD_EXPENSE_ACTIVITY_CODE, null)
+                            fragment.requireActivity().startActivity(startIntent)
                         }
                         // Edit this one and following ones
                         1 -> {
@@ -162,8 +135,7 @@ class ExpensesRecyclerViewAdapter(
                                 startDate = expense.date,
                             )
 
-                            ActivityCompat.startActivityForResult(fragment.requireActivity(), startIntent,
-                                MainActivity.MANAGE_RECURRING_EXPENSE_ACTIVITY_CODE, null)
+                            fragment.requireActivity().startActivity(startIntent)
                         }
                         // Delete this one
                         2 -> {
@@ -213,8 +185,7 @@ class ExpensesRecyclerViewAdapter(
                                 date = expense.date,
                             )
 
-                            ActivityCompat.startActivityForResult(fragment.requireActivity(), startIntent,
-                                MainActivity.ADD_EXPENSE_ACTIVITY_CODE, null)
+                            fragment.requireActivity().startActivity(startIntent)
                         }
                         1 // Delete
                         -> {

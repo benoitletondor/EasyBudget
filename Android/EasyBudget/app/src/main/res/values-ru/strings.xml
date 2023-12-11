@@ -459,4 +459,6 @@
     <string name="main_account_online_name">%s (онлайн)</string>
     <string name="premium_popup_upgrade_cta">Обновление</string>
     <string name="premium_popup_become_go_back">Назад</string>
+    <string name="calendar_month_loading_error_title">Невозможно загрузить данные</string>
+    <string name="calendar_month_loading_error_description">Произошла ошибка при загрузке данных календаря. Пожалуйста, попробуйте еще раз.\n(%s)</string>
 </resources>

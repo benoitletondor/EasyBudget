@@ -16,10 +16,12 @@
 
 package com.benoitletondor.easybudgetapp.db
 
+import com.benoitletondor.easybudgetapp.model.DataForMonth
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
+import java.time.YearMonth
 
 interface DB {
     val onChangeFlow: Flow<Unit>
@@ -30,13 +32,11 @@ interface DB {
 
     suspend fun persistExpense(expense: Expense): Expense
 
-    suspend fun hasExpenseForDay(dayDate: LocalDate): Boolean
-
-    suspend fun hasUncheckedExpenseForDay(dayDate: LocalDate): Boolean
+    suspend fun getDataForMonth(yearMonth: YearMonth): DataForMonth
 
     suspend fun getExpensesForDay(dayDate: LocalDate): List<Expense>
 
-    suspend fun getExpensesForMonth(monthStartDate: LocalDate): List<Expense>
+    suspend fun getExpensesForMonth(month: YearMonth): List<Expense>
 
     suspend fun getBalanceForDay(dayDate: LocalDate): Double
 

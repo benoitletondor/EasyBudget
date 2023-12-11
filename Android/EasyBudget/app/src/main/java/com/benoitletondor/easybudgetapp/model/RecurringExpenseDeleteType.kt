@@ -51,7 +51,7 @@ enum class RecurringExpenseDeleteType(val value: Int) {
          * @return
          */
         fun fromValue(value: Int): RecurringExpenseDeleteType? {
-            for (type in values()) {
+            for (type in entries) {
                 if (value == type.value) {
                     return type
                 }

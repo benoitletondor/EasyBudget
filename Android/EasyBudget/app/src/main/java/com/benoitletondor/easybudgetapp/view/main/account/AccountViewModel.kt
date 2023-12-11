@@ -34,7 +34,7 @@ import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType
 import com.benoitletondor.easybudgetapp.parameters.Parameters
-import com.benoitletondor.easybudgetapp.parameters.getShouldShowCheckedBalance
+import com.benoitletondor.easybudgetapp.parameters.watchShouldShowCheckedBalance
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import com.benoitletondor.easybudgetapp.view.main.account.AccountFragment.Companion.ARG_SELECTED_ACCOUNT
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -52,7 +52,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
@@ -60,7 +59,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.ref.WeakReference
 import java.time.LocalDate
-import java.util.Calendar
+import java.time.YearMonth
 import javax.inject.Inject
 
 @HiltViewModel
@@ -91,6 +90,10 @@ class AccountViewModel @Inject constructor(
     }
 
     private val selectDateMutableStateFlow = MutableStateFlow(LocalDate.now())
+    val selectDateFlow: StateFlow<LocalDate> = selectDateMutableStateFlow
+
+    private val goBackToCurrentMonthEventMutableFlow = MutableSharedFlow<Unit>()
+    val goBackToCurrentMonthEventFlow: Flow<Unit> = goBackToCurrentMonthEventMutableFlow
 
     private val expenseDeletionSuccessEventMutableFlow = MutableLiveFlow<ExpenseDeletionSuccessData>()
     val expenseDeletionSuccessEventFlow: Flow<ExpenseDeletionSuccessData> = expenseDeletionSuccessEventMutableFlow
@@ -129,9 +132,6 @@ class AccountViewModel @Inject constructor(
     private val expenseCheckedErrorEventMutableFlow = MutableLiveFlow<Exception>()
     val expenseCheckedErrorEventFlow: Flow<Exception> = expenseCheckedErrorEventMutableFlow
 
-    private val goBackToCurrentMonthEventMutableFlow = MutableLiveFlow<Unit>()
-    val goBackToCurrentMonthEventFlow: Flow<Unit> = goBackToCurrentMonthEventMutableFlow
-
     private val confirmCheckAllPastEntriesEventMutableFlow = MutableLiveFlow<Unit>()
     val confirmCheckAllPastEntriesEventFlow: Flow<Unit> = confirmCheckAllPastEntriesEventMutableFlow
 
@@ -141,41 +141,49 @@ class AccountViewModel @Inject constructor(
     private val openMonthlyReportEventMutableFlow = MutableLiveFlow<Unit>()
     val openMonthlyReportEventFlow: Flow<Unit> = openMonthlyReportEventMutableFlow
 
+    private val openExpenseAddEventMutableFlow = MutableLiveFlow<LocalDate>()
+    val openExpenseAddEventFlow: Flow<LocalDate> = openExpenseAddEventMutableFlow
+
     private val openManageAccountEventMutableFlow = MutableLiveFlow<MainViewModel.SelectedAccount.Selected.Online>()
     val openManageAccountEventFlow: Flow<MainViewModel.SelectedAccount.Selected.Online> = openManageAccountEventMutableFlow
 
     private val forceRefreshMutableFlow = MutableSharedFlow<Unit>()
-    val refreshDatesFlow: Flow<Unit> = forceRefreshMutableFlow
+    val forceRefreshFlow: Flow<Unit> = forceRefreshMutableFlow
 
     private val showManageAccountMenuItemMutableFlow = MutableStateFlow(false)
     val showManageAccountMenuItem: StateFlow<Boolean> = showManageAccountMenuItemMutableFlow
 
     private var changesWatchingJob: Job? = null
 
+    val includeCheckedBalanceFlow = premiumStatusFlow
+        .mapNotNull { when(it) {
+            PremiumCheckStatus.INITIALIZING,
+            PremiumCheckStatus.CHECKING -> null
+            PremiumCheckStatus.ERROR,
+            PremiumCheckStatus.NOT_PREMIUM -> false
+            PremiumCheckStatus.LEGACY_PREMIUM,
+            PremiumCheckStatus.PREMIUM_SUBSCRIBED,
+            PremiumCheckStatus.PRO_SUBSCRIBED -> true
+        } }
+        .distinctUntilChanged()
+        .combine(parameters.watchShouldShowCheckedBalance()) { isPremium, shouldShowCheckedBalance ->
+            isPremium && shouldShowCheckedBalance
+        }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
     val selectedDateDataFlow = combine(
         selectDateMutableStateFlow,
-        premiumStatusFlow
-            .mapNotNull { when(it) {
-                PremiumCheckStatus.INITIALIZING,
-                PremiumCheckStatus.CHECKING -> null
-                PremiumCheckStatus.ERROR,
-                PremiumCheckStatus.NOT_PREMIUM -> false
-                PremiumCheckStatus.LEGACY_PREMIUM,
-                PremiumCheckStatus.PREMIUM_SUBSCRIBED,
-                PremiumCheckStatus.PRO_SUBSCRIBED -> true
-            } }
-            .onStart { emit(false) }
-            .distinctUntilChanged(),
+        includeCheckedBalanceFlow,
         forceRefreshMutableFlow
             .onStart {
                 emit(Unit)
             },
-    ) { date, isPremium, _ ->
+    ) { date, includeCheckedBalance, _ ->
         val (balance, expenses, checkedBalance) = withContext(Dispatchers.Default) {
             Triple(
                 getBalanceForDay(date),
                 awaitDB().getExpensesForDay(date),
-                if (isPremium && parameters.getShouldShowCheckedBalance()) {
+                if (includeCheckedBalance) {
                     getCheckedBalanceForDay(date)
                 } else {
                     null
@@ -315,11 +323,8 @@ class AccountViewModel @Inject constructor(
                     awaitDB().deleteExpense(expense)
                 }
 
-                val selectedDate = selectDateMutableStateFlow.value
                 expenseDeletionSuccessEventMutableFlow.emit(ExpenseDeletionSuccessData(
                     expense,
-                    getBalanceForDay(selectedDate),
-                    if (parameters.getShouldShowCheckedBalance()) { awaitDB().getCheckedBalanceForDay(selectedDate) } else { null },
                     restoreAction,
                 ))
             } catch (t: Throwable) {
@@ -511,6 +516,12 @@ class AccountViewModel @Inject constructor(
         selectDateMutableStateFlow.value = date
     }
 
+    fun onDateLongClicked(date: LocalDate) {
+        viewModelScope.launch {
+            openExpenseAddEventMutableFlow.emit(date)
+        }
+    }
+
     fun onCurrencySelected() {
         viewModelScope.launch {
             forceRefreshMutableFlow.emit(Unit)
@@ -531,10 +542,6 @@ class AccountViewModel @Inject constructor(
         return balance
     }
 
-    fun onDayChanged() {
-        selectDateMutableStateFlow.value = LocalDate.now()
-    }
-
     fun onExpenseChecked(expense: Expense, checked: Boolean) {
         viewModelScope.launch {
             try {
@@ -548,16 +555,14 @@ class AccountViewModel @Inject constructor(
         }
     }
 
-    fun onMonthChanged(month: Int, year: Int) {
-        val cal = Calendar.getInstance()
-        showGoToCurrentMonthButtonStateMutableFlow.value = cal.get(Calendar.MONTH) != month || cal.get(
-            Calendar.YEAR) != year
+    fun onMonthChanged(yearMonth: YearMonth) {
+        showGoToCurrentMonthButtonStateMutableFlow.value = yearMonth != YearMonth.now()
     }
 
     fun onGoBackToCurrentMonthButtonPressed() {
         viewModelScope.launch {
-            goBackToCurrentMonthEventMutableFlow.emit(Unit)
             selectDateMutableStateFlow.value = LocalDate.now()
+            goBackToCurrentMonthEventMutableFlow.emit(Unit)
         }
     }
 
@@ -616,5 +621,5 @@ class AccountViewModel @Inject constructor(
 }
 
 data class SelectedDateExpensesData(val date: LocalDate, val balance: Double, val checkedBalance: Double?, val expenses: List<Expense>)
-data class ExpenseDeletionSuccessData(val deletedExpense: Expense, val newDayBalance: Double, val newCheckedBalance: Double?, val restoreAction: RestoreAction)
+data class ExpenseDeletionSuccessData(val deletedExpense: Expense, val restoreAction: RestoreAction)
 data class BalanceAdjustedData(val balanceExpense: Expense, val diffWithOldBalance: Double, val newBalance: Double)

@@ -224,7 +224,7 @@ class FirebaseAccounts(
                 INVITATION_DOCUMENT_RECEIVER_EMAIL to email,
                 INVITATION_DOCUMENT_SENDER_ID to currentUser.id,
                 INVITATION_DOCUMENT_SENDER_EMAIL to currentUser.email,
-                INVITATION_DOCUMENT_SENDER_LOCALE to Locale.getDefault()?.toString(),
+                INVITATION_DOCUMENT_SENDER_LOCALE to Locale.getDefault().toString(),
             ))
         }.await()
     }
@@ -303,7 +303,7 @@ class FirebaseAccounts(
         }
 
     private fun <T> Query.watchAsFlow(processData: (QuerySnapshot) -> T): Flow<T> = callbackFlow {
-        val snapshotListener = addSnapshotListener() { value, error ->
+        val snapshotListener = addSnapshotListener { value, error ->
             if (error != null) {
                 close(error)
                 return@addSnapshotListener
@@ -348,7 +348,7 @@ class FirebaseAccounts(
             senderId = getString(INVITATION_DOCUMENT_SENDER_ID) ?: throw IllegalStateException("Missing $INVITATION_DOCUMENT_SENDER_ID to create invitation"),
             receiverEmail = getString(INVITATION_DOCUMENT_RECEIVER_EMAIL) ?: throw IllegalStateException("Missing $INVITATION_DOCUMENT_RECEIVER_EMAIL to create invitation"),
             accountId = getString(INVITATION_DOCUMENT_ACCOUNT_ID) ?: throw IllegalStateException("Missing $INVITATION_DOCUMENT_ACCOUNT_ID to create invitation"),
-            status = InvitationStatus.values().firstOrNull {
+            status = InvitationStatus.entries.firstOrNull {
                 it.dbValue.toLong() == getLong(INVITATION_DOCUMENT_STATUS)
             } ?: throw IllegalStateException("Invalid $INVITATION_DOCUMENT_STATUS (${getLong(INVITATION_DOCUMENT_STATUS)}) to create invitation"),
             senderLocale = getString(INVITATION_DOCUMENT_SENDER_LOCALE),

@@ -18,8 +18,10 @@ package com.benoitletondor.easybudgetapp.model
 
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.compose.runtime.Immutable
 import java.time.LocalDate
 
+@Immutable
 data class AssociatedRecurringExpense(
     val recurringExpense: RecurringExpense,
     val originalDate: LocalDate,

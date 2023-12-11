@@ -296,7 +296,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
         return when (menuItem.itemId) {
             R.id.action_settings -> {
                 val startIntent = Intent(this, SettingsActivity::class.java)
-                ActivityCompat.startActivityForResult(this@MainActivity, startIntent, SETTINGS_SCREEN_ACTIVITY_CODE, null)
+                this@MainActivity.startActivity(startIntent)
 
                 true
             }
@@ -318,7 +318,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
     private fun openSettingsIfNeeded(intent: Intent) {
         if (intent.getBooleanExtra(INTENT_REDIRECT_TO_SETTINGS_EXTRA, false)) {
             val startIntent = Intent(this, SettingsActivity::class.java)
-            ActivityCompat.startActivityForResult(this@MainActivity, startIntent, SETTINGS_SCREEN_ACTIVITY_CODE, null)
+            this@MainActivity.startActivity(startIntent)
         }
     }
 
@@ -331,7 +331,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
             val startIntent = Intent(this, SettingsActivity::class.java).apply {
                 putExtra(SHOW_BACKUP_INTENT_KEY, true)
             }
-            ActivityCompat.startActivityForResult(this@MainActivity, startIntent, SETTINGS_SCREEN_ACTIVITY_CODE, null)
+            this@MainActivity.startActivity(startIntent)
         }
     }
 
@@ -357,7 +357,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
         } catch (e: Exception) {
             Logger.error("Error while opening report activity", e)
         }
-
     }
 
     /**
@@ -371,7 +370,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
             val startIntent = Intent(this, SettingsActivity::class.java)
             startIntent.putExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, true)
 
-            ActivityCompat.startActivityForResult(this, startIntent, SETTINGS_SCREEN_ACTIVITY_CODE, null)
+            this.startActivity(startIntent)
         }
     }
 
@@ -389,7 +388,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
                 editedExpense = null,
             )
 
-            ActivityCompat.startActivityForResult(this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null)
+            startActivity(startIntent)
         }
     }
 
@@ -407,15 +406,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
                 editedExpense = null,
             )
 
-            ActivityCompat.startActivityForResult(this, startIntent, ADD_EXPENSE_ACTIVITY_CODE, null)
+            startActivity(startIntent)
         }
     }
 
     companion object {
-        const val ADD_EXPENSE_ACTIVITY_CODE = 101
-        const val MANAGE_RECURRING_EXPENSE_ACTIVITY_CODE = 102
         const val WELCOME_SCREEN_ACTIVITY_CODE = 103
-        const val SETTINGS_SCREEN_ACTIVITY_CODE = 104
         const val INTENT_EXPENSE_DELETED = "intent.expense.deleted"
         const val INTENT_RECURRING_EXPENSE_DELETED = "intent.expense.monthly.deleted"
         const val INTENT_SHOW_WELCOME_SCREEN = "intent.welcomscreen.show"
@@ -428,9 +424,5 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
         const val INTENT_REDIRECT_TO_SETTINGS_EXTRA = "intent.extra.redirecttosettings"
         const val INTENT_REDIRECT_TO_SETTINGS_FOR_BACKUP_EXTRA = "intent.extra.redirecttosettingsforbackup"
         const val INTENT_OPEN_ACCOUNTS_TRAY_EXTRA = "intent.extra.openaccountstray"
-
-        const val ANIMATE_TRANSITION_KEY = "animate"
-        const val CENTER_X_KEY = "centerX"
-        const val CENTER_Y_KEY = "centerY"
     }
 }
