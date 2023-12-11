@@ -27,10 +27,8 @@ import com.benoitletondor.easybudgetapp.cloudstorage.CloudStorage
 import com.benoitletondor.easybudgetapp.cloudstorage.FirebaseStorage
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.iab.IabImpl
-import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.db.cacheimpl.CachedDBImpl
-import com.benoitletondor.easybudgetapp.db.cacheimpl.CacheDBStorage
 import com.benoitletondor.easybudgetapp.db.cacheimpl.CachedOnlineDBImpl
 import com.benoitletondor.easybudgetapp.db.offlineimpl.OfflineDBImpl
 import com.benoitletondor.easybudgetapp.db.offlineimpl.RoomDB
@@ -43,8 +41,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import java.time.LocalDate
-import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -79,12 +75,6 @@ object AppModule {
         @ApplicationContext context: Context,
     ): DB = CachedDBImpl(
         OfflineDBImpl(RoomDB.create(context)),
-        object : CacheDBStorage {
-            override val expenses: MutableMap<LocalDate, List<Expense>> = mutableMapOf()
-            override val balances: MutableMap<LocalDate, Double> = mutableMapOf()
-            override val checkedBalances: MutableMap<LocalDate, Double> = mutableMapOf()
-        },
-        Executors.newSingleThreadExecutor(),
     )
 
     suspend fun provideSyncedOnlineDBOrThrow(
@@ -98,11 +88,5 @@ object AppModule {
             accountId = accountId,
             accountSecret = accountSecret
         ),
-        object : CacheDBStorage {
-            override val expenses: MutableMap<LocalDate, List<Expense>> = mutableMapOf()
-            override val balances: MutableMap<LocalDate, Double> = mutableMapOf()
-            override val checkedBalances: MutableMap<LocalDate, Double> = mutableMapOf()
-        },
-        Executors.newSingleThreadExecutor(),
     )
 }

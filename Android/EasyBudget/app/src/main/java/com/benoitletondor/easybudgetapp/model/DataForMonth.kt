@@ -13,27 +13,27 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-plugins {
-    id("com.android.library")
-}
 
-android {
-    namespace = "com.caldroid"
+package com.benoitletondor.easybudgetapp.model
 
-    defaultConfig {
-        compileSdk = 34
-        minSdk = 21
+import androidx.compose.runtime.Immutable
+import java.time.LocalDate
+import java.time.YearMonth
+
+@Immutable
+data class DataForMonth(
+    val month: YearMonth,
+    val daysData: Map<LocalDate, DataForDay>,
+) {
+    companion object {
+        const val numberOfLeewayDays: Long = 6
     }
-
-    compileOptions {
-        isCoreLibraryDesugaringEnabled = true
-    }
 }
 
-dependencies {
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
-
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.viewpager:viewpager:1.0.0")
-    api("com.darwinsys:hirondelle-date4j:1.5.1")
-}
+@Immutable
+data class DataForDay(
+    val day: LocalDate,
+    val expenses: List<Expense>,
+    val balance: Double,
+    val checkedBalance: Double,
+)

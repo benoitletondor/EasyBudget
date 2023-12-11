@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "EasyBudget"
 
-include(":app", ":caldroid")
+include(":app")

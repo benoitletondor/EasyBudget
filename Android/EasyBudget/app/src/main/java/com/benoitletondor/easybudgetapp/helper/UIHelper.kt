@@ -16,8 +16,6 @@
 
 package com.benoitletondor.easybudgetapp.helper
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
 import android.app.Activity
 import android.content.Context
 import android.os.Build
@@ -25,8 +23,6 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.Gravity
 import android.view.View
-import android.view.ViewAnimationUtils
-import android.view.ViewTreeObserver
 import android.view.WindowManager
 import android.view.animation.AccelerateInterpolator
 import android.view.inputmethod.InputMethodManager
@@ -39,11 +35,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.updateLayoutParams
 import com.benoitletondor.easybudgetapp.R
-import com.benoitletondor.easybudgetapp.view.main.MainActivity
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-import kotlin.math.max
 
 /**
  * This helper prevents the user to add unsupported values into an EditText for decimal numbers
@@ -124,53 +118,6 @@ fun EditText.setFocus() {
 
     val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
-}
-
-/**
- * Animate activity enter if compatible
- */
-fun Activity.animateActivityEnter(listener: Animator.AnimatorListener) {
-    if (!willAnimateActivityEnter()) {
-        return
-    }
-
-    val rootView = window.decorView.findViewById<View>(android.R.id.content)
-    rootView.alpha = 0.0f
-
-    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-
-    val viewTreeObserver = rootView.viewTreeObserver
-    if (viewTreeObserver.isAlive) {
-        viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                rootView.viewTreeObserver.removeOnGlobalLayoutListener(this)
-
-                // get the center for the clipping circle
-                val cx = intent?.getIntExtra(MainActivity.CENTER_X_KEY, rootView.width / 2) ?: (rootView.width / 2)
-                val cy = intent?.getIntExtra(MainActivity.CENTER_Y_KEY, rootView.height / 2) ?: (rootView.height / 2)
-
-                // get the final radius for the clipping circle
-                val finalRadius = max(rootView.width, rootView.height)
-
-                // create the animator for this view (the start radius is zero)
-                val anim = ViewAnimationUtils.createCircularReveal(rootView, cx, cy, 0f, finalRadius.toFloat())
-                anim.addListener(listener)
-                anim.addListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationStart(animation: Animator) {
-                        rootView.alpha = 1.0f
-                    }
-                })
-                anim.start()
-            }
-        })
-    }
-}
-
-/**
- * Check if the activity contains the animation key
- */
-fun Activity.willAnimateActivityEnter(): Boolean {
-    return intent?.getBooleanExtra(MainActivity.ANIMATE_TRANSITION_KEY, false) ?: false
 }
 
 /**

@@ -38,8 +38,8 @@ android {
         compileSdk = 34
         minSdk = 21
         targetSdk = 34
-        versionCode = 113
-        versionName = "3.0.13"
+        versionCode = 117
+        versionName = "3.1.0"
         vectorDrawables.useSupportLibrary = true
 
         javaCompileOptions {
@@ -177,7 +177,6 @@ dependencies {
 
     implementation("com.android.billingclient:billing-ktx:6.1.0")
 
-    implementation(project(":caldroid"))
     implementation("me.relex:circleindicator:2.1.6@aar")
     implementation("com.batch.android:batch-sdk:1.20.1")
 
@@ -192,6 +191,7 @@ dependencies {
 
     implementation("io.realm.kotlin:library-sync:$realmVersion")
 
+    implementation("com.kizitonwose.calendar:compose:2.4.0")
     implementation("net.sf.biweekly:biweekly:0.6.7")
 
     implementation("net.lingala.zip4j:zip4j:2.11.5")

@@ -22,7 +22,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
 import androidx.fragment.app.viewModels
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.databinding.FragmentAccountSelectorBinding
@@ -73,7 +72,7 @@ class AccountSelectorFragment : BottomSheetDialogFragment() {
                     activity?.let { activity ->
                         val startIntent = Intent(activity, SettingsActivity::class.java)
                         startIntent.putExtra(SettingsActivity.SHOW_PRO_INTENT_KEY, true)
-                        ActivityCompat.startActivityForResult(activity, startIntent, MainActivity.SETTINGS_SCREEN_ACTIVITY_CODE, null)
+                        activity.startActivity(startIntent)
                     }
                     dismiss()
                 }

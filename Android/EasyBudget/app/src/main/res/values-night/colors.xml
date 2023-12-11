@@ -25,7 +25,6 @@
     <color name="main_fab_action_color">@color/window_background</color>
     <color name="home_fab_button_color">@color/easy_budget_green_night</color>
     <color name="expense_edit_field_accent_color_dark">@color/easy_budget_green_night</color>
-    <color name="calendar_today_background_color">@color/window_background</color>
     <color name="calendar_cell_disabled_text_color">#666</color>
     <color name="calendar_month_button_color_disabled">#555</color>
     <color name="calendar_month_button_color">@color/easy_budget_green_night</color>
