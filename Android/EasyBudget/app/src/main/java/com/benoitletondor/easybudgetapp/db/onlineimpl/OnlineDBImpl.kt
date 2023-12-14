@@ -264,19 +264,7 @@ class OnlineDBImpl(
     }
 
     override suspend fun getExpensesForMonth(month: YearMonth): List<Expense> {
-        val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
-
-        val recurringExpensesOfTheDay = recurringExpenses
-            .map { it.generateExpenses(month.atStartOfMonth(), month.atEndOfMonth()) }
-            .flatten()
-
-        val expenses = realm.query<ExpenseEntity>("${account.generateQuery()} AND ${generateQueryForDateRange(month.atStartOfMonth(), month.atEndOfMonth())}")
-            .asFlow()
-            .first()
-            .list
-            .map { it.toExpense(associatedRecurringExpense = null) }
-
-        return recurringExpensesOfTheDay + expenses
+        return getExpensesBetweenDates(month.atStartOfMonth(), month.atEndOfMonth())
     }
 
     override suspend fun getBalanceForDay(dayDate: LocalDate): Double {
