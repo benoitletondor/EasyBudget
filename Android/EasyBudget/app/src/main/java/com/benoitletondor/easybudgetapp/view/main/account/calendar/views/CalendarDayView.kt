@@ -240,14 +240,14 @@ private fun CalendarDayView(
                     shape = CircleShape
                 )
                 .combinedClickable(onClick = onClick, onLongClick = onLongClick)
-                .padding(4.dp),
+                .padding(3.dp),
             verticalArrangement = Arrangement.Center,
         ) {
             AutoSizeText(
                 text = dayOfMonth.toString(),
                 color = dayOfMonthColor,
                 fontStyle = dayOfMonthFontStyle,
-                minTextSize = 10.sp,
+                minTextSize = 12.sp,
                 maxTextSize = 13.sp,
                 fontWeight = FontWeight.Bold,
                 alignment = Alignment.BottomCenter,
@@ -260,7 +260,7 @@ private fun CalendarDayView(
             AutoSizeText(
                 text = maybeBalanceToDisplay?.let { formatBalance(it) } ?: "",
                 color = balanceColor,
-                minTextSize = 7.sp,
+                minTextSize = 8.sp,
                 maxTextSize = 10.sp,
                 maxLines = 1,
                 alignment = Alignment.TopCenter,
