@@ -57,7 +57,6 @@ import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.getLowMoneyWarningAmount
-import com.benoitletondor.easybudgetapp.parameters.watchFirstDayOfWeek
 import com.benoitletondor.easybudgetapp.theme.AppTheme
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
@@ -72,7 +71,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.drop
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -516,13 +514,6 @@ class AccountFragment : Fragment(), MenuProvider {
             )
 
             requireActivity().startActivity(startIntent)
-        }
-
-        // TODO : Remove when bug is fixed
-        // https://github.com/kizitonwose/Calendar/issues/514
-        viewLifecycleScope.launchCollect(parameters.watchFirstDayOfWeek().drop(1)) {
-            binding.calendarView.disposeComposition()
-            initCalendarView()
         }
     }
 

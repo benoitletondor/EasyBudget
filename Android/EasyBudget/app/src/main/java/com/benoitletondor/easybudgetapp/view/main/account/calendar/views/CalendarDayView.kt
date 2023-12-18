@@ -30,31 +30,35 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.benoitletondor.easybudgetapp.R
-import com.benoitletondor.easybudgetapp.helper.AutoSizeText
 import com.benoitletondor.easybudgetapp.theme.AppTheme
 import com.benoitletondor.easybudgetapp.view.main.account.calendar.NumberFormatter
 import com.benoitletondor.easybudgetapp.view.main.account.calendar.RoundedToIntNumberFormatter
 
 @Composable
-fun InCalendarWithBalanceDayView(
+fun BoxScope.InCalendarWithBalanceDayView(
+    size: Dp,
     dayOfMonth: Int,
     balanceToDisplay: Double,
     lowMoneyWarningAmount: Int,
@@ -65,6 +69,7 @@ fun InCalendarWithBalanceDayView(
     onLongClick: () -> Unit,
 ) {
     InCalendarDayView(
+        size = size,
         dayOfMonth = dayOfMonth,
         maybeBalanceToDisplay = balanceToDisplay,
         lowMoneyWarningAmount = lowMoneyWarningAmount,
@@ -77,7 +82,8 @@ fun InCalendarWithBalanceDayView(
 }
 
 @Composable
-fun InCalendarEmptyDayView(
+fun BoxScope.InCalendarEmptyDayView(
+    size: Dp,
     dayOfMonth: Int,
     selected: Boolean,
     today: Boolean,
@@ -85,6 +91,7 @@ fun InCalendarEmptyDayView(
     onLongClick: () -> Unit,
 ) {
     InCalendarDayView(
+        size = size,
         dayOfMonth = dayOfMonth,
         maybeBalanceToDisplay = null,
         lowMoneyWarningAmount = null,
@@ -97,7 +104,8 @@ fun InCalendarEmptyDayView(
 }
 
 @Composable
-fun OffCalendarWithBalanceDayView(
+fun BoxScope.OffCalendarWithBalanceDayView(
+    size: Dp,
     dayOfMonth: Int,
     balanceToDisplay: Double,
     lowMoneyWarningAmount: Int,
@@ -107,6 +115,7 @@ fun OffCalendarWithBalanceDayView(
     onLongClick: () -> Unit,
 ) {
     OffCalendarDayView(
+        size = size,
         dayOfMonth = dayOfMonth,
         maybeBalanceToDisplay = balanceToDisplay,
         lowMoneyWarningAmount = lowMoneyWarningAmount,
@@ -118,13 +127,15 @@ fun OffCalendarWithBalanceDayView(
 }
 
 @Composable
-fun OffCalendarEmptyDayView(
+fun BoxScope.OffCalendarEmptyDayView(
+    size: Dp,
     dayOfMonth: Int,
     today: Boolean,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
 ) {
     OffCalendarDayView(
+        size = size,
         dayOfMonth = dayOfMonth,
         maybeBalanceToDisplay = null,
         lowMoneyWarningAmount = null,
@@ -136,7 +147,8 @@ fun OffCalendarEmptyDayView(
 }
 
 @Composable
-private fun InCalendarDayView(
+private fun BoxScope.InCalendarDayView(
+    size: Dp,
     dayOfMonth: Int,
     maybeBalanceToDisplay: Double?,
     lowMoneyWarningAmount: Int?,
@@ -147,6 +159,7 @@ private fun InCalendarDayView(
     onLongClick: () -> Unit,
 ) {
     CalendarDayView(
+        size = size,
         dayOfMonth = dayOfMonth,
         maybeBalanceToDisplay = maybeBalanceToDisplay,
         dayOfMonthColor = colorResource(id = getDayOfMonthColor(
@@ -164,7 +177,8 @@ private fun InCalendarDayView(
 }
 
 @Composable
-private fun OffCalendarDayView(
+private fun BoxScope.OffCalendarDayView(
+    size: Dp,
     dayOfMonth: Int,
     maybeBalanceToDisplay: Double?,
     lowMoneyWarningAmount: Int?,
@@ -174,6 +188,7 @@ private fun OffCalendarDayView(
     onLongClick: () -> Unit,
 ) {
     CalendarDayView(
+        size = size,
         dayOfMonth = dayOfMonth,
         maybeBalanceToDisplay = maybeBalanceToDisplay,
         dayOfMonthColor = colorResource(id = getDayOfMonthColor(
@@ -206,7 +221,8 @@ private fun getDayOfMonthColor(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun CalendarDayView(
+private fun BoxScope.CalendarDayView(
+    size: Dp,
     dayOfMonth: Int,
     maybeBalanceToDisplay: Double?,
     dayOfMonthColor: Color,
@@ -217,58 +233,52 @@ private fun CalendarDayView(
     onClick: () -> Unit,
     onLongClick: () -> Unit,
 ) {
-    Box(
+    Column(
         modifier = Modifier
-            .padding(horizontal = 8.dp, vertical = 1.dp)
-            .fillMaxWidth()
+            .width(size)
+            .aspectRatio(1f)
+            .align(Alignment.Center)
+            .clip(shape = CircleShape)
+            .background(
+                color = if (selected) {
+                    colorResource(id = R.color.calendar_cell_selected)
+                } else {
+                    Color.Transparent
+                },
+            )
+            .border(
+                width = 2.dp,
+                color = if (today) colorResource(id = R.color.calendar_today_stroke_color) else Color.Transparent,
+                shape = CircleShape
+            )
+            .combinedClickable(onClick = onClick, onLongClick = onLongClick),
+        verticalArrangement = Arrangement.Center,
     ) {
-        Column(
+        Text(
+            text = dayOfMonth.toString(),
+            color = dayOfMonthColor,
+            fontStyle = dayOfMonthFontStyle,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            overflow = TextOverflow.Visible,
+            maxLines = 1,
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(1f)
-                .clip(shape = CircleShape)
-                .background(
-                    color = if (selected) {
-                        colorResource(id = R.color.calendar_cell_selected)
-                    } else {
-                        Color.Transparent
-                    }
-                )
-                .border(
-                    width = 2.dp,
-                    color = if (today) colorResource(id = R.color.calendar_today_stroke_color) else Color.Transparent,
-                    shape = CircleShape
-                )
-                .combinedClickable(onClick = onClick, onLongClick = onLongClick)
-                .padding(3.dp),
-            verticalArrangement = Arrangement.Center,
-        ) {
-            AutoSizeText(
-                text = dayOfMonth.toString(),
-                color = dayOfMonthColor,
-                fontStyle = dayOfMonthFontStyle,
-                minTextSize = 12.sp,
-                maxTextSize = 13.sp,
-                fontWeight = FontWeight.Bold,
-                alignment = Alignment.BottomCenter,
-                maxLines = 1,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            )
+                .weight(1f)
+                .wrapContentHeight(align = Alignment.Bottom)
+        )
 
-            AutoSizeText(
-                text = maybeBalanceToDisplay?.let { formatBalance(it) } ?: "",
-                color = balanceColor,
-                minTextSize = 8.sp,
-                maxTextSize = 10.sp,
-                maxLines = 1,
-                alignment = Alignment.TopCenter,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            )
-        }
+        Text(
+            text = maybeBalanceToDisplay?.let { formatBalance(it) } ?: "",
+            color = balanceColor,
+            fontSize = 10.sp,
+            maxLines = 1,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+        )
     }
 }
 
@@ -284,18 +294,17 @@ private fun formatBalance(balance: Double): String {
 }
 
 @Composable
-@Preview(widthDp = 1000)
-@Preview(widthDp = 1000, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "Normal light", widthDp = 1000)
+@Preview(name = "Normal dark", widthDp = 1000, uiMode = Configuration.UI_MODE_NIGHT_YES)
 private fun DayViewPreview() {
     AppTheme {
         Column(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
+            PreviewRowForWidth(width = 300.dp)
+            PreviewRowForWidth(width = 350.dp)
+            PreviewRowForWidth(width = 400.dp)
             PreviewRowForWidth(width = 500.dp)
-            PreviewRowForWidth(width = 600.dp)
-            PreviewRowForWidth(width = 700.dp)
-            PreviewRowForWidth(width = 800.dp)
-            PreviewRowForWidth(width = 1000.dp)
         }
     }
 }
@@ -315,8 +324,17 @@ private fun PreviewRowForWidth(width: Dp) {
 
 @Composable
 private fun RowScope.DayViewsForPreview() {
+    val density = LocalDensity.current
+    val size = remember {
+        with(density) {
+            40.sp.toDp()
+        }
+    }
+
+
     DayViewForPreview {
         OffCalendarEmptyDayView(
+            size = size,
             dayOfMonth = 25,
             today = false,
             onClick = {},
@@ -326,6 +344,7 @@ private fun RowScope.DayViewsForPreview() {
 
     DayViewForPreview {
         OffCalendarEmptyDayView(
+            size = size,
             dayOfMonth = 26,
             today = true,
             onClick = {},
@@ -335,6 +354,7 @@ private fun RowScope.DayViewsForPreview() {
 
     DayViewForPreview {
         OffCalendarWithBalanceDayView(
+            size = size,
             dayOfMonth = 27,
             balanceToDisplay = -500.0,
             lowMoneyWarningAmount = 100,
@@ -347,6 +367,7 @@ private fun RowScope.DayViewsForPreview() {
 
     DayViewForPreview {
         OffCalendarWithBalanceDayView(
+            size = size,
             dayOfMonth = 28,
             balanceToDisplay = 50.0,
             lowMoneyWarningAmount = 1000,
@@ -359,6 +380,7 @@ private fun RowScope.DayViewsForPreview() {
 
     DayViewForPreview {
         OffCalendarWithBalanceDayView(
+            size = size,
             dayOfMonth = 29,
             balanceToDisplay = 5.0,
             lowMoneyWarningAmount = 100,
@@ -371,6 +393,7 @@ private fun RowScope.DayViewsForPreview() {
 
     DayViewForPreview {
         OffCalendarWithBalanceDayView(
+            size = size,
             dayOfMonth = 30,
             balanceToDisplay = 5000.0,
             lowMoneyWarningAmount = 100,
@@ -383,6 +406,7 @@ private fun RowScope.DayViewsForPreview() {
 
     DayViewForPreview {
         InCalendarEmptyDayView(
+            size = size,
             dayOfMonth = 1,
             selected = false,
             today = false,
@@ -393,6 +417,7 @@ private fun RowScope.DayViewsForPreview() {
 
     DayViewForPreview {
         InCalendarWithBalanceDayView(
+            size = size,
             dayOfMonth = 2,
             balanceToDisplay = -500.0,
             lowMoneyWarningAmount = 100,
@@ -406,6 +431,7 @@ private fun RowScope.DayViewsForPreview() {
 
     DayViewForPreview {
         InCalendarWithBalanceDayView(
+            size = size,
             dayOfMonth = 3,
             balanceToDisplay = -500.0,
             lowMoneyWarningAmount = 600,
@@ -419,11 +445,12 @@ private fun RowScope.DayViewsForPreview() {
 
     DayViewForPreview {
         InCalendarWithBalanceDayView(
+            size = size,
             dayOfMonth = 4,
             balanceToDisplay = 500.0,
             lowMoneyWarningAmount = 100,
             displayUncheckedStyle = true,
-            selected = false,
+            selected = true,
             today = false,
             onClick = {},
             onLongClick = {},
@@ -432,6 +459,7 @@ private fun RowScope.DayViewsForPreview() {
 
     DayViewForPreview {
         InCalendarWithBalanceDayView(
+            size = size,
             dayOfMonth = 5,
             balanceToDisplay = 5000.0,
             lowMoneyWarningAmount = 100,
@@ -445,6 +473,7 @@ private fun RowScope.DayViewsForPreview() {
 
     DayViewForPreview {
         InCalendarWithBalanceDayView(
+            size = size,
             dayOfMonth = 6,
             balanceToDisplay = 500.0,
             lowMoneyWarningAmount = 100,
