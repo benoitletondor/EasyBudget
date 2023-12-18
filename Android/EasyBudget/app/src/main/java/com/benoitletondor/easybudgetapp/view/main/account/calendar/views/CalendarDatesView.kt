@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -40,6 +39,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -76,6 +76,13 @@ fun CalendarDatesView(
     onDateSelected: (LocalDate) -> Unit,
     onDateLongClicked: (LocalDate) -> Unit,
 ) {
+    val density = LocalDensity.current
+    val dayCellSize = remember {
+        with(density) {
+            40.sp.toDp()
+        }
+    }
+
     HorizontalCalendar(
         state = calendarState,
         monthHeader = { month ->
@@ -152,6 +159,7 @@ fun CalendarDatesView(
             if (maybeDataForDay != null && maybeDataForDay.expenses.isNotEmpty()) {
                 if (calendarDay.position == DayPosition.MonthDate) {
                     InCalendarWithBalanceDayView(
+                        size = dayCellSize,
                         dayOfMonth = calendarDay.date.dayOfMonth,
                         balanceToDisplay = maybeDataForDay.balance,
                         lowMoneyWarningAmount = lowMoneyWarningAmount,
@@ -167,6 +175,7 @@ fun CalendarDatesView(
                     )
                 } else {
                     OffCalendarWithBalanceDayView(
+                        size = dayCellSize,
                         dayOfMonth = calendarDay.date.dayOfMonth,
                         balanceToDisplay = maybeDataForDay.balance,
                         lowMoneyWarningAmount = lowMoneyWarningAmount,
@@ -183,6 +192,7 @@ fun CalendarDatesView(
             } else {
                 if (calendarDay.position == DayPosition.MonthDate) {
                     InCalendarEmptyDayView(
+                        size = dayCellSize,
                         dayOfMonth = calendarDay.date.dayOfMonth,
                         selected = calendarDay.date == selectedDate,
                         today = calendarDay.date == LocalDate.now(),
@@ -195,6 +205,7 @@ fun CalendarDatesView(
                     )
                 } else {
                     OffCalendarEmptyDayView(
+                        size = dayCellSize,
                         dayOfMonth = calendarDay.date.dayOfMonth,
                         today = calendarDay.date == LocalDate.now(),
                         onClick = {
