@@ -1,5 +1,5 @@
 /*
- *   Copyright 2023 Benoit LETONDOR
+ *   Copyright 2024 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -38,17 +38,9 @@ android {
         compileSdk = 34
         minSdk = 21
         targetSdk = 34
-        versionCode = 120
-        versionName = "3.1.3"
+        versionCode = 121
+        versionName = "3.1.4"
         vectorDrawables.useSupportLibrary = true
-
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments += mapOf(
-                    "room.incremental" to "true"
-                )
-            }
-        }
     }
 
     buildTypes {
@@ -101,7 +93,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.5"
+        kotlinCompilerExtensionVersion = "1.5.7"
     }
 
     buildFeatures {
@@ -149,14 +141,14 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
-    implementation("androidx.work:work-runtime-ktx:2.8.1")
-    implementation("androidx.work:work-gcm:2.8.1")
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
+    implementation("androidx.work:work-gcm:2.9.0")
     implementation("com.google.android.play:core:1.10.3")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
-    implementation(platform("com.google.firebase:firebase-bom:32.6.0"))
+    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
     implementation("com.google.firebase:firebase-messaging-ktx")
     implementation("com.google.firebase:firebase-storage")
     implementation("com.google.firebase:firebase-crashlytics")
@@ -178,7 +170,7 @@ dependencies {
     implementation("com.android.billingclient:billing-ktx:6.1.0")
 
     implementation("me.relex:circleindicator:2.1.6@aar")
-    implementation("com.batch.android:batch-sdk:1.20.1")
+    implementation("com.batch.android:batch-sdk:1.21.0")
 
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     implementation("androidx.hilt:hilt-work:1.1.0")
@@ -192,7 +184,7 @@ dependencies {
     implementation("io.realm.kotlin:library-sync:$realmVersion")
 
     implementation("com.kizitonwose.calendar:compose:2.4.1")
-    implementation("net.sf.biweekly:biweekly:0.6.7")
+    implementation("net.sf.biweekly:biweekly:0.6.8")
 
     implementation("net.lingala.zip4j:zip4j:2.11.5")
 }

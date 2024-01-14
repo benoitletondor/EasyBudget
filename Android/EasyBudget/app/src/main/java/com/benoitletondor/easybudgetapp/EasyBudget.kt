@@ -1,5 +1,5 @@
 /*
- *   Copyright 2023 Benoit LETONDOR
+ *   Copyright 2024 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -114,8 +114,8 @@ class EasyBudget : Application(), Configuration.Provider {
         AppCompatDelegate.setDefaultNightMode(parameters.getTheme().toPlatformValue())
     }
 
-    override fun getWorkManagerConfiguration(): Configuration =
-        Configuration.Builder()
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder()
             .setWorkerFactory(workerFactory)
             .build()
 
@@ -347,7 +347,7 @@ class EasyBudget : Application(), Configuration.Provider {
             }
         }
 
-        Batch.setConfig(Config(BuildConfig.BATCH_API_KEY).setCanUseAdvertisingID(false))
+        Batch.setConfig(Config(BuildConfig.BATCH_API_KEY))
         Batch.Push.setManualDisplay(true)
         Batch.Push.setSmallIconResourceId(R.drawable.ic_push)
         Batch.Push.setNotificationsColor(ContextCompat.getColor(this, R.color.accent))

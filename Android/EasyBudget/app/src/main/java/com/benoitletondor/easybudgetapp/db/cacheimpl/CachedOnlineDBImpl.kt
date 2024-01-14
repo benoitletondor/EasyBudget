@@ -1,5 +1,5 @@
 /*
- *   Copyright 2023 Benoit LETONDOR
+ *   Copyright 2024 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.benoitletondor.easybudgetapp.db.cacheimpl
 
 import com.benoitletondor.easybudgetapp.db.onlineimpl.Account
 import com.benoitletondor.easybudgetapp.db.onlineimpl.OnlineDB
+import kotlinx.coroutines.cancel
 
 class CachedOnlineDBImpl(
     private val wrappedDB: OnlineDB,
@@ -30,6 +31,7 @@ class CachedOnlineDBImpl(
     }
 
     override fun close() {
+        cancel()
         wrappedDB.close()
     }
 }

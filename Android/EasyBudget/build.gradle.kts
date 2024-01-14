@@ -1,5 +1,5 @@
 /*
- *   Copyright 2023 Benoit LETONDOR
+ *   Copyright 2024 Benoit LETONDOR
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -13,17 +13,17 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-val kotlinVersion by extra("1.9.20") // Change in the plugins below too
-val hiltVersion by extra("2.49") // Change in the plugins below too
+val kotlinVersion by extra("1.9.21") // Change in the plugins below too
+val hiltVersion by extra("2.50") // Change in the plugins below too
 val realmVersion by extra("1.13.0") // Change in the plugins below too
 
 plugins {
-    id("com.android.application") version "8.2.0" apply false
-    id("com.android.library") version "8.2.0" apply false
+    id("com.android.application") version "8.2.1" apply false
+    id("com.android.library") version "8.2.1" apply false
     id("com.google.firebase.crashlytics") version "2.9.9" apply false
     id("com.google.gms.google-services") version "4.4.0" apply false
-    id("org.jetbrains.kotlin.android") version "1.9.20" apply false
-    id("com.google.dagger.hilt.android") version "2.49" apply false
-    id("com.google.devtools.ksp") version "1.9.20-1.0.14" apply false
+    id("org.jetbrains.kotlin.android") version "1.9.21" apply false
+    id("com.google.dagger.hilt.android") version "2.50" apply false
+    id("com.google.devtools.ksp") version "1.9.21-1.0.16" apply false
     id("io.realm.kotlin") version "1.13.0" apply false
 }
