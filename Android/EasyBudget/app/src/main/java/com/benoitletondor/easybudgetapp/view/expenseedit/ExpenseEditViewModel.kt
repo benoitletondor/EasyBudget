@@ -122,9 +122,6 @@ class ExpenseEditViewModel @Inject constructor(
                     title = description,
                     amount = if (isRevenue) -value else value,
                     date = date,
-                    associatedRecurringExpense = editedExpense.associatedRecurringExpense?.copy(
-                        originalDate = editedExpense.date,
-                    )
                 ) ?: Expense(description, if (isRevenue) -value else value, date, false)
 
                 db.persistExpense(expense)

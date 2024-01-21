@@ -320,7 +320,7 @@ class OnlineDBImpl(
 
     override suspend fun updateRecurringExpenseAfterDate(
         newRecurringExpense: RecurringExpense,
-        oldOccurrenceDate: LocalDate,
+        afterDate: LocalDate,
     ) {
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
 
@@ -329,7 +329,7 @@ class OnlineDBImpl(
 
         realm.write {
             findLatest(entity)?.updateAllOccurrencesAfterDate(
-                oldOccurrenceDate,
+                afterDate,
                 newRecurringExpense,
             )
         }
@@ -366,7 +366,7 @@ class OnlineDBImpl(
             val icalBeforeDeletion = entity.iCalRepresentation
 
             realm.write {
-                findLatest(entity)?.deleteOccurrence(expense.date)
+                findLatest(entity)?.deleteOccurrence(expense.date, expense.associatedRecurringExpense.originalDate)
             }
 
             return {
@@ -417,7 +417,7 @@ class OnlineDBImpl(
 
     override suspend fun deleteAllExpenseForRecurringExpenseBeforeDate(
         recurringExpense: RecurringExpense,
-        beforeDate: LocalDate
+        beforeDate: LocalDate,
     ): RestoreAction {
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
 
