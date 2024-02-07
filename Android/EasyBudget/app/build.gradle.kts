@@ -38,8 +38,8 @@ android {
         compileSdk = 34
         minSdk = 21
         targetSdk = 34
-        versionCode = 123
-        versionName = "3.1.5"
+        versionCode = 124
+        versionName = "3.1.6"
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -47,7 +47,7 @@ android {
         debug {
             val batchDevKey = rootProject.extra["batchDevKey"] as String
             val licenceKey = rootProject.extra["licenceKey"] as String
-            val atlasAppId = rootProject.extra["atlasAppId"] as String
+            val atlasAppId = rootProject.extra["devAtlasAppId"] as String
 
             buildConfigField("boolean", "DEBUG_LOG", "true")
             buildConfigField("boolean", "CRASHLYTICS_ACTIVATED", "false")
