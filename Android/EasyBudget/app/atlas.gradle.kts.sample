@@ -1,1 +1,2 @@
 val atlasAppId by rootProject.extra("atlas-app-id")
+val devAtlasAppId by rootProject.extra("dev-atlas-app-id")
