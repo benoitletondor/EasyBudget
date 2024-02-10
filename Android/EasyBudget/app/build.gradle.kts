@@ -38,7 +38,7 @@ android {
         compileSdk = 34
         minSdk = 21
         targetSdk = 34
-        versionCode = 125
+        versionCode = 126
         versionName = "3.1.7"
         vectorDrawables.useSupportLibrary = true
     }
