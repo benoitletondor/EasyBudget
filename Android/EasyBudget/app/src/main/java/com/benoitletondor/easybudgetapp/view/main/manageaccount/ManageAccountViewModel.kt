@@ -17,6 +17,7 @@
 package com.benoitletondor.easybudgetapp.view.main.manageaccount
 
 import android.util.Patterns
+import androidx.compose.ui.text.toLowerCase
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -280,6 +281,14 @@ class ManageAccountViewModel @Inject constructor(
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             viewModelScope.launch {
                 eventMutableFlow.emit(Event.ErrorWhileInviting(IllegalStateException("Email is invalid")))
+            }
+
+            return
+        }
+
+        if (selectedAccount.ownerEmail.trim() == email.lowercase().trim()) {
+            viewModelScope.launch {
+                eventMutableFlow.emit(Event.ErrorWhileInviting(IllegalStateException("Cannot invite account owner")))
             }
 
             return

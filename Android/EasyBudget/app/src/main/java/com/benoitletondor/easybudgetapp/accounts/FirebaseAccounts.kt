@@ -125,10 +125,14 @@ class FirebaseAccounts(
         val accountRef = db.collection(ACCOUNTS_COLLECTION).document(invitation.accountId)
         val invitationRef = db.collection(INVITATIONS_COLLECTION).document(invitation.id)
 
+        val account = accountRef.get().await().toAccountOrThrow(currentUser)
+
         db.runTransaction { transaction ->
-            transaction.update(accountRef, mapOf(
-                ACCOUNT_DOCUMENT_MEMBERS to FieldValue.arrayRemove(invitation.receiverEmail),
-            ))
+            if (account.ownerEmail != invitation.receiverEmail) {
+                transaction.update(accountRef, mapOf(
+                    ACCOUNT_DOCUMENT_MEMBERS to FieldValue.arrayRemove(invitation.receiverEmail),
+                ))
+            }
 
             transaction.delete(invitationRef)
         }.await()
@@ -209,9 +213,14 @@ class FirebaseAccounts(
         accountCredentials: AccountCredentials,
         invitedUserEmail: String,
     ) {
-        val email = invitedUserEmail.lowercase()
+        val email = invitedUserEmail.lowercase().trim()
         val accountRef = db.collection(ACCOUNTS_COLLECTION).document(accountCredentials.id)
         val invitationRef = db.collection(INVITATIONS_COLLECTION).document()
+
+        val account = accountRef.get().await().toAccountOrThrow(currentUser);
+        if (account.ownerEmail == email) {
+            throw IllegalStateException("Cannot invite the account owner")
+        }
 
         db.runTransaction { transaction ->
             transaction.update(accountRef, mapOf(
