@@ -43,6 +43,8 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -263,6 +265,12 @@ private fun BoxScope.CalendarDayView(
             textAlign = TextAlign.Center,
             overflow = TextOverflow.Visible,
             maxLines = 1,
+            style = TextStyle(
+                // https://developer.android.com/jetpack/androidx/releases/compose-ui#1.6.0-alpha01
+                platformStyle = PlatformTextStyle(
+                    includeFontPadding = true,
+                )
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
@@ -275,6 +283,12 @@ private fun BoxScope.CalendarDayView(
             fontSize = 10.sp,
             maxLines = 1,
             textAlign = TextAlign.Center,
+            style = TextStyle(
+                // https://developer.android.com/jetpack/androidx/releases/compose-ui#1.6.0-alpha01
+                platformStyle = PlatformTextStyle(
+                    includeFontPadding = true,
+                )
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
