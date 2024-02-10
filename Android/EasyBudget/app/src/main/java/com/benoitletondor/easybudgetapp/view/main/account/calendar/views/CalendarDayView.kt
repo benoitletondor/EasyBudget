@@ -266,6 +266,7 @@ private fun BoxScope.CalendarDayView(
             overflow = TextOverflow.Visible,
             maxLines = 1,
             style = TextStyle(
+                // https://developer.android.com/jetpack/androidx/releases/compose-ui#1.6.0-alpha01
                 platformStyle = PlatformTextStyle(
                     includeFontPadding = true,
                 )
@@ -283,6 +284,7 @@ private fun BoxScope.CalendarDayView(
             maxLines = 1,
             textAlign = TextAlign.Center,
             style = TextStyle(
+                // https://developer.android.com/jetpack/androidx/releases/compose-ui#1.6.0-alpha01
                 platformStyle = PlatformTextStyle(
                     includeFontPadding = true,
                 )
