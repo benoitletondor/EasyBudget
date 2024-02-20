@@ -26,9 +26,12 @@ interface Iab {
     suspend fun isUserPremium(): Boolean
     suspend fun isUserPro(): Boolean
     fun updateIAPStatusIfNeeded()
+    suspend fun fetchPricing(): Pricing
     suspend fun launchPremiumSubscriptionFlow(activity: Activity): PurchaseFlowResult
     suspend fun launchProSubscriptionFlow(activity: Activity): PurchaseFlowResult
 }
+
+data class Pricing(val premiumPricing: String, val proPricing: String)
 
 sealed class PurchaseFlowResult {
     data object Cancelled : PurchaseFlowResult()

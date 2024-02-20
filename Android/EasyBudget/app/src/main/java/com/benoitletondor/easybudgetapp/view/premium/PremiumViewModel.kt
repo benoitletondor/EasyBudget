@@ -23,12 +23,20 @@ import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.iab.PremiumCheckStatus
+import com.benoitletondor.easybudgetapp.iab.Pricing
 import com.benoitletondor.easybudgetapp.iab.PurchaseFlowResult
 import com.benoitletondor.easybudgetapp.iab.PurchaseType
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -36,16 +44,32 @@ import javax.inject.Inject
 class PremiumViewModel @Inject constructor(
     private val iab: Iab,
 ) : ViewModel() {
-    val userSubscriptionStatus: Flow<SubscriptionStatus> = iab.iabStatusFlow
-        .map { iabStatus ->
-            return@map when(iabStatus) {
-                PremiumCheckStatus.INITIALIZING, PremiumCheckStatus.CHECKING -> SubscriptionStatus.Verifying
-                PremiumCheckStatus.ERROR -> SubscriptionStatus.Error
-                PremiumCheckStatus.NOT_PREMIUM -> SubscriptionStatus.NotSubscribed
-                PremiumCheckStatus.LEGACY_PREMIUM,
-                PremiumCheckStatus.PREMIUM_SUBSCRIBED -> SubscriptionStatus.PremiumSubscribed
-                PremiumCheckStatus.PRO_SUBSCRIBED -> SubscriptionStatus.ProSubscribed
-            }
+    private val errorRetryMutableSharedFlow = MutableSharedFlow<Unit>()
+
+    private val eventMutableSharedFlow = MutableSharedFlow<Event>()
+    val eventFlow: Flow<Event> = eventMutableSharedFlow
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val userSubscriptionStatus: Flow<SubscriptionStatus> = flow { emit(iab.fetchPricing()) }
+        .flatMapLatest { pricing ->
+            iab.iabStatusFlow
+                .map { iabStatus ->
+                    return@map when(iabStatus) {
+                        PremiumCheckStatus.INITIALIZING, PremiumCheckStatus.CHECKING -> SubscriptionStatus.Verifying
+                        PremiumCheckStatus.ERROR -> SubscriptionStatus.Error
+                        PremiumCheckStatus.NOT_PREMIUM -> SubscriptionStatus.NotSubscribed(pricing)
+                        PremiumCheckStatus.LEGACY_PREMIUM,
+                        PremiumCheckStatus.PREMIUM_SUBSCRIBED -> SubscriptionStatus.PremiumSubscribed(pricing)
+                        PremiumCheckStatus.PRO_SUBSCRIBED -> SubscriptionStatus.ProSubscribed(pricing)
+                    }
+                } }
+        .retryWhen { cause, _ ->
+            Logger.error("Error while fetching subscription pricing", cause)
+            emit(SubscriptionStatus.Error)
+
+            errorRetryMutableSharedFlow.first()
+
+            true
         }
 
     private val premiumPurchaseStatusMutableFlow = MutableStateFlow(PurchaseFlowStatus.NOT_STARTED)
@@ -59,6 +83,18 @@ class PremiumViewModel @Inject constructor(
 
     private val proPurchaseEventMutableFlow = MutableLiveFlow<PurchaseFlowResult>()
     val proPurchaseEventFlow: Flow<PurchaseFlowResult> = proPurchaseEventMutableFlow
+
+    fun onRetryButtonPressed() {
+        viewModelScope.launch {
+            errorRetryMutableSharedFlow.emit(Unit)
+        }
+    }
+
+    fun onCloseButtonPressed() {
+        viewModelScope.launch {
+            eventMutableSharedFlow.emit(Event.Finish)
+        }
+    }
 
     fun onBuyPremiumClicked(activity: Activity) {
         premiumPurchaseStatusMutableFlow.value = PurchaseFlowStatus.LOADING
@@ -117,9 +153,17 @@ class PremiumViewModel @Inject constructor(
     sealed class SubscriptionStatus {
         data object Verifying : SubscriptionStatus()
         data object Error : SubscriptionStatus()
-        data object NotSubscribed : SubscriptionStatus()
-        data object PremiumSubscribed : SubscriptionStatus()
-        data object ProSubscribed : SubscriptionStatus()
+        data class NotSubscribed(override val pricing: Pricing) : SubscriptionStatus(), WithPricing
+        data class PremiumSubscribed(override val pricing: Pricing) : SubscriptionStatus(), WithPricing
+        data class ProSubscribed(override val pricing: Pricing) : SubscriptionStatus(), WithPricing
+    }
+
+    sealed interface WithPricing {
+        val pricing: Pricing
+    }
+
+    sealed class Event {
+        data object Finish : Event()
     }
 }
 

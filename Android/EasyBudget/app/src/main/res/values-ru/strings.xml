@@ -228,6 +228,10 @@
     <string name="premium_popup_become_not_now">Не сейчас</string>
     <string name="premium_popup_become_not_ask_again">Не спрашивать в дальнейшем</string>
     <string name="premium_settings_coming_soon">Вскоре…</string>
+    <string name="premium_screen_pricing_disclaimer">%s/месяц, отмените в любое время.</string>
+    <string name="premium_screen_error_loading_title">Ой</string>
+    <string name="premium_screen_error_loading_message">Невозможно получить доступ к PlayStore для получения данных Premium и Pro. Пожалуйста, проверьте свою сеть и повторите попытку.</string>
+    <string name="premium_screen_error_close_cta">Закрыть</string>
 
     <string name="iab_purchase_success_title">Спасибо</string>
     <string name="iab_purchase_success_message">Большое спасибо за вашу поддержку! Теперь вы можете наслаждаться разблокированными функциями.</string>

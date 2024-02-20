@@ -37,6 +37,7 @@ import com.benoitletondor.easybudgetapp.helper.setStatusBarColor
 import com.benoitletondor.easybudgetapp.iab.PurchaseFlowResult
 import com.benoitletondor.easybudgetapp.theme.AppTheme
 import com.benoitletondor.easybudgetapp.theme.easyBudgetGreenColor
+import com.benoitletondor.easybudgetapp.view.premium.view.ErrorView
 import com.benoitletondor.easybudgetapp.view.premium.view.LoadingView
 import com.benoitletondor.easybudgetapp.view.premium.view.SubscribeView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -63,18 +64,13 @@ class PremiumActivity : AppCompatActivity() {
                 ) {
                     val state by viewModel.userSubscriptionStatus.collectAsState(PremiumViewModel.SubscriptionStatus.Verifying)
 
-                    when (state) {
-                        PremiumViewModel.SubscriptionStatus.Error,
-                        PremiumViewModel.SubscriptionStatus.NotSubscribed,
-                        PremiumViewModel.SubscriptionStatus.PremiumSubscribed,
-                        PremiumViewModel.SubscriptionStatus.ProSubscribed -> SubscribeView(
-                            viewModel,
+                    when (val currentState = state) {
+                        is PremiumViewModel.WithPricing -> SubscribeView(
+                            currentState.pricing,
                             showProByDefault = intent.getBooleanExtra(EXTRA_SHOW_PRO, false),
-                            premiumSubscribed = state == PremiumViewModel.SubscriptionStatus.PremiumSubscribed || state == PremiumViewModel.SubscriptionStatus.ProSubscribed,
-                            proSubscribed = state == PremiumViewModel.SubscriptionStatus.ProSubscribed,
-                            onCancelButtonClicked = {
-                                finish()
-                            },
+                            premiumSubscribed = currentState is PremiumViewModel.SubscriptionStatus.PremiumSubscribed || currentState is PremiumViewModel.SubscriptionStatus.ProSubscribed,
+                            proSubscribed = currentState is PremiumViewModel.SubscriptionStatus.ProSubscribed,
+                            onCancelButtonClicked = this@PremiumActivity::finish,
                             onBuyPremiumButtonClicked = {
                                 viewModel.onBuyPremiumClicked(this@PremiumActivity)
                             },
@@ -84,6 +80,10 @@ class PremiumActivity : AppCompatActivity() {
                         )
 
                         PremiumViewModel.SubscriptionStatus.Verifying -> LoadingView()
+                        PremiumViewModel.SubscriptionStatus.Error -> ErrorView(
+                            onRetryButtonPressed = viewModel::onRetryButtonPressed,
+                            onCloseButtonPressed = viewModel::onCloseButtonPressed,
+                        )
                     }
                 }
             }
@@ -131,6 +131,12 @@ class PremiumActivity : AppCompatActivity() {
                     setResult(Activity.RESULT_OK)
                     finish()
                 }
+            }
+        }
+
+        lifecycleScope.launchCollect(viewModel.eventFlow) { event ->
+            when(event) {
+                PremiumViewModel.Event.Finish -> finish()
             }
         }
     }

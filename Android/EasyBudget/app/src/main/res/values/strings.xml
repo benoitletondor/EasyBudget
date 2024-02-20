@@ -241,6 +241,10 @@
     <string name="premium_popup_become_go_back">Back</string>
     <string name="premium_popup_become_not_ask_again">Don\'t ask me again</string>
     <string name="premium_settings_coming_soon">Coming soon…</string>
+    <string name="premium_screen_pricing_disclaimer">%s/month, cancel any time.</string>
+    <string name="premium_screen_error_loading_title">Oops</string>
+    <string name="premium_screen_error_loading_message">Unable to reach the PlayStore to fetch the Premium and Pro data. Please check your network and try again.</string>
+    <string name="premium_screen_error_close_cta">Close</string>
 
     <string name="iab_purchase_success_title">Thank you</string>
     <string name="iab_purchase_success_message">Thank you so much for your support! You can now enjoy the unlocked features.</string>
