@@ -227,6 +227,10 @@
     <string name="premium_popup_become_not_now">Agora não</string>
     <string name="premium_popup_become_not_ask_again">Não perguntar novamente</string>
     <string name="premium_settings_coming_soon">Em breve…</string>
+    <string name="premium_screen_pricing_disclaimer">%s/mês, cancele a qualquer momento.</string>
+    <string name="premium_screen_error_loading_title">Ops</string>
+    <string name="premium_screen_error_loading_message">Não foi possível acessar a PlayStore para buscar os dados Premium e Pro. Verifique sua rede e tente novamente.</string>
+    <string name="premium_screen_error_close_cta">Fechar</string>
 
     <string name="iab_purchase_success_title">Obrigado</string>
     <string name="iab_purchase_success_message">Muito obrigado pelo seu apoio! Agora você pode aproveitar os recursos desbloqueados.</string>

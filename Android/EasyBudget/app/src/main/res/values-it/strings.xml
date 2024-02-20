@@ -227,6 +227,10 @@
     <string name="premium_popup_become_not_now">Non ora</string>
     <string name="premium_popup_become_not_ask_again">Non chiedermelo più</string>
     <string name="premium_settings_coming_soon">Prossimamente…</string>
+    <string name="premium_screen_pricing_disclaimer">%s/mese, annulla in qualsiasi momento.</string>
+    <string name="premium_screen_error_loading_title">Spiacenti</string>
+    <string name="premium_screen_error_loading_message">Impossibile raggiungere il PlayStore per recuperare i dati Premium e Pro. Controlla la tua rete e riprova.</string>
+    <string name="premium_screen_error_close_cta">Chiudi</string>
 
     <string name="iab_purchase_success_title">Grazie</string>
     <string name="iab_purchase_success_message">Grazie mille per il vostro sostegno! Ora puoi goderti le funzionalità sbloccate.</string>

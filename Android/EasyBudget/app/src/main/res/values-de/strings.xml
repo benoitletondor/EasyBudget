@@ -227,6 +227,10 @@
     <string name="premium_popup_become_not_now">Nicht jetzt</string>
     <string name="premium_popup_become_not_ask_again">Nicht wieder fragen</string>
     <string name="premium_settings_coming_soon">Demnächst…</string>
+    <string name="premium_screen_pricing_disclaimer">%s/Monat, jederzeit kündbar.</string>
+    <string name="premium_screen_error_loading_title">Ups</string>
+    <string name="premium_screen_error_loading_message">Der PlayStore konnte nicht erreicht werden, um die Premium- und Pro-Daten abzurufen. Bitte überprüfen Sie Ihr Netzwerk und versuchen Sie es erneut.</string>
+    <string name="premium_screen_error_close_cta">Schließen</string>
 
     <string name="iab_purchase_success_title">Danke</string>
     <string name="iab_purchase_success_message">Vielen dank für Ihre Hilfe! Sie können jetzt die freigeschalteten Funktionen genießen.</string>

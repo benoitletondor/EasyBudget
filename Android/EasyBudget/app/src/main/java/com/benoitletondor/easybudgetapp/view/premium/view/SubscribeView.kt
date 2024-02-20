@@ -63,6 +63,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.benoitletondor.easybudgetapp.R
+import com.benoitletondor.easybudgetapp.iab.Pricing
 import com.benoitletondor.easybudgetapp.theme.AppTheme
 import com.benoitletondor.easybudgetapp.theme.easyBudgetGreenColor
 import com.benoitletondor.easybudgetapp.theme.easyBudgetGreenDarkColor
@@ -73,26 +74,7 @@ private val starsGreyColor = Color(0xFFD7D7D7)
 
 @Composable
 fun BoxScope.SubscribeView(
-    viewModel: PremiumViewModel,
-    showProByDefault: Boolean,
-    premiumSubscribed: Boolean,
-    proSubscribed: Boolean,
-    onCancelButtonClicked: () -> Unit,
-    onBuyPremiumButtonClicked: () -> Unit,
-    onBuyProButtonClicked: () -> Unit,
-) {
-    SubscribeView(
-        showProByDefault = showProByDefault,
-        premiumSubscribed = premiumSubscribed,
-        proSubscribed = proSubscribed,
-        onCancelButtonClicked = onCancelButtonClicked,
-        onBuyPremiumButtonClicked = onBuyPremiumButtonClicked,
-        onBuyProButtonClicked = onBuyProButtonClicked,
-    )
-}
-
-@Composable
-private fun BoxScope.SubscribeView(
+    pricing: Pricing,
     showProByDefault: Boolean,
     premiumSubscribed: Boolean,
     proSubscribed: Boolean,
@@ -201,8 +183,17 @@ private fun BoxScope.SubscribeView(
 
                         val (x) = dragAmount
                         when {
-                            x < 0 && x < 125 -> { if (selectedIndex == 0) { selectedIndex++ } }
-                            x > 0 && x > 125 -> { if (selectedIndex == 1) { selectedIndex-- } }
+                            x < 0 && x < 125 -> {
+                                if (selectedIndex == 0) {
+                                    selectedIndex++
+                                }
+                            }
+
+                            x > 0 && x > 125 -> {
+                                if (selectedIndex == 1) {
+                                    selectedIndex--
+                                }
+                            }
                         }
                     }
                 }
@@ -217,7 +208,7 @@ private fun BoxScope.SubscribeView(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
+                .padding(bottom = 6.dp, start = 16.dp, end = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Button(
@@ -269,8 +260,24 @@ private fun BoxScope.SubscribeView(
                         fontSize = 18.sp,
                     )
                 }
+
+                Spacer(modifier = Modifier.width(16.dp))
             }
         }
+
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp)
+                .padding(bottom = 6.dp),
+            text = stringResource(
+                id = R.string.premium_screen_pricing_disclaimer,
+                if (selectedIndex == 0) pricing.premiumPricing else pricing.proPricing
+            ),
+            color = Color.White,
+            fontSize = 13.sp,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 
@@ -478,6 +485,11 @@ private fun ColumnScope.ProSubscriptionView(proSubscribed: Boolean) {
     }
 }
 
+private val stubPricing = Pricing(
+    premiumPricing = "$2",
+    proPricing = "$5",
+)
+
 @Composable
 @Preview(showSystemUi = true)
 private fun SubscribeToPremiumPreview() {
@@ -489,6 +501,7 @@ private fun SubscribeToPremiumPreview() {
                 .fillMaxHeight()
         ) {
             SubscribeView(
+                pricing = stubPricing,
                 showProByDefault = false,
                 premiumSubscribed = false,
                 proSubscribed = false,
@@ -511,6 +524,7 @@ private fun PremiumSubscribedPreview() {
                 .fillMaxHeight()
         ) {
             SubscribeView(
+                pricing = stubPricing,
                 showProByDefault = false,
                 premiumSubscribed = true,
                 proSubscribed = false,
@@ -533,6 +547,7 @@ private fun ProSubscribedPreview() {
                 .fillMaxHeight()
         ) {
             SubscribeView(
+                pricing = stubPricing,
                 showProByDefault = false,
                 premiumSubscribed = true,
                 proSubscribed = true,
