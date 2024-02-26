@@ -138,12 +138,10 @@ fun Activity.setStatusBarColor(@ColorRes colorRes: Int) {
 }
 
 fun Activity.setNavigationBarColor(@ColorRes colorRes: Int) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        var flags = window.decorView.systemUiVisibility
-        flags = flags and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
+    var flags = window.decorView.systemUiVisibility
+    flags = flags and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
 
-        window.decorView.systemUiVisibility = flags
-    }
+    window.decorView.systemUiVisibility = flags
 }
 
 /**

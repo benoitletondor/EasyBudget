@@ -36,10 +36,10 @@ android {
     defaultConfig {
         applicationId = "com.benoitletondor.easybudgetapp"
         compileSdk = 34
-        minSdk = 21
+        minSdk = 23
         targetSdk = 34
-        versionCode = 128
-        versionName = "3.1.9"
+        versionCode = 130
+        versionName = "3.1.10"
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -93,7 +93,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.9"
+        kotlinCompilerExtensionVersion = "1.5.10"
     }
 
     buildFeatures {
@@ -145,8 +145,8 @@ dependencies {
     implementation("androidx.work:work-gcm:2.9.0")
     implementation("com.google.android.play:core:1.10.3")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
 
     implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
     implementation("com.google.firebase:firebase-messaging-ktx")
@@ -156,7 +156,7 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.firebaseui:firebase-ui-auth:8.0.2")
 
-    val composeBom = platform("androidx.compose:compose-bom:2024.02.00")
+    val composeBom = platform("androidx.compose:compose-bom:2024.02.01")
     implementation(composeBom)
     androidTestImplementation(composeBom)
     debugImplementation("androidx.compose.ui:ui-tooling")
@@ -183,7 +183,7 @@ dependencies {
 
     implementation("io.realm.kotlin:library-sync:$realmVersion")
 
-    implementation("com.kizitonwose.calendar:compose:2.5.0-beta01")
+    implementation("com.kizitonwose.calendar:compose:2.5.0")
     implementation("net.sf.biweekly:biweekly:0.6.8")
 
     implementation("net.lingala.zip4j:zip4j:2.11.5")
