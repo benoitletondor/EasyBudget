@@ -32,7 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.launchCollect
-import com.benoitletondor.easybudgetapp.helper.setNavigationBarColor
+import com.benoitletondor.easybudgetapp.helper.setNavigationBarColored
 import com.benoitletondor.easybudgetapp.helper.setStatusBarColor
 import com.benoitletondor.easybudgetapp.iab.PurchaseFlowResult
 import com.benoitletondor.easybudgetapp.theme.AppTheme
@@ -90,7 +90,7 @@ class PremiumActivity : AppCompatActivity() {
         }
 
         setStatusBarColor(R.color.easy_budget_green)
-        setNavigationBarColor(R.color.easy_budget_green)
+        setNavigationBarColored()
 
         collectViewModelEvents()
     }
