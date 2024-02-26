@@ -27,6 +27,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.first
 
 private const val SKU_PREMIUM_LEGACY = "premium"
@@ -101,9 +102,15 @@ class IabImpl(
      * @return true if we could verify that the user is premium, false otherwise
      */
     override suspend fun isUserPremium(): Boolean {
-        iabStatusMutableFlow.first { it.isFinal() }
+        var status = iabStatusMutableFlow.first { it.isFinal() }
 
-        return when(iabStatusMutableFlow.value) {
+        // Try to avoid sending false negative, it seems that it can happen when launching the app
+        if (status === PremiumCheckStatus.NOT_PREMIUM || status === PremiumCheckStatus.ERROR) {
+            delay(250)
+            status = iabStatusMutableFlow.first { it.isFinal() }
+        }
+
+        return when(status) {
             PremiumCheckStatus.INITIALIZING,
             PremiumCheckStatus.CHECKING,
             PremiumCheckStatus.ERROR,
@@ -115,9 +122,15 @@ class IabImpl(
     }
 
     override suspend fun isUserPro(): Boolean {
-        iabStatusMutableFlow.first { it.isFinal() }
+        var status = iabStatusMutableFlow.first { it.isFinal() }
 
-        return when(iabStatusMutableFlow.value) {
+        // Try to avoid sending false negative, it seems that it can happen when launching the app
+        if (status === PremiumCheckStatus.NOT_PREMIUM || status === PremiumCheckStatus.ERROR) {
+            delay(250)
+            status = iabStatusMutableFlow.first { it.isFinal() }
+        }
+
+        return when(status) {
             PremiumCheckStatus.INITIALIZING,
             PremiumCheckStatus.CHECKING,
             PremiumCheckStatus.ERROR,
@@ -215,25 +228,59 @@ class IabImpl(
 
             // Is it a failure?
             if (subscriptionsResult.billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
-                Logger.error("Error while querying iab inventory: " + subscriptionsResult.billingResult.responseCode)
+                Logger.error(
+                    "Error while querying iab inventory: ${subscriptionsResult.billingResult.responseCode}",
+                    Exception("Unable to query subscriptions"),
+                )
                 setIabStatusAndNotify(PremiumCheckStatus.ERROR)
                 return@launch
             }
 
-            val premiumSubscribed = subscriptionsResult.purchasesList.any { it.products.contains(SKU_PREMIUM_SUBSCRIPTION) }
-            val proSubscribed = subscriptionsResult.purchasesList.any { it.products.contains(SKU_PRO_SUBSCRIPTION) }
+            val premiumSubscriptions = subscriptionsResult.purchasesList.filter { it.products.contains(SKU_PREMIUM_SUBSCRIPTION) }
+            val proSubscriptions = subscriptionsResult.purchasesList.filter { it.products.contains(SKU_PRO_SUBSCRIPTION) }
 
-            Logger.debug("iab query inventory was successful: premium subscribed: $premiumSubscribed, pro subscribed: $proSubscribed")
+            Logger.debug("iab query inventory was successful: premium subscribed: ${premiumSubscriptions.isNotEmpty()}, pro subscribed: ${proSubscriptions.isNotEmpty()}")
 
-            if (premiumSubscribed) {
+            if (proSubscriptions.isNotEmpty()) {
+                proSubscriptions
+                    .filter { !it.isAcknowledged }
+                    .forEach { purchase ->
+                        Logger.warning("Found a not ACKed Pro purchase, taking care of it", Exception("Non ACKed Pro purchase"))
+
+                        val ackResult = billingClient.acknowledgePurchase(AcknowledgePurchaseParams.newBuilder().setPurchaseToken(purchase.purchaseToken).build())
+
+                        if( ackResult.responseCode != BillingClient.BillingResponseCode.OK ) {
+                            Logger.error(
+                                "Error while sending ACK for old Pro purchase: ${ackResult.responseCode}: ${ackResult.debugMessage}",
+                                Exception("Pro subscription late ACK error"),
+                            )
+                        }
+                    }
+
+                setIabStatusAndNotify(PremiumCheckStatus.PRO_SUBSCRIBED)
+                return@launch
+            }
+
+            if (premiumSubscriptions.isNotEmpty()) {
+                premiumSubscriptions
+                    .filter { !it.isAcknowledged }
+                    .forEach { purchase ->
+                        Logger.warning("Found a not ACKed premium purchase, taking care of it", Exception("Non ACKed Premium purchase"))
+
+                        val ackResult = billingClient.acknowledgePurchase(AcknowledgePurchaseParams.newBuilder().setPurchaseToken(purchase.purchaseToken).build())
+
+                        if( ackResult.responseCode != BillingClient.BillingResponseCode.OK ) {
+                            Logger.error(
+                                "Error while sending ACK for old Premium purchase: ${ackResult.responseCode}: ${ackResult.debugMessage}",
+                                Exception("Premium subscription late ACK error"),
+                            )
+                        }
+                    }
+
                 setIabStatusAndNotify(PremiumCheckStatus.PREMIUM_SUBSCRIBED)
                 return@launch
             }
 
-            if (proSubscribed) {
-                setIabStatusAndNotify(PremiumCheckStatus.PRO_SUBSCRIBED)
-                return@launch
-            }
 
             val legacyPremiumResult = billingClient.queryPurchasesAsync(
                 QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP).build(),
@@ -241,7 +288,10 @@ class IabImpl(
 
             // Is it a failure?
             if (legacyPremiumResult.billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
-                Logger.error("Error while querying iab inventory: " + legacyPremiumResult.billingResult.responseCode)
+                Logger.error(
+                    "Error while querying iab inventory: ${legacyPremiumResult.billingResult.responseCode}: ${legacyPremiumResult.billingResult.debugMessage}",
+                    Exception("Unable to query legacy purchase")
+                )
                 setIabStatusAndNotify(PremiumCheckStatus.ERROR)
                 return@launch
             }
@@ -377,13 +427,19 @@ class IabImpl(
             )
 
             if (subscriptionsResult.billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
-                Logger.error("Error while querying iab inventory: " + subscriptionsResult.billingResult.responseCode)
+                Logger.error(
+                    "Error while querying iab inventory: ${subscriptionsResult.billingResult.responseCode}: ${subscriptionsResult.billingResult.debugMessage}",
+                    Exception("Unable to query current subscriptions for upgrade"),
+                )
                 return PurchaseFlowResult.Error("Unable to fetch content from PlayStore (premium subscription fetch response code: ${subscriptionsResult.billingResult.responseCode}). Please restart the app and try again")
             }
 
             val premiumSubscription = subscriptionsResult.purchasesList.firstOrNull { it.products.contains(SKU_PREMIUM_SUBSCRIPTION) }
             if (premiumSubscription == null) {
-                Logger.error("Unable to find premium subscription")
+                Logger.error(
+                    "Unable to find premium subscription",
+                    Exception("Unable to find premium subscription to upgrade")
+                )
                 return PurchaseFlowResult.Error("Unable to find your premium subscription. Please restart the app and try again")
             }
 
@@ -420,7 +476,10 @@ class IabImpl(
 
         if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
             setIabStatusAndNotify(PremiumCheckStatus.ERROR)
-            Logger.error("Error while setting-up iab: " + billingResult.responseCode)
+            Logger.error(
+                "Error while setting-up iab: ${billingResult.responseCode}: ${billingResult.debugMessage}",
+                Exception("Unable to setup IAB"),
+            )
             return
         }
 
@@ -444,10 +503,18 @@ class IabImpl(
 
         scope.launch {
             if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
-                Logger.error("Error while purchasing premium: " + billingResult.responseCode)
                 when (billingResult.responseCode) {
-                    BillingClient.BillingResponseCode.USER_CANCELED -> pendingPurchaseEventMutableFlow.emit(PurchaseFlowResult.Cancelled)
-                    else -> pendingPurchaseEventMutableFlow.emit(PurchaseFlowResult.Error("An error occurred (status code: " + billingResult.responseCode + ")"))
+                    BillingClient.BillingResponseCode.USER_CANCELED -> {
+                        Logger.debug("Purchase cancelled")
+                        pendingPurchaseEventMutableFlow.emit(PurchaseFlowResult.Cancelled)
+                    }
+                    else -> {
+                        Logger.error(
+                            "Error while purchasing: ${billingResult.responseCode}: ${billingResult.debugMessage}",
+                            Exception("Error while purchasing")
+                        )
+                        pendingPurchaseEventMutableFlow.emit(PurchaseFlowResult.Error("An error occurred (status code: " + billingResult.responseCode + ")"))
+                    }
                 }
 
                 return@launch
