@@ -36,10 +36,10 @@ android {
     defaultConfig {
         applicationId = "com.benoitletondor.easybudgetapp"
         compileSdk = 34
-        minSdk = 21
+        minSdk = 23
         targetSdk = 34
-        versionCode = 128
-        versionName = "3.1.9"
+        versionCode = 130
+        versionName = "3.1.10"
         vectorDrawables.useSupportLibrary = true
     }
 
