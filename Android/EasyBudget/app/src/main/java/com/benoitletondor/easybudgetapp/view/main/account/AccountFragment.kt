@@ -57,7 +57,7 @@ import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.getLowMoneyWarningAmount
-import com.benoitletondor.easybudgetapp.theme.AppTheme
+import com.benoitletondor.easybudgetapp.ui.AppTheme
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
@@ -158,9 +158,9 @@ class AccountFragment : Fragment(), MenuProvider {
         }
 
         // Remove back to today button if needed
-        if (!viewModel.showGoToCurrentMonthButtonStateFlow.value) {
+        /*if (!viewModel.showGoToCurrentMonthButtonStateFlow.value) {
             menu.removeItem(R.id.action_go_to_current_month)
-        }
+        }*/
 
         // Remove manage account if needed
         if (!viewModel.showManageAccountMenuItem.value) {
@@ -464,9 +464,9 @@ class AccountFragment : Fragment(), MenuProvider {
                 .show()
         }
 
-        viewLifecycleScope.launchCollect(viewModel.showGoToCurrentMonthButtonStateFlow) {
+        /*viewLifecycleScope.launchCollect(viewModel.showGoToCurrentMonthButtonStateFlow) {
             invalidateOptionsMenu(requireActivity())
-        }
+        }*/
 
         viewLifecycleScope.launchCollect(viewModel.showManageAccountMenuItem) {
             invalidateOptionsMenu(requireActivity())

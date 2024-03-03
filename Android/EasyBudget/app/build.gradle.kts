@@ -127,6 +127,7 @@ dependencies {
     val realmVersion: String by rootProject.extra
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
@@ -165,6 +166,7 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.activity:activity-compose:1.8.2")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("com.google.accompanist:accompanist-themeadapter-material3:0.34.0")
 
     implementation("com.android.billingclient:billing-ktx:6.1.0")
@@ -173,8 +175,9 @@ dependencies {
     implementation("com.batch.android:batch-sdk:1.21.1")
 
     implementation("com.google.dagger:hilt-android:$hiltVersion")
-    implementation("androidx.hilt:hilt-work:1.1.0")
-    ksp("androidx.hilt:hilt-compiler:1.1.0")
+    implementation("androidx.hilt:hilt-work:1.2.0")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    ksp("androidx.hilt:hilt-compiler:1.2.0")
     ksp("com.google.dagger:hilt-compiler:$hiltVersion")
 
     ksp("androidx.room:room-compiler:2.6.1")

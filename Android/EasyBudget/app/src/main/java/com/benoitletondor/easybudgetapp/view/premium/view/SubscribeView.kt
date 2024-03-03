@@ -64,10 +64,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.iab.Pricing
-import com.benoitletondor.easybudgetapp.theme.AppTheme
-import com.benoitletondor.easybudgetapp.theme.easyBudgetGreenColor
-import com.benoitletondor.easybudgetapp.theme.easyBudgetGreenDarkColor
-import com.benoitletondor.easybudgetapp.view.premium.PremiumViewModel
+import com.benoitletondor.easybudgetapp.ui.AppTheme
+import com.benoitletondor.easybudgetapp.ui.easyBudgetGreenColor
+import com.benoitletondor.easybudgetapp.ui.easyBudgetGreenDarkColor
 
 private val starsYellowColor = Color(0xFFFEE101)
 private val starsGreyColor = Color(0xFFD7D7D7)

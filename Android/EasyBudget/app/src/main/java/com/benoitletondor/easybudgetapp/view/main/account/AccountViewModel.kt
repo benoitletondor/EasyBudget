@@ -37,6 +37,9 @@ import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.watchShouldShowCheckedBalance
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import com.benoitletondor.easybudgetapp.view.main.account.AccountFragment.Companion.ARG_SELECTED_ACCOUNT
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.realm.kotlin.mongodb.exceptions.InvalidCredentialsException
@@ -62,22 +65,25 @@ import java.time.LocalDate
 import java.time.YearMonth
 import javax.inject.Inject
 
-@HiltViewModel
-class AccountViewModel @Inject constructor(
-    private val parameters: Parameters,
+@HiltViewModel(assistedFactory = AccountViewModel.AccountViewModelFactory::class)
+class AccountViewModel @AssistedInject constructor(
+    val parameters: Parameters,
     private val iab: Iab,
     private val auth: Auth,
-    savedStateHandle: SavedStateHandle,
+    @Assisted private val account: MainViewModel.SelectedAccount.Selected,
+    @Assisted private val showGoToCurrentMonthStateFlow: MutableStateFlow<Boolean>,
     @ApplicationContext private val appContext: Context,
 ): ViewModel() {
-    private val account = savedStateHandle.get<MainViewModel.SelectedAccount.Selected>(ARG_SELECTED_ACCOUNT)
-        ?: throw IllegalStateException("No ARG_SELECTED_ACCOUNT arg")
 
     private val dbAvailableMutableStateFlow = MutableStateFlow<DBState>(DBState.Loading)
     val dbAvailableFlow: StateFlow<DBState> = dbAvailableMutableStateFlow
 
     val premiumStatusFlow: StateFlow<PremiumCheckStatus> = iab.iabStatusFlow
         .stateIn(viewModelScope, SharingStarted.Eagerly, PremiumCheckStatus.INITIALIZING)
+
+    init {
+        showGoToCurrentMonthStateFlow.value = false
+    }
 
     val shouldShowPremiumRelatedButtons: Boolean get() = when(iab.iabStatusFlow.value) {
         PremiumCheckStatus.INITIALIZING,
@@ -116,9 +122,6 @@ class AccountViewModel @Inject constructor(
 
     private val startCurrentBalanceEditorEventMutableFlow = MutableLiveFlow<Double>()
     val startCurrentBalanceEditorEventFlow: Flow<Double> = startCurrentBalanceEditorEventMutableFlow
-
-    private val showGoToCurrentMonthButtonStateMutableFlow = MutableStateFlow(false)
-    val showGoToCurrentMonthButtonStateFlow: StateFlow<Boolean> = showGoToCurrentMonthButtonStateMutableFlow
 
     private val currentBalanceEditingErrorEventMutableFlow = MutableLiveFlow<Exception>()
     val currentBalanceEditingErrorEventFlow: Flow<Exception> = currentBalanceEditingErrorEventMutableFlow
@@ -556,7 +559,7 @@ class AccountViewModel @Inject constructor(
     }
 
     fun onMonthChanged(yearMonth: YearMonth) {
-        showGoToCurrentMonthButtonStateMutableFlow.value = yearMonth != YearMonth.now()
+        showGoToCurrentMonthStateFlow.value = yearMonth != YearMonth.now()
     }
 
     fun onGoBackToCurrentMonthButtonPressed() {
@@ -617,6 +620,14 @@ class AccountViewModel @Inject constructor(
         private var currentDBRef: WeakReference<DB>? = null
 
         fun getCurrentDB(): DB? = currentDBRef?.get()
+    }
+
+    @AssistedFactory
+    interface AccountViewModelFactory {
+        fun create(
+            account: MainViewModel.SelectedAccount.Selected,
+            showGoToCurrentMonthStateFlow: MutableStateFlow<Boolean>,
+        ): AccountViewModel
     }
 }
 
