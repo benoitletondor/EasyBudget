@@ -271,7 +271,10 @@ class RecurringExpenseEntity() : RealmObject {
                 continue
             }
 
-            cal.addExceptionFromExpense(expense.copy(checked = true), expense.date)
+            cal.addExceptionFromExpense(
+                expense = expense.copy(checked = true),
+                originalOccurrenceDate = expense.associatedRecurringExpense?.originalDate ?: expense.date,
+            )
         }
 
         iCalRepresentation = cal.write()
