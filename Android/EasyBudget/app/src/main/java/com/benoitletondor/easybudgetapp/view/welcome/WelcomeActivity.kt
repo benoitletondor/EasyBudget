@@ -32,6 +32,7 @@ import android.view.ViewAnimationUtils
 
 import com.benoitletondor.easybudgetapp.databinding.ActivityWelcomeBinding
 import com.benoitletondor.easybudgetapp.helper.BaseActivity
+import com.benoitletondor.easybudgetapp.helper.setNavigationBarColored
 import com.benoitletondor.easybudgetapp.helper.setStatusBarColor
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import dagger.hilt.android.AndroidEntryPoint
@@ -165,10 +166,7 @@ class WelcomeActivity : BaseActivity<ActivityWelcomeBinding>() {
             setStatusBarColor(fragment.statusBarColor)
         }
 
-        var flags = window.decorView.systemUiVisibility
-        flags = flags and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
-
-        window.decorView.systemUiVisibility = flags
+        setNavigationBarColored()
     }
 
     override fun onDestroy() {

@@ -26,7 +26,7 @@ interface Iab {
     suspend fun isUserPremium(): Boolean
     suspend fun isUserPro(): Boolean
     fun updateIAPStatusIfNeeded()
-    suspend fun fetchPricing(): Pricing
+    suspend fun fetchPricingOrDefault(): Pricing
     suspend fun launchPremiumSubscriptionFlow(activity: Activity): PurchaseFlowResult
     suspend fun launchProSubscriptionFlow(activity: Activity): PurchaseFlowResult
 }

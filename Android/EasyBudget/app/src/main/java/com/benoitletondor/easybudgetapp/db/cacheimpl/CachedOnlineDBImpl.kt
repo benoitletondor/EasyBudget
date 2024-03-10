@@ -18,11 +18,16 @@ package com.benoitletondor.easybudgetapp.db.cacheimpl
 
 import com.benoitletondor.easybudgetapp.db.onlineimpl.Account
 import com.benoitletondor.easybudgetapp.db.onlineimpl.OnlineDB
+import com.benoitletondor.easybudgetapp.helper.Logger
+import com.benoitletondor.easybudgetapp.model.DataForMonth
 import kotlinx.coroutines.cancel
+import java.time.YearMonth
 
 class CachedOnlineDBImpl(
     private val wrappedDB: OnlineDB,
 ) : OnlineDB, CachedDBImpl(wrappedDB) {
+    private var isClosed = false
+
     override val account: Account
         get() = wrappedDB.account
 
@@ -30,7 +35,17 @@ class CachedOnlineDBImpl(
         wrappedDB.deleteAllEntries()
     }
 
+    override suspend fun getDataForMonth(yearMonth: YearMonth): DataForMonth {
+        if (isClosed) {
+            Logger.error("Trying to access closed online DB for account: ${account.id}", IllegalStateException("DB is closed"))
+            return DataForMonth(yearMonth, emptyMap())
+        }
+
+        return super.getDataForMonth(yearMonth)
+    }
+
     override fun close() {
+        isClosed = true
         cancel()
         wrappedDB.close()
     }

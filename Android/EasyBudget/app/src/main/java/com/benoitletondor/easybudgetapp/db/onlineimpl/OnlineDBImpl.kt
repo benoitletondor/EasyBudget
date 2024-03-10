@@ -136,7 +136,9 @@ class OnlineDBImpl(
                 .filter { it is UpdatedRealm }
                 .debounce(500)
                 .collect {
-                    onChangeMutableFlow.emit(Unit)
+                    if (!realm.isClosed()) {
+                        onChangeMutableFlow.emit(Unit)
+                    }
                 }
         }
     }
