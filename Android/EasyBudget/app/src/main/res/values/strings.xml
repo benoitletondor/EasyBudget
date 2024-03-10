@@ -490,6 +490,9 @@
     <string name="calendar_month_loading_error_title">Unable to load data</string>
     <string name="calendar_month_loading_error_description">An error occurred while loading calendar data. Please try again.\n(%s)</string>
 
+    <string name="premium_subscription_price">$1.99</string>
+    <string name="pro_subscription_price">$4.99</string>
+
     <!-- Keys, not for translations. -->
     <string name="setting_category_bug_report_send_button_key" translatable="false">send_bug_report</string>
     <string name="setting_category_show_welcome_screen_button_key" translatable="false">show_welcome_screen</string>

@@ -50,7 +50,7 @@ class PremiumViewModel @Inject constructor(
     val eventFlow: Flow<Event> = eventMutableSharedFlow
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val userSubscriptionStatus: Flow<SubscriptionStatus> = flow { emit(iab.fetchPricing()) }
+    val userSubscriptionStatus: Flow<SubscriptionStatus> = flow { emit(iab.fetchPricingOrDefault()) }
         .flatMapLatest { pricing ->
             iab.iabStatusFlow
                 .map { iabStatus ->

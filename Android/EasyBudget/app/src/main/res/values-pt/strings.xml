@@ -463,4 +463,6 @@
     <string name="premium_popup_become_go_back">Voltar</string>
     <string name="calendar_month_loading_error_title">Não foi possível carregar os dados</string>
     <string name="calendar_month_loading_error_description">Ocorreu um erro ao carregar os dados do calendário. Por favor, tente novamente.\n(%s)</string>
+    <string name="premium_subscription_price">1,99€</string>
+    <string name="pro_subscription_price">4,99€</string>
 </resources>

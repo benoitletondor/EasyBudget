@@ -22,6 +22,7 @@ import android.content.Intent
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.android.billingclient.api.*
 import com.android.billingclient.api.BillingFlowParams.SubscriptionUpdateParams
+import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.Logger
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -161,62 +162,74 @@ class IabImpl(
         }
     }
 
-    override suspend fun fetchPricing(): Pricing {
-        if(iabStatusMutableFlow.value == PremiumCheckStatus.INITIALIZING || iabStatusMutableFlow.value == PremiumCheckStatus.ERROR) {
-            throw IllegalStateException("IAB is not setup")
+    override suspend fun fetchPricingOrDefault(): Pricing {
+        try {
+            if(iabStatusMutableFlow.value == PremiumCheckStatus.INITIALIZING || iabStatusMutableFlow.value == PremiumCheckStatus.ERROR) {
+                throw IllegalStateException("IAB is not setup")
+            }
+
+            val skuList = listOf(
+                SKU_PREMIUM_SUBSCRIPTION,
+                SKU_PRO_SUBSCRIPTION,
+            )
+
+            val productList = skuList.map { productId ->
+                QueryProductDetailsParams.Product
+                    .newBuilder()
+                    .setProductId(productId)
+                    .setProductType(BillingClient.ProductType.SUBS)
+                    .build()
+            }
+
+            val (billingResult, skuDetailsList) = billingClient.queryProductDetails(
+                QueryProductDetailsParams.newBuilder()
+                    .setProductList(productList)
+                    .build()
+            )
+
+            if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
+                throw IllegalStateException("Unable to connect to reach PlayStore (response code: " + billingResult.responseCode + "). Please restart the app and try again")
+            }
+
+            if(skuDetailsList == null) {
+                throw IllegalStateException("Unable to get details from PlayStore. Please restart the app and try again")
+            }
+
+            val premiumSubscriptionPrice = skuDetailsList
+                .first { it.productId == SKU_PREMIUM_SUBSCRIPTION }
+                .subscriptionOfferDetails
+                ?.first()
+                ?.pricingPhases
+                ?.pricingPhaseList
+                ?.first()
+                ?.formattedPrice
+                ?: throw IllegalArgumentException("No price for premium subscription")
+
+            val proSubscriptionPrice = skuDetailsList
+                .first { it.productId == SKU_PRO_SUBSCRIPTION }
+                .subscriptionOfferDetails
+                ?.first()
+                ?.pricingPhases
+                ?.pricingPhaseList
+                ?.first()
+                ?.formattedPrice
+                ?: throw IllegalArgumentException("No price for pro subscription")
+
+            return Pricing(
+                premiumPricing = premiumSubscriptionPrice,
+                proPricing = proSubscriptionPrice,
+            )
+        } catch (e: Exception) {
+            if (e is CancellationException) throw e
+
+            Logger.error("Error while fetching pricing, returning default", e)
+
+            return Pricing(
+                premiumPricing = appContext.getString(R.string.premium_subscription_price),
+                proPricing = appContext.getString(R.string.pro_subscription_price),
+            )
         }
 
-        val skuList = listOf(
-            SKU_PREMIUM_SUBSCRIPTION,
-            SKU_PRO_SUBSCRIPTION,
-        )
-
-        val productList = skuList.map { productId ->
-            QueryProductDetailsParams.Product
-                .newBuilder()
-                .setProductId(productId)
-                .setProductType(BillingClient.ProductType.SUBS)
-                .build()
-        }
-
-        val (billingResult, skuDetailsList) = billingClient.queryProductDetails(
-            QueryProductDetailsParams.newBuilder()
-                .setProductList(productList)
-                .build()
-        )
-
-        if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
-            throw IllegalStateException("Unable to connect to reach PlayStore (response code: " + billingResult.responseCode + "). Please restart the app and try again")
-        }
-
-        if(skuDetailsList == null) {
-            throw IllegalStateException("Unable to get details from PlayStore. Please restart the app and try again")
-        }
-
-        val premiumSubscriptionPrice = skuDetailsList
-            .first { it.productId == SKU_PREMIUM_SUBSCRIPTION }
-            .subscriptionOfferDetails
-            ?.first()
-            ?.pricingPhases
-            ?.pricingPhaseList
-            ?.first()
-            ?.formattedPrice
-            ?: throw IllegalArgumentException("No price for premium subscription")
-
-        val proSubscriptionPrice = skuDetailsList
-            .first { it.productId == SKU_PRO_SUBSCRIPTION }
-            .subscriptionOfferDetails
-            ?.first()
-            ?.pricingPhases
-            ?.pricingPhaseList
-            ?.first()
-            ?.formattedPrice
-            ?: throw IllegalArgumentException("No price for pro subscription")
-
-        return Pricing(
-            premiumPricing = premiumSubscriptionPrice,
-            proPricing = proSubscriptionPrice,
-        )
     }
 
     private fun queryPurchases() {
