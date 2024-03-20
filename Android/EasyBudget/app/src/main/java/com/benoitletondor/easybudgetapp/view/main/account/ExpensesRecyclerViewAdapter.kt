@@ -29,9 +29,9 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
+import com.benoitletondor.easybudgetapp.helper.toFormattedString
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType
-import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
@@ -97,18 +97,7 @@ class ExpensesRecyclerViewAdapter(
         viewHolder.checkedCheckBox.isChecked = expense.checked
 
         if (expense.isRecurring()) {
-            when (expense.associatedRecurringExpense!!.recurringExpense.type) {
-                RecurringExpenseType.DAILY -> viewHolder.recurringIndicatorTextview.text = viewHolder.view.context.getString(R.string.daily)
-                RecurringExpenseType.WEEKLY -> viewHolder.recurringIndicatorTextview.text = viewHolder.view.context.getString(R.string.weekly)
-                RecurringExpenseType.BI_WEEKLY -> viewHolder.recurringIndicatorTextview.text = viewHolder.view.context.getString(R.string.bi_weekly)
-                RecurringExpenseType.TER_WEEKLY -> viewHolder.recurringIndicatorTextview.text = viewHolder.view.context.getString(R.string.ter_weekly)
-                RecurringExpenseType.FOUR_WEEKLY -> viewHolder.recurringIndicatorTextview.text = viewHolder.view.context.getString(R.string.four_weekly)
-                RecurringExpenseType.MONTHLY -> viewHolder.recurringIndicatorTextview.text = viewHolder.view.context.getString(R.string.monthly)
-                RecurringExpenseType.BI_MONTHLY -> viewHolder.recurringIndicatorTextview.text = viewHolder.view.context.getString(R.string.bi_monthly)
-                RecurringExpenseType.TER_MONTHLY -> viewHolder.recurringIndicatorTextview.text = viewHolder.view.context.getString(R.string.ter_monthly)
-                RecurringExpenseType.SIX_MONTHLY -> viewHolder.recurringIndicatorTextview.text = viewHolder.view.context.getString(R.string.six_monthly)
-                RecurringExpenseType.YEARLY -> viewHolder.recurringIndicatorTextview.text = viewHolder.view.context.getString(R.string.yearly)
-            }
+            viewHolder.recurringIndicatorTextview.text = expense.associatedRecurringExpense!!.recurringExpense.type.toFormattedString(viewHolder.view.context)
         }
 
         val onClickListener = View.OnClickListener {

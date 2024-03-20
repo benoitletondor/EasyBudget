@@ -231,7 +231,7 @@
     <string name="premium_popup_not_pro_feature2_title">2. Share your accounts</string>
     <string name="premium_popup_not_pro_feature2_message">You can invite other pro users to your online accounts so that they can see and add/edit entries.</string>
     <string name="premium_popup_not_pro_feature3_title">3. Export or print your data</string>
-    <string name="premium_popup_not_pro_feature3_message">Export your monthly reports as CSV to use the data on another app or to PDF to print it.</string>
+    <string name="premium_popup_not_pro_feature3_message">Export your monthly reports as CSV to use the data on another app or to print it.</string>
     <string name="premium_popup_buy_cta">Purchase</string>
     <string name="premium_popup_upgrade_cta">Upgrade</string>
     <string name="premium_popup_become_title">Become a premium user</string>
@@ -240,7 +240,6 @@
     <string name="premium_popup_become_not_now">Not now</string>
     <string name="premium_popup_become_go_back">Back</string>
     <string name="premium_popup_become_not_ask_again">Don\'t ask me again</string>
-    <string name="premium_settings_coming_soon">Coming soon…</string>
     <string name="premium_screen_pricing_disclaimer">%s/month, cancel any time.</string>
     <string name="premium_screen_error_loading_title">Oops</string>
     <string name="premium_screen_error_loading_message">Unable to reach the PlayStore to fetch the Premium and Pro data. Please check your network and try again.</string>
@@ -492,6 +491,21 @@
 
     <string name="premium_subscription_price">$1.99</string>
     <string name="pro_subscription_price">$4.99</string>
+
+    <string name="title_activity_monthly_report_export">Export monthly report</string>
+    <string name="action_export">Export as CSV</string>
+    <string name="monthly_report_data_loading_error_title">Unable to load data</string>
+    <string name="monthly_report_data_loading_error_description">An error occurred while preparing the CSV file. Please try again.\n(%s)</string>
+    <string name="monthly_report_data_loading_error_cta">Retry</string>
+    <string name="monthly_report_data_date_row">Date</string>
+    <string name="monthly_report_data_title_row">Title</string>
+    <string name="monthly_report_data_amount_row">Amount</string>
+    <string name="monthly_report_data_checked_row">Checked</string>
+    <string name="monthly_report_data_recurring_row">Recurring</string>
+    <string name="monthly_report_data_open_error_title">Oops</string>
+    <string name="monthly_report_data_open_error_description">Unable to open the CSV with an app on your phone. Make sure you have an app that can open CSV files and try again.</string>
+    <string name="monthly_report_export_data_loaded_title">Your CSV file is ready</string>
+    <string name="monthly_report_export_data_loaded_cta">Export</string>
 
     <!-- Keys, not for translations. -->
     <string name="setting_category_bug_report_send_button_key" translatable="false">send_bug_report</string>

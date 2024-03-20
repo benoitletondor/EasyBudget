@@ -187,4 +187,6 @@ dependencies {
     implementation("net.sf.biweekly:biweekly:0.6.8")
 
     implementation("net.lingala.zip4j:zip4j:2.11.5")
+
+    implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.9.3")
 }

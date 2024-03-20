@@ -20,13 +20,20 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.helper.Logger
+import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
 import com.benoitletondor.easybudgetapp.helper.getListOfMonthsAvailableForUser
+import com.benoitletondor.easybudgetapp.helper.launchCollect
+import com.benoitletondor.easybudgetapp.iab.Iab
+import com.benoitletondor.easybudgetapp.iab.PremiumCheckStatus
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity.Companion.FROM_NOTIFICATION_EXTRA
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.YearMonth
@@ -35,9 +42,15 @@ import javax.inject.Inject
 @HiltViewModel
 class MonthlyReportBaseViewModel @Inject constructor(
     private val parameters: Parameters,
+    private val iab: Iab,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val fromNotification = savedStateHandle.get<Boolean>(FROM_NOTIFICATION_EXTRA) ?: false
+
+    private var isUserPro = false
+
+    private val eventMutableFlow = MutableLiveFlow<Event>()
+    val eventFlow: Flow<Event> = eventMutableFlow
 
     private val stateMutableFlow = MutableStateFlow<State>(State.Loading)
     val stateFlow: Flow<State> = stateMutableFlow
@@ -64,7 +77,19 @@ class MonthlyReportBaseViewModel @Inject constructor(
 
             stateMutableFlow.value = State.Loaded(months, selectedPosition)
         }
+
+        viewModelScope.launch {
+            iab.iabStatusFlow
+                .map { it == PremiumCheckStatus.PRO_SUBSCRIBED }
+                .distinctUntilChanged()
+                .collect { isPro ->
+                    isUserPro = isPro
+                    eventMutableFlow.emit(Event.RefreshMenu)
+                }
+        }
     }
+
+    fun shouldShowExportButton(): Boolean = isUserPro
 
     fun onPreviousMonthButtonClicked() {
         val loadedState = stateMutableFlow.value as? State.Loaded ?: return
@@ -96,9 +121,23 @@ class MonthlyReportBaseViewModel @Inject constructor(
         )
     }
 
+    fun onExportButtonClicked() {
+        val loadedState = stateMutableFlow.value as? State.Loaded ?: return
+
+        val selectedMonth = loadedState.selectedPosition.month
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.OpenExport(selectedMonth))
+        }
+    }
+
     sealed class State {
         data object Loading : State()
         data class Loaded(val months: List<YearMonth>, val selectedPosition: MonthlyReportSelectedPosition) : State()
+    }
+
+    sealed class Event {
+        data object RefreshMenu : Event()
+        data class OpenExport(val month: YearMonth) : Event()
     }
 }
 

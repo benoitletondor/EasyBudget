@@ -17,6 +17,8 @@
 package com.benoitletondor.easybudgetapp.view.report.base
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
@@ -24,14 +26,15 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
+import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.databinding.ActivityMonthlyReportBinding
 import com.benoitletondor.easybudgetapp.helper.BaseActivity
 import com.benoitletondor.easybudgetapp.helper.getMonthTitle
 import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.helper.removeButtonBorder
 import com.benoitletondor.easybudgetapp.view.report.MonthlyReportFragment
+import com.benoitletondor.easybudgetapp.view.report.export.ExportReportActivity
 import dagger.hilt.android.AndroidEntryPoint
-import java.time.LocalDate
 import java.time.YearMonth
 
 /**
@@ -41,6 +44,7 @@ import java.time.YearMonth
  */
 @AndroidEntryPoint
 class MonthlyReportBaseActivity : BaseActivity<ActivityMonthlyReportBinding>(), ViewPager.OnPageChangeListener {
+
     private val viewModel: MonthlyReportBaseViewModel by viewModels()
 
     private var ignoreNextPageSelectedEvent: Boolean = false
@@ -100,6 +104,31 @@ class MonthlyReportBaseActivity : BaseActivity<ActivityMonthlyReportBinding>(), 
                 }
             }
         }
+
+        lifecycleScope.launchCollect(viewModel.eventFlow) { event ->
+            when(event) {
+                is MonthlyReportBaseViewModel.Event.OpenExport -> startActivity(ExportReportActivity.createIntent(this, event.month))
+                MonthlyReportBaseViewModel.Event.RefreshMenu -> invalidateOptionsMenu()
+            }
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater: MenuInflater = menuInflater
+        inflater.inflate(R.menu.menu_monthly_report, menu)
+        return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        if (menu == null) {
+            return false
+        }
+
+        if (!viewModel.shouldShowExportButton()) {
+            menu.removeItem(R.id.action_export)
+        }
+
+        return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -107,6 +136,9 @@ class MonthlyReportBaseActivity : BaseActivity<ActivityMonthlyReportBinding>(), 
 
         if (id == android.R.id.home) {
             finish()
+            return true
+        } else if (id == R.id.action_export) {
+            viewModel.onExportButtonClicked()
             return true
         }
 

@@ -219,14 +219,13 @@
     <string name="premium_popup_not_pro_feature2_title">2. Partagez vos comptes</string>
     <string name="premium_popup_not_pro_feature2_message">Vous pouvez inviter d\'autres utilisateurs Pro sur vos comptes en ligne afin qu\'ils puissent voir et ajouter/modifier des entrées.</string>
     <string name="premium_popup_not_pro_feature3_title">3. Exportez ou imprimez vos données</string>
-    <string name="premium_popup_not_pro_feature3_message">Exportez vos rapports mensuels au format CSV pour utiliser les données sur une autre application ou au format PDF pour les imprimer.</string>
+    <string name="premium_popup_not_pro_feature3_message">Exportez vos rapports mensuels au format CSV pour utiliser les données dans une autre application ou les imprimer.</string>
     <string name="premium_popup_buy_cta">Acheter</string>
     <string name="premium_popup_become_title">Devenez utilisateur premium</string>
     <string name="premium_popup_become_message">On dirait que vous aimez utiliser EasyBudget !\nVoulez vous passer à la vitesse supérieure et découvrir les fonctionnalités premium ?</string>
     <string name="premium_popup_become_cta">Découvrir</string>
     <string name="premium_popup_become_not_now">Pas maintenant</string>
     <string name="premium_popup_become_not_ask_again">Ne plus me demander</string>
-    <string name="premium_settings_coming_soon">À venir…</string>
     <string name="premium_screen_pricing_disclaimer">%s/mois, annulez quand vous voulez.</string>
     <string name="premium_screen_error_loading_title">Oups</string>
     <string name="premium_screen_error_loading_message">Impossible de se connecter au PlayStore pour récupérer les données du mode Premium et Pro. Vérifiez votre connexion et réessayez.</string>
@@ -465,4 +464,18 @@
     <string name="calendar_month_loading_error_description">Une erreur est survenue lors du chargement des données du calendrier. Veuillez réessayer.\n(%s)</string>
     <string name="premium_subscription_price">1,99€</string>
     <string name="pro_subscription_price">4,99€</string>
+    <string name="title_activity_monthly_report_export">Exporter le rapport mensuel</string>
+    <string name="action_export">Exporter au format CSV</string>
+    <string name="monthly_report_data_loading_error_title">Impossible de charger les données</string>
+    <string name="monthly_report_data_loading_error_description">Une erreur s\'est produite lors de la préparation du fichier CSV. Veuillez réessayer.\n(%s)</string>
+    <string name="monthly_report_data_loading_error_cta">Réessayer</string>
+    <string name="monthly_report_data_date_row">Date</string>
+    <string name="monthly_report_data_title_row">Titre</string>
+    <string name="monthly_report_data_amount_row">Montant</string>
+    <string name="monthly_report_data_checked_row">Marqué</string>
+    <string name="monthly_report_data_recurring_row">Récurrent</string>
+    <string name="monthly_report_data_open_error_title">Oups</string>
+    <string name="monthly_report_data_open_error_description">Impossible d\'ouvrir le CSV avec une application sur votre téléphone. Assurez-vous que vous disposez d\'une app capable d\'ouvrir les fichiers CSV et réessayez.</string>
+    <string name="monthly_report_export_data_loaded_title">Votre fichier CSV est prêt</string>
+    <string name="monthly_report_export_data_loaded_cta">Exporter</string>
 </resources>

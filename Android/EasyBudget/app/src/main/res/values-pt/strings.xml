@@ -219,14 +219,13 @@
     <string name="premium_popup_not_pro_feature2_title">2. Compartilhe suas contas</string>
     <string name="premium_popup_not_pro_feature2_message">Você pode convidar outros usuários Pro para suas contas online para que possam ver e adicionar/editar entradas.</string>
     <string name="premium_popup_not_pro_feature3_title">3. Exporte ou imprima seus dados</string>
-    <string name="premium_popup_not_pro_feature3_message">Exporte seus relatórios mensais como CSV para usar os dados em outro aplicativo ou para PDF para imprimi-los.</string>
+    <string name="premium_popup_not_pro_feature3_message">Exporte seus relatórios mensais como CSV para usar os dados em outro aplicativo ou para imprimi-los.</string>
     <string name="premium_popup_buy_cta">Comprar</string>
     <string name="premium_popup_become_title">Torne-se premium</string>
     <string name="premium_popup_become_message">Parece que você gosta de usar EasyBudget!\nVocê gostaria de passar ao próximo nível e descobrir as funções premium?</string>
     <string name="premium_popup_become_cta">Descobrir</string>
     <string name="premium_popup_become_not_now">Agora não</string>
     <string name="premium_popup_become_not_ask_again">Não perguntar novamente</string>
-    <string name="premium_settings_coming_soon">Em breve…</string>
     <string name="premium_screen_pricing_disclaimer">%s/mês, cancele a qualquer momento.</string>
     <string name="premium_screen_error_loading_title">Ops</string>
     <string name="premium_screen_error_loading_message">Não foi possível acessar a PlayStore para buscar os dados Premium e Pro. Verifique sua rede e tente novamente.</string>
@@ -465,4 +464,18 @@
     <string name="calendar_month_loading_error_description">Ocorreu um erro ao carregar os dados do calendário. Por favor, tente novamente.\n(%s)</string>
     <string name="premium_subscription_price">1,99€</string>
     <string name="pro_subscription_price">4,99€</string>
+    <string name="title_activity_monthly_report_export">Exportar relatório mensal</string>
+    <string name="action_export">Exportar como CSV</string>
+    <string name="monthly_report_data_loading_error_title">Não foi possível carregar dados</string>
+    <string name="monthly_report_data_loading_error_description">Ocorreu um erro ao preparar o arquivo CSV. Por favor, tente novamente.\n(%s)</string>
+    <string name="monthly_report_data_loading_error_cta">Tentar novamente</string>
+    <string name="monthly_report_data_date_row">Data</string>
+    <string name="monthly_report_data_title_row">Título</string>
+    <string name="monthly_report_data_amount_row">Valor</string>
+    <string name="monthly_report_data_checked_row">Marcado</string>
+    <string name="monthly_report_data_recurring_row">Recorrente</string>
+    <string name="monthly_report_data_open_error_title">Opa</string>
+    <string name="monthly_report_data_open_error_description">Não é possível abrir o CSV com um aplicativo no seu telefone. Certifique-se de ter um aplicativo que possa abrir arquivos CSV e tente novamente.</string>
+    <string name="monthly_report_export_data_loaded_title">Seu arquivo CSV está pronto</string>
+    <string name="monthly_report_export_data_loaded_cta">Exportar</string>
 </resources>
