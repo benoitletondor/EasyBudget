@@ -34,6 +34,7 @@ import io.realm.kotlin.ext.query
 import io.realm.kotlin.log.LogLevel
 import io.realm.kotlin.log.RealmLogger
 import io.realm.kotlin.mongodb.App
+import io.realm.kotlin.mongodb.AppConfiguration
 import io.realm.kotlin.mongodb.Credentials
 import io.realm.kotlin.mongodb.subscriptions
 import io.realm.kotlin.mongodb.sync.SyncConfiguration
@@ -557,7 +558,11 @@ class OnlineDBImpl(
             accountId: String,
             accountSecret: String,
         ): OnlineDBImpl {
-            val app = App.create(atlasAppId)
+            val app = App.create(
+                AppConfiguration.Builder(atlasAppId)
+                    .enableSessionMultiplexing(true)
+                    .build()
+            )
 
             val user = withContext(Dispatchers.IO) {
                 try {
