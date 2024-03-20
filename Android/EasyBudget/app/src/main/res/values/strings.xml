@@ -482,10 +482,6 @@
     <string name="main_account_default_name">Default (offline)</string>
     <string name="main_account_online_name">%s (online)</string>
 
-    <string name="update_three_dot_zero_notification_title">New in EasyBudget</string>
-    <string name="update_three_dot_zero_notification_message">Manage multiple accounts and share them with others with the new EasyBudget Pro!</string>
-    <string name="update_three_dot_zero_notification_cta">Discover</string>
-
     <string name="calendar_month_loading_error_title">Unable to load data</string>
     <string name="calendar_month_loading_error_description">An error occurred while loading calendar data. Please try again.\n(%s)</string>
 
@@ -506,6 +502,10 @@
     <string name="monthly_report_data_open_error_description">Unable to open the CSV with an app on your phone. Make sure you have an app that can open CSV files and try again.</string>
     <string name="monthly_report_export_data_loaded_title">Your CSV file is ready</string>
     <string name="monthly_report_export_data_loaded_cta">Export</string>
+
+    <string name="update_three_dot_two_notification_title">New in EasyBudget</string>
+    <string name="update_three_dot_two_notification_message">As a Pro user, you can now export your monthly reports as CSV!</string>
+    <string name="update_three_dot_two_notification_cta">Discover</string>
 
     <!-- Keys, not for translations. -->
     <string name="setting_category_bug_report_send_button_key" translatable="false">send_bug_report</string>

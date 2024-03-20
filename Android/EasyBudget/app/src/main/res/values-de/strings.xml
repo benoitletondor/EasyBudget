@@ -361,9 +361,6 @@
     <string name="account_management_account_left_confirmation">Das Konto wurde erfolgreich verlassen</string>
     <string name="account_management_account_name_updated_confirmation">Der Kontoname wurde erfolgreich aktualisiert</string>
     <string name="account_management_error_title">Oops</string>
-    <string name="update_three_dot_zero_notification_title">Neu in EasyBudget</string>
-    <string name="update_three_dot_zero_notification_message">Verwalten Sie mehrere Konten und teilen Sie sie mit anderen, verfügbar mit EasyBudget Pro!</string>
-    <string name="update_three_dot_zero_notification_cta">Entdecken</string>
     <string name="setting_notification_permission_rejected_dialog_title">Berechtigung für Benachrichtigungen verweigert</string>
     <string name="setting_notification_permission_rejected_dialog_description">Um Ihre täglichen und monatlichen Prämienerinnerungen zu erhalten, müssen Sie Benachrichtigungen zulassen. Möchten Sie Benachrichtigungen erhalten?</string>
     <string name="setting_notification_permission_rejected_dialog_accept_cta">Erlauben</string>
@@ -478,4 +475,7 @@
     <string name="monthly_report_data_open_error_description">Die CSV-Datei kann nicht mit einer App auf Ihrem Telefon geöffnet werden. Stellen Sie sicher, dass Sie über eine App verfügen, die CSV-Dateien öffnen kann, und versuchen Sie es erneut.</string>
     <string name="monthly_report_export_data_loaded_title">Ihre CSV-Datei ist fertig</string>
     <string name="monthly_report_export_data_loaded_cta">Exportieren</string>
+    <string name="update_three_dot_two_notification_title">Neu in EasyBudget</string>
+    <string name="update_three_dot_two_notification_message">Als Pro-Benutzer können Sie jetzt Ihre monatlichen Berichte als CSV exportieren!</string>
+    <string name="update_three_dot_two_notification_cta">Entdecken</string>
 </resources>
