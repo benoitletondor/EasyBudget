@@ -82,7 +82,6 @@ class OnlineDBImpl(
     }
 
     private val onChangeMutableFlow = MutableSharedFlow<Unit>()
-
     override val onChangeFlow: Flow<Unit> = onChangeMutableFlow
 
     override fun ensureDBCreated() { /* No-op */ }
@@ -527,6 +526,7 @@ class OnlineDBImpl(
         realm.close()
         app.close()
         cancel()
+        recurringExpensesLoadingStateMutableFlow.value = RecurringExpenseLoadingState.NotLoaded
     }
 
     private fun generateQueryForDateRange(from: LocalDate, to: LocalDate): String

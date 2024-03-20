@@ -28,12 +28,19 @@ import java.util.ArrayList
  * Get the list of months available in the monthly report view.
  */
 fun Parameters.getListOfMonthsAvailableForUser(): List<YearMonth> {
-    val initDate = getInitDate() ?: return emptyList()
+    val initMonth = getInitDate()?.yearMonth ?: YearMonth.now()
+
+    // End 12 months in the future (13 because we are comparing with "isBefore")
     val endRange = LocalDate.now().yearMonth.plusMonths(13)
 
-    val months = ArrayList<YearMonth>()
-    var currentMonth = initDate.yearMonth
+    // Start at least 12 months ago
+    var currentMonth = if (initMonth.isAfter(YearMonth.now().minusMonths(12))) {
+        YearMonth.now().minusMonths(12)
+    } else {
+        initMonth
+    }
 
+    val months = ArrayList<YearMonth>()
     while (currentMonth.isBefore(endRange)) {
         months.add(currentMonth)
         currentMonth = currentMonth.plusMonths(1)
