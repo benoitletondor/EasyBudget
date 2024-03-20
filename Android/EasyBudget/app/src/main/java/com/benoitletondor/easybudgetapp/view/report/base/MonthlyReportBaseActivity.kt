@@ -32,6 +32,7 @@ import com.benoitletondor.easybudgetapp.helper.removeButtonBorder
 import com.benoitletondor.easybudgetapp.view.report.MonthlyReportFragment
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
+import java.time.YearMonth
 
 /**
  * Activity that displays monthly report
@@ -67,16 +68,16 @@ class MonthlyReportBaseActivity : BaseActivity<ActivityMonthlyReportBinding>(), 
         binding.monthlyReportPreviousMonthButton.removeButtonBorder()
         binding.monthlyReportNextMonthButton.removeButtonBorder()
 
-        var loadedDates: List<LocalDate> = emptyList()
+        var loadedMonths: List<YearMonth> = emptyList()
         lifecycleScope.launchCollect(viewModel.stateFlow) { state ->
             when(state) {
                 is MonthlyReportBaseViewModel.State.Loaded -> {
                     binding.monthlyReportProgressBar.visibility = View.GONE
                     binding.monthlyReportContent.visibility = View.VISIBLE
 
-                    if (state.dates != loadedDates) {
-                        loadedDates = state.dates
-                        configureViewPager(state.dates)
+                    if (state.months != loadedMonths) {
+                        loadedMonths = state.months
+                        configureViewPager(state.months)
                     }
 
                     if( !ignoreNextPageSelectedEvent ) {
@@ -85,7 +86,7 @@ class MonthlyReportBaseActivity : BaseActivity<ActivityMonthlyReportBinding>(), 
 
                     ignoreNextPageSelectedEvent = false
 
-                    binding.monthlyReportMonthTitleTv.text = state.selectedPosition.date.getMonthTitle(this)
+                    binding.monthlyReportMonthTitleTv.text = state.selectedPosition.month.getMonthTitle(this)
 
                     // Last and first available month
                     val isFirstMonth = state.selectedPosition.position == 0
@@ -115,7 +116,7 @@ class MonthlyReportBaseActivity : BaseActivity<ActivityMonthlyReportBinding>(), 
     /**
      * Configure the [.pager] adapter and listener.
      */
-    private fun configureViewPager(dates: List<LocalDate>) {
+    private fun configureViewPager(dates: List<YearMonth>) {
         binding.monthlyReportViewPager.removeOnPageChangeListener(this)
 
         binding.monthlyReportViewPager.offscreenPageLimit = 0
