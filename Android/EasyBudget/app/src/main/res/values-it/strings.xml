@@ -361,9 +361,6 @@
     <string name="account_management_account_left_confirmation">Account lasciato con successo</string>
     <string name="account_management_account_name_updated_confirmation">Nome account aggiornato correttamente</string>
     <string name="account_management_error_title">OPS!</string>
-    <string name="update_three_dot_zero_notification_title">Nuovo in EasyBudget</string>
-    <string name="update_three_dot_zero_notification_message">Gestisci più account e condividili con altri, disponibile con EasyBudget Pro!</string>
-    <string name="update_three_dot_zero_notification_cta">Scoprire</string>
     <string name="setting_notification_permission_rejected_dialog_title">Autorizzazione notifiche negata</string>
     <string name="setting_notification_permission_rejected_dialog_description">Per ricevere i tuoi promemoria giornalieri e mensili premium, devi consentire le notifiche. Vuoi ricevere le notifiche?</string>
     <string name="setting_notification_permission_rejected_dialog_accept_cta">Permettere</string>
@@ -478,4 +475,7 @@
     <string name="monthly_report_data_open_error_description">Impossibile aprire il CSV con un\'app sul tuo telefono. Assicurati di avere un\'app in grado di aprire file CSV e riprova.</string>
     <string name="monthly_report_export_data_loaded_title">Il tuo file CSV è pronto</string>
     <string name="monthly_report_export_data_loaded_cta">Esporta</string>
+    <string name="update_three_dot_two_notification_title">Novità in EasyBudget</string>
+    <string name="update_three_dot_two_notification_message">Come utente Pro, ora puoi esportare i tuoi rapporti mensili come CSV!</string>
+    <string name="update_three_dot_two_notification_cta">Scopri</string>
 </resources>

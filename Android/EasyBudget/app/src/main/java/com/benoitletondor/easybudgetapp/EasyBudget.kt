@@ -390,34 +390,39 @@ class EasyBudget : Application(), Configuration.Provider {
     private fun onUpdate(previousVersion: Int, @Suppress("SameParameterValue") newVersion: Int) {
         Logger.debug("Update detected, from $previousVersion to $newVersion")
 
-        if (previousVersion < 90) {
-            try {
-                if (Build.VERSION.SDK_INT >= 33 && ActivityCompat.checkSelfPermission(this@EasyBudget, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                    return
-                }
+        if (previousVersion < 132) {
+            GlobalScope.launch {
+                try {
+                    if (Build.VERSION.SDK_INT >= 33 && ActivityCompat.checkSelfPermission(this@EasyBudget, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                        return@launch
+                    }
 
-                val intent = Intent(this, MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    putExtra(MainActivity.INTENT_OPEN_ACCOUNTS_TRAY_EXTRA, true)
-                }
-                val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+                    if (!iab.isUserPro()) {
+                        return@launch
+                    }
 
-                val builder = NotificationCompat.Builder(this, CHANNEL_NEW_FEATURES)
-                    .setSmallIcon(R.drawable.ic_push)
-                    .setContentTitle(getString(R.string.update_three_dot_zero_notification_title))
-                    .setContentText(getString(R.string.update_three_dot_zero_notification_message))
-                    .setStyle(NotificationCompat.BigTextStyle().bigText(getString(R.string.update_three_dot_zero_notification_message)))
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                    .setAutoCancel(true)
-                    .setContentIntent(pendingIntent)
-                    .addAction(R.drawable.ic_baseline_new_releases, getString(R.string.update_three_dot_zero_notification_cta), pendingIntent)
+                    val intent = Intent(this@EasyBudget, MainActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    }
+                    val pendingIntent: PendingIntent = PendingIntent.getActivity(this@EasyBudget, 0, intent, PendingIntent.FLAG_IMMUTABLE)
 
-                with(NotificationManagerCompat.from(this)) {
-                    // notificationId is a unique int for each notification that you must define
-                    notify(100001, builder.build())
+                    val builder = NotificationCompat.Builder(this@EasyBudget, CHANNEL_NEW_FEATURES)
+                        .setSmallIcon(R.drawable.ic_push)
+                        .setContentTitle(getString(R.string.update_three_dot_two_notification_title))
+                        .setContentText(getString(R.string.update_three_dot_two_notification_message))
+                        .setStyle(NotificationCompat.BigTextStyle().bigText(getString(R.string.update_three_dot_two_notification_message)))
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setAutoCancel(true)
+                        .setContentIntent(pendingIntent)
+                        .addAction(R.drawable.ic_baseline_new_releases, getString(R.string.update_three_dot_two_notification_cta), pendingIntent)
+
+                    with(NotificationManagerCompat.from(this@EasyBudget)) {
+                        // notificationId is a unique int for each notification that you must define
+                        notify(100001, builder.build())
+                    }
+                } catch (e: Exception) {
+                    Logger.error("Error while showing update notification", e)
                 }
-            } catch (e: Exception) {
-                Logger.error("Error while showing update notification", e)
             }
         }
     }

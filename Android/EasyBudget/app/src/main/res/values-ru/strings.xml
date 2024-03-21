@@ -363,9 +363,6 @@
     <string name="account_management_account_left_confirmation">Учетная запись успешно удалена</string>
     <string name="account_management_account_name_updated_confirmation">Имя учетной записи успешно обновлено</string>
     <string name="account_management_error_title">Ой…</string>
-    <string name="update_three_dot_zero_notification_title">Новое в EasyBudget</string>
-    <string name="update_three_dot_zero_notification_message">Управляйте несколькими учетными записями и делитесь ими с другими, доступными в EasyBudget Pro!</string>
-    <string name="update_three_dot_zero_notification_cta">Обнаружить</string>
     <string name="setting_notification_permission_rejected_dialog_title">Notifications permission denied</string>
     <string name="setting_notification_permission_rejected_dialog_description">To receive your premium daily and monthly reminders, you need to allow notifications. Do you want to receive notifications?</string>
     <string name="setting_notification_permission_rejected_dialog_accept_cta">Разрешать</string>
@@ -480,4 +477,7 @@
     <string name="monthly_report_data_open_error_description">Невозможно открыть CSV-файл с помощью приложения на телефоне. Убедитесь, что у вас есть приложение, которое может открывать файлы CSV, и повторите попытку.</string>
     <string name="monthly_report_export_data_loaded_title">Ваш CSV-файл готов</string>
     <string name="monthly_report_export_data_loaded_cta">Экспорт</string>
+    <string name="update_three_dot_two_notification_title">Новое в EasyBudget</string>
+    <string name="update_three_dot_two_notification_message">Как пользователь Pro, вы теперь можете экспортировать свои ежемесячные отчеты в формате CSV!</string>
+    <string name="update_three_dot_two_notification_cta">Обнаружить</string>
 </resources>

@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -43,6 +44,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
@@ -237,7 +239,9 @@ private fun ExportReportScreen(
 
 @Composable
 private fun LoadingView() {
-    Box {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+    ) {
         CircularProgressIndicator(
             modifier = Modifier.align(Alignment.Center),
         )
@@ -251,7 +255,7 @@ private fun ErrorView(
 ) {
     Column(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.Center,
     ) {
@@ -288,7 +292,7 @@ private fun LoadedView(
 ) {
     Column(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.Center,
     ) {
@@ -310,5 +314,34 @@ private fun LoadedView(
                 text = stringResource(id = R.string.monthly_report_export_data_loaded_cta),
             )
         }
+    }
+}
+
+@Composable
+@Preview(name = "Loading preview", showSystemUi = true)
+private fun LoadingPreview() {
+    AppTheme {
+        LoadingView()
+    }
+}
+
+@Composable
+@Preview(name = "Error preview", showSystemUi = true)
+private fun ErrorPreview() {
+    AppTheme {
+        ErrorView(
+            exception = IllegalArgumentException("An error occurred"),
+            onRetryButtonClicked = {},
+        )
+    }
+}
+
+@Composable
+@Preview(name = "Success preview", showSystemUi = true)
+private fun SuccessPreview() {
+    AppTheme {
+        LoadedView(
+            onDownloadButtonClicked = {},
+        )
     }
 }
