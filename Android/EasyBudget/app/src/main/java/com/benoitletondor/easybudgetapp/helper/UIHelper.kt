@@ -36,6 +36,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.updateLayoutParams
 import com.benoitletondor.easybudgetapp.R
 import java.time.LocalDate
+import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -178,7 +179,7 @@ fun AlertDialog.centerButtons() {
  * @param context non null context
  * @return a formatted string like "January 2016"
  */
-fun LocalDate.getMonthTitle(context: Context): String {
+fun YearMonth.getMonthTitle(context: Context): String {
     val format = DateTimeFormatter.ofPattern(context.resources.getString(R.string.monthly_report_month_title_format), Locale.getDefault())
     return format.format(this)
 }

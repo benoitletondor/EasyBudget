@@ -219,14 +219,13 @@
     <string name="premium_popup_not_pro_feature2_title">2. Teilen Sie Ihre Konten</string>
     <string name="premium_popup_not_pro_feature2_message">Sie können andere Pro-Benutzer zu Ihren Online-Konten einladen, damit diese Einträge anzeigen und hinzufügen/bearbeiten können.</string>
     <string name="premium_popup_not_pro_feature3_title">3. Exportieren oder drucken Sie Ihre Daten</string>
-    <string name="premium_popup_not_pro_feature3_message">Exportieren Sie Ihre monatlichen Berichte als CSV, um die Daten in einer anderen App zu verwenden, oder als PDF, um sie auszudrucken.</string>
+    <string name="premium_popup_not_pro_feature3_message">Exportieren Sie Ihre monatlichen Berichte als CSV, um die Daten in einer anderen App zu verwenden oder auszudrucken.</string>
     <string name="premium_popup_buy_cta">Kaufen</string>
     <string name="premium_popup_become_title">Premium-Nutzer werden</string>
     <string name="premium_popup_become_message">Es sieht so aus als würde Ihnen EasyBudget gefallen!\nWürden Sie gerne in den nächsten Gang schalten und die Premium-Features entdecken?</string>
     <string name="premium_popup_become_cta">Entdecken</string>
     <string name="premium_popup_become_not_now">Nicht jetzt</string>
     <string name="premium_popup_become_not_ask_again">Nicht wieder fragen</string>
-    <string name="premium_settings_coming_soon">Demnächst…</string>
     <string name="premium_screen_pricing_disclaimer">%s/Monat, jederzeit kündbar.</string>
     <string name="premium_screen_error_loading_title">Ups</string>
     <string name="premium_screen_error_loading_message">Der PlayStore konnte nicht erreicht werden, um die Premium- und Pro-Daten abzurufen. Bitte überprüfen Sie Ihr Netzwerk und versuchen Sie es erneut.</string>
@@ -362,9 +361,6 @@
     <string name="account_management_account_left_confirmation">Das Konto wurde erfolgreich verlassen</string>
     <string name="account_management_account_name_updated_confirmation">Der Kontoname wurde erfolgreich aktualisiert</string>
     <string name="account_management_error_title">Oops</string>
-    <string name="update_three_dot_zero_notification_title">Neu in EasyBudget</string>
-    <string name="update_three_dot_zero_notification_message">Verwalten Sie mehrere Konten und teilen Sie sie mit anderen, verfügbar mit EasyBudget Pro!</string>
-    <string name="update_three_dot_zero_notification_cta">Entdecken</string>
     <string name="setting_notification_permission_rejected_dialog_title">Berechtigung für Benachrichtigungen verweigert</string>
     <string name="setting_notification_permission_rejected_dialog_description">Um Ihre täglichen und monatlichen Prämienerinnerungen zu erhalten, müssen Sie Benachrichtigungen zulassen. Möchten Sie Benachrichtigungen erhalten?</string>
     <string name="setting_notification_permission_rejected_dialog_accept_cta">Erlauben</string>
@@ -465,4 +461,21 @@
     <string name="calendar_month_loading_error_description">Beim Laden der Kalenderdaten ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.\n(%s)</string>
     <string name="premium_subscription_price">1,99€</string>
     <string name="pro_subscription_price">4,99€</string>
+    <string name="title_activity_monthly_report_export">Monatsbericht exportieren</string>
+    <string name="action_export">Als CSV exportieren</string>
+    <string name="monthly_report_data_loading_error_title">Daten können nicht geladen werden</string>
+    <string name="monthly_report_data_loading_error_description">Beim Vorbereiten der CSV-Datei ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.\n(%s)</string>
+    <string name="monthly_report_data_loading_error_cta">Wiederholen</string>
+    <string name="monthly_report_data_date_row">Datum</string>
+    <string name="monthly_report_data_title_row">Titel</string>
+    <string name="monthly_report_data_amount_row">Betrag</string>
+    <string name="monthly_report_data_checked_row">Geprüft</string>
+    <string name="monthly_report_data_recurring_row">Wiederkehrend</string>
+    <string name="monthly_report_data_open_error_title">Ups</string>
+    <string name="monthly_report_data_open_error_description">Die CSV-Datei kann nicht mit einer App auf Ihrem Telefon geöffnet werden. Stellen Sie sicher, dass Sie über eine App verfügen, die CSV-Dateien öffnen kann, und versuchen Sie es erneut.</string>
+    <string name="monthly_report_export_data_loaded_title">Ihre CSV-Datei ist fertig</string>
+    <string name="monthly_report_export_data_loaded_cta">Exportieren</string>
+    <string name="update_three_dot_two_notification_title">Neu in EasyBudget</string>
+    <string name="update_three_dot_two_notification_message">Als Pro-Benutzer können Sie jetzt Ihre monatlichen Berichte als CSV exportieren!</string>
+    <string name="update_three_dot_two_notification_cta">Entdecken</string>
 </resources>

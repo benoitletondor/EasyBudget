@@ -16,8 +16,10 @@
 
 package com.benoitletondor.easybudgetapp.helper
 
+import android.content.Context
 import biweekly.util.Frequency
 import biweekly.util.Recurrence
+import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 
 fun Recurrence.toRecurringExpenseType(): RecurringExpenseType {
@@ -62,4 +64,17 @@ fun RecurringExpenseType.toRecurrence(): Recurrence {
     }
 
     return Recurrence.Builder(frequency).interval(interval).build()
+}
+
+fun RecurringExpenseType.toFormattedString(context: Context): String = when(this) {
+    RecurringExpenseType.DAILY -> context.getString(R.string.daily)
+    RecurringExpenseType.WEEKLY -> context.getString(R.string.weekly)
+    RecurringExpenseType.BI_WEEKLY -> context.getString(R.string.bi_weekly)
+    RecurringExpenseType.TER_WEEKLY -> context.getString(R.string.ter_weekly)
+    RecurringExpenseType.FOUR_WEEKLY -> context.getString(R.string.four_weekly)
+    RecurringExpenseType.MONTHLY -> context.getString(R.string.monthly)
+    RecurringExpenseType.BI_MONTHLY -> context.getString(R.string.bi_monthly)
+    RecurringExpenseType.TER_MONTHLY -> context.getString(R.string.ter_monthly)
+    RecurringExpenseType.SIX_MONTHLY ->context.getString(R.string.six_monthly)
+    RecurringExpenseType.YEARLY -> context.getString(R.string.yearly)
 }

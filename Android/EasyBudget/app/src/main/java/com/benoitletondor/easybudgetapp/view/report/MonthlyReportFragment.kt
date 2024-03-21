@@ -35,10 +35,10 @@ import com.benoitletondor.easybudgetapp.helper.viewLifecycleScope
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import java.time.LocalDate
+import java.time.YearMonth
 import javax.inject.Inject
 
-private const val ARG_FIRST_DAY_OF_MONTH_DATE = "arg_date"
+private const val ARG_MONTH = "arg_month"
 
 /**
  * Fragment that displays monthly report for a given month
@@ -50,7 +50,7 @@ class MonthlyReportFragment : Fragment() {
     /**
      * The first day of the month
      */
-    private lateinit var firstDayOfMonth: LocalDate
+    private lateinit var month: YearMonth
 
     private val viewModel: MonthlyReportViewModel by viewModels()
     @Inject lateinit var parameters: Parameters
@@ -73,7 +73,7 @@ class MonthlyReportFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        firstDayOfMonth = requireArguments().getSerializable(ARG_FIRST_DAY_OF_MONTH_DATE) as LocalDate
+        month = requireArguments().getSerializable(ARG_MONTH) as YearMonth
 
         // Inflate the layout for this fragment
         val v = inflater.inflate(R.layout.fragment_monthly_report, container, false)
@@ -120,7 +120,7 @@ class MonthlyReportFragment : Fragment() {
             }
         }
 
-        viewModel.loadDataForMonth(firstDayOfMonth)
+        viewModel.loadDataForMonth(month)
 
         return v
     }
@@ -134,9 +134,9 @@ class MonthlyReportFragment : Fragment() {
     }
 
     companion object {
-        fun newInstance(firstDayOfMonth: LocalDate): MonthlyReportFragment = MonthlyReportFragment().apply {
+        fun newInstance(month: YearMonth): MonthlyReportFragment = MonthlyReportFragment().apply {
             arguments = Bundle().apply {
-                putSerializable(ARG_FIRST_DAY_OF_MONTH_DATE, firstDayOfMonth)
+                putSerializable(ARG_MONTH, month)
             }
         }
     }

@@ -455,31 +455,19 @@ private fun ColumnScope.ProSubscriptionView(proSubscribed: Boolean) {
             modifier = Modifier.align(Alignment.CenterHorizontally),
         )
 
-        Spacer(modifier = Modifier.height(30.dp))
-
-        Text(
-            modifier = Modifier
-                .padding(bottom = 10.dp)
-                .fillMaxWidth(),
-            text = stringResource(R.string.premium_settings_coming_soon),
-            color = Color.White,
-            fontSize = 20.sp,
-            textAlign = TextAlign.Center,
-        )
+        Spacer(modifier = Modifier.height(20.dp))
 
         Text(
             modifier = Modifier.padding(bottom = 10.dp),
             text = stringResource(R.string.premium_popup_not_pro_feature3_title),
-            color = Color.White.copy(alpha = 0.9f),
+            color = Color.White,
             fontSize = 20.sp,
-            fontStyle = FontStyle.Italic,
         )
 
         Text(
             text = stringResource(R.string.premium_popup_not_pro_feature3_message),
-            color = Color.White.copy(alpha = 0.9f),
+            color = Color.White,
             fontSize = 16.sp,
-            fontStyle = FontStyle.Italic,
         )
 
     }

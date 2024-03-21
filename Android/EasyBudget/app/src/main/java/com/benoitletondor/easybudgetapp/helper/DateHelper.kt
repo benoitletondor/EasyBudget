@@ -18,25 +18,32 @@ package com.benoitletondor.easybudgetapp.helper
 
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.getInitDate
+import com.kizitonwose.calendar.core.yearMonth
 
 import java.time.LocalDate
+import java.time.YearMonth
 import java.util.ArrayList
 
 /**
- * Get the list of months available for the user for the monthly report view.
- *
- * @return a list of Date object set at the 1st day of the month 00:00:00:000
+ * Get the list of months available in the monthly report view.
  */
-fun Parameters.getListOfMonthsAvailableForUser(): List<LocalDate> {
-    val initDate = getInitDate() ?: return emptyList()
-    val today = LocalDate.now()
+fun Parameters.getListOfMonthsAvailableForUser(): List<YearMonth> {
+    val initMonth = getInitDate()?.yearMonth ?: YearMonth.now()
 
-    val months = ArrayList<LocalDate>()
-    var currentDate = LocalDate.of(initDate.year, initDate.month, 1)
+    // End 12 months in the future (13 because we are comparing with "isBefore")
+    val endRange = LocalDate.now().yearMonth.plusMonths(13)
 
-    while (currentDate.isBefore(today) || currentDate == today) {
-        months.add(currentDate)
-        currentDate = currentDate.plusMonths(1)
+    // Start at least 12 months ago
+    var currentMonth = if (initMonth.isAfter(YearMonth.now().minusMonths(12))) {
+        YearMonth.now().minusMonths(12)
+    } else {
+        initMonth
+    }
+
+    val months = ArrayList<YearMonth>()
+    while (currentMonth.isBefore(endRange)) {
+        months.add(currentMonth)
+        currentMonth = currentMonth.plusMonths(1)
     }
 
     return months

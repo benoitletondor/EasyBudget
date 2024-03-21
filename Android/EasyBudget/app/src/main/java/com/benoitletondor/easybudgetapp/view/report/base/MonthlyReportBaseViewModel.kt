@@ -19,24 +19,38 @@ package com.benoitletondor.easybudgetapp.view.report.base
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.benoitletondor.easybudgetapp.helper.Logger
+import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
 import com.benoitletondor.easybudgetapp.helper.getListOfMonthsAvailableForUser
+import com.benoitletondor.easybudgetapp.helper.launchCollect
+import com.benoitletondor.easybudgetapp.iab.Iab
+import com.benoitletondor.easybudgetapp.iab.PremiumCheckStatus
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity.Companion.FROM_NOTIFICATION_EXTRA
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.time.LocalDate
+import java.time.YearMonth
 import javax.inject.Inject
 
 @HiltViewModel
 class MonthlyReportBaseViewModel @Inject constructor(
     private val parameters: Parameters,
+    private val iab: Iab,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val fromNotification = savedStateHandle.get<Boolean>(FROM_NOTIFICATION_EXTRA) ?: false
+
+    private var isUserPro = false
+
+    private val eventMutableFlow = MutableLiveFlow<Event>()
+    val eventFlow: Flow<Event> = eventMutableFlow
 
     private val stateMutableFlow = MutableStateFlow<State>(State.Loading)
     val stateFlow: Flow<State> = stateMutableFlow
@@ -45,19 +59,37 @@ class MonthlyReportBaseViewModel @Inject constructor(
         viewModelScope.launch {
             stateMutableFlow.value = State.Loading
 
-            val dates = withContext(Dispatchers.IO) {
+            val months = withContext(Dispatchers.IO) {
                 return@withContext parameters.getListOfMonthsAvailableForUser()
             }
 
-            val selectedPosition = if( !fromNotification || dates.size == 1) {
-                MonthlyReportSelectedPosition(dates.size - 1, dates[dates.size - 1], true)
-            } else {
-                MonthlyReportSelectedPosition(dates.size - 2, dates[dates.size - 2], false)
+            var currentMonthPosition = months.indexOf(YearMonth.now())
+            if (currentMonthPosition == -1) {
+                Logger.error("Error while getting current month position, returned -1", IllegalStateException("Current month not found in list of available months"))
+                currentMonthPosition = months.size - 1
             }
 
-            stateMutableFlow.value = State.Loaded(dates, selectedPosition)
+            val selectedPosition = if( !fromNotification || months.size == 1) {
+                MonthlyReportSelectedPosition(currentMonthPosition, months[currentMonthPosition], currentMonthPosition == months.size - 1)
+            } else {
+                MonthlyReportSelectedPosition(currentMonthPosition - 1, months[currentMonthPosition - 1], false)
+            }
+
+            stateMutableFlow.value = State.Loaded(months, selectedPosition)
+        }
+
+        viewModelScope.launch {
+            iab.iabStatusFlow
+                .map { it == PremiumCheckStatus.PRO_SUBSCRIBED }
+                .distinctUntilChanged()
+                .collect { isPro ->
+                    isUserPro = isPro
+                    eventMutableFlow.emit(Event.RefreshMenu)
+                }
         }
     }
+
+    fun shouldShowExportButton(): Boolean = isUserPro
 
     fun onPreviousMonthButtonClicked() {
         val loadedState = stateMutableFlow.value as? State.Loaded ?: return
@@ -65,7 +97,7 @@ class MonthlyReportBaseViewModel @Inject constructor(
         val position = loadedState.selectedPosition.position
         if (position > 0) {
             stateMutableFlow.value = loadedState.copy(
-                selectedPosition = MonthlyReportSelectedPosition(position - 1, loadedState.dates[position - 1], false)
+                selectedPosition = MonthlyReportSelectedPosition(position - 1, loadedState.months[position - 1], false)
             )
         }
     }
@@ -74,9 +106,9 @@ class MonthlyReportBaseViewModel @Inject constructor(
         val loadedState = stateMutableFlow.value as? State.Loaded ?: return
 
         val position = loadedState.selectedPosition.position
-        if ( position < loadedState.dates.size - 1 ) {
+        if ( position < loadedState.months.size - 1 ) {
             stateMutableFlow.value = loadedState.copy(
-                selectedPosition = MonthlyReportSelectedPosition(position + 1, loadedState.dates[position + 1], loadedState.dates.size == position + 2)
+                selectedPosition = MonthlyReportSelectedPosition(position + 1, loadedState.months[position + 1], loadedState.months.size == position + 2)
             )
         }
     }
@@ -85,14 +117,28 @@ class MonthlyReportBaseViewModel @Inject constructor(
         val loadedState = stateMutableFlow.value as? State.Loaded ?: return
 
         stateMutableFlow.value = loadedState.copy(
-            selectedPosition = MonthlyReportSelectedPosition(position, loadedState.dates[position], loadedState.dates.size == position + 1)
+            selectedPosition = MonthlyReportSelectedPosition(position, loadedState.months[position], loadedState.months.size == position + 1)
         )
+    }
+
+    fun onExportButtonClicked() {
+        val loadedState = stateMutableFlow.value as? State.Loaded ?: return
+
+        val selectedMonth = loadedState.selectedPosition.month
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.OpenExport(selectedMonth))
+        }
     }
 
     sealed class State {
         data object Loading : State()
-        data class Loaded(val dates: List<LocalDate>, val selectedPosition: MonthlyReportSelectedPosition) : State()
+        data class Loaded(val months: List<YearMonth>, val selectedPosition: MonthlyReportSelectedPosition) : State()
+    }
+
+    sealed class Event {
+        data object RefreshMenu : Event()
+        data class OpenExport(val month: YearMonth) : Event()
     }
 }
 
-data class MonthlyReportSelectedPosition(val position: Int, val date: LocalDate, val latest: Boolean)
+data class MonthlyReportSelectedPosition(val position: Int, val month: YearMonth, val latest: Boolean)

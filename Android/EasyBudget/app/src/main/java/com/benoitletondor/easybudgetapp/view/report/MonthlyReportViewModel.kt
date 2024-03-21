@@ -22,14 +22,13 @@ import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
 import com.benoitletondor.easybudgetapp.view.main.account.AccountViewModel
-import com.kizitonwose.calendar.core.yearMonth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.time.LocalDate
+import java.time.YearMonth
 import javax.inject.Inject
 
 @HiltViewModel
@@ -53,14 +52,14 @@ class MonthlyReportViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun loadDataForMonth(month: LocalDate) {
+    fun loadDataForMonth(month: YearMonth) {
         if (!::db.isInitialized) {
             return
         }
 
         viewModelScope.launch {
             val expensesForMonth = withContext(Dispatchers.Default) {
-                db.getExpensesForMonth(month.yearMonth)
+                db.getExpensesForMonth(month)
             }
             if( expensesForMonth.isEmpty() ) {
                 stateMutableFlow.emit(MonthlyReportState.Empty)

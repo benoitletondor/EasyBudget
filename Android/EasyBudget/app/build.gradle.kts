@@ -38,8 +38,8 @@ android {
         compileSdk = 34
         minSdk = 23
         targetSdk = 34
-        versionCode = 131
-        versionName = "3.1.11"
+        versionCode = 133
+        versionName = "3.2.0"
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -187,4 +187,6 @@ dependencies {
     implementation("net.sf.biweekly:biweekly:0.6.8")
 
     implementation("net.lingala.zip4j:zip4j:2.11.5")
+
+    implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.9.3")
 }
