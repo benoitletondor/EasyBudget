@@ -93,31 +93,13 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.10"
+        kotlinCompilerExtensionVersion = "1.5.11"
     }
 
     buildFeatures {
         viewBinding = true
         buildConfig = true
         compose = true
-    }
-}
-
-// Remove this when https://github.com/google/dagger/issues/4049 is merged
-androidComponents {
-    onVariants(selector().all()) { variant ->
-        afterEvaluate {
-            // This is a workaround for https://issuetracker.google.com/301245705 which depends on internal
-            // implementations of the android gradle plugin and the ksp gradle plugin which might change in the future
-            // in an unpredictable way.
-            project.tasks.getByName("ksp" + variant.name.capitalize() + "Kotlin") {
-                val dataBindingTask = project.tasks.getByName ("dataBindingGenBaseClasses" + variant.name.capitalize()) as com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask
-
-                (this as org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompileTool<*>).setSource(
-                    dataBindingTask.sourceOutFolder
-                )
-            }
-        }
     }
 }
 
@@ -148,7 +130,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
 
-    implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
+    implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
     implementation("com.google.firebase:firebase-messaging-ktx")
     implementation("com.google.firebase:firebase-storage")
     implementation("com.google.firebase:firebase-crashlytics")
@@ -156,7 +138,7 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.firebaseui:firebase-ui-auth:8.0.2")
 
-    val composeBom = platform("androidx.compose:compose-bom:2024.02.02")
+    val composeBom = platform("androidx.compose:compose-bom:2024.04.00")
     implementation(composeBom)
     androidTestImplementation(composeBom)
     debugImplementation("androidx.compose.ui:ui-tooling")
