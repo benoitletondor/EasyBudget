@@ -322,7 +322,7 @@ class OnlineDBImpl(
 
     override suspend fun updateRecurringExpenseAfterDate(
         newRecurringExpense: RecurringExpense,
-        afterDate: LocalDate,
+        oldOccurrenceDate: LocalDate,
     ) {
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
 
@@ -331,7 +331,7 @@ class OnlineDBImpl(
 
         realm.write {
             findLatest(entity)?.updateAllOccurrencesAfterDate(
-                afterDate,
+                afterDate = oldOccurrenceDate,
                 newRecurringExpense,
             )
         }
