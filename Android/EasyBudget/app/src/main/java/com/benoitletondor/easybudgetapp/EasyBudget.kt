@@ -32,7 +32,6 @@ import androidx.work.Configuration
 import com.batch.android.Batch
 import com.batch.android.BatchActivityLifecycleHelper
 import com.batch.android.BatchNotificationChannelsManager.DEFAULT_CHANNEL_ID
-import com.batch.android.Config
 import com.batch.android.PushNotificationType
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.*
@@ -347,7 +346,7 @@ class EasyBudget : Application(), Configuration.Provider {
             }
         }
 
-        Batch.setConfig(Config(BuildConfig.BATCH_API_KEY))
+        Batch.start(BuildConfig.BATCH_API_KEY)
         Batch.Push.setManualDisplay(true)
         Batch.Push.setSmallIconResourceId(R.drawable.ic_push)
         Batch.Push.setNotificationsColor(ContextCompat.getColor(this, R.color.accent))

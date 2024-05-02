@@ -16,7 +16,6 @@
 
 package com.benoitletondor.easybudgetapp.view.main
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
@@ -252,8 +251,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
         }
     }
 
-    @SuppressLint("MissingSuperCall") // Not sure why this is reported, probably a bug
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
 
         this.intent = intent
