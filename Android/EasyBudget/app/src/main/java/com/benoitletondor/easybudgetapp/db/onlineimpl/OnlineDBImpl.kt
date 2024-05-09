@@ -560,7 +560,6 @@ class OnlineDBImpl(
         ): OnlineDBImpl {
             val app = App.create(
                 AppConfiguration.Builder(atlasAppId)
-                    .enableSessionMultiplexing(true)
                     .build()
             )
 
