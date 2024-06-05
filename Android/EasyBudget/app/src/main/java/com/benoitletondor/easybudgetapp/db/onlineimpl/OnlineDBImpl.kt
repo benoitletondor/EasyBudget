@@ -16,7 +16,6 @@
 
 package com.benoitletondor.easybudgetapp.db.onlineimpl
 
-import com.benoitletondor.easybudgetapp.BuildConfig
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.benoitletondor.easybudgetapp.db.RestoreAction
 import com.benoitletondor.easybudgetapp.db.onlineimpl.entity.ExpenseEntity
@@ -31,8 +30,6 @@ import com.kizitonwose.calendar.core.atStartOfMonth
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
-import io.realm.kotlin.log.LogLevel
-import io.realm.kotlin.log.RealmLogger
 import io.realm.kotlin.mongodb.App
 import io.realm.kotlin.mongodb.AppConfiguration
 import io.realm.kotlin.mongodb.Credentials
@@ -596,37 +593,6 @@ class OnlineDBImpl(
                         name = "${currentUser.id}:${account.id}:recurring",
                     )
                 }
-                .log(level = if (BuildConfig.DEBUG_LOG) LogLevel.INFO else LogLevel.WARN, listOf(
-                    object : RealmLogger {
-                        override val level: LogLevel = LogLevel.WARN
-                        override val tag: String = "EasyBudgetAtlas"
-
-                        override fun log(
-                            level: LogLevel,
-                            throwable: Throwable?,
-                            message: String?,
-                            vararg args: Any?
-                        ) {
-                            val argsString = args
-                                .mapNotNull {
-                                    it?.toString()
-                                }
-                                .joinToString { ", " }
-
-                            when (level) {
-                                LogLevel.WARN -> {
-                                    Logger.warning((message ?: "Realm warning") + " $argsString", throwable)
-                                }
-                                LogLevel.ERROR -> {
-                                    Logger.error((message ?: "Realm error") + " $argsString", throwable)
-                                }
-
-                                else -> Unit // No-op
-                            }
-                        }
-
-                    }
-                ))
                 .build()
             )
 

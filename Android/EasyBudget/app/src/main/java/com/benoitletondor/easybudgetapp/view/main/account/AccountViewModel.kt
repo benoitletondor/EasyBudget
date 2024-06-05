@@ -39,7 +39,7 @@ import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import com.benoitletondor.easybudgetapp.view.main.account.AccountFragment.Companion.ARG_SELECTED_ACCOUNT
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.realm.kotlin.mongodb.exceptions.InvalidCredentialsException
+import io.realm.kotlin.mongodb.exceptions.AuthException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -268,7 +268,7 @@ class AccountViewModel @Inject constructor(
 
     fun onRetryLoadingButtonPressed() {
         val e = (dbAvailableMutableStateFlow.value as? DBState.Error)?.error
-        if (e != null && e is InvalidCredentialsException) {
+        if (e != null && e is AuthException) {
             viewModelScope.launch {
                 dbAvailableMutableStateFlow.value = DBState.Loading
 
