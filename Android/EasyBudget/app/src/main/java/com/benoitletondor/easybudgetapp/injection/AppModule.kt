@@ -47,6 +47,8 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+    private var usedOnlineDB: CachedOnlineDBImpl? = null
+
     @Provides
     @Singleton
     fun provideIab(
@@ -81,12 +83,19 @@ object AppModule {
         currentUser: CurrentUser,
         accountId: String,
         accountSecret: String,
-    ): OnlineDB = CachedOnlineDBImpl(
-        OnlineDBImpl.provideFor(
-            atlasAppId = BuildConfig.ATLAS_APP_ID,
-            currentUser = currentUser,
-            accountId = accountId,
-            accountSecret = accountSecret
-        ),
-    )
+    ): OnlineDB {
+        usedOnlineDB?.close()
+
+        val db = CachedOnlineDBImpl(
+            OnlineDBImpl.provideFor(
+                atlasAppId = BuildConfig.ATLAS_APP_ID,
+                currentUser = currentUser,
+                accountId = accountId,
+                accountSecret = accountSecret
+            ),
+        )
+
+        usedOnlineDB = db
+        return db
+    }
 }

@@ -200,14 +200,6 @@ class AccountViewModel @Inject constructor(
 
     private fun loadDB() {
         viewModelScope.launch {
-            // Make sure to close any previous DB
-            try {
-                (currentDBRef?.get() as? OnlineDB)?.close()
-                currentDBRef = null
-            } catch (e: Exception) {
-                Logger.warning("Error while trying to close online DB when loading, continuing")
-            }
-
             dbAvailableMutableStateFlow.value = DBState.Loading
             showManageAccountMenuItemMutableFlow.value = false
 

@@ -354,6 +354,7 @@ class EasyBudget : Application(), Configuration.Provider {
         }
 
         Batch.start(BuildConfig.BATCH_API_KEY)
+        Batch.setFindMyInstallationEnabled(false)
         Batch.Push.setManualDisplay(true)
         Batch.Push.setSmallIconResourceId(R.drawable.ic_push)
         Batch.Push.setNotificationsColor(ContextCompat.getColor(this, R.color.accent))

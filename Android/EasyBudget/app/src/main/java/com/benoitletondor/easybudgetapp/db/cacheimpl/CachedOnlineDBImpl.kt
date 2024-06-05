@@ -26,7 +26,8 @@ import java.time.YearMonth
 class CachedOnlineDBImpl(
     private val wrappedDB: OnlineDB,
 ) : OnlineDB, CachedDBImpl(wrappedDB) {
-    private var isClosed = false
+    var isClosed: Boolean = false
+        private set
 
     override val account: Account
         get() = wrappedDB.account

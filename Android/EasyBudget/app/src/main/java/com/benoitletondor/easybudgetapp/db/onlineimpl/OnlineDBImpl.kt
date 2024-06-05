@@ -521,6 +521,7 @@ class OnlineDBImpl(
 
         Logger.debug("Closing Online DB: ${account.id}")
         realm.close()
+        app.sync.waitForSessionsToTerminate()
         app.close()
         cancel()
         recurringExpensesLoadingStateMutableFlow.value = RecurringExpenseLoadingState.NotLoaded
@@ -557,6 +558,7 @@ class OnlineDBImpl(
         ): OnlineDBImpl {
             val app = App.create(
                 AppConfiguration.Builder(atlasAppId)
+                    .enableSessionMultiplexing(true)
                     .build()
             )
 
