@@ -98,7 +98,7 @@ object AppModule {
             )
 
             this.app = createdApp
-            app
+            createdApp
         }
 
         val db = CachedOnlineDBImpl(
