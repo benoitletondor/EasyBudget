@@ -39,7 +39,7 @@ import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import com.benoitletondor.easybudgetapp.view.main.account.AccountFragment.Companion.ARG_SELECTED_ACCOUNT
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.realm.kotlin.mongodb.exceptions.InvalidCredentialsException
+import io.realm.kotlin.mongodb.exceptions.AuthException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -48,6 +48,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterIsInstance
@@ -192,7 +193,11 @@ class AccountViewModel @Inject constructor(
         }
 
         SelectedDateExpensesData(date, balance, checkedBalance, expenses)
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, SelectedDateExpensesData(selectDateMutableStateFlow.value, 0.0, null, emptyList()))
+    }
+        .catch { e ->
+            Logger.error("Error while getting selected date data", e)
+        }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, SelectedDateExpensesData(selectDateMutableStateFlow.value, 0.0, null, emptyList()))
 
     init {
         loadDB()
@@ -200,14 +205,6 @@ class AccountViewModel @Inject constructor(
 
     private fun loadDB() {
         viewModelScope.launch {
-            // Make sure to close any previous DB
-            try {
-                (currentDBRef?.get() as? OnlineDB)?.close()
-                currentDBRef = null
-            } catch (e: Exception) {
-                Logger.warning("Error while trying to close online DB when loading, continuing")
-            }
-
             dbAvailableMutableStateFlow.value = DBState.Loading
             showManageAccountMenuItemMutableFlow.value = false
 
@@ -268,7 +265,7 @@ class AccountViewModel @Inject constructor(
 
     fun onRetryLoadingButtonPressed() {
         val e = (dbAvailableMutableStateFlow.value as? DBState.Error)?.error
-        if (e != null && e is InvalidCredentialsException) {
+        if (e != null && e is AuthException) {
             viewModelScope.launch {
                 dbAvailableMutableStateFlow.value = DBState.Loading
 

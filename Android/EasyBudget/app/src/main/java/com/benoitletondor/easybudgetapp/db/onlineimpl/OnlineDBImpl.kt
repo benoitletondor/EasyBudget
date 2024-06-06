@@ -31,13 +31,13 @@ import com.kizitonwose.calendar.core.atStartOfMonth
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
-import io.realm.kotlin.log.LogLevel
-import io.realm.kotlin.log.RealmLogger
+import io.realm.kotlin.internal.RealmImpl
 import io.realm.kotlin.mongodb.App
 import io.realm.kotlin.mongodb.AppConfiguration
 import io.realm.kotlin.mongodb.Credentials
 import io.realm.kotlin.mongodb.subscriptions
 import io.realm.kotlin.mongodb.sync.SyncConfiguration
+import io.realm.kotlin.mongodb.syncSession
 import io.realm.kotlin.notifications.UpdatedRealm
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -66,7 +66,6 @@ import kotlin.time.toDuration
 class OnlineDBImpl(
     private val realm: Realm,
     override val account: Account,
-    private val app: App,
 ) : OnlineDB, CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.IO) {
     private var recurringExpenseWatchingJob: Job? = null
     private var changesWatchingJob: Job? = null
@@ -524,7 +523,6 @@ class OnlineDBImpl(
 
         Logger.debug("Closing Online DB: ${account.id}")
         realm.close()
-        app.close()
         cancel()
         recurringExpensesLoadingStateMutableFlow.value = RecurringExpenseLoadingState.NotLoaded
     }
@@ -553,16 +551,11 @@ class OnlineDBImpl(
         private val readWriteTimeout = 5.toDuration(DurationUnit.SECONDS)
 
         suspend fun provideFor(
-            atlasAppId: String,
             currentUser: CurrentUser,
             accountId: String,
             accountSecret: String,
+            app: App,
         ): OnlineDBImpl {
-            val app = App.create(
-                AppConfiguration.Builder(atlasAppId)
-                    .build()
-            )
-
             val user = withContext(Dispatchers.IO) {
                 try {
                     app.login(Credentials.jwt(currentUser.token))
@@ -596,44 +589,12 @@ class OnlineDBImpl(
                         name = "${currentUser.id}:${account.id}:recurring",
                     )
                 }
-                .log(level = if (BuildConfig.DEBUG_LOG) LogLevel.INFO else LogLevel.WARN, listOf(
-                    object : RealmLogger {
-                        override val level: LogLevel = LogLevel.WARN
-                        override val tag: String = "EasyBudgetAtlas"
-
-                        override fun log(
-                            level: LogLevel,
-                            throwable: Throwable?,
-                            message: String?,
-                            vararg args: Any?
-                        ) {
-                            val argsString = args
-                                .mapNotNull {
-                                    it?.toString()
-                                }
-                                .joinToString { ", " }
-
-                            when (level) {
-                                LogLevel.WARN -> {
-                                    Logger.warning((message ?: "Realm warning") + " $argsString", throwable)
-                                }
-                                LogLevel.ERROR -> {
-                                    Logger.error((message ?: "Realm error") + " $argsString", throwable)
-                                }
-
-                                else -> Unit // No-op
-                            }
-                        }
-
-                    }
-                ))
                 .build()
             )
 
             val db = OnlineDBImpl(
                 realm,
                 account,
-                app,
             )
 
             db.awaitSyncDone()

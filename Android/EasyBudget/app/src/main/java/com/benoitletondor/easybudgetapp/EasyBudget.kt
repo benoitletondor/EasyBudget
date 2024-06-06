@@ -48,6 +48,10 @@ import com.benoitletondor.easybudgetapp.view.getRatingPopupUserStep
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.HiltAndroidApp
+import io.realm.kotlin.log.LogCategory
+import io.realm.kotlin.log.LogLevel
+import io.realm.kotlin.log.RealmLog
+import io.realm.kotlin.log.RealmLogger
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -108,6 +112,9 @@ class EasyBudget : Application(), Configuration.Provider {
 
         // Batch
         setUpBatchSDK()
+
+        // Realm
+        setupRealm()
 
         // Setup theme
         AppCompatDelegate.setDefaultNightMode(parameters.getTheme().toPlatformValue())
@@ -347,6 +354,7 @@ class EasyBudget : Application(), Configuration.Provider {
         }
 
         Batch.start(BuildConfig.BATCH_API_KEY)
+        Batch.setFindMyInstallationEnabled(false)
         Batch.Push.setManualDisplay(true)
         Batch.Push.setSmallIconResourceId(R.drawable.ic_push)
         Batch.Push.setNotificationsColor(ContextCompat.getColor(this, R.color.accent))
@@ -369,6 +377,36 @@ class EasyBudget : Application(), Configuration.Provider {
         Batch.Push.setNotificationsType(notificationTypes)
 
         registerActivityLifecycleCallbacks(BatchActivityLifecycleHelper())
+    }
+
+    private fun setupRealm() {
+        RealmLog.setLevel(level = if (BuildConfig.DEBUG_LOG) LogLevel.INFO else LogLevel.WARN)
+        RealmLog.add(object : RealmLogger {
+            override fun log(
+                category: LogCategory,
+                level: LogLevel,
+                throwable: Throwable?,
+                message: String?,
+                vararg args: Any?
+            ) {
+                val argsString = args
+                    .mapNotNull {
+                        it?.toString()
+                    }
+                    .joinToString { ", " }
+
+                when (level) {
+                    LogLevel.WARN -> {
+                        Logger.warning((message ?: "Realm warning") + " $argsString", throwable)
+                    }
+                    LogLevel.ERROR -> {
+                        Logger.error((message ?: "Realm error") + " $argsString", throwable)
+                    }
+
+                    else -> Unit // No-op
+                }
+            }
+        })
     }
 
     /**
