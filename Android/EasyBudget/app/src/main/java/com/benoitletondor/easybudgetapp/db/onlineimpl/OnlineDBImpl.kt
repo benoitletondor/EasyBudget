@@ -16,6 +16,7 @@
 
 package com.benoitletondor.easybudgetapp.db.onlineimpl
 
+import com.benoitletondor.easybudgetapp.BuildConfig
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.benoitletondor.easybudgetapp.db.RestoreAction
 import com.benoitletondor.easybudgetapp.db.onlineimpl.entity.ExpenseEntity
@@ -30,11 +31,13 @@ import com.kizitonwose.calendar.core.atStartOfMonth
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.internal.RealmImpl
 import io.realm.kotlin.mongodb.App
 import io.realm.kotlin.mongodb.AppConfiguration
 import io.realm.kotlin.mongodb.Credentials
 import io.realm.kotlin.mongodb.subscriptions
 import io.realm.kotlin.mongodb.sync.SyncConfiguration
+import io.realm.kotlin.mongodb.syncSession
 import io.realm.kotlin.notifications.UpdatedRealm
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -63,7 +66,6 @@ import kotlin.time.toDuration
 class OnlineDBImpl(
     private val realm: Realm,
     override val account: Account,
-    private val app: App,
 ) : OnlineDB, CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.IO) {
     private var recurringExpenseWatchingJob: Job? = null
     private var changesWatchingJob: Job? = null
@@ -521,8 +523,6 @@ class OnlineDBImpl(
 
         Logger.debug("Closing Online DB: ${account.id}")
         realm.close()
-        app.sync.waitForSessionsToTerminate()
-        app.close()
         cancel()
         recurringExpensesLoadingStateMutableFlow.value = RecurringExpenseLoadingState.NotLoaded
     }
@@ -551,17 +551,11 @@ class OnlineDBImpl(
         private val readWriteTimeout = 5.toDuration(DurationUnit.SECONDS)
 
         suspend fun provideFor(
-            atlasAppId: String,
             currentUser: CurrentUser,
             accountId: String,
             accountSecret: String,
+            app: App,
         ): OnlineDBImpl {
-            val app = App.create(
-                AppConfiguration.Builder(atlasAppId)
-                    .enableSessionMultiplexing(true)
-                    .build()
-            )
-
             val user = withContext(Dispatchers.IO) {
                 try {
                     app.login(Credentials.jwt(currentUser.token))
@@ -601,7 +595,6 @@ class OnlineDBImpl(
             val db = OnlineDBImpl(
                 realm,
                 account,
-                app,
             )
 
             db.awaitSyncDone()

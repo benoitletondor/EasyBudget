@@ -41,6 +41,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import io.realm.kotlin.mongodb.App
+import io.realm.kotlin.mongodb.AppConfiguration
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -79,6 +81,8 @@ object AppModule {
         OfflineDBImpl(RoomDB.create(context)),
     )
 
+    private var app: App? = null;
+
     suspend fun provideSyncedOnlineDBOrThrow(
         currentUser: CurrentUser,
         accountId: String,
@@ -86,12 +90,23 @@ object AppModule {
     ): OnlineDB {
         usedOnlineDB?.close()
 
+        val app = this.app ?: run {
+            val createdApp = App.create(
+                AppConfiguration.Builder(BuildConfig.ATLAS_APP_ID)
+                    .enableSessionMultiplexing(true)
+                    .build()
+            )
+
+            this.app = createdApp
+            app
+        }
+
         val db = CachedOnlineDBImpl(
             OnlineDBImpl.provideFor(
-                atlasAppId = BuildConfig.ATLAS_APP_ID,
                 currentUser = currentUser,
                 accountId = accountId,
-                accountSecret = accountSecret
+                accountSecret = accountSecret,
+                app = app,
             ),
         )
 
