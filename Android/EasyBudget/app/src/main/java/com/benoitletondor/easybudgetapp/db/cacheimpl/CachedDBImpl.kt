@@ -69,18 +69,10 @@ open class CachedDBImpl(
         yearMonth: YearMonth,
     ): DataForMonth {
         cacheMutex.withLock {
-            val cachedDataForMonth = cachedDataForMonths[yearMonth]
-
-            if (cachedDataForMonth != null) {
-                return cachedDataForMonth
+            return cachedDataForMonths.getOrPut(yearMonth) {
+                Logger.debug("DBCache: Caching data for month: $yearMonth")
+                wrappedDB.getDataForMonth(yearMonth)
             }
-
-            Logger.debug("DBCache: Caching data for month: $yearMonth")
-
-            val dataForMonth = wrappedDB.getDataForMonth(yearMonth)
-            cachedDataForMonths[yearMonth] = dataForMonth
-
-            return dataForMonth
         }
     }
 
