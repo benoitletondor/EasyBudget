@@ -71,7 +71,7 @@ import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.accounts.model.Invitation
 import com.benoitletondor.easybudgetapp.accounts.model.InvitationStatus
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
-import com.benoitletondor.easybudgetapp.theme.AppTheme
+import com.benoitletondor.easybudgetapp.compose.AppTheme
 import com.benoitletondor.easybudgetapp.view.main.manageaccount.LoadingKind
 import com.benoitletondor.easybudgetapp.view.main.manageaccount.ManageAccountViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder

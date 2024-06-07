@@ -21,7 +21,9 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -51,10 +53,11 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.withStarted
 import com.benoitletondor.easybudgetapp.R
+import com.benoitletondor.easybudgetapp.compose.AppNavHost
 import com.benoitletondor.easybudgetapp.databinding.ActivityMainBinding
 import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.parameters.*
-import com.benoitletondor.easybudgetapp.theme.AppTheme
+import com.benoitletondor.easybudgetapp.compose.AppTheme
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.main.account.AccountFragment
 import com.benoitletondor.easybudgetapp.view.main.accountselector.AccountSelectorFragment
@@ -68,6 +71,7 @@ import com.benoitletondor.easybudgetapp.view.welcome.getOnboardingStep
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
 import javax.inject.Inject
+import kotlinx.serialization.Serializable
 
 /**
  * Main activity containing Calendar and List of expenses
@@ -75,7 +79,7 @@ import javax.inject.Inject
  * @author Benoit LETONDOR
  */
 @AndroidEntryPoint
-class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
+class MainActivity : AppCompatActivity(), MenuProvider {
 
     private val viewModel: MainViewModel by viewModels()
 
@@ -84,7 +88,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
 
 // ------------------------------------------>
 
-    override fun createBinding(): ActivityMainBinding = ActivityMainBinding.inflate(layoutInflater)
+    //override fun createBinding(): ActivityMainBinding = ActivityMainBinding.inflate(layoutInflater)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,7 +99,13 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
             ActivityCompat.startActivityForResult(this, startIntent, WELCOME_SCREEN_ACTIVITY_CODE, null)
         }
 
-        setSupportActionBar(binding.toolbar)
+        setContent {
+            AppTheme {
+                AppNavHost()
+            }
+        }
+
+        /*setSupportActionBar(binding.toolbar)
         addMenuProvider(this)
 
         collectViewModelEvents()
@@ -180,7 +190,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), MenuProvider {
                     }
                 }
             }
-        }
+        }*/
     }
 
     @Deprecated("This method has been deprecated in favor of using the Activity Result API\n      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt\n      contracts for common intents available in\n      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for\n      testing, and allow receiving results in separate, testable classes independent from your\n      activity. Use\n      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)}\n      with the appropriate {@link ActivityResultContract} and handling the result in the\n      {@link ActivityResultCallback#onActivityResult(Object) callback}.")

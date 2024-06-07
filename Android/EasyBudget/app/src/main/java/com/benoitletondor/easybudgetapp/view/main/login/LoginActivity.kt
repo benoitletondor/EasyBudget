@@ -51,7 +51,7 @@ import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.benoitletondor.easybudgetapp.databinding.ActivityLoginBinding
 import com.benoitletondor.easybudgetapp.helper.BaseActivity
 import com.benoitletondor.easybudgetapp.helper.launchCollect
-import com.benoitletondor.easybudgetapp.theme.AppTheme
+import com.benoitletondor.easybudgetapp.compose.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

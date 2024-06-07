@@ -13,7 +13,7 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-val kotlinVersion by extra("2.0.0") // Change in the plugins below too & for compose plugin
+val kotlinVersion by extra("2.0.0") // Change in the plugins below too & for compose & serialization plugin
 val hiltVersion by extra("2.51.1") // Change in the plugins below too
 val realmVersion by extra("2.0.0") // Change in the plugins below too
 
@@ -27,4 +27,5 @@ plugins {
     id("com.google.devtools.ksp") version "2.0.0-1.0.21" apply false
     id("io.realm.kotlin") version "2.0.0" apply false
     id("org.jetbrains.kotlin.plugin.compose") version "2.0.0" apply false
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.0" apply false
 }

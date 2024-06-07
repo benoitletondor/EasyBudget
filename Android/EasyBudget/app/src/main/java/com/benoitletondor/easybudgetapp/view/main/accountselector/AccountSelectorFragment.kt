@@ -27,7 +27,7 @@ import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.databinding.FragmentAccountSelectorBinding
 import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.helper.viewLifecycleScope
-import com.benoitletondor.easybudgetapp.theme.AppTheme
+import com.benoitletondor.easybudgetapp.compose.AppTheme
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
 import com.benoitletondor.easybudgetapp.view.main.accountselector.view.AccountsView
 import com.benoitletondor.easybudgetapp.view.main.createaccount.CreateAccountActivity

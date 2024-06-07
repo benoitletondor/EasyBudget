@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp.theme
+package com.benoitletondor.easybudgetapp.compose
 
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.compose.runtime.Composable

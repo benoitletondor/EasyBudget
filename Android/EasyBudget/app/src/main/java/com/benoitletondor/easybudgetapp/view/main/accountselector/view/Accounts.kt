@@ -52,7 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
-import com.benoitletondor.easybudgetapp.theme.AppTheme
+import com.benoitletondor.easybudgetapp.compose.AppTheme
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import com.benoitletondor.easybudgetapp.view.main.accountselector.AccountSelectorViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -544,7 +544,7 @@ private fun InvitationView(
 
 @Composable
 @Preview(name = "Loading preview")
-fun AccountsLoadingViewPreview() {
+private fun AccountsLoadingViewPreview() {
     AppTheme {
         AccountsView(
             state = AccountSelectorViewModel.State.Loading,

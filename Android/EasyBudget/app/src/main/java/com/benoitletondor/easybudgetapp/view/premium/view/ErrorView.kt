@@ -24,8 +24,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.benoitletondor.easybudgetapp.R
-import com.benoitletondor.easybudgetapp.theme.AppTheme
-import com.benoitletondor.easybudgetapp.theme.easyBudgetGreenColor
+import com.benoitletondor.easybudgetapp.compose.AppTheme
+import com.benoitletondor.easybudgetapp.compose.easyBudgetGreenColor
 
 @Composable
 fun ErrorView(

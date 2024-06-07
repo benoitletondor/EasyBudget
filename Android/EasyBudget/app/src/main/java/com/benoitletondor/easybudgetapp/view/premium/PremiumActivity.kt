@@ -35,8 +35,8 @@ import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.helper.setNavigationBarColored
 import com.benoitletondor.easybudgetapp.helper.setStatusBarColor
 import com.benoitletondor.easybudgetapp.iab.PurchaseFlowResult
-import com.benoitletondor.easybudgetapp.theme.AppTheme
-import com.benoitletondor.easybudgetapp.theme.easyBudgetGreenColor
+import com.benoitletondor.easybudgetapp.compose.AppTheme
+import com.benoitletondor.easybudgetapp.compose.easyBudgetGreenColor
 import com.benoitletondor.easybudgetapp.view.premium.view.ErrorView
 import com.benoitletondor.easybudgetapp.view.premium.view.LoadingView
 import com.benoitletondor.easybudgetapp.view.premium.view.SubscribeView
