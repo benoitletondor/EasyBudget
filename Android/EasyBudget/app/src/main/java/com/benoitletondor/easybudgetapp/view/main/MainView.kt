@@ -44,10 +44,8 @@ fun MainView(
 ) {
     Scaffold(
         topBar = {
-            AppTopAppBar(
+            MainViewTopAppBar(
                 navController = navController,
-                title = stringResource(id = R.string.app_name),
-                showBackButton = false,
             )
         },
         content = { contentPadding ->
@@ -65,6 +63,17 @@ fun MainView(
 }
 
 @Composable
+private fun MainViewTopAppBar(
+    navController: NavController,
+) {
+    AppTopAppBar(
+        navController = navController,
+        title = stringResource(id = R.string.app_name),
+        showBackButton = false,
+    )
+}
+
+@Composable
 private fun MainView(
     selectedAccountFlow: StateFlow<MainViewModel.SelectedAccount>,
     hasPendingInvitationsFlow: StateFlow<Boolean>,
@@ -77,11 +86,17 @@ private fun MainView(
     ) {
         when(val selectedAccount = account) {
             MainViewModel.SelectedAccount.Loading -> LoadingView()
-            is MainViewModel.SelectedAccount.Selected -> SelectedAccountHeader(
-                selectedAccount = selectedAccount,
-                hasPendingInvitationsFlow = hasPendingInvitationsFlow,
-                onAccountTapped = onAccountTapped,
-            )
+            is MainViewModel.SelectedAccount.Selected -> {
+                SelectedAccountHeader(
+                    selectedAccount = selectedAccount,
+                    hasPendingInvitationsFlow = hasPendingInvitationsFlow,
+                    onAccountTapped = onAccountTapped,
+                )
+
+                CalendarView(
+                    selectedAccount = selectedAccount,
+                )
+            }
         }
     }
 }
@@ -159,4 +174,11 @@ private fun SelectedAccountHeader(
         }
 
     }
+}
+
+@Composable
+private fun CalendarView(
+    selectedAccount: MainViewModel.SelectedAccount.Selected,
+) {
+
 }

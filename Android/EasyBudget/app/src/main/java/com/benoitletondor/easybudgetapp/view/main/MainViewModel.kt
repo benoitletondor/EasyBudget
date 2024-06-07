@@ -47,9 +47,6 @@ class MainViewModel @Inject constructor(
     val premiumStatusFlow: StateFlow<PremiumCheckStatus> = iab.iabStatusFlow
         .stateIn(viewModelScope, SharingStarted.Eagerly, PremiumCheckStatus.INITIALIZING)
 
-    private val openPremiumEventMutableFlow = MutableLiveFlow<Unit>()
-    val openPremiumEventFlow: Flow<Unit> = openPremiumEventMutableFlow
-
     private val selectedOnlineAccountIdMutableStateFlow: MutableStateFlow<String?>
         = MutableStateFlow(parameters.getLatestSelectedOnlineAccountId())
 
@@ -129,7 +126,7 @@ class MainViewModel @Inject constructor(
 
     fun onBecomePremiumButtonPressed() {
         viewModelScope.launch {
-            openPremiumEventMutableFlow.emit(Unit)
+            eventMutableFlow.emit(Event.OpenPremium)
         }
     }
 
@@ -198,5 +195,6 @@ class MainViewModel @Inject constructor(
 
     sealed class Event {
         data object ShowAccountSelect : Event()
+        data object OpenPremium : Event()
     }
 }

@@ -71,6 +71,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -219,32 +221,229 @@ class AccountFragment : Fragment(), MenuProvider {
             }
         }
 
-        viewLifecycleScope.launchCollect(viewModel.expenseDeletionSuccessEventFlow) { (deletedExpense, restoreAction) ->
-            val snackbar = Snackbar.make(
-                binding.coordinatorLayout,
-                if (deletedExpense.isRevenue()) R.string.income_delete_snackbar_text else R.string.expense_delete_snackbar_text,
-                Snackbar.LENGTH_LONG
-            )
-            snackbar.setAction(R.string.undo) {
-                viewModel.onExpenseDeletionCancelled(restoreAction)
+        viewLifecycleScope.launchCollect(viewModel.eventFlow) { event ->
+            when(event) {
+                is AccountViewModel.Event.CheckAllPastEntriesError -> {
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(R.string.check_all_past_expences_error_title)
+                        .setMessage(
+                            getString(
+                                R.string.check_all_past_expences_error_message,
+                                event.error.localizedMessage,
+                            )
+                        )
+                        .setNegativeButton(R.string.ok) { dialog2, _ -> dialog2.dismiss() }
+                        .show()
+                }
+                is AccountViewModel.Event.CurrentBalanceEditionError -> {
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(R.string.adjust_balance_error_title)
+                        .setMessage(R.string.adjust_balance_error_message)
+                        .setNegativeButton(R.string.ok) { dialog1, _ -> dialog1.dismiss() }
+                        .show()
+                }
+                is AccountViewModel.Event.CurrentBalanceEditionSuccess -> {
+                    val (expense, diff, newBalance) = event.data
+
+                    val snackbar = Snackbar.make(
+                        binding.coordinatorLayout,
+                        resources.getString(
+                            R.string.adjust_balance_snackbar_text,
+                            CurrencyHelper.getFormattedCurrencyString(parameters, newBalance)
+                        ),
+                        Snackbar.LENGTH_LONG
+                    )
+                    snackbar.setAction(R.string.undo) {
+                        viewModel.onCurrentBalanceEditedCancelled(expense, diff)
+                    }
+                    snackbar.setActionTextColor(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.snackbar_action_undo
+                        )
+                    )
+
+                    snackbar.duration = BaseTransientBottomBar.LENGTH_LONG
+                    snackbar.show()
+                }
+                is AccountViewModel.Event.CurrentBalanceRestorationError -> {
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(R.string.adjust_balance_error_title)
+                        .setMessage(R.string.adjust_balance_error_message)
+                        .setNegativeButton(R.string.ok) { dialog1, _ -> dialog1.dismiss() }
+                        .show()
+                }
+                is AccountViewModel.Event.ExpenseCheckingError -> {
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(R.string.expense_check_error_title)
+                        .setMessage(
+                            getString(
+                                R.string.expense_check_error_message,
+                                event.error.localizedMessage
+                            )
+                        )
+                        .setNegativeButton(R.string.ok) { dialog2, _ -> dialog2.dismiss() }
+                        .show()
+                }
+                is AccountViewModel.Event.ExpenseDeletionError -> {
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(R.string.expense_delete_error_title)
+                        .setMessage(R.string.expense_delete_error_message)
+                        .setNegativeButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
+                        .show()
+                }
+                is AccountViewModel.Event.ExpenseDeletionSuccess -> {
+                    val (deletedExpense, restoreAction) = event.data
+
+                    val snackbar = Snackbar.make(
+                        binding.coordinatorLayout,
+                        if (deletedExpense.isRevenue()) R.string.income_delete_snackbar_text else R.string.expense_delete_snackbar_text,
+                        Snackbar.LENGTH_LONG
+                    )
+                    snackbar.setAction(R.string.undo) {
+                        viewModel.onExpenseDeletionCancelled(restoreAction)
+                    }
+                    snackbar.setActionTextColor(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.snackbar_action_undo
+                        )
+                    )
+
+                    snackbar.duration = BaseTransientBottomBar.LENGTH_LONG
+                    snackbar.show()
+                }
+                AccountViewModel.Event.GoBackToCurrentMonth -> Unit /* No-op */
+                is AccountViewModel.Event.OpenAddExpense -> {
+                    val startIntent = ExpenseEditActivity.newIntent(
+                        context = requireContext(),
+                        editedExpense = null,
+                        date = event.date,
+                    )
+
+                    requireActivity().startActivity(startIntent)
+                }
+                is AccountViewModel.Event.OpenManageAccount -> {
+                    startActivity(ManageAccountActivity.newIntent(requireContext(), event.account))
+                }
+                AccountViewModel.Event.OpenMonthlyReport -> {
+                    val startIntent = Intent(requireActivity(), MonthlyReportBaseActivity::class.java)
+                    ActivityCompat.startActivity(requireContext(), startIntent, null)
+                }
+                is AccountViewModel.Event.RecurringExpenseDeletionResult -> {
+                    when(event.data) {
+                        is AccountViewModel.RecurringExpenseDeletionEvent.ErrorCantDeleteBeforeFirstOccurrence -> {
+                            MaterialAlertDialogBuilder(requireContext())
+                                .setTitle(R.string.recurring_expense_delete_first_error_title)
+                                .setMessage(R.string.recurring_expense_delete_first_error_message)
+                                .setNegativeButton(R.string.ok, null)
+                                .show()
+                        }
+                        is AccountViewModel.RecurringExpenseDeletionEvent.ErrorIO -> {
+                            showGenericRecurringDeleteErrorDialog()
+                        }
+                        is AccountViewModel.RecurringExpenseDeletionEvent.ErrorRecurringExpenseDeleteNotAssociated -> {
+                            showGenericRecurringDeleteErrorDialog()
+                        }
+                        is AccountViewModel.RecurringExpenseDeletionEvent.Success -> {
+                            val snackbar = Snackbar.make(
+                                binding.coordinatorLayout,
+                                R.string.recurring_expense_delete_success_message,
+                                Snackbar.LENGTH_LONG
+                            )
+
+                            snackbar.setAction(R.string.undo) {
+                                viewModel.onRestoreRecurringExpenseClicked(
+                                    event.data.recurringExpense,
+                                    event.data.restoreAction,
+                                )
+                            }
+
+                            snackbar.setActionTextColor(
+                                ContextCompat.getColor(
+                                    requireContext(),
+                                    R.color.snackbar_action_undo
+                                )
+                            )
+                            snackbar.duration = BaseTransientBottomBar.LENGTH_LONG
+                            snackbar.show()
+                        }
+                    }
+                }
+                is AccountViewModel.Event.RecurringExpenseRestoreResult -> {
+                    when(event.data) {
+                        is AccountViewModel.RecurringExpenseRestoreEvent.ErrorIO -> {
+                            MaterialAlertDialogBuilder(requireContext())
+                                .setTitle(R.string.recurring_expense_restore_error_title)
+                                .setMessage(resources.getString(R.string.recurring_expense_restore_error_message))
+                                .setNegativeButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
+                                .show()
+                        }
+                        is AccountViewModel.RecurringExpenseRestoreEvent.Success -> {
+                            Snackbar.make(
+                                binding.coordinatorLayout,
+                                R.string.recurring_expense_restored_success_message,
+                                Snackbar.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+                }
+                AccountViewModel.Event.ShowConfirmCheckAllPastEntries -> {
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(R.string.check_all_past_expences_title)
+                        .setMessage(getString(R.string.check_all_past_expences_message))
+                        .setPositiveButton(R.string.check_all_past_expences_confirm_cta) { dialog2, _ ->
+                            viewModel.onCheckAllPastEntriesConfirmPressed()
+                            dialog2.dismiss()
+                        }
+                        .setNegativeButton(android.R.string.cancel) { dialog2, _ -> dialog2.dismiss() }
+                        .show()
+                }
+                is AccountViewModel.Event.StartCurrentBalanceEditor -> {
+                    val dialogView = layoutInflater.inflate(R.layout.dialog_adjust_balance, null)
+                    val amountEditText = dialogView.findViewById<EditText>(R.id.balance_amount)
+                    amountEditText.setText(
+                        if (event.currentBalance == 0.0) "0" else CurrencyHelper.getFormattedAmountValue(
+                            event.currentBalance
+                        )
+                    )
+                    amountEditText.preventUnsupportedInputForDecimals()
+                    amountEditText.setSelection(amountEditText.text.length) // Put focus at the end of the text
+
+                    val builder = MaterialAlertDialogBuilder(requireContext())
+                    builder.setTitle(R.string.adjust_balance_title)
+                    builder.setMessage(R.string.adjust_balance_message)
+                    builder.setView(dialogView)
+                    builder.setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
+                    builder.setPositiveButton(R.string.ok) { dialog, _ ->
+                        try {
+                            val stringValue = amountEditText.text.toString()
+                            if (stringValue.isNotBlank()) {
+                                val newBalance = java.lang.Double.valueOf(stringValue)
+                                viewModel.onNewBalanceSelected(
+                                    newBalance,
+                                    getString(R.string.adjust_balance_expense_title)
+                                )
+                            }
+                        } catch (e: Exception) {
+                            Logger.error("Error parsing new balance", e)
+                        }
+
+                        dialog.dismiss()
+                    }
+
+                    val dialog = builder.show()
+
+                    // Directly show keyboard when the dialog pops
+                    amountEditText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+                        // Check if the device doesn't have a physical keyboard
+                        if (hasFocus && resources.configuration.keyboard == Configuration.KEYBOARD_NOKEYS) {
+                            dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+                        }
+                    }
+                }
             }
-            snackbar.setActionTextColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.snackbar_action_undo
-                )
-            )
 
-            snackbar.duration = BaseTransientBottomBar.LENGTH_LONG
-            snackbar.show()
-        }
-
-        viewLifecycleScope.launchCollect(viewModel.expenseDeletionErrorEventFlow) {
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.expense_delete_error_title)
-                .setMessage(R.string.expense_delete_error_message)
-                .setNegativeButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
-                .show()
         }
 
         var expenseDeletionDialog: ProgressDialog? = null
@@ -264,47 +463,6 @@ class AccountFragment : Fragment(), MenuProvider {
                 AccountViewModel.RecurringExpenseDeleteProgressState.Idle -> {
                     expenseDeletionDialog?.dismiss()
                     expenseDeletionDialog = null
-                }
-            }
-        }
-
-        viewLifecycleScope.launchCollect(viewModel.recurringExpenseDeletionEventFlow) { event ->
-            when(event) {
-                is AccountViewModel.RecurringExpenseDeletionEvent.ErrorCantDeleteBeforeFirstOccurrence -> {
-                    MaterialAlertDialogBuilder(requireContext())
-                        .setTitle(R.string.recurring_expense_delete_first_error_title)
-                        .setMessage(R.string.recurring_expense_delete_first_error_message)
-                        .setNegativeButton(R.string.ok, null)
-                        .show()
-                }
-                is AccountViewModel.RecurringExpenseDeletionEvent.ErrorIO -> {
-                    showGenericRecurringDeleteErrorDialog()
-                }
-                is AccountViewModel.RecurringExpenseDeletionEvent.ErrorRecurringExpenseDeleteNotAssociated -> {
-                    showGenericRecurringDeleteErrorDialog()
-                }
-                is AccountViewModel.RecurringExpenseDeletionEvent.Success -> {
-                    val snackbar = Snackbar.make(
-                        binding.coordinatorLayout,
-                        R.string.recurring_expense_delete_success_message,
-                        Snackbar.LENGTH_LONG
-                    )
-
-                    snackbar.setAction(R.string.undo) {
-                        viewModel.onRestoreRecurringExpenseClicked(
-                            event.recurringExpense,
-                            event.restoreAction,
-                        )
-                    }
-
-                    snackbar.setActionTextColor(
-                        ContextCompat.getColor(
-                            requireContext(),
-                            R.color.snackbar_action_undo
-                        )
-                    )
-                    snackbar.duration = BaseTransientBottomBar.LENGTH_LONG
-                    snackbar.show()
                 }
             }
         }
@@ -330,109 +488,6 @@ class AccountFragment : Fragment(), MenuProvider {
             }
         }
 
-        viewLifecycleScope.launchCollect(viewModel.recurringExpenseRestoreEventFlow) { event ->
-            when(event) {
-                is AccountViewModel.RecurringExpenseRestoreEvent.ErrorIO -> {
-                    MaterialAlertDialogBuilder(requireContext())
-                        .setTitle(R.string.recurring_expense_restore_error_title)
-                        .setMessage(resources.getString(R.string.recurring_expense_restore_error_message))
-                        .setNegativeButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
-                        .show()
-                }
-                is AccountViewModel.RecurringExpenseRestoreEvent.Success -> {
-                    Snackbar.make(
-                        binding.coordinatorLayout,
-                        R.string.recurring_expense_restored_success_message,
-                        Snackbar.LENGTH_LONG
-                    ).show()
-                }
-            }
-        }
-
-        viewLifecycleScope.launchCollect(viewModel.startCurrentBalanceEditorEventFlow) { currentBalance ->
-            val dialogView = layoutInflater.inflate(R.layout.dialog_adjust_balance, null)
-            val amountEditText = dialogView.findViewById<EditText>(R.id.balance_amount)
-            amountEditText.setText(
-                if (currentBalance == 0.0) "0" else CurrencyHelper.getFormattedAmountValue(
-                    currentBalance
-                )
-            )
-            amountEditText.preventUnsupportedInputForDecimals()
-            amountEditText.setSelection(amountEditText.text.length) // Put focus at the end of the text
-
-            val builder = MaterialAlertDialogBuilder(requireContext())
-            builder.setTitle(R.string.adjust_balance_title)
-            builder.setMessage(R.string.adjust_balance_message)
-            builder.setView(dialogView)
-            builder.setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
-            builder.setPositiveButton(R.string.ok) { dialog, _ ->
-                try {
-                    val stringValue = amountEditText.text.toString()
-                    if (stringValue.isNotBlank()) {
-                        val newBalance = java.lang.Double.valueOf(stringValue)
-                        viewModel.onNewBalanceSelected(
-                            newBalance,
-                            getString(R.string.adjust_balance_expense_title)
-                        )
-                    }
-                } catch (e: Exception) {
-                    Logger.error("Error parsing new balance", e)
-                }
-
-                dialog.dismiss()
-            }
-
-            val dialog = builder.show()
-
-            // Directly show keyboard when the dialog pops
-            amountEditText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
-                // Check if the device doesn't have a physical keyboard
-                if (hasFocus && resources.configuration.keyboard == Configuration.KEYBOARD_NOKEYS) {
-                    dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-                }
-            }
-        }
-
-        viewLifecycleScope.launchCollect(viewModel.currentBalanceEditingErrorEventFlow) {
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.adjust_balance_error_title)
-                .setMessage(R.string.adjust_balance_error_message)
-                .setNegativeButton(R.string.ok) { dialog1, _ -> dialog1.dismiss() }
-                .show()
-        }
-
-        viewLifecycleScope.launchCollect(viewModel.currentBalanceEditedEventFlow) { (expense, diff, newBalance) ->
-            //Show snackbar
-            val snackbar = Snackbar.make(
-                binding.coordinatorLayout,
-                resources.getString(
-                    R.string.adjust_balance_snackbar_text,
-                    CurrencyHelper.getFormattedCurrencyString(parameters, newBalance)
-                ),
-                Snackbar.LENGTH_LONG
-            )
-            snackbar.setAction(R.string.undo) {
-                viewModel.onCurrentBalanceEditedCancelled(expense, diff)
-            }
-            snackbar.setActionTextColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.snackbar_action_undo
-                )
-            )
-
-            snackbar.duration = BaseTransientBottomBar.LENGTH_LONG
-            snackbar.show()
-        }
-
-        viewLifecycleScope.launchCollect(viewModel.currentBalanceRestoringErrorEventFlow) {
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.adjust_balance_error_title)
-                .setMessage(R.string.adjust_balance_error_message)
-                .setNegativeButton(R.string.ok) { dialog1, _ -> dialog1.dismiss() }
-                .show()
-        }
-
         viewLifecycleScope.launchCollect(viewModel.selectedDateDataFlow) { (date, balance, maybeCheckedBalance, expenses) ->
             refreshBalanceAndExpenseListForDate(date, balance, maybeCheckedBalance, expenses)
         }
@@ -451,69 +506,12 @@ class AccountFragment : Fragment(), MenuProvider {
             })
         }
 
-        viewLifecycleScope.launchCollect(viewModel.expenseCheckedErrorEventFlow) { exception ->
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.expense_check_error_title)
-                .setMessage(
-                    getString(
-                        R.string.expense_check_error_message,
-                        exception.localizedMessage
-                    )
-                )
-                .setNegativeButton(R.string.ok) { dialog2, _ -> dialog2.dismiss() }
-                .show()
-        }
-
         viewLifecycleScope.launchCollect(viewModel.showGoToCurrentMonthButtonStateFlow) {
             invalidateOptionsMenu(requireActivity())
         }
 
         viewLifecycleScope.launchCollect(viewModel.showManageAccountMenuItem) {
             invalidateOptionsMenu(requireActivity())
-        }
-
-        viewLifecycleScope.launchCollect(viewModel.confirmCheckAllPastEntriesEventFlow) {
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.check_all_past_expences_title)
-                .setMessage(getString(R.string.check_all_past_expences_message))
-                .setPositiveButton(R.string.check_all_past_expences_confirm_cta) { dialog2, _ ->
-                    viewModel.onCheckAllPastEntriesConfirmPressed()
-                    dialog2.dismiss()
-                }
-                .setNegativeButton(android.R.string.cancel) { dialog2, _ -> dialog2.dismiss() }
-                .show()
-        }
-
-        viewLifecycleScope.launchCollect(viewModel.checkAllPastEntriesErrorEventFlow) { error ->
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.check_all_past_expences_error_title)
-                .setMessage(
-                    getString(
-                        R.string.check_all_past_expences_error_message,
-                        error.localizedMessage
-                    )
-                )
-                .setNegativeButton(R.string.ok) { dialog2, _ -> dialog2.dismiss() }
-                .show()
-        }
-
-        viewLifecycleScope.launchCollect(viewModel.openMonthlyReportEventFlow) {
-            val startIntent = Intent(requireActivity(), MonthlyReportBaseActivity::class.java)
-            ActivityCompat.startActivity(requireContext(), startIntent, null)
-        }
-
-        viewLifecycleScope.launchCollect(viewModel.openManageAccountEventFlow) { account ->
-            startActivity(ManageAccountActivity.newIntent(requireContext(), account))
-        }
-
-        viewLifecycleScope.launchCollect(viewModel.openExpenseAddEventFlow) { date ->
-            val startIntent = ExpenseEditActivity.newIntent(
-                context = requireContext(),
-                editedExpense = null,
-                date = date,
-            )
-
-            requireActivity().startActivity(startIntent)
         }
     }
 
@@ -576,7 +574,9 @@ class AccountFragment : Fragment(), MenuProvider {
                     selectedDateFlow = viewModel.selectDateFlow,
                     includeCheckedBalanceFlow = viewModel.includeCheckedBalanceFlow,
                     onMonthChanged = viewModel::onMonthChanged,
-                    goBackToCurrentMonthEventFlow = viewModel.goBackToCurrentMonthEventFlow,
+                    goBackToCurrentMonthEventFlow = viewModel.eventFlow
+                        .filterIsInstance<AccountViewModel.Event.GoBackToCurrentMonth>()
+                        .map { /* No-op to produce Unit */ },
                     onDateSelected = viewModel::onSelectDate,
                     onDateLongClicked = viewModel::onDateLongClicked,
                 )

@@ -44,7 +44,6 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -93,63 +92,21 @@ class AccountViewModel @Inject constructor(
     private val selectDateMutableStateFlow = MutableStateFlow(LocalDate.now())
     val selectDateFlow: StateFlow<LocalDate> = selectDateMutableStateFlow
 
-    private val goBackToCurrentMonthEventMutableFlow = MutableSharedFlow<Unit>()
-    val goBackToCurrentMonthEventFlow: Flow<Unit> = goBackToCurrentMonthEventMutableFlow
+    private val eventMutableFlow = MutableLiveFlow<Event>()
+    val eventFlow: Flow<Event> = eventMutableFlow
 
-    private val expenseDeletionSuccessEventMutableFlow = MutableLiveFlow<ExpenseDeletionSuccessData>()
-    val expenseDeletionSuccessEventFlow: Flow<ExpenseDeletionSuccessData> = expenseDeletionSuccessEventMutableFlow
-
-    private val expenseDeletionErrorEventMutableFlow = MutableLiveFlow<Expense>()
-    val expenseDeletionErrorEventFlow: Flow<Expense> = expenseDeletionErrorEventMutableFlow
+    private val forceRefreshMutableFlow = MutableLiveFlow<Unit>()
+    val forceRefreshFlow: Flow<Unit> = forceRefreshMutableFlow
 
     private val recurringExpenseDeletionProgressStateMutableFlow = MutableStateFlow<RecurringExpenseDeleteProgressState>(RecurringExpenseDeleteProgressState.Idle)
     val recurringExpenseDeletionProgressStateFlow: Flow<RecurringExpenseDeleteProgressState> = recurringExpenseDeletionProgressStateMutableFlow
-
-    private val recurringExpenseDeletionEventMutableFlow = MutableLiveFlow<RecurringExpenseDeletionEvent>()
-    val recurringExpenseDeletionEventFlow: Flow<RecurringExpenseDeletionEvent> = recurringExpenseDeletionEventMutableFlow
 
     private val recurringExpenseRestoreProgressStateMutableFlow = MutableStateFlow<RecurringExpenseRestoreProgressState>(
         RecurringExpenseRestoreProgressState.Idle)
     val recurringExpenseRestoreProgressStateFlow: Flow<RecurringExpenseRestoreProgressState> = recurringExpenseRestoreProgressStateMutableFlow
 
-    private val recurringExpenseRestoreEventMutableFlow = MutableLiveFlow<RecurringExpenseRestoreEvent>()
-    val recurringExpenseRestoreEventFlow: Flow<RecurringExpenseRestoreEvent> = recurringExpenseRestoreEventMutableFlow
-
-    private val startCurrentBalanceEditorEventMutableFlow = MutableLiveFlow<Double>()
-    val startCurrentBalanceEditorEventFlow: Flow<Double> = startCurrentBalanceEditorEventMutableFlow
-
     private val showGoToCurrentMonthButtonStateMutableFlow = MutableStateFlow(false)
     val showGoToCurrentMonthButtonStateFlow: StateFlow<Boolean> = showGoToCurrentMonthButtonStateMutableFlow
-
-    private val currentBalanceEditingErrorEventMutableFlow = MutableLiveFlow<Exception>()
-    val currentBalanceEditingErrorEventFlow: Flow<Exception> = currentBalanceEditingErrorEventMutableFlow
-
-    private val currentBalanceEditedEventMutableFlow = MutableLiveFlow<BalanceAdjustedData>()
-    val currentBalanceEditedEventFlow: Flow<BalanceAdjustedData> = currentBalanceEditedEventMutableFlow
-
-    private val currentBalanceRestoringErrorEventMutableFlow = MutableLiveFlow<Exception>()
-    val currentBalanceRestoringErrorEventFlow: Flow<Exception> = currentBalanceRestoringErrorEventMutableFlow
-
-    private val expenseCheckedErrorEventMutableFlow = MutableLiveFlow<Exception>()
-    val expenseCheckedErrorEventFlow: Flow<Exception> = expenseCheckedErrorEventMutableFlow
-
-    private val confirmCheckAllPastEntriesEventMutableFlow = MutableLiveFlow<Unit>()
-    val confirmCheckAllPastEntriesEventFlow: Flow<Unit> = confirmCheckAllPastEntriesEventMutableFlow
-
-    private val checkAllPastEntriesErrorEventMutableFlow = MutableLiveFlow<Throwable>()
-    val checkAllPastEntriesErrorEventFlow: Flow<Throwable> = checkAllPastEntriesErrorEventMutableFlow
-
-    private val openMonthlyReportEventMutableFlow = MutableLiveFlow<Unit>()
-    val openMonthlyReportEventFlow: Flow<Unit> = openMonthlyReportEventMutableFlow
-
-    private val openExpenseAddEventMutableFlow = MutableLiveFlow<LocalDate>()
-    val openExpenseAddEventFlow: Flow<LocalDate> = openExpenseAddEventMutableFlow
-
-    private val openManageAccountEventMutableFlow = MutableLiveFlow<MainViewModel.SelectedAccount.Selected.Online>()
-    val openManageAccountEventFlow: Flow<MainViewModel.SelectedAccount.Selected.Online> = openManageAccountEventMutableFlow
-
-    private val forceRefreshMutableFlow = MutableSharedFlow<Unit>()
-    val forceRefreshFlow: Flow<Unit> = forceRefreshMutableFlow
 
     private val showManageAccountMenuItemMutableFlow = MutableStateFlow(false)
     val showManageAccountMenuItem: StateFlow<Boolean> = showManageAccountMenuItemMutableFlow
@@ -287,7 +244,7 @@ class AccountViewModel @Inject constructor(
 
     fun onMonthlyReportButtonPressed() {
         viewModelScope.launch {
-            openMonthlyReportEventMutableFlow.emit(Unit)
+            eventMutableFlow.emit(Event.OpenMonthlyReport)
         }
     }
 
@@ -320,13 +277,17 @@ class AccountViewModel @Inject constructor(
                     awaitDB().deleteExpense(expense)
                 }
 
-                expenseDeletionSuccessEventMutableFlow.emit(ExpenseDeletionSuccessData(
-                    expense,
-                    restoreAction,
-                ))
+                eventMutableFlow.emit(
+                    Event.ExpenseDeletionSuccess(
+                        ExpenseDeletionSuccessData(
+                            expense,
+                            restoreAction,
+                        )
+                    )
+                )
             } catch (t: Throwable) {
                 Logger.error("Error while deleting expense", t)
-                expenseDeletionErrorEventMutableFlow.emit(expense)
+                eventMutableFlow.emit(Event.ExpenseDeletionError(expense))
             }
         }
     }
@@ -350,7 +311,7 @@ class AccountViewModel @Inject constructor(
             try {
                 val associatedRecurringExpense = expense.associatedRecurringExpense
                 if( associatedRecurringExpense == null ) {
-                    recurringExpenseDeletionEventMutableFlow.emit(RecurringExpenseDeletionEvent.ErrorRecurringExpenseDeleteNotAssociated(expense))
+                    eventMutableFlow.emit(Event.RecurringExpenseDeletionResult(RecurringExpenseDeletionEvent.ErrorRecurringExpenseDeleteNotAssociated(expense)))
                     return@launch
                 }
 
@@ -359,7 +320,7 @@ class AccountViewModel @Inject constructor(
                 }
 
                 if ( firstOccurrenceError ) {
-                    recurringExpenseDeletionEventMutableFlow.emit(RecurringExpenseDeletionEvent.ErrorCantDeleteBeforeFirstOccurrence(expense))
+                    eventMutableFlow.emit(Event.RecurringExpenseDeletionResult(RecurringExpenseDeletionEvent.ErrorCantDeleteBeforeFirstOccurrence(expense)))
                     return@launch
                 }
 
@@ -409,11 +370,11 @@ class AccountViewModel @Inject constructor(
                 }
 
                 if( restoreAction == null ) {
-                    recurringExpenseDeletionEventMutableFlow.emit(RecurringExpenseDeletionEvent.ErrorIO(expense))
+                    eventMutableFlow.emit(Event.RecurringExpenseDeletionResult(RecurringExpenseDeletionEvent.ErrorIO(expense)))
                     return@launch
                 }
 
-                recurringExpenseDeletionEventMutableFlow.emit(RecurringExpenseDeletionEvent.Success(associatedRecurringExpense.recurringExpense, restoreAction))
+                eventMutableFlow.emit(Event.RecurringExpenseDeletionResult(RecurringExpenseDeletionEvent.Success(associatedRecurringExpense.recurringExpense, restoreAction)))
             } finally {
                 recurringExpenseDeletionProgressStateMutableFlow.value = RecurringExpenseDeleteProgressState.Idle
             }
@@ -427,9 +388,11 @@ class AccountViewModel @Inject constructor(
 
             try {
                 restoreAction()
-                recurringExpenseRestoreEventMutableFlow.emit(RecurringExpenseRestoreEvent.Success(recurringExpense))
+                eventMutableFlow.emit(Event.RecurringExpenseRestoreResult(RecurringExpenseRestoreEvent.Success(recurringExpense)))
             } catch (e: Exception) {
-                recurringExpenseRestoreEventMutableFlow.emit(RecurringExpenseRestoreEvent.ErrorIO(recurringExpense))
+                if (e is CancellationException) throw e
+
+                eventMutableFlow.emit(Event.RecurringExpenseRestoreResult(RecurringExpenseRestoreEvent.ErrorIO(recurringExpense)))
             } finally {
                 recurringExpenseRestoreProgressStateMutableFlow.value = RecurringExpenseRestoreProgressState.Idle
             }
@@ -448,7 +411,7 @@ class AccountViewModel @Inject constructor(
                 -awaitDB().getBalanceForDay(LocalDate.now())
             }
 
-            startCurrentBalanceEditorEventMutableFlow.emit(balance)
+            eventMutableFlow.emit(Event.StartCurrentBalanceEditor(balance))
         }
     }
 
@@ -476,17 +439,19 @@ class AccountViewModel @Inject constructor(
                         awaitDB().persistExpense(existingExpense.copy(amount = existingExpense.amount - diff))
                     }
 
-                    currentBalanceEditedEventMutableFlow.emit(BalanceAdjustedData(newExpense, diff, newBalance))
+                    eventMutableFlow.emit(Event.CurrentBalanceEditionSuccess(BalanceAdjustedData(newExpense, diff, newBalance)))
                 } else { // If no adjust balance yet, create a new one
                     val persistedExpense = withContext(Dispatchers.Default) {
                         awaitDB().persistExpense(Expense(balanceExpenseTitle, -diff, LocalDate.now(), true))
                     }
 
-                    currentBalanceEditedEventMutableFlow.emit(BalanceAdjustedData(persistedExpense, diff, newBalance))
+                    eventMutableFlow.emit(Event.CurrentBalanceEditionSuccess(BalanceAdjustedData(persistedExpense, diff, newBalance)))
                 }
             } catch (e: Exception) {
+                if (e is CancellationException) throw e
+
                 Logger.error("Error while editing balance", e)
-                currentBalanceEditingErrorEventMutableFlow.emit(e)
+                eventMutableFlow.emit(Event.CurrentBalanceEditionError(e))
             }
         }
     }
@@ -503,8 +468,10 @@ class AccountViewModel @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
+                if (e is CancellationException) throw e
+
                 Logger.error("Error while restoring balance", e)
-                currentBalanceRestoringErrorEventMutableFlow.emit(e)
+                eventMutableFlow.emit(Event.CurrentBalanceRestorationError(e))
             }
         }
     }
@@ -515,7 +482,7 @@ class AccountViewModel @Inject constructor(
 
     fun onDateLongClicked(date: LocalDate) {
         viewModelScope.launch {
-            openExpenseAddEventMutableFlow.emit(date)
+            eventMutableFlow.emit(Event.OpenAddExpense(date))
         }
     }
 
@@ -546,8 +513,10 @@ class AccountViewModel @Inject constructor(
                     awaitDB().persistExpense(expense.copy(checked = checked))
                 }
             } catch (e: Exception) {
+                if (e is CancellationException) throw e
+
                 Logger.error("Error while checking expense", e)
-                expenseCheckedErrorEventMutableFlow.emit(e)
+                eventMutableFlow.emit(Event.ExpenseCheckingError(e))
             }
         }
     }
@@ -559,7 +528,7 @@ class AccountViewModel @Inject constructor(
     fun onGoBackToCurrentMonthButtonPressed() {
         viewModelScope.launch {
             selectDateMutableStateFlow.value = LocalDate.now()
-            goBackToCurrentMonthEventMutableFlow.emit(Unit)
+            eventMutableFlow.emit(Event.GoBackToCurrentMonth)
         }
     }
 
@@ -571,7 +540,7 @@ class AccountViewModel @Inject constructor(
 
     fun onCheckAllPastEntriesPressed() {
         viewModelScope.launch {
-            confirmCheckAllPastEntriesEventMutableFlow.emit(Unit)
+            eventMutableFlow.emit(Event.ShowConfirmCheckAllPastEntries)
         }
     }
 
@@ -582,8 +551,10 @@ class AccountViewModel @Inject constructor(
                     awaitDB().markAllEntriesAsChecked(LocalDate.now())
                 }
             } catch (e: Exception) {
+                if (e is CancellationException) throw e
+
                 Logger.error("Error while checking all past entries", e)
-                checkAllPastEntriesErrorEventMutableFlow.emit(e)
+                eventMutableFlow.emit(Event.CheckAllPastEntriesError(e))
             }
         }
     }
@@ -597,7 +568,7 @@ class AccountViewModel @Inject constructor(
     fun onManageAccountButtonPressed() {
         viewModelScope.launch {
             (account as? MainViewModel.SelectedAccount.Selected.Online)?.let {
-                openManageAccountEventMutableFlow.emit(it)
+                eventMutableFlow.emit(Event.OpenManageAccount(it))
             }
         }
     }
@@ -608,6 +579,24 @@ class AccountViewModel @Inject constructor(
         data object Loading : DBState()
         class Loaded(val db: DB) : DBState()
         class Error(val error: Exception) : DBState()
+    }
+
+    sealed class Event {
+        data object GoBackToCurrentMonth : Event()
+        data class ExpenseDeletionSuccess(val data: ExpenseDeletionSuccessData) : Event()
+        data class ExpenseDeletionError(val expense: Expense) : Event()
+        data class RecurringExpenseDeletionResult(val data: RecurringExpenseDeletionEvent) : Event()
+        data class RecurringExpenseRestoreResult(val data: RecurringExpenseRestoreEvent) : Event()
+        data class StartCurrentBalanceEditor(val currentBalance: Double) : Event()
+        data class CurrentBalanceEditionError(val error: Exception) : Event()
+        data class CurrentBalanceEditionSuccess(val data: BalanceAdjustedData) : Event()
+        data class CurrentBalanceRestorationError(val error: Exception) : Event()
+        data class ExpenseCheckingError(val error: Exception) : Event()
+        data object ShowConfirmCheckAllPastEntries : Event()
+        data class CheckAllPastEntriesError(val error: Throwable) : Event()
+        data object OpenMonthlyReport : Event()
+        data class OpenAddExpense(val date: LocalDate) : Event()
+        data class OpenManageAccount(val account: MainViewModel.SelectedAccount.Selected.Online) : Event()
     }
 
     companion object {
