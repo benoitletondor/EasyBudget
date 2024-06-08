@@ -18,13 +18,9 @@ package com.benoitletondor.easybudgetapp.view.main
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.view.MenuProvider
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.compose.AppNavHost
 import com.benoitletondor.easybudgetapp.helper.*
@@ -47,14 +43,12 @@ import javax.inject.Inject
  * @author Benoit LETONDOR
  */
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), MenuProvider {
+class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var parameters: Parameters
 
 // ------------------------------------------>
-
-    //override fun createBinding(): ActivityMainBinding = ActivityMainBinding.inflate(layoutInflater)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
@@ -71,11 +65,6 @@ class MainActivity : AppCompatActivity(), MenuProvider {
                 AppNavHost()
             }
         }
-
-        /*setSupportActionBar(binding.toolbar)
-        addMenuProvider(this)
-
-        collectViewModelEvents()*/
     }
 
     @Deprecated("This method has been deprecated in favor of using the Activity Result API\n      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt\n      contracts for common intents available in\n      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for\n      testing, and allow receiving results in separate, testable classes independent from your\n      activity. Use\n      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)}\n      with the appropriate {@link ActivityResultContract} and handling the result in the\n      {@link ActivityResultCallback#onActivityResult(Object) callback}.")
@@ -135,54 +124,6 @@ class MainActivity : AppCompatActivity(), MenuProvider {
         /*(viewModel.accountSelectionFlow.value as? MainViewModel.SelectedAccount.Selected)?.let {
             performIntentActionIfAny()
         }*/
-    }
-
-    fun onAccountSelectedFromBottomSheet(account: MainViewModel.SelectedAccount.Selected) {
-        //viewModel.onAccountSelected(account)
-    }
-
-// ------------------------------------------>
-
-    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        /*menuInflater.inflate(R.menu.menu_main, menu)
-
-        if (viewModel.shouldShowMenuButtons()) {
-            // Remove monthly report for non premium users
-            if ( viewModel.showPremiumMenuButtons() ) {
-                menu.removeItem(R.id.action_become_premium)
-
-                if ( !parameters.hasUserSawMonthlyReportHint() ) {
-                    binding.monthlyReportHint.isVisible = true
-
-                    binding.monthlyReportHintButton.setOnClickListener {
-                        binding.monthlyReportHint.isVisible = false
-                        parameters.setUserSawMonthlyReportHint()
-                    }
-                }
-            }
-        } else {
-            menu.removeItem(R.id.action_become_premium)
-        }*/
-    }
-
-    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-        /*return when (menuItem.itemId) {
-            R.id.action_settings -> {
-                val startIntent = Intent(this, SettingsActivity::class.java)
-                this@MainActivity.startActivity(startIntent)
-
-                true
-            }
-            R.id.action_become_premium -> {
-                viewModel.onBecomePremiumButtonPressed()
-
-                true
-            }
-            else -> false
-        }*/
-
-        return false
     }
 
 // ------------------------------------------>

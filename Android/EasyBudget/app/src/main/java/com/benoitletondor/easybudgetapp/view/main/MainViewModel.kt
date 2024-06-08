@@ -83,11 +83,11 @@ class MainViewModel @Inject constructor(
 
     private val recurringExpenseDeletionProgressStateMutableFlow = MutableStateFlow<RecurringExpenseDeleteProgressState>(
         RecurringExpenseDeleteProgressState.Idle)
-    val recurringExpenseDeletionProgressStateFlow: Flow<RecurringExpenseDeleteProgressState> = recurringExpenseDeletionProgressStateMutableFlow
+    val recurringExpenseDeletionProgressStateFlow: StateFlow<RecurringExpenseDeleteProgressState> = recurringExpenseDeletionProgressStateMutableFlow
 
     private val recurringExpenseRestoreProgressStateMutableFlow = MutableStateFlow<RecurringExpenseRestoreProgressState>(
         RecurringExpenseRestoreProgressState.Idle)
-    val recurringExpenseRestoreProgressStateFlow: Flow<RecurringExpenseRestoreProgressState> = recurringExpenseRestoreProgressStateMutableFlow
+    val recurringExpenseRestoreProgressStateFlow: StateFlow<RecurringExpenseRestoreProgressState> = recurringExpenseRestoreProgressStateMutableFlow
 
     private val showGoToCurrentMonthButtonStateMutableFlow = MutableStateFlow(false)
     val showGoToCurrentMonthButtonStateFlow: StateFlow<Boolean> = showGoToCurrentMonthButtonStateMutableFlow

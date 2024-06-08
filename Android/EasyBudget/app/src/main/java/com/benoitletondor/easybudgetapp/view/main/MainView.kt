@@ -1,6 +1,7 @@
 package com.benoitletondor.easybudgetapp.view.main
 
 import android.app.Activity
+import android.app.ProgressDialog
 import android.content.Intent
 import android.content.res.Configuration
 import android.view.View
@@ -124,6 +125,8 @@ fun MainView(
         showGoBackToCurrentMonthButtonFlow = viewModel.showGoToCurrentMonthButtonStateFlow,
         hasPendingInvitationsFlow = viewModel.hasPendingInvitationsFlow,
         userCurrencyFlow = viewModel.userCurrencyFlow,
+        recurringExpenseDeletionProgressFlow = viewModel.recurringExpenseDeletionProgressStateFlow,
+        recurringExpenseRestoreProgressFlow = viewModel.recurringExpenseRestoreProgressStateFlow,
         onSettingsButtonPressed = viewModel::onSettingsButtonPressed,
         onAdjustCurrentBalanceButtonPressed = viewModel::onAdjustCurrentBalanceClicked,
         onTickAllPastEntriesButtonPressed = viewModel::onCheckAllPastEntriesPressed,
@@ -165,6 +168,8 @@ private fun MainView(
     showGoBackToCurrentMonthButtonFlow: StateFlow<Boolean>,
     hasPendingInvitationsFlow: StateFlow<Boolean>,
     userCurrencyFlow: StateFlow<Currency>,
+    recurringExpenseDeletionProgressFlow: StateFlow<MainViewModel.RecurringExpenseDeleteProgressState>,
+    recurringExpenseRestoreProgressFlow: StateFlow<MainViewModel.RecurringExpenseRestoreProgressState>,
     onSettingsButtonPressed: () -> Unit,
     onAdjustCurrentBalanceButtonPressed: () -> Unit,
     onTickAllPastEntriesButtonPressed: () -> Unit,
@@ -422,6 +427,52 @@ private fun MainView(
                             dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
                         }
                     }
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(key1 = "recurringExpenseDeletionProgressDialog") {
+        var expenseDeletionDialog: ProgressDialog? = null
+        launchCollect(recurringExpenseDeletionProgressFlow) { state ->
+            when(state) {
+                is MainViewModel.RecurringExpenseDeleteProgressState.Deleting -> {
+                    val dialog = ProgressDialog(activity)
+                    dialog.isIndeterminate = true
+                    dialog.setTitle(R.string.recurring_expense_delete_loading_title)
+                    dialog.setMessage(activity.getString(R.string.recurring_expense_delete_loading_message))
+                    dialog.setCanceledOnTouchOutside(false)
+                    dialog.setCancelable(false)
+                    dialog.show()
+
+                    expenseDeletionDialog = dialog
+                }
+                MainViewModel.RecurringExpenseDeleteProgressState.Idle -> {
+                    expenseDeletionDialog?.dismiss()
+                    expenseDeletionDialog = null
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(key1 = "expenseRestorationProgressDialog") {
+        var expenseRestoreDialog: ProgressDialog? = null
+        launchCollect(recurringExpenseRestoreProgressFlow) { state ->
+            when(state) {
+                is MainViewModel.RecurringExpenseRestoreProgressState.Restoring -> {
+                    val dialog = ProgressDialog(activity)
+                    dialog.isIndeterminate = true
+                    dialog.setTitle(R.string.recurring_expense_restoring_loading_title)
+                    dialog.setMessage(activity.getString(R.string.recurring_expense_restoring_loading_message))
+                    dialog.setCanceledOnTouchOutside(false)
+                    dialog.setCancelable(false)
+                    dialog.show()
+
+                    expenseRestoreDialog = dialog
+                }
+                MainViewModel.RecurringExpenseRestoreProgressState.Idle -> {
+                    expenseRestoreDialog?.dismiss()
+                    expenseRestoreDialog = null
                 }
             }
         }
@@ -891,6 +942,8 @@ private fun Preview(
             showGoBackToCurrentMonthButtonFlow = MutableStateFlow(false),
             hasPendingInvitationsFlow = MutableStateFlow(false),
             userCurrencyFlow = MutableStateFlow(Currency.getInstance("USD")),
+            recurringExpenseDeletionProgressFlow = MutableStateFlow(MainViewModel.RecurringExpenseDeleteProgressState.Idle),
+            recurringExpenseRestoreProgressFlow = MutableStateFlow(MainViewModel.RecurringExpenseRestoreProgressState.Idle),
             onSettingsButtonPressed = {},
             onAdjustCurrentBalanceButtonPressed = {},
             onTickAllPastEntriesButtonPressed = {},

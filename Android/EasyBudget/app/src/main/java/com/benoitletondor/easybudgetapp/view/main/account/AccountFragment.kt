@@ -208,62 +208,6 @@ class AccountFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewLifecycleScope.launchCollect(viewModel.dbAvailableFlow) { dbState ->
-            binding.accountLoadedView.isVisible = dbState is AccountViewModel.DBState.Loaded
-            binding.accountLoadingView.isVisible = dbState is AccountViewModel.DBState.Loading
-            binding.accountErrorView.isVisible = dbState is AccountViewModel.DBState.Error
-
-            if (dbState is AccountViewModel.DBState.Error) {
-                binding.accountErrorMessageTextView.text = getString(R.string.account_error_loading_message, dbState.error.localizedMessage)
-                binding.accountErrorMessageRetryCta.setOnClickListener {
-                    viewModel.onRetryLoadingButtonPressed()
-                }
-            }
-        }
-
-
-        var expenseDeletionDialog: ProgressDialog? = null
-        viewLifecycleScope.launchCollect(viewModel.recurringExpenseDeletionProgressStateFlow) { state ->
-            when(state) {
-                is AccountViewModel.RecurringExpenseDeleteProgressState.Deleting -> {
-                    val dialog = ProgressDialog(requireContext())
-                    dialog.isIndeterminate = true
-                    dialog.setTitle(R.string.recurring_expense_delete_loading_title)
-                    dialog.setMessage(resources.getString(R.string.recurring_expense_delete_loading_message))
-                    dialog.setCanceledOnTouchOutside(false)
-                    dialog.setCancelable(false)
-                    dialog.show()
-
-                    expenseDeletionDialog = dialog
-                }
-                AccountViewModel.RecurringExpenseDeleteProgressState.Idle -> {
-                    expenseDeletionDialog?.dismiss()
-                    expenseDeletionDialog = null
-                }
-            }
-        }
-
-        var expenseRestoreDialog: Dialog? = null
-        viewLifecycleScope.launchCollect(viewModel.recurringExpenseRestoreProgressStateFlow) { state ->
-            when(state) {
-                AccountViewModel.RecurringExpenseRestoreProgressState.Idle -> {
-                    expenseRestoreDialog?.dismiss()
-                    expenseRestoreDialog = null
-                }
-                is AccountViewModel.RecurringExpenseRestoreProgressState.Restoring -> {
-                    val dialog = ProgressDialog(requireContext())
-                    dialog.isIndeterminate = true
-                    dialog.setTitle(R.string.recurring_expense_restoring_loading_title)
-                    dialog.setMessage(resources.getString(R.string.recurring_expense_restoring_loading_message))
-                    dialog.setCanceledOnTouchOutside(false)
-                    dialog.setCancelable(false)
-                    dialog.show()
-
-                    expenseRestoreDialog = dialog
-                }
-            }
-        }
-
         viewLifecycleScope.launchCollect(viewModel.selectedDateDataFlow) { (date, balance, maybeCheckedBalance, expenses) ->
             refreshBalanceAndExpenseListForDate(date, balance, maybeCheckedBalance, expenses)
         }
