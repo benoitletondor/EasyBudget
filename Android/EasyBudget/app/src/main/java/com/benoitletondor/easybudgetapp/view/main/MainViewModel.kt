@@ -342,7 +342,7 @@ class MainViewModel @Inject constructor(
 
     suspend fun getDataForMonth(month: YearMonth): DataForMonth = awaitDB().getDataForMonth(month)
 
-    fun onRetryLoadingDataButtonPressed() {
+    fun onRetryLoadingDBButtonPressed() {
         viewModelScope.launch {
             retryLoadingDBEventMutableFlow.emit(Unit)
         }

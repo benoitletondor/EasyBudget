@@ -3,14 +3,18 @@ package com.benoitletondor.easybudgetapp.view.main
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,6 +32,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -93,6 +98,7 @@ fun MainView(
         onMonthChanged = viewModel::onMonthChanged,
         onDateClicked = viewModel::onSelectDate,
         onDateLongClicked = viewModel::onDateLongClicked,
+        onRetryDBLoadingButtonPressed = viewModel::onRetryLoadingDBButtonPressed,
     )
 }
 
@@ -124,6 +130,7 @@ private fun MainView(
     onMonthChanged: (YearMonth) -> Unit,
     onDateClicked: (LocalDate) -> Unit,
     onDateLongClicked: (LocalDate) -> Unit,
+    onRetryDBLoadingButtonPressed: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -161,6 +168,7 @@ private fun MainView(
                     onMonthChanged = onMonthChanged,
                     onDateClicked = onDateClicked,
                     onDateLongClicked = onDateLongClicked,
+                    onRetryDBLoadingButtonPressed = onRetryDBLoadingButtonPressed,
                 )
             }
         }
@@ -293,6 +301,7 @@ private fun MainViewContent(
     onMonthChanged: (YearMonth) -> Unit,
     onDateClicked: (LocalDate) -> Unit,
     onDateLongClicked: (LocalDate) -> Unit,
+    onRetryDBLoadingButtonPressed: () -> Unit,
 ) {
     val account by selectedAccountFlow.collectAsState()
 
@@ -310,8 +319,11 @@ private fun MainViewContent(
 
                 val dbState by dbStateFlow.collectAsState()
 
-                when(dbState) {
-                    is MainViewModel.DBState.Error -> TODO()
+                when(val currentDbState = dbState) {
+                    is MainViewModel.DBState.Error -> DBLoadingErrorView(
+                        error = currentDbState.error,
+                        onRetryButtonClicked = onRetryDBLoadingButtonPressed,
+                    )
                     is MainViewModel.DBState.Loaded -> {
                         CalendarView(
                             appInitDate = appInitDate,
@@ -422,8 +434,63 @@ private fun ExpensesView(
 }
 
 @Composable
+private fun DBLoadingErrorView(
+    error: Throwable,
+    onRetryButtonClicked: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 20.dp, vertical = 16.dp),
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = stringResource(id = R.string.calendar_month_loading_error_title),
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 16.sp,
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = stringResource(id = R.string.account_error_loading_message, error.localizedMessage ?: "No error message"),
+            fontSize = 16.sp,
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Button(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            onClick = onRetryButtonClicked,
+        ) {
+            Text(stringResource(R.string.manage_account_error_cta))
+        }
+    }
+}
+
+@Composable
 @Preview
 private fun ProAccountSelectedPreview() {
+    Preview(
+        dbState = MainViewModel.DBState.Loaded(AppModule.provideDB(LocalContext.current)),
+    )
+}
+
+@Composable
+@Preview
+private fun DBErrorLoadingPreview() {
+    Preview(
+        dbState = MainViewModel.DBState.Error(RuntimeException("Error")),
+    )
+}
+
+@Composable
+private fun Preview(
+    dbState: MainViewModel.DBState,
+) {
     AppTheme {
         val context = LocalContext.current
 
@@ -435,7 +502,7 @@ private fun ProAccountSelectedPreview() {
                 accountId = "accountId",
                 accountSecret = "accountSecret",
             )),
-            dbStateFlow = MutableStateFlow(MainViewModel.DBState.Loaded(AppModule.provideDB(context))),
+            dbStateFlow = MutableStateFlow(dbState),
             forceRefreshDataFlow = MutableSharedFlow(),
             firstDayOfWeekFlow = MutableStateFlow(DayOfWeek.MONDAY),
             includeCheckedBalanceFlow = MutableStateFlow(true),
@@ -479,6 +546,7 @@ private fun ProAccountSelectedPreview() {
             onMonthChanged = {},
             onDateClicked = {},
             onDateLongClicked = {},
+            onRetryDBLoadingButtonPressed = {},
         )
     }
 }
