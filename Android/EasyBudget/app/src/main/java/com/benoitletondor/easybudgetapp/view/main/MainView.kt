@@ -31,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.benoitletondor.easybudgetapp.R
@@ -238,7 +239,11 @@ private fun MainViewTopAppBar(
                     DropdownMenuItem(
                         onClick = onAdjustCurrentBalanceButtonPressed,
                         text = {
-                            Text(stringResource(R.string.action_balance))
+                            Text(
+                                text = stringResource(R.string.action_balance),
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Normal,
+                            )
                         },
                     )
                 }
@@ -247,7 +252,11 @@ private fun MainViewTopAppBar(
                     DropdownMenuItem(
                         onClick = onTickAllPastEntriesButtonPressed,
                         text = {
-                            Text(stringResource(R.string.action_mark_all_past_entries_as_checked))
+                            Text(
+                                text = stringResource(R.string.action_mark_all_past_entries_as_checked),
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Normal,
+                            )
                         },
                     )
                 }
@@ -255,7 +264,11 @@ private fun MainViewTopAppBar(
                 DropdownMenuItem(
                     onClick = onSettingsButtonPressed,
                     text = {
-                        Text(stringResource(R.string.action_settings))
+                        Text(
+                            text = stringResource(R.string.action_settings),
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Normal,
+                        )
                     },
                 )
             }
