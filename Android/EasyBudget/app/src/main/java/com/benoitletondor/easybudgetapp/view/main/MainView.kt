@@ -481,6 +481,14 @@ private fun ProAccountSelectedPreview() {
 
 @Composable
 @Preview
+private fun DBLoadingPreview() {
+    Preview(
+        dbState = MainViewModel.DBState.Loading,
+    )
+}
+
+@Composable
+@Preview
 private fun DBErrorLoadingPreview() {
     Preview(
         dbState = MainViewModel.DBState.Error(RuntimeException("Error")),
@@ -492,8 +500,6 @@ private fun Preview(
     dbState: MainViewModel.DBState,
 ) {
     AppTheme {
-        val context = LocalContext.current
-
         MainView(
             selectedAccountFlow = MutableStateFlow(MainViewModel.SelectedAccount.Selected.Online(
                 name = "Account name",
