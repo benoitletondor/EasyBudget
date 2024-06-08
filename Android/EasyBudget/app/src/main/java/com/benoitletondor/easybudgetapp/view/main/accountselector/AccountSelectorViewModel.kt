@@ -155,36 +155,6 @@ class AccountSelectorViewModel @Inject constructor(
         }
     }
 
-    fun onAccountSelected(account: MainViewModel.SelectedAccount.Selected) {
-        viewModelScope.launch {
-            eventMutableFlow.emit(Event.AccountSelected(account))
-        }
-    }
-
-    fun onBecomeProButtonClicked() {
-        viewModelScope.launch {
-            eventMutableFlow.emit(Event.OpenProScreen)
-        }
-    }
-
-    fun onLoginButtonPressed() {
-        viewModelScope.launch {
-            eventMutableFlow.emit(Event.OpenLoginScreen(shouldDismissAfterAuth = true))
-        }
-    }
-
-    fun onEmailTapped() {
-        viewModelScope.launch {
-            eventMutableFlow.emit(Event.OpenLoginScreen(shouldDismissAfterAuth = false))
-        }
-    }
-
-    fun onCreateAccountClicked() {
-        viewModelScope.launch {
-            eventMutableFlow.emit(Event.OpenCreateAccountScreen)
-        }
-    }
-
     fun onAcceptInvitationConfirmed(invitation: Invitation) {
         viewModelScope.launch {
             if (loadingInvitationMutableFlow.value != null) {
@@ -288,13 +258,9 @@ class AccountSelectorViewModel @Inject constructor(
     }
 
     sealed class Event {
-        data class AccountSelected(val account: MainViewModel.SelectedAccount.Selected) : Event()
         class ErrorAcceptingInvitation(val error: Throwable) : Event()
         data object InvitationAccepted : Event()
         class ErrorRejectingInvitation(val error: Throwable) : Event()
         data object InvitationRejected : Event()
-        data object OpenProScreen : Event()
-        data class OpenLoginScreen(val shouldDismissAfterAuth: Boolean) : Event()
-        data object OpenCreateAccountScreen : Event()
     }
 }

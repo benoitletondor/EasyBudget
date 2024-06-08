@@ -66,7 +66,7 @@ fun AppTopAppBar(
 }
 
 @Composable
-fun AppTopBarMoreMenuItem(content: @Composable ColumnScope.() -> Unit) {
+fun AppTopBarMoreMenuItem(content: @Composable ColumnScope.(dismiss: () -> Unit) -> Unit) {
     var showMenu by remember { mutableStateOf(false) }
 
     Box(
@@ -81,8 +81,9 @@ fun AppTopBarMoreMenuItem(content: @Composable ColumnScope.() -> Unit) {
         )
         DropdownMenu(
             expanded = showMenu,
-            onDismissRequest = { showMenu = false },
-            content = content,
-        )
+            onDismissRequest = { showMenu = false }
+        ) {
+            content { showMenu = false }
+        }
     }
 }

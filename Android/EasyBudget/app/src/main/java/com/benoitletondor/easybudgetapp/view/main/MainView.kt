@@ -1,6 +1,11 @@
 package com.benoitletondor.easybudgetapp.view.main
 
+import android.app.Activity
+import android.content.Intent
 import android.content.res.Configuration
+import android.view.View
+import android.view.WindowManager
+import android.widget.EditText
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,13 +22,25 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,7 +53,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.UiMode
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -47,10 +63,25 @@ import com.benoitletondor.easybudgetapp.compose.AppTopAppBar
 import com.benoitletondor.easybudgetapp.compose.AppTopBarMoreMenuItem
 import com.benoitletondor.easybudgetapp.compose.BackButtonBehavior
 import com.benoitletondor.easybudgetapp.compose.components.LoadingView
+import com.benoitletondor.easybudgetapp.db.RestoreAction
+import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
+import com.benoitletondor.easybudgetapp.helper.Logger
+import com.benoitletondor.easybudgetapp.helper.launchCollect
+import com.benoitletondor.easybudgetapp.helper.preventUnsupportedInputForDecimals
 import com.benoitletondor.easybudgetapp.injection.AppModule
 import com.benoitletondor.easybudgetapp.model.DataForDay
 import com.benoitletondor.easybudgetapp.model.DataForMonth
+import com.benoitletondor.easybudgetapp.model.Expense
+import com.benoitletondor.easybudgetapp.model.RecurringExpense
+import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
+import com.benoitletondor.easybudgetapp.view.main.accountselector.AccountSelectorView
 import com.benoitletondor.easybudgetapp.view.main.calendar.CalendarView
+import com.benoitletondor.easybudgetapp.view.main.createaccount.CreateAccountActivity
+import com.benoitletondor.easybudgetapp.view.main.login.LoginActivity
+import com.benoitletondor.easybudgetapp.view.main.manageaccount.ManageAccountActivity
+import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
+import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.kizitonwose.calendar.core.atStartOfMonth
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -58,10 +89,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
+import java.util.Currency
 
 @Serializable
 object MainDestination
@@ -74,6 +107,7 @@ fun MainView(
     MainView(
         selectedAccountFlow = viewModel.accountSelectionFlow,
         dbStateFlow = viewModel.dbAvailableFlow,
+        eventFlow = viewModel.eventFlow,
         forceRefreshDataFlow = viewModel.forceRefreshFlow,
         firstDayOfWeekFlow = viewModel.firstDayOfWeekFlow,
         includeCheckedBalanceFlow = viewModel.includeCheckedBalanceFlow,
@@ -89,6 +123,7 @@ fun MainView(
         showManageAccountButtonFlow = viewModel.showManageAccountMenuItemFlow,
         showGoBackToCurrentMonthButtonFlow = viewModel.showGoToCurrentMonthButtonStateFlow,
         hasPendingInvitationsFlow = viewModel.hasPendingInvitationsFlow,
+        userCurrencyFlow = viewModel.userCurrencyFlow,
         onSettingsButtonPressed = viewModel::onSettingsButtonPressed,
         onAdjustCurrentBalanceButtonPressed = viewModel::onAdjustCurrentBalanceClicked,
         onTickAllPastEntriesButtonPressed = viewModel::onCheckAllPastEntriesPressed,
@@ -101,13 +136,21 @@ fun MainView(
         onDateClicked = viewModel::onSelectDate,
         onDateLongClicked = viewModel::onDateLongClicked,
         onRetryDBLoadingButtonPressed = viewModel::onRetryLoadingDBButtonPressed,
+        onAccountSelected = viewModel::onAccountSelected,
+        onExpenseDeletionCancelled = viewModel::onExpenseDeletionCancelled,
+        onCurrentBalanceEditedCancelled = viewModel::onCurrentBalanceEditedCancelled,
+        onRestoreRecurringExpenseClicked = viewModel::onRestoreRecurringExpenseClicked,
+        onCheckAllPastEntriesConfirmPressed = viewModel::onCheckAllPastEntriesConfirmPressed,
+        onNewBalanceSelected = viewModel::onNewBalanceSelected,
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MainView(
     selectedAccountFlow: StateFlow<MainViewModel.SelectedAccount>,
     dbStateFlow: StateFlow<MainViewModel.DBState>,
+    eventFlow: Flow<MainViewModel.Event>,
     forceRefreshDataFlow: Flow<Unit>,
     firstDayOfWeekFlow: StateFlow<DayOfWeek>,
     includeCheckedBalanceFlow: StateFlow<Boolean>,
@@ -121,6 +164,7 @@ private fun MainView(
     showManageAccountButtonFlow: StateFlow<Boolean>,
     showGoBackToCurrentMonthButtonFlow: StateFlow<Boolean>,
     hasPendingInvitationsFlow: StateFlow<Boolean>,
+    userCurrencyFlow: StateFlow<Currency>,
     onSettingsButtonPressed: () -> Unit,
     onAdjustCurrentBalanceButtonPressed: () -> Unit,
     onTickAllPastEntriesButtonPressed: () -> Unit,
@@ -133,7 +177,256 @@ private fun MainView(
     onDateClicked: (LocalDate) -> Unit,
     onDateLongClicked: (LocalDate) -> Unit,
     onRetryDBLoadingButtonPressed: () -> Unit,
+    onAccountSelected: (MainViewModel.SelectedAccount.Selected) -> Unit,
+    onExpenseDeletionCancelled: (RestoreAction) -> Unit,
+    onCurrentBalanceEditedCancelled: (Expense, Double) -> Unit,
+    onRestoreRecurringExpenseClicked: (RecurringExpense, RestoreAction) -> Unit,
+    onCheckAllPastEntriesConfirmPressed: () -> Unit,
+    onNewBalanceSelected: (Double, String) -> Unit,
 ) {
+    var showAccountSelectorModal by remember { mutableStateOf(false) }
+    val accountSelectorModalSheetState = rememberModalBottomSheetState()
+    val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    val activity = LocalContext.current as Activity
+
+    LaunchedEffect(key1 = "eventsListener") {
+        launchCollect(eventFlow) { event ->
+            when(event) {
+                is MainViewModel.Event.CheckAllPastEntriesError -> {
+                    MaterialAlertDialogBuilder(activity)
+                        .setTitle(R.string.check_all_past_expences_error_title)
+                        .setMessage(
+                            activity.getString(
+                                R.string.check_all_past_expences_error_message,
+                                event.error.localizedMessage,
+                            )
+                        )
+                        .setNegativeButton(R.string.ok) { dialog2, _ -> dialog2.dismiss() }
+                        .show()
+                }
+                is MainViewModel.Event.CurrentBalanceEditionError -> {
+                    MaterialAlertDialogBuilder(activity)
+                        .setTitle(R.string.adjust_balance_error_title)
+                        .setMessage(R.string.adjust_balance_error_message)
+                        .setNegativeButton(R.string.ok) { dialog1, _ -> dialog1.dismiss() }
+                        .show()
+                }
+                is MainViewModel.Event.CurrentBalanceEditionSuccess -> {
+                    val (expense, diff, newBalance) = event.data
+
+                    coroutineScope.launch {
+                        val result = snackbarHostState.showSnackbar(
+                            message = activity.getString(
+                                R.string.adjust_balance_snackbar_text,
+                                CurrencyHelper.getFormattedCurrencyString(
+                                    currency = userCurrencyFlow.value,
+                                    amount = newBalance,
+                                )
+                            ),
+                            actionLabel = activity.getString(R.string.undo),
+                            duration = SnackbarDuration.Long,
+                        )
+
+                        if (result === SnackbarResult.ActionPerformed) {
+                            onCurrentBalanceEditedCancelled(expense, diff)
+                        }
+                    }
+                }
+                is MainViewModel.Event.CurrentBalanceRestorationError -> {
+                    MaterialAlertDialogBuilder(activity)
+                        .setTitle(R.string.adjust_balance_error_title)
+                        .setMessage(R.string.adjust_balance_error_message)
+                        .setNegativeButton(R.string.ok) { dialog1, _ -> dialog1.dismiss() }
+                        .show()
+                }
+                is MainViewModel.Event.ExpenseCheckingError -> {
+                    MaterialAlertDialogBuilder(activity)
+                        .setTitle(R.string.expense_check_error_title)
+                        .setMessage(
+                            activity.getString(
+                                R.string.expense_check_error_message,
+                                event.error.localizedMessage
+                            )
+                        )
+                        .setNegativeButton(R.string.ok) { dialog2, _ -> dialog2.dismiss() }
+                        .show()
+                }
+                is MainViewModel.Event.ExpenseDeletionError -> {
+                    MaterialAlertDialogBuilder(activity)
+                        .setTitle(R.string.expense_delete_error_title)
+                        .setMessage(R.string.expense_delete_error_message)
+                        .setNegativeButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
+                        .show()
+                }
+                is MainViewModel.Event.ExpenseDeletionSuccess -> {
+                    val (deletedExpense, restoreAction) = event.data
+
+                    coroutineScope.launch {
+                        val result = snackbarHostState.showSnackbar(
+                            message = activity.getString(if (deletedExpense.isRevenue()) R.string.income_delete_snackbar_text else R.string.expense_delete_snackbar_text),
+                            actionLabel = activity.getString(R.string.undo),
+                            duration = SnackbarDuration.Long,
+                        )
+
+                        if (result === SnackbarResult.ActionPerformed) {
+                            onExpenseDeletionCancelled(restoreAction)
+                        }
+                    }
+                }
+                MainViewModel.Event.GoBackToCurrentMonth -> Unit /* No-op */
+                is MainViewModel.Event.OpenAddExpense -> {
+                    // FIXME replace this
+                    val startIntent = ExpenseEditActivity.newIntent(
+                        context = activity,
+                        editedExpense = null,
+                        date = event.date,
+                    )
+
+                    activity.startActivity(startIntent)
+                }
+                is MainViewModel.Event.OpenManageAccount -> {
+                    // FIXME replace this
+                    activity.startActivity(ManageAccountActivity.newIntent(activity, event.account))
+                }
+                MainViewModel.Event.OpenMonthlyReport -> {
+                    // FIXME replace this
+                    val startIntent = Intent(activity, MonthlyReportBaseActivity::class.java)
+                    activity.startActivity(startIntent)
+                }
+                MainViewModel.Event.OpenPremium -> {
+                    // FIXME replace this
+                    val startIntent = Intent(activity, SettingsActivity::class.java)
+                    startIntent.putExtra(SettingsActivity.SHOW_PRO_INTENT_KEY, true)
+                    activity.startActivity(startIntent)
+                }
+                is MainViewModel.Event.RecurringExpenseDeletionResult -> {
+                    when(event.data) {
+                        is MainViewModel.RecurringExpenseDeletionEvent.ErrorCantDeleteBeforeFirstOccurrence -> {
+                            MaterialAlertDialogBuilder(activity)
+                                .setTitle(R.string.recurring_expense_delete_first_error_title)
+                                .setMessage(R.string.recurring_expense_delete_first_error_message)
+                                .setNegativeButton(R.string.ok, null)
+                                .show()
+                        }
+                        is MainViewModel.RecurringExpenseDeletionEvent.ErrorIO -> {
+                            MaterialAlertDialogBuilder(activity)
+                                .setTitle(R.string.recurring_expense_delete_error_title)
+                                .setMessage(R.string.recurring_expense_delete_error_message)
+                                .setNegativeButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
+                                .show()
+                        }
+                        is MainViewModel.RecurringExpenseDeletionEvent.ErrorRecurringExpenseDeleteNotAssociated -> {
+                            MaterialAlertDialogBuilder(activity)
+                                .setTitle(R.string.recurring_expense_delete_error_title)
+                                .setMessage(R.string.recurring_expense_delete_error_message)
+                                .setNegativeButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
+                                .show()
+                        }
+                        is MainViewModel.RecurringExpenseDeletionEvent.Success -> {
+                            coroutineScope.launch {
+                                val result = snackbarHostState.showSnackbar(
+                                    message = activity.getString(R.string.recurring_expense_delete_success_message),
+                                    actionLabel = activity.getString(R.string.undo),
+                                    duration = SnackbarDuration.Long,
+                                )
+
+                                if (result === SnackbarResult.ActionPerformed) {
+                                    onRestoreRecurringExpenseClicked(
+                                        event.data.recurringExpense,
+                                        event.data.restoreAction,
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+                is MainViewModel.Event.RecurringExpenseRestoreResult -> {
+                    when(event.data) {
+                        is MainViewModel.RecurringExpenseRestoreEvent.ErrorIO -> {
+                            MaterialAlertDialogBuilder(activity)
+                                .setTitle(R.string.recurring_expense_restore_error_title)
+                                .setMessage(activity.getString(R.string.recurring_expense_restore_error_message))
+                                .setNegativeButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
+                                .show()
+                        }
+                        is MainViewModel.RecurringExpenseRestoreEvent.Success -> {
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(
+                                    message = activity.getString(R.string.recurring_expense_restored_success_message),
+                                    actionLabel = activity.getString(R.string.undo),
+                                    duration = SnackbarDuration.Long,
+                                )
+                            }
+                        }
+                    }
+                }
+                MainViewModel.Event.ShowAccountSelect -> {
+                    showAccountSelectorModal = true
+                }
+                MainViewModel.Event.ShowConfirmCheckAllPastEntries -> {
+                    MaterialAlertDialogBuilder(activity)
+                        .setTitle(R.string.check_all_past_expences_title)
+                        .setMessage(R.string.check_all_past_expences_message)
+                        .setPositiveButton(R.string.check_all_past_expences_confirm_cta) { dialog2, _ ->
+                            onCheckAllPastEntriesConfirmPressed()
+                            dialog2.dismiss()
+                        }
+                        .setNegativeButton(android.R.string.cancel) { dialog2, _ -> dialog2.dismiss() }
+                        .show()
+                }
+                MainViewModel.Event.ShowSettings -> {
+                    // FIXME replace this
+                    activity.startActivity(Intent(activity, SettingsActivity::class.java))
+                }
+                is MainViewModel.Event.StartCurrentBalanceEditor -> {
+                    val dialogView = activity.layoutInflater.inflate(R.layout.dialog_adjust_balance, null)
+                    val amountEditText = dialogView.findViewById<EditText>(R.id.balance_amount)
+                    amountEditText.setText(
+                        if (event.currentBalance == 0.0) "0" else CurrencyHelper.getFormattedAmountValue(
+                            event.currentBalance
+                        )
+                    )
+                    amountEditText.preventUnsupportedInputForDecimals()
+                    amountEditText.setSelection(amountEditText.text.length) // Put focus at the end of the text
+
+                    val builder = MaterialAlertDialogBuilder(activity)
+                    builder.setTitle(R.string.adjust_balance_title)
+                    builder.setMessage(R.string.adjust_balance_message)
+                    builder.setView(dialogView)
+                    builder.setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
+                    builder.setPositiveButton(R.string.ok) { dialog, _ ->
+                        try {
+                            val stringValue = amountEditText.text.toString()
+                            if (stringValue.isNotBlank()) {
+                                val newBalance = java.lang.Double.valueOf(stringValue)
+                                onNewBalanceSelected(
+                                    newBalance,
+                                    activity.getString(R.string.adjust_balance_expense_title)
+                                )
+                            }
+                        } catch (e: Exception) {
+                            Logger.error("Error parsing new balance", e)
+                        }
+
+                        dialog.dismiss()
+                    }
+
+                    val dialog = builder.show()
+
+                    // Directly show keyboard when the dialog pops
+                    amountEditText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+                        // Check if the device doesn't have a physical keyboard
+                        if (hasFocus && activity.resources.configuration.keyboard == Configuration.KEYBOARD_NOKEYS) {
+                            dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
             MainViewTopAppBar(
@@ -149,6 +442,9 @@ private fun MainView(
                 onMonthlyReportButtonPressed = onMonthlyReportButtonPressed,
                 onGoBackToCurrentMonthButtonPressed = onGoBackToCurrentMonthButtonPressed,
             )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
         },
         content = { contentPadding ->
             Box(
@@ -172,6 +468,44 @@ private fun MainView(
                     onDateLongClicked = onDateLongClicked,
                     onRetryDBLoadingButtonPressed = onRetryDBLoadingButtonPressed,
                 )
+
+                if (showAccountSelectorModal) {
+                    ModalBottomSheet(
+                        onDismissRequest = {
+                            showAccountSelectorModal = false
+                        },
+                        sheetState = accountSelectorModalSheetState,
+                    ) {
+                        AccountSelectorView(
+                            onAccountSelected = { account ->
+                                onAccountSelected(account)
+                                coroutineScope.launch {
+                                    accountSelectorModalSheetState.hide()
+                                    showAccountSelectorModal = false
+                                }
+                            },
+                            onOpenBecomeProScreen = {
+                                // FIXME replace this
+                                val startIntent = Intent(activity, SettingsActivity::class.java)
+                                startIntent.putExtra(SettingsActivity.SHOW_PRO_INTENT_KEY, true)
+                                activity.startActivity(startIntent)
+
+                                coroutineScope.launch {
+                                    accountSelectorModalSheetState.hide()
+                                    showAccountSelectorModal = false
+                                }
+                            },
+                            onOpenLoginScreen = { shouldDismissAfterAuth ->
+                                // FIXME replace this
+                                activity.startActivity(LoginActivity.newIntent(activity, shouldDismissAfterAuth = shouldDismissAfterAuth))
+                            },
+                            onOpenCreateAccountScreen = {
+                                // FIXME replace this
+                                activity.startActivity(Intent(activity, CreateAccountActivity::class.java))
+                            },
+                        )
+                    }
+                }
             }
         }
     )
@@ -244,14 +578,17 @@ private fun MainViewTopAppBar(
                 }
             }
 
-            AppTopBarMoreMenuItem {
+            AppTopBarMoreMenuItem { dismiss ->
                 if (showActionButtons) {
                     DropdownMenuItem(
-                        onClick = onAdjustCurrentBalanceButtonPressed,
+                        onClick = {
+                            onAdjustCurrentBalanceButtonPressed()
+                            dismiss()
+                        },
                         text = {
                             Text(
                                 text = stringResource(R.string.action_balance),
-                                fontSize = 18.sp,
+                                fontSize = 16.sp,
                                 fontWeight = FontWeight.Normal,
                             )
                         },
@@ -260,11 +597,14 @@ private fun MainViewTopAppBar(
 
                 if (showActionButtons && showPremiumRelatedButtons) {
                     DropdownMenuItem(
-                        onClick = onTickAllPastEntriesButtonPressed,
+                        onClick = {
+                            onTickAllPastEntriesButtonPressed()
+                            dismiss()
+                        },
                         text = {
                             Text(
                                 text = stringResource(R.string.action_mark_all_past_entries_as_checked),
-                                fontSize = 18.sp,
+                                fontSize = 16.sp,
                                 fontWeight = FontWeight.Normal,
                             )
                         },
@@ -272,11 +612,14 @@ private fun MainViewTopAppBar(
                 }
 
                 DropdownMenuItem(
-                    onClick = onSettingsButtonPressed,
+                    onClick = {
+                        onSettingsButtonPressed()
+                        dismiss()
+                    },
                     text = {
                         Text(
                             text = stringResource(R.string.action_settings),
-                            fontSize = 18.sp,
+                            fontSize = 16.sp,
                             fontWeight = FontWeight.Normal,
                         )
                     },
@@ -514,6 +857,7 @@ private fun Preview(
                 accountSecret = "accountSecret",
             )),
             dbStateFlow = MutableStateFlow(dbState),
+            eventFlow = MutableSharedFlow(),
             forceRefreshDataFlow = MutableSharedFlow(),
             firstDayOfWeekFlow = MutableStateFlow(DayOfWeek.MONDAY),
             includeCheckedBalanceFlow = MutableStateFlow(true),
@@ -546,6 +890,7 @@ private fun Preview(
             showManageAccountButtonFlow = MutableStateFlow(true),
             showGoBackToCurrentMonthButtonFlow = MutableStateFlow(false),
             hasPendingInvitationsFlow = MutableStateFlow(false),
+            userCurrencyFlow = MutableStateFlow(Currency.getInstance("USD")),
             onSettingsButtonPressed = {},
             onAdjustCurrentBalanceButtonPressed = {},
             onTickAllPastEntriesButtonPressed = {},
@@ -558,6 +903,12 @@ private fun Preview(
             onDateClicked = {},
             onDateLongClicked = {},
             onRetryDBLoadingButtonPressed = {},
+            onAccountSelected = {},
+            onExpenseDeletionCancelled = {},
+            onCurrentBalanceEditedCancelled = {_, _ ->},
+            onRestoreRecurringExpenseClicked = {_, _ ->},
+            onCheckAllPastEntriesConfirmPressed = {},
+            onNewBalanceSelected = {_, _ ->},
         )
     }
 }

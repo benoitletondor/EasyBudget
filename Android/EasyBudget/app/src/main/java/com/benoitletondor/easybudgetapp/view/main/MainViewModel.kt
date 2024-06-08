@@ -31,6 +31,7 @@ import com.benoitletondor.easybudgetapp.db.onlineimpl.OnlineDB
 import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
+import com.benoitletondor.easybudgetapp.helper.watchUserCurrency
 import com.benoitletondor.easybudgetapp.iab.PremiumCheckStatus
 import com.benoitletondor.easybudgetapp.injection.AppModule
 import com.benoitletondor.easybudgetapp.injection.CurrentDBProvider
@@ -337,6 +338,8 @@ class MainViewModel @Inject constructor(
     val firstDayOfWeekFlow = parameters.watchFirstDayOfWeek()
 
     val lowMoneyAmountWarningFlow = parameters.watchLowMoneyWarningAmount()
+
+    val userCurrencyFlow = parameters.watchUserCurrency()
 
     val appInitDate: LocalDate get() = parameters.getInitDate() ?: LocalDate.now()
 

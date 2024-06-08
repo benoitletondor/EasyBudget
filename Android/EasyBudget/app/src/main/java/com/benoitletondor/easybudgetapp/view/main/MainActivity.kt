@@ -22,46 +22,15 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Text
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.view.MenuProvider
-import androidx.core.view.isVisible
-import androidx.fragment.app.commit
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.withStarted
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.compose.AppNavHost
-import com.benoitletondor.easybudgetapp.databinding.ActivityMainBinding
 import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.parameters.*
 import com.benoitletondor.easybudgetapp.compose.AppTheme
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
-import com.benoitletondor.easybudgetapp.view.main.account.AccountFragment
-import com.benoitletondor.easybudgetapp.view.main.accountselector.AccountSelectorFragment
-import com.benoitletondor.easybudgetapp.view.main.loading.LoadingFragment
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
@@ -71,7 +40,6 @@ import com.benoitletondor.easybudgetapp.view.welcome.getOnboardingStep
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
 import javax.inject.Inject
-import kotlinx.serialization.Serializable
 
 /**
  * Main activity containing Calendar and List of expenses
@@ -107,89 +75,7 @@ class MainActivity : AppCompatActivity(), MenuProvider {
         /*setSupportActionBar(binding.toolbar)
         addMenuProvider(this)
 
-        collectViewModelEvents()
-
-        binding.mainComposeView.setContent {
-            val selectedAccount by viewModel.accountSelectionFlow.collectAsState()
-            val hasPendingInvitations by viewModel.hasPendingInvitationsFlow.collectAsState()
-
-            AppTheme {
-                if (selectedAccount is MainViewModel.SelectedAccount.Selected) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(colorResource(R.color.status_bar_color))
-                            .padding(bottom = 8.dp)
-                            .clickable(
-                                onClick = viewModel::onAccountTapped,
-                            )
-                            .padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 10.dp),
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            Box(
-                                modifier = Modifier.weight(1f),
-                            ) {
-                                when(val account = selectedAccount) {
-                                    MainViewModel.SelectedAccount.Loading -> Unit /* Nothing to display when loading */
-                                    is MainViewModel.SelectedAccount.Selected -> {
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                        ) {
-                                            Text(
-                                                text = stringResource(R.string.main_account_name) + " ",
-                                                fontWeight = FontWeight.SemiBold,
-                                                color = colorResource(R.color.action_bar_text_color),
-                                            )
-
-                                            Text(
-                                                modifier = Modifier.fillMaxWidth(),
-                                                text = when(account) {
-                                                    MainViewModel.SelectedAccount.Selected.Offline -> stringResource(R.string.main_account_default_name)
-                                                    is MainViewModel.SelectedAccount.Selected.Online -> stringResource(R.string.main_account_online_name, account.name)
-                                                },
-                                                maxLines = 1,
-                                                color = colorResource(R.color.action_bar_text_color),
-                                                overflow = TextOverflow.Ellipsis,
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-
-                            if (hasPendingInvitations && selectedAccount is MainViewModel.SelectedAccount.Selected) {
-                                Box(
-                                    modifier = Modifier.padding(start = 16.dp, end = 6.dp),
-                                ){
-                                    Image(
-                                        painter =  painterResource(id = R.drawable.ic_baseline_notifications_24),
-                                        colorFilter = ColorFilter.tint(colorResource(R.color.action_bar_text_color)),
-                                        contentDescription = stringResource(R.string.account_pending_invitation_description),
-                                    )
-                                    Box(
-                                        modifier = Modifier
-                                            .size(7.dp)
-                                            .clip(CircleShape)
-                                            .background(colorResource(R.color.budget_red))
-                                            .align(Alignment.TopEnd)
-                                    )
-                                }
-                            } else {
-                                Image(
-                                    painter =  painterResource(id = R.drawable.ic_baseline_arrow_drop_down_24),
-                                    colorFilter = ColorFilter.tint(colorResource(R.color.action_bar_text_color)),
-                                    contentDescription = null,
-                                    modifier = Modifier.padding(start = 10.dp),
-                                )
-                            }
-                        }
-
-                    }
-                }
-            }
-        }*/
+        collectViewModelEvents()*/
     }
 
     @Deprecated("This method has been deprecated in favor of using the Activity Result API\n      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt\n      contracts for common intents available in\n      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for\n      testing, and allow receiving results in separate, testable classes independent from your\n      activity. Use\n      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)}\n      with the appropriate {@link ActivityResultContract} and handling the result in the\n      {@link ActivityResultCallback#onActivityResult(Object) callback}.")
@@ -220,26 +106,6 @@ class MainActivity : AppCompatActivity(), MenuProvider {
             ActivityCompat.startActivity(this, startIntent, null)
         }*/
 
-        /*lifecycleScope.launchCollect(viewModel.accountSelectionFlow) { selectedAccount ->
-            invalidateOptionsMenu()
-
-            withStarted {
-                when(selectedAccount) {
-                    MainViewModel.SelectedAccount.Loading -> {
-                        supportFragmentManager.commit {
-                            replace(R.id.mainFragmentContainer, LoadingFragment())
-                        }
-                    }
-                    is MainViewModel.SelectedAccount.Selected -> {
-                        performIntentActionIfAny()
-
-                        supportFragmentManager.commit {
-                            replace(R.id.mainFragmentContainer, AccountFragment.newInstance(selectedAccount))
-                        }
-                    }
-                }
-            }
-        }*/
 
         /*lifecycleScope.launchCollect(viewModel.eventFlow) { event ->
             when(event) {
@@ -347,7 +213,8 @@ class MainActivity : AppCompatActivity(), MenuProvider {
 
     private fun openAccountsTrayIfNeeded(intent: Intent) {
         if( intent.getBooleanExtra(INTENT_OPEN_ACCOUNTS_TRAY_EXTRA, false) ) {
-            AccountSelectorFragment().show(supportFragmentManager, "accountSelector")
+            //AccountSelectorFragment().show(supportFragmentManager, "accountSelector")
+            TODO()
         }
     }
 

@@ -14,8 +14,9 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp.view.main.accountselector.view
+package com.benoitletondor.easybudgetapp.view.main.accountselector
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -38,6 +39,7 @@ import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -50,26 +52,40 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.benoitletondor.easybudgetapp.compose.AppTheme
+import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
-import com.benoitletondor.easybudgetapp.view.main.accountselector.AccountSelectorViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 
 @Composable
-fun AccountsView(viewModel: AccountSelectorViewModel) {
+fun AccountSelectorView(
+    viewModel: AccountSelectorViewModel = hiltViewModel(),
+    onAccountSelected: (MainViewModel.SelectedAccount.Selected) -> Unit,
+    onOpenBecomeProScreen: () -> Unit,
+    onOpenLoginScreen: (shouldDismissAfterAuth: Boolean) -> Unit,
+    onOpenCreateAccountScreen: () -> Unit,
+) {
     val state: AccountSelectorViewModel.State by viewModel.stateFlow.collectAsState()
 
     AccountsView(
         state = state,
+        eventFlow = viewModel.eventFlow,
         onIabErrorRetryButtonClicked = viewModel::onIabErrorRetryButtonClicked,
         onErrorRetryButtonClicked = viewModel::onRetryErrorButtonClicked,
-        onAccountSelected = viewModel::onAccountSelected,
-        onBecomeProButtonClicked = viewModel::onBecomeProButtonClicked,
-        onLoginButtonPressed = viewModel::onLoginButtonPressed,
-        onEmailTapped = viewModel::onEmailTapped,
-        onCreateAccountClicked = viewModel::onCreateAccountClicked,
+        onAccountSelected = onAccountSelected,
+        onBecomeProButtonClicked = onOpenBecomeProScreen,
+        onLoginButtonPressed = {
+            onOpenLoginScreen(true)
+        },
+        onEmailTapped = {
+            onOpenLoginScreen(false)
+        },
+        onCreateAccountClicked = onOpenCreateAccountScreen,
         onAcceptInvitationConfirmed = viewModel::onAcceptInvitationConfirmed,
         onRejectInvitationConfirmed = viewModel::onRejectInvitationConfirmed,
     )
@@ -78,6 +94,7 @@ fun AccountsView(viewModel: AccountSelectorViewModel) {
 @Composable
 private fun AccountsView(
     state: AccountSelectorViewModel.State,
+    eventFlow: Flow<AccountSelectorViewModel.Event>,
     onIabErrorRetryButtonClicked: () -> Unit,
     onErrorRetryButtonClicked: () -> Unit,
     onAccountSelected: (MainViewModel.SelectedAccount.Selected) -> Unit,
@@ -99,11 +116,45 @@ private fun AccountsView(
     }
     val shouldDisplayOfflineBackupEnabled = state is AccountSelectorViewModel.OfflineBackStateAvailable && state.isOfflineBackupEnabled
 
+    val context = LocalContext.current
+
+    LaunchedEffect(key1 = "eventsListener") {
+        launchCollect(eventFlow) { event ->
+            when(event) {
+                is AccountSelectorViewModel.Event.ErrorAcceptingInvitation -> {
+                    MaterialAlertDialogBuilder(context)
+                        .setTitle(R.string.account_invitation_error_accepting_title)
+                        .setMessage(context.getString(R.string.account_invitation_error_accepting_message, event.error.localizedMessage))
+                        .setPositiveButton(R.string.ok) { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        .show()
+                }
+                is AccountSelectorViewModel.Event.ErrorRejectingInvitation -> {
+                    MaterialAlertDialogBuilder(context)
+                        .setTitle(R.string.account_invitation_error_rejecting_title)
+                        .setMessage(context.getString(R.string.account_invitation_error_rejecting_message, event.error.localizedMessage))
+                        .setPositiveButton(R.string.ok) { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        .show()
+                }
+                AccountSelectorViewModel.Event.InvitationAccepted -> {
+                    Toast.makeText(context, R.string.account_invitation_accepted_message, Toast.LENGTH_LONG).show()
+                }
+                AccountSelectorViewModel.Event.InvitationRejected -> {
+                    Toast.makeText(context, R.string.account_invitation_rejected_message, Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .padding(
-                vertical = 20.dp,
-                horizontal = 16.dp
+                start = 16.dp,
+                end = 16.dp,
+                bottom = 40.dp,
             )
             .verticalScroll(rememberScrollState()),
     ) {
@@ -417,7 +468,7 @@ private fun AccountButton(
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable (
+            .clickable(
                 enabled = enabled,
                 onClick = onClick,
             ),
@@ -548,6 +599,7 @@ private fun AccountsLoadingViewPreview() {
     AppTheme {
         AccountsView(
             state = AccountSelectorViewModel.State.Loading,
+            eventFlow = MutableSharedFlow(),
             onIabErrorRetryButtonClicked = {},
             onErrorRetryButtonClicked = {},
             onAccountSelected = {},
@@ -567,6 +619,7 @@ fun AccountsIabErrorViewPreview() {
     AppTheme {
         AccountsView(
             state = AccountSelectorViewModel.State.IabError,
+            eventFlow = MutableSharedFlow(),
             onIabErrorRetryButtonClicked = {},
             onErrorRetryButtonClicked = {},
             onAccountSelected = {},
@@ -588,6 +641,7 @@ fun AccountsNotProViewPreview() {
             state = AccountSelectorViewModel.State.NotPro(
                 isOfflineBackupEnabled = false,
             ),
+            eventFlow = MutableSharedFlow(),
             onIabErrorRetryButtonClicked = {},
             onErrorRetryButtonClicked = {},
             onAccountSelected = {},
@@ -609,6 +663,7 @@ fun AccountsNotAuthenticatedViewPreview() {
             state = AccountSelectorViewModel.State.NotAuthenticated(
                 isOfflineBackupEnabled = false,
             ),
+            eventFlow = MutableSharedFlow(),
             onIabErrorRetryButtonClicked = {},
             onErrorRetryButtonClicked = {},
             onAccountSelected = {},
@@ -666,6 +721,7 @@ fun AccountsAvailableViewPreview() {
                 pendingInvitations = listOf(),
                 isOfflineBackupEnabled = true,
             ),
+            eventFlow = MutableSharedFlow(),
             onIabErrorRetryButtonClicked = {},
             onErrorRetryButtonClicked = {},
             onAccountSelected = {},
@@ -743,6 +799,7 @@ fun AccountsAvailableFullViewPreview() {
                 ),
                 isOfflineBackupEnabled = false,
             ),
+            eventFlow = MutableSharedFlow(),
             onIabErrorRetryButtonClicked = {},
             onErrorRetryButtonClicked = {},
             onAccountSelected = {},
