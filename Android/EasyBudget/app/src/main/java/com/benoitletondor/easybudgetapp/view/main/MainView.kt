@@ -1,5 +1,6 @@
 package com.benoitletondor.easybudgetapp.view.main
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -35,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.UiMode
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -472,7 +474,8 @@ private fun DBLoadingErrorView(
 }
 
 @Composable
-@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 private fun ProAccountSelectedPreview() {
     Preview(
         dbState = MainViewModel.DBState.Loaded(AppModule.provideDB(LocalContext.current)),
@@ -480,7 +483,8 @@ private fun ProAccountSelectedPreview() {
 }
 
 @Composable
-@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 private fun DBLoadingPreview() {
     Preview(
         dbState = MainViewModel.DBState.Loading,
@@ -488,7 +492,8 @@ private fun DBLoadingPreview() {
 }
 
 @Composable
-@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 private fun DBErrorLoadingPreview() {
     Preview(
         dbState = MainViewModel.DBState.Error(RuntimeException("Error")),
