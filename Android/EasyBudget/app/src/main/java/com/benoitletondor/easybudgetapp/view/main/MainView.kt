@@ -11,6 +11,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,12 +28,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.benoitletondor.easybudgetapp.R
+import com.benoitletondor.easybudgetapp.compose.AppTheme
 import com.benoitletondor.easybudgetapp.compose.AppTopAppBar
+import com.benoitletondor.easybudgetapp.compose.AppTopBarMoreMenuItem
+import com.benoitletondor.easybudgetapp.compose.BackButtonBehavior
 import com.benoitletondor.easybudgetapp.compose.components.LoadingView
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
 
@@ -42,10 +50,55 @@ fun MainView(
     navController: NavController,
     viewModel: MainViewModel = viewModel(),
 ) {
+    MainView(
+        showActionButtonsFlow = viewModel.showMenuActionButtonsFlow,
+        showPremiumRelatedButtonsFlow = viewModel.showPremiumRelatedButtonsFlow,
+        showManageAccountButtonFlow = viewModel.showManageAccountMenuItemFlow,
+        showGoBackToCurrentMonthButtonFlow = viewModel.showGoToCurrentMonthButtonStateFlow,
+        selectedAccountFlow = viewModel.accountSelectionFlow,
+        hasPendingInvitationsFlow = viewModel.hasPendingInvitationsFlow,
+        onSettingsButtonPressed = viewModel::onSettingsButtonPressed,
+        onAdjustCurrentBalanceButtonPressed = viewModel::onAdjustCurrentBalanceClicked,
+        onTickAllPastEntriesButtonPressed = viewModel::onCheckAllPastEntriesPressed,
+        onManageAccountButtonPressed = viewModel::onManageAccountButtonPressed,
+        onDiscoverPremiumButtonPressed = viewModel::onDiscoverPremiumButtonPressed,
+        onMonthlyReportButtonPressed = viewModel::onMonthlyReportButtonPressed,
+        onGoBackToCurrentMonthButtonPressed = viewModel::onGoBackToCurrentMonthButtonPressed,
+        onCurrentAccountTapped = viewModel::onCurrentAccountTapped,
+    )
+}
+
+@Composable
+private fun MainView(
+    showActionButtonsFlow: StateFlow<Boolean>,
+    showPremiumRelatedButtonsFlow: StateFlow<Boolean>,
+    showManageAccountButtonFlow: StateFlow<Boolean>,
+    showGoBackToCurrentMonthButtonFlow: StateFlow<Boolean>,
+    selectedAccountFlow: StateFlow<MainViewModel.SelectedAccount>,
+    hasPendingInvitationsFlow: StateFlow<Boolean>,
+    onSettingsButtonPressed: () -> Unit,
+    onAdjustCurrentBalanceButtonPressed: () -> Unit,
+    onTickAllPastEntriesButtonPressed: () -> Unit,
+    onManageAccountButtonPressed: () -> Unit,
+    onDiscoverPremiumButtonPressed: () -> Unit,
+    onMonthlyReportButtonPressed: () -> Unit,
+    onGoBackToCurrentMonthButtonPressed: () -> Unit,
+    onCurrentAccountTapped: () -> Unit,
+) {
     Scaffold(
         topBar = {
             MainViewTopAppBar(
-                navController = navController,
+                showActionButtonsFlow = showActionButtonsFlow,
+                showPremiumRelatedButtonsFlow = showPremiumRelatedButtonsFlow,
+                showManageAccountButtonFlow = showManageAccountButtonFlow,
+                showGoBackToCurrentMonthButtonFlow = showGoBackToCurrentMonthButtonFlow,
+                onSettingsButtonPressed = onSettingsButtonPressed,
+                onAdjustCurrentBalanceButtonPressed = onAdjustCurrentBalanceButtonPressed,
+                onTickAllPastEntriesButtonPressed = onTickAllPastEntriesButtonPressed,
+                onManageAccountButtonPressed = onManageAccountButtonPressed,
+                onDiscoverPremiumButtonPressed = onDiscoverPremiumButtonPressed,
+                onMonthlyReportButtonPressed = onMonthlyReportButtonPressed,
+                onGoBackToCurrentMonthButtonPressed = onGoBackToCurrentMonthButtonPressed,
             )
         },
         content = { contentPadding ->
@@ -53,9 +106,9 @@ fun MainView(
                 modifier = Modifier.padding(contentPadding),
             ) {
                 MainView(
-                    selectedAccountFlow = viewModel.accountSelectionFlow,
-                    hasPendingInvitationsFlow = viewModel.hasPendingInvitationsFlow,
-                    onAccountTapped = viewModel::onAccountTapped,
+                    selectedAccountFlow = selectedAccountFlow,
+                    hasPendingInvitationsFlow = hasPendingInvitationsFlow,
+                    onCurrentAccountTapped = onCurrentAccountTapped,
                 )
             }
         }
@@ -64,12 +117,98 @@ fun MainView(
 
 @Composable
 private fun MainViewTopAppBar(
-    navController: NavController,
+    showActionButtonsFlow: StateFlow<Boolean>,
+    showPremiumRelatedButtonsFlow: StateFlow<Boolean>,
+    showManageAccountButtonFlow: StateFlow<Boolean>,
+    showGoBackToCurrentMonthButtonFlow: StateFlow<Boolean>,
+    onSettingsButtonPressed: () -> Unit,
+    onAdjustCurrentBalanceButtonPressed: () -> Unit,
+    onTickAllPastEntriesButtonPressed: () -> Unit,
+    onManageAccountButtonPressed: () -> Unit,
+    onDiscoverPremiumButtonPressed: () -> Unit,
+    onMonthlyReportButtonPressed: () -> Unit,
+    onGoBackToCurrentMonthButtonPressed: () -> Unit,
 ) {
     AppTopAppBar(
-        navController = navController,
-        title = stringResource(id = R.string.app_name),
-        showBackButton = false,
+        title = stringResource(R.string.app_name),
+        backButtonBehavior = BackButtonBehavior.Hidden,
+        actions = {
+            val showActionButtons by showActionButtonsFlow.collectAsState()
+            val showPremiumRelatedButtons by showPremiumRelatedButtonsFlow.collectAsState()
+            val showManageAccountButton by showManageAccountButtonFlow.collectAsState()
+            val showGoBackToCurrentMonthButton by showGoBackToCurrentMonthButtonFlow.collectAsState()
+
+            if (showActionButtons) {
+                if (showManageAccountButton) {
+                    IconButton(
+                        onClick = onManageAccountButtonPressed,
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_baseline_manage_accounts_24),
+                            contentDescription = stringResource(R.string.action_manage_account),
+                        )
+                    }
+                }
+
+                if (showGoBackToCurrentMonthButton) {
+                    IconButton(
+                        onClick = onGoBackToCurrentMonthButtonPressed,
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_calendar_today),
+                            contentDescription = stringResource(R.string.action_go_to_current_month),
+                        )
+                    }
+                }
+
+                if (showPremiumRelatedButtons) {
+                    IconButton(
+                        onClick = onMonthlyReportButtonPressed,
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_list_alt_24),
+                            contentDescription = stringResource(R.string.monthly_report_button_title),
+                        )
+                    }
+                } else {
+                    IconButton(
+                        onClick = onDiscoverPremiumButtonPressed,
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_baseline_star_24),
+                            contentDescription = stringResource(R.string.action_become_premium),
+                        )
+                    }
+                }
+            }
+
+            AppTopBarMoreMenuItem {
+                if (showActionButtons) {
+                    DropdownMenuItem(
+                        onClick = onAdjustCurrentBalanceButtonPressed,
+                        text = {
+                            Text(stringResource(R.string.action_balance))
+                        },
+                    )
+                }
+
+                if (showActionButtons && showPremiumRelatedButtons) {
+                    DropdownMenuItem(
+                        onClick = onTickAllPastEntriesButtonPressed,
+                        text = {
+                            Text(stringResource(R.string.action_mark_all_past_entries_as_checked))
+                        },
+                    )
+                }
+
+                DropdownMenuItem(
+                    onClick = onSettingsButtonPressed,
+                    text = {
+                        Text(stringResource(R.string.action_settings))
+                    },
+                )
+            }
+        }
     )
 }
 
@@ -77,7 +216,7 @@ private fun MainViewTopAppBar(
 private fun MainView(
     selectedAccountFlow: StateFlow<MainViewModel.SelectedAccount>,
     hasPendingInvitationsFlow: StateFlow<Boolean>,
-    onAccountTapped: () -> Unit,
+    onCurrentAccountTapped: () -> Unit,
 ) {
     val account by selectedAccountFlow.collectAsState()
 
@@ -90,10 +229,14 @@ private fun MainView(
                 SelectedAccountHeader(
                     selectedAccount = selectedAccount,
                     hasPendingInvitationsFlow = hasPendingInvitationsFlow,
-                    onAccountTapped = onAccountTapped,
+                    onCurrentAccountTapped = onCurrentAccountTapped,
                 )
 
                 CalendarView(
+                    selectedAccount = selectedAccount,
+                )
+
+                ExpensesView(
                     selectedAccount = selectedAccount,
                 )
             }
@@ -105,7 +248,7 @@ private fun MainView(
 private fun SelectedAccountHeader(
     selectedAccount: MainViewModel.SelectedAccount.Selected,
     hasPendingInvitationsFlow: StateFlow<Boolean>,
-    onAccountTapped: () -> Unit,
+    onCurrentAccountTapped: () -> Unit,
 ) {
     val hasPendingInvitations by hasPendingInvitationsFlow.collectAsState()
 
@@ -114,7 +257,7 @@ private fun SelectedAccountHeader(
             .fillMaxWidth()
             .background(colorResource(R.color.status_bar_color))
             .padding(bottom = 8.dp)
-            .clickable(onClick = onAccountTapped)
+            .clickable(onClick = onCurrentAccountTapped)
             .padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 10.dp),
     ) {
         Row(
@@ -181,4 +324,40 @@ private fun CalendarView(
     selectedAccount: MainViewModel.SelectedAccount.Selected,
 ) {
 
+}
+
+@Composable
+private fun ExpensesView(
+    selectedAccount: MainViewModel.SelectedAccount.Selected,
+) {
+
+}
+
+@Composable
+@Preview
+private fun ProAccountSelectedPreview() {
+    AppTheme {
+        MainView(
+            showActionButtonsFlow = MutableStateFlow(true),
+            showPremiumRelatedButtonsFlow = MutableStateFlow(true),
+            showManageAccountButtonFlow = MutableStateFlow(true),
+            showGoBackToCurrentMonthButtonFlow = MutableStateFlow(false),
+            selectedAccountFlow = MutableStateFlow(MainViewModel.SelectedAccount.Selected.Online(
+                name = "Account name",
+                isOwner = true,
+                ownerEmail = "test@test.com",
+                accountId = "accountId",
+                accountSecret = "accountSecret",
+            )),
+            hasPendingInvitationsFlow = MutableStateFlow(false),
+            onSettingsButtonPressed = {},
+            onAdjustCurrentBalanceButtonPressed = {},
+            onTickAllPastEntriesButtonPressed = {},
+            onManageAccountButtonPressed = {},
+            onDiscoverPremiumButtonPressed = {},
+            onMonthlyReportButtonPressed = {},
+            onGoBackToCurrentMonthButtonPressed = {},
+            onCurrentAccountTapped = {},
+        )
+    }
 }

@@ -28,12 +28,16 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.benoitletondor.easybudgetapp.R
 
+sealed class BackButtonBehavior {
+    data object Hidden : BackButtonBehavior()
+    data class NavigateBack(val onBackButtonPressed: () -> Unit) : BackButtonBehavior()
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppTopAppBar(
-    navController: NavController,
     title: String,
-    showBackButton: Boolean,
+    backButtonBehavior: BackButtonBehavior,
     actions: @Composable RowScope.() -> Unit = {},
 ) {
     TopAppBar(
@@ -44,10 +48,8 @@ fun AppTopAppBar(
         },
         actions = actions,
         navigationIcon = {
-            if (showBackButton) {
-                IconButton(onClick = {
-                    navController.popBackStack()
-                }) {
+            if (backButtonBehavior is BackButtonBehavior.NavigateBack) {
+                IconButton(onClick = backButtonBehavior.onBackButtonPressed) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Up button",
