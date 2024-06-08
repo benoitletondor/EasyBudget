@@ -42,8 +42,8 @@
     <color name="divider">#eeeeee</color>
     <color name="budget_line_background_color">#f2f2f2</color>
     <color name="home_fab_button_color">@color/accent</color>
-    <color name="fab_add_expense">#F44336</color>
-    <color name="fab_add_monthly_expense">@color/secondary</color>
+    <color name="fab_add_monthly_expense">#F44336</color>
+    <color name="fab_add_expense">@color/secondary</color>
     <color name="main_fab_action_color">@color/white</color>
 
     <color name="calendar_cell_selected">@color/primary_light</color>

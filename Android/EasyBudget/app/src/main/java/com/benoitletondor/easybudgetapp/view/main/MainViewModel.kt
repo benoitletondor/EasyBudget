@@ -212,6 +212,8 @@ class MainViewModel @Inject constructor(
                             }
                     }
 
+                    dbProvider.activeDB = db
+
                     emit(DBState.Loaded(db))
                 }
             }
@@ -652,6 +654,18 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun onAddRecurringEntryPressed() {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.OpenAddRecurringExpense(LocalDate.now()))
+        }
+    }
+
+    fun onAddEntryPressed() {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.OpenAddExpense(LocalDate.now()))
+        }
+    }
+
     override fun onCleared() {
         val currentDB = dbProvider.activeDB
         val dbState = dbAvailableFlow.value as? DBState.Loaded
@@ -749,6 +763,7 @@ class MainViewModel @Inject constructor(
         data object ShowConfirmCheckAllPastEntries : Event()
         data class CheckAllPastEntriesError(val error: Throwable) : Event()
         data object OpenMonthlyReport : Event()
+        data class OpenAddRecurringExpense(val date: LocalDate) : Event()
         data class OpenAddExpense(val date: LocalDate) : Event()
         data class OpenManageAccount(val account: SelectedAccount.Selected.Online) : Event()
     }

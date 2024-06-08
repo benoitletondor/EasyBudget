@@ -7,6 +7,9 @@ import android.content.res.Configuration
 import android.view.View
 import android.view.WindowManager
 import android.widget.EditText
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,10 +23,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
@@ -45,6 +51,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -80,6 +87,7 @@ import com.benoitletondor.easybudgetapp.view.main.calendar.CalendarView
 import com.benoitletondor.easybudgetapp.view.main.createaccount.CreateAccountActivity
 import com.benoitletondor.easybudgetapp.view.main.login.LoginActivity
 import com.benoitletondor.easybudgetapp.view.main.manageaccount.ManageAccountActivity
+import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -145,6 +153,8 @@ fun MainView(
         onRestoreRecurringExpenseClicked = viewModel::onRestoreRecurringExpenseClicked,
         onCheckAllPastEntriesConfirmPressed = viewModel::onCheckAllPastEntriesConfirmPressed,
         onNewBalanceSelected = viewModel::onNewBalanceSelected,
+        onAddRecurringEntryPressed = viewModel::onAddRecurringEntryPressed,
+        onAddEntryPressed = viewModel::onAddEntryPressed,
     )
 }
 
@@ -188,11 +198,14 @@ private fun MainView(
     onRestoreRecurringExpenseClicked: (RecurringExpense, RestoreAction) -> Unit,
     onCheckAllPastEntriesConfirmPressed: () -> Unit,
     onNewBalanceSelected: (Double, String) -> Unit,
+    onAddRecurringEntryPressed: () -> Unit,
+    onAddEntryPressed: () -> Unit,
 ) {
     var showAccountSelectorModal by remember { mutableStateOf(false) }
     val accountSelectorModalSheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+    var showFABMenu by remember { mutableStateOf(false) }
 
     val activity = LocalContext.current as Activity
 
@@ -291,6 +304,16 @@ private fun MainView(
 
                     activity.startActivity(startIntent)
                 }
+                is MainViewModel.Event.OpenAddRecurringExpense -> {
+                    // FIXME replace this
+                    val startIntent = RecurringExpenseEditActivity.newIntent(
+                        context = activity,
+                        editedExpense = null,
+                        startDate = event.date,
+                    )
+
+                    activity.startActivity(startIntent)
+                }
                 is MainViewModel.Event.OpenManageAccount -> {
                     // FIXME replace this
                     activity.startActivity(ManageAccountActivity.newIntent(activity, event.account))
@@ -303,7 +326,7 @@ private fun MainView(
                 MainViewModel.Event.OpenPremium -> {
                     // FIXME replace this
                     val startIntent = Intent(activity, SettingsActivity::class.java)
-                    startIntent.putExtra(SettingsActivity.SHOW_PRO_INTENT_KEY, true)
+                    startIntent.putExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, true)
                     activity.startActivity(startIntent)
                 }
                 is MainViewModel.Event.RecurringExpenseDeletionResult -> {
@@ -497,6 +520,20 @@ private fun MainView(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    showFABMenu = !showFABMenu
+                },
+                containerColor = colorResource(R.color.home_fab_button_color),
+                contentColor = colorResource(R.color.white),
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_baseline_add_24),
+                    contentDescription = stringResource(R.string.fab_add_expense),
+                )
+            }
+        },
         content = { contentPadding ->
             Box(
                 modifier = Modifier.padding(contentPadding),
@@ -556,6 +593,94 @@ private fun MainView(
                             },
                         )
                     }
+                }
+
+                AnimatedVisibility(
+                    visible = showFABMenu,
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(color = colorResource(R.color.menu_background_overlay_color))
+                            .padding(bottom = 90.dp, end = 16.dp),
+                        verticalArrangement = Arrangement.Bottom,
+                        horizontalAlignment = Alignment.End,
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .clickable {
+                                    showFABMenu = false
+                                    onAddRecurringEntryPressed()
+                                },
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(color = Color.Black)
+                                    .padding(horizontal = 10.dp, vertical = 5.dp),
+                                text = stringResource(R.string.fab_add_monthly_expense),
+                                color = Color.White,
+                                fontSize = 15.sp,
+                            )
+
+                            Spacer(modifier = Modifier.width(10.dp))
+
+                            FloatingActionButton(
+                                onClick = {
+                                    showFABMenu = false
+                                    onAddRecurringEntryPressed()
+                                },
+                                containerColor = colorResource(R.color.fab_add_monthly_expense),
+                                contentColor = colorResource(R.color.white),
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_autorenew_white),
+                                    contentDescription = stringResource(R.string.fab_add_monthly_expense),
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Row(
+                            modifier = Modifier
+                                .clickable {
+                                    showFABMenu = false
+                                    onAddEntryPressed()
+                                },
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(color = Color.Black)
+                                    .padding(horizontal = 10.dp, vertical = 5.dp),
+                                text = stringResource(R.string.fab_add_expense),
+                                color = Color.White,
+                                fontSize = 15.sp,
+                            )
+
+                            Spacer(modifier = Modifier.width(10.dp))
+
+                            FloatingActionButton(
+                                onClick = {
+                                    showFABMenu = false
+                                    onAddEntryPressed()
+                                },
+                                containerColor = colorResource(R.color.fab_add_expense),
+                                contentColor = colorResource(R.color.white),
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_baseline_add_24),
+                                    contentDescription = stringResource(R.string.fab_add_expense),
+                                )
+                            }
+                        }
+                    }
+
                 }
             }
         }
@@ -962,6 +1087,8 @@ private fun Preview(
             onRestoreRecurringExpenseClicked = {_, _ ->},
             onCheckAllPastEntriesConfirmPressed = {},
             onNewBalanceSelected = {_, _ ->},
+            onAddRecurringEntryPressed = {},
+            onAddEntryPressed = {},
         )
     }
 }
