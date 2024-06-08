@@ -606,87 +606,16 @@ private fun MainView(
                     enter = fadeIn(),
                     exit = fadeOut(),
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(color = colorResource(R.color.menu_background_overlay_color))
-                            .padding(bottom = 90.dp, end = 16.dp),
-                        verticalArrangement = Arrangement.Bottom,
-                        horizontalAlignment = Alignment.End,
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .clickable {
-                                    showFABMenu = false
-                                    onAddRecurringEntryPressed()
-                                },
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Text(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(6.dp))
-                                    .background(color = Color.Black)
-                                    .padding(horizontal = 10.dp, vertical = 5.dp),
-                                text = stringResource(R.string.fab_add_monthly_expense),
-                                color = Color.White,
-                                fontSize = 15.sp,
-                            )
-
-                            Spacer(modifier = Modifier.width(10.dp))
-
-                            FloatingActionButton(
-                                onClick = {
-                                    showFABMenu = false
-                                    onAddRecurringEntryPressed()
-                                },
-                                containerColor = colorResource(R.color.fab_add_monthly_expense),
-                                contentColor = colorResource(R.color.white),
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_autorenew_white),
-                                    contentDescription = stringResource(R.string.fab_add_monthly_expense),
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        Row(
-                            modifier = Modifier
-                                .clickable {
-                                    showFABMenu = false
-                                    onAddEntryPressed()
-                                },
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Text(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(6.dp))
-                                    .background(color = Color.Black)
-                                    .padding(horizontal = 10.dp, vertical = 5.dp),
-                                text = stringResource(R.string.fab_add_expense),
-                                color = Color.White,
-                                fontSize = 15.sp,
-                            )
-
-                            Spacer(modifier = Modifier.width(10.dp))
-
-                            FloatingActionButton(
-                                onClick = {
-                                    showFABMenu = false
-                                    onAddEntryPressed()
-                                },
-                                containerColor = colorResource(R.color.fab_add_expense),
-                                contentColor = colorResource(R.color.white),
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_baseline_add_24),
-                                    contentDescription = stringResource(R.string.fab_add_expense),
-                                )
-                            }
-                        }
-                    }
-
+                    FABAddExpenseOverlay(
+                        onAddRecurringEntryPressed = {
+                            onAddRecurringEntryPressed()
+                            showFABMenu = false
+                        },
+                        onAddEntryPressed = {
+                            onAddEntryPressed()
+                            showFABMenu = false
+                        },
+                    )
                 }
             }
         }
@@ -958,6 +887,81 @@ private fun ExpensesView(
     selectedAccount: MainViewModel.SelectedAccount.Selected,
 ) {
 
+}
+
+@Composable
+private fun FABAddExpenseOverlay(
+    onAddRecurringEntryPressed: () -> Unit,
+    onAddEntryPressed: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = colorResource(R.color.menu_background_overlay_color))
+            .padding(bottom = 90.dp, end = 16.dp),
+        verticalArrangement = Arrangement.Bottom,
+        horizontalAlignment = Alignment.End,
+    ) {
+        Row(
+            modifier = Modifier
+                .clickable(onClick = onAddRecurringEntryPressed),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(color = Color.Black)
+                    .padding(horizontal = 10.dp, vertical = 5.dp),
+                text = stringResource(R.string.fab_add_monthly_expense),
+                color = Color.White,
+                fontSize = 15.sp,
+            )
+
+            Spacer(modifier = Modifier.width(10.dp))
+
+            FloatingActionButton(
+                onClick = onAddRecurringEntryPressed,
+                containerColor = colorResource(R.color.fab_add_monthly_expense),
+                contentColor = colorResource(R.color.white),
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_autorenew_white),
+                    contentDescription = stringResource(R.string.fab_add_monthly_expense),
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(
+            modifier = Modifier
+                .clickable(onClick = onAddEntryPressed),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(color = Color.Black)
+                    .padding(horizontal = 10.dp, vertical = 5.dp),
+                text = stringResource(R.string.fab_add_expense),
+                color = Color.White,
+                fontSize = 15.sp,
+            )
+
+            Spacer(modifier = Modifier.width(10.dp))
+
+            FloatingActionButton(
+                onClick = onAddEntryPressed,
+                containerColor = colorResource(R.color.fab_add_expense),
+                contentColor = colorResource(R.color.white),
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_baseline_add_24),
+                    contentDescription = stringResource(R.string.fab_add_expense),
+                )
+            }
+        }
+    }
 }
 
 @Composable
