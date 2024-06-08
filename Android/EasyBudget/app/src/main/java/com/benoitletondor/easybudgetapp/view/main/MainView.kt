@@ -31,19 +31,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.compose.AppTheme
 import com.benoitletondor.easybudgetapp.compose.AppTopAppBar
 import com.benoitletondor.easybudgetapp.compose.AppTopBarMoreMenuItem
 import com.benoitletondor.easybudgetapp.compose.BackButtonBehavior
 import com.benoitletondor.easybudgetapp.compose.components.LoadingView
-import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.injection.AppModule
 import com.benoitletondor.easybudgetapp.model.DataForDay
 import com.benoitletondor.easybudgetapp.model.DataForMonth
-import com.benoitletondor.easybudgetapp.view.main.account.AccountViewModel
 import com.benoitletondor.easybudgetapp.view.main.calendar.CalendarView
 import com.kizitonwose.calendar.core.atStartOfMonth
 import kotlinx.coroutines.flow.Flow
@@ -63,7 +61,7 @@ object MainDestination
 @Composable
 fun MainView(
     navController: NavController,
-    viewModel: MainViewModel = viewModel(),
+    viewModel: MainViewModel = hiltViewModel(),
 ) {
     MainView(
         selectedAccountFlow = viewModel.accountSelectionFlow,
@@ -413,9 +411,9 @@ private fun ExpensesView(
 @Composable
 @Preview
 private fun ProAccountSelectedPreview() {
-    val context = LocalContext.current
-
     AppTheme {
+        val context = LocalContext.current
+
         MainView(
             selectedAccountFlow = MutableStateFlow(MainViewModel.SelectedAccount.Selected.Online(
                 name = "Account name",

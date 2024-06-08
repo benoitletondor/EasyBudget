@@ -79,10 +79,10 @@ import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AccountFragment : Fragment(), MenuProvider {
+class AccountFragment : Fragment() {
     private val viewModel: AccountViewModel by viewModels()
 
-    private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
+    /*private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
                 MainActivity.INTENT_EXPENSE_DELETED -> {
@@ -737,5 +737,5 @@ class AccountFragment : Fragment(), MenuProvider {
                 }
             }
         }
-    }
+    }*/
 }

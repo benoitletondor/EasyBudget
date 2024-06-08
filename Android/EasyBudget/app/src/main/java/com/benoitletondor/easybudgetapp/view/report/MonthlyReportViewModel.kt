@@ -21,6 +21,7 @@ import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
+import com.benoitletondor.easybudgetapp.injection.CurrentDBProvider
 import com.benoitletondor.easybudgetapp.view.main.account.AccountViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -32,7 +33,9 @@ import java.time.YearMonth
 import javax.inject.Inject
 
 @HiltViewModel
-class MonthlyReportViewModel @Inject constructor() : ViewModel() {
+class MonthlyReportViewModel @Inject constructor(
+    currentDBProvider: CurrentDBProvider,
+) : ViewModel() {
     private val stateMutableFlow = MutableStateFlow<MonthlyReportState>(MonthlyReportState.Loading)
     val stateFlow: Flow<MonthlyReportState> = stateMutableFlow
 
@@ -42,7 +45,7 @@ class MonthlyReportViewModel @Inject constructor() : ViewModel() {
     private lateinit var db: DB
 
     init {
-        val currentDb = AccountViewModel.getCurrentDB()
+        val currentDb = currentDBProvider.activeDB
         if (currentDb == null) {
             viewModelScope.launch {
                 unableToLoadDBEventMutableFlow.emit(Unit)

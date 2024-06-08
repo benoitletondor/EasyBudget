@@ -24,6 +24,7 @@ import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
+import com.benoitletondor.easybudgetapp.injection.CurrentDBProvider
 import kotlinx.coroutines.launch
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.parameters.Parameters
@@ -41,6 +42,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RecurringExpenseEditViewModel @Inject constructor(
     private val parameters: Parameters,
+    currentDBProvider: CurrentDBProvider,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     /**
@@ -80,7 +82,7 @@ class RecurringExpenseEditViewModel @Inject constructor(
     private lateinit var db: DB
 
     init {
-        val currentDb = AccountViewModel.getCurrentDB()
+        val currentDb = currentDBProvider.activeDB
         if (currentDb == null) {
             viewModelScope.launch {
                 unableToLoadDBEventMutableFlow.emit(Unit)

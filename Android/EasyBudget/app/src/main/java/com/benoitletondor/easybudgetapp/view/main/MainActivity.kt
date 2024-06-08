@@ -81,8 +81,6 @@ import kotlinx.serialization.Serializable
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), MenuProvider {
 
-    private val viewModel: MainViewModel by viewModels()
-
     @Inject
     lateinit var parameters: Parameters
 
@@ -91,6 +89,7 @@ class MainActivity : AppCompatActivity(), MenuProvider {
     //override fun createBinding(): ActivityMainBinding = ActivityMainBinding.inflate(layoutInflater)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
 
         // Launch welcome screen if needed
@@ -197,7 +196,7 @@ class MainActivity : AppCompatActivity(), MenuProvider {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == WELCOME_SCREEN_ACTIVITY_CODE) {
+        /*if (requestCode == WELCOME_SCREEN_ACTIVITY_CODE) {
             if (resultCode == RESULT_OK) {
                 viewModel.onWelcomeScreenFinished()
             } else if (resultCode == RESULT_CANCELED) {
@@ -207,11 +206,11 @@ class MainActivity : AppCompatActivity(), MenuProvider {
             for (fragment in supportFragmentManager.fragments) {
                 fragment.onActivityResult(requestCode, resultCode, data)
             }
-        }
+        }*/
     }
 
     private fun collectViewModelEvents() {
-        lifecycleScope.launchCollect(viewModel.premiumStatusFlow) {
+        /*lifecycleScope.launchCollect(viewModel.premiumStatusFlow) {
             invalidateOptionsMenu()
         }
 
@@ -219,9 +218,9 @@ class MainActivity : AppCompatActivity(), MenuProvider {
             val startIntent = Intent(this, SettingsActivity::class.java)
             startIntent.putExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, true)
             ActivityCompat.startActivity(this, startIntent, null)
-        }
+        }*/
 
-        lifecycleScope.launchCollect(viewModel.accountSelectionFlow) { selectedAccount ->
+        /*lifecycleScope.launchCollect(viewModel.accountSelectionFlow) { selectedAccount ->
             invalidateOptionsMenu()
 
             withStarted {
@@ -240,13 +239,13 @@ class MainActivity : AppCompatActivity(), MenuProvider {
                     }
                 }
             }
-        }
+        }*/
 
-        lifecycleScope.launchCollect(viewModel.eventFlow) { event ->
+        /*lifecycleScope.launchCollect(viewModel.eventFlow) { event ->
             when(event) {
                 MainViewModel.Event.ShowAccountSelect -> AccountSelectorFragment().show(supportFragmentManager, "accountSelector")
             }
-        }
+        }*/
     }
 
     private fun performIntentActionIfAny() {
@@ -267,20 +266,20 @@ class MainActivity : AppCompatActivity(), MenuProvider {
 
         this.intent = intent
 
-        (viewModel.accountSelectionFlow.value as? MainViewModel.SelectedAccount.Selected)?.let {
+        /*(viewModel.accountSelectionFlow.value as? MainViewModel.SelectedAccount.Selected)?.let {
             performIntentActionIfAny()
-        }
+        }*/
     }
 
     fun onAccountSelectedFromBottomSheet(account: MainViewModel.SelectedAccount.Selected) {
-        viewModel.onAccountSelected(account)
+        //viewModel.onAccountSelected(account)
     }
 
 // ------------------------------------------>
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_main, menu)
+        /*menuInflater.inflate(R.menu.menu_main, menu)
 
         if (viewModel.shouldShowMenuButtons()) {
             // Remove monthly report for non premium users
@@ -298,11 +297,11 @@ class MainActivity : AppCompatActivity(), MenuProvider {
             }
         } else {
             menu.removeItem(R.id.action_become_premium)
-        }
+        }*/
     }
 
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-        return when (menuItem.itemId) {
+        /*return when (menuItem.itemId) {
             R.id.action_settings -> {
                 val startIntent = Intent(this, SettingsActivity::class.java)
                 this@MainActivity.startActivity(startIntent)
@@ -315,7 +314,9 @@ class MainActivity : AppCompatActivity(), MenuProvider {
                 true
             }
             else -> false
-        }
+        }*/
+
+        return false
     }
 
 // ------------------------------------------>

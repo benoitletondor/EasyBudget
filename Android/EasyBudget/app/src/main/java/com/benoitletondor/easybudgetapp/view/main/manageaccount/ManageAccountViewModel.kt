@@ -31,6 +31,7 @@ import com.benoitletondor.easybudgetapp.db.onlineimpl.OnlineDB
 import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
 import com.benoitletondor.easybudgetapp.helper.combine
+import com.benoitletondor.easybudgetapp.injection.CurrentDBProvider
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import com.benoitletondor.easybudgetapp.view.main.account.AccountViewModel
 import com.benoitletondor.easybudgetapp.view.main.manageaccount.ManageAccountActivity.Companion.SELECTED_ACCOUNT_EXTRA
@@ -54,6 +55,7 @@ import javax.inject.Inject
 class ManageAccountViewModel @Inject constructor(
     auth: Auth,
     private val accounts: Accounts,
+    private val currentDBProvider: CurrentDBProvider,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val selectedAccount = savedStateHandle.get<MainViewModel.SelectedAccount.Selected.Online>(SELECTED_ACCOUNT_EXTRA)
@@ -326,7 +328,7 @@ class ManageAccountViewModel @Inject constructor(
 
             try {
                 val credentials = selectedAccount.toAccountCredentials()
-                val onlineDB = (AccountViewModel.getCurrentDB() as? OnlineDB)
+                val onlineDB = (currentDBProvider.activeDB as? OnlineDB)
                     ?: throw IllegalStateException("No online DB found")
 
                 if (onlineDB.account.id != credentials.id || onlineDB.account.secret != credentials.secret) {

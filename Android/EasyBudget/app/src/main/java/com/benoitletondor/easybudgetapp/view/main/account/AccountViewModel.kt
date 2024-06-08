@@ -36,7 +36,6 @@ import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.watchShouldShowCheckedBalance
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
-import com.benoitletondor.easybudgetapp.view.main.account.AccountFragment.Companion.ARG_SELECTED_ACCOUNT
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.realm.kotlin.mongodb.exceptions.AuthException
@@ -70,9 +69,6 @@ class AccountViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     @ApplicationContext private val appContext: Context,
 ): ViewModel() {
-    private val account = savedStateHandle.get<MainViewModel.SelectedAccount.Selected>(ARG_SELECTED_ACCOUNT)
-        ?: throw IllegalStateException("No ARG_SELECTED_ACCOUNT arg")
-
 
 }
 

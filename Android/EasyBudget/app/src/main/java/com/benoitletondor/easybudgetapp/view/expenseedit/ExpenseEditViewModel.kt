@@ -22,6 +22,8 @@ import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
+import com.benoitletondor.easybudgetapp.injection.CurrentDBProvider
+import com.benoitletondor.easybudgetapp.injection.requireDB
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.getInitDate
 import com.benoitletondor.easybudgetapp.view.main.account.AccountViewModel
@@ -37,6 +39,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ExpenseEditViewModel @Inject constructor(
     private val parameters: Parameters,
+    currentDBProvider: CurrentDBProvider,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     /**
@@ -73,7 +76,7 @@ class ExpenseEditViewModel @Inject constructor(
     private lateinit var db: DB
 
     init {
-        val currentDb = AccountViewModel.getCurrentDB()
+        val currentDb = currentDBProvider.activeDB
         if (currentDb == null) {
             viewModelScope.launch {
                 unableToLoadDBEventMutableFlow.emit(Unit)

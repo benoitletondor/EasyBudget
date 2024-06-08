@@ -152,6 +152,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.1")
     implementation("androidx.navigation:navigation-compose:2.8.0-beta02")
     implementation("com.google.accompanist:accompanist-themeadapter-material3:0.34.0")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
     implementation("com.android.billingclient:billing-ktx:7.0.0")
 
@@ -169,7 +170,7 @@ dependencies {
 
     implementation("io.realm.kotlin:library-sync:$realmVersion")
 
-    implementation("com.kizitonwose.calendar:compose:2.5.1")
+    implementation("com.kizitonwose.calendar:compose:2.6.0-beta01")
     implementation("net.sf.biweekly:biweekly:0.6.8")
 
     implementation("net.lingala.zip4j:zip4j:2.11.5")

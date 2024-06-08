@@ -58,6 +58,7 @@ import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.helper.toFormattedString
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.compose.AppTheme
+import com.benoitletondor.easybudgetapp.injection.CurrentDBProvider
 import com.benoitletondor.easybudgetapp.view.main.account.AccountViewModel
 import com.benoitletondor.easybudgetapp.view.report.export.ExportReportActivity.Companion.REQUEST_CODE_SHARE_CSV
 import com.benoitletondor.easybudgetapp.view.report.export.ExportReportActivity.Companion.tempFileName
@@ -78,6 +79,8 @@ class ExportReportActivity: BaseActivity<ActivityMonthlyReportExportBinding>() {
     private lateinit var month: YearMonth
     @Inject
     lateinit var parameters: Parameters
+    @Inject
+    lateinit var currentDBProvider: CurrentDBProvider
 
     override fun createBinding(): ActivityMonthlyReportExportBinding = ActivityMonthlyReportExportBinding.inflate(layoutInflater)
 
@@ -85,7 +88,7 @@ class ExportReportActivity: BaseActivity<ActivityMonthlyReportExportBinding>() {
         super.onCreate(savedInstanceState)
 
         month = intent.getSerializableExtra(EXTRA_MONTH) as? YearMonth ?: throw IllegalArgumentException("Missing month extra")
-        val currentDb = AccountViewModel.getCurrentDB()
+        val currentDb = currentDBProvider.activeDB
         if (currentDb == null) {
             Logger.error("Unable to get current DB in ExportReportActivity", Exception("No DB found"))
             finish()
