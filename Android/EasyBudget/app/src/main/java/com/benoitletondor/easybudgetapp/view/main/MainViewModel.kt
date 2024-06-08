@@ -34,12 +34,16 @@ import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
 import com.benoitletondor.easybudgetapp.iab.PremiumCheckStatus
 import com.benoitletondor.easybudgetapp.injection.AppModule
 import com.benoitletondor.easybudgetapp.injection.CurrentDBProvider
+import com.benoitletondor.easybudgetapp.model.DataForMonth
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType
 import com.benoitletondor.easybudgetapp.parameters.Parameters
+import com.benoitletondor.easybudgetapp.parameters.getInitDate
 import com.benoitletondor.easybudgetapp.parameters.getLatestSelectedOnlineAccountId
 import com.benoitletondor.easybudgetapp.parameters.setLatestSelectedOnlineAccountId
+import com.benoitletondor.easybudgetapp.parameters.watchFirstDayOfWeek
+import com.benoitletondor.easybudgetapp.parameters.watchLowMoneyWarningAmount
 import com.benoitletondor.easybudgetapp.parameters.watchShouldShowCheckedBalance
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -177,7 +181,7 @@ class MainViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.Eagerly, SelectedAccount.Loading)
 
     private var changesWatchingJob: Job? = null
-    private val dbAvailableFlow: StateFlow<DBState> = accountSelectionFlow
+    val dbAvailableFlow: StateFlow<DBState> = accountSelectionFlow
         .flatMapLatest { selectedAccount ->
             changesWatchingJob?.cancel()
 
@@ -329,6 +333,14 @@ class MainViewModel @Inject constructor(
             }
         }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+    val firstDayOfWeekFlow = parameters.watchFirstDayOfWeek()
+
+    val lowMoneyAmountWarningFlow = parameters.watchLowMoneyWarningAmount()
+
+    val appInitDate: LocalDate get() = parameters.getInitDate() ?: LocalDate.now()
+
+    suspend fun getDataForMonth(month: YearMonth): DataForMonth = awaitDB().getDataForMonth(month)
 
     fun onRetryLoadingDataButtonPressed() {
         viewModelScope.launch {

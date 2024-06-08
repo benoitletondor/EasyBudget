@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp.view.main.account.calendar
+package com.benoitletondor.easybudgetapp.view.main.calendar
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,8 +35,8 @@ import com.benoitletondor.easybudgetapp.parameters.getInitDate
 import com.benoitletondor.easybudgetapp.parameters.watchFirstDayOfWeek
 import com.benoitletondor.easybudgetapp.parameters.watchLowMoneyWarningAmount
 import com.benoitletondor.easybudgetapp.view.main.account.AccountViewModel
-import com.benoitletondor.easybudgetapp.view.main.account.calendar.views.CalendarDatesView
-import com.benoitletondor.easybudgetapp.view.main.account.calendar.views.CalendarHeaderView
+import com.benoitletondor.easybudgetapp.view.main.calendar.views.CalendarDatesView
+import com.benoitletondor.easybudgetapp.view.main.calendar.views.CalendarHeaderView
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.yearMonth
 import kotlinx.coroutines.flow.Flow
@@ -48,39 +48,6 @@ import java.time.YearMonth
 
 @Composable
 fun CalendarView(
-    parameters: Parameters,
-    dbAvailableFlow: StateFlow<AccountViewModel.DBState>,
-    forceRefreshDataFlow: Flow<Unit>,
-    includeCheckedBalanceFlow: StateFlow<Boolean>,
-    selectedDateFlow: StateFlow<LocalDate>,
-    onMonthChanged: (YearMonth) -> Unit,
-    goBackToCurrentMonthEventFlow: Flow<Unit>,
-    onDateSelected: (LocalDate) -> Unit,
-    onDateLongClicked: (LocalDate) -> Unit,
-) {
-    val dbState by dbAvailableFlow.collectAsState()
-
-    when(val currentDbState = dbState) {
-        is AccountViewModel.DBState.Error,
-        AccountViewModel.DBState.Loading -> Unit
-        is AccountViewModel.DBState.Loaded -> CalendarView(
-            appInitDate = parameters.getInitDate() ?: LocalDate.now(),
-            forceRefreshDataFlow = forceRefreshDataFlow,
-            firstDayOfWeekFlow = parameters.watchFirstDayOfWeek(),
-            includeCheckedBalanceFlow = includeCheckedBalanceFlow,
-            getDataForMonth = currentDbState.db::getDataForMonth,
-            selectedDateFlow = selectedDateFlow,
-            lowMoneyAmountWarningFlow = parameters.watchLowMoneyWarningAmount(),
-            onMonthChanged = onMonthChanged,
-            goBackToCurrentMonthEventFlow = goBackToCurrentMonthEventFlow,
-            onDateSelected = onDateSelected,
-            onDateLongClicked = onDateLongClicked,
-        )
-    }
-}
-
-@Composable
-private fun CalendarView(
     appInitDate: LocalDate,
     forceRefreshDataFlow: Flow<Unit>,
     firstDayOfWeekFlow: StateFlow<DayOfWeek>,

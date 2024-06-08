@@ -61,7 +61,7 @@ import com.benoitletondor.easybudgetapp.compose.AppTheme
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
-import com.benoitletondor.easybudgetapp.view.main.account.calendar.CalendarView
+import com.benoitletondor.easybudgetapp.view.main.calendar.CalendarView
 import com.benoitletondor.easybudgetapp.view.main.manageaccount.ManageAccountActivity
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity

@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -38,9 +39,23 @@ import com.benoitletondor.easybudgetapp.compose.AppTopAppBar
 import com.benoitletondor.easybudgetapp.compose.AppTopBarMoreMenuItem
 import com.benoitletondor.easybudgetapp.compose.BackButtonBehavior
 import com.benoitletondor.easybudgetapp.compose.components.LoadingView
+import com.benoitletondor.easybudgetapp.db.DB
+import com.benoitletondor.easybudgetapp.injection.AppModule
+import com.benoitletondor.easybudgetapp.model.DataForDay
+import com.benoitletondor.easybudgetapp.model.DataForMonth
+import com.benoitletondor.easybudgetapp.view.main.account.AccountViewModel
+import com.benoitletondor.easybudgetapp.view.main.calendar.CalendarView
+import com.kizitonwose.calendar.core.atStartOfMonth
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.YearMonth
 
 @Serializable
 object MainDestination
@@ -51,11 +66,22 @@ fun MainView(
     viewModel: MainViewModel = viewModel(),
 ) {
     MainView(
+        selectedAccountFlow = viewModel.accountSelectionFlow,
+        dbStateFlow = viewModel.dbAvailableFlow,
+        forceRefreshDataFlow = viewModel.forceRefreshFlow,
+        firstDayOfWeekFlow = viewModel.firstDayOfWeekFlow,
+        includeCheckedBalanceFlow = viewModel.includeCheckedBalanceFlow,
+        getDataForMonth = viewModel::getDataForMonth,
+        selectedDateFlow = viewModel.selectedDateFlow,
+        lowMoneyAmountWarningFlow = viewModel.lowMoneyAmountWarningFlow,
+        goBackToCurrentMonthEventFlow = viewModel.eventFlow
+            .filterIsInstance<MainViewModel.Event.GoBackToCurrentMonth>()
+            .map { /* No-op to produce Unit */ },
+        appInitDate = viewModel.appInitDate,
         showActionButtonsFlow = viewModel.showMenuActionButtonsFlow,
         showPremiumRelatedButtonsFlow = viewModel.showPremiumRelatedButtonsFlow,
         showManageAccountButtonFlow = viewModel.showManageAccountMenuItemFlow,
         showGoBackToCurrentMonthButtonFlow = viewModel.showGoToCurrentMonthButtonStateFlow,
-        selectedAccountFlow = viewModel.accountSelectionFlow,
         hasPendingInvitationsFlow = viewModel.hasPendingInvitationsFlow,
         onSettingsButtonPressed = viewModel::onSettingsButtonPressed,
         onAdjustCurrentBalanceButtonPressed = viewModel::onAdjustCurrentBalanceClicked,
@@ -65,16 +91,28 @@ fun MainView(
         onMonthlyReportButtonPressed = viewModel::onMonthlyReportButtonPressed,
         onGoBackToCurrentMonthButtonPressed = viewModel::onGoBackToCurrentMonthButtonPressed,
         onCurrentAccountTapped = viewModel::onCurrentAccountTapped,
+        onMonthChanged = viewModel::onMonthChanged,
+        onDateClicked = viewModel::onSelectDate,
+        onDateLongClicked = viewModel::onDateLongClicked,
     )
 }
 
 @Composable
 private fun MainView(
+    selectedAccountFlow: StateFlow<MainViewModel.SelectedAccount>,
+    dbStateFlow: StateFlow<MainViewModel.DBState>,
+    forceRefreshDataFlow: Flow<Unit>,
+    firstDayOfWeekFlow: StateFlow<DayOfWeek>,
+    includeCheckedBalanceFlow: StateFlow<Boolean>,
+    getDataForMonth: suspend (YearMonth) -> DataForMonth,
+    selectedDateFlow: StateFlow<LocalDate>,
+    lowMoneyAmountWarningFlow: StateFlow<Int>,
+    goBackToCurrentMonthEventFlow: Flow<Unit>,
+    appInitDate: LocalDate,
     showActionButtonsFlow: StateFlow<Boolean>,
     showPremiumRelatedButtonsFlow: StateFlow<Boolean>,
     showManageAccountButtonFlow: StateFlow<Boolean>,
     showGoBackToCurrentMonthButtonFlow: StateFlow<Boolean>,
-    selectedAccountFlow: StateFlow<MainViewModel.SelectedAccount>,
     hasPendingInvitationsFlow: StateFlow<Boolean>,
     onSettingsButtonPressed: () -> Unit,
     onAdjustCurrentBalanceButtonPressed: () -> Unit,
@@ -84,6 +122,9 @@ private fun MainView(
     onMonthlyReportButtonPressed: () -> Unit,
     onGoBackToCurrentMonthButtonPressed: () -> Unit,
     onCurrentAccountTapped: () -> Unit,
+    onMonthChanged: (YearMonth) -> Unit,
+    onDateClicked: (LocalDate) -> Unit,
+    onDateLongClicked: (LocalDate) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -105,10 +146,22 @@ private fun MainView(
             Box(
                 modifier = Modifier.padding(contentPadding),
             ) {
-                MainView(
+                MainViewContent(
                     selectedAccountFlow = selectedAccountFlow,
+                    dbStateFlow = dbStateFlow,
                     hasPendingInvitationsFlow = hasPendingInvitationsFlow,
+                    forceRefreshDataFlow = forceRefreshDataFlow,
+                    firstDayOfWeekFlow = firstDayOfWeekFlow,
+                    includeCheckedBalanceFlow = includeCheckedBalanceFlow,
+                    getDataForMonth = getDataForMonth,
+                    selectedDateFlow = selectedDateFlow,
+                    lowMoneyAmountWarningFlow = lowMoneyAmountWarningFlow,
+                    goBackToCurrentMonthEventFlow = goBackToCurrentMonthEventFlow,
+                    appInitDate = appInitDate,
                     onCurrentAccountTapped = onCurrentAccountTapped,
+                    onMonthChanged = onMonthChanged,
+                    onDateClicked = onDateClicked,
+                    onDateLongClicked = onDateLongClicked,
                 )
             }
         }
@@ -213,10 +266,22 @@ private fun MainViewTopAppBar(
 }
 
 @Composable
-private fun MainView(
+private fun MainViewContent(
     selectedAccountFlow: StateFlow<MainViewModel.SelectedAccount>,
+    dbStateFlow: StateFlow<MainViewModel.DBState>,
     hasPendingInvitationsFlow: StateFlow<Boolean>,
+    forceRefreshDataFlow: Flow<Unit>,
+    firstDayOfWeekFlow: StateFlow<DayOfWeek>,
+    includeCheckedBalanceFlow: StateFlow<Boolean>,
+    getDataForMonth: suspend (YearMonth) -> DataForMonth,
+    selectedDateFlow: StateFlow<LocalDate>,
+    lowMoneyAmountWarningFlow: StateFlow<Int>,
+    goBackToCurrentMonthEventFlow: Flow<Unit>,
+    appInitDate: LocalDate,
     onCurrentAccountTapped: () -> Unit,
+    onMonthChanged: (YearMonth) -> Unit,
+    onDateClicked: (LocalDate) -> Unit,
+    onDateLongClicked: (LocalDate) -> Unit,
 ) {
     val account by selectedAccountFlow.collectAsState()
 
@@ -232,13 +297,32 @@ private fun MainView(
                     onCurrentAccountTapped = onCurrentAccountTapped,
                 )
 
-                CalendarView(
-                    selectedAccount = selectedAccount,
-                )
+                val dbState by dbStateFlow.collectAsState()
 
-                ExpensesView(
-                    selectedAccount = selectedAccount,
-                )
+                when(dbState) {
+                    is MainViewModel.DBState.Error -> TODO()
+                    is MainViewModel.DBState.Loaded -> {
+                        CalendarView(
+                            appInitDate = appInitDate,
+                            forceRefreshDataFlow = forceRefreshDataFlow,
+                            firstDayOfWeekFlow = firstDayOfWeekFlow,
+                            includeCheckedBalanceFlow = includeCheckedBalanceFlow,
+                            getDataForMonth = getDataForMonth,
+                            selectedDateFlow = selectedDateFlow,
+                            lowMoneyAmountWarningFlow = lowMoneyAmountWarningFlow,
+                            onMonthChanged = onMonthChanged,
+                            goBackToCurrentMonthEventFlow = goBackToCurrentMonthEventFlow,
+                            onDateSelected = onDateClicked,
+                            onDateLongClicked = onDateLongClicked,
+                        )
+
+                        ExpensesView(
+                            selectedAccount = selectedAccount,
+                        )
+                    }
+                    MainViewModel.DBState.Loading,
+                    MainViewModel.DBState.NotLoaded -> LoadingView()
+                }
             }
         }
     }
@@ -320,13 +404,6 @@ private fun SelectedAccountHeader(
 }
 
 @Composable
-private fun CalendarView(
-    selectedAccount: MainViewModel.SelectedAccount.Selected,
-) {
-
-}
-
-@Composable
 private fun ExpensesView(
     selectedAccount: MainViewModel.SelectedAccount.Selected,
 ) {
@@ -336,12 +413,10 @@ private fun ExpensesView(
 @Composable
 @Preview
 private fun ProAccountSelectedPreview() {
+    val context = LocalContext.current
+
     AppTheme {
         MainView(
-            showActionButtonsFlow = MutableStateFlow(true),
-            showPremiumRelatedButtonsFlow = MutableStateFlow(true),
-            showManageAccountButtonFlow = MutableStateFlow(true),
-            showGoBackToCurrentMonthButtonFlow = MutableStateFlow(false),
             selectedAccountFlow = MutableStateFlow(MainViewModel.SelectedAccount.Selected.Online(
                 name = "Account name",
                 isOwner = true,
@@ -349,6 +424,38 @@ private fun ProAccountSelectedPreview() {
                 accountId = "accountId",
                 accountSecret = "accountSecret",
             )),
+            dbStateFlow = MutableStateFlow(MainViewModel.DBState.Loaded(AppModule.provideDB(context))),
+            forceRefreshDataFlow = MutableSharedFlow(),
+            firstDayOfWeekFlow = MutableStateFlow(DayOfWeek.MONDAY),
+            includeCheckedBalanceFlow = MutableStateFlow(true),
+            getDataForMonth = { yearMonth ->
+                DataForMonth(
+                    month = yearMonth,
+                    daysData = yearMonth.lengthOfMonth().let { days ->
+                        (-6..days + 6).associate { day ->
+                            val date = yearMonth.atStartOfMonth().plusDays(day.toLong())
+
+                            Pair(
+                                date,
+                                DataForDay(
+                                    day = date,
+                                    expenses = emptyList(),
+                                    balance = 0.0,
+                                    checkedBalance = 0.0,
+                                )
+                            )
+                        }
+                    }
+                )
+            },
+            selectedDateFlow = MutableStateFlow(LocalDate.now()),
+            lowMoneyAmountWarningFlow = MutableStateFlow(50),
+            goBackToCurrentMonthEventFlow = MutableSharedFlow(),
+            appInitDate = LocalDate.now(),
+            showActionButtonsFlow = MutableStateFlow(true),
+            showPremiumRelatedButtonsFlow = MutableStateFlow(true),
+            showManageAccountButtonFlow = MutableStateFlow(true),
+            showGoBackToCurrentMonthButtonFlow = MutableStateFlow(false),
             hasPendingInvitationsFlow = MutableStateFlow(false),
             onSettingsButtonPressed = {},
             onAdjustCurrentBalanceButtonPressed = {},
@@ -358,6 +465,9 @@ private fun ProAccountSelectedPreview() {
             onMonthlyReportButtonPressed = {},
             onGoBackToCurrentMonthButtonPressed = {},
             onCurrentAccountTapped = {},
+            onMonthChanged = {},
+            onDateClicked = {},
+            onDateLongClicked = {},
         )
     }
 }
