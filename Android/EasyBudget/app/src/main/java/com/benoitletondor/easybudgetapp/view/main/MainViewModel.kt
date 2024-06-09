@@ -18,6 +18,7 @@ package com.benoitletondor.easybudgetapp.view.main
 
 import android.content.Context
 import android.os.Parcelable
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.accounts.Accounts
@@ -709,6 +710,7 @@ class MainViewModel @Inject constructor(
             @Parcelize
             object Offline : Selected()
             @Parcelize
+            @Immutable
             data class Online(
                 val name: String,
                 val isOwner: Boolean,
@@ -768,6 +770,7 @@ class MainViewModel @Inject constructor(
         data class OpenManageAccount(val account: SelectedAccount.Selected.Online) : Event()
     }
 
+    @Immutable
     data class SelectedDateExpensesData(val date: LocalDate, val balance: Double, val checkedBalance: Double?, val expenses: List<Expense>)
     data class ExpenseDeletionSuccessData(val deletedExpense: Expense, val restoreAction: RestoreAction)
     data class BalanceAdjustedData(val balanceExpense: Expense, val diffWithOldBalance: Double, val newBalance: Double)
@@ -777,6 +780,7 @@ class MainViewModel @Inject constructor(
     sealed class DBState {
         data object NotLoaded : DBState()
         data object Loading : DBState()
+        @Immutable
         class Loaded(val db: DB) : DBState()
         class Error(val error: Throwable) : DBState()
     }
