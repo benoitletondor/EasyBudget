@@ -326,6 +326,8 @@ class MainViewModel @Inject constructor(
         }
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
+    val showExpensesCheckBoxFlow: StateFlow<Boolean> = showPremiumRelatedButtonsFlow
+
     val showManageAccountMenuItemFlow: StateFlow<Boolean> = combine(dbAvailableFlow, accountSelectionFlow) { dbState, accountSelection ->
         when(dbState) {
             DBState.NotLoaded,
