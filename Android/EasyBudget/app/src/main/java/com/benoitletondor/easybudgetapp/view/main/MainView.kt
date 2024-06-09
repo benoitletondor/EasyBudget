@@ -615,6 +615,9 @@ private fun MainView(
                             onAddEntryPressed()
                             showFABMenu = false
                         },
+                        onTapOutsideCTAs = {
+                            showFABMenu = false
+                        }
                     )
                 }
             }
@@ -893,18 +896,23 @@ private fun ExpensesView(
 private fun FABAddExpenseOverlay(
     onAddRecurringEntryPressed: () -> Unit,
     onAddEntryPressed: () -> Unit,
+    onTapOutsideCTAs: () -> Unit,
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(color = colorResource(R.color.menu_background_overlay_color))
-            .padding(bottom = 90.dp, end = 16.dp),
+            .padding(bottom = 90.dp, end = 16.dp)
+            .clickable(
+                onClick = onTapOutsideCTAs,
+                indication = null,
+                interactionSource = null,
+            ),
         verticalArrangement = Arrangement.Bottom,
         horizontalAlignment = Alignment.End,
     ) {
         Row(
-            modifier = Modifier
-                .clickable(onClick = onAddRecurringEntryPressed),
+            modifier = Modifier.clickable(onClick = onAddRecurringEntryPressed),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
@@ -934,8 +942,7 @@ private fun FABAddExpenseOverlay(
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(
-            modifier = Modifier
-                .clickable(onClick = onAddEntryPressed),
+            modifier = Modifier.clickable(onClick = onAddEntryPressed),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
