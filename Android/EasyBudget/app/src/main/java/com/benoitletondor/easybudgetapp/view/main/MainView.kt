@@ -16,6 +16,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -104,7 +105,9 @@ import kotlinx.serialization.Serializable
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 import java.util.Currency
+import java.util.Locale
 
 @Serializable
 object MainDestination
@@ -136,6 +139,7 @@ fun MainView(
         userCurrencyFlow = viewModel.userCurrencyFlow,
         recurringExpenseDeletionProgressFlow = viewModel.recurringExpenseDeletionProgressStateFlow,
         recurringExpenseRestoreProgressFlow = viewModel.recurringExpenseRestoreProgressStateFlow,
+        dayDataFlow = viewModel.selectedDateDataFlow,
         onSettingsButtonPressed = viewModel::onSettingsButtonPressed,
         onAdjustCurrentBalanceButtonPressed = viewModel::onAdjustCurrentBalanceClicked,
         onTickAllPastEntriesButtonPressed = viewModel::onCheckAllPastEntriesPressed,
@@ -181,6 +185,7 @@ private fun MainView(
     userCurrencyFlow: StateFlow<Currency>,
     recurringExpenseDeletionProgressFlow: StateFlow<MainViewModel.RecurringExpenseDeleteProgressState>,
     recurringExpenseRestoreProgressFlow: StateFlow<MainViewModel.RecurringExpenseRestoreProgressState>,
+    dayDataFlow: StateFlow<MainViewModel.SelectedDateExpensesData>,
     onSettingsButtonPressed: () -> Unit,
     onAdjustCurrentBalanceButtonPressed: () -> Unit,
     onTickAllPastEntriesButtonPressed: () -> Unit,
@@ -555,6 +560,8 @@ private fun MainView(
                     selectedDateFlow = selectedDateFlow,
                     lowMoneyAmountWarningFlow = lowMoneyAmountWarningFlow,
                     goBackToCurrentMonthEventFlow = goBackToCurrentMonthEventFlow,
+                    dayDataFlow = dayDataFlow,
+                    userCurrencyFlow = userCurrencyFlow,
                     appInitDate = appInitDate,
                     onCurrentAccountTapped = onCurrentAccountTapped,
                     onMonthChanged = onMonthChanged,
@@ -755,6 +762,8 @@ private fun MainViewContent(
     selectedDateFlow: StateFlow<LocalDate>,
     lowMoneyAmountWarningFlow: StateFlow<Int>,
     goBackToCurrentMonthEventFlow: Flow<Unit>,
+    dayDataFlow: StateFlow<MainViewModel.SelectedDateExpensesData>,
+    userCurrencyFlow: StateFlow<Currency>,
     appInitDate: LocalDate,
     onCurrentAccountTapped: () -> Unit,
     onMonthChanged: (YearMonth) -> Unit,
@@ -800,7 +809,9 @@ private fun MainViewContent(
                         )
 
                         ExpensesView(
-                            selectedAccount = selectedAccount,
+                            dayDataFlow = dayDataFlow,
+                            lowMoneyAmountWarningFlow = lowMoneyAmountWarningFlow,
+                            userCurrencyFlow = userCurrencyFlow,
                         )
                     }
                     MainViewModel.DBState.Loading,
@@ -887,10 +898,88 @@ private fun SelectedAccountHeader(
 }
 
 @Composable
-private fun ExpensesView(
-    selectedAccount: MainViewModel.SelectedAccount.Selected,
+private fun ColumnScope.ExpensesView(
+    dayDataFlow: StateFlow<MainViewModel.SelectedDateExpensesData>,
+    lowMoneyAmountWarningFlow: StateFlow<Int>,
+    userCurrencyFlow: StateFlow<Currency>,
 ) {
+    val dayData by dayDataFlow.collectAsState()
 
+    BalanceView(
+        date = dayData.date,
+        balance = dayData.balance,
+        checkedBalance = dayData.checkedBalance,
+        lowMoneyAmountWarningFlow = lowMoneyAmountWarningFlow,
+        userCurrencyFlow = userCurrencyFlow,
+    )
+}
+
+@Composable
+private fun BalanceView(
+    date: LocalDate,
+    balance: Double,
+    checkedBalance: Double?,
+    lowMoneyAmountWarningFlow: StateFlow<Int>,
+    userCurrencyFlow: StateFlow<Currency>,
+) {
+    val context = LocalContext.current
+    val balanceDateFormatter = remember(key1 = Locale.getDefault()) {
+        DateTimeFormatter.ofPattern(context.getString(R.string.account_balance_date_format), Locale.getDefault())
+    }
+    val userCurrency by userCurrencyFlow.collectAsState()
+    val lowMoneyAmountWarning by lowMoneyAmountWarningFlow.collectAsState()
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(color = colorResource(R.color.budget_line_background_color))
+            .padding(horizontal = 15.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.Center,
+    ) {
+        val formattedDate = remember(key1 = date, key2 = balanceDateFormatter) {
+            context.getString(R.string.account_balance_format, balanceDateFormatter.format(date)).let {
+                // FIXME it's ugly!!
+                if (it.endsWith(".:")) {
+                    return@let it.substring(0, it.length - 2) + ":" // Remove . at the end of the month (ex: nov.: -> nov:)
+                } else if (it.endsWith(". :")) {
+                    return@let it.substring(0, it.length - 3) + " :" // Remove . at the end of the month (ex: nov. : -> nov :)
+                } else {
+                    return@let it
+                }
+            }
+        }
+
+        Text(
+            text = formattedDate,
+            fontSize = 14.sp,
+            color = colorResource(R.color.primary_text),
+        )
+
+        Spacer(modifier = Modifier.width(4.dp))
+
+        val checkedBalanceString = remember(key1 = balance, key2 = checkedBalance, key3 = userCurrency) {
+            if (checkedBalance != null) {
+                context.getString(
+                    R.string.account_balance_checked_format,
+                    CurrencyHelper.getFormattedCurrencyString(userCurrency, balance),
+                    CurrencyHelper.getFormattedCurrencyString(userCurrency, checkedBalance),
+                )
+            } else {
+                CurrencyHelper.getFormattedCurrencyString(userCurrency, balance)
+            }
+        }
+
+        Text(
+            text = checkedBalanceString,
+            fontWeight = FontWeight.Bold,
+            fontSize = 14.sp,
+            color = when {
+                balance <= 0 -> colorResource(R.color.budget_red)
+                balance < lowMoneyAmountWarning -> colorResource(R.color.budget_orange)
+                else -> colorResource(R.color.budget_green)
+            }
+        )
+    }
 }
 
 @Composable
@@ -1087,6 +1176,12 @@ private fun Preview(
             userCurrencyFlow = MutableStateFlow(Currency.getInstance("USD")),
             recurringExpenseDeletionProgressFlow = MutableStateFlow(MainViewModel.RecurringExpenseDeleteProgressState.Idle),
             recurringExpenseRestoreProgressFlow = MutableStateFlow(MainViewModel.RecurringExpenseRestoreProgressState.Idle),
+            dayDataFlow = MutableStateFlow(MainViewModel.SelectedDateExpensesData(
+                date = LocalDate.now(),
+                balance = 100.0,
+                checkedBalance = 20.0,
+                expenses = emptyList(),
+            )),
             onSettingsButtonPressed = {},
             onAdjustCurrentBalanceButtonPressed = {},
             onTickAllPastEntriesButtonPressed = {},
