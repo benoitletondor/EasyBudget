@@ -10,9 +10,11 @@ import android.widget.EditText
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -73,6 +75,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.NavController
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.compose.AppTheme
@@ -91,6 +94,7 @@ import com.benoitletondor.easybudgetapp.model.DataForDay
 import com.benoitletondor.easybudgetapp.model.DataForMonth
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
+import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.main.accountselector.AccountSelectorView
 import com.benoitletondor.easybudgetapp.view.main.calendar.CalendarView
@@ -170,6 +174,10 @@ fun MainView(
         onAddRecurringEntryPressed = viewModel::onAddRecurringEntryPressed,
         onAddEntryPressed = viewModel::onAddEntryPressed,
         onExpenseCheckedChange = viewModel::onExpenseChecked,
+        onExpensePressed = viewModel::onExpensePressed,
+        onExpenseLongPressed = viewModel::onExpenseLongPressed,
+        onDeleteRecurringExpenseClicked = viewModel::onDeleteRecurringExpenseClicked,
+        onDeleteExpenseClicked = viewModel::onDeleteExpenseClicked,
     )
 }
 
@@ -218,6 +226,10 @@ private fun MainView(
     onAddRecurringEntryPressed: () -> Unit,
     onAddEntryPressed: () -> Unit,
     onExpenseCheckedChange: (Expense, Boolean) -> Unit,
+    onExpensePressed: (Expense) -> Unit,
+    onExpenseLongPressed: (Expense) -> Unit,
+    onDeleteRecurringExpenseClicked: (Expense, RecurringExpenseDeleteType) -> Unit,
+    onDeleteExpenseClicked: (Expense) -> Unit,
 ) {
     var showAccountSelectorModal by remember { mutableStateOf(false) }
     val accountSelectorModalSheetState = rememberModalBottomSheetState()
@@ -469,6 +481,69 @@ private fun MainView(
                         }
                     }
                 }
+                is MainViewModel.Event.ShowExpenseEditionOptions -> {
+                    val expense = event.expense
+                    if (expense.isRecurring()) {
+                        val builder = MaterialAlertDialogBuilder(activity)
+                        builder.setTitle(if (expense.isRevenue()) R.string.dialog_edit_recurring_income_title else R.string.dialog_edit_recurring_expense_title)
+                        builder.setItems(if (expense.isRevenue()) R.array.dialog_edit_recurring_income_choices else R.array.dialog_edit_recurring_expense_choices) { _, which ->
+                            when (which) {
+                                // Edit this one
+                                0 -> {
+                                    // FIXME replace this
+                                    val startIntent = ExpenseEditActivity.newIntent(
+                                        context = activity,
+                                        editedExpense = expense,
+                                        date = expense.date,
+                                    )
+
+                                    activity.startActivity(startIntent)
+                                }
+                                // Edit this one and following ones
+                                1 -> {
+                                    // FIXME replace this
+                                    val startIntent = RecurringExpenseEditActivity.newIntent(
+                                        context = activity,
+                                        editedExpense = expense,
+                                        startDate = expense.date,
+                                    )
+
+                                    activity.startActivity(startIntent)
+                                }
+                                // Delete this one
+                                2 -> onDeleteRecurringExpenseClicked(expense, RecurringExpenseDeleteType.ONE)
+                                // Delete from
+                                3 -> onDeleteRecurringExpenseClicked(expense, RecurringExpenseDeleteType.FROM)
+                                // Delete up to
+                                4 -> onDeleteRecurringExpenseClicked(expense, RecurringExpenseDeleteType.TO)
+                                // Delete all
+                                5 -> onDeleteRecurringExpenseClicked(expense, RecurringExpenseDeleteType.ALL)
+                            }
+                        }
+                        builder.show()
+                    } else {
+                        val builder = MaterialAlertDialogBuilder(activity)
+                        builder.setTitle(if (expense.isRevenue()) R.string.dialog_edit_income_title else R.string.dialog_edit_expense_title)
+                        builder.setItems(if (expense.isRevenue()) R.array.dialog_edit_income_choices else R.array.dialog_edit_expense_choices) { _, which ->
+                            when (which) {
+                                0 // Edit expense
+                                -> {
+                                    // FIXME replace this
+                                    val startIntent = ExpenseEditActivity.newIntent(
+                                        context = activity,
+                                        editedExpense = expense,
+                                        date = expense.date,
+                                    )
+
+                                    activity.startActivity(startIntent)
+                                }
+                                1 // Delete
+                                -> onDeleteExpenseClicked(expense)
+                            }
+                        }
+                        builder.show()
+                    }
+                }
             }
         }
     }
@@ -582,6 +657,8 @@ private fun MainView(
                     onDateLongClicked = onDateLongClicked,
                     onRetryDBLoadingButtonPressed = onRetryDBLoadingButtonPressed,
                     onExpenseCheckedChange = onExpenseCheckedChange,
+                    onExpensePressed = onExpensePressed,
+                    onExpenseLongPressed = onExpenseLongPressed,
                 )
 
                 if (showAccountSelectorModal) {
@@ -786,6 +863,8 @@ private fun MainViewContent(
     onDateLongClicked: (LocalDate) -> Unit,
     onRetryDBLoadingButtonPressed: () -> Unit,
     onExpenseCheckedChange: (Expense, Boolean) -> Unit,
+    onExpensePressed: (Expense) -> Unit,
+    onExpenseLongPressed: (Expense) -> Unit,
 ) {
     val account by selectedAccountFlow.collectAsState()
 
@@ -830,6 +909,8 @@ private fun MainViewContent(
                             userCurrencyFlow = userCurrencyFlow,
                             showExpensesCheckBoxFlow = showExpensesCheckBoxFlow,
                             onExpenseCheckedChange = onExpenseCheckedChange,
+                            onExpensePressed = onExpensePressed,
+                            onExpenseLongPressed = onExpenseLongPressed,
                         )
                     }
                     MainViewModel.DBState.Loading,
@@ -922,6 +1003,8 @@ private fun ColumnScope.ExpensesView(
     userCurrencyFlow: StateFlow<Currency>,
     showExpensesCheckBoxFlow: StateFlow<Boolean>,
     onExpenseCheckedChange: (Expense, Boolean) -> Unit,
+    onExpensePressed: (Expense) -> Unit,
+    onExpenseLongPressed: (Expense) -> Unit,
 ) {
     val dayData by dayDataFlow.collectAsState()
     val userCurrency by userCurrencyFlow.collectAsState()
@@ -939,6 +1022,8 @@ private fun ColumnScope.ExpensesView(
         userCurrency = userCurrency,
         showExpensesCheckBoxFlow = showExpensesCheckBoxFlow,
         onExpenseCheckedChange = onExpenseCheckedChange,
+        onExpensePressed = onExpensePressed,
+        onExpenseLongPressed = onExpenseLongPressed,
     )
 }
 
@@ -960,7 +1045,7 @@ private fun BalanceView(
         modifier = Modifier
             .fillMaxWidth()
             .background(color = colorResource(R.color.budget_line_background_color))
-            .padding(horizontal = 15.dp, vertical = 4.dp),
+            .padding(horizontal = 15.dp, vertical = 3.dp),
         horizontalArrangement = Arrangement.Center,
     ) {
         val formattedDate = remember(key1 = date, key2 = balanceDateFormatter) {
@@ -1009,16 +1094,19 @@ private fun BalanceView(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun ExpensesList(
     expenses: List<Expense>,
     userCurrency: Currency,
     showExpensesCheckBoxFlow: StateFlow<Boolean>,
     onExpenseCheckedChange: (Expense, Boolean) -> Unit,
+    onExpensePressed: (Expense) -> Unit,
+    onExpenseLongPressed: (Expense) -> Unit,
 ) {
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize(),
     ) {
         items(
             count = expenses.size,
@@ -1031,6 +1119,10 @@ private fun ExpensesList(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .combinedClickable(
+                            onClick = { onExpensePressed(expense) },
+                            onLongClick = { onExpenseLongPressed(expense) },
+                        )
                         .padding(horizontal = 20.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -1119,6 +1211,9 @@ private fun ExpensesList(
                         color = colorResource(R.color.divider),
                         thickness = 1.dp,
                     )
+                } else {
+                    // Add inner padding for the FAB
+                    Spacer(modifier = Modifier.height(80.dp))
                 }
             }
 
@@ -1349,6 +1444,10 @@ private fun Preview(
             onAddRecurringEntryPressed = {},
             onAddEntryPressed = {},
             onExpenseCheckedChange = {_, _ ->},
+            onExpensePressed = {},
+            onExpenseLongPressed = {},
+            onDeleteRecurringExpenseClicked = {_, _ ->},
+            onDeleteExpenseClicked = {},
         )
     }
 }

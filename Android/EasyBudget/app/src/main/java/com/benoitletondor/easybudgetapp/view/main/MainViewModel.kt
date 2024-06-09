@@ -669,6 +669,18 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun onExpensePressed(expense: Expense) {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.ShowExpenseEditionOptions(expense))
+        }
+    }
+
+    fun onExpenseLongPressed(expense: Expense) {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.ShowExpenseEditionOptions(expense))
+        }
+    }
+
     override fun onCleared() {
         val currentDB = dbProvider.activeDB
         val dbState = dbAvailableFlow.value as? DBState.Loaded
@@ -770,6 +782,7 @@ class MainViewModel @Inject constructor(
         data class OpenAddRecurringExpense(val date: LocalDate) : Event()
         data class OpenAddExpense(val date: LocalDate) : Event()
         data class OpenManageAccount(val account: SelectedAccount.Selected.Online) : Event()
+        data class ShowExpenseEditionOptions(val expense: Expense) : Event()
     }
 
     @Immutable
