@@ -363,11 +363,26 @@ fun Parameters.setTheme(theme: AppTheme) {
     putInt(APP_THEME_PARAMETERS_KEY, theme.value)
 }
 
+private lateinit var isBackupEnabledFlow: MutableStateFlow<Boolean>
+
+fun Parameters.watchIsBackupEnabled(): StateFlow<Boolean> {
+    if (!::isBackupEnabledFlow.isInitialized) {
+        isBackupEnabledFlow = MutableStateFlow(isBackupEnabled())
+    }
+
+    return isBackupEnabledFlow
+}
+
 fun Parameters.isBackupEnabled(): Boolean {
     return getBoolean(BACKUP_ENABLED_PARAMETERS_KEY, false)
 }
 
 fun Parameters.setBackupEnabled(enabled: Boolean) {
+    if (!::isBackupEnabledFlow.isInitialized) {
+        isBackupEnabledFlow = MutableStateFlow(enabled)
+    }
+
+    isBackupEnabledFlow.value = enabled
     putBoolean(BACKUP_ENABLED_PARAMETERS_KEY, enabled)
 }
 
@@ -419,11 +434,27 @@ fun Parameters.setShouldShowCheckedBalance(shouldShow: Boolean) {
     putBoolean(SHOULD_SHOW_CHECKED_BALANCE, shouldShow)
 }
 
+private lateinit var latestSelectedOnlineAccountIdFlow: MutableStateFlow<String?>
+
+fun Parameters.watchLatestSelectedOnlineAccountId(): StateFlow<String?> {
+    if (!::latestSelectedOnlineAccountIdFlow.isInitialized) {
+        latestSelectedOnlineAccountIdFlow = MutableStateFlow(getLatestSelectedOnlineAccountId())
+    }
+
+    return latestSelectedOnlineAccountIdFlow
+}
+
 fun Parameters.getLatestSelectedOnlineAccountId(): String? {
     return getString(SELECTED_ACCOUNT_ID_KEY)
 }
 
 fun Parameters.setLatestSelectedOnlineAccountId(accountId: String?) {
+    if (!::latestSelectedOnlineAccountIdFlow.isInitialized) {
+        latestSelectedOnlineAccountIdFlow = MutableStateFlow(accountId)
+    }
+
+    latestSelectedOnlineAccountIdFlow.value = accountId
+
     if (accountId != null) {
         putString(SELECTED_ACCOUNT_ID_KEY, accountId)
     } else {

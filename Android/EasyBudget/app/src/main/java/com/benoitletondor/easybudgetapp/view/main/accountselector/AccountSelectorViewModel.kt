@@ -25,12 +25,12 @@ import com.benoitletondor.easybudgetapp.auth.AuthState
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
+import com.benoitletondor.easybudgetapp.helper.combine
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.iab.PremiumCheckStatus
 import com.benoitletondor.easybudgetapp.parameters.Parameters
-import com.benoitletondor.easybudgetapp.parameters.getLatestSelectedOnlineAccountId
-import com.benoitletondor.easybudgetapp.parameters.isBackupEnabled
-import com.benoitletondor.easybudgetapp.view.main.MainViewModel
+import com.benoitletondor.easybudgetapp.parameters.watchIsBackupEnabled
+import com.benoitletondor.easybudgetapp.parameters.watchLatestSelectedOnlineAccountId
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
@@ -38,7 +38,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -52,7 +51,7 @@ class AccountSelectorViewModel @Inject constructor(
     private val iab: Iab,
     private val auth: Auth,
     private val accounts: Accounts,
-    private val parameters: Parameters,
+    parameters: Parameters,
 ) : ViewModel() {
     private val eventMutableFlow = MutableLiveFlow<Event>()
     val eventFlow: Flow<Event> = eventMutableFlow
@@ -92,45 +91,47 @@ class AccountSelectorViewModel @Inject constructor(
                     else -> flowOf(emptyList())
                 }
             },
-        loadingInvitationMutableFlow
-    ) { iabStatus, authStatus, onlineAccounts, pendingAccountsInvitation, maybeLoadingInvitation ->
+        loadingInvitationMutableFlow,
+        parameters.watchLatestSelectedOnlineAccountId(),
+        parameters.watchIsBackupEnabled(),
+    ) { iabStatus, authStatus, onlineAccounts, pendingAccountsInvitation, maybeLoadingInvitation, maybeSelectedOnlineAccountId, isBackupEnabled ->
         return@combine when(iabStatus) {
             PremiumCheckStatus.INITIALIZING,
             PremiumCheckStatus.CHECKING -> State.Loading
             PremiumCheckStatus.ERROR -> State.IabError
             PremiumCheckStatus.NOT_PREMIUM -> State.NotPro(isOfflineBackupEnabled = false)
             PremiumCheckStatus.LEGACY_PREMIUM,
-            PremiumCheckStatus.PREMIUM_SUBSCRIBED -> State.NotPro(isOfflineBackupEnabled = parameters.isBackupEnabled())
+            PremiumCheckStatus.PREMIUM_SUBSCRIBED -> State.NotPro(isOfflineBackupEnabled = isBackupEnabled)
             PremiumCheckStatus.PRO_SUBSCRIBED -> when(authStatus) {
                 is AuthState.Authenticated -> {
                     val ownAccounts = onlineAccounts
                         .filter { it.isUserOwner }
-                        .map { it.toViewModelAccount() }
+                        .map { it.toViewModelAccount(maybeSelectedOnlineAccountId = maybeSelectedOnlineAccountId) }
 
                     val invitedAccounts = onlineAccounts
                         .filter { !it.isUserOwner }
-                        .map { it.toViewModelAccount() }
+                        .map { it.toViewModelAccount(maybeSelectedOnlineAccountId = maybeSelectedOnlineAccountId) }
 
                     State.AccountsAvailable(
                         userEmail = authStatus.currentUser.email,
-                        isOfflineSelected = parameters.getLatestSelectedOnlineAccountId() == null ||
+                        isOfflineSelected = maybeSelectedOnlineAccountId == null ||
                             (ownAccounts.none { it.selected } && invitedAccounts.none { it.selected } ),
                         ownAccounts = ownAccounts.take(5),
                         showCreateOnlineAccountButton = ownAccounts.size < 5,
                         invitedAccounts = invitedAccounts,
                         pendingInvitations = pendingAccountsInvitation.map { account ->
                             Invitation(
-                                account = account.toViewModelAccount(),
+                                account = account.toViewModelAccount(maybeSelectedOnlineAccountId = maybeSelectedOnlineAccountId),
                                 user = authStatus.currentUser,
                                 isLoading = maybeLoadingInvitation?.account?.id == account.id,
                             )
                         },
-                        isOfflineBackupEnabled = parameters.isBackupEnabled(),
+                        isOfflineBackupEnabled = isBackupEnabled,
                     )
                 }
                 AuthState.Authenticating -> State.Loading
                 AuthState.NotAuthenticated -> State.NotAuthenticated(
-                    isOfflineBackupEnabled = parameters.isBackupEnabled(),
+                    isOfflineBackupEnabled = isBackupEnabled,
                 )
             }
         }
@@ -222,12 +223,12 @@ class AccountSelectorViewModel @Inject constructor(
         )
     }
 
-    private fun com.benoitletondor.easybudgetapp.accounts.model.Account.toViewModelAccount() = Account(
+    private fun com.benoitletondor.easybudgetapp.accounts.model.Account.toViewModelAccount(maybeSelectedOnlineAccountId: String?) = Account(
         id = id,
         secret = secret,
         name = name,
         ownerEmail = ownerEmail,
-        selected = parameters.getLatestSelectedOnlineAccountId() == id,
+        selected = maybeSelectedOnlineAccountId == id,
     )
 
     data class Invitation(

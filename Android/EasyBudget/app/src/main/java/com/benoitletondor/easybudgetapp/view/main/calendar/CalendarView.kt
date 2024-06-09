@@ -30,11 +30,7 @@ import androidx.compose.ui.Modifier
 import com.benoitletondor.easybudgetapp.helper.computeCalendarMinDateFromInitDate
 import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.model.DataForMonth
-import com.benoitletondor.easybudgetapp.parameters.Parameters
-import com.benoitletondor.easybudgetapp.parameters.getInitDate
-import com.benoitletondor.easybudgetapp.parameters.watchFirstDayOfWeek
-import com.benoitletondor.easybudgetapp.parameters.watchLowMoneyWarningAmount
-import com.benoitletondor.easybudgetapp.view.main.account.AccountViewModel
+import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import com.benoitletondor.easybudgetapp.view.main.calendar.views.CalendarDatesView
 import com.benoitletondor.easybudgetapp.view.main.calendar.views.CalendarHeaderView
 import com.kizitonwose.calendar.compose.rememberCalendarState
@@ -48,6 +44,7 @@ import java.time.YearMonth
 
 @Composable
 fun CalendarView(
+    dbStateFlow: StateFlow<MainViewModel.DBState>,
     appInitDate: LocalDate,
     forceRefreshDataFlow: Flow<Unit>,
     firstDayOfWeekFlow: StateFlow<DayOfWeek>,
@@ -119,6 +116,7 @@ fun CalendarView(
 
         val includeCheckedBalance by includeCheckedBalanceFlow.collectAsState()
         CalendarDatesView(
+            dbStateFlow = dbStateFlow,
             calendarState = calendarState,
             forceRefreshDataFlow = forceRefreshDataFlow,
             getDataForMonth = getDataForMonth,

@@ -50,6 +50,7 @@ import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.model.DataForMonth
+import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import com.kizitonwose.calendar.compose.CalendarState
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.core.CalendarMonth
@@ -58,6 +59,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
@@ -67,6 +69,7 @@ import java.util.Locale
 
 @Composable
 fun CalendarDatesView(
+    dbStateFlow: StateFlow<MainViewModel.DBState>,
     calendarState: CalendarState,
     forceRefreshDataFlow: Flow<Unit>,
     getDataForMonth: suspend (YearMonth) -> DataForMonth,
@@ -92,8 +95,9 @@ fun CalendarDatesView(
             val (state, setState) = remember { mutableStateOf<State>(State.NotAvailable) }
             val coroutineScope = rememberCoroutineScope()
 
-            LaunchedEffect("InitialLoading") {
-                withContext(Dispatchers.IO) {
+            // Loads on first load and when DB state changes
+            LaunchedEffect("DBAvailableLoading") {
+                launchCollect(dbStateFlow.filterIsInstance<MainViewModel.DBState.Loaded>(), Dispatchers.IO) {
                     loadData(
                         setState = setState,
                         calendarMonth = calendarMonth,

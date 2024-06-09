@@ -785,6 +785,7 @@ private fun MainViewContent(
                     )
                     is MainViewModel.DBState.Loaded -> {
                         CalendarView(
+                            dbStateFlow = dbStateFlow,
                             appInitDate = appInitDate,
                             forceRefreshDataFlow = forceRefreshDataFlow,
                             firstDayOfWeekFlow = firstDayOfWeekFlow,
