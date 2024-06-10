@@ -276,10 +276,6 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun onWelcomeScreenFinished() {
-        // No-op
-    }
-
     fun onCurrentAccountTapped() {
         viewModelScope.launch {
             retryLoadingAccountsEventMutableFlow.emit(Unit)
@@ -597,12 +593,6 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun onCurrencySelected() {
-        viewModelScope.launch {
-            forceRefreshMutableFlow.emit(Unit)
-        }
-    }
-
     fun onExpenseChecked(expense: Expense, checked: Boolean) {
         viewModelScope.launch {
             try {
@@ -626,12 +616,6 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             selectedDateMutableStateFlow.value = LocalDate.now()
             eventMutableFlow.emit(Event.GoBackToCurrentMonth)
-        }
-    }
-
-    fun onShowCheckedBalanceChanged() {
-        viewModelScope.launch {
-            forceRefreshMutableFlow.emit(Unit)
         }
     }
 
@@ -659,12 +643,6 @@ class MainViewModel @Inject constructor(
                 Logger.error("Error while checking all past entries", e)
                 eventMutableFlow.emit(Event.CheckAllPastEntriesError(e))
             }
-        }
-    }
-
-    fun onLowMoneyWarningThresholdChanged() {
-        viewModelScope.launch {
-            forceRefreshMutableFlow.emit(Unit)
         }
     }
 
