@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp.view.main.login
+package com.benoitletondor.easybudgetapp.view.login
 
 import android.content.Context
 import android.content.Intent

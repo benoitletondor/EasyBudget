@@ -262,12 +262,13 @@ class MainViewModel @Inject constructor(
             )
         }
 
-        SelectedDateExpensesData(date, balance, checkedBalance, expenses)
+        SelectedDateExpensesData.DataAvailable(date, balance, checkedBalance, expenses) as SelectedDateExpensesData
     }
         .catch { e ->
             Logger.error("Error while getting selected date data", e)
+            emit(SelectedDateExpensesData.NoDataAvailable)
         }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, SelectedDateExpensesData(selectedDateMutableStateFlow.value, 0.0, null, emptyList()))
+        .stateIn(viewModelScope, SharingStarted.Eagerly, SelectedDateExpensesData.NoDataAvailable)
 
     fun onDiscoverPremiumButtonPressed() {
         viewModelScope.launch {
@@ -806,8 +807,13 @@ class MainViewModel @Inject constructor(
         data class OpenEditRecurringExpenseOccurence(val expense: Expense) : Event()
     }
 
-    @Immutable
-    data class SelectedDateExpensesData(val date: LocalDate, val balance: Double, val checkedBalance: Double?, val expenses: List<Expense>)
+
+    sealed class SelectedDateExpensesData {
+        data object NoDataAvailable : SelectedDateExpensesData()
+        @Immutable
+        data class DataAvailable(val date: LocalDate, val balance: Double, val checkedBalance: Double?, val expenses: List<Expense>) : SelectedDateExpensesData()
+    }
+
     data class ExpenseDeletionSuccessData(val deletedExpense: Expense, val restoreAction: RestoreAction)
     data class BalanceAdjustedData(val balanceExpense: Expense, val diffWithOldBalance: Double, val newBalance: Double)
 

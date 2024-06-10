@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp.view.main.manageaccount.view
+package com.benoitletondor.easybudgetapp.view.manageaccount.view
 
 import android.util.Patterns
 import android.view.WindowManager
@@ -72,8 +72,8 @@ import com.benoitletondor.easybudgetapp.accounts.model.Invitation
 import com.benoitletondor.easybudgetapp.accounts.model.InvitationStatus
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.benoitletondor.easybudgetapp.compose.AppTheme
-import com.benoitletondor.easybudgetapp.view.main.manageaccount.LoadingKind
-import com.benoitletondor.easybudgetapp.view.main.manageaccount.ManageAccountViewModel
+import com.benoitletondor.easybudgetapp.view.manageaccount.LoadingKind
+import com.benoitletondor.easybudgetapp.view.manageaccount.ManageAccountViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 @Composable

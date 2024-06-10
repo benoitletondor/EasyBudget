@@ -59,6 +59,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -98,9 +99,9 @@ import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.main.accountselector.AccountSelectorView
 import com.benoitletondor.easybudgetapp.view.main.calendar.CalendarView
-import com.benoitletondor.easybudgetapp.view.main.createaccount.CreateAccountActivity
-import com.benoitletondor.easybudgetapp.view.main.login.LoginActivity
-import com.benoitletondor.easybudgetapp.view.main.manageaccount.ManageAccountActivity
+import com.benoitletondor.easybudgetapp.view.createaccount.CreateAccountActivity
+import com.benoitletondor.easybudgetapp.view.login.LoginActivity
+import com.benoitletondor.easybudgetapp.view.manageaccount.ManageAccountActivity
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
@@ -523,7 +524,6 @@ private fun MainView(
                         builder.show()
                     }
                 }
-
                 is MainViewModel.Event.OpenEditExpense -> {
                     // FIXME replace this
                     val startIntent = ExpenseEditActivity.newIntent(
@@ -1016,25 +1016,32 @@ private fun ColumnScope.ExpensesView(
     onExpensePressed: (Expense) -> Unit,
     onExpenseLongPressed: (Expense) -> Unit,
 ) {
-    val dayData by dayDataFlow.collectAsState()
+    val dataForDay by dayDataFlow.collectAsState()
     val userCurrency by userCurrencyFlow.collectAsState()
 
-    BalanceView(
-        date = dayData.date,
-        balance = dayData.balance,
-        checkedBalance = dayData.checkedBalance,
-        userCurrency = userCurrency,
-        lowMoneyAmountWarningFlow = lowMoneyAmountWarningFlow,
-    )
+    when(val dayData = dataForDay) {
+        is MainViewModel.SelectedDateExpensesData.DataAvailable -> {
+            BalanceView(
+                date = dayData.date,
+                balance = dayData.balance,
+                checkedBalance = dayData.checkedBalance,
+                userCurrency = userCurrency,
+                lowMoneyAmountWarningFlow = lowMoneyAmountWarningFlow,
+            )
 
-    ExpensesList(
-        expenses = dayData.expenses,
-        userCurrency = userCurrency,
-        showExpensesCheckBoxFlow = showExpensesCheckBoxFlow,
-        onExpenseCheckedChange = onExpenseCheckedChange,
-        onExpensePressed = onExpensePressed,
-        onExpenseLongPressed = onExpenseLongPressed,
-    )
+            ExpensesList(
+                expenses = dayData.expenses,
+                userCurrency = userCurrency,
+                showExpensesCheckBoxFlow = showExpensesCheckBoxFlow,
+                onExpenseCheckedChange = onExpenseCheckedChange,
+                onExpensePressed = onExpensePressed,
+                onExpenseLongPressed = onExpenseLongPressed,
+            )
+        }
+        MainViewModel.SelectedDateExpensesData.NoDataAvailable -> {
+            LoadingView()
+        }
+    }
 }
 
 @Composable
@@ -1114,120 +1121,143 @@ private fun ExpensesList(
     onExpensePressed: (Expense) -> Unit,
     onExpenseLongPressed: (Expense) -> Unit,
 ) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize(),
-    ) {
-        items(
-            count = expenses.size,
-        ) { index ->
-            val expense = expenses[index]
+    if (expenses.isEmpty()) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 15.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Image(
+                modifier = Modifier.alpha(0.6f),
+                painter = painterResource(R.drawable.ic_wallet),
+                contentDescription = null,
+            )
 
-            Column(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .combinedClickable(
-                            onClick = { onExpensePressed(expense) },
-                            onLongClick = { onExpenseLongPressed(expense) },
-                        )
-                        .padding(horizontal = 20.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
+            Spacer(modifier = Modifier.height(5.dp))
+
+            Text(
+                text = stringResource(R.string.no_expense_for_today),
+                fontSize = 14.sp,
+                color = colorResource(R.color.secondary_text),
+            )
+        }
+    } else {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize(),
+        ) {
+            items(
+                count = expenses.size,
+            ) { index ->
+                val expense = expenses[index]
+
+                Column(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    val context = LocalContext.current
-
-                    Image(
-                        modifier = Modifier.size(30.dp),
-                        painter = painterResource(if (expense.isRevenue()) R.drawable.ic_label_green else R.drawable.ic_label_red),
-                        contentDescription = null
-                    )
-
-                    Spacer(modifier = Modifier.width(20.dp))
-
-                    Column(
+                    Row(
                         modifier = Modifier
-                            .weight(1f)
+                            .fillMaxWidth()
+                            .combinedClickable(
+                                onClick = { onExpensePressed(expense) },
+                                onLongClick = { onExpenseLongPressed(expense) },
+                            )
+                            .padding(horizontal = 20.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text(
-                            text = expense.title,
-                            fontSize = 14.sp,
-                            maxLines = 2,
-                            color = colorResource(R.color.primary_text),
-                            overflow = TextOverflow.Ellipsis,
+                        val context = LocalContext.current
+
+                        Image(
+                            modifier = Modifier.size(30.dp),
+                            painter = painterResource(if (expense.isRevenue()) R.drawable.ic_label_green else R.drawable.ic_label_red),
+                            contentDescription = null
                         )
 
-                        Text(
-                            text = CurrencyHelper.getFormattedCurrencyString(userCurrency, -expense.amount),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            maxLines = 1,
-                            color = colorResource(if (expense.isRevenue()) R.color.budget_green else R.color.budget_red),
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    }
+                        Spacer(modifier = Modifier.width(20.dp))
 
-                    Spacer(modifier = Modifier.width(10.dp))
-
-                    if (expense.isRecurring()) {
                         Column(
-                            modifier = Modifier.width(60.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .weight(1f)
                         ) {
-                            Image(
-                                painter = painterResource(R.drawable.ic_autorenew_grey_26dp),
-                                contentDescription = null,
+                            Text(
+                                text = expense.title,
+                                fontSize = 14.sp,
+                                maxLines = 2,
+                                color = colorResource(R.color.primary_text),
+                                overflow = TextOverflow.Ellipsis,
                             )
 
-                            Spacer(modifier = Modifier.height(2.dp))
-
                             Text(
-                                modifier = Modifier.fillMaxWidth(),
-                                textAlign = TextAlign.Center,
-                                style = TextStyle(
-                                    platformStyle = PlatformTextStyle(
-                                        includeFontPadding = false,
-                                    ),
-                                ),
-                                text = expense.associatedRecurringExpense!!.recurringExpense.type.toFormattedString(context),
-                                fontSize = 9.sp,
-                                color = colorResource(R.color.secondary_text),
+                                text = CurrencyHelper.getFormattedCurrencyString(userCurrency, -expense.amount),
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
                                 maxLines = 1,
+                                color = colorResource(if (expense.isRevenue()) R.color.budget_green else R.color.budget_red),
                                 overflow = TextOverflow.Ellipsis,
                             )
                         }
-                    }
 
-                    val showCheckBox by showExpensesCheckBoxFlow.collectAsState()
-                    if (showCheckBox) {
                         Spacer(modifier = Modifier.width(10.dp))
 
-                        // Remove padding from the checkbox
-                        CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
-                            Checkbox(
-                                checked = expense.checked,
-                                onCheckedChange = { checked ->
-                                    onExpenseCheckedChange(expense, checked)
-                                },
-                            )
+                        if (expense.isRecurring()) {
+                            Column(
+                                modifier = Modifier.width(60.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                            ) {
+                                Image(
+                                    painter = painterResource(R.drawable.ic_autorenew_grey_26dp),
+                                    contentDescription = null,
+                                )
+
+                                Spacer(modifier = Modifier.height(2.dp))
+
+                                Text(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Center,
+                                    style = TextStyle(
+                                        platformStyle = PlatformTextStyle(
+                                            includeFontPadding = false,
+                                        ),
+                                    ),
+                                    text = expense.associatedRecurringExpense!!.recurringExpense.type.toFormattedString(context),
+                                    fontSize = 9.sp,
+                                    color = colorResource(R.color.secondary_text),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            }
                         }
+
+                        val showCheckBox by showExpensesCheckBoxFlow.collectAsState()
+                        if (showCheckBox) {
+                            Spacer(modifier = Modifier.width(10.dp))
+
+                            // Remove padding from the checkbox
+                            CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
+                                Checkbox(
+                                    checked = expense.checked,
+                                    onCheckedChange = { checked ->
+                                        onExpenseCheckedChange(expense, checked)
+                                    },
+                                )
+                            }
+                        }
+                    }
+
+                    if (index < expenses.size - 1) {
+                        HorizontalDivider(
+                            modifier = Modifier.padding(start = 70.dp),
+                            color = colorResource(R.color.divider),
+                            thickness = 1.dp,
+                        )
+                    } else {
+                        // Add inner padding for the FAB
+                        Spacer(modifier = Modifier.height(80.dp))
                     }
                 }
 
-                if (index < expenses.size - 1) {
-                    HorizontalDivider(
-                        modifier = Modifier.padding(start = 70.dp),
-                        color = colorResource(R.color.divider),
-                        thickness = 1.dp,
-                    )
-                } else {
-                    // Add inner padding for the FAB
-                    Spacer(modifier = Modifier.height(80.dp))
-                }
+
             }
-
-
         }
     }
 }
@@ -1426,7 +1456,7 @@ private fun Preview(
             userCurrencyFlow = MutableStateFlow(Currency.getInstance("USD")),
             recurringExpenseDeletionProgressFlow = MutableStateFlow(MainViewModel.RecurringExpenseDeleteProgressState.Idle),
             recurringExpenseRestoreProgressFlow = MutableStateFlow(MainViewModel.RecurringExpenseRestoreProgressState.Idle),
-            dayDataFlow = MutableStateFlow(MainViewModel.SelectedDateExpensesData(
+            dayDataFlow = MutableStateFlow(MainViewModel.SelectedDateExpensesData.DataAvailable(
                 date = LocalDate.now(),
                 balance = 100.0,
                 checkedBalance = 20.0,

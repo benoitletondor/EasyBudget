@@ -70,8 +70,8 @@ import com.benoitletondor.easybudgetapp.parameters.setUserAllowMonthlyReminderPu
 import com.benoitletondor.easybudgetapp.parameters.setUserAllowUpdatePushes
 import com.benoitletondor.easybudgetapp.view.RatingPopup
 import com.benoitletondor.easybudgetapp.view.main.MainActivity
-import com.benoitletondor.easybudgetapp.view.main.createaccount.CreateAccountActivity
-import com.benoitletondor.easybudgetapp.view.main.login.LoginActivity
+import com.benoitletondor.easybudgetapp.view.createaccount.CreateAccountActivity
+import com.benoitletondor.easybudgetapp.view.login.LoginActivity
 import com.benoitletondor.easybudgetapp.view.premium.PremiumActivity
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyFragment
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.SHOW_BACKUP_INTENT_KEY

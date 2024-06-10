@@ -14,10 +14,9 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp.view.main.manageaccount
+package com.benoitletondor.easybudgetapp.view.manageaccount
 
 import android.util.Patterns
-import androidx.compose.ui.text.toLowerCase
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -33,8 +32,7 @@ import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
 import com.benoitletondor.easybudgetapp.helper.combine
 import com.benoitletondor.easybudgetapp.injection.CurrentDBProvider
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
-import com.benoitletondor.easybudgetapp.view.main.account.AccountViewModel
-import com.benoitletondor.easybudgetapp.view.main.manageaccount.ManageAccountActivity.Companion.SELECTED_ACCOUNT_EXTRA
+import com.benoitletondor.easybudgetapp.view.manageaccount.ManageAccountActivity.Companion.SELECTED_ACCOUNT_EXTRA
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow

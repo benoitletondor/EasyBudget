@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp.view.main.manageaccount
+package com.benoitletondor.easybudgetapp.view.manageaccount
 
 import android.content.Context
 import android.content.Intent
@@ -31,7 +31,7 @@ import com.benoitletondor.easybudgetapp.helper.BaseActivity
 import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.compose.AppTheme
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
-import com.benoitletondor.easybudgetapp.view.main.manageaccount.view.ContentView
+import com.benoitletondor.easybudgetapp.view.manageaccount.view.ContentView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 

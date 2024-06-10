@@ -59,7 +59,6 @@ import com.benoitletondor.easybudgetapp.helper.toFormattedString
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.compose.AppTheme
 import com.benoitletondor.easybudgetapp.injection.CurrentDBProvider
-import com.benoitletondor.easybudgetapp.view.main.account.AccountViewModel
 import com.benoitletondor.easybudgetapp.view.report.export.ExportReportActivity.Companion.REQUEST_CODE_SHARE_CSV
 import com.benoitletondor.easybudgetapp.view.report.export.ExportReportActivity.Companion.tempFileName
 import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter

@@ -133,19 +133,19 @@
             android:exported="false"
             tools:ignore="DiscouragedApi,LockedOrientationActivity"/>
         <activity
-            android:name=".view.main.login.LoginActivity"
+            android:name=".view.login.LoginActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_login"
             android:screenOrientation="portrait"
             tools:ignore="DiscouragedApi,LockedOrientationActivity"/>
         <activity
-            android:name=".view.main.createaccount.CreateAccountActivity"
+            android:name=".view.createaccount.CreateAccountActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_create_account"
             android:screenOrientation="portrait"
             tools:ignore="DiscouragedApi,LockedOrientationActivity"/>
         <activity
-            android:name=".view.main.manageaccount.ManageAccountActivity"
+            android:name=".view.manageaccount.ManageAccountActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_manage_account"
             android:screenOrientation="portrait"
