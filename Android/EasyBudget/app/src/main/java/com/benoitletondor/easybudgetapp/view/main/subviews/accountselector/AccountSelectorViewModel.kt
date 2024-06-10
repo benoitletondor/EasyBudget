@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp.view.main.accountselector
+package com.benoitletondor.easybudgetapp.view.main.subviews.accountselector
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

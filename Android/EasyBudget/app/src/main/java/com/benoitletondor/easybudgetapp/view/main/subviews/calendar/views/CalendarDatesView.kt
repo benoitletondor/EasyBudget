@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp.view.main.calendar.views
+package com.benoitletondor.easybudgetapp.view.main.subviews.calendar.views
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -61,7 +61,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.TextStyle

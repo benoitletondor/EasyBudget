@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp.view.main.calendar
+package com.benoitletondor.easybudgetapp.view.main.subviews.calendar
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,8 +31,8 @@ import com.benoitletondor.easybudgetapp.helper.computeCalendarMinDateFromInitDat
 import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.model.DataForMonth
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
-import com.benoitletondor.easybudgetapp.view.main.calendar.views.CalendarDatesView
-import com.benoitletondor.easybudgetapp.view.main.calendar.views.CalendarHeaderView
+import com.benoitletondor.easybudgetapp.view.main.subviews.calendar.views.CalendarDatesView
+import com.benoitletondor.easybudgetapp.view.main.subviews.calendar.views.CalendarHeaderView
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.yearMonth
 import kotlinx.coroutines.flow.Flow

@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp.view.main.calendar
+package com.benoitletondor.easybudgetapp.view.main.subviews.calendar
 
 import android.icu.number.Notation
 import android.icu.text.CompactDecimalFormat

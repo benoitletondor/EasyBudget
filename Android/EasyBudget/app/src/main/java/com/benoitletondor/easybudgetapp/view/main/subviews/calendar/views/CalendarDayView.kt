@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp.view.main.calendar.views
+package com.benoitletondor.easybudgetapp.view.main.subviews.calendar.views
 
 import android.content.res.Configuration
 import androidx.annotation.ColorRes
@@ -55,8 +55,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.compose.AppTheme
-import com.benoitletondor.easybudgetapp.view.main.calendar.NumberFormatter
-import com.benoitletondor.easybudgetapp.view.main.calendar.RoundedToIntNumberFormatter
+import com.benoitletondor.easybudgetapp.view.main.subviews.calendar.NumberFormatter
+import com.benoitletondor.easybudgetapp.view.main.subviews.calendar.RoundedToIntNumberFormatter
 
 @Composable
 fun BoxScope.InCalendarWithBalanceDayView(
