@@ -85,9 +85,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun collectViewModelEvents() {
-        /*lifecycleScope.launchCollect(viewModel.premiumStatusFlow) {
-            invalidateOptionsMenu()
-        }
+        /*
 
         lifecycleScope.launchCollect(viewModel.openPremiumEventFlow) {
             val startIntent = Intent(this, SettingsActivity::class.java)
@@ -230,8 +228,6 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         const val WELCOME_SCREEN_ACTIVITY_CODE = 103
-        const val INTENT_EXPENSE_DELETED = "intent.expense.deleted"
-        const val INTENT_RECURRING_EXPENSE_DELETED = "intent.expense.monthly.deleted"
         const val INTENT_SHOW_WELCOME_SCREEN = "intent.welcomscreen.show"
         const val INTENT_SHOW_ADD_EXPENSE = "intent.addexpense.show"
         const val INTENT_SHOW_ADD_RECURRING_EXPENSE = "intent.addrecurringexpense.show"
