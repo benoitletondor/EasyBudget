@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Intent
 import android.content.res.Configuration
+import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import android.widget.EditText
@@ -46,11 +47,13 @@ import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.helper.preventUnsupportedInputForDecimals
 import com.benoitletondor.easybudgetapp.injection.AppModule
+import com.benoitletondor.easybudgetapp.model.AssociatedRecurringExpense
 import com.benoitletondor.easybudgetapp.model.DataForDay
 import com.benoitletondor.easybudgetapp.model.DataForMonth
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType
+import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.main.subviews.accountselector.AccountSelectorView
 import com.benoitletondor.easybudgetapp.view.createaccount.CreateAccountActivity
@@ -199,16 +202,16 @@ private fun MainView(
     val snackbarHostState = remember { SnackbarHostState() }
     var showFABMenu by remember { mutableStateOf(false) }
 
-    val activity = LocalContext.current as Activity
+    val context = LocalContext.current
 
     LaunchedEffect(key1 = "eventsListener") {
         launchCollect(eventFlow) { event ->
             when(event) {
                 is MainViewModel.Event.CheckAllPastEntriesError -> {
-                    MaterialAlertDialogBuilder(activity)
+                    MaterialAlertDialogBuilder(context)
                         .setTitle(R.string.check_all_past_expences_error_title)
                         .setMessage(
-                            activity.getString(
+                            context.getString(
                                 R.string.check_all_past_expences_error_message,
                                 event.error.localizedMessage,
                             )
@@ -217,7 +220,7 @@ private fun MainView(
                         .show()
                 }
                 is MainViewModel.Event.CurrentBalanceEditionError -> {
-                    MaterialAlertDialogBuilder(activity)
+                    MaterialAlertDialogBuilder(context)
                         .setTitle(R.string.adjust_balance_error_title)
                         .setMessage(R.string.adjust_balance_error_message)
                         .setNegativeButton(R.string.ok) { dialog1, _ -> dialog1.dismiss() }
@@ -228,14 +231,14 @@ private fun MainView(
 
                     coroutineScope.launch {
                         val result = snackbarHostState.showSnackbar(
-                            message = activity.getString(
+                            message = context.getString(
                                 R.string.adjust_balance_snackbar_text,
                                 CurrencyHelper.getFormattedCurrencyString(
                                     currency = userCurrencyFlow.value,
                                     amount = newBalance,
                                 )
                             ),
-                            actionLabel = activity.getString(R.string.undo),
+                            actionLabel = context.getString(R.string.undo),
                             duration = SnackbarDuration.Long,
                         )
 
@@ -245,17 +248,17 @@ private fun MainView(
                     }
                 }
                 is MainViewModel.Event.CurrentBalanceRestorationError -> {
-                    MaterialAlertDialogBuilder(activity)
+                    MaterialAlertDialogBuilder(context)
                         .setTitle(R.string.adjust_balance_error_title)
                         .setMessage(R.string.adjust_balance_error_message)
                         .setNegativeButton(R.string.ok) { dialog1, _ -> dialog1.dismiss() }
                         .show()
                 }
                 is MainViewModel.Event.ExpenseCheckingError -> {
-                    MaterialAlertDialogBuilder(activity)
+                    MaterialAlertDialogBuilder(context)
                         .setTitle(R.string.expense_check_error_title)
                         .setMessage(
-                            activity.getString(
+                            context.getString(
                                 R.string.expense_check_error_message,
                                 event.error.localizedMessage
                             )
@@ -264,7 +267,7 @@ private fun MainView(
                         .show()
                 }
                 is MainViewModel.Event.ExpenseDeletionError -> {
-                    MaterialAlertDialogBuilder(activity)
+                    MaterialAlertDialogBuilder(context)
                         .setTitle(R.string.expense_delete_error_title)
                         .setMessage(R.string.expense_delete_error_message)
                         .setNegativeButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
@@ -275,8 +278,8 @@ private fun MainView(
 
                     coroutineScope.launch {
                         val result = snackbarHostState.showSnackbar(
-                            message = activity.getString(if (deletedExpense.isRevenue()) R.string.income_delete_snackbar_text else R.string.expense_delete_snackbar_text),
-                            actionLabel = activity.getString(R.string.undo),
+                            message = context.getString(if (deletedExpense.isRevenue()) R.string.income_delete_snackbar_text else R.string.expense_delete_snackbar_text),
+                            actionLabel = context.getString(R.string.undo),
                             duration = SnackbarDuration.Long,
                         )
 
@@ -289,56 +292,56 @@ private fun MainView(
                 is MainViewModel.Event.OpenAddExpense -> {
                     // FIXME replace this
                     val startIntent = ExpenseEditActivity.newIntent(
-                        context = activity,
+                        context = context,
                         editedExpense = null,
                         date = event.date,
                     )
 
-                    activity.startActivity(startIntent)
+                    context.startActivity(startIntent)
                 }
                 is MainViewModel.Event.OpenAddRecurringExpense -> {
                     // FIXME replace this
                     val startIntent = RecurringExpenseEditActivity.newIntent(
-                        context = activity,
+                        context = context,
                         editedExpense = null,
                         startDate = event.date,
                     )
 
-                    activity.startActivity(startIntent)
+                    context.startActivity(startIntent)
                 }
                 is MainViewModel.Event.OpenManageAccount -> {
                     // FIXME replace this
-                    activity.startActivity(ManageAccountActivity.newIntent(activity, event.account))
+                    context.startActivity(ManageAccountActivity.newIntent(context, event.account))
                 }
                 MainViewModel.Event.OpenMonthlyReport -> {
                     // FIXME replace this
-                    val startIntent = Intent(activity, MonthlyReportBaseActivity::class.java)
-                    activity.startActivity(startIntent)
+                    val startIntent = Intent(context, MonthlyReportBaseActivity::class.java)
+                    context.startActivity(startIntent)
                 }
                 MainViewModel.Event.OpenPremium -> {
                     // FIXME replace this
-                    val startIntent = Intent(activity, SettingsActivity::class.java)
+                    val startIntent = Intent(context, SettingsActivity::class.java)
                     startIntent.putExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, true)
-                    activity.startActivity(startIntent)
+                    context.startActivity(startIntent)
                 }
                 is MainViewModel.Event.RecurringExpenseDeletionResult -> {
                     when(event.data) {
                         is MainViewModel.RecurringExpenseDeletionEvent.ErrorCantDeleteBeforeFirstOccurrence -> {
-                            MaterialAlertDialogBuilder(activity)
+                            MaterialAlertDialogBuilder(context)
                                 .setTitle(R.string.recurring_expense_delete_first_error_title)
                                 .setMessage(R.string.recurring_expense_delete_first_error_message)
                                 .setNegativeButton(R.string.ok, null)
                                 .show()
                         }
                         is MainViewModel.RecurringExpenseDeletionEvent.ErrorIO -> {
-                            MaterialAlertDialogBuilder(activity)
+                            MaterialAlertDialogBuilder(context)
                                 .setTitle(R.string.recurring_expense_delete_error_title)
                                 .setMessage(R.string.recurring_expense_delete_error_message)
                                 .setNegativeButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
                                 .show()
                         }
                         is MainViewModel.RecurringExpenseDeletionEvent.ErrorRecurringExpenseDeleteNotAssociated -> {
-                            MaterialAlertDialogBuilder(activity)
+                            MaterialAlertDialogBuilder(context)
                                 .setTitle(R.string.recurring_expense_delete_error_title)
                                 .setMessage(R.string.recurring_expense_delete_error_message)
                                 .setNegativeButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
@@ -347,8 +350,8 @@ private fun MainView(
                         is MainViewModel.RecurringExpenseDeletionEvent.Success -> {
                             coroutineScope.launch {
                                 val result = snackbarHostState.showSnackbar(
-                                    message = activity.getString(R.string.recurring_expense_delete_success_message),
-                                    actionLabel = activity.getString(R.string.undo),
+                                    message = context.getString(R.string.recurring_expense_delete_success_message),
+                                    actionLabel = context.getString(R.string.undo),
                                     duration = SnackbarDuration.Long,
                                 )
 
@@ -365,17 +368,17 @@ private fun MainView(
                 is MainViewModel.Event.RecurringExpenseRestoreResult -> {
                     when(event.data) {
                         is MainViewModel.RecurringExpenseRestoreEvent.ErrorIO -> {
-                            MaterialAlertDialogBuilder(activity)
+                            MaterialAlertDialogBuilder(context)
                                 .setTitle(R.string.recurring_expense_restore_error_title)
-                                .setMessage(activity.getString(R.string.recurring_expense_restore_error_message))
+                                .setMessage(context.getString(R.string.recurring_expense_restore_error_message))
                                 .setNegativeButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
                                 .show()
                         }
                         is MainViewModel.RecurringExpenseRestoreEvent.Success -> {
                             coroutineScope.launch {
                                 snackbarHostState.showSnackbar(
-                                    message = activity.getString(R.string.recurring_expense_restored_success_message),
-                                    actionLabel = activity.getString(R.string.undo),
+                                    message = context.getString(R.string.recurring_expense_restored_success_message),
+                                    actionLabel = context.getString(R.string.undo),
                                     duration = SnackbarDuration.Long,
                                 )
                             }
@@ -386,7 +389,7 @@ private fun MainView(
                     showAccountSelectorModal = true
                 }
                 MainViewModel.Event.ShowConfirmCheckAllPastEntries -> {
-                    MaterialAlertDialogBuilder(activity)
+                    MaterialAlertDialogBuilder(context)
                         .setTitle(R.string.check_all_past_expences_title)
                         .setMessage(R.string.check_all_past_expences_message)
                         .setPositiveButton(R.string.check_all_past_expences_confirm_cta) { dialog2, _ ->
@@ -398,10 +401,10 @@ private fun MainView(
                 }
                 MainViewModel.Event.ShowSettings -> {
                     // FIXME replace this
-                    activity.startActivity(Intent(activity, SettingsActivity::class.java))
+                    context.startActivity(Intent(context, SettingsActivity::class.java))
                 }
                 is MainViewModel.Event.StartCurrentBalanceEditor -> {
-                    val dialogView = activity.layoutInflater.inflate(R.layout.dialog_adjust_balance, null)
+                    val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_adjust_balance, null)
                     val amountEditText = dialogView.findViewById<EditText>(R.id.balance_amount)
                     amountEditText.setText(
                         if (event.currentBalance == 0.0) "0" else CurrencyHelper.getFormattedAmountValue(
@@ -411,7 +414,7 @@ private fun MainView(
                     amountEditText.preventUnsupportedInputForDecimals()
                     amountEditText.setSelection(amountEditText.text.length) // Put focus at the end of the text
 
-                    val builder = MaterialAlertDialogBuilder(activity)
+                    val builder = MaterialAlertDialogBuilder(context)
                     builder.setTitle(R.string.adjust_balance_title)
                     builder.setMessage(R.string.adjust_balance_message)
                     builder.setView(dialogView)
@@ -423,7 +426,7 @@ private fun MainView(
                                 val newBalance = java.lang.Double.valueOf(stringValue)
                                 onNewBalanceSelected(
                                     newBalance,
-                                    activity.getString(R.string.adjust_balance_expense_title)
+                                    context.getString(R.string.adjust_balance_expense_title)
                                 )
                             }
                         } catch (e: Exception) {
@@ -438,7 +441,7 @@ private fun MainView(
                     // Directly show keyboard when the dialog pops
                     amountEditText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
                         // Check if the device doesn't have a physical keyboard
-                        if (hasFocus && activity.resources.configuration.keyboard == Configuration.KEYBOARD_NOKEYS) {
+                        if (hasFocus && context.resources.configuration.keyboard == Configuration.KEYBOARD_NOKEYS) {
                             dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
                         }
                     }
@@ -446,7 +449,7 @@ private fun MainView(
                 is MainViewModel.Event.ShowExpenseEditionOptions -> {
                     val expense = event.expense
                     if (expense.isRecurring()) {
-                        val builder = MaterialAlertDialogBuilder(activity)
+                        val builder = MaterialAlertDialogBuilder(context)
                         builder.setTitle(if (expense.isRevenue()) R.string.dialog_edit_recurring_income_title else R.string.dialog_edit_recurring_expense_title)
                         builder.setItems(if (expense.isRevenue()) R.array.dialog_edit_recurring_income_choices else R.array.dialog_edit_recurring_expense_choices) { _, which ->
                             when (which) {
@@ -466,7 +469,7 @@ private fun MainView(
                         }
                         builder.show()
                     } else {
-                        val builder = MaterialAlertDialogBuilder(activity)
+                        val builder = MaterialAlertDialogBuilder(context)
                         builder.setTitle(if (expense.isRevenue()) R.string.dialog_edit_income_title else R.string.dialog_edit_expense_title)
                         builder.setItems(if (expense.isRevenue()) R.array.dialog_edit_income_choices else R.array.dialog_edit_expense_choices) { _, which ->
                             when (which) {
@@ -482,32 +485,32 @@ private fun MainView(
                 is MainViewModel.Event.OpenEditExpense -> {
                     // FIXME replace this
                     val startIntent = ExpenseEditActivity.newIntent(
-                        context = activity,
+                        context = context,
                         editedExpense = event.expense,
                         date = event.expense.date,
                     )
 
-                    activity.startActivity(startIntent)
+                    context.startActivity(startIntent)
                 }
                 is MainViewModel.Event.OpenEditRecurringExpenseOccurence -> {
                     // FIXME replace this
                     val startIntent = ExpenseEditActivity.newIntent(
-                        context = activity,
+                        context = context,
                         editedExpense = event.expense,
                         date = event.expense.date,
                     )
 
-                    activity.startActivity(startIntent)
+                    context.startActivity(startIntent)
                 }
                 is MainViewModel.Event.OpenEditRecurringExpenseOccurenceAndFollowingOnes -> {
                     // FIXME replace this
                     val startIntent = RecurringExpenseEditActivity.newIntent(
-                        context = activity,
+                        context = context,
                         editedExpense = event.expense,
                         startDate = event.expense.date,
                     )
 
-                    activity.startActivity(startIntent)
+                    context.startActivity(startIntent)
                 }
             }
         }
@@ -518,10 +521,10 @@ private fun MainView(
         launchCollect(recurringExpenseDeletionProgressFlow) { state ->
             when(state) {
                 is MainViewModel.RecurringExpenseDeleteProgressState.Deleting -> {
-                    val dialog = ProgressDialog(activity)
+                    val dialog = ProgressDialog(context)
                     dialog.isIndeterminate = true
                     dialog.setTitle(R.string.recurring_expense_delete_loading_title)
-                    dialog.setMessage(activity.getString(R.string.recurring_expense_delete_loading_message))
+                    dialog.setMessage(context.getString(R.string.recurring_expense_delete_loading_message))
                     dialog.setCanceledOnTouchOutside(false)
                     dialog.setCancelable(false)
                     dialog.show()
@@ -541,10 +544,10 @@ private fun MainView(
         launchCollect(recurringExpenseRestoreProgressFlow) { state ->
             when(state) {
                 is MainViewModel.RecurringExpenseRestoreProgressState.Restoring -> {
-                    val dialog = ProgressDialog(activity)
+                    val dialog = ProgressDialog(context)
                     dialog.isIndeterminate = true
                     dialog.setTitle(R.string.recurring_expense_restoring_loading_title)
-                    dialog.setMessage(activity.getString(R.string.recurring_expense_restoring_loading_message))
+                    dialog.setMessage(context.getString(R.string.recurring_expense_restoring_loading_message))
                     dialog.setCanceledOnTouchOutside(false)
                     dialog.setCancelable(false)
                     dialog.show()
@@ -643,9 +646,9 @@ private fun MainView(
                             },
                             onOpenBecomeProScreen = {
                                 // FIXME replace this
-                                val startIntent = Intent(activity, SettingsActivity::class.java)
+                                val startIntent = Intent(context, SettingsActivity::class.java)
                                 startIntent.putExtra(SettingsActivity.SHOW_PRO_INTENT_KEY, true)
-                                activity.startActivity(startIntent)
+                                context.startActivity(startIntent)
 
                                 coroutineScope.launch {
                                     accountSelectorModalSheetState.hide()
@@ -654,11 +657,11 @@ private fun MainView(
                             },
                             onOpenLoginScreen = { shouldDismissAfterAuth ->
                                 // FIXME replace this
-                                activity.startActivity(LoginActivity.newIntent(activity, shouldDismissAfterAuth = shouldDismissAfterAuth))
+                                context.startActivity(LoginActivity.newIntent(context, shouldDismissAfterAuth = shouldDismissAfterAuth))
                             },
                             onOpenCreateAccountScreen = {
                                 // FIXME replace this
-                                activity.startActivity(Intent(activity, CreateAccountActivity::class.java))
+                                context.startActivity(Intent(context, CreateAccountActivity::class.java))
                             },
                         )
                     }
@@ -769,7 +772,31 @@ private fun Preview(
                 date = LocalDate.now(),
                 balance = 100.0,
                 checkedBalance = 20.0,
-                expenses = emptyList(),
+                expenses = listOf(
+                    Expense(
+                        id = 1L,
+                        date = LocalDate.now(),
+                        title = "Test",
+                        amount = 10.0,
+                        checked = false,
+                    ),
+                    Expense(
+                        id = 2L,
+                        date = LocalDate.now(),
+                        title = "Test 2",
+                        amount = -10.0,
+                        checked = true,
+                        associatedRecurringExpense = AssociatedRecurringExpense(
+                            recurringExpense = RecurringExpense(
+                                title = "Test",
+                                originalAmount = -10.0,
+                                recurringDate = LocalDate.now(),
+                                type = RecurringExpenseType.WEEKLY,
+                            ),
+                            originalDate = LocalDate.now(),
+                        )
+                    )
+                ),
             )),
             showExpensesCheckBoxFlow = MutableStateFlow(true),
             onSettingsButtonPressed = {},
