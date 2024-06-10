@@ -69,7 +69,7 @@ import com.benoitletondor.easybudgetapp.parameters.setUserAllowDailyReminderPush
 import com.benoitletondor.easybudgetapp.parameters.setUserAllowMonthlyReminderPushes
 import com.benoitletondor.easybudgetapp.parameters.setUserAllowUpdatePushes
 import com.benoitletondor.easybudgetapp.view.RatingPopup
-import com.benoitletondor.easybudgetapp.view.main.MainActivity
+import com.benoitletondor.easybudgetapp.MainActivity
 import com.benoitletondor.easybudgetapp.view.createaccount.CreateAccountActivity
 import com.benoitletondor.easybudgetapp.view.login.LoginActivity
 import com.benoitletondor.easybudgetapp.view.premium.PremiumActivity
@@ -281,7 +281,8 @@ class PreferencesFragment : PreferenceFragmentCompat() {
 
                             parameters.setLowMoneyWarningAmount(newLimit)
                             setLimitWarningPreferenceTitle(limitWarningPreference)
-                            LocalBroadcastManager.getInstance(context).sendBroadcast(Intent(MainActivity.INTENT_LOW_MONEY_WARNING_THRESHOLD_CHANGED))
+                            LocalBroadcastManager.getInstance(context).sendBroadcast(Intent(
+                                MainActivity.INTENT_LOW_MONEY_WARNING_THRESHOLD_CHANGED))
                         } catch (e: Exception) {
                             MaterialAlertDialogBuilder(context)
                                 .setTitle(R.string.adjust_limit_warning_error_title)

@@ -1,6 +1,5 @@
 package com.benoitletondor.easybudgetapp.view.main
 
-import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Intent
 import android.content.res.Configuration
@@ -38,7 +37,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.compose.AppTheme
 import com.benoitletondor.easybudgetapp.db.RestoreAction
@@ -62,6 +60,7 @@ import com.benoitletondor.easybudgetapp.view.main.subviews.FABMenuOverlay
 import com.benoitletondor.easybudgetapp.view.main.subviews.MainViewContent
 import com.benoitletondor.easybudgetapp.view.main.subviews.MainViewTopBar
 import com.benoitletondor.easybudgetapp.view.manageaccount.ManageAccountActivity
+import com.benoitletondor.easybudgetapp.view.onboarding.OnboardingResult
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
@@ -85,8 +84,10 @@ object MainDestination
 
 @Composable
 fun MainView(
-    navController: NavController,
     viewModel: MainViewModel = hiltViewModel(),
+    navigateToOnboarding: () -> Unit,
+    onboardingResultFlow: Flow<OnboardingResult>,
+    closeApp: () -> Unit,
 ) {
     MainView(
         selectedAccountFlow = viewModel.accountSelectionFlow,
@@ -112,6 +113,7 @@ fun MainView(
         recurringExpenseRestoreProgressFlow = viewModel.recurringExpenseRestoreProgressStateFlow,
         dayDataFlow = viewModel.selectedDateDataFlow,
         showExpensesCheckBoxFlow = viewModel.showExpensesCheckBoxFlow,
+        onboardingResultFlow = onboardingResultFlow,
         onSettingsButtonPressed = viewModel::onSettingsButtonPressed,
         onAdjustCurrentBalanceButtonPressed = viewModel::onAdjustCurrentBalanceClicked,
         onTickAllPastEntriesButtonPressed = viewModel::onCheckAllPastEntriesPressed,
@@ -138,8 +140,11 @@ fun MainView(
         onDeleteRecurringExpenseClicked = viewModel::onDeleteRecurringExpenseClicked,
         onDeleteExpenseClicked = viewModel::onDeleteExpenseClicked,
         onEditExpensePressed = viewModel::onEditExpensePressed,
-        onEditRecurringExpenseOccurenceAndFollowingOnesPressed = viewModel::onEditRecurringExpenseOccurenceAndFollowingOnesPressed,
-        onEditRecurringExpenseOccurencePressed = viewModel::onEditRecurringExpenseOccurencePressed,
+        onEditRecurringExpenseOccurrenceAndFollowingOnesPressed = viewModel::onEditRecurringExpenseOccurenceAndFollowingOnesPressed,
+        onEditRecurringExpenseOccurrencePressed = viewModel::onEditRecurringExpenseOccurencePressed,
+        navigateToOnboarding = navigateToOnboarding,
+        onOnboardingResult = viewModel::onOnboardingResult,
+        closeApp = closeApp,
     )
 }
 
@@ -167,6 +172,7 @@ private fun MainView(
     recurringExpenseRestoreProgressFlow: StateFlow<MainViewModel.RecurringExpenseRestoreProgressState>,
     dayDataFlow: StateFlow<MainViewModel.SelectedDateExpensesData>,
     showExpensesCheckBoxFlow: StateFlow<Boolean>,
+    onboardingResultFlow: Flow<OnboardingResult>,
     onSettingsButtonPressed: () -> Unit,
     onAdjustCurrentBalanceButtonPressed: () -> Unit,
     onTickAllPastEntriesButtonPressed: () -> Unit,
@@ -193,8 +199,11 @@ private fun MainView(
     onDeleteRecurringExpenseClicked: (Expense, RecurringExpenseDeleteType) -> Unit,
     onDeleteExpenseClicked: (Expense) -> Unit,
     onEditExpensePressed: (Expense) -> Unit,
-    onEditRecurringExpenseOccurenceAndFollowingOnesPressed: (Expense) -> Unit,
-    onEditRecurringExpenseOccurencePressed: (Expense) -> Unit,
+    onEditRecurringExpenseOccurrenceAndFollowingOnesPressed: (Expense) -> Unit,
+    onEditRecurringExpenseOccurrencePressed: (Expense) -> Unit,
+    navigateToOnboarding: () -> Unit,
+    onOnboardingResult: (OnboardingResult) -> Unit,
+    closeApp: () -> Unit,
 ) {
     var showAccountSelectorModal by remember { mutableStateOf(false) }
     val accountSelectorModalSheetState = rememberModalBottomSheetState()
@@ -454,9 +463,9 @@ private fun MainView(
                         builder.setItems(if (expense.isRevenue()) R.array.dialog_edit_recurring_income_choices else R.array.dialog_edit_recurring_expense_choices) { _, which ->
                             when (which) {
                                 // Edit this one
-                                0 -> onEditRecurringExpenseOccurencePressed(expense)
+                                0 -> onEditRecurringExpenseOccurrencePressed(expense)
                                 // Edit this one and following ones
-                                1 -> onEditRecurringExpenseOccurenceAndFollowingOnesPressed(expense)
+                                1 -> onEditRecurringExpenseOccurrenceAndFollowingOnesPressed(expense)
                                 // Delete this one
                                 2 -> onDeleteRecurringExpenseClicked(expense, RecurringExpenseDeleteType.ONE)
                                 // Delete from
@@ -492,7 +501,7 @@ private fun MainView(
 
                     context.startActivity(startIntent)
                 }
-                is MainViewModel.Event.OpenEditRecurringExpenseOccurence -> {
+                is MainViewModel.Event.OpenEditRecurringExpenseOccurrence -> {
                     // FIXME replace this
                     val startIntent = ExpenseEditActivity.newIntent(
                         context = context,
@@ -502,7 +511,7 @@ private fun MainView(
 
                     context.startActivity(startIntent)
                 }
-                is MainViewModel.Event.OpenEditRecurringExpenseOccurenceAndFollowingOnes -> {
+                is MainViewModel.Event.OpenEditRecurringExpenseOccurrenceAndFollowingOnes -> {
                     // FIXME replace this
                     val startIntent = RecurringExpenseEditActivity.newIntent(
                         context = context,
@@ -512,6 +521,8 @@ private fun MainView(
 
                     context.startActivity(startIntent)
                 }
+                MainViewModel.Event.StartOnboarding -> navigateToOnboarding()
+                MainViewModel.Event.CloseApp -> closeApp()
             }
         }
     }
@@ -559,6 +570,12 @@ private fun MainView(
                     expenseRestoreDialog = null
                 }
             }
+        }
+    }
+
+    LaunchedEffect(key1 = "onboardingResultListener") {
+        launchCollect(onboardingResultFlow) { result ->
+            onOnboardingResult(result)
         }
     }
 
@@ -799,6 +816,7 @@ private fun Preview(
                 ),
             )),
             showExpensesCheckBoxFlow = MutableStateFlow(true),
+            onboardingResultFlow = MutableSharedFlow(),
             onSettingsButtonPressed = {},
             onAdjustCurrentBalanceButtonPressed = {},
             onTickAllPastEntriesButtonPressed = {},
@@ -825,8 +843,11 @@ private fun Preview(
             onDeleteRecurringExpenseClicked = {_, _ ->},
             onDeleteExpenseClicked = {},
             onEditExpensePressed = {},
-            onEditRecurringExpenseOccurenceAndFollowingOnesPressed = {},
-            onEditRecurringExpenseOccurencePressed = {},
+            onEditRecurringExpenseOccurrenceAndFollowingOnesPressed = {},
+            onEditRecurringExpenseOccurrencePressed = {},
+            navigateToOnboarding = {},
+            onOnboardingResult = {},
+            closeApp = {},
         )
     }
 }

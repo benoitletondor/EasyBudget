@@ -217,6 +217,6 @@ fun Parameters.getOnboardingStep(): Int {
     return getInt(ONBOARDING_STEP_PARAMETERS_KEY, 0)
 }
 
-private fun Parameters.setOnboardingStep(step: Int) {
+fun Parameters.setOnboardingStep(step: Int) {
     putInt(ONBOARDING_STEP_PARAMETERS_KEY, step)
 }

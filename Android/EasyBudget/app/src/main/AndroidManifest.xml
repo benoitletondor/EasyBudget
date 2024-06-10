@@ -67,7 +67,7 @@
         </provider>
 
         <activity
-            android:name=".view.main.MainActivity"
+            android:name=".MainActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"

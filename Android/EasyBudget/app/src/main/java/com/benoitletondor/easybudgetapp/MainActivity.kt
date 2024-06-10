@@ -14,91 +14,45 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp.view.main
+package com.benoitletondor.easybudgetapp
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.compose.AppNavHost
 import com.benoitletondor.easybudgetapp.helper.*
-import com.benoitletondor.easybudgetapp.parameters.*
 import com.benoitletondor.easybudgetapp.compose.AppTheme
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.SHOW_BACKUP_INTENT_KEY
-import com.benoitletondor.easybudgetapp.view.welcome.WelcomeActivity
-import com.benoitletondor.easybudgetapp.view.welcome.getOnboardingStep
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
-import javax.inject.Inject
 
 /**
- * Main activity containing Calendar and List of expenses
+ * Main activity of the app
  *
  * @author Benoit LETONDOR
  */
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    @Inject
-    lateinit var parameters: Parameters
-
-// ------------------------------------------>
-
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
 
-        // Launch welcome screen if needed
-        if (parameters.getOnboardingStep() != WelcomeActivity.STEP_COMPLETED) {
-            val startIntent = Intent(this, WelcomeActivity::class.java)
-            ActivityCompat.startActivityForResult(this, startIntent, WELCOME_SCREEN_ACTIVITY_CODE, null)
-        }
-
         setContent {
             AppTheme {
-                AppNavHost()
+                AppNavHost(
+                    closeApp = {
+                        finish()
+                    }
+                )
             }
         }
-    }
-
-    @Deprecated("This method has been deprecated in favor of using the Activity Result API\n      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt\n      contracts for common intents available in\n      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for\n      testing, and allow receiving results in separate, testable classes independent from your\n      activity. Use\n      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)}\n      with the appropriate {@link ActivityResultContract} and handling the result in the\n      {@link ActivityResultCallback#onActivityResult(Object) callback}.")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        /*if (requestCode == WELCOME_SCREEN_ACTIVITY_CODE) {
-            if (resultCode == RESULT_OK) {
-                viewModel.onWelcomeScreenFinished()
-            } else if (resultCode == RESULT_CANCELED) {
-                finish() // Finish activity if welcome screen is finish via back button
-            }
-        } else {
-            for (fragment in supportFragmentManager.fragments) {
-                fragment.onActivityResult(requestCode, resultCode, data)
-            }
-        }*/
-    }
-
-    private fun collectViewModelEvents() {
-        /*
-
-        lifecycleScope.launchCollect(viewModel.openPremiumEventFlow) {
-            val startIntent = Intent(this, SettingsActivity::class.java)
-            startIntent.putExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, true)
-            ActivityCompat.startActivity(this, startIntent, null)
-        }*/
-
-
-        /*lifecycleScope.launchCollect(viewModel.eventFlow) { event ->
-            when(event) {
-                MainViewModel.Event.ShowAccountSelect -> AccountSelectorFragment().show(supportFragmentManager, "accountSelector")
-            }
-        }*/
     }
 
     private fun performIntentActionIfAny() {
@@ -227,7 +181,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        const val WELCOME_SCREEN_ACTIVITY_CODE = 103
         const val INTENT_SHOW_WELCOME_SCREEN = "intent.welcomscreen.show"
         const val INTENT_SHOW_ADD_EXPENSE = "intent.addexpense.show"
         const val INTENT_SHOW_ADD_RECURRING_EXPENSE = "intent.addrecurringexpense.show"

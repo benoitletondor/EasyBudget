@@ -47,6 +47,10 @@ import com.benoitletondor.easybudgetapp.parameters.setLatestSelectedOnlineAccoun
 import com.benoitletondor.easybudgetapp.parameters.watchFirstDayOfWeek
 import com.benoitletondor.easybudgetapp.parameters.watchLowMoneyWarningAmount
 import com.benoitletondor.easybudgetapp.parameters.watchShouldShowCheckedBalance
+import com.benoitletondor.easybudgetapp.view.onboarding.OnboardingResult
+import com.benoitletondor.easybudgetapp.view.welcome.WelcomeActivity
+import com.benoitletondor.easybudgetapp.view.welcome.getOnboardingStep
+import com.benoitletondor.easybudgetapp.view.welcome.setOnboardingStep
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.realm.kotlin.mongodb.exceptions.AuthException
@@ -345,6 +349,25 @@ class MainViewModel @Inject constructor(
 
     val appInitDate: LocalDate get() = parameters.getInitDate() ?: LocalDate.now()
 
+    init {
+        // Launch welcome screen if needed
+        if (parameters.getOnboardingStep() != WelcomeActivity.STEP_COMPLETED) {
+            viewModelScope.launch {
+                eventMutableFlow.emit(Event.StartOnboarding)
+            }
+        }
+    }
+
+    fun onOnboardingResult(onboardingResult: OnboardingResult) {
+        if (onboardingResult.onboardingCompleted) {
+            parameters.setOnboardingStep(WelcomeActivity.STEP_COMPLETED)
+        } else {
+            viewModelScope.launch {
+                eventMutableFlow.emit(Event.CloseApp)
+            }
+        }
+    }
+
     suspend fun getDataForMonth(month: YearMonth): DataForMonth = awaitDB().getDataForMonth(month)
 
     fun onRetryLoadingDBButtonPressed() {
@@ -367,13 +390,13 @@ class MainViewModel @Inject constructor(
 
     fun onEditRecurringExpenseOccurenceAndFollowingOnesPressed(expense: Expense) {
         viewModelScope.launch {
-            eventMutableFlow.emit(Event.OpenEditRecurringExpenseOccurenceAndFollowingOnes(expense))
+            eventMutableFlow.emit(Event.OpenEditRecurringExpenseOccurrenceAndFollowingOnes(expense))
         }
     }
 
     fun onEditRecurringExpenseOccurencePressed(expense: Expense) {
         viewModelScope.launch {
-            eventMutableFlow.emit(Event.OpenEditRecurringExpenseOccurence(expense))
+            eventMutableFlow.emit(Event.OpenEditRecurringExpenseOccurrence(expense))
         }
     }
 
@@ -781,8 +804,10 @@ class MainViewModel @Inject constructor(
         data class OpenManageAccount(val account: SelectedAccount.Selected.Online) : Event()
         data class ShowExpenseEditionOptions(val expense: Expense) : Event()
         data class OpenEditExpense(val expense: Expense) : Event()
-        data class OpenEditRecurringExpenseOccurenceAndFollowingOnes(val expense: Expense) : Event()
-        data class OpenEditRecurringExpenseOccurence(val expense: Expense) : Event()
+        data class OpenEditRecurringExpenseOccurrenceAndFollowingOnes(val expense: Expense) : Event()
+        data class OpenEditRecurringExpenseOccurrence(val expense: Expense) : Event()
+        data object StartOnboarding : Event()
+        data object CloseApp : Event()
     }
 
 
