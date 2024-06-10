@@ -178,6 +178,9 @@ fun MainView(
         onExpenseLongPressed = viewModel::onExpenseLongPressed,
         onDeleteRecurringExpenseClicked = viewModel::onDeleteRecurringExpenseClicked,
         onDeleteExpenseClicked = viewModel::onDeleteExpenseClicked,
+        onEditExpensePressed = viewModel::onEditExpensePressed,
+        onEditRecurringExpenseOccurenceAndFollowingOnesPressed = viewModel::onEditRecurringExpenseOccurenceAndFollowingOnesPressed,
+        onEditRecurringExpenseOccurencePressed = viewModel::onEditRecurringExpenseOccurencePressed,
     )
 }
 
@@ -230,6 +233,9 @@ private fun MainView(
     onExpenseLongPressed: (Expense) -> Unit,
     onDeleteRecurringExpenseClicked: (Expense, RecurringExpenseDeleteType) -> Unit,
     onDeleteExpenseClicked: (Expense) -> Unit,
+    onEditExpensePressed: (Expense) -> Unit,
+    onEditRecurringExpenseOccurenceAndFollowingOnesPressed: (Expense) -> Unit,
+    onEditRecurringExpenseOccurencePressed: (Expense) -> Unit,
 ) {
     var showAccountSelectorModal by remember { mutableStateOf(false) }
     val accountSelectorModalSheetState = rememberModalBottomSheetState()
@@ -489,27 +495,9 @@ private fun MainView(
                         builder.setItems(if (expense.isRevenue()) R.array.dialog_edit_recurring_income_choices else R.array.dialog_edit_recurring_expense_choices) { _, which ->
                             when (which) {
                                 // Edit this one
-                                0 -> {
-                                    // FIXME replace this
-                                    val startIntent = ExpenseEditActivity.newIntent(
-                                        context = activity,
-                                        editedExpense = expense,
-                                        date = expense.date,
-                                    )
-
-                                    activity.startActivity(startIntent)
-                                }
+                                0 -> onEditRecurringExpenseOccurencePressed(expense)
                                 // Edit this one and following ones
-                                1 -> {
-                                    // FIXME replace this
-                                    val startIntent = RecurringExpenseEditActivity.newIntent(
-                                        context = activity,
-                                        editedExpense = expense,
-                                        startDate = expense.date,
-                                    )
-
-                                    activity.startActivity(startIntent)
-                                }
+                                1 -> onEditRecurringExpenseOccurenceAndFollowingOnesPressed(expense)
                                 // Delete this one
                                 2 -> onDeleteRecurringExpenseClicked(expense, RecurringExpenseDeleteType.ONE)
                                 // Delete from
@@ -527,22 +515,44 @@ private fun MainView(
                         builder.setItems(if (expense.isRevenue()) R.array.dialog_edit_income_choices else R.array.dialog_edit_expense_choices) { _, which ->
                             when (which) {
                                 0 // Edit expense
-                                -> {
-                                    // FIXME replace this
-                                    val startIntent = ExpenseEditActivity.newIntent(
-                                        context = activity,
-                                        editedExpense = expense,
-                                        date = expense.date,
-                                    )
-
-                                    activity.startActivity(startIntent)
-                                }
+                                -> onEditExpensePressed(expense)
                                 1 // Delete
                                 -> onDeleteExpenseClicked(expense)
                             }
                         }
                         builder.show()
                     }
+                }
+
+                is MainViewModel.Event.OpenEditExpense -> {
+                    // FIXME replace this
+                    val startIntent = ExpenseEditActivity.newIntent(
+                        context = activity,
+                        editedExpense = event.expense,
+                        date = event.expense.date,
+                    )
+
+                    activity.startActivity(startIntent)
+                }
+                is MainViewModel.Event.OpenEditRecurringExpenseOccurence -> {
+                    // FIXME replace this
+                    val startIntent = ExpenseEditActivity.newIntent(
+                        context = activity,
+                        editedExpense = event.expense,
+                        date = event.expense.date,
+                    )
+
+                    activity.startActivity(startIntent)
+                }
+                is MainViewModel.Event.OpenEditRecurringExpenseOccurenceAndFollowingOnes -> {
+                    // FIXME replace this
+                    val startIntent = RecurringExpenseEditActivity.newIntent(
+                        context = activity,
+                        editedExpense = event.expense,
+                        startDate = event.expense.date,
+                    )
+
+                    activity.startActivity(startIntent)
                 }
             }
         }
@@ -1448,6 +1458,9 @@ private fun Preview(
             onExpenseLongPressed = {},
             onDeleteRecurringExpenseClicked = {_, _ ->},
             onDeleteExpenseClicked = {},
+            onEditExpensePressed = {},
+            onEditRecurringExpenseOccurenceAndFollowingOnesPressed = {},
+            onEditRecurringExpenseOccurencePressed = {},
         )
     }
 }

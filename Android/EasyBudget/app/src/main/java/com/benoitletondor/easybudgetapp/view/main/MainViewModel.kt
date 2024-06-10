@@ -362,6 +362,24 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun onEditExpensePressed(expense: Expense) {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.OpenEditExpense(expense))
+        }
+    }
+
+    fun onEditRecurringExpenseOccurenceAndFollowingOnesPressed(expense: Expense) {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.OpenEditRecurringExpenseOccurenceAndFollowingOnes(expense))
+        }
+    }
+
+    fun onEditRecurringExpenseOccurencePressed(expense: Expense) {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.OpenEditRecurringExpenseOccurence(expense))
+        }
+    }
+
     fun onDeleteExpenseClicked(expense: Expense) {
         viewModelScope.launch {
             try {
@@ -783,6 +801,9 @@ class MainViewModel @Inject constructor(
         data class OpenAddExpense(val date: LocalDate) : Event()
         data class OpenManageAccount(val account: SelectedAccount.Selected.Online) : Event()
         data class ShowExpenseEditionOptions(val expense: Expense) : Event()
+        data class OpenEditExpense(val expense: Expense) : Event()
+        data class OpenEditRecurringExpenseOccurenceAndFollowingOnes(val expense: Expense) : Event()
+        data class OpenEditRecurringExpenseOccurence(val expense: Expense) : Event()
     }
 
     @Immutable
