@@ -3,14 +3,17 @@ package com.benoitletondor.easybudgetapp.view.onboarding
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
+import com.benoitletondor.easybudgetapp.helper.setUserCurrency
+import com.benoitletondor.easybudgetapp.parameters.Parameters
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import java.util.Currency
 import javax.inject.Inject
 
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
-
+    private val parameters: Parameters,
 ) : ViewModel() {
     private val mutableEventFlow: MutableLiveFlow<Event> = MutableLiveFlow()
     val eventFlow: Flow<Event> = mutableEventFlow
@@ -32,6 +35,14 @@ class OnboardingViewModel @Inject constructor(
             } else {
                 mutableEventFlow.emit(Event.GoToNextPage)
             }
+        }
+    }
+
+    fun onCurrencySelected(currency: Currency) {
+        parameters.setUserCurrency(currency)
+
+        viewModelScope.launch {
+            mutableEventFlow.emit(Event.GoToNextPage)
         }
     }
 

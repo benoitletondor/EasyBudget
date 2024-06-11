@@ -31,7 +31,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,6 +52,7 @@ import com.benoitletondor.easybudgetapp.helper.launchCollect
 import kotlinx.coroutines.flow.Flow
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
+import java.util.Currency
 
 @Serializable
 object OnboardingDestination
@@ -66,6 +70,7 @@ fun OnboardingView(
         finishWithResult = finishWithResult,
         onBackPressed = viewModel::onBackPressed,
         onNextButtonPressed = viewModel::onNextButtonPressed,
+        onCurrencySelected = viewModel::onCurrencySelected,
     )
 }
 
@@ -75,6 +80,7 @@ private fun OnboardingView(
     finishWithResult: (OnboardingResult) -> Unit,
     onBackPressed: (page: Int) -> Unit,
     onNextButtonPressed: (isFinalPage: Boolean) -> Unit,
+    onCurrencySelected: (Currency) -> Unit,
 ) {
     val isAndroid33OrMore = Build.VERSION.SDK_INT >= 33
 
@@ -126,7 +132,10 @@ private fun OnboardingView(
                                 onNextButtonPressed(false)
                             },
                         )
-                        1 -> OnboardingPageCurrency(contentPadding = pageContentPadding)
+                        1 -> OnboardingPageCurrency(
+                            contentPadding = pageContentPadding,
+                            onNextPressed = onCurrencySelected,
+                        )
                         2 -> OnboardingPageAccountAmount(contentPadding = pageContentPadding)
                         3 -> if (isAndroid33OrMore) OnboardingPagePushNotifications(contentPadding =pageContentPadding) else OnboardingPageEnd(contentPadding = pageContentPadding)
                         4 -> OnboardingPageEnd(contentPadding = pageContentPadding)
@@ -234,14 +243,56 @@ private fun OnboardingPageWelcome(
 @Composable
 private fun OnboardingPageCurrency(
     contentPadding: PaddingValues,
+    onNextPressed: (Currency) -> Unit,
 ) {
+    var selectedCurrency by remember { mutableStateOf(Currency.getInstance("USD")) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(color = colorResource(R.color.secondary))
             .padding(contentPadding),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .padding(bottom = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(R.string.onboarding_screen_2_title),
+                color = Color.White,
+                fontSize = 30.sp,
+                textAlign = TextAlign.Center,
+                lineHeight = 46.sp,
+            )
 
+            Spacer(modifier = Modifier.height(30.dp))
+
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(R.string.onboarding_screen_2_message),
+                color = Color.White,
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
+            )
+
+            Spacer(modifier = Modifier.height(30.dp))
+        }
+
+        Button(
+            onClick = {
+                onNextPressed(selectedCurrency)
+            },
+        ) {
+            Text(
+                text = stringResource(R.string.onboarding_screen_2_cta, selectedCurrency.symbol),
+                fontSize = 20.sp,
+            )
+        }
     }
 }
 

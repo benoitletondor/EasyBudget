@@ -1,7 +1,9 @@
 package com.benoitletondor.easybudgetapp.compose
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -21,7 +23,11 @@ fun AppNavHost(
 ) {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = MainDestination) {
+    NavHost(
+        modifier = Modifier.fillMaxSize(),
+        navController = navController,
+        startDestination = MainDestination,
+    ) {
         composable<MainDestination> { navBackStackEntry ->
             val onboardingResultFlow = remember(navBackStackEntry) {
                 navBackStackEntry.savedStateHandle.getStateFlow<OnboardingResult?>(OnboardingResultKey, null)
