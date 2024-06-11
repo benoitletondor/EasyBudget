@@ -25,8 +25,19 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
+    fun onNextButtonPressed(isFinalPage: Boolean) {
+        viewModelScope.launch {
+            if (isFinalPage) {
+                mutableEventFlow.emit(Event.FinishWithResult(OnboardingResult(onboardingCompleted = true)))
+            } else {
+                mutableEventFlow.emit(Event.GoToNextPage)
+            }
+        }
+    }
+
     sealed class Event {
         data class FinishWithResult(val result: OnboardingResult) : Event()
         data object GoToPreviousPage : Event()
+        data object GoToNextPage : Event()
     }
 }

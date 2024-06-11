@@ -39,7 +39,11 @@ fun AppNavHost(
                 closeApp = closeApp,
             )
         }
-        composable<OnboardingDestination> {
+        composable<OnboardingDestination>(
+            popEnterTransition = null,
+            enterTransition = null,
+            popExitTransition = null,
+        ) {
             OnboardingView(
                 finishWithResult = { result ->
                     navController.previousBackStackEntry?.savedStateHandle?.set(OnboardingResultKey, result)
