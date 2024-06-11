@@ -36,7 +36,7 @@ fun FABMenuOverlay(
         modifier = Modifier
             .fillMaxSize()
             .background(color = colorResource(R.color.menu_background_overlay_color))
-            .padding(bottom = 90.dp, end = 16.dp)
+            .padding(bottom = 110.dp, end = 16.dp)
             .clickable(
                 onClick = onTapOutsideCTAs,
                 indication = null,

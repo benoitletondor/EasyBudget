@@ -349,14 +349,7 @@ class MainViewModel @Inject constructor(
 
     val appInitDate: LocalDate get() = parameters.getInitDate() ?: LocalDate.now()
 
-    init {
-        // Launch welcome screen if needed
-        if (parameters.getOnboardingStep() != WelcomeActivity.STEP_COMPLETED) {
-            viewModelScope.launch {
-                eventMutableFlow.emit(Event.StartOnboarding)
-            }
-        }
-    }
+    val shouldNavigateToOnboarding get() = parameters.getOnboardingStep() != WelcomeActivity.STEP_COMPLETED
 
     fun onOnboardingResult(onboardingResult: OnboardingResult) {
         if (onboardingResult.onboardingCompleted) {

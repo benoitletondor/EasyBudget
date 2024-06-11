@@ -11,6 +11,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -89,6 +91,8 @@ fun MainView(
     onboardingResultFlow: Flow<OnboardingResult>,
     closeApp: () -> Unit,
 ) {
+
+
     MainView(
         selectedAccountFlow = viewModel.accountSelectionFlow,
         dbStateFlow = viewModel.dbAvailableFlow,
@@ -114,6 +118,7 @@ fun MainView(
         dayDataFlow = viewModel.selectedDateDataFlow,
         showExpensesCheckBoxFlow = viewModel.showExpensesCheckBoxFlow,
         onboardingResultFlow = onboardingResultFlow,
+        shouldNavigateToOnboarding = viewModel.shouldNavigateToOnboarding,
         onSettingsButtonPressed = viewModel::onSettingsButtonPressed,
         onAdjustCurrentBalanceButtonPressed = viewModel::onAdjustCurrentBalanceClicked,
         onTickAllPastEntriesButtonPressed = viewModel::onCheckAllPastEntriesPressed,
@@ -173,6 +178,7 @@ private fun MainView(
     dayDataFlow: StateFlow<MainViewModel.SelectedDateExpensesData>,
     showExpensesCheckBoxFlow: StateFlow<Boolean>,
     onboardingResultFlow: Flow<OnboardingResult>,
+    shouldNavigateToOnboarding: Boolean,
     onSettingsButtonPressed: () -> Unit,
     onAdjustCurrentBalanceButtonPressed: () -> Unit,
     onTickAllPastEntriesButtonPressed: () -> Unit,
@@ -212,6 +218,12 @@ private fun MainView(
     var showFABMenu by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
+
+    LaunchedEffect(key1 = "startOnboarding") {
+        if (shouldNavigateToOnboarding) {
+            navigateToOnboarding()
+        }
+    }
 
     LaunchedEffect(key1 = "eventsListener") {
         launchCollect(eventFlow) { event ->
@@ -618,10 +630,9 @@ private fun MainView(
             }
         },
         content = { contentPadding ->
-            Box(
-                modifier = Modifier.padding(contentPadding),
-            ) {
+            Box {
                 MainViewContent(
+                    modifier = Modifier.padding(contentPadding),
                     selectedAccountFlow = selectedAccountFlow,
                     dbStateFlow = dbStateFlow,
                     hasPendingInvitationsFlow = hasPendingInvitationsFlow,
@@ -652,6 +663,7 @@ private fun MainView(
                             showAccountSelectorModal = false
                         },
                         sheetState = accountSelectorModalSheetState,
+                        windowInsets = WindowInsets(0, 0, 0, 0),
                     ) {
                         AccountSelectorView(
                             onAccountSelected = { account ->
@@ -817,6 +829,7 @@ private fun Preview(
             )),
             showExpensesCheckBoxFlow = MutableStateFlow(true),
             onboardingResultFlow = MutableSharedFlow(),
+            shouldNavigateToOnboarding = false,
             onSettingsButtonPressed = {},
             onAdjustCurrentBalanceButtonPressed = {},
             onTickAllPastEntriesButtonPressed = {},

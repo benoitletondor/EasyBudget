@@ -17,13 +17,19 @@
 package com.benoitletondor.easybudgetapp
 
 import android.content.Intent
+import android.content.res.Configuration
+import android.graphics.Color
 import android.os.Bundle
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.benoitletondor.easybudgetapp.compose.AppNavHost
 import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.compose.AppTheme
+import com.benoitletondor.easybudgetapp.parameters.Parameters
+import com.benoitletondor.easybudgetapp.parameters.getTheme
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
@@ -31,6 +37,7 @@ import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.SHOW_BACKUP_INTENT_KEY
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
+import javax.inject.Inject
 
 /**
  * Main activity of the app
@@ -39,10 +46,23 @@ import java.time.LocalDate
  */
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+    @Inject lateinit var parameters: Parameters
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.auto(
+                lightScrim = Color.TRANSPARENT,
+                darkScrim = Color.TRANSPARENT,
+                detectDarkMode = { resources ->
+                    // This is reversed to have the right bars colors
+                    parameters.getTheme() == AppTheme.LIGHT ||
+                            (parameters.getTheme() == AppTheme.PLATFORM_DEFAULT && (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_NO)
+                }),
+        )
 
         setContent {
             AppTheme {

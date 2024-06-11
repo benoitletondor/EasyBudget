@@ -20,6 +20,7 @@ import java.util.Currency
 
 @Composable
 fun MainViewContent(
+    modifier: Modifier = Modifier,
     selectedAccountFlow: StateFlow<MainViewModel.SelectedAccount>,
     dbStateFlow: StateFlow<MainViewModel.DBState>,
     hasPendingInvitationsFlow: StateFlow<Boolean>,
@@ -46,7 +47,7 @@ fun MainViewContent(
     val account by selectedAccountFlow.collectAsState()
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
     ) {
         when(val selectedAccount = account) {
             MainViewModel.SelectedAccount.Loading -> LoadingView()

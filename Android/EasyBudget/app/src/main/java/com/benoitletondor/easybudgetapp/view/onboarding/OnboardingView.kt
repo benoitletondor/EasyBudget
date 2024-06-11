@@ -1,6 +1,8 @@
 package com.benoitletondor.easybudgetapp.view.onboarding
 
 import android.os.Build
+import android.os.Parcelable
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,13 +26,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.benoitletondor.easybudgetapp.helper.launchCollect
 import kotlinx.coroutines.flow.Flow
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
 @Serializable
 object OnboardingDestination
 
-@Serializable
-data class OnboardingResult(val onboardingCompleted: Boolean)
+@Parcelize
+data class OnboardingResult(val onboardingCompleted: Boolean) : Parcelable
 
 @Composable
 fun OnboardingView(
@@ -40,6 +43,7 @@ fun OnboardingView(
     OnboardingView(
         eventFlow = viewModel.eventFlow,
         finishWithResult = finishWithResult,
+        onBackPressed = viewModel::onBackPressed,
     )
 }
 
@@ -47,13 +51,27 @@ fun OnboardingView(
 private fun OnboardingView(
     eventFlow: Flow<OnboardingViewModel.Event>,
     finishWithResult: (OnboardingResult) -> Unit,
+    onBackPressed: (page: Int) -> Unit,
 ) {
+    val isAndroid33OrMore = Build.VERSION.SDK_INT >= 33
+
+    val pagerState = rememberPagerState(
+        pageCount = { if (isAndroid33OrMore) 5 else 4 },
+    )
+
     LaunchedEffect(key1 = "eventsListener") {
         launchCollect(eventFlow) { event ->
             when(event) {
                 is OnboardingViewModel.Event.FinishWithResult -> finishWithResult(event.result)
+                OnboardingViewModel.Event.GoToPreviousPage -> {
+                    pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                }
             }
         }
+    }
+
+    BackHandler {
+        onBackPressed(pagerState.currentPage)
     }
 
     Scaffold(
@@ -63,12 +81,6 @@ private fun OnboardingView(
                     .fillMaxSize()
                     .padding(contentPadding),
             ) {
-                val isAndroid33OrMore = Build.VERSION.SDK_INT >= 33
-
-                val pagerState = rememberPagerState(
-                    pageCount = { if (isAndroid33OrMore) 5 else 4 },
-                )
-
                 HorizontalPager(
                     modifier = Modifier.weight(1f),
                     state = pagerState,
