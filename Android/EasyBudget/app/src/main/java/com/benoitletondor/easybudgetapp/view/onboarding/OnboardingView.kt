@@ -7,7 +7,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -19,11 +22,16 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.launchCollect
 import kotlinx.coroutines.flow.Flow
 import kotlinx.parcelize.Parcelize
@@ -76,39 +84,51 @@ private fun OnboardingView(
 
     Scaffold(
         content = { contentPadding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(contentPadding),
+            val layoutDirection = LocalLayoutDirection.current
+            val pageContentPadding = remember {
+                PaddingValues(
+                    start = contentPadding.calculateStartPadding(layoutDirection),
+                    top = contentPadding.calculateTopPadding(),
+                    end = contentPadding.calculateEndPadding(layoutDirection),
+                    bottom = contentPadding.calculateBottomPadding() + 32.dp,
+                )
+            }
+
+            Box(
+                modifier = Modifier.fillMaxSize(),
             ) {
                 HorizontalPager(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.fillMaxSize(),
                     state = pagerState,
                 ) {pageIndex ->
                     when(pageIndex) {
-                        0 -> OnboardingPageWelcome()
-                        1 -> OnboardingPageCurrency()
-                        2 -> OnboardingPageAccountAmount()
-                        3 -> if (isAndroid33OrMore) OnboardingPageEnd() else OnboardingPagePushNotifications()
-                        4 -> OnboardingPageEnd()
+                        0 -> OnboardingPageWelcome(contentPadding = pageContentPadding)
+                        1 -> OnboardingPageCurrency(contentPadding = pageContentPadding)
+                        2 -> OnboardingPageAccountAmount(contentPadding = pageContentPadding)
+                        3 -> if (isAndroid33OrMore) OnboardingPagePushNotifications(contentPadding =pageContentPadding) else OnboardingPageEnd(contentPadding = pageContentPadding)
+                        4 -> OnboardingPageEnd(contentPadding = pageContentPadding)
                     }
                 }
 
                 Row(
                     Modifier
+                        .padding(contentPadding)
                         .wrapContentHeight()
                         .fillMaxWidth()
-                        .padding(vertical = 16.dp),
+                        .align(Alignment.BottomCenter)
+                        .padding()
+                        .padding(bottom = 8.dp),
                     horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     repeat(pagerState.pageCount) { iteration ->
-                        val color = if (pagerState.currentPage == iteration) Color.DarkGray else Color.White
+                        val color = if (pagerState.currentPage == iteration) Color.White else Color.White.copy(alpha = .6f)
                         Box(
                             modifier = Modifier
-                                .padding(2.dp)
+                                .padding(horizontal = 4.dp)
                                 .clip(CircleShape)
                                 .background(color)
-                                .size(10.dp)
+                                .size(if (pagerState.currentPage == iteration) 8.dp else 5.dp)
                         )
                     }
                 }
@@ -118,27 +138,72 @@ private fun OnboardingView(
 }
 
 @Composable
-private fun OnboardingPageWelcome() {
-    // TODO
+private fun OnboardingPageWelcome(
+    contentPadding: PaddingValues,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = colorResource(R.color.easy_budget_green))
+            .padding(contentPadding),
+    ) {
+
+    }
 }
 
 @Composable
-private fun OnboardingPageCurrency() {
-    // TODO
+private fun OnboardingPageCurrency(
+    contentPadding: PaddingValues,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = colorResource(R.color.secondary))
+            .padding(contentPadding),
+    ) {
+
+    }
 }
 
 @Composable
-private fun OnboardingPageAccountAmount() {
-    // TODO
+private fun OnboardingPageAccountAmount(
+    contentPadding: PaddingValues,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = colorResource(R.color.secondary))
+            .padding(contentPadding),
+    ) {
+
+    }
 }
 
 @Composable
-private fun OnboardingPagePushNotifications() {
-    // TODO
+private fun OnboardingPagePushNotifications(
+    contentPadding: PaddingValues,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = colorResource(R.color.secondary))
+            .padding(contentPadding),
+    ) {
+
+    }
 }
 
 @Composable
-private fun OnboardingPageEnd() {
-    // TODO
+private fun OnboardingPageEnd(
+    contentPadding: PaddingValues,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = colorResource(R.color.easy_budget_green))
+            .padding(contentPadding),
+    ) {
+
+    }
 }
 
