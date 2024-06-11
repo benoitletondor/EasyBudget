@@ -94,7 +94,7 @@ class SelectCurrencyFragment : DialogFragment() {
         lifecycleScope.launchCollect(viewModel.stateFlow) { state ->
             when(state) {
                 is SelectCurrencyViewModel.State.Loaded -> {
-                    val adapter = SelectCurrencyRecyclerViewAdapter(state.mainCurrencies, state.otherCurrencies, parameters)
+                    val adapter = SelectCurrencyRecyclerViewAdapter(state.mainCurrencies.map { it.currency }, state.otherCurrencies.map { it.currency }, parameters)
                     recyclerView.adapter = adapter
 
                     if( adapter.selectedCurrencyPosition() > 1 ) {

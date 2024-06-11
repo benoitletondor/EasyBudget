@@ -17,12 +17,13 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun LoadingView(
+    modifier: Modifier = Modifier,
     loadingText: String? = null,
 ) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 20.dp),
     ) {

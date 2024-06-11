@@ -18,19 +18,23 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,15 +47,21 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.benoitletondor.easybudgetapp.R
+import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
 import com.benoitletondor.easybudgetapp.helper.launchCollect
+import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyView
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
+import java.lang.IllegalStateException
 import java.util.Currency
 
 @Serializable
@@ -67,20 +77,37 @@ fun OnboardingView(
 ) {
     OnboardingView(
         eventFlow = viewModel.eventFlow,
+        userCurrencyFlow = viewModel.userCurrencyFlow,
+        userMoneyAmountFlow = viewModel.userMoneyAmountFlow,
         finishWithResult = finishWithResult,
         onBackPressed = viewModel::onBackPressed,
         onNextButtonPressed = viewModel::onNextButtonPressed,
-        onCurrencySelected = viewModel::onCurrencySelected,
+        onAmountChange = viewModel::onAmountChange,
     )
+}
+
+private fun pageIndexToOnboardingPage(index: Int): OnboardingViewModel.OnboardingPage {
+    val isAndroid33OrMore = Build.VERSION.SDK_INT >= 33
+
+    return when(index) {
+        0 -> OnboardingViewModel.OnboardingPage.WELCOME
+        1 -> OnboardingViewModel.OnboardingPage.CURRENCY
+        2 -> OnboardingViewModel.OnboardingPage.INITIAL_AMOUNT
+        3 -> if (isAndroid33OrMore) OnboardingViewModel.OnboardingPage.PUSH_NOTIFICATIONS else OnboardingViewModel.OnboardingPage.END
+        4 -> OnboardingViewModel.OnboardingPage.END
+        else -> throw IllegalStateException("Unknown onboarding page index: $index")
+    }
 }
 
 @Composable
 private fun OnboardingView(
     eventFlow: Flow<OnboardingViewModel.Event>,
+    userCurrencyFlow: StateFlow<Currency>,
+    userMoneyAmountFlow: StateFlow<Double>,
     finishWithResult: (OnboardingResult) -> Unit,
-    onBackPressed: (page: Int) -> Unit,
-    onNextButtonPressed: (isFinalPage: Boolean) -> Unit,
-    onCurrencySelected: (Currency) -> Unit,
+    onBackPressed: (page: OnboardingViewModel.OnboardingPage) -> Unit,
+    onNextButtonPressed: (page: OnboardingViewModel.OnboardingPage) -> Unit,
+    onAmountChange: (String) -> Unit,
 ) {
     val isAndroid33OrMore = Build.VERSION.SDK_INT >= 33
 
@@ -103,7 +130,7 @@ private fun OnboardingView(
     }
 
     BackHandler {
-        onBackPressed(pagerState.currentPage)
+        onBackPressed(pageIndexToOnboardingPage(pagerState.currentPage))
     }
 
     Scaffold(
@@ -125,20 +152,29 @@ private fun OnboardingView(
                     modifier = Modifier.fillMaxSize(),
                     state = pagerState,
                 ) {pageIndex ->
-                    when(pageIndex) {
-                        0 -> OnboardingPageWelcome(
+                    when(val page = pageIndexToOnboardingPage(pageIndex)) {
+                        OnboardingViewModel.OnboardingPage.WELCOME -> OnboardingPageWelcome(
                             contentPadding = pageContentPadding,
-                            onNextPressed = {
-                                onNextButtonPressed(false)
-                            },
+                            onNextPressed = { onNextButtonPressed(page) },
                         )
-                        1 -> OnboardingPageCurrency(
+                        OnboardingViewModel.OnboardingPage.CURRENCY ->  OnboardingPageCurrency(
                             contentPadding = pageContentPadding,
-                            onNextPressed = onCurrencySelected,
+                            userCurrencyFlow = userCurrencyFlow,
+                            onNextPressed = { onNextButtonPressed(page) },
                         )
-                        2 -> OnboardingPageAccountAmount(contentPadding = pageContentPadding)
-                        3 -> if (isAndroid33OrMore) OnboardingPagePushNotifications(contentPadding =pageContentPadding) else OnboardingPageEnd(contentPadding = pageContentPadding)
-                        4 -> OnboardingPageEnd(contentPadding = pageContentPadding)
+                        OnboardingViewModel.OnboardingPage.INITIAL_AMOUNT -> OnboardingPageAccountAmount(
+                            contentPadding = pageContentPadding,
+                            userCurrencyFlow = userCurrencyFlow,
+                            userMoneyAmountFlow = userMoneyAmountFlow,
+                            onNextPressed = { onNextButtonPressed(page) },
+                            onAmountChange = onAmountChange,
+                        )
+                        OnboardingViewModel.OnboardingPage.PUSH_NOTIFICATIONS -> OnboardingPagePushNotifications(
+                            contentPadding = pageContentPadding,
+                        )
+                        OnboardingViewModel.OnboardingPage.END -> OnboardingPageEnd(
+                            contentPadding = pageContentPadding,
+                        )
                     }
                 }
 
@@ -210,7 +246,7 @@ private fun OnboardingPageWelcome(
                 modifier = Modifier.fillMaxWidth(),
                 text = stringResource(R.string.onboarding_screen_1_message),
                 color = Color.White,
-                fontSize = 15.sp,
+                fontSize = 16.sp,
                 textAlign = TextAlign.Center,
             )
 
@@ -243,9 +279,10 @@ private fun OnboardingPageWelcome(
 @Composable
 private fun OnboardingPageCurrency(
     contentPadding: PaddingValues,
-    onNextPressed: (Currency) -> Unit,
+    userCurrencyFlow: StateFlow<Currency>,
+    onNextPressed: () -> Unit,
 ) {
-    var selectedCurrency by remember { mutableStateOf(Currency.getInstance("USD")) }
+    val selectedCurrency by userCurrencyFlow.collectAsState()
 
     Column(
         modifier = Modifier
@@ -267,7 +304,7 @@ private fun OnboardingPageCurrency(
                 color = Color.White,
                 fontSize = 30.sp,
                 textAlign = TextAlign.Center,
-                lineHeight = 46.sp,
+                lineHeight = 36.sp,
             )
 
             Spacer(modifier = Modifier.height(30.dp))
@@ -280,13 +317,17 @@ private fun OnboardingPageCurrency(
                 textAlign = TextAlign.Center,
             )
 
-            Spacer(modifier = Modifier.height(30.dp))
+            SelectCurrencyView(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(weight = 1f, fill = false)
+                    .padding(horizontal = 20.dp, vertical = 30.dp)
+                    .background(color = Color.White),
+            )
         }
 
         Button(
-            onClick = {
-                onNextPressed(selectedCurrency)
-            },
+            onClick = onNextPressed,
         ) {
             Text(
                 text = stringResource(R.string.onboarding_screen_2_cta, selectedCurrency.symbol),
@@ -299,14 +340,103 @@ private fun OnboardingPageCurrency(
 @Composable
 private fun OnboardingPageAccountAmount(
     contentPadding: PaddingValues,
+    userCurrencyFlow: StateFlow<Currency>,
+    userMoneyAmountFlow: StateFlow<Double>,
+    onNextPressed: () -> Unit,
+    onAmountChange: (String) -> Unit,
 ) {
+    val currency by userCurrencyFlow.collectAsState()
+    var stringValue by remember { mutableStateOf("") }
+    val currentAmount by userMoneyAmountFlow.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(color = colorResource(R.color.secondary))
             .padding(contentPadding),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+                .padding(bottom = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(R.string.onboarding_screen_3_title),
+                color = Color.White,
+                fontSize = 30.sp,
+                textAlign = TextAlign.Center,
+                lineHeight = 36.sp,
+            )
 
+            Spacer(modifier = Modifier.height(30.dp))
+
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(R.string.onboarding_screen_3_message),
+                color = Color.White,
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(0.7f),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+            ){
+                TextField(
+                    modifier = Modifier.weight(1f),
+                    value = stringValue,
+                    onValueChange = { newString ->
+                        if (newString.all { "-0123456789.,".contains(it) }) {
+                            stringValue = if (newString.count() > 1 && newString.endsWith("-")) {
+                                if (newString.startsWith("-")) {
+                                    newString.substring(1, newString.length - 1)
+                                } else {
+                                    "-${newString.substring(0, newString.length - 1)}"
+                                }
+                            } else {
+                                newString
+                            }
+
+                            onAmountChange(stringValue)
+                        }
+                    },
+                    textStyle = TextStyle(
+                        fontSize = 20.sp,
+                    ),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        autoCorrectEnabled = false,
+                    ),
+                )
+
+                Spacer(modifier = Modifier.width(5.dp))
+
+                Text(
+                    text = currency.symbol,
+                    color = Color.White,
+                    fontSize = 30.sp,
+                )
+            }
+
+        }
+
+        Button(
+            onClick = onNextPressed,
+        ) {
+            Text(
+                text = stringResource(R.string.onboarding_screen_3_cta, CurrencyHelper.getFormattedCurrencyString(currency, currentAmount)),
+                fontSize = 20.sp,
+            )
+        }
     }
 }
 
@@ -328,13 +458,6 @@ private fun OnboardingPagePushNotifications(
 private fun OnboardingPageEnd(
     contentPadding: PaddingValues,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = colorResource(R.color.easy_budget_green))
-            .padding(contentPadding),
-    ) {
 
-    }
 }
 
