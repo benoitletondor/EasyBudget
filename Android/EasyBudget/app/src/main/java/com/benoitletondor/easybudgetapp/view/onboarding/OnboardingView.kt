@@ -16,11 +16,13 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -39,11 +41,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -146,7 +152,9 @@ private fun OnboardingView(
             }
 
             Box(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .imePadding()
             ) {
                 HorizontalPager(
                     modifier = Modifier.fillMaxSize(),
@@ -164,6 +172,7 @@ private fun OnboardingView(
                         )
                         OnboardingViewModel.OnboardingPage.INITIAL_AMOUNT -> OnboardingPageAccountAmount(
                             contentPadding = pageContentPadding,
+                            pagerState = pagerState,
                             userCurrencyFlow = userCurrencyFlow,
                             userMoneyAmountFlow = userMoneyAmountFlow,
                             onNextPressed = { onNextButtonPressed(page) },
@@ -340,6 +349,7 @@ private fun OnboardingPageCurrency(
 @Composable
 private fun OnboardingPageAccountAmount(
     contentPadding: PaddingValues,
+    pagerState: PagerState,
     userCurrencyFlow: StateFlow<Currency>,
     userMoneyAmountFlow: StateFlow<Double>,
     onNextPressed: () -> Unit,
@@ -348,6 +358,21 @@ private fun OnboardingPageAccountAmount(
     val currency by userCurrencyFlow.collectAsState()
     var stringValue by remember { mutableStateOf("") }
     val currentAmount by userMoneyAmountFlow.collectAsState()
+
+    val focusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.currentPage }.collect { page ->
+            if (pageIndexToOnboardingPage(page) == OnboardingViewModel.OnboardingPage.INITIAL_AMOUNT) {
+                focusRequester.requestFocus()
+                keyboardController?.show()
+            } else {
+                focusRequester.freeFocus()
+                keyboardController?.hide()
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -391,7 +416,9 @@ private fun OnboardingPageAccountAmount(
                 verticalAlignment = Alignment.CenterVertically,
             ){
                 TextField(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .focusRequester(focusRequester),
                     value = stringValue,
                     onValueChange = { newString ->
                         if (newString.all { "-0123456789.,".contains(it) }) {
