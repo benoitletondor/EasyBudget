@@ -53,8 +53,10 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -65,6 +67,7 @@ import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyView
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import java.lang.IllegalStateException
@@ -356,8 +359,23 @@ private fun OnboardingPageAccountAmount(
     onAmountChange: (String) -> Unit,
 ) {
     val currency by userCurrencyFlow.collectAsState()
-    var stringValue by remember { mutableStateOf("") }
     val currentAmount by userMoneyAmountFlow.collectAsState()
+
+    var currentTextFieldValue by remember { mutableStateOf(TextFieldValue(
+        text = "",
+        selection = TextRange(index = 0),
+    )) }
+
+    LaunchedEffect("initAmount") {
+        val amountFromDB = userMoneyAmountFlow.value
+        val formattedAmount = formatAmountValue(amountFromDB)
+        if (amountFromDB != 0.0 && formattedAmount != currentTextFieldValue.text) {
+            currentTextFieldValue = TextFieldValue(
+                text = formattedAmount,
+                selection = TextRange(index = formattedAmount.length),
+            )
+        }
+    }
 
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -419,20 +437,24 @@ private fun OnboardingPageAccountAmount(
                     modifier = Modifier
                         .weight(1f)
                         .focusRequester(focusRequester),
-                    value = stringValue,
-                    onValueChange = { newString ->
-                        if (newString.all { "-0123456789.,".contains(it) }) {
-                            stringValue = if (newString.count() > 1 && newString.endsWith("-")) {
-                                if (newString.startsWith("-")) {
-                                    newString.substring(1, newString.length - 1)
+                    value = currentTextFieldValue,
+                    onValueChange = { newValue ->
+                        if (newValue.text.all { "-0123456789.,".contains(it) }) {
+                            val newText = if (newValue.text.count() > 1 && newValue.text.endsWith("-")) {
+                                if (newValue.text.startsWith("-")) {
+                                    newValue.text.substring(1, newValue.text.length - 1)
                                 } else {
-                                    "-${newString.substring(0, newString.length - 1)}"
+                                    "-${newValue.text.substring(0, newValue.text.length - 1)}"
                                 }
                             } else {
-                                newString
+                                newValue.text
                             }
 
-                            onAmountChange(stringValue)
+                            currentTextFieldValue = TextFieldValue(
+                                text = newText,
+                                selection = newValue.selection,
+                            )
+                            onAmountChange(newText)
                         }
                     },
                     textStyle = TextStyle(
@@ -445,7 +467,7 @@ private fun OnboardingPageAccountAmount(
                     ),
                 )
 
-                Spacer(modifier = Modifier.width(5.dp))
+                Spacer(modifier = Modifier.width(8.dp))
 
                 Text(
                     text = currency.symbol,
@@ -466,6 +488,8 @@ private fun OnboardingPageAccountAmount(
         }
     }
 }
+
+private fun formatAmountValue(amount: Double): String = if (amount == 0.0) "0" else amount.toString()
 
 @Composable
 private fun OnboardingPagePushNotifications(

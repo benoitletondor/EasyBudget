@@ -30,7 +30,7 @@ class OnboardingViewModel @Inject constructor(
     private val mutableEventFlow: MutableLiveFlow<Event> = MutableLiveFlow()
     val eventFlow: Flow<Event> = mutableEventFlow
 
-    val userMoneyAmountMutableFlow = MutableStateFlow(0.0)
+    private val userMoneyAmountMutableFlow = MutableStateFlow(0.0)
     val userMoneyAmountFlow: StateFlow<Double> = userMoneyAmountMutableFlow
 
     init {
@@ -101,7 +101,7 @@ class OnboardingViewModel @Inject constructor(
 
 private fun parseAmountValue(valueString: String): Double {
     return try {
-        if ( "" == valueString || "-" == valueString) 0.0 else java.lang.Double.valueOf(valueString)
+        if ( "" == valueString || "-" == valueString) 0.0 else java.lang.Double.valueOf(valueString.replace(",", "."))
     } catch (e: Exception) {
         Logger.warning("An error occurred during initial amount parsing: $valueString", e)
         return 0.0
