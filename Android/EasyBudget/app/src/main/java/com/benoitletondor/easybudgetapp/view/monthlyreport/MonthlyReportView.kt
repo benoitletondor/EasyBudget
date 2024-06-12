@@ -18,11 +18,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
 
 @Serializable
-object MonthlyReportDestination
+data class MonthlyReportDestination(val fromNotification: Boolean)
 
 @Composable
 fun MonthlyReportView(
-    viewModel: MonthlyReportViewModel = hiltViewModel(),
+    viewModel: MonthlyReportViewModel,
     navigateUp: () -> Unit,
 ) {
     MonthlyReportView(

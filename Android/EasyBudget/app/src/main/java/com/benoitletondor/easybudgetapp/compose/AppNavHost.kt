@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -12,6 +13,8 @@ import com.benoitletondor.easybudgetapp.view.main.MainDestination
 import com.benoitletondor.easybudgetapp.view.main.MainView
 import com.benoitletondor.easybudgetapp.view.monthlyreport.MonthlyReportDestination
 import com.benoitletondor.easybudgetapp.view.monthlyreport.MonthlyReportView
+import com.benoitletondor.easybudgetapp.view.monthlyreport.MonthlyReportViewModel
+import com.benoitletondor.easybudgetapp.view.monthlyreport.MonthlyReportViewModelFactory
 import com.benoitletondor.easybudgetapp.view.onboarding.OnboardingDestination
 import com.benoitletondor.easybudgetapp.view.onboarding.OnboardingResult
 import com.benoitletondor.easybudgetapp.view.onboarding.OnboardingView
@@ -52,7 +55,7 @@ fun AppNavHost(
                     navController.navigate(PremiumDestination(startOnPro = startOnPro))
                 },
                 navigateToMonthlyReport = {
-                    navController.navigate(MonthlyReportDestination)
+                    navController.navigate(MonthlyReportDestination(fromNotification = false))
                 },
             )
         }
@@ -77,8 +80,16 @@ fun AppNavHost(
                 }
             )
         }
-        composable<MonthlyReportDestination> {
+        composable<MonthlyReportDestination> { backStackEntry ->
+            val destination: MonthlyReportDestination = backStackEntry.toRoute()
             MonthlyReportView(
+                viewModel = hiltViewModel(
+                    creationCallback = { factory: MonthlyReportViewModelFactory ->
+                        factory.create(
+                            fromNotification = destination.fromNotification,
+                        )
+                    }
+                ),
                 navigateUp = {
                     navController.navigateUp()
                 }
