@@ -120,13 +120,6 @@
             android:screenOrientation="portrait"
             tools:ignore="DiscouragedApi,LockedOrientationActivity"/>
         <activity
-            android:name=".view.welcome.WelcomeActivity"
-            android:configChanges="locale|keyboardHidden|orientation|screenSize"
-            android:label="@string/title_activity_welcome"
-            android:screenOrientation="portrait"
-            tools:ignore="DiscouragedApi,LockedOrientationActivity"
-            android:exported="false"/>
-        <activity
             android:name=".view.premium.PremiumActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_premium"

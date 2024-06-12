@@ -40,17 +40,17 @@ import com.benoitletondor.easybudgetapp.model.DataForMonth
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType
+import com.benoitletondor.easybudgetapp.parameters.ONBOARDING_STEP_COMPLETED
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.getInitDate
 import com.benoitletondor.easybudgetapp.parameters.getLatestSelectedOnlineAccountId
+import com.benoitletondor.easybudgetapp.parameters.getOnboardingStep
 import com.benoitletondor.easybudgetapp.parameters.setLatestSelectedOnlineAccountId
+import com.benoitletondor.easybudgetapp.parameters.setOnboardingStep
 import com.benoitletondor.easybudgetapp.parameters.watchFirstDayOfWeek
 import com.benoitletondor.easybudgetapp.parameters.watchLowMoneyWarningAmount
 import com.benoitletondor.easybudgetapp.parameters.watchShouldShowCheckedBalance
 import com.benoitletondor.easybudgetapp.view.onboarding.OnboardingResult
-import com.benoitletondor.easybudgetapp.view.welcome.WelcomeActivity
-import com.benoitletondor.easybudgetapp.view.welcome.getOnboardingStep
-import com.benoitletondor.easybudgetapp.view.welcome.setOnboardingStep
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.realm.kotlin.mongodb.exceptions.AuthException
@@ -349,11 +349,11 @@ class MainViewModel @Inject constructor(
 
     val appInitDate: LocalDate get() = parameters.getInitDate() ?: LocalDate.now()
 
-    val shouldNavigateToOnboarding get() = parameters.getOnboardingStep() != WelcomeActivity.STEP_COMPLETED
+    val shouldNavigateToOnboarding get() = parameters.getOnboardingStep() != ONBOARDING_STEP_COMPLETED
 
     fun onOnboardingResult(onboardingResult: OnboardingResult) {
         if (onboardingResult.onboardingCompleted) {
-            parameters.setOnboardingStep(WelcomeActivity.STEP_COMPLETED)
+            parameters.setOnboardingStep(ONBOARDING_STEP_COMPLETED)
         } else {
             viewModelScope.launch {
                 eventMutableFlow.emit(Event.CloseApp)

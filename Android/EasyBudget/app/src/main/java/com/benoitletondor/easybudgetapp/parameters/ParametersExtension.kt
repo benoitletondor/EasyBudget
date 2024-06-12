@@ -461,3 +461,17 @@ fun Parameters.setLatestSelectedOnlineAccountId(accountId: String?) {
         remove(SELECTED_ACCOUNT_ID_KEY)
     }
 }
+
+/**
+ * The current onboarding step (int)
+ */
+private const val ONBOARDING_STEP_PARAMETERS_KEY = "onboarding_step"
+const val ONBOARDING_STEP_COMPLETED = Integer.MAX_VALUE
+
+fun Parameters.getOnboardingStep(): Int {
+    return getInt(ONBOARDING_STEP_PARAMETERS_KEY, 0)
+}
+
+fun Parameters.setOnboardingStep(step: Int) {
+    putInt(ONBOARDING_STEP_PARAMETERS_KEY, step)
+}
