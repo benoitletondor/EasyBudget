@@ -90,6 +90,7 @@ fun MainView(
     onboardingResultFlow: Flow<OnboardingResult>,
     closeApp: () -> Unit,
     navigateToPremium: (startOnPro: Boolean) -> Unit,
+    navigateToMonthlyReport: () -> Unit,
 ) {
     MainView(
         selectedAccountFlow = viewModel.accountSelectionFlow,
@@ -149,6 +150,7 @@ fun MainView(
         onOnboardingResult = viewModel::onOnboardingResult,
         closeApp = closeApp,
         navigateToPremium = navigateToPremium,
+        navigateToMonthlyReport = navigateToMonthlyReport,
     )
 }
 
@@ -210,6 +212,7 @@ private fun MainView(
     onOnboardingResult: (OnboardingResult) -> Unit,
     closeApp: () -> Unit,
     navigateToPremium: (startOnPro: Boolean) -> Unit,
+    navigateToMonthlyReport: () -> Unit,
 ) {
     var showAccountSelectorModal by remember { mutableStateOf(false) }
     val accountSelectorModalSheetState = rememberModalBottomSheetState()
@@ -334,11 +337,7 @@ private fun MainView(
                     // FIXME replace this
                     context.startActivity(ManageAccountActivity.newIntent(context, event.account))
                 }
-                MainViewModel.Event.OpenMonthlyReport -> {
-                    // FIXME replace this
-                    val startIntent = Intent(context, MonthlyReportBaseActivity::class.java)
-                    context.startActivity(startIntent)
-                }
+                MainViewModel.Event.OpenMonthlyReport -> navigateToMonthlyReport()
                 MainViewModel.Event.OpenPremium -> navigateToPremium(false)
                 is MainViewModel.Event.RecurringExpenseDeletionResult -> {
                     when(event.data) {
@@ -854,6 +853,7 @@ private fun Preview(
             onOnboardingResult = {},
             closeApp = {},
             navigateToPremium = {},
+            navigateToMonthlyReport = {},
         )
     }
 }

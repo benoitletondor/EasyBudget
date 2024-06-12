@@ -10,6 +10,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.benoitletondor.easybudgetapp.view.main.MainDestination
 import com.benoitletondor.easybudgetapp.view.main.MainView
+import com.benoitletondor.easybudgetapp.view.monthlyreport.MonthlyReportDestination
+import com.benoitletondor.easybudgetapp.view.monthlyreport.MonthlyReportView
 import com.benoitletondor.easybudgetapp.view.onboarding.OnboardingDestination
 import com.benoitletondor.easybudgetapp.view.onboarding.OnboardingResult
 import com.benoitletondor.easybudgetapp.view.onboarding.OnboardingView
@@ -49,6 +51,9 @@ fun AppNavHost(
                 navigateToPremium = { startOnPro ->
                     navController.navigate(PremiumDestination(startOnPro = startOnPro))
                 },
+                navigateToMonthlyReport = {
+                    navController.navigate(MonthlyReportDestination)
+                },
             )
         }
         composable<OnboardingDestination>(
@@ -59,7 +64,7 @@ fun AppNavHost(
             OnboardingView(
                 finishWithResult = { result ->
                     navController.previousBackStackEntry?.savedStateHandle?.set(OnboardingResultKey, result)
-                    navController.navigateUp()
+                    navController.popBackStack()
                 }
             )
         }
@@ -68,6 +73,13 @@ fun AppNavHost(
             PremiumView(
                 startOnPro = destination.startOnPro,
                 close = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable<MonthlyReportDestination> {
+            MonthlyReportView(
+                navigateUp = {
                     navController.navigateUp()
                 }
             )
