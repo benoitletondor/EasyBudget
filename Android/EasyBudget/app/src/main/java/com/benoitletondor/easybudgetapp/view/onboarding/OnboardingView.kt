@@ -227,6 +227,7 @@ private fun OnboardingView(
                         )
                         OnboardingViewModel.OnboardingPage.END -> OnboardingPageEnd(
                             contentPadding = pageContentPadding,
+                            onNextPressed = { onNextButtonPressed(page) },
                         )
                     }
                 }
@@ -619,7 +620,91 @@ private fun OnboardingPagePushNotifications(
 @Composable
 private fun OnboardingPageEnd(
     contentPadding: PaddingValues,
+    onNextPressed: () -> Unit,
 ) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = colorResource(R.color.easy_budget_green))
+            .padding(contentPadding),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+                .padding(bottom = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Image(
+                painter = painterResource(R.drawable.ic_done_white_48dp),
+                contentDescription = null,
+            )
 
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(R.string.onboarding_screen_4_title),
+                color = Color.White,
+                fontSize = 30.sp,
+                textAlign = TextAlign.Center,
+                lineHeight = 36.sp,
+            )
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(R.string.onboarding_screen_4_message),
+                color = Color.White,
+                fontSize = 18.sp,
+                textAlign = TextAlign.Center,
+            )
+
+            Spacer(modifier = Modifier.height(50.dp))
+
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(R.string.onboarding_screen_4_message2),
+                color = Color.White,
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(R.string.onboarding_screen_4_message3),
+                color = Color.White,
+                fontSize = 18.sp,
+            )
+
+            Spacer(modifier = Modifier.height(50.dp))
+
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(R.string.onboarding_screen_4_message4),
+                color = Color.White,
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
+            )
+        }
+
+        Button(
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+            ),
+            onClick = onNextPressed,
+        ) {
+            Text(
+                text = stringResource(R.string.onboarding_screen_4_cta),
+                fontSize = 20.sp,
+            )
+        }
+    }
 }
 
