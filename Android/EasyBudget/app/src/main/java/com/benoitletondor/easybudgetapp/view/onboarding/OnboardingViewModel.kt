@@ -71,7 +71,9 @@ class OnboardingViewModel @Inject constructor(
                             db.persistExpense(expense)
                         }
 
-                        mutableEventFlow.emit(Event.GoToNextPage)
+                        withContext(Dispatchers.Main) {
+                            mutableEventFlow.emit(Event.GoToNextPage)
+                        }
                     }
                 }
                 OnboardingPage.END -> mutableEventFlow.emit(Event.FinishWithResult(OnboardingResult(onboardingCompleted = true)))

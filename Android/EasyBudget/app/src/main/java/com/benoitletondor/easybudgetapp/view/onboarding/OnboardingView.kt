@@ -37,6 +37,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -380,15 +381,19 @@ private fun OnboardingPageAccountAmount(
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    LaunchedEffect(pagerState) {
-        snapshotFlow { pagerState.currentPage }.collect { page ->
-            if (pageIndexToOnboardingPage(page) == OnboardingViewModel.OnboardingPage.INITIAL_AMOUNT) {
-                focusRequester.requestFocus()
-                keyboardController?.show()
-            } else {
-                focusRequester.freeFocus()
-                keyboardController?.hide()
-            }
+    val shouldRequestFocus by remember {
+        derivedStateOf {
+            pagerState.currentPageOffsetFraction == 0f && pageIndexToOnboardingPage(pagerState.currentPage) == OnboardingViewModel.OnboardingPage.INITIAL_AMOUNT
+        }
+    }
+
+    LaunchedEffect(shouldRequestFocus) {
+        if (shouldRequestFocus) {
+            focusRequester.requestFocus()
+            keyboardController?.show()
+        } else {
+            focusRequester.freeFocus()
+            keyboardController?.hide()
         }
     }
 
