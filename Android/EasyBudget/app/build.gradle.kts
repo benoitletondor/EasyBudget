@@ -152,6 +152,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.1")
     implementation("androidx.navigation:navigation-compose:2.8.0-beta02")
     implementation("com.google.accompanist:accompanist-themeadapter-material3:0.34.0")
+    implementation("com.google.accompanist:accompanist-permissions:0.34.0")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
     implementation("com.android.billingclient:billing-ktx:7.0.0")

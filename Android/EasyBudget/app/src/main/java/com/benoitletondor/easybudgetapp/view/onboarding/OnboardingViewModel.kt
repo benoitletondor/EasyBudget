@@ -86,10 +86,31 @@ class OnboardingViewModel @Inject constructor(
         userMoneyAmountMutableFlow.value = amountParsed
     }
 
+    fun onAcceptNotificationsPressed() {
+        viewModelScope.launch {
+            mutableEventFlow.emit(Event.RequestPushPermission)
+        }
+    }
+
+    fun onDenyNotificationsPressed() {
+        viewModelScope.launch {
+            mutableEventFlow.emit(Event.GoToNextPage)
+        }
+    }
+
+    fun onPushNotificationsResponse(onboardingPage: OnboardingPage) {
+        if (onboardingPage == OnboardingPage.PUSH_NOTIFICATIONS) {
+            viewModelScope.launch {
+                mutableEventFlow.emit(Event.GoToNextPage)
+            }
+        }
+    }
+
     sealed class Event {
         data class FinishWithResult(val result: OnboardingResult) : Event()
         data object GoToPreviousPage : Event()
         data object GoToNextPage : Event()
+        data object RequestPushPermission : Event()
     }
 
     enum class OnboardingPage {

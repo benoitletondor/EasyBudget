@@ -1,5 +1,6 @@
 package com.benoitletondor.easybudgetapp.view.onboarding
 
+import android.Manifest
 import android.os.Build
 import android.os.Parcelable
 import androidx.activity.compose.BackHandler
@@ -66,6 +67,11 @@ import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
 import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyView
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionState
+import com.google.accompanist.permissions.PermissionStatus
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -93,6 +99,9 @@ fun OnboardingView(
         onBackPressed = viewModel::onBackPressed,
         onNextButtonPressed = viewModel::onNextButtonPressed,
         onAmountChange = viewModel::onAmountChange,
+        onAcceptNotificationsPressed = viewModel::onAcceptNotificationsPressed,
+        onDenyNotificationsPressed = viewModel::onDenyNotificationsPressed,
+        onPushNotificationsResponse = viewModel::onPushNotificationsResponse,
     )
 }
 
@@ -109,6 +118,7 @@ private fun pageIndexToOnboardingPage(index: Int): OnboardingViewModel.Onboardin
     }
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 private fun OnboardingView(
     eventFlow: Flow<OnboardingViewModel.Event>,
@@ -118,12 +128,29 @@ private fun OnboardingView(
     onBackPressed: (page: OnboardingViewModel.OnboardingPage) -> Unit,
     onNextButtonPressed: (page: OnboardingViewModel.OnboardingPage) -> Unit,
     onAmountChange: (String) -> Unit,
+    onAcceptNotificationsPressed: () -> Unit,
+    onDenyNotificationsPressed: () -> Unit,
+    onPushNotificationsResponse: (OnboardingViewModel.OnboardingPage) -> Unit,
 ) {
     val isAndroid33OrMore = Build.VERSION.SDK_INT >= 33
 
     val pagerState = rememberPagerState(
         pageCount = { if (isAndroid33OrMore) 5 else 4 },
     )
+
+    val pushPermissionState = if (isAndroid33OrMore) {
+        rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS)
+    } else {
+        remember {
+            object : PermissionState {
+                override val permission: String = "android.permission.POST_NOTIFICATIONS"
+                override val status: PermissionStatus = PermissionStatus.Granted
+                override fun launchPermissionRequest() {
+                    /* No-op */
+                }
+            }
+        }
+    }
 
     LaunchedEffect(key1 = "eventsListener") {
         launchCollect(eventFlow) { event ->
@@ -135,8 +162,19 @@ private fun OnboardingView(
                 OnboardingViewModel.Event.GoToNextPage -> {
                     pagerState.animateScrollToPage(page = pagerState.currentPage + 1)
                 }
+                OnboardingViewModel.Event.RequestPushPermission -> {
+                    if (pushPermissionState.status.isGranted) {
+                        onPushNotificationsResponse(pageIndexToOnboardingPage(pagerState.currentPage))
+                    } else {
+                        pushPermissionState.launchPermissionRequest()
+                    }
+                }
             }
         }
+    }
+
+    LaunchedEffect(pushPermissionState) {
+        onPushNotificationsResponse(pageIndexToOnboardingPage(pagerState.currentPage))
     }
 
     BackHandler {
@@ -184,6 +222,8 @@ private fun OnboardingView(
                         )
                         OnboardingViewModel.OnboardingPage.PUSH_NOTIFICATIONS -> OnboardingPagePushNotifications(
                             contentPadding = pageContentPadding,
+                            onAcceptNotificationsPressed = onAcceptNotificationsPressed,
+                            onDenyNotificationsPressed = onDenyNotificationsPressed,
                         )
                         OnboardingViewModel.OnboardingPage.END -> OnboardingPageEnd(
                             contentPadding = pageContentPadding,
@@ -499,14 +539,80 @@ private fun formatAmountValue(amount: Double): String = if (amount == 0.0) "0" e
 @Composable
 private fun OnboardingPagePushNotifications(
     contentPadding: PaddingValues,
+    onAcceptNotificationsPressed: () -> Unit,
+    onDenyNotificationsPressed: () -> Unit,
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(color = colorResource(R.color.secondary))
             .padding(contentPadding),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+                .padding(bottom = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Image(
+                painter = painterResource(R.drawable.ic_baseline_notification_important_24),
+                contentDescription = null,
+            )
 
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(R.string.onboarding_screen_push_permission_title),
+                color = Color.White,
+                fontSize = 30.sp,
+                textAlign = TextAlign.Center,
+                lineHeight = 36.sp,
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(R.string.onboarding_screen_push_permission_message),
+                color = Color.White,
+                fontSize = 18.sp,
+                textAlign = TextAlign.Center,
+            )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Button(
+                modifier = Modifier.weight(0.5f),
+                onClick = onDenyNotificationsPressed,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorResource(R.color.accent_ripple),
+                    contentColor = colorResource(R.color.easy_budget_green_dark),
+                ),
+            ) {
+                Text(
+                    text = stringResource(R.string.onboarding_screen_push_permission_not_now_cta),
+                    fontSize = 20.sp,
+                )
+            }
+
+            Spacer(modifier = Modifier.width(10.dp))
+
+            Button(
+                modifier = Modifier.weight(0.5f),
+                onClick = onAcceptNotificationsPressed,
+            ) {
+                Text(
+                    text = stringResource(R.string.onboarding_screen_push_permission_accept_cta),
+                    fontSize = 20.sp,
+                )
+            }
+        }
     }
 }
 
