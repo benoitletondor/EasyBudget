@@ -49,6 +49,8 @@ class PremiumViewModel @Inject constructor(
     private val eventMutableSharedFlow = MutableLiveFlow<Event>()
     val eventFlow: Flow<Event> = eventMutableSharedFlow
 
+    private var shouldFinishOnPermissionResult = false
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val userSubscriptionStatusFlow: StateFlow<SubscriptionStatus> = flow { emit(iab.fetchPricingOrDefault()) }
         .flatMapLatest { pricing ->
@@ -91,25 +93,33 @@ class PremiumViewModel @Inject constructor(
         }
     }
 
+    fun onPushPermissionResult() {
+        if (shouldFinishOnPermissionResult) {
+            viewModelScope.launch {
+                eventMutableSharedFlow.emit(Event.Finish)
+            }
+        }
+    }
+
     fun onBuyPremiumClicked(activity: Activity) {
         viewModelScope.launch {
             val result = iab.launchPremiumSubscriptionFlow(activity)
-            eventMutableSharedFlow.emit(Event.PremiumPurchaseResult(result))
-
             if (result is PurchaseFlowResult.Success) {
-                eventMutableSharedFlow.emit(Event.Finish)
+                shouldFinishOnPermissionResult = true
             }
+
+            eventMutableSharedFlow.emit(Event.PremiumPurchaseResult(result))
         }
     }
 
     fun onBuyProClicked(activity: Activity) {
         viewModelScope.launch {
             val result = iab.launchProSubscriptionFlow(activity)
-            eventMutableSharedFlow.emit(Event.ProPurchaseResult(result))
-
             if (result is PurchaseFlowResult.Success) {
-                eventMutableSharedFlow.emit(Event.Finish)
+                shouldFinishOnPermissionResult = true
             }
+
+            eventMutableSharedFlow.emit(Event.ProPurchaseResult(result))
         }
     }
 

@@ -26,6 +26,7 @@ import com.benoitletondor.easybudgetapp.view.premium.view.SubscribeView
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.PermissionStatus
+import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.Flow
@@ -60,6 +61,7 @@ fun PremiumView(
         },
         onRetryButtonPressed = viewModel::onRetryButtonPressed,
         onCloseButtonPressed = viewModel::onCloseButtonPressed,
+        onPushPermissionResult = viewModel::onPushPermissionResult,
         close = close,
     )
 }
@@ -75,6 +77,7 @@ private fun PremiumView(
     onBuyProClicked: () -> Unit,
     onRetryButtonPressed: () -> Unit,
     onCloseButtonPressed: () -> Unit,
+    onPushPermissionResult: () -> Unit,
     close: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -91,6 +94,10 @@ private fun PremiumView(
                 }
             }
         }
+    }
+
+    LaunchedEffect(pushPermissionState) {
+        onPushPermissionResult()
     }
 
     LaunchedEffect("eventsListener") {
@@ -112,7 +119,11 @@ private fun PremiumView(
                             .setMessage(R.string.iab_purchase_success_message)
                             .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
                             .setOnDismissListener {
-                                pushPermissionState.launchPermissionRequest()
+                                if (pushPermissionState.status.isGranted) {
+                                    onPushPermissionResult()
+                                } else {
+                                    pushPermissionState.launchPermissionRequest()
+                                }
                             }
                             .show()
                     }
@@ -132,7 +143,11 @@ private fun PremiumView(
                             .setMessage(R.string.iab_purchase_success_message)
                             .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
                             .setOnDismissListener {
-                                pushPermissionState.launchPermissionRequest()
+                                if (pushPermissionState.status.isGranted) {
+                                    onPushPermissionResult()
+                                } else {
+                                    pushPermissionState.launchPermissionRequest()
+                                }
                             }
                             .show()
                     }
