@@ -62,7 +62,7 @@ class PremiumActivity : AppCompatActivity() {
                     .fillMaxWidth()
                     .fillMaxHeight()
                 ) {
-                    val state by viewModel.userSubscriptionStatus.collectAsState(PremiumViewModel.SubscriptionStatus.Verifying)
+                    val state by viewModel.userSubscriptionStatusFlow.collectAsState()
 
                     when (val currentState = state) {
                         is PremiumViewModel.WithPricing -> SubscribeView(
@@ -96,47 +96,39 @@ class PremiumActivity : AppCompatActivity() {
     }
 
     private fun collectViewModelEvents() {
-        lifecycleScope.launchCollect(viewModel.premiumPurchaseEventFlow) { purchaseResult ->
-            when(purchaseResult) {
-                PurchaseFlowResult.Cancelled -> Unit
-                is PurchaseFlowResult.Error -> {
-                    MaterialAlertDialogBuilder(this)
-                        .setTitle(R.string.iab_purchase_error_title)
-                        .setMessage(getString(R.string.iab_purchase_error_message, purchaseResult.reason))
-                        .setPositiveButton(R.string.ok) { dialog, _ ->
-                            dialog.dismiss()
-                        }
-                        .show()
-                }
-                is PurchaseFlowResult.Success -> {
-                    setResult(Activity.RESULT_OK)
-                    finish()
-                }
-            }
-        }
-
-        lifecycleScope.launchCollect(viewModel.proPurchaseEventFlow) { purchaseResult ->
-            when(purchaseResult) {
-                PurchaseFlowResult.Cancelled -> Unit
-                is PurchaseFlowResult.Error -> {
-                    MaterialAlertDialogBuilder(this)
-                        .setTitle(R.string.iab_purchase_error_title)
-                        .setMessage(getString(R.string.iab_purchase_error_message, purchaseResult.reason))
-                        .setPositiveButton(R.string.ok) { dialog, _ ->
-                            dialog.dismiss()
-                        }
-                        .show()
-                }
-                is PurchaseFlowResult.Success -> {
-                    setResult(Activity.RESULT_OK)
-                    finish()
-                }
-            }
-        }
-
         lifecycleScope.launchCollect(viewModel.eventFlow) { event ->
             when(event) {
                 PremiumViewModel.Event.Finish -> finish()
+                is PremiumViewModel.Event.PremiumPurchaseResult -> when(event.result) {
+                    PurchaseFlowResult.Cancelled -> Unit
+                    is PurchaseFlowResult.Error -> {
+                        MaterialAlertDialogBuilder(this)
+                            .setTitle(R.string.iab_purchase_error_title)
+                            .setMessage(getString(R.string.iab_purchase_error_message, event.result.reason))
+                            .setPositiveButton(R.string.ok) { dialog, _ ->
+                                dialog.dismiss()
+                            }
+                            .show()
+                    }
+                    is PurchaseFlowResult.Success -> {
+                        setResult(Activity.RESULT_OK)
+                    }
+                }
+                is PremiumViewModel.Event.ProPurchaseResult -> when(event.result) {
+                    PurchaseFlowResult.Cancelled -> Unit
+                    is PurchaseFlowResult.Error -> {
+                        MaterialAlertDialogBuilder(this)
+                            .setTitle(R.string.iab_purchase_error_title)
+                            .setMessage(getString(R.string.iab_purchase_error_message, event.result))
+                            .setPositiveButton(R.string.ok) { dialog, _ ->
+                                dialog.dismiss()
+                            }
+                            .show()
+                    }
+                    is PurchaseFlowResult.Success -> {
+                        setResult(Activity.RESULT_OK)
+                    }
+                }
             }
         }
     }

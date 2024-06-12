@@ -12,7 +12,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -90,9 +89,8 @@ fun MainView(
     navigateToOnboarding: () -> Unit,
     onboardingResultFlow: Flow<OnboardingResult>,
     closeApp: () -> Unit,
+    navigateToPremium: (startOnPro: Boolean) -> Unit,
 ) {
-
-
     MainView(
         selectedAccountFlow = viewModel.accountSelectionFlow,
         dbStateFlow = viewModel.dbAvailableFlow,
@@ -150,6 +148,7 @@ fun MainView(
         navigateToOnboarding = navigateToOnboarding,
         onOnboardingResult = viewModel::onOnboardingResult,
         closeApp = closeApp,
+        navigateToPremium = navigateToPremium,
     )
 }
 
@@ -210,6 +209,7 @@ private fun MainView(
     navigateToOnboarding: () -> Unit,
     onOnboardingResult: (OnboardingResult) -> Unit,
     closeApp: () -> Unit,
+    navigateToPremium: (startOnPro: Boolean) -> Unit,
 ) {
     var showAccountSelectorModal by remember { mutableStateOf(false) }
     val accountSelectorModalSheetState = rememberModalBottomSheetState()
@@ -339,12 +339,7 @@ private fun MainView(
                     val startIntent = Intent(context, MonthlyReportBaseActivity::class.java)
                     context.startActivity(startIntent)
                 }
-                MainViewModel.Event.OpenPremium -> {
-                    // FIXME replace this
-                    val startIntent = Intent(context, SettingsActivity::class.java)
-                    startIntent.putExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, true)
-                    context.startActivity(startIntent)
-                }
+                MainViewModel.Event.OpenPremium -> navigateToPremium(false)
                 is MainViewModel.Event.RecurringExpenseDeletionResult -> {
                     when(event.data) {
                         is MainViewModel.RecurringExpenseDeletionEvent.ErrorCantDeleteBeforeFirstOccurrence -> {
@@ -674,10 +669,7 @@ private fun MainView(
                                 }
                             },
                             onOpenBecomeProScreen = {
-                                // FIXME replace this
-                                val startIntent = Intent(context, SettingsActivity::class.java)
-                                startIntent.putExtra(SettingsActivity.SHOW_PRO_INTENT_KEY, true)
-                                context.startActivity(startIntent)
+                                navigateToPremium(true)
 
                                 coroutineScope.launch {
                                     accountSelectorModalSheetState.hide()
@@ -861,6 +853,7 @@ private fun Preview(
             navigateToOnboarding = {},
             onOnboardingResult = {},
             closeApp = {},
+            navigateToPremium = {},
         )
     }
 }

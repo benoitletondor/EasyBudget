@@ -25,18 +25,18 @@ import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.iab.PremiumCheckStatus
 import com.benoitletondor.easybudgetapp.iab.Pricing
 import com.benoitletondor.easybudgetapp.iab.PurchaseFlowResult
-import com.benoitletondor.easybudgetapp.iab.PurchaseType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.retryWhen
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -46,11 +46,11 @@ class PremiumViewModel @Inject constructor(
 ) : ViewModel() {
     private val errorRetryMutableSharedFlow = MutableSharedFlow<Unit>()
 
-    private val eventMutableSharedFlow = MutableSharedFlow<Event>()
+    private val eventMutableSharedFlow = MutableLiveFlow<Event>()
     val eventFlow: Flow<Event> = eventMutableSharedFlow
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val userSubscriptionStatus: Flow<SubscriptionStatus> = flow { emit(iab.fetchPricingOrDefault()) }
+    val userSubscriptionStatusFlow: StateFlow<SubscriptionStatus> = flow { emit(iab.fetchPricingOrDefault()) }
         .flatMapLatest { pricing ->
             iab.iabStatusFlow
                 .map { iabStatus ->
@@ -71,18 +71,7 @@ class PremiumViewModel @Inject constructor(
 
             true
         }
-
-    private val premiumPurchaseStatusMutableFlow = MutableStateFlow(PurchaseFlowStatus.NOT_STARTED)
-    val premiumPurchaseStatusFlow: Flow<PurchaseFlowStatus> = premiumPurchaseStatusMutableFlow
-
-    private val premiumPurchaseEventMutableFlow = MutableLiveFlow<PurchaseFlowResult>()
-    val premiumPurchaseEventFlow: Flow<PurchaseFlowResult> = premiumPurchaseEventMutableFlow
-
-    private val proPurchaseStatusMutableFlow = MutableStateFlow(PurchaseFlowStatus.NOT_STARTED)
-    val proPurchaseStatusFlow: Flow<PurchaseFlowStatus> = proPurchaseStatusMutableFlow
-
-    private val proPurchaseEventMutableFlow = MutableLiveFlow<PurchaseFlowResult>()
-    val proPurchaseEventFlow: Flow<PurchaseFlowResult> = proPurchaseEventMutableFlow
+        .stateIn(viewModelScope, SharingStarted.Eagerly, SubscriptionStatus.Verifying)
 
     fun onRetryButtonPressed() {
         viewModelScope.launch {
@@ -96,58 +85,32 @@ class PremiumViewModel @Inject constructor(
         }
     }
 
-    fun onBuyPremiumClicked(activity: Activity) {
-        premiumPurchaseStatusMutableFlow.value = PurchaseFlowStatus.LOADING
-
+    fun onCancelButtonClicked() {
         viewModelScope.launch {
-            when(val result = iab.launchPremiumSubscriptionFlow(activity)) {
-                PurchaseFlowResult.Cancelled -> {
-                    premiumPurchaseEventMutableFlow.emit(result)
-                    premiumPurchaseStatusMutableFlow.value = PurchaseFlowStatus.NOT_STARTED
-                }
-                is PurchaseFlowResult.Success -> {
-                    if (result.purchaseType == PurchaseType.PREMIUM_SUBSCRIPTION) {
-                        premiumPurchaseEventMutableFlow.emit(result)
-                        premiumPurchaseStatusMutableFlow.value = PurchaseFlowStatus.DONE
-                    }
-                }
-                is PurchaseFlowResult.Error -> {
-                    Logger.error("Error while launching premium purchase flow: ${result.reason}")
-                    premiumPurchaseEventMutableFlow.emit(result)
-                    premiumPurchaseStatusMutableFlow.value = PurchaseFlowStatus.NOT_STARTED
-                }
+            eventMutableSharedFlow.emit(Event.Finish)
+        }
+    }
+
+    fun onBuyPremiumClicked(activity: Activity) {
+        viewModelScope.launch {
+            val result = iab.launchPremiumSubscriptionFlow(activity)
+            eventMutableSharedFlow.emit(Event.PremiumPurchaseResult(result))
+
+            if (result is PurchaseFlowResult.Success) {
+                eventMutableSharedFlow.emit(Event.Finish)
             }
         }
     }
 
     fun onBuyProClicked(activity: Activity) {
-        premiumPurchaseStatusMutableFlow.value = PurchaseFlowStatus.LOADING
-
         viewModelScope.launch {
-            when(val result = iab.launchProSubscriptionFlow(activity)) {
-                PurchaseFlowResult.Cancelled -> {
-                    proPurchaseEventMutableFlow.emit(result)
-                    proPurchaseStatusMutableFlow.value = PurchaseFlowStatus.NOT_STARTED
-                }
-                is PurchaseFlowResult.Success -> {
-                    if (result.purchaseType == PurchaseType.PRO_SUBSCRIPTION) {
-                        proPurchaseEventMutableFlow.emit(result)
-                        proPurchaseStatusMutableFlow.value = PurchaseFlowStatus.DONE
-                    }
-                }
-                is PurchaseFlowResult.Error -> {
-                    Logger.error("Error while launching pro purchase flow: ${result.reason}")
-                    proPurchaseEventMutableFlow.emit(result)
-                    proPurchaseStatusMutableFlow.value = PurchaseFlowStatus.NOT_STARTED
-                }
+            val result = iab.launchProSubscriptionFlow(activity)
+            eventMutableSharedFlow.emit(Event.ProPurchaseResult(result))
+
+            if (result is PurchaseFlowResult.Success) {
+                eventMutableSharedFlow.emit(Event.Finish)
             }
         }
-    }
-
-    enum class PurchaseFlowStatus {
-        NOT_STARTED,
-        LOADING,
-        DONE
     }
 
     sealed class SubscriptionStatus {
@@ -164,6 +127,8 @@ class PremiumViewModel @Inject constructor(
 
     sealed class Event {
         data object Finish : Event()
+        data class PremiumPurchaseResult(val result: PurchaseFlowResult) : Event()
+        data class ProPurchaseResult(val result: PurchaseFlowResult) : Event()
     }
 }
 

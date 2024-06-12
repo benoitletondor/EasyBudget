@@ -74,9 +74,9 @@ fun OnboardingView(
     )
 }
 
-fun pageIndexToOnboardingPage(index: Int): OnboardingViewModel.OnboardingPage {
-    val isAndroid33OrMore = Build.VERSION.SDK_INT >= 33
+private val isAndroid33OrMore = Build.VERSION.SDK_INT >= 33
 
+fun pageIndexToOnboardingPage(index: Int): OnboardingViewModel.OnboardingPage {
     return when(index) {
         0 -> OnboardingViewModel.OnboardingPage.WELCOME
         1 -> OnboardingViewModel.OnboardingPage.CURRENCY
@@ -101,8 +101,6 @@ private fun OnboardingView(
     onDenyNotificationsPressed: () -> Unit,
     onPushNotificationsResponse: (OnboardingViewModel.OnboardingPage) -> Unit,
 ) {
-    val isAndroid33OrMore = Build.VERSION.SDK_INT >= 33
-
     val pagerState = rememberPagerState(
         pageCount = { if (isAndroid33OrMore) 5 else 4 },
     )
