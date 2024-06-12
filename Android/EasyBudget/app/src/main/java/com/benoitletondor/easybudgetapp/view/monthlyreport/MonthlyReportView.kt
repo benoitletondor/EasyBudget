@@ -2,6 +2,7 @@ package com.benoitletondor.easybudgetapp.view.monthlyreport
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -42,6 +44,7 @@ import com.benoitletondor.easybudgetapp.compose.components.LoadingView
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
 import com.benoitletondor.easybudgetapp.helper.getMonthTitle
 import com.benoitletondor.easybudgetapp.helper.launchCollect
+import com.benoitletondor.easybudgetapp.model.Expense
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
@@ -236,13 +239,16 @@ private fun ColumnScope.MonthData(
                 thickness = 1.dp,
             )
 
-            EntriesView()
+            EntriesView(
+                expenses = state.expenses,
+                revenues = state.revenues,
+            )
         }
     }
 }
 
 @Composable
-private fun ColumnScope.RecapView(
+private fun RecapView(
     userCurrencyStateFlow: StateFlow<Currency>,
     expensesAmount: Double,
     revenuesAmount: Double,
@@ -324,7 +330,64 @@ private fun ColumnScope.RecapView(
 }
 
 @Composable
-private fun ColumnScope.EntriesView() {
+private fun EntriesView(
+    expenses: List<Expense>,
+    revenues: List<Expense>,
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        items(expenses.size + revenues.size + 2) { index ->
+            when(index) {
+                0 -> {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(color = colorResource(R.color.budget_green))
+                            .padding(horizontal = 16.dp, vertical = 5.dp),
+                        text = stringResource(R.string.revenues),
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        fontSize = 16.sp,
+                    )
+                }
+                revenues.size + 1 -> {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(color = colorResource(R.color.budget_red))
+                            .padding(horizontal = 16.dp, vertical = 5.dp),
+                        text = stringResource(R.string.expenses),
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        fontSize = 16.sp,
+                    )
+                }
+                else -> {
+                    when(index) {
+                        in 1 until revenues.size + 1 -> {
+                            val revenue = revenues.getOrNull(index - 1)
+                            if (revenue != null) {
+                                Entry(expense = revenue)
+                            }
+                        }
+                        in revenues.size + 1 until revenues.size + expenses.size + 1 -> {
+                            val expense = expenses.getOrNull(index - revenues.size - 1)
+                            if (expense != null) {
+                                Entry(expense = expense)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun Entry(
+    expense: Expense,
+) {
 
 }
 
