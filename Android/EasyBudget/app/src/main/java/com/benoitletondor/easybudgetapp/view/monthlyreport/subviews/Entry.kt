@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
@@ -33,12 +31,11 @@ import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
 import com.benoitletondor.easybudgetapp.helper.toFormattedString
 import com.benoitletondor.easybudgetapp.model.Expense
-import kotlinx.coroutines.flow.StateFlow
 import java.util.Currency
 
 @Composable
 fun Entry(
-    userCurrencyStateFlow: StateFlow<Currency>,
+    currency: Currency,
     expense: Expense,
     includeDivider: Boolean,
 ) {
@@ -84,8 +81,6 @@ fun Entry(
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
-
-                val currency by userCurrencyStateFlow.collectAsState()
 
                 Text(
                     text = CurrencyHelper.getFormattedCurrencyString(currency, expense.amount),

@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
@@ -25,6 +27,8 @@ fun EntriesView(
     expenses: List<Expense>,
     revenues: List<Expense>,
 ) {
+    val currency by userCurrencyStateFlow.collectAsState()
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
     ) {
@@ -60,7 +64,7 @@ fun EntriesView(
                             val revenue = revenues.getOrNull(index - 1)
                             if (revenue != null) {
                                 Entry(
-                                    userCurrencyStateFlow = userCurrencyStateFlow,
+                                    currency = currency,
                                     expense = revenue,
                                     includeDivider = index < revenues.size,
                                 )
@@ -70,7 +74,7 @@ fun EntriesView(
                             val expense = expenses.getOrNull(index - revenues.size - 1)
                             if (expense != null) {
                                 Entry(
-                                    userCurrencyStateFlow = userCurrencyStateFlow,
+                                    currency = currency,
                                     expense = expense,
                                     includeDivider = index < revenues.size + expenses.size,
                                 )
