@@ -70,8 +70,8 @@ fun EntriesView(
                                 )
                             }
                         }
-                        in revenues.size + 1 until revenues.size + expenses.size + 1 -> {
-                            val expense = expenses.getOrNull(index - revenues.size - 1)
+                        in revenues.size + 2 until revenues.size + expenses.size + 2 -> {
+                            val expense = expenses.getOrNull(index - revenues.size - 2)
                             if (expense != null) {
                                 Entry(
                                     currency = currency,
