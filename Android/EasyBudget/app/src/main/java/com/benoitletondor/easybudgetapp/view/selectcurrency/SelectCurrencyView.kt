@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -68,10 +67,6 @@ private fun CurrenciesView(
     state: SelectCurrencyViewModel.State.Loaded,
     onCurrencySelected: (Currency) -> Unit,
 ) {
-    LaunchedEffect(key1 = "firstEmit") {
-        onCurrencySelected(state.mainCurrencies.firstOrNull { it.isSelected }?.currency ?: state.otherCurrencies.first { it.isSelected }.currency)
-    }
-
     LazyColumn(
         modifier = modifier,
     ) {
