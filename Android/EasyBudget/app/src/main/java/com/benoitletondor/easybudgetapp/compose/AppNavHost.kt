@@ -34,6 +34,9 @@ import com.benoitletondor.easybudgetapp.view.onboarding.OnboardingResult
 import com.benoitletondor.easybudgetapp.view.onboarding.OnboardingView
 import com.benoitletondor.easybudgetapp.view.premium.PremiumDestination
 import com.benoitletondor.easybudgetapp.view.premium.PremiumView
+import com.benoitletondor.easybudgetapp.view.settings.SettingsView
+import com.benoitletondor.easybudgetapp.view.settings.SettingsViewDestination
+import com.benoitletondor.easybudgetapp.view.settings.SettingsViewModelFactory
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.encodeToString
@@ -178,6 +181,18 @@ fun AppNavHost(
                 finish = {
                     navController.popBackStack()
                 },
+            )
+        }
+        composable<SettingsViewDestination> { backStackEntry ->
+            val destination: SettingsViewDestination = backStackEntry.toRoute()
+            SettingsView(
+                viewModel = hiltViewModel(
+                    creationCallback = { factory: SettingsViewModelFactory ->
+                        factory.create(
+                            redirectToBackupSettings = destination.redirectToBackupSettings,
+                        )
+                    }
+                )
             )
         }
     }
