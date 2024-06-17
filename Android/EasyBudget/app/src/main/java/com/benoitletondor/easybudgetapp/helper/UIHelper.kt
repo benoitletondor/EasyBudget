@@ -43,6 +43,58 @@ import java.util.Locale
 /**
  * This helper prevents the user to add unsupported values into an EditText for decimal numbers
  */
+
+fun String.sanitizeFromUnsupportedInputForDecimals(): String {
+    val s = Editable.Factory.getInstance().newEditable(
+        filter { "-0123456789.,".contains(it) }
+    )
+
+    try {
+        // Remove - that is not at first char
+        val minusIndex = lastIndexOf("-")
+        if (minusIndex > 0) {
+            s.delete(minusIndex, minusIndex + 1)
+
+            if (startsWith("-")) {
+                s.delete(0, 1)
+            } else {
+                s.insert(0, "-")
+            }
+
+            return s.toString()
+        }
+
+        val comaIndex = indexOf(",")
+        val dotIndex = indexOf(".")
+        val lastDotIndex = lastIndexOf(".")
+
+        // Remove ,
+        if (comaIndex >= 0) {
+            if (dotIndex >= 0) {
+                s.delete(comaIndex, comaIndex + 1)
+            } else {
+                s.replace(comaIndex, comaIndex + 1, ".")
+            }
+
+            return s.toString()
+        }
+
+        // Disallow double .
+        if (dotIndex >= 0 && dotIndex != lastDotIndex) {
+            s.delete(lastDotIndex, lastDotIndex + 1)
+        } else if (dotIndex > 0) {
+            val decimals = substring(dotIndex + 1)
+            if (decimals.length > 2) {
+                s.delete(dotIndex + 3, length)
+            }
+        }// No more than 2 decimals
+    } catch (e: Exception) {
+        Logger.error("An error occurred during text changing watcher. Value: $this", e)
+    }
+
+    return s.toString()
+}
+
 fun EditText.preventUnsupportedInputForDecimals() {
     addTextChangedListener(object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}

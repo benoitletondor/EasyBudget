@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
+import com.benoitletondor.easybudgetapp.helper.sanitizeFromUnsupportedInputForDecimals
 import com.benoitletondor.easybudgetapp.view.onboarding.OnboardingViewModel
 import com.benoitletondor.easybudgetapp.view.onboarding.pageIndexToOnboardingPage
 import kotlinx.coroutines.flow.StateFlow
@@ -64,7 +65,7 @@ fun OnboardingPageAccountAmount(
         TextFieldValue(
         text = "",
         selection = TextRange(index = 0),
-    )
+        )
     ) }
 
     LaunchedEffect("initAmount") {
@@ -144,23 +145,13 @@ fun OnboardingPageAccountAmount(
                         .focusRequester(focusRequester),
                     value = currentTextFieldValue,
                     onValueChange = { newValue ->
-                        if (newValue.text.all { "-0123456789.,".contains(it) }) {
-                            val newText = if (newValue.text.count() > 1 && newValue.text.endsWith("-")) {
-                                if (newValue.text.startsWith("-")) {
-                                    newValue.text.substring(1, newValue.text.length - 1)
-                                } else {
-                                    "-${newValue.text.substring(0, newValue.text.length - 1)}"
-                                }
-                            } else {
-                                newValue.text
-                            }
+                        val newText = newValue.text.sanitizeFromUnsupportedInputForDecimals()
 
-                            currentTextFieldValue = TextFieldValue(
-                                text = newText,
-                                selection = newValue.selection,
-                            )
-                            onAmountChange(newText)
-                        }
+                        currentTextFieldValue = TextFieldValue(
+                            text = newText,
+                            selection = newValue.selection,
+                        )
+                        onAmountChange(newText)
                     },
                     textStyle = TextStyle(
                         fontSize = 20.sp,
