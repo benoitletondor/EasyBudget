@@ -1,5 +1,7 @@
 package com.benoitletondor.easybudgetapp.compose
 
+import android.os.Build
+import android.os.Bundle
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -8,12 +10,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.benoitletondor.easybudgetapp.view.main.MainDestination
 import com.benoitletondor.easybudgetapp.view.main.MainView
+import com.benoitletondor.easybudgetapp.view.main.MainViewModel
+import com.benoitletondor.easybudgetapp.view.manageaccount.ManageAccountDestination
+import com.benoitletondor.easybudgetapp.view.manageaccount.ManageAccountView
+import com.benoitletondor.easybudgetapp.view.manageaccount.ManageAccountViewModelFactory
 import com.benoitletondor.easybudgetapp.view.monthlyreport.MonthlyReportDestination
 import com.benoitletondor.easybudgetapp.view.monthlyreport.MonthlyReportView
 import com.benoitletondor.easybudgetapp.view.monthlyreport.MonthlyReportViewModelFactory
@@ -24,6 +31,9 @@ import com.benoitletondor.easybudgetapp.view.premium.PremiumDestination
 import com.benoitletondor.easybudgetapp.view.premium.PremiumView
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.onEach
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlin.reflect.typeOf
 
 private const val OnboardingResultKey = "OnboardingResult"
 
@@ -77,6 +87,9 @@ fun AppNavHost(
                 navigateToMonthlyReport = {
                     navController.navigate(MonthlyReportDestination(fromNotification = false))
                 },
+                navigateToManageAccount = { account ->
+                    navController.navigate(ManageAccountDestination(selectedAccount = account))
+                }
             )
         }
         composable<OnboardingDestination>(
@@ -115,5 +128,50 @@ fun AppNavHost(
                 }
             )
         }
+        composable<ManageAccountDestination>(
+            typeMap = mapOf(typeOf<MainViewModel.SelectedAccount.Selected.Online>() to OnlineAccountNavType),
+        ) { backStackEntry ->
+            val destination: ManageAccountDestination = backStackEntry.toRoute()
+            ManageAccountView(
+                viewModel = hiltViewModel(
+                    creationCallback = { factory: ManageAccountViewModelFactory ->
+                        factory.create(
+                            selectedAccount = destination.selectedAccount,
+                        )
+                    }
+                ),
+                navigateUp = {
+                    navController.navigateUp()
+                },
+                finish = {
+                    navController.popBackStack()
+                },
+            )
+        }
+    }
+}
+
+private val OnlineAccountNavType = object : NavType<MainViewModel.SelectedAccount.Selected.Online>(
+    isNullableAllowed = false
+) {
+    override fun get(bundle: Bundle, key: String): MainViewModel.SelectedAccount.Selected.Online? {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            bundle.getParcelable(key, MainViewModel.SelectedAccount.Selected.Online::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            bundle.getParcelable(key)
+        }
+    }
+
+    override fun parseValue(value: String): MainViewModel.SelectedAccount.Selected.Online {
+        return Json.decodeFromString<MainViewModel.SelectedAccount.Selected.Online>(value)
+    }
+
+    override fun serializeAsValue(value: MainViewModel.SelectedAccount.Selected.Online): String {
+        return Json.encodeToString(value)
+    }
+
+    override fun put(bundle: Bundle, key: String, value: MainViewModel.SelectedAccount.Selected.Online) {
+        bundle.putParcelable(key, value)
     }
 }

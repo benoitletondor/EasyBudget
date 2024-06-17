@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp.view.manageaccount.view
+package com.benoitletondor.easybudgetapp.view.manageaccount.subviews
 
 import android.util.Patterns
 import android.view.WindowManager
@@ -22,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -72,12 +73,21 @@ import com.benoitletondor.easybudgetapp.accounts.model.Invitation
 import com.benoitletondor.easybudgetapp.accounts.model.InvitationStatus
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.benoitletondor.easybudgetapp.compose.AppTheme
-import com.benoitletondor.easybudgetapp.view.manageaccount.LoadingKind
 import com.benoitletondor.easybudgetapp.view.manageaccount.ManageAccountViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
+private enum class LoadingKind {
+    LOADING_DATA,
+    DELETING_INVITATION,
+    SENDING_INVITATION,
+    UPDATING_NAME,
+    DELETING_ACCOUNT,
+    LEAVING_ACCOUNT,
+}
+
 @Composable
 fun ContentView(
+    modifier: Modifier,
     state: ManageAccountViewModel.State,
     onUpdateAccountNameClicked: (String) -> Unit,
     onInvitationDeleteConfirmed: (Invitation) -> Unit,
@@ -86,30 +96,34 @@ fun ContentView(
     onInviteEmailToAccount: (String) -> Unit,
     onDeleteAccountConfirmed: () -> Unit,
 ) {
-    when(state) {
-        ManageAccountViewModel.State.DeletingInvitation -> LoadingView(kind = LoadingKind.DELETING_INVITATION)
-        is ManageAccountViewModel.State.Error -> ErrorView(
-            error = state.error,
-            onRetryButtonClicked = onRetryButtonClicked,
-        )
-        ManageAccountViewModel.State.Loading -> LoadingView(kind = LoadingKind.LOADING_DATA)
-        is ManageAccountViewModel.State.Ready.Invited -> ManageAccountAsInvitedView(
-            accountName = state.accountName,
-            onLeaveAccountConfirmed = onLeaveAccountConfirmed,
-        )
-        is ManageAccountViewModel.State.Ready.Owner -> ManageAccountAsOwnerView(
-            initialNameValue = state.accountName,
-            invitationsSent = state.invitationsSent,
-            invitationsAccepted = state.invitationsAccepted,
-            onUpdateAccountNameClicked = onUpdateAccountNameClicked,
-            onInvitationDeleteConfirmed = onInvitationDeleteConfirmed,
-            onInviteEmailToAccount = onInviteEmailToAccount,
-            onDeleteAccountConfirmed = onDeleteAccountConfirmed,
-        )
-        ManageAccountViewModel.State.SendingInvitation -> LoadingView(kind = LoadingKind.SENDING_INVITATION)
-        ManageAccountViewModel.State.Updating -> LoadingView(kind = LoadingKind.UPDATING_NAME)
-        ManageAccountViewModel.State.DeletingAccount ->  LoadingView(kind = LoadingKind.DELETING_ACCOUNT)
-        ManageAccountViewModel.State.LeavingAccount ->  LoadingView(kind = LoadingKind.LEAVING_ACCOUNT)
+    Box(
+        modifier = modifier
+    ) {
+        when(state) {
+            ManageAccountViewModel.State.DeletingInvitation -> LoadingView(kind = LoadingKind.DELETING_INVITATION)
+            is ManageAccountViewModel.State.Error -> ErrorView(
+                error = state.error,
+                onRetryButtonClicked = onRetryButtonClicked,
+            )
+            ManageAccountViewModel.State.Loading -> LoadingView(kind = LoadingKind.LOADING_DATA)
+            is ManageAccountViewModel.State.Ready.Invited -> ManageAccountAsInvitedView(
+                accountName = state.accountName,
+                onLeaveAccountConfirmed = onLeaveAccountConfirmed,
+            )
+            is ManageAccountViewModel.State.Ready.Owner -> ManageAccountAsOwnerView(
+                initialNameValue = state.accountName,
+                invitationsSent = state.invitationsSent,
+                invitationsAccepted = state.invitationsAccepted,
+                onUpdateAccountNameClicked = onUpdateAccountNameClicked,
+                onInvitationDeleteConfirmed = onInvitationDeleteConfirmed,
+                onInviteEmailToAccount = onInviteEmailToAccount,
+                onDeleteAccountConfirmed = onDeleteAccountConfirmed,
+            )
+            ManageAccountViewModel.State.SendingInvitation -> LoadingView(kind = LoadingKind.SENDING_INVITATION)
+            ManageAccountViewModel.State.Updating -> LoadingView(kind = LoadingKind.UPDATING_NAME)
+            ManageAccountViewModel.State.DeletingAccount ->  LoadingView(kind = LoadingKind.DELETING_ACCOUNT)
+            ManageAccountViewModel.State.LeavingAccount ->  LoadingView(kind = LoadingKind.LEAVING_ACCOUNT)
+        }
     }
 }
 
@@ -533,6 +547,7 @@ private fun LoadingView(
 private fun LoadingStatePreview() {
     AppTheme {
         ContentView(
+            modifier = Modifier,
             state = ManageAccountViewModel.State.Loading,
             onUpdateAccountNameClicked = {},
             onInvitationDeleteConfirmed = {},
@@ -549,6 +564,7 @@ private fun LoadingStatePreview() {
 private fun OwnerStateEmptyInvitationsPreview() {
     AppTheme {
         ContentView(
+            modifier = Modifier,
             state = ManageAccountViewModel.State.Ready.Owner(
                 "accountName",
                 CurrentUser("", "", ""),
@@ -570,6 +586,7 @@ private fun OwnerStateEmptyInvitationsPreview() {
 private fun OwnerStateFullInvitationsPreview() {
     AppTheme {
         ContentView(
+            modifier = Modifier,
             state = ManageAccountViewModel.State.Ready.Owner(
                 "accountName",
                 CurrentUser("", "", ""),

@@ -60,10 +60,8 @@ import com.benoitletondor.easybudgetapp.view.login.LoginActivity
 import com.benoitletondor.easybudgetapp.view.main.subviews.FABMenuOverlay
 import com.benoitletondor.easybudgetapp.view.main.subviews.MainViewContent
 import com.benoitletondor.easybudgetapp.view.main.subviews.MainViewTopBar
-import com.benoitletondor.easybudgetapp.view.manageaccount.ManageAccountActivity
 import com.benoitletondor.easybudgetapp.view.onboarding.OnboardingResult
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
-import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.kizitonwose.calendar.core.atStartOfMonth
@@ -91,6 +89,7 @@ fun MainView(
     closeApp: () -> Unit,
     navigateToPremium: (startOnPro: Boolean) -> Unit,
     navigateToMonthlyReport: () -> Unit,
+    navigateToManageAccount: (account: MainViewModel.SelectedAccount.Selected.Online) -> Unit,
 ) {
     MainView(
         selectedAccountFlow = viewModel.accountSelectionFlow,
@@ -151,6 +150,7 @@ fun MainView(
         closeApp = closeApp,
         navigateToPremium = navigateToPremium,
         navigateToMonthlyReport = navigateToMonthlyReport,
+        navigateToManageAccount = navigateToManageAccount,
     )
 }
 
@@ -213,6 +213,7 @@ private fun MainView(
     closeApp: () -> Unit,
     navigateToPremium: (startOnPro: Boolean) -> Unit,
     navigateToMonthlyReport: () -> Unit,
+    navigateToManageAccount: (MainViewModel.SelectedAccount.Selected.Online) -> Unit,
 ) {
     var showAccountSelectorModal by remember { mutableStateOf(false) }
     val accountSelectorModalSheetState = rememberModalBottomSheetState()
@@ -333,10 +334,7 @@ private fun MainView(
 
                     context.startActivity(startIntent)
                 }
-                is MainViewModel.Event.OpenManageAccount -> {
-                    // FIXME replace this
-                    context.startActivity(ManageAccountActivity.newIntent(context, event.account))
-                }
+                is MainViewModel.Event.OpenManageAccount -> navigateToManageAccount(event.account)
                 MainViewModel.Event.OpenMonthlyReport -> navigateToMonthlyReport()
                 MainViewModel.Event.OpenPremium -> navigateToPremium(false)
                 is MainViewModel.Event.RecurringExpenseDeletionResult -> {
@@ -854,6 +852,7 @@ private fun Preview(
             closeApp = {},
             navigateToPremium = {},
             navigateToMonthlyReport = {},
+            navigateToManageAccount = {},
         )
     }
 }

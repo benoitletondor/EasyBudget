@@ -17,7 +17,6 @@
 package com.benoitletondor.easybudgetapp.view.manageaccount
 
 import android.util.Patterns
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.accounts.Accounts
@@ -32,7 +31,9 @@ import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
 import com.benoitletondor.easybudgetapp.helper.combine
 import com.benoitletondor.easybudgetapp.injection.CurrentDBProvider
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
-import com.benoitletondor.easybudgetapp.view.manageaccount.ManageAccountActivity.Companion.SELECTED_ACCOUNT_EXTRA
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
@@ -49,16 +50,13 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@HiltViewModel
-class ManageAccountViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = ManageAccountViewModelFactory::class)
+class ManageAccountViewModel @AssistedInject constructor(
     auth: Auth,
     private val accounts: Accounts,
     private val currentDBProvider: CurrentDBProvider,
-    savedStateHandle: SavedStateHandle,
+    @Assisted private val selectedAccount: MainViewModel.SelectedAccount.Selected.Online,
 ) : ViewModel() {
-    private val selectedAccount = savedStateHandle.get<MainViewModel.SelectedAccount.Selected.Online>(SELECTED_ACCOUNT_EXTRA)
-        ?: throw IllegalStateException("Missing SELECTED_ACCOUNT_EXTRA arg")
-
     private val isUpdatingNameMutableFlow = MutableStateFlow(false)
     private val isDeletingInvitationMutableFlow = MutableStateFlow(false)
     private val isSendingInvitationMutableFlow = MutableStateFlow(false)
@@ -393,4 +391,9 @@ class ManageAccountViewModel @Inject constructor(
         data object AccountDeleted : Event()
         data class ErrorWhileDeletingAccount(val error: Exception) : Event()
     }
+}
+
+@AssistedFactory
+interface ManageAccountViewModelFactory {
+    fun create(selectedAccount: MainViewModel.SelectedAccount.Selected.Online): ManageAccountViewModel
 }

@@ -61,6 +61,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 import java.time.LocalDate
 import java.time.YearMonth
 import javax.inject.Inject
@@ -737,6 +738,7 @@ class MainViewModel @Inject constructor(
             @Parcelize
             object Offline : Selected()
             @Parcelize
+            @Serializable
             @Immutable
             data class Online(
                 val name: String,
