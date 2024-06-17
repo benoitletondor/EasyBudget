@@ -31,6 +31,7 @@ import com.benoitletondor.easybudgetapp.view.monthlyreport.subviews.RecapView
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
+import java.time.YearMonth
 import java.util.Currency
 
 @Serializable
@@ -40,6 +41,7 @@ data class MonthlyReportDestination(val fromNotification: Boolean)
 fun MonthlyReportView(
     viewModel: MonthlyReportViewModel,
     navigateUp: () -> Unit,
+    navigateToExportToCsv: (YearMonth) -> Unit,
 ) {
     MonthlyReportView(
         navigateUp = navigateUp,
@@ -52,6 +54,7 @@ fun MonthlyReportView(
         onPreviousMonthClicked = viewModel::onPreviousMonthClicked,
         onNextMonthClicked = viewModel::onNextMonthClicked,
         onRetryLoadingMonthDataPressed = viewModel::onRetryLoadingMonthDataPressed,
+        navigateToExportToCsv = navigateToExportToCsv,
     )
 }
 
@@ -67,11 +70,12 @@ private fun MonthlyReportView(
     onPreviousMonthClicked: () -> Unit,
     onNextMonthClicked: () -> Unit,
     onRetryLoadingMonthDataPressed: () -> Unit,
+    navigateToExportToCsv: (YearMonth) -> Unit,
 ) {
     LaunchedEffect("eventsListener") {
         launchCollect(eventFlow) { event ->
             when(event) {
-                MonthlyReportViewModel.Event.OpenExportToCsvScreen -> TODO()
+                is MonthlyReportViewModel.Event.OpenExportToCsvScreen -> navigateToExportToCsv(event.month)
             }
         }
     }

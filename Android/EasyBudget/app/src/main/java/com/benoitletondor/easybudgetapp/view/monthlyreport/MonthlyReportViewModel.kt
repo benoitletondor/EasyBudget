@@ -127,7 +127,7 @@ class MonthlyReportViewModel @AssistedInject constructor(
 
     fun onExportToCsvButtonPressed() {
         viewModelScope.launch {
-            eventMutableFlow.emit(Event.OpenExportToCsvScreen)
+            eventMutableFlow.emit(Event.OpenExportToCsvScreen((stateFlow.value as State.Loaded).selectedPosition.month))
         }
     }
 
@@ -156,7 +156,7 @@ class MonthlyReportViewModel @AssistedInject constructor(
     }
 
     sealed class Event {
-        data object OpenExportToCsvScreen : Event()
+        data class OpenExportToCsvScreen(val month: YearMonth) : Event()
     }
 
     sealed class State {

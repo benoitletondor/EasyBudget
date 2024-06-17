@@ -24,6 +24,9 @@ import com.benoitletondor.easybudgetapp.view.manageaccount.ManageAccountViewMode
 import com.benoitletondor.easybudgetapp.view.monthlyreport.MonthlyReportDestination
 import com.benoitletondor.easybudgetapp.view.monthlyreport.MonthlyReportView
 import com.benoitletondor.easybudgetapp.view.monthlyreport.MonthlyReportViewModelFactory
+import com.benoitletondor.easybudgetapp.view.monthlyreport.export.MonthlyReportExportDestination
+import com.benoitletondor.easybudgetapp.view.monthlyreport.export.MonthlyReportExportView
+import com.benoitletondor.easybudgetapp.view.monthlyreport.export.MonthlyReportExportViewModelFactory
 import com.benoitletondor.easybudgetapp.view.onboarding.OnboardingDestination
 import com.benoitletondor.easybudgetapp.view.onboarding.OnboardingResult
 import com.benoitletondor.easybudgetapp.view.onboarding.OnboardingView
@@ -33,6 +36,11 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.int
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import java.time.YearMonth
 import kotlin.reflect.typeOf
 
 private const val OnboardingResultKey = "OnboardingResult"
@@ -125,6 +133,9 @@ fun AppNavHost(
                 ),
                 navigateUp = {
                     navController.navigateUp()
+                },
+                navigateToExportToCsv = { month ->
+                    navController.navigate(MonthlyReportExportDestination(month = month))
                 }
             )
         }
@@ -137,6 +148,26 @@ fun AppNavHost(
                     creationCallback = { factory: ManageAccountViewModelFactory ->
                         factory.create(
                             selectedAccount = destination.selectedAccount,
+                        )
+                    }
+                ),
+                navigateUp = {
+                    navController.navigateUp()
+                },
+                finish = {
+                    navController.popBackStack()
+                },
+            )
+        }
+        composable<MonthlyReportExportDestination>(
+            typeMap = mapOf(typeOf<YearMonth>() to YearMonthNavType),
+        ){ backStackEntry ->
+            val destination: MonthlyReportExportDestination = backStackEntry.toRoute()
+            MonthlyReportExportView(
+                viewModel = hiltViewModel(
+                    creationCallback = { factory: MonthlyReportExportViewModelFactory ->
+                        factory.create(
+                            month = destination.month,
                         )
                     }
                 ),
@@ -173,5 +204,31 @@ private val OnlineAccountNavType = object : NavType<MainViewModel.SelectedAccoun
 
     override fun put(bundle: Bundle, key: String, value: MainViewModel.SelectedAccount.Selected.Online) {
         bundle.putParcelable(key, value)
+    }
+}
+
+private val YearMonthNavType = object : NavType<YearMonth>(
+    isNullableAllowed = false
+) {
+    override fun get(bundle: Bundle, key: String): YearMonth? {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            bundle.getSerializable(key, YearMonth::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            bundle.getSerializable(key) as? YearMonth
+        }
+    }
+
+    override fun parseValue(value: String): YearMonth {
+        val json = Json.parseToJsonElement(value)
+        return YearMonth.of(json.jsonObject["year"]!!.jsonPrimitive.int, json.jsonObject["month"]!!.jsonPrimitive.int)
+    }
+
+    override fun serializeAsValue(value: YearMonth): String {
+        return Json.encodeToJsonElement(mapOf("year" to value.year, "month" to value.monthValue)).toString()
+    }
+
+    override fun put(bundle: Bundle, key: String, value: YearMonth) {
+        bundle.putSerializable(key, value)
     }
 }
