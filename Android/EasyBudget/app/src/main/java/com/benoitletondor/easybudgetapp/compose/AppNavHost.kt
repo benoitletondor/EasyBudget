@@ -1,5 +1,8 @@
 package com.benoitletondor.easybudgetapp.compose
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -13,7 +16,6 @@ import com.benoitletondor.easybudgetapp.view.main.MainDestination
 import com.benoitletondor.easybudgetapp.view.main.MainView
 import com.benoitletondor.easybudgetapp.view.monthlyreport.MonthlyReportDestination
 import com.benoitletondor.easybudgetapp.view.monthlyreport.MonthlyReportView
-import com.benoitletondor.easybudgetapp.view.monthlyreport.MonthlyReportViewModel
 import com.benoitletondor.easybudgetapp.view.monthlyreport.MonthlyReportViewModelFactory
 import com.benoitletondor.easybudgetapp.view.onboarding.OnboardingDestination
 import com.benoitletondor.easybudgetapp.view.onboarding.OnboardingResult
@@ -35,8 +37,26 @@ fun AppNavHost(
         modifier = Modifier.fillMaxSize(),
         navController = navController,
         startDestination = MainDestination,
+        enterTransition = { slideIntoContainer(
+            AnimatedContentTransitionScope.SlideDirection.Left,
+            initialOffset = { it / 2 },
+        ) + fadeIn() },
+        exitTransition = { slideOutOfContainer(
+            AnimatedContentTransitionScope.SlideDirection.Left,
+            targetOffset = { it / 2 },
+        ) + fadeOut() },
+        popEnterTransition = { slideIntoContainer(
+            AnimatedContentTransitionScope.SlideDirection.Right,
+            initialOffset = { it / 2 },
+        ) + fadeIn() },
+        popExitTransition = { slideOutOfContainer(
+            AnimatedContentTransitionScope.SlideDirection.Right,
+            targetOffset = { it / 2 },
+        ) + fadeOut() },
     ) {
-        composable<MainDestination> { navBackStackEntry ->
+        composable<MainDestination>(
+            enterTransition = null,
+        ) { navBackStackEntry ->
             val onboardingResultFlow = remember(navBackStackEntry) {
                 navBackStackEntry.savedStateHandle.getStateFlow<OnboardingResult?>(OnboardingResultKey, null)
                     .filterNotNull()
