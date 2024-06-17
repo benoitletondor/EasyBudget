@@ -32,7 +32,6 @@ import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.getTheme
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
-import com.benoitletondor.easybudgetapp.view.report.base.MonthlyReportBaseActivity
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
 import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity.Companion.SHOW_BACKUP_INTENT_KEY
 import dagger.hilt.android.AndroidEntryPoint
@@ -140,9 +139,10 @@ class MainActivity : AppCompatActivity() {
         try {
             val data = intent.data
             if (data != null && "true" == data.getQueryParameter("monthly")) {
-                val startIntent = Intent(this, MonthlyReportBaseActivity::class.java)
+                /*val startIntent = Intent(this, MonthlyReportBaseActivity::class.java)
                 startIntent.putExtra(MonthlyReportBaseActivity.FROM_NOTIFICATION_EXTRA, true)
-                ActivityCompat.startActivity(this@MainActivity, startIntent, null)
+                ActivityCompat.startActivity(this@MainActivity, startIntent, null)*/
+                // FIXME
             }
         } catch (e: Exception) {
             Logger.error("Error while opening report activity", e)
