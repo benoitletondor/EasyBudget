@@ -40,8 +40,8 @@ android {
         compileSdk = 34
         minSdk = 23
         targetSdk = 34
-        versionCode = 138
-        versionName = "3.2.4"
+        versionCode = 139
+        versionName = "3.2.5"
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -128,7 +128,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.2")
     implementation("androidx.work:work-runtime-ktx:2.9.0")
     implementation("androidx.work:work-gcm:2.9.0")
-    implementation("com.google.android.play:core:1.10.3")
+    implementation("com.google.android.play:review-ktx:2.0.1")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
@@ -158,7 +158,7 @@ dependencies {
     implementation("com.android.billingclient:billing-ktx:7.0.0")
 
     implementation("me.relex:circleindicator:2.1.6@aar")
-    implementation("com.batch.android:batch-sdk:2.0.0")
+    implementation("com.batch.android:batch-sdk:2.0.3")
 
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     implementation("androidx.hilt:hilt-work:1.2.0")
