@@ -192,7 +192,10 @@ fun AppNavHost(
                             redirectToBackupSettings = destination.redirectToBackupSettings,
                         )
                     }
-                )
+                ),
+                navigateUp = {
+                    navController.navigateUp()
+                }
             )
         }
     }

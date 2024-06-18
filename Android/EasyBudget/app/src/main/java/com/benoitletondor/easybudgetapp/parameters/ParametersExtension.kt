@@ -268,6 +268,16 @@ private fun Int.toDayOfWeek(): DayOfWeek {
     }
 }
 
+private lateinit var userAllowingUpdatePushesFlow: MutableStateFlow<Boolean>
+
+fun Parameters.watchUserAllowingUpdatePushes(): StateFlow<Boolean> {
+    if (!::userAllowingUpdatePushesFlow.isInitialized) {
+        userAllowingUpdatePushesFlow = MutableStateFlow(isUserAllowingUpdatePushes())
+    }
+
+    return userAllowingUpdatePushesFlow
+}
+
 /**
  * The user wants or not to receive notification about updates
  *
@@ -283,7 +293,22 @@ fun Parameters.isUserAllowingUpdatePushes(): Boolean {
  * @param value if the user wants or not to receive notifications about updates
  */
 fun Parameters.setUserAllowUpdatePushes(value: Boolean) {
+    if (!::userAllowingUpdatePushesFlow.isInitialized) {
+        userAllowingUpdatePushesFlow = MutableStateFlow(value)
+    }
+
+    userAllowingUpdatePushesFlow.value = value
     putBoolean(USER_ALLOW_UPDATE_PUSH_PARAMETERS_KEY, value)
+}
+
+private lateinit var userAllowingDailyReminderPushesFlow: MutableStateFlow<Boolean>
+
+fun Parameters.watchUserAllowingDailyReminderPushes(): StateFlow<Boolean> {
+    if (!::userAllowingDailyReminderPushesFlow.isInitialized) {
+        userAllowingDailyReminderPushesFlow = MutableStateFlow(isUserAllowingDailyReminderPushes())
+    }
+
+    return userAllowingDailyReminderPushesFlow
 }
 
 /**
@@ -301,7 +326,22 @@ fun Parameters.isUserAllowingDailyReminderPushes(): Boolean {
  * @param value if the user wants or not to receive daily notifications
  */
 fun Parameters.setUserAllowDailyReminderPushes(value: Boolean) {
+    if (!::userAllowingDailyReminderPushesFlow.isInitialized) {
+        userAllowingDailyReminderPushesFlow = MutableStateFlow(value)
+    }
+
+    userAllowingDailyReminderPushesFlow.value = value
     putBoolean(USER_ALLOW_DAILY_PUSH_PARAMETERS_KEY, value)
+}
+
+private lateinit var userAllowingMonthlyReminderPushesFlow: MutableStateFlow<Boolean>
+
+fun Parameters.watchUserAllowingMonthlyReminderPushes(): StateFlow<Boolean> {
+    if (!::userAllowingMonthlyReminderPushesFlow.isInitialized) {
+        userAllowingMonthlyReminderPushesFlow = MutableStateFlow(isUserAllowingMonthlyReminderPushes())
+    }
+
+    return userAllowingMonthlyReminderPushesFlow
 }
 
 /**
@@ -319,6 +359,11 @@ fun Parameters.isUserAllowingMonthlyReminderPushes(): Boolean {
  * @param value if the user wants or not to receive monthly notifications
  */
 fun Parameters.setUserAllowMonthlyReminderPushes(value: Boolean) {
+    if (!::userAllowingMonthlyReminderPushesFlow.isInitialized) {
+        userAllowingMonthlyReminderPushesFlow = MutableStateFlow(value)
+    }
+
+    userAllowingMonthlyReminderPushesFlow.value = value
     putBoolean(USER_ALLOW_MONTHLY_PUSH_PARAMETERS_KEY, value)
 }
 
@@ -354,12 +399,27 @@ fun Parameters.setUserSawMonthlyReportHint() {
     putBoolean(USER_SAW_MONTHLY_REPORT_HINT_PARAMETERS_KEY, true)
 }
 
+private lateinit var themeFlow: MutableStateFlow<AppTheme>
+
+fun Parameters.watchTheme(): StateFlow<AppTheme> {
+    if (!::themeFlow.isInitialized) {
+        themeFlow = MutableStateFlow(getTheme())
+    }
+
+    return themeFlow
+}
+
 fun Parameters.getTheme(): AppTheme {
     val value = getInt(APP_THEME_PARAMETERS_KEY, AppTheme.LIGHT.value)
     return AppTheme.entries.first { it.value == value }
 }
 
 fun Parameters.setTheme(theme: AppTheme) {
+    if (!::themeFlow.isInitialized) {
+        themeFlow = MutableStateFlow(theme)
+    }
+
+    themeFlow.value = theme
     putInt(APP_THEME_PARAMETERS_KEY, theme.value)
 }
 
