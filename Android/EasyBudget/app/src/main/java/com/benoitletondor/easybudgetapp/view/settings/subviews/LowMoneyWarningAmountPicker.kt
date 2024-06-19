@@ -51,9 +51,9 @@ fun Context.showLowMoneyWarningAmountPickerDialog(
 
     // Directly show keyboard when the dialog pops
     limitEditText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
-        // Check if the device doesn't have a physical keyboard
-        if (hasFocus && resources.configuration.keyboard == Configuration.KEYBOARD_NOKEYS) {
+        if (hasFocus) {
             dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         }
     }
+    limitEditText.requestFocus()
 }

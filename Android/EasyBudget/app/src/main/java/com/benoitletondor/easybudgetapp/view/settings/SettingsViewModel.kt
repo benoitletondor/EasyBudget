@@ -23,6 +23,7 @@ import com.benoitletondor.easybudgetapp.parameters.watchUserAllowingDailyReminde
 import com.benoitletondor.easybudgetapp.parameters.watchUserAllowingMonthlyReminderPushes
 import com.benoitletondor.easybudgetapp.parameters.watchUserAllowingUpdatePushes
 import com.benoitletondor.easybudgetapp.BuildConfig
+import com.benoitletondor.easybudgetapp.parameters.getLocalId
 import com.benoitletondor.easybudgetapp.parameters.setLowMoneyWarningAmount
 import com.benoitletondor.easybudgetapp.parameters.setShouldShowCheckedBalance
 import com.benoitletondor.easybudgetapp.parameters.setUserAllowDailyReminderPushes
@@ -219,7 +220,7 @@ class SettingsViewModel @AssistedInject constructor(
 
     fun onRateAppClicked() {
         viewModelScope.launch {
-            eventMutableFlow.emit(Event.ShowAppRating)
+            eventMutableFlow.emit(Event.ShowAppRating(parameters = parameters))
         }
     }
 
@@ -240,7 +241,9 @@ class SettingsViewModel @AssistedInject constructor(
 
     fun onBugReportClicked() {
         viewModelScope.launch {
-            eventMutableFlow.emit(Event.OpenBugReport)
+            eventMutableFlow.emit(Event.OpenBugReport(
+                localId = parameters.getLocalId() ?: "UNKNOWN_LOCAL_ID"
+            ))
         }
     }
 
@@ -322,9 +325,9 @@ class SettingsViewModel @AssistedInject constructor(
         data object OpenSubscribeScreen : Event()
         data object ShowThemePicker : Event()
         data object AskForNotificationPermission : Event()
-        data object ShowAppRating : Event()
+        data class ShowAppRating(val parameters: Parameters) : Event()
         data object ShowAppSharing : Event()
-        data object OpenBugReport : Event()
+        data class OpenBugReport(val localId: String) : Event()
         data object RedirectToTwitter : Event()
         data object OpenRedeemCode : Event()
     }

@@ -607,44 +607,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                 // Redeem promo code pref
                 findPreference<Preference>(resources.getString(R.string.setting_category_premium_redeem_key))?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                     activity?.let { activity ->
-                        val dialogView = activity.layoutInflater.inflate(R.layout.dialog_redeem_voucher, null)
-                        val voucherEditText = dialogView.findViewById<View>(R.id.voucher) as EditText
 
-                        val builder = MaterialAlertDialogBuilder(activity)
-                            .setTitle(R.string.voucher_redeem_dialog_title)
-                            .setMessage(R.string.voucher_redeem_dialog_message)
-                            .setView(dialogView)
-                            .setPositiveButton(R.string.voucher_redeem_dialog_cta) { dialog, _ ->
-                                dialog.dismiss()
-
-                                val promocode = voucherEditText.text.toString()
-                                if (promocode.trim { it <= ' ' }.isEmpty()) {
-                                    MaterialAlertDialogBuilder(activity)
-                                        .setTitle(R.string.voucher_redeem_error_dialog_title)
-                                        .setMessage(R.string.voucher_redeem_error_code_invalid_dialog_message)
-                                        .setPositiveButton(R.string.ok) { dialog12, _ -> dialog12.dismiss() }
-                                        .show()
-                                }
-
-                                if (!launchRedeemPromocodeFlow(promocode)) {
-                                    MaterialAlertDialogBuilder(activity)
-                                        .setTitle(R.string.iab_purchase_error_title)
-                                        .setMessage(resources.getString(R.string.iab_purchase_error_message, "Error redeeming promo code"))
-                                        .setPositiveButton(R.string.ok) { dialog1, _ -> dialog1.dismiss() }
-                                        .show()
-                                }
-                            }
-                            .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
-
-                        val dialog = builder.show()
-
-                        // Directly show keyboard when the dialog pops
-                        voucherEditText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
-                            // Check if the device doesn't have a physical keyboard
-                            if (hasFocus && resources.configuration.keyboard == Configuration.KEYBOARD_NOKEYS) {
-                                dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-                            }
-                        }
                     }
 
                     false

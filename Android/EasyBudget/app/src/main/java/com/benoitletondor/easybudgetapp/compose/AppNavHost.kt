@@ -201,6 +201,9 @@ fun AppNavHost(
                 },
                 navigateToBackupSettings = {
                     TODO() // FIXME
+                },
+                navigateToPremium = {
+                    navController.navigate(PremiumDestination(startOnPro = false))
                 }
             )
         }

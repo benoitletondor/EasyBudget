@@ -1,5 +1,9 @@
 package com.benoitletondor.easybudgetapp.view.settings
 
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -17,10 +21,14 @@ import com.benoitletondor.easybudgetapp.compose.AppWithTopAppBarScaffold
 import com.benoitletondor.easybudgetapp.compose.BackButtonBehavior
 import com.benoitletondor.easybudgetapp.compose.components.LoadingView
 import com.benoitletondor.easybudgetapp.compose.rememberPermissionStateCompat
+import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.helper.launchCollect
+import com.benoitletondor.easybudgetapp.parameters.getLocalId
+import com.benoitletondor.easybudgetapp.view.RatingPopup
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyDialog
 import com.benoitletondor.easybudgetapp.view.settings.subviews.ErrorView
 import com.benoitletondor.easybudgetapp.view.settings.subviews.Settings
+import com.benoitletondor.easybudgetapp.view.settings.subviews.openRedeemCodeDialog
 import com.benoitletondor.easybudgetapp.view.settings.subviews.showLowMoneyWarningAmountPickerDialog
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -38,6 +46,7 @@ fun SettingsView(
     viewModel: SettingsViewModel,
     navigateUp: () -> Unit,
     navigateToBackupSettings: () -> Unit,
+    navigateToPremium: () -> Unit,
 ) {
     SettingsView(
         stateFlow = viewModel.stateFlow,
@@ -64,6 +73,7 @@ fun SettingsView(
         onRedeemCodeButtonClicked =  viewModel::onRedeemCodeButtonClicked,
         onPushPermissionResult = viewModel::onPushPermissionResult,
         onAdjustLowMoneyWarningAmountChanged = viewModel::onAdjustLowMoneyWarningAmountChanged,
+        navigateToPremium = navigateToPremium,
     )
 }
 
@@ -94,6 +104,7 @@ private fun SettingsView(
     onRedeemCodeButtonClicked: () -> Unit,
     onPushPermissionResult: () -> Unit,
     onAdjustLowMoneyWarningAmountChanged: (Int) -> Unit,
+    navigateToPremium: () -> Unit,
 ) {
     val context = LocalContext.current
     val pushPermissionState = rememberPermissionStateCompat()
@@ -108,9 +119,7 @@ private fun SettingsView(
         launchCollect(eventFlow) { event ->
             when(event) {
                 SettingsViewModel.Event.OpenBackupSettings -> navigateToBackupSettings()
-                SettingsViewModel.Event.ShowCurrencyPicker -> {
-                    showCurrencyPickerDialog = true
-                }
+                SettingsViewModel.Event.ShowCurrencyPicker -> showCurrencyPickerDialog = true
                 is SettingsViewModel.Event.ShowLowMoneyWarningAmountPicker -> {
                     context.showLowMoneyWarningAmountPickerDialog(
                         lowMoneyWarningAmount = event.currentLowMoneyWarningAmount,
@@ -124,12 +133,39 @@ private fun SettingsView(
                         pushPermissionState.launchPermissionRequest()
                     }
                 }
-                SettingsViewModel.Event.OpenBugReport -> TODO()
-                SettingsViewModel.Event.OpenRedeemCode -> TODO()
-                SettingsViewModel.Event.OpenSubscribeScreen -> TODO()
-                SettingsViewModel.Event.RedirectToTwitter -> TODO()
-                SettingsViewModel.Event.ShowAppRating -> TODO()
-                SettingsViewModel.Event.ShowAppSharing -> TODO()
+                is SettingsViewModel.Event.OpenBugReport -> {
+                    val sendIntent = Intent()
+                    sendIntent.action = Intent.ACTION_SENDTO
+                    sendIntent.data = Uri.parse("mailto:") // only email apps should handle this
+                    sendIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(context.getString(R.string.bug_report_email)))
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, context.getString(R.string.setting_category_bug_report_send_text, event.localId))
+                    sendIntent.putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.setting_category_bug_report_send_subject))
+
+                    if (context.packageManager != null && sendIntent.resolveActivity(context.packageManager) != null) {
+                        context.startActivity(sendIntent)
+                    } else {
+                        Toast.makeText(context, context.getString(R.string.setting_category_bug_report_send_error), Toast.LENGTH_SHORT).show()
+                    }
+                }
+                SettingsViewModel.Event.OpenRedeemCode -> context.openRedeemCodeDialog()
+                SettingsViewModel.Event.OpenSubscribeScreen -> navigateToPremium()
+                SettingsViewModel.Event.RedirectToTwitter -> {
+                    val i = Intent(Intent.ACTION_VIEW)
+                    i.data = Uri.parse("https://x.com/BenoitLetondor")
+                    context.startActivity(i)
+                }
+                is SettingsViewModel.Event.ShowAppRating -> RatingPopup(context as Activity, event.parameters).show(true)
+                SettingsViewModel.Event.ShowAppSharing -> {
+                    try {
+                        val sendIntent = Intent()
+                        sendIntent.action = Intent.ACTION_SEND
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, context.getString(R.string.app_invite_message) + "\n" + "https://play.google.com/store/apps/details?id=com.benoitletondor.easybudgetapp")
+                        sendIntent.type = "text/plain"
+                        context.startActivity(sendIntent)
+                    } catch (e: Exception) {
+                        Logger.error("An error occurred during sharing app activity start", e)
+                    }
+                }
                 SettingsViewModel.Event.ShowThemePicker -> TODO()
             }
         }

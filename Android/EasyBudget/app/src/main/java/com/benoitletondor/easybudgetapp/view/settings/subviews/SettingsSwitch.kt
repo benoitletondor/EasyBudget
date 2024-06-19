@@ -40,13 +40,13 @@ fun SettingsSwitch(
             Text(
                 text = title,
                 fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.SemiBold,
                 color = colorResource(R.color.primary_text),
             )
 
             Text(
                 text = subtitle,
-                fontSize = 16.sp,
+                fontSize = 15.sp,
                 color = colorResource(R.color.primary_text),
             )
         }
