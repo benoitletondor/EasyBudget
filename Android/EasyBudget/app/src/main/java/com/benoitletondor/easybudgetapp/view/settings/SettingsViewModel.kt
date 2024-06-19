@@ -3,6 +3,7 @@ package com.benoitletondor.easybudgetapp.view.settings
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.helper.AppTheme
@@ -26,6 +27,7 @@ import com.benoitletondor.easybudgetapp.BuildConfig
 import com.benoitletondor.easybudgetapp.parameters.getLocalId
 import com.benoitletondor.easybudgetapp.parameters.setLowMoneyWarningAmount
 import com.benoitletondor.easybudgetapp.parameters.setShouldShowCheckedBalance
+import com.benoitletondor.easybudgetapp.parameters.setTheme
 import com.benoitletondor.easybudgetapp.parameters.setUserAllowDailyReminderPushes
 import com.benoitletondor.easybudgetapp.parameters.setUserAllowMonthlyReminderPushes
 import com.benoitletondor.easybudgetapp.parameters.setUserAllowUpdatePushes
@@ -180,7 +182,9 @@ class SettingsViewModel @AssistedInject constructor(
 
     fun onThemeClicked() {
         viewModelScope.launch {
-            eventMutableFlow.emit(Event.ShowThemePicker)
+            eventMutableFlow.emit(Event.ShowThemePicker(
+                currentTheme = ((stateFlow.value as State.Loaded).subscriptionStatus as SubscriptionStatus.Subscribed).theme),
+            )
         }
     }
 
@@ -271,6 +275,13 @@ class SettingsViewModel @AssistedInject constructor(
         }
     }
 
+    fun onThemeSelected(theme: AppTheme) {
+        viewModelScope.launch {
+            parameters.setTheme(theme)
+            AppCompatDelegate.setDefaultNightMode(theme.toPlatformValue())
+        }
+    }
+
     private fun isNotificationPermissionGranted(): Boolean = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
     } else {
@@ -323,7 +334,7 @@ class SettingsViewModel @AssistedInject constructor(
         data object ShowCurrencyPicker : Event()
         data class ShowLowMoneyWarningAmountPicker(val currentLowMoneyWarningAmount: Int) : Event()
         data object OpenSubscribeScreen : Event()
-        data object ShowThemePicker : Event()
+        data class ShowThemePicker(val currentTheme: AppTheme) : Event()
         data object AskForNotificationPermission : Event()
         data class ShowAppRating(val parameters: Parameters) : Event()
         data object ShowAppSharing : Event()

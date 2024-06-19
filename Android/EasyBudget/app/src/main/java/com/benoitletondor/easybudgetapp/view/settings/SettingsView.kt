@@ -21,13 +21,14 @@ import com.benoitletondor.easybudgetapp.compose.AppWithTopAppBarScaffold
 import com.benoitletondor.easybudgetapp.compose.BackButtonBehavior
 import com.benoitletondor.easybudgetapp.compose.components.LoadingView
 import com.benoitletondor.easybudgetapp.compose.rememberPermissionStateCompat
+import com.benoitletondor.easybudgetapp.helper.AppTheme
 import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.helper.launchCollect
-import com.benoitletondor.easybudgetapp.parameters.getLocalId
 import com.benoitletondor.easybudgetapp.view.RatingPopup
 import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyDialog
 import com.benoitletondor.easybudgetapp.view.settings.subviews.ErrorView
 import com.benoitletondor.easybudgetapp.view.settings.subviews.Settings
+import com.benoitletondor.easybudgetapp.view.settings.subviews.ThemePickerDialog
 import com.benoitletondor.easybudgetapp.view.settings.subviews.openRedeemCodeDialog
 import com.benoitletondor.easybudgetapp.view.settings.subviews.showLowMoneyWarningAmountPickerDialog
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -36,7 +37,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
 import java.time.DayOfWeek
-import kotlin.reflect.KProperty
 
 @Serializable
 data class SettingsViewDestination(val redirectToBackupSettings: Boolean)
@@ -74,6 +74,7 @@ fun SettingsView(
         onPushPermissionResult = viewModel::onPushPermissionResult,
         onAdjustLowMoneyWarningAmountChanged = viewModel::onAdjustLowMoneyWarningAmountChanged,
         navigateToPremium = navigateToPremium,
+        onThemeSelected = viewModel::onThemeSelected,
     )
 }
 
@@ -105,6 +106,7 @@ private fun SettingsView(
     onPushPermissionResult: () -> Unit,
     onAdjustLowMoneyWarningAmountChanged: (Int) -> Unit,
     navigateToPremium: () -> Unit,
+    onThemeSelected: (AppTheme) -> Unit,
 ) {
     val context = LocalContext.current
     val pushPermissionState = rememberPermissionStateCompat()
@@ -114,6 +116,7 @@ private fun SettingsView(
     }
 
     var showCurrencyPickerDialog by remember { mutableStateOf(false) }
+    var showThemePickerDialogWithTheme by remember { mutableStateOf<AppTheme?>(null) }
 
     LaunchedEffect(key1 = "eventsListener") {
         launchCollect(eventFlow) { event ->
@@ -166,7 +169,7 @@ private fun SettingsView(
                         Logger.error("An error occurred during sharing app activity start", e)
                     }
                 }
-                SettingsViewModel.Event.ShowThemePicker -> TODO()
+                is SettingsViewModel.Event.ShowThemePicker -> showThemePickerDialogWithTheme = event.currentTheme
             }
         }
     }
@@ -213,6 +216,20 @@ private fun SettingsView(
                 if (showCurrencyPickerDialog) {
                     SelectCurrencyDialog(
                         onDismissRequest = { showCurrencyPickerDialog = false },
+                    )
+                }
+
+                val currentThemeForThemePicker = showThemePickerDialogWithTheme
+                if (currentThemeForThemePicker != null) {
+                    ThemePickerDialog(
+                        currentTheme = currentThemeForThemePicker,
+                        onThemeSelected = {
+                            showThemePickerDialogWithTheme = null
+                            onThemeSelected(it)
+                        },
+                        onDismissRequest = {
+                            showThemePickerDialogWithTheme = null
+                        },
                     )
                 }
             }
