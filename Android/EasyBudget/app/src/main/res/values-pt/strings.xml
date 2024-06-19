@@ -478,4 +478,6 @@
     <string name="update_three_dot_two_notification_title">Novo no EasyBudget</string>
     <string name="update_three_dot_two_notification_message">Como usuário Pro, agora você pode exportar seus relatórios mensais como CSV!</string>
     <string name="update_three_dot_two_notification_cta">Descubra</string>
+    <string name="settings_error_loading_title">Não foi possível carregar as configurações</string>
+    <string name="settings_error_loading_description">Ocorreu um erro ao carregar as configurações. Por favor, tente novamente.\n(%s)</string>
 </resources>

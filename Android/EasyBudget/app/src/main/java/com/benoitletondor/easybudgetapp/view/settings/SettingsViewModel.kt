@@ -13,6 +13,7 @@ import com.benoitletondor.easybudgetapp.helper.watchUserCurrency
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.iab.PremiumCheckStatus
 import com.benoitletondor.easybudgetapp.parameters.Parameters
+import com.benoitletondor.easybudgetapp.parameters.setFirstDayOfWeek
 import com.benoitletondor.easybudgetapp.parameters.watchFirstDayOfWeek
 import com.benoitletondor.easybudgetapp.parameters.watchIsBackupEnabled
 import com.benoitletondor.easybudgetapp.parameters.watchLowMoneyWarningAmount
@@ -21,6 +22,11 @@ import com.benoitletondor.easybudgetapp.parameters.watchTheme
 import com.benoitletondor.easybudgetapp.parameters.watchUserAllowingDailyReminderPushes
 import com.benoitletondor.easybudgetapp.parameters.watchUserAllowingMonthlyReminderPushes
 import com.benoitletondor.easybudgetapp.parameters.watchUserAllowingUpdatePushes
+import com.benoitletondor.easybudgetapp.BuildConfig
+import com.benoitletondor.easybudgetapp.parameters.setShouldShowCheckedBalance
+import com.benoitletondor.easybudgetapp.parameters.setUserAllowDailyReminderPushes
+import com.benoitletondor.easybudgetapp.parameters.setUserAllowMonthlyReminderPushes
+import com.benoitletondor.easybudgetapp.parameters.setUserAllowUpdatePushes
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -105,6 +111,7 @@ class SettingsViewModel @AssistedInject constructor(
             firstDayOfWeek,
             subscriptionStatus,
             userAllowingUpdatePushes = isNotificationPermissionGranted && userAllowingUpdatePushes,
+            appVersion = BuildConfig.VERSION_NAME,
         ) as State
     }
         .retryWhen { cause, _ ->
@@ -139,6 +146,121 @@ class SettingsViewModel @AssistedInject constructor(
         }
     }
 
+    fun onCurrencyChangeClicked() {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.ShowCurrencyPicker)
+        }
+    }
+
+    fun onAdjustLowMoneyWarningAmountClicked() {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.ShowLowMoneyWarningAmountPicker)
+        }
+    }
+
+    fun onFirstDayOfWeekChanged(dayOfWeek: DayOfWeek) {
+        viewModelScope.launch {
+            parameters.setFirstDayOfWeek(dayOfWeek)
+        }
+    }
+
+    fun onPremiumButtonClicked() {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.OpenSubscribeScreen)
+        }
+    }
+
+    fun onProButtonClicked() {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.OpenSubscribeScreen)
+        }
+    }
+
+    fun onThemeClicked() {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.ShowThemePicker)
+        }
+    }
+
+    fun onShowCheckedBalanceChanged(showCheckedBalance: Boolean) {
+        viewModelScope.launch {
+            parameters.setShouldShowCheckedBalance(showCheckedBalance)
+        }
+    }
+
+    fun onCloudBackupClicked() {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.OpenBackupSettings)
+        }
+    }
+
+    fun onDailyReminderNotificationActivatedChanged(activated: Boolean) {
+        viewModelScope.launch {
+            parameters.setUserAllowDailyReminderPushes(activated)
+            if (activated) {
+                eventMutableFlow.emit(Event.AskForNotificationPermission)
+            }
+        }
+    }
+
+    fun onMonthlyReportNotificationActivatedChanged(activated: Boolean) {
+        viewModelScope.launch {
+            parameters.setUserAllowMonthlyReminderPushes(activated)
+            if (activated) {
+                eventMutableFlow.emit(Event.AskForNotificationPermission)
+            }
+        }
+    }
+
+    fun onPushPermissionResult() {
+        isNotificationPermissionGrantedMutableFlow.value = isNotificationPermissionGranted()
+    }
+
+    fun onRateAppClicked() {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.ShowAppRating)
+        }
+    }
+
+    fun onShareAppClicked() {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.ShowAppSharing)
+        }
+    }
+
+    fun onUpdateNotificationActivatedChanged(activated: Boolean) {
+        viewModelScope.launch {
+            parameters.setUserAllowUpdatePushes(activated)
+            if (activated) {
+                eventMutableFlow.emit(Event.AskForNotificationPermission)
+            }
+        }
+    }
+
+    fun onBugReportClicked() {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.OpenBugReport)
+        }
+    }
+
+    fun onAppClicked() {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.RedirectToTwitter)
+        }
+    }
+
+    fun onSubscribeButtonClicked() {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.OpenSubscribeScreen)
+        }
+    }
+
+    fun onRedeemCodeButtonClicked() {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.OpenRedeemCode)
+        }
+    }
+
     private fun isNotificationPermissionGranted(): Boolean = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
     } else {
@@ -154,6 +276,7 @@ class SettingsViewModel @AssistedInject constructor(
             val firstDayOfWeek: DayOfWeek,
             val subscriptionStatus: SubscriptionStatus,
             val userAllowingUpdatePushes: Boolean,
+            val appVersion: String,
         ) : State()
     }
 
@@ -187,6 +310,16 @@ class SettingsViewModel @AssistedInject constructor(
 
     sealed class Event {
         data object OpenBackupSettings : Event()
+        data object ShowCurrencyPicker : Event()
+        data object ShowLowMoneyWarningAmountPicker : Event()
+        data object OpenSubscribeScreen : Event()
+        data object ShowThemePicker : Event()
+        data object AskForNotificationPermission : Event()
+        data object ShowAppRating : Event()
+        data object ShowAppSharing : Event()
+        data object OpenBugReport : Event()
+        data object RedirectToTwitter : Event()
+        data object OpenRedeemCode : Event()
     }
 }
 

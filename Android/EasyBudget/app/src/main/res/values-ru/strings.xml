@@ -480,4 +480,6 @@
     <string name="update_three_dot_two_notification_title">Новое в EasyBudget</string>
     <string name="update_three_dot_two_notification_message">Как пользователь Pro, вы теперь можете экспортировать свои ежемесячные отчеты в формате CSV!</string>
     <string name="update_three_dot_two_notification_cta">Обнаружить</string>
+    <string name="settings_error_loading_title">Не удалось загрузить настройки</string>
+    <string name="settings_error_loading_description">Произошла ошибка при загрузке настроек. Пожалуйста, попробуйте еще раз.\n(%s)</string>
 </resources>

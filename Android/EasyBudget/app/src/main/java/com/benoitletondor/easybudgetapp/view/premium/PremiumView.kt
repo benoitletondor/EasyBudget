@@ -1,8 +1,6 @@
 package com.benoitletondor.easybudgetapp.view.premium
 
-import android.Manifest
 import android.app.Activity
-import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,22 +10,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.compose.easyBudgetGreenColor
+import com.benoitletondor.easybudgetapp.compose.rememberPermissionStateCompat
 import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.iab.PurchaseFlowResult
 import com.benoitletondor.easybudgetapp.view.premium.view.ErrorView
 import com.benoitletondor.easybudgetapp.view.premium.view.LoadingView
 import com.benoitletondor.easybudgetapp.view.premium.view.SubscribeView
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.PermissionState
-import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -82,19 +77,7 @@ private fun PremiumView(
 ) {
     val context = LocalContext.current
 
-    val pushPermissionState = if (Build.VERSION.SDK_INT >= 33) {
-        rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS)
-    } else {
-        remember {
-            object : PermissionState {
-                override val permission: String = "android.permission.POST_NOTIFICATIONS"
-                override val status: PermissionStatus = PermissionStatus.Granted
-                override fun launchPermissionRequest() {
-                    /* No-op */
-                }
-            }
-        }
-    }
+    val pushPermissionState = rememberPermissionStateCompat()
 
     LaunchedEffect(pushPermissionState) {
         onPushPermissionResult()

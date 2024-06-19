@@ -1,6 +1,5 @@
 package com.benoitletondor.easybudgetapp.view.onboarding
 
-import android.Manifest
 import android.os.Build
 import android.os.Parcelable
 import androidx.activity.compose.BackHandler
@@ -31,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.benoitletondor.easybudgetapp.compose.rememberPermissionStateCompat
 import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.view.onboarding.subviews.OnboardingPageAccountAmount
 import com.benoitletondor.easybudgetapp.view.onboarding.subviews.OnboardingPageCurrency
@@ -38,10 +38,7 @@ import com.benoitletondor.easybudgetapp.view.onboarding.subviews.OnboardingPageE
 import com.benoitletondor.easybudgetapp.view.onboarding.subviews.OnboardingPagePushNotifications
 import com.benoitletondor.easybudgetapp.view.onboarding.subviews.OnboardingPageWelcome
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.PermissionState
-import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.parcelize.Parcelize
@@ -105,19 +102,7 @@ private fun OnboardingView(
         pageCount = { if (isAndroid33OrMore) 5 else 4 },
     )
 
-    val pushPermissionState = if (isAndroid33OrMore) {
-        rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS)
-    } else {
-        remember {
-            object : PermissionState {
-                override val permission: String = "android.permission.POST_NOTIFICATIONS"
-                override val status: PermissionStatus = PermissionStatus.Granted
-                override fun launchPermissionRequest() {
-                    /* No-op */
-                }
-            }
-        }
-    }
+    val pushPermissionState = rememberPermissionStateCompat()
 
     LaunchedEffect(key1 = "eventsListener") {
         launchCollect(eventFlow) { event ->

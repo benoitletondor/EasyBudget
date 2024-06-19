@@ -478,4 +478,6 @@
     <string name="update_three_dot_two_notification_title">Neu in EasyBudget</string>
     <string name="update_three_dot_two_notification_message">Als Pro-Benutzer können Sie jetzt Ihre monatlichen Berichte als CSV exportieren!</string>
     <string name="update_three_dot_two_notification_cta">Entdecken</string>
+    <string name="settings_error_loading_title">Einstellungen konnten nicht geladen werden</string>
+    <string name="settings_error_loading_description">Beim Laden der Einstellungen ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.\n(%s)</string>
 </resources>
