@@ -62,7 +62,6 @@ import com.benoitletondor.easybudgetapp.view.main.subviews.MainViewContent
 import com.benoitletondor.easybudgetapp.view.main.subviews.MainViewTopBar
 import com.benoitletondor.easybudgetapp.view.onboarding.OnboardingResult
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
-import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.kizitonwose.calendar.core.atStartOfMonth
 import kotlinx.coroutines.flow.Flow
@@ -90,6 +89,7 @@ fun MainView(
     navigateToPremium: (startOnPro: Boolean) -> Unit,
     navigateToMonthlyReport: () -> Unit,
     navigateToManageAccount: (account: MainViewModel.SelectedAccount.Selected.Online) -> Unit,
+    navigateToSettings: () -> Unit,
 ) {
     MainView(
         selectedAccountFlow = viewModel.accountSelectionFlow,
@@ -151,6 +151,7 @@ fun MainView(
         navigateToPremium = navigateToPremium,
         navigateToMonthlyReport = navigateToMonthlyReport,
         navigateToManageAccount = navigateToManageAccount,
+        navigateToSettings = navigateToSettings,
     )
 }
 
@@ -214,6 +215,7 @@ private fun MainView(
     navigateToPremium: (startOnPro: Boolean) -> Unit,
     navigateToMonthlyReport: () -> Unit,
     navigateToManageAccount: (MainViewModel.SelectedAccount.Selected.Online) -> Unit,
+    navigateToSettings: () -> Unit,
 ) {
     var showAccountSelectorModal by remember { mutableStateOf(false) }
     val accountSelectorModalSheetState = rememberModalBottomSheetState()
@@ -413,8 +415,7 @@ private fun MainView(
                         .show()
                 }
                 MainViewModel.Event.ShowSettings -> {
-                    // FIXME replace this
-                    context.startActivity(Intent(context, SettingsActivity::class.java))
+                    navigateToSettings()
                 }
                 is MainViewModel.Event.StartCurrentBalanceEditor -> {
                     val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_adjust_balance, null)
@@ -853,6 +854,7 @@ private fun Preview(
             navigateToPremium = {},
             navigateToMonthlyReport = {},
             navigateToManageAccount = {},
+            navigateToSettings = {},
         )
     }
 }

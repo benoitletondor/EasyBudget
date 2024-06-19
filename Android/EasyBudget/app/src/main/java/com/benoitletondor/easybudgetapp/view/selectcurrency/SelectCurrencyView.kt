@@ -2,13 +2,20 @@ package com.benoitletondor.easybudgetapp.view.selectcurrency
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,6 +28,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.compose.components.LoadingView
@@ -29,14 +37,40 @@ import kotlinx.coroutines.flow.StateFlow
 import java.util.Currency
 
 @Composable
+fun SelectCurrencyDialog(
+    onDismissRequest: () -> Unit,
+) {
+    Dialog(onDismissRequest = onDismissRequest) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.7f),
+            shape = RoundedCornerShape(10.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = colorResource(R.color.window_background),
+            ),
+        ) {
+            SelectCurrencyView(
+                modifier = Modifier.fillMaxSize(),
+                onCurrencySelected = onDismissRequest,
+            )
+        }
+    }
+}
+
+@Composable
 fun SelectCurrencyView(
     modifier: Modifier = Modifier,
     viewModel: SelectCurrencyViewModel = hiltViewModel(),
+    onCurrencySelected: () -> Unit = {},
 ) {
     SelectCurrencyView(
         modifier = modifier,
         stateFlow = viewModel.stateFlow,
-        onCurrencySelected = viewModel::onCurrencySelected,
+        onCurrencySelected = { currency ->
+            viewModel.onCurrencySelected(currency)
+            onCurrencySelected()
+        },
     )
 }
 

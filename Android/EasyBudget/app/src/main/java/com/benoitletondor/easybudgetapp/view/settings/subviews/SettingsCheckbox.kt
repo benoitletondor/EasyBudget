@@ -31,7 +31,7 @@ fun SettingsCheckbox(
             .clickable(onClick = {
                 onCheckedChanged(!checked)
             })
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ){
         Column(

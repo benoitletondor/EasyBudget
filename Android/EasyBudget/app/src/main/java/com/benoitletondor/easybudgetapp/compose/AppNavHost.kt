@@ -101,6 +101,9 @@ fun AppNavHost(
                 },
                 navigateToManageAccount = { account ->
                     navController.navigate(ManageAccountDestination(selectedAccount = account))
+                },
+                navigateToSettings = {
+                    navController.navigate(SettingsViewDestination(redirectToBackupSettings = false))
                 }
             )
         }

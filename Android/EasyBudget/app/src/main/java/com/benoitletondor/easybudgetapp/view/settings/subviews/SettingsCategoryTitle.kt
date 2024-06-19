@@ -6,6 +6,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.benoitletondor.easybudgetapp.R
@@ -17,9 +18,10 @@ fun SettingsCategoryTitle(
     Text(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 20.dp)
+            .padding(top = 20.dp, bottom = 12.dp),
         text = title,
-        fontSize = 15.sp,
+        fontSize = 19.sp,
         color = colorResource(R.color.primary),
     )
 }

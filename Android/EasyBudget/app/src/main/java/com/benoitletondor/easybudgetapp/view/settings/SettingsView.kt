@@ -6,7 +6,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.compose.AppWithTopAppBarScaffold
@@ -14,14 +18,17 @@ import com.benoitletondor.easybudgetapp.compose.BackButtonBehavior
 import com.benoitletondor.easybudgetapp.compose.components.LoadingView
 import com.benoitletondor.easybudgetapp.compose.rememberPermissionStateCompat
 import com.benoitletondor.easybudgetapp.helper.launchCollect
+import com.benoitletondor.easybudgetapp.view.selectcurrency.SelectCurrencyDialog
 import com.benoitletondor.easybudgetapp.view.settings.subviews.ErrorView
 import com.benoitletondor.easybudgetapp.view.settings.subviews.Settings
+import com.benoitletondor.easybudgetapp.view.settings.subviews.showLowMoneyWarningAmountPickerDialog
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
 import java.time.DayOfWeek
+import kotlin.reflect.KProperty
 
 @Serializable
 data class SettingsViewDestination(val redirectToBackupSettings: Boolean)
@@ -56,6 +63,7 @@ fun SettingsView(
         onSubscribeButtonClicked = viewModel::onSubscribeButtonClicked,
         onRedeemCodeButtonClicked =  viewModel::onRedeemCodeButtonClicked,
         onPushPermissionResult = viewModel::onPushPermissionResult,
+        onAdjustLowMoneyWarningAmountChanged = viewModel::onAdjustLowMoneyWarningAmountChanged,
     )
 }
 
@@ -85,19 +93,30 @@ private fun SettingsView(
     onSubscribeButtonClicked: () -> Unit,
     onRedeemCodeButtonClicked: () -> Unit,
     onPushPermissionResult: () -> Unit,
+    onAdjustLowMoneyWarningAmountChanged: (Int) -> Unit,
 ) {
+    val context = LocalContext.current
     val pushPermissionState = rememberPermissionStateCompat()
 
     LaunchedEffect(pushPermissionState) {
         onPushPermissionResult()
     }
 
+    var showCurrencyPickerDialog by remember { mutableStateOf(false) }
+
     LaunchedEffect(key1 = "eventsListener") {
         launchCollect(eventFlow) { event ->
             when(event) {
                 SettingsViewModel.Event.OpenBackupSettings -> navigateToBackupSettings()
-                SettingsViewModel.Event.ShowCurrencyPicker -> TODO()
-                SettingsViewModel.Event.ShowLowMoneyWarningAmountPicker -> TODO()
+                SettingsViewModel.Event.ShowCurrencyPicker -> {
+                    showCurrencyPickerDialog = true
+                }
+                is SettingsViewModel.Event.ShowLowMoneyWarningAmountPicker -> {
+                    context.showLowMoneyWarningAmountPickerDialog(
+                        lowMoneyWarningAmount = event.currentLowMoneyWarningAmount,
+                        onLowMoneyWarningAmountChanged = onAdjustLowMoneyWarningAmountChanged,
+                    )
+                }
                 SettingsViewModel.Event.AskForNotificationPermission -> {
                     if (pushPermissionState.status.isGranted) {
                         onPushPermissionResult()
@@ -153,6 +172,12 @@ private fun SettingsView(
                         onRedeemCodeButtonClicked = onRedeemCodeButtonClicked,
                     )
                     SettingsViewModel.State.Loading -> LoadingView()
+                }
+
+                if (showCurrencyPickerDialog) {
+                    SelectCurrencyDialog(
+                        onDismissRequest = { showCurrencyPickerDialog = false },
+                    )
                 }
             }
         }

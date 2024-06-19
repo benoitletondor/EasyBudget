@@ -23,6 +23,7 @@ import com.benoitletondor.easybudgetapp.parameters.watchUserAllowingDailyReminde
 import com.benoitletondor.easybudgetapp.parameters.watchUserAllowingMonthlyReminderPushes
 import com.benoitletondor.easybudgetapp.parameters.watchUserAllowingUpdatePushes
 import com.benoitletondor.easybudgetapp.BuildConfig
+import com.benoitletondor.easybudgetapp.parameters.setLowMoneyWarningAmount
 import com.benoitletondor.easybudgetapp.parameters.setShouldShowCheckedBalance
 import com.benoitletondor.easybudgetapp.parameters.setUserAllowDailyReminderPushes
 import com.benoitletondor.easybudgetapp.parameters.setUserAllowMonthlyReminderPushes
@@ -154,7 +155,7 @@ class SettingsViewModel @AssistedInject constructor(
 
     fun onAdjustLowMoneyWarningAmountClicked() {
         viewModelScope.launch {
-            eventMutableFlow.emit(Event.ShowLowMoneyWarningAmountPicker)
+            eventMutableFlow.emit(Event.ShowLowMoneyWarningAmountPicker((stateFlow.value as State.Loaded).lowMoneyWarningAmount))
         }
     }
 
@@ -261,6 +262,12 @@ class SettingsViewModel @AssistedInject constructor(
         }
     }
 
+    fun onAdjustLowMoneyWarningAmountChanged(newLowMoneyWarningAmount: Int) {
+        viewModelScope.launch {
+            parameters.setLowMoneyWarningAmount(newLowMoneyWarningAmount)
+        }
+    }
+
     private fun isNotificationPermissionGranted(): Boolean = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
     } else {
@@ -311,7 +318,7 @@ class SettingsViewModel @AssistedInject constructor(
     sealed class Event {
         data object OpenBackupSettings : Event()
         data object ShowCurrencyPicker : Event()
-        data object ShowLowMoneyWarningAmountPicker : Event()
+        data class ShowLowMoneyWarningAmountPicker(val currentLowMoneyWarningAmount: Int) : Event()
         data object OpenSubscribeScreen : Event()
         data object ShowThemePicker : Event()
         data object AskForNotificationPermission : Event()
