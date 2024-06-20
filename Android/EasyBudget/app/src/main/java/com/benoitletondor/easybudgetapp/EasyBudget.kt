@@ -156,7 +156,7 @@ class EasyBudget : Application(), Configuration.Provider {
 
             override fun onActivityStarted(activity: Activity) {
                 if (activityCounter == 0) {
-                    onAppForeground(activity)
+                    onAppForeground()
                 }
 
                 activityCounter++
@@ -336,10 +336,8 @@ class EasyBudget : Application(), Configuration.Provider {
 
     /**
      * Called when the app goes foreground
-     *
-     * @param activity The activity that gone foreground
      */
-    private fun onAppForeground(activity: Activity) {
+    private fun onAppForeground() {
         Logger.debug("onAppForeground")
 
         /*
