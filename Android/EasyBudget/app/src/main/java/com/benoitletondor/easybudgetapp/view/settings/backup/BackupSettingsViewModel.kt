@@ -16,9 +16,10 @@
 
 package com.benoitletondor.easybudgetapp.view.settings.backup
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.result.ActivityResult
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.ListenableWorker
@@ -133,16 +134,16 @@ class BackupSettingsViewModel @Inject constructor(
         }
     }
 
-    fun onAuthenticationConfirmationConfirmed(activity: Activity) {
-        auth.startAuthentication(activity)
+    fun onAuthenticationConfirmationConfirmed(launcher: ManagedActivityResultLauncher<Intent, ActivityResult>) {
+        auth.startAuthentication(launcher)
     }
 
     fun onAuthenticationConfirmationCancelled() {
         // No-op
     }
 
-    fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        auth.handleActivityResult(requestCode, resultCode, data)
+    fun handleAuthActivityResult(activityResult: ActivityResult) {
+        auth.handleActivityResult(activityResult.resultCode, activityResult.data)
     }
 
     fun onLogoutButtonPressed() {
@@ -317,17 +318,19 @@ class BackupSettingsViewModel @Inject constructor(
     sealed class State {
         data object NotAuthenticated : State()
         data object Authenticating : State()
-        data class NotActivated(val currentUser: CurrentUser) : State()
+        sealed interface Authenticated
+
+        data class NotActivated(val currentUser: CurrentUser) : State(), Authenticated
         data class Activated(
             val currentUser: CurrentUser,
             val lastBackupDate: Date?,
             val backupNowAvailable: Boolean,
             val restoreAvailable: Boolean
-        ) : State()
+        ) : State(), Authenticated
 
-        data class BackupInProgress(val currentUser: CurrentUser) : State()
-        data class RestorationInProgress(val currentUser: CurrentUser) : State()
-        data class DeletionInProgress(val currentUser: CurrentUser) : State()
+        data class BackupInProgress(val currentUser: CurrentUser) : State(), Authenticated
+        data class RestorationInProgress(val currentUser: CurrentUser) : State(), Authenticated
+        data class DeletionInProgress(val currentUser: CurrentUser) : State(), Authenticated
     }
 
 }

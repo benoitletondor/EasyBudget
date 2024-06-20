@@ -342,11 +342,5 @@ class BackupSettingsActivity : BaseActivity<ActivityBackupSettingsBinding>() {
         viewModel.handleActivityResult(requestCode, resultCode, data)
     }
 
-    private fun Date.formatLastBackupDate(): String {
-        return DateUtils.formatDateTime(
-            this@BackupSettingsActivity,
-            this.time,
-            DateUtils.FORMAT_SHOW_TIME or DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR
-        )
-    }*/
+    */
 }
