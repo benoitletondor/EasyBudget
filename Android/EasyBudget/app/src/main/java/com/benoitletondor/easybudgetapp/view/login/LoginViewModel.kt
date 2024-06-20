@@ -62,11 +62,12 @@ class LoginViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.Eagerly, State.Loading)
 
     fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        auth.handleActivityResult(requestCode, resultCode, data)
+        auth.handleActivityResult(resultCode, data)
     }
 
     fun onAuthenticatedButtonClicked(activity: Activity) {
-        auth.startAuthentication(activity)
+        //auth.startAuthentication(activity)
+        // FIXME
     }
 
     fun onLogoutButtonClicked() {

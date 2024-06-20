@@ -11,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -20,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -62,6 +64,16 @@ fun BackupSettingsView(
         onDeleteBackupConfirmationCancelled = viewModel::onDeleteBackupConfirmationCancelled,
         onAuthActivityResult = viewModel::handleAuthActivityResult,
         onLogoutButtonClicked = viewModel::onLogoutButtonPressed,
+        onBackupActivationChange = { backupActivated ->
+            if (backupActivated) {
+                viewModel.onBackupActivated()
+            } else {
+                viewModel.onBackupDeactivated()
+            }
+        },
+        onBackupNowClicked = viewModel::onBackupNowButtonPressed,
+        onRestoreNowClicked = viewModel::onRestoreButtonPressed,
+        onDeleteBackupClicked = viewModel::onDeleteBackupButtonPressed,
     )
 }
 
@@ -79,6 +91,10 @@ private fun BackupSettingsView(
     onDeleteBackupConfirmationCancelled: () -> Unit,
     onAuthActivityResult: (ActivityResult) -> Unit,
     onLogoutButtonClicked: () -> Unit,
+    onBackupActivationChange: (Boolean) -> Unit,
+    onBackupNowClicked: () -> Unit,
+    onRestoreNowClicked: () -> Unit,
+    onDeleteBackupClicked: () -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -189,8 +205,10 @@ private fun BackupSettingsView(
                     .padding(contentPadding)
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 20.dp, vertical = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
+                    modifier = Modifier.fillMaxWidth(),
                     text = stringResource(R.string.backup_settings_cloud_backup),
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
@@ -208,6 +226,10 @@ private fun BackupSettingsView(
                         AuthenticatedView(
                             state = currentState,
                             onLogoutButtonClicked = onLogoutButtonClicked,
+                            onBackupActivationChange = onBackupActivationChange,
+                            onBackupNowClicked = onBackupNowClicked,
+                            onRestoreNowClicked = onRestoreNowClicked,
+                            onDeleteBackupClicked = onDeleteBackupClicked,
                         )
                     }
                 }
