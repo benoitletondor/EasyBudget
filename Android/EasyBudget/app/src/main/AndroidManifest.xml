@@ -107,12 +107,6 @@
             tools:ignore="DiscouragedApi,LockedOrientationActivity"
             android:exported="false"/>
         <activity
-            android:name=".view.login.LoginActivity"
-            android:configChanges="locale|keyboardHidden|orientation|screenSize"
-            android:label="@string/title_activity_login"
-            android:screenOrientation="portrait"
-            tools:ignore="DiscouragedApi,LockedOrientationActivity"/>
-        <activity
             android:name=".view.createaccount.CreateAccountActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_create_account"

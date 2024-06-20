@@ -19,6 +19,9 @@ import androidx.navigation.toRoute
 import com.benoitletondor.easybudgetapp.helper.SerializedYearMonth
 import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.helper.toSerializedYearMonth
+import com.benoitletondor.easybudgetapp.view.login.LoginDestination
+import com.benoitletondor.easybudgetapp.view.login.LoginView
+import com.benoitletondor.easybudgetapp.view.login.LoginViewModelFactory
 import com.benoitletondor.easybudgetapp.view.main.MainDestination
 import com.benoitletondor.easybudgetapp.view.main.MainView
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
@@ -115,6 +118,9 @@ fun AppNavHost(
                 },
                 navigateToSettings = {
                     navController.navigate(SettingsViewDestination)
+                },
+                navigateToLogin = { shouldDismissAfterAuth ->
+                    navController.navigate(LoginDestination(shouldDismissAfterAuth = shouldDismissAfterAuth))
                 }
             )
         }
@@ -215,6 +221,24 @@ fun AppNavHost(
                 navigateUp = {
                     navController.navigateUp()
                 }
+            )
+        }
+        composable<LoginDestination> { backStackEntry ->
+            val destination: LoginDestination = backStackEntry.toRoute()
+            LoginView(
+                viewModel = hiltViewModel(
+                    creationCallback = { factory: LoginViewModelFactory ->
+                        factory.create(
+                            shouldDismissAfterAuth = destination.shouldDismissAfterAuth,
+                        )
+                    }
+                ),
+                navigateUp = {
+                    navController.navigateUp()
+                },
+                finish = {
+                    navController.popBackStack()
+                },
             )
         }
     }

@@ -1,29 +1,14 @@
-/*
- *   Copyright 2024 Benoit LETONDOR
- *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- */
-
 package com.benoitletondor.easybudgetapp.view.login
 
-import android.content.Context
 import android.content.Intent
-import android.os.Bundle
-import android.view.MenuItem
-import androidx.activity.viewModels
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -31,12 +16,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -45,97 +30,94 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.lifecycleScope
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
-import com.benoitletondor.easybudgetapp.databinding.ActivityLoginBinding
-import com.benoitletondor.easybudgetapp.helper.BaseActivity
-import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.compose.AppTheme
-import dagger.hilt.android.AndroidEntryPoint
+import com.benoitletondor.easybudgetapp.compose.AppWithTopAppBarScaffold
+import com.benoitletondor.easybudgetapp.compose.BackButtonBehavior
+import com.benoitletondor.easybudgetapp.compose.components.LoadingView
+import com.benoitletondor.easybudgetapp.helper.launchCollect
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.serialization.Serializable
 
-@AndroidEntryPoint
-class LoginActivity : BaseActivity<ActivityLoginBinding>() {
-    private val viewModel: LoginViewModel by viewModels()
+@Serializable
+data class LoginDestination(val shouldDismissAfterAuth: Boolean)
 
-    override fun createBinding(): ActivityLoginBinding = ActivityLoginBinding.inflate(layoutInflater)
+@Composable
+fun LoginView(
+    viewModel: LoginViewModel,
+    navigateUp: () -> Unit,
+    finish: () -> Unit,
+) {
+    LoginView(
+        stateFlow = viewModel.stateFlow,
+        eventFlow = viewModel.eventFlow,
+        navigateUp = navigateUp,
+        onLogoutButtonPressed = viewModel::onLogoutButtonClicked,
+        onFinishButtonPressed = viewModel::onFinishButtonPressed,
+        onLoginButtonPressed = viewModel::onAuthenticatedButtonClicked,
+        onAuthActivityResult = {
+            viewModel.handleAuthActivityResult(it.resultCode, it.data)
+        },
+        finish = finish,
+    )
+}
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+@Composable
+private fun LoginView(
+    stateFlow: StateFlow<LoginViewModel.State>,
+    eventFlow: Flow<LoginViewModel.Event>,
+    navigateUp: () -> Unit,
+    onLogoutButtonPressed: () -> Unit,
+    onFinishButtonPressed: () -> Unit,
+    onLoginButtonPressed: (ManagedActivityResultLauncher<Intent, ActivityResult>) -> Unit,
+    onAuthActivityResult: (ActivityResult) -> Unit,
+    finish: () -> Unit,
+) {
+    val authActivityLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+        onAuthActivityResult(result)
+    }
 
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        binding.loginComposeView.setContent {
-            AppTheme {
-                val state by viewModel.stateFlow.collectAsState()
-
-                ContentView(
-                    state = state,
-                    onLogoutButtonPressed = viewModel::onLogoutButtonClicked,
-                    onFinishButtonPressed = viewModel::onFinishButtonPressed,
-                    onLoginButtonPressed = {
-                        viewModel.onAuthenticatedButtonClicked(this)
-                    }
-                )
-            }
-        }
-
-        lifecycleScope.launchCollect(viewModel.eventFlow) { event ->
+    LaunchedEffect(key1 = "eventsListener") {
+        launchCollect(eventFlow) { event ->
             when(event) {
                 LoginViewModel.Event.Finish -> finish()
             }
         }
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+    AppWithTopAppBarScaffold(
+        title = stringResource(R.string.title_activity_login),
+        backButtonBehavior = BackButtonBehavior.NavigateBack(
+            onBackButtonPressed = navigateUp,
+        ),
+        content = { contentPadding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(contentPadding),
+            ) {
+                val state by stateFlow.collectAsState()
 
-        viewModel.handleActivityResult(requestCode, resultCode, data)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-
-        if (id == android.R.id.home) {
-            finish()
-            return true
-        }
-
-        return super.onOptionsItemSelected(item)
-    }
-
-    companion object {
-        const val SHOULD_DISMISS_AFTER_AUTH_EXTRA = "shouldDismissAfterAuth"
-
-        fun newIntent(context: Context, shouldDismissAfterAuth: Boolean): Intent {
-            return Intent(context, LoginActivity::class.java).apply {
-                putExtra(SHOULD_DISMISS_AFTER_AUTH_EXTRA, shouldDismissAfterAuth)
+                when(val currentState = state) {
+                    is LoginViewModel.State.Authenticated -> AuthenticatedView(
+                        currentUser = currentState.user,
+                        onLogoutButtonPressed = onLogoutButtonPressed,
+                        onFinishButtonPressed = onFinishButtonPressed,
+                    )
+                    LoginViewModel.State.Loading -> LoadingView()
+                    LoginViewModel.State.NotAuthenticated -> NotAuthenticatedView(
+                        onLoginButtonPressed = {
+                            onLoginButtonPressed(authActivityLauncher)
+                        },
+                    )
+                }
             }
-        }
-    }
-}
-
-@Composable
-private fun ContentView(
-    state: LoginViewModel.State,
-    onLogoutButtonPressed: () -> Unit,
-    onFinishButtonPressed: () -> Unit,
-    onLoginButtonPressed: () -> Unit,
-) {
-    when(state) {
-        is LoginViewModel.State.Authenticated -> AuthenticatedView(
-            currentUser = state.user,
-            onLogoutButtonPressed = onLogoutButtonPressed,
-            onFinishButtonPressed = onFinishButtonPressed,
-        )
-        LoginViewModel.State.Loading -> LoadingView()
-        LoginViewModel.State.NotAuthenticated -> NotAuthenticatedView(
-            onLoginButtonPressed = onLoginButtonPressed,
-        )
-    }
+        },
+    )
 }
 
 @Composable
@@ -263,24 +245,19 @@ private fun AuthenticatedView(
     }
 }
 
-@Composable
-private fun LoadingView() {
-    Box {
-        CircularProgressIndicator(
-            modifier = Modifier.align(Alignment.Center),
-        )
-    }
-}
-
 @Preview(name = "Loading preview", showSystemUi = true)
 @Composable
 private fun LoadingPreview() {
     AppTheme {
-        ContentView(
-            state = LoginViewModel.State.Loading,
+        LoginView(
+            stateFlow = MutableStateFlow(LoginViewModel.State.Loading),
+            eventFlow = MutableSharedFlow(),
+            navigateUp = {},
             onLogoutButtonPressed = {},
             onFinishButtonPressed = {},
             onLoginButtonPressed = {},
+            onAuthActivityResult = {},
+            finish = {},
         )
     }
 }
@@ -289,17 +266,21 @@ private fun LoadingPreview() {
 @Composable
 private fun AuthenticatedPreview() {
     AppTheme {
-        ContentView(
-            state = LoginViewModel.State.Authenticated(
+        LoginView(
+            stateFlow = MutableStateFlow(LoginViewModel.State.Authenticated(
                 user = CurrentUser(
                     id = "",
                     email = "test@login.com",
                     token = "",
                 )
-            ),
+            )),
+            eventFlow = MutableSharedFlow(),
+            navigateUp = {},
             onLogoutButtonPressed = {},
             onFinishButtonPressed = {},
             onLoginButtonPressed = {},
+            onAuthActivityResult = {},
+            finish = {},
         )
     }
 }
@@ -308,11 +289,15 @@ private fun AuthenticatedPreview() {
 @Composable
 private fun NotAuthenticatedPreview() {
     AppTheme {
-        ContentView(
-            state = LoginViewModel.State.NotAuthenticated,
+        LoginView(
+            stateFlow = MutableStateFlow(LoginViewModel.State.NotAuthenticated),
+            eventFlow = MutableSharedFlow(),
+            navigateUp = {},
             onLogoutButtonPressed = {},
             onFinishButtonPressed = {},
             onLoginButtonPressed = {},
+            onAuthActivityResult = {},
+            finish = {},
         )
     }
 }

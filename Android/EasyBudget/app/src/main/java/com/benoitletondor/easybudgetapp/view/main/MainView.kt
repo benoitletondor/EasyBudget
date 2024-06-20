@@ -30,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -56,7 +57,6 @@ import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.main.subviews.accountselector.AccountSelectorView
 import com.benoitletondor.easybudgetapp.view.createaccount.CreateAccountActivity
-import com.benoitletondor.easybudgetapp.view.login.LoginActivity
 import com.benoitletondor.easybudgetapp.view.main.subviews.FABMenuOverlay
 import com.benoitletondor.easybudgetapp.view.main.subviews.MainViewContent
 import com.benoitletondor.easybudgetapp.view.main.subviews.MainViewTopBar
@@ -90,6 +90,7 @@ fun MainView(
     navigateToMonthlyReport: () -> Unit,
     navigateToManageAccount: (account: MainViewModel.SelectedAccount.Selected.Online) -> Unit,
     navigateToSettings: () -> Unit,
+    navigateToLogin: (shouldDismissAfterAuth: Boolean) -> Unit,
 ) {
     MainView(
         selectedAccountFlow = viewModel.accountSelectionFlow,
@@ -152,6 +153,7 @@ fun MainView(
         navigateToMonthlyReport = navigateToMonthlyReport,
         navigateToManageAccount = navigateToManageAccount,
         navigateToSettings = navigateToSettings,
+        navigateToLogin = navigateToLogin,
     )
 }
 
@@ -216,8 +218,9 @@ private fun MainView(
     navigateToMonthlyReport: () -> Unit,
     navigateToManageAccount: (MainViewModel.SelectedAccount.Selected.Online) -> Unit,
     navigateToSettings: () -> Unit,
+    navigateToLogin: (shouldDismissAfterAuth: Boolean) -> Unit,
 ) {
-    var showAccountSelectorModal by remember { mutableStateOf(false) }
+    var showAccountSelectorModal by rememberSaveable { mutableStateOf(false) }
     val accountSelectorModalSheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -675,8 +678,7 @@ private fun MainView(
                                 }
                             },
                             onOpenLoginScreen = { shouldDismissAfterAuth ->
-                                // FIXME replace this
-                                context.startActivity(LoginActivity.newIntent(context, shouldDismissAfterAuth = shouldDismissAfterAuth))
+                                navigateToLogin(shouldDismissAfterAuth)
                             },
                             onOpenCreateAccountScreen = {
                                 // FIXME replace this
@@ -855,6 +857,7 @@ private fun Preview(
             navigateToMonthlyReport = {},
             navigateToManageAccount = {},
             navigateToSettings = {},
+            navigateToLogin = {},
         )
     }
 }

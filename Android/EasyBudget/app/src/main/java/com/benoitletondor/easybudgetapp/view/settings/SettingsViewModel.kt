@@ -129,10 +129,6 @@ class SettingsViewModel @Inject constructor(
     private val eventMutableFlow = MutableLiveFlow<Event>()
     val eventFlow: Flow<Event> = eventMutableFlow
 
-    fun onNotificationPermissionChanged() {
-        isNotificationPermissionGrantedMutableFlow.value = isNotificationPermissionGranted()
-    }
-
     fun onRetryButtonPressed() {
         viewModelScope.launch {
             retryLoadingMutableFlow.emit(Unit)

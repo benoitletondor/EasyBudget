@@ -16,15 +16,18 @@
 
 package com.benoitletondor.easybudgetapp.view.login
 
-import android.app.Activity
 import android.content.Intent
-import androidx.lifecycle.SavedStateHandle
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.result.ActivityResult
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.auth.Auth
 import com.benoitletondor.easybudgetapp.auth.AuthState
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -33,16 +36,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class LoginViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = LoginViewModelFactory::class)
+class LoginViewModel @AssistedInject constructor(
     private val auth: Auth,
-    savedStateHandle: SavedStateHandle,
+    @Assisted private val shouldDismissAfterAuth: Boolean,
 ) : ViewModel() {
-    private val shouldDismissAfterAuth = savedStateHandle.get<Boolean>(LoginActivity.SHOULD_DISMISS_AFTER_AUTH_EXTRA)
-        ?: throw IllegalStateException("Missing SHOULD_DISMISS_AFTER_AUTH_EXTRA extra")
-
     private val eventMutableFlow = MutableLiveFlow<Event>()
     val eventFlow: Flow<Event> = eventMutableFlow
 
@@ -61,13 +60,12 @@ class LoginViewModel @Inject constructor(
         }
         .stateIn(viewModelScope, SharingStarted.Eagerly, State.Loading)
 
-    fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    fun handleAuthActivityResult(resultCode: Int, data: Intent?) {
         auth.handleActivityResult(resultCode, data)
     }
 
-    fun onAuthenticatedButtonClicked(activity: Activity) {
-        //auth.startAuthentication(activity)
-        // FIXME
+    fun onAuthenticatedButtonClicked(launcher: ManagedActivityResultLauncher<Intent, ActivityResult>) {
+        auth.startAuthentication(launcher)
     }
 
     fun onLogoutButtonClicked() {
@@ -89,4 +87,9 @@ class LoginViewModel @Inject constructor(
     sealed class Event {
         data object Finish : Event()
     }
+}
+
+@AssistedFactory
+interface LoginViewModelFactory {
+    fun create(shouldDismissAfterAuth: Boolean): LoginViewModel
 }
