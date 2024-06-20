@@ -16,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.compose.AppWithTopAppBarScaffold
 import com.benoitletondor.easybudgetapp.compose.BackButtonBehavior
@@ -39,11 +40,11 @@ import kotlinx.serialization.Serializable
 import java.time.DayOfWeek
 
 @Serializable
-data class SettingsViewDestination(val redirectToBackupSettings: Boolean)
+object SettingsViewDestination
 
 @Composable
 fun SettingsView(
-    viewModel: SettingsViewModel,
+    viewModel: SettingsViewModel = hiltViewModel(),
     navigateUp: () -> Unit,
     navigateToBackupSettings: () -> Unit,
     navigateToPremium: () -> Unit,

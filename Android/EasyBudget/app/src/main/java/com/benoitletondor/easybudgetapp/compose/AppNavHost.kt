@@ -38,7 +38,6 @@ import com.benoitletondor.easybudgetapp.view.premium.PremiumDestination
 import com.benoitletondor.easybudgetapp.view.premium.PremiumView
 import com.benoitletondor.easybudgetapp.view.settings.SettingsView
 import com.benoitletondor.easybudgetapp.view.settings.SettingsViewDestination
-import com.benoitletondor.easybudgetapp.view.settings.SettingsViewModelFactory
 import com.benoitletondor.easybudgetapp.view.settings.backup.BackupSettingsDestination
 import com.benoitletondor.easybudgetapp.view.settings.backup.BackupSettingsView
 import kotlinx.coroutines.flow.Flow
@@ -115,7 +114,7 @@ fun AppNavHost(
                     navController.navigate(ManageAccountDestination(selectedAccount = account))
                 },
                 navigateToSettings = {
-                    navController.navigate(SettingsViewDestination(redirectToBackupSettings = false))
+                    navController.navigate(SettingsViewDestination)
                 }
             )
         }
@@ -198,16 +197,8 @@ fun AppNavHost(
                 },
             )
         }
-        composable<SettingsViewDestination> { backStackEntry ->
-            val destination: SettingsViewDestination = backStackEntry.toRoute()
+        composable<SettingsViewDestination> {
             SettingsView(
-                viewModel = hiltViewModel(
-                    creationCallback = { factory: SettingsViewModelFactory ->
-                        factory.create(
-                            redirectToBackupSettings = destination.redirectToBackupSettings,
-                        )
-                    }
-                ),
                 navigateUp = {
                     navController.navigateUp()
                 },

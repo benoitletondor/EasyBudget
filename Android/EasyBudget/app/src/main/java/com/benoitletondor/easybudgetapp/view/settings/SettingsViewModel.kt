@@ -31,9 +31,6 @@ import com.benoitletondor.easybudgetapp.parameters.setTheme
 import com.benoitletondor.easybudgetapp.parameters.setUserAllowDailyReminderPushes
 import com.benoitletondor.easybudgetapp.parameters.setUserAllowMonthlyReminderPushes
 import com.benoitletondor.easybudgetapp.parameters.setUserAllowUpdatePushes
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -49,12 +46,12 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.util.Currency
+import javax.inject.Inject
 
-@HiltViewModel(assistedFactory = SettingsViewModelFactory::class)
-class SettingsViewModel @AssistedInject constructor(
+@HiltViewModel
+class SettingsViewModel @Inject constructor(
     private val parameters: Parameters,
     iab: Iab,
-    @Assisted redirectToBackupSettings: Boolean,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
     private val retryLoadingMutableFlow = MutableSharedFlow<Unit>()
@@ -131,14 +128,6 @@ class SettingsViewModel @AssistedInject constructor(
 
     private val eventMutableFlow = MutableLiveFlow<Event>()
     val eventFlow: Flow<Event> = eventMutableFlow
-
-    init {
-        if (redirectToBackupSettings) {
-            viewModelScope.launch {
-                eventMutableFlow.emit(Event.OpenBackupSettings)
-            }
-        }
-    }
 
     fun onNotificationPermissionChanged() {
         isNotificationPermissionGrantedMutableFlow.value = isNotificationPermissionGranted()
@@ -342,9 +331,4 @@ class SettingsViewModel @AssistedInject constructor(
         data object RedirectToTwitter : Event()
         data object OpenRedeemCode : Event()
     }
-}
-
-@AssistedFactory
-interface SettingsViewModelFactory {
-    fun create(redirectToBackupSettings: Boolean): SettingsViewModel
 }
