@@ -22,7 +22,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -33,6 +32,7 @@ import com.benoitletondor.easybudgetapp.compose.AppWithTopAppBarScaffold
 import com.benoitletondor.easybudgetapp.compose.BackButtonBehavior
 import com.benoitletondor.easybudgetapp.compose.components.LoadingView
 import com.benoitletondor.easybudgetapp.helper.launchCollect
+import com.benoitletondor.easybudgetapp.view.settings.backup.subviews.AuthenticatedView
 import com.benoitletondor.easybudgetapp.view.settings.backup.subviews.NotAuthenticatedView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.Flow
@@ -61,6 +61,7 @@ fun BackupSettingsView(
         onDeleteBackupConfirmationConfirmed = viewModel::onDeleteBackupConfirmationConfirmed,
         onDeleteBackupConfirmationCancelled = viewModel::onDeleteBackupConfirmationCancelled,
         onAuthActivityResult = viewModel::handleAuthActivityResult,
+        onLogoutButtonClicked = viewModel::onLogoutButtonPressed,
     )
 }
 
@@ -77,6 +78,7 @@ private fun BackupSettingsView(
     onDeleteBackupConfirmationConfirmed: () -> Unit,
     onDeleteBackupConfirmationCancelled: () -> Unit,
     onAuthActivityResult: (ActivityResult) -> Unit,
+    onLogoutButtonClicked: () -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -192,7 +194,6 @@ private fun BackupSettingsView(
                     text = stringResource(R.string.backup_settings_cloud_backup),
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
-                    color = colorResource(R.color.primary_text),
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -204,13 +205,10 @@ private fun BackupSettingsView(
                     )
                     BackupSettingsViewModel.State.Authenticating -> LoadingView()
                     is BackupSettingsViewModel.State.Authenticated -> {
-                        when(currentState) {
-                            is BackupSettingsViewModel.State.Activated -> TODO()
-                            is BackupSettingsViewModel.State.NotActivated -> TODO()
-                            is BackupSettingsViewModel.State.BackupInProgress -> TODO()
-                            is BackupSettingsViewModel.State.DeletionInProgress -> TODO()
-                            is BackupSettingsViewModel.State.RestorationInProgress -> TODO()
-                        }
+                        AuthenticatedView(
+                            state = currentState,
+                            onLogoutButtonClicked = onLogoutButtonClicked,
+                        )
                     }
                 }
             }

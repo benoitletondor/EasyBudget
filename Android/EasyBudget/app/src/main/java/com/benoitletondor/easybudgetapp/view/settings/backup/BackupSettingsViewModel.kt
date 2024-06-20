@@ -318,19 +318,21 @@ class BackupSettingsViewModel @Inject constructor(
     sealed class State {
         data object NotAuthenticated : State()
         data object Authenticating : State()
-        sealed interface Authenticated
+        sealed interface Authenticated {
+            val currentUser: CurrentUser
+        }
 
-        data class NotActivated(val currentUser: CurrentUser) : State(), Authenticated
+        data class NotActivated(override val currentUser: CurrentUser) : State(), Authenticated
         data class Activated(
-            val currentUser: CurrentUser,
+            override val currentUser: CurrentUser,
             val lastBackupDate: Date?,
             val backupNowAvailable: Boolean,
             val restoreAvailable: Boolean
         ) : State(), Authenticated
 
-        data class BackupInProgress(val currentUser: CurrentUser) : State(), Authenticated
-        data class RestorationInProgress(val currentUser: CurrentUser) : State(), Authenticated
-        data class DeletionInProgress(val currentUser: CurrentUser) : State(), Authenticated
+        data class BackupInProgress(override val currentUser: CurrentUser) : State(), Authenticated
+        data class RestorationInProgress(override val currentUser: CurrentUser) : State(), Authenticated
+        data class DeletionInProgress(override val currentUser: CurrentUser) : State(), Authenticated
     }
 
 }

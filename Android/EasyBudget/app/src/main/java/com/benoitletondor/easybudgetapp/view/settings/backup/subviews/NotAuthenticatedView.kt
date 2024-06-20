@@ -26,7 +26,6 @@ fun NotAuthenticatedView(
             modifier = Modifier.fillMaxWidth(),
             text = stringResource(R.string.backup_settings_not_authenticated_description),
             fontSize = 16.sp,
-            color = colorResource(R.color.primary_text),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
