@@ -446,6 +446,16 @@ fun Parameters.setBackupEnabled(enabled: Boolean) {
     putBoolean(BACKUP_ENABLED_PARAMETERS_KEY, enabled)
 }
 
+private lateinit var lastBackupDateFlow: MutableStateFlow<Date?>
+
+fun Parameters.watchLastBackupDate(): StateFlow<Date?> {
+    if (!::lastBackupDateFlow.isInitialized) {
+        lastBackupDateFlow = MutableStateFlow(getLastBackupDate())
+    }
+
+    return lastBackupDateFlow
+}
+
 fun Parameters.getLastBackupDate(): Date? {
     val lastTimestamp = getLong(LAST_BACKUP_TIMESTAMP, -1)
     if( lastTimestamp > 0 ) {
@@ -456,6 +466,11 @@ fun Parameters.getLastBackupDate(): Date? {
 }
 
 fun Parameters.saveLastBackupDate(date: Date?) {
+    if (!::lastBackupDateFlow.isInitialized) {
+        lastBackupDateFlow = MutableStateFlow(date)
+    }
+
+    lastBackupDateFlow.value = date
     if( date != null ) {
         putLong(LAST_BACKUP_TIMESTAMP, date.time)
     } else {

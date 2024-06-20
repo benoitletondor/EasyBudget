@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -16,6 +17,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.benoitletondor.easybudgetapp.helper.SerializedYearMonth
+import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.helper.toSerializedYearMonth
 import com.benoitletondor.easybudgetapp.view.main.MainDestination
 import com.benoitletondor.easybudgetapp.view.main.MainView
@@ -37,6 +39,9 @@ import com.benoitletondor.easybudgetapp.view.premium.PremiumView
 import com.benoitletondor.easybudgetapp.view.settings.SettingsView
 import com.benoitletondor.easybudgetapp.view.settings.SettingsViewDestination
 import com.benoitletondor.easybudgetapp.view.settings.SettingsViewModelFactory
+import com.benoitletondor.easybudgetapp.view.settings.backup.BackupSettingsDestination
+import com.benoitletondor.easybudgetapp.view.settings.backup.BackupSettingsView
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.encodeToString
@@ -52,8 +57,15 @@ private const val OnboardingResultKey = "OnboardingResult"
 @Composable
 fun AppNavHost(
     closeApp: () -> Unit,
+    openSubscriptionScreenFlow: Flow<Unit>,
 ) {
     val navController = rememberNavController()
+
+    LaunchedEffect(key1 = "openSubscriptionScreenListener") {
+        launchCollect(openSubscriptionScreenFlow) {
+            navController.navigate(PremiumDestination)
+        }
+    }
 
     NavHost(
         modifier = Modifier.fillMaxSize(),
@@ -200,10 +212,17 @@ fun AppNavHost(
                     navController.navigateUp()
                 },
                 navigateToBackupSettings = {
-                    TODO() // FIXME
+                    navController.navigate(BackupSettingsDestination)
                 },
                 navigateToPremium = {
                     navController.navigate(PremiumDestination(startOnPro = false))
+                }
+            )
+        }
+        composable<BackupSettingsDestination> {
+            BackupSettingsView(
+                navigateUp = {
+                    navController.navigateUp()
                 }
             )
         }

@@ -36,27 +36,19 @@ import com.batch.android.PushNotificationType
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.iab.Iab
-import com.benoitletondor.easybudgetapp.iab.PremiumCheckStatus
 import com.benoitletondor.easybudgetapp.notif.*
 import com.benoitletondor.easybudgetapp.parameters.*
 import com.benoitletondor.easybudgetapp.push.PushService.Companion.DAILY_REMINDER_KEY
 import com.benoitletondor.easybudgetapp.push.PushService.Companion.MONTHLY_REMINDER_KEY
-import com.benoitletondor.easybudgetapp.view.RatingPopup
-import com.benoitletondor.easybudgetapp.view.settings.SettingsActivity
-import com.benoitletondor.easybudgetapp.view.getRatingPopupUserStep
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.HiltAndroidApp
 import io.realm.kotlin.log.LogCategory
 import io.realm.kotlin.log.LogLevel
 import io.realm.kotlin.log.RealmLog
 import io.realm.kotlin.log.RealmLogger
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
 
@@ -188,129 +180,6 @@ class EasyBudget : Application(), Configuration.Provider {
         })
     }
 
-    /**
-     * Show the rating popup if the user didn't asked not to every day after the app has been open
-     * in 3 different days.
-     */
-    private fun showRatingPopupIfNeeded(activity: Activity) {
-        try {
-            if (activity !is MainActivity) {
-                Logger.debug("Not showing rating popup cause app is not opened by the MainActivity")
-                return
-            }
-
-            val dailyOpens = parameters.getNumberOfDailyOpen()
-            if (dailyOpens > 2) {
-                if (!hasRatingPopupBeenShownToday()) {
-                    val shown = RatingPopup(activity, parameters).show(false)
-                    if (shown) {
-                        parameters.setRatingPopupLastAutoShowTimestamp(Date().time)
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            Logger.error("Error while showing rating popup", e)
-        }
-
-    }
-
-    @OptIn(DelicateCoroutinesApi::class)
-    private fun showPremiumPopupIfNeeded(activity: Activity) {
-        GlobalScope.launch {
-            try {
-                if (activity !is MainActivity) {
-                    return@launch
-                }
-
-                if ( parameters.hasPremiumPopupBeenShow() ) {
-                    return@launch
-                }
-
-                if ( iab.isUserPremium() || iab.iabStatusFlow.value == PremiumCheckStatus.ERROR ) {
-                    return@launch
-                }
-
-                if ( !parameters.hasUserCompleteRating() ) {
-                    return@launch
-                }
-
-                val currentStep = parameters.getRatingPopupUserStep()
-                if (currentStep == RatingPopup.RatingPopupStep.STEP_LIKE ||
-                    currentStep == RatingPopup.RatingPopupStep.STEP_LIKE_NOT_RATED ||
-                    currentStep == RatingPopup.RatingPopupStep.STEP_LIKE_RATED) {
-                    if ( !hasRatingPopupBeenShownToday() && shouldShowPremiumPopup() ) {
-                        parameters.setPremiumPopupLastAutoShowTimestamp(Date().time)
-
-                        withContext(Dispatchers.Main) {
-                            MaterialAlertDialogBuilder(activity)
-                                .setTitle(R.string.premium_popup_become_title)
-                                .setMessage(R.string.premium_popup_become_message)
-                                .setPositiveButton(R.string.premium_popup_become_cta) { dialog13, _ ->
-                                    val startIntent = Intent(activity, SettingsActivity::class.java)
-                                    startIntent.putExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, true)
-                                    ActivityCompat.startActivity(activity, startIntent, null)
-
-                                    dialog13.dismiss()
-                                }
-                                .setNegativeButton(R.string.premium_popup_become_not_now) { dialog12, _ -> dialog12.dismiss() }
-                                .setNeutralButton(R.string.premium_popup_become_not_ask_again) { dialog1, _ ->
-                                    parameters.setPremiumPopupShown()
-                                    dialog1.dismiss()
-                                }
-                                .show()
-                                .centerButtons()
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                Logger.error("Error while showing become premium popup", e)
-            }
-        }
-
-    }
-
-    /**
-     * Has the rating popup been shown automatically today
-     *
-     * @return true if the rating popup has been shown today, false otherwise
-     */
-    private fun hasRatingPopupBeenShownToday(): Boolean {
-        val lastRatingTS = parameters.getRatingPopupLastAutoShowTimestamp()
-        if (lastRatingTS > 0) {
-            val cal = Calendar.getInstance()
-            val currentDay = cal.get(Calendar.DAY_OF_YEAR)
-
-            cal.time = Date(lastRatingTS)
-            val lastTimeDay = cal.get(Calendar.DAY_OF_YEAR)
-
-            return currentDay == lastTimeDay
-        }
-
-        return false
-    }
-
-    /**
-     * Check that last time the premium popup was shown was 2 days ago or more
-     *
-     * @return true if we can show premium popup, false otherwise
-     */
-    private fun shouldShowPremiumPopup(): Boolean {
-        val lastPremiumTS = parameters.getPremiumPopupLastAutoShowTimestamp()
-        if (lastPremiumTS == 0L) {
-            return true
-        }
-
-        // Set calendar to last time 00:00 + 2 days
-        val cal = Calendar.getInstance()
-        cal.time = Date(lastPremiumTS)
-        cal.set(Calendar.HOUR, 0)
-        cal.set(Calendar.MINUTE, 0)
-        cal.set(Calendar.SECOND, 0)
-        cal.set(Calendar.MILLISECOND, 0)
-        cal.add(Calendar.DAY_OF_YEAR, 2)
-
-        return Date().after(cal.time)
-    }
 
     /**
      * Set-up Batch SDK config + lifecycle
@@ -509,16 +378,6 @@ class EasyBudget : Application(), Configuration.Provider {
          * Save last open date
          */
         parameters.setLastOpenTimestamp(Date().time)
-
-        /*
-         * Rating popup every day after 3 opens
-         */
-        showRatingPopupIfNeeded(activity)
-
-        /*
-         * Premium popup after rating complete
-         */
-        showPremiumPopupIfNeeded(activity)
 
         /*
          * Update iap status if needed

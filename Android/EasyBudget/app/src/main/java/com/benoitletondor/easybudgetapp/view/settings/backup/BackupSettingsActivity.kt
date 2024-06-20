@@ -38,7 +38,7 @@ class BackupSettingsActivity : BaseActivity<ActivityBackupSettingsBinding>() {
 
     override fun createBinding(): ActivityBackupSettingsBinding = ActivityBackupSettingsBinding.inflate(layoutInflater)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    /*override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setSupportActionBar(binding.toolbar)
@@ -348,5 +348,5 @@ class BackupSettingsActivity : BaseActivity<ActivityBackupSettingsBinding>() {
             this.time,
             DateUtils.FORMAT_SHOW_TIME or DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR
         )
-    }
+    }*/
 }
