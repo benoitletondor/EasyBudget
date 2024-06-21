@@ -19,6 +19,8 @@ import androidx.navigation.toRoute
 import com.benoitletondor.easybudgetapp.helper.SerializedYearMonth
 import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.helper.toSerializedYearMonth
+import com.benoitletondor.easybudgetapp.view.createaccount.CreateAccountDestination
+import com.benoitletondor.easybudgetapp.view.createaccount.CreateAccountView
 import com.benoitletondor.easybudgetapp.view.login.LoginDestination
 import com.benoitletondor.easybudgetapp.view.login.LoginView
 import com.benoitletondor.easybudgetapp.view.login.LoginViewModelFactory
@@ -121,6 +123,9 @@ fun AppNavHost(
                 },
                 navigateToLogin = { shouldDismissAfterAuth ->
                     navController.navigate(LoginDestination(shouldDismissAfterAuth = shouldDismissAfterAuth))
+                },
+                navigateToCreateAccount = {
+                    navController.navigate(CreateAccountDestination)
                 }
             )
         }
@@ -233,6 +238,16 @@ fun AppNavHost(
                         )
                     }
                 ),
+                navigateUp = {
+                    navController.navigateUp()
+                },
+                finish = {
+                    navController.popBackStack()
+                },
+            )
+        }
+        composable<CreateAccountDestination> {
+            CreateAccountView(
                 navigateUp = {
                     navController.navigateUp()
                 },

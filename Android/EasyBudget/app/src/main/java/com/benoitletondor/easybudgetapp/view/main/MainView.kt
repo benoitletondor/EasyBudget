@@ -56,7 +56,6 @@ import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.main.subviews.accountselector.AccountSelectorView
-import com.benoitletondor.easybudgetapp.view.createaccount.CreateAccountActivity
 import com.benoitletondor.easybudgetapp.view.main.subviews.FABMenuOverlay
 import com.benoitletondor.easybudgetapp.view.main.subviews.MainViewContent
 import com.benoitletondor.easybudgetapp.view.main.subviews.MainViewTopBar
@@ -91,6 +90,7 @@ fun MainView(
     navigateToManageAccount: (account: MainViewModel.SelectedAccount.Selected.Online) -> Unit,
     navigateToSettings: () -> Unit,
     navigateToLogin: (shouldDismissAfterAuth: Boolean) -> Unit,
+    navigateToCreateAccount: () -> Unit,
 ) {
     MainView(
         selectedAccountFlow = viewModel.accountSelectionFlow,
@@ -154,6 +154,7 @@ fun MainView(
         navigateToManageAccount = navigateToManageAccount,
         navigateToSettings = navigateToSettings,
         navigateToLogin = navigateToLogin,
+        navigateToCreateAccount = navigateToCreateAccount,
     )
 }
 
@@ -219,6 +220,7 @@ private fun MainView(
     navigateToManageAccount: (MainViewModel.SelectedAccount.Selected.Online) -> Unit,
     navigateToSettings: () -> Unit,
     navigateToLogin: (shouldDismissAfterAuth: Boolean) -> Unit,
+    navigateToCreateAccount: () -> Unit,
 ) {
     var showAccountSelectorModal by rememberSaveable { mutableStateOf(false) }
     val accountSelectorModalSheetState = rememberModalBottomSheetState()
@@ -681,8 +683,7 @@ private fun MainView(
                                 navigateToLogin(shouldDismissAfterAuth)
                             },
                             onOpenCreateAccountScreen = {
-                                // FIXME replace this
-                                context.startActivity(Intent(context, CreateAccountActivity::class.java))
+                                navigateToCreateAccount()
                             },
                         )
                     }
@@ -858,6 +859,7 @@ private fun Preview(
             navigateToManageAccount = {},
             navigateToSettings = {},
             navigateToLogin = {},
+            navigateToCreateAccount = {},
         )
     }
 }

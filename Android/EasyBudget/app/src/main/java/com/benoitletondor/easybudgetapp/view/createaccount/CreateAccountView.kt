@@ -1,101 +1,95 @@
-/*
- *   Copyright 2024 Benoit LETONDOR
- *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- */
-
 package com.benoitletondor.easybudgetapp.view.createaccount
 
-import android.os.Bundle
-import android.view.MenuItem
 import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.lifecycle.lifecycleScope
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
-import com.benoitletondor.easybudgetapp.databinding.ActivityCreateAccountBinding
-import com.benoitletondor.easybudgetapp.helper.BaseActivity
-import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.compose.AppTheme
+import com.benoitletondor.easybudgetapp.compose.AppWithTopAppBarScaffold
+import com.benoitletondor.easybudgetapp.compose.BackButtonBehavior
+import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.serialization.Serializable
 
-@AndroidEntryPoint
-class CreateAccountActivity : BaseActivity<ActivityCreateAccountBinding>() {
-    private val viewModel: CreateAccountViewModel by viewModels()
+@Serializable
+object CreateAccountDestination
 
-    override fun createBinding(): ActivityCreateAccountBinding = ActivityCreateAccountBinding.inflate(layoutInflater)
+@Composable
+fun CreateAccountView(
+    viewModel: CreateAccountViewModel = hiltViewModel(),
+    navigateUp: () -> Unit,
+    finish: () -> Unit,
+) {
+    CreateAccountView(
+        stateFlow = viewModel.stateFlow,
+        eventFlow = viewModel.eventFlow,
+        navigateUp = navigateUp,
+        finish = finish,
+        onFinishButtonClicked = viewModel::onFinishButtonClicked,
+        onCreateAccountClicked = viewModel::onCreateAccountButtonPressed,
+    )
+}
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+@Composable
+private fun CreateAccountView(
+    stateFlow: StateFlow<CreateAccountViewModel.State>,
+    eventFlow: Flow<CreateAccountViewModel.Event>,
+    navigateUp: () -> Unit,
+    finish: () -> Unit,
+    onFinishButtonClicked: () -> Unit,
+    onCreateAccountClicked: (String) -> Unit,
+) {
+    val context = LocalContext.current
 
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        binding.createAccountComposeView.setContent {
-            AppTheme {
-                val state by viewModel.stateFlow.collectAsState()
-
-                ContentView(
-                    state = state,
-                    onFinishButtonClicked = viewModel::onFinishButtonClicked,
-                    onCreateAccountClicked = viewModel::onCreateAccountButtonPressed,
-                )
-            }
-        }
-
-        lifecycleScope.launchCollect(viewModel.eventFlow) { event ->
+    LaunchedEffect(key1 = "eventsListener") {
+        launchCollect(eventFlow) { event ->
             when(event) {
                 CreateAccountViewModel.Event.Finish -> finish()
                 is CreateAccountViewModel.Event.ErrorWhileCreatingAccount -> {
-                    MaterialAlertDialogBuilder(this)
+                    MaterialAlertDialogBuilder(context)
                         .setTitle(R.string.account_creation_success_error_title)
-                        .setMessage(getString(R.string.account_creation_success_error_message, event.error.localizedMessage))
+                        .setMessage(context.getString(R.string.account_creation_success_error_message, event.error.localizedMessage))
                         .setPositiveButton(R.string.ok) { dialog, _ ->
                             dialog.dismiss()
                         }
                         .show()
                 }
                 CreateAccountViewModel.Event.SuccessCreatingAccount -> Toast.makeText(
-                    this,
+                    context,
                     R.string.account_creation_success_toast,
                     Toast.LENGTH_LONG,
                 ).show()
@@ -103,35 +97,33 @@ class CreateAccountActivity : BaseActivity<ActivityCreateAccountBinding>() {
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
+    AppWithTopAppBarScaffold(
+        title = stringResource(R.string.title_activity_create_account),
+        backButtonBehavior = BackButtonBehavior.NavigateBack(
+            onBackButtonPressed = navigateUp,
+        ),
+        content = { contentPadding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(contentPadding),
+            ) {
+                val state by stateFlow.collectAsState()
 
-        if (id == android.R.id.home) {
-            finish()
-            return true
-        }
-
-        return super.onOptionsItemSelected(item)
-    }
-}
-
-@Composable
-private fun ContentView(
-    state: CreateAccountViewModel.State,
-    onFinishButtonClicked: () -> Unit,
-    onCreateAccountClicked: (String) -> Unit,
-) {
-    when(state) {
-        is CreateAccountViewModel.State.Creating -> LoadingView(isCreating = true)
-        CreateAccountViewModel.State.Loading -> LoadingView(isCreating = false)
-        CreateAccountViewModel.State.NotAuthenticatedError -> NotAuthenticatedView(
-            onFinishButtonClicked = onFinishButtonClicked,
-        )
-        is CreateAccountViewModel.State.Ready -> CreateAccountView(
-            initialNameValue = state.initialNameValue,
-            onCreateAccountClicked = onCreateAccountClicked,
-        )
-    }
+                when(val currentState = state) {
+                    is CreateAccountViewModel.State.Creating -> LoadingView(isCreating = true)
+                    CreateAccountViewModel.State.Loading -> LoadingView(isCreating = false)
+                    CreateAccountViewModel.State.NotAuthenticatedError -> NotAuthenticatedView(
+                        onFinishButtonClicked = onFinishButtonClicked,
+                    )
+                    is CreateAccountViewModel.State.Ready -> CreateAccountView(
+                        initialNameValue = currentState.initialNameValue,
+                        onCreateAccountClicked = onCreateAccountClicked,
+                    )
+                }
+            }
+        },
+    )
 }
 
 @Composable
@@ -233,31 +225,20 @@ private fun NotAuthenticatedView(
 private fun LoadingView(
     isCreating: Boolean,
 ) {
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(horizontal = 20.dp),
-    ) {
-        CircularProgressIndicator()
-
-        if (isCreating) {
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
-                text = stringResource(R.string.create_account_creating_placeholder),
-            )
-        }
-    }
+    com.benoitletondor.easybudgetapp.compose.components.LoadingView(
+        loadingText = if (isCreating) stringResource(R.string.create_account_creating_placeholder) else null
+    )
 }
 
 @Composable
 @Preview(name = "Loading state preview", showSystemUi = true)
 private fun LoadingStatePreview() {
     AppTheme {
-        ContentView(
-            state = CreateAccountViewModel.State.Loading,
+        CreateAccountView(
+            stateFlow = MutableStateFlow(CreateAccountViewModel.State.Loading),
+            eventFlow = MutableSharedFlow(),
+            navigateUp = {},
+            finish = {},
             onFinishButtonClicked = {},
             onCreateAccountClicked = {},
         )
@@ -268,8 +249,11 @@ private fun LoadingStatePreview() {
 @Preview(name = "Creating state preview", showSystemUi = true)
 private fun CreatingStatePreview() {
     AppTheme {
-        ContentView(
-            state = CreateAccountViewModel.State.Creating(currentUser = CurrentUser("", "", "")),
+        CreateAccountView(
+            stateFlow = MutableStateFlow(CreateAccountViewModel.State.Creating(currentUser = CurrentUser("", "", ""))),
+            eventFlow = MutableSharedFlow(),
+            navigateUp = {},
+            finish = {},
             onFinishButtonClicked = {},
             onCreateAccountClicked = {},
         )
@@ -280,8 +264,11 @@ private fun CreatingStatePreview() {
 @Preview(name = "Not authenticated preview", showSystemUi = true)
 private fun NotAuthenticatedStatePreview() {
     AppTheme {
-        ContentView(
-            state = CreateAccountViewModel.State.NotAuthenticatedError,
+        CreateAccountView(
+            stateFlow = MutableStateFlow(CreateAccountViewModel.State.NotAuthenticatedError),
+            eventFlow = MutableSharedFlow(),
+            navigateUp = {},
+            finish = {},
             onFinishButtonClicked = {},
             onCreateAccountClicked = {},
         )
@@ -292,11 +279,14 @@ private fun NotAuthenticatedStatePreview() {
 @Preview(name = "Ready preview", showSystemUi = true)
 private fun ReadyStatePreview() {
     AppTheme {
-        ContentView(
-            state = CreateAccountViewModel.State.Ready(
+        CreateAccountView(
+            stateFlow = MutableStateFlow(CreateAccountViewModel.State.Ready(
                 initialNameValue = "",
                 currentUser = CurrentUser("", "", ""),
-            ),
+            )),
+            eventFlow = MutableSharedFlow(),
+            navigateUp = {},
+            finish = {},
             onFinishButtonClicked = {},
             onCreateAccountClicked = {},
         )
