@@ -16,11 +16,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.benoitletondor.easybudgetapp.helper.SerializedExpense
 import com.benoitletondor.easybudgetapp.helper.SerializedYearMonth
 import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.helper.toSerializedYearMonth
 import com.benoitletondor.easybudgetapp.view.createaccount.CreateAccountDestination
 import com.benoitletondor.easybudgetapp.view.createaccount.CreateAccountView
+import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseAddDestination
+import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditDestination
+import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditView
+import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditViewModelFactory
 import com.benoitletondor.easybudgetapp.view.login.LoginDestination
 import com.benoitletondor.easybudgetapp.view.login.LoginView
 import com.benoitletondor.easybudgetapp.view.login.LoginViewModelFactory
@@ -54,6 +59,7 @@ import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import java.time.LocalDate
 import kotlin.reflect.typeOf
 
 private const val OnboardingResultKey = "OnboardingResult"
@@ -67,7 +73,7 @@ fun AppNavHost(
 
     LaunchedEffect(key1 = "openSubscriptionScreenListener") {
         launchCollect(openSubscriptionScreenFlow) {
-            navController.navigate(PremiumDestination)
+            navController.navigate(PremiumDestination(startOnPro = false))
         }
     }
 
@@ -126,6 +132,13 @@ fun AppNavHost(
                 },
                 navigateToCreateAccount = {
                     navController.navigate(CreateAccountDestination)
+                },
+                navigateToAddExpense = { date, editedExpense ->
+                    if (editedExpense != null) {
+                        navController.navigate(ExpenseEditDestination(date = date, editedExpense = editedExpense))
+                    } else {
+                        navController.navigate(ExpenseAddDestination(date = date))
+                    }
                 }
             )
         }
@@ -256,6 +269,48 @@ fun AppNavHost(
                 },
             )
         }
+        composable<ExpenseEditDestination>(
+            typeMap = mapOf(typeOf<SerializedExpense>() to SerializedExpenseNavType),
+        ) { backStackEntry ->
+            val destination: ExpenseEditDestination = backStackEntry.toRoute()
+            ExpenseEditView(
+                viewModel = hiltViewModel(
+                    creationCallback = { factory: ExpenseEditViewModelFactory ->
+                        factory.create(
+                            date = LocalDate.ofEpochDay(destination.dateEpochDay),
+                            editedExpense = destination.editedExpense?.toExpense(),
+                        )
+                    }
+
+                ),
+                navigateUp = {
+                    navController.navigateUp()
+                },
+                finish = {
+                    navController.popBackStack()
+                },
+            )
+        }
+        composable<ExpenseAddDestination> { backStackEntry ->
+            val destination: ExpenseAddDestination = backStackEntry.toRoute()
+            ExpenseEditView(
+                viewModel = hiltViewModel(
+                    creationCallback = { factory: ExpenseEditViewModelFactory ->
+                        factory.create(
+                            date = LocalDate.ofEpochDay(destination.dateEpochDay),
+                            editedExpense = null,
+                        )
+                    }
+
+                ),
+                navigateUp = {
+                    navController.navigateUp()
+                },
+                finish = {
+                    navController.popBackStack()
+                },
+            )
+        }
     }
 }
 
@@ -306,6 +361,31 @@ private val SerializedYearMonthNavType = object : NavType<SerializedYearMonth>(
     }
 
     override fun put(bundle: Bundle, key: String, value: SerializedYearMonth) {
+        bundle.putParcelable(key, value)
+    }
+}
+
+private val SerializedExpenseNavType = object : NavType<SerializedExpense>(
+    isNullableAllowed = false,
+) {
+    override fun get(bundle: Bundle, key: String): SerializedExpense? {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            bundle.getParcelable(key, SerializedExpense::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            bundle.getParcelable(key) as? SerializedExpense
+        }
+    }
+
+    override fun parseValue(value: String): SerializedExpense {
+        return Json.decodeFromString(value) as SerializedExpense
+    }
+
+    override fun serializeAsValue(value: SerializedExpense): String {
+        return Json.encodeToString(value)
+    }
+
+    override fun put(bundle: Bundle, key: String, value: SerializedExpense) {
         bundle.putParcelable(key, value)
     }
 }

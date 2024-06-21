@@ -16,7 +16,6 @@
 
 package com.benoitletondor.easybudgetapp.view.expenseedit
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.db.DB
@@ -25,6 +24,9 @@ import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
 import com.benoitletondor.easybudgetapp.injection.CurrentDBProvider
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.getInitDate
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -32,21 +34,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
-import javax.inject.Inject
 
-@HiltViewModel
-class ExpenseEditViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = ExpenseEditViewModelFactory::class)
+class ExpenseEditViewModel @AssistedInject constructor(
     private val parameters: Parameters,
     currentDBProvider: CurrentDBProvider,
-    savedStateHandle: SavedStateHandle,
+    @Assisted private val editedExpense: Expense?,
+    @Assisted date: LocalDate,
 ) : ViewModel() {
-    /**
-     * Expense that is being edited (will be null if it's a new one)
-     */
-    private val editedExpense: Expense? = savedStateHandle.get<Expense>(ExpenseEditActivity.ARG_EDITED_EXPENSE)
 
-    private val expenseDateMutableStateFlow = MutableStateFlow(LocalDate.ofEpochDay(
-        savedStateHandle[ExpenseEditActivity.ARG_DATE] ?: throw IllegalStateException("No ARG_DATE arg")))
+    private val expenseDateMutableStateFlow = MutableStateFlow(date)
     val expenseDateFlow: Flow<LocalDate> = expenseDateMutableStateFlow
 
     private val editTypeMutableStateFlow = MutableStateFlow(ExpenseEditType(
@@ -142,3 +139,11 @@ class ExpenseEditViewModel @Inject constructor(
 data class ExpenseEditType(val isRevenue: Boolean, val editing: Boolean)
 
 data class ExistingExpenseData(val title: String, val amount: Double)
+
+@AssistedFactory
+interface ExpenseEditViewModelFactory {
+    fun create(
+        date: LocalDate,
+        editedExpense: Expense?,
+    ): ExpenseEditViewModel
+}

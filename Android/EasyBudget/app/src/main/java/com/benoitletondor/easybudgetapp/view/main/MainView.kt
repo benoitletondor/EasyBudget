@@ -1,7 +1,6 @@
 package com.benoitletondor.easybudgetapp.view.main
 
 import android.app.ProgressDialog
-import android.content.Intent
 import android.content.res.Configuration
 import android.view.LayoutInflater
 import android.view.View
@@ -91,6 +90,7 @@ fun MainView(
     navigateToSettings: () -> Unit,
     navigateToLogin: (shouldDismissAfterAuth: Boolean) -> Unit,
     navigateToCreateAccount: () -> Unit,
+    navigateToAddExpense: (LocalDate, Expense?) -> Unit,
 ) {
     MainView(
         selectedAccountFlow = viewModel.accountSelectionFlow,
@@ -155,6 +155,7 @@ fun MainView(
         navigateToSettings = navigateToSettings,
         navigateToLogin = navigateToLogin,
         navigateToCreateAccount = navigateToCreateAccount,
+        navigateToAddExpense = navigateToAddExpense,
     )
 }
 
@@ -221,6 +222,7 @@ private fun MainView(
     navigateToSettings: () -> Unit,
     navigateToLogin: (shouldDismissAfterAuth: Boolean) -> Unit,
     navigateToCreateAccount: () -> Unit,
+    navigateToAddExpense: (LocalDate, Expense?) -> Unit,
 ) {
     var showAccountSelectorModal by rememberSaveable { mutableStateOf(false) }
     val accountSelectorModalSheetState = rememberModalBottomSheetState()
@@ -322,14 +324,7 @@ private fun MainView(
                 }
                 MainViewModel.Event.GoBackToCurrentMonth -> Unit /* No-op */
                 is MainViewModel.Event.OpenAddExpense -> {
-                    // FIXME replace this
-                    val startIntent = ExpenseEditActivity.newIntent(
-                        context = context,
-                        editedExpense = null,
-                        date = event.date,
-                    )
-
-                    context.startActivity(startIntent)
+                    navigateToAddExpense(event.date, null)
                 }
                 is MainViewModel.Event.OpenAddRecurringExpense -> {
                     // FIXME replace this
@@ -502,14 +497,7 @@ private fun MainView(
                     }
                 }
                 is MainViewModel.Event.OpenEditExpense -> {
-                    // FIXME replace this
-                    val startIntent = ExpenseEditActivity.newIntent(
-                        context = context,
-                        editedExpense = event.expense,
-                        date = event.expense.date,
-                    )
-
-                    context.startActivity(startIntent)
+                    navigateToAddExpense(event.expense.date, event.expense)
                 }
                 is MainViewModel.Event.OpenEditRecurringExpenseOccurrence -> {
                     // FIXME replace this
@@ -860,6 +848,7 @@ private fun Preview(
             navigateToSettings = {},
             navigateToLogin = {},
             navigateToCreateAccount = {},
+            navigateToAddExpense = { _, _ -> },
         )
     }
 }
