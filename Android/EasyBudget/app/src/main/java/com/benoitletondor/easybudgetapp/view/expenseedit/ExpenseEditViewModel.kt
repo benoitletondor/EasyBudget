@@ -31,42 +31,30 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
+import kotlin.math.abs
 
 @HiltViewModel(assistedFactory = ExpenseEditViewModelFactory::class)
 class ExpenseEditViewModel @AssistedInject constructor(
     private val parameters: Parameters,
     currentDBProvider: CurrentDBProvider,
-    @Assisted private val editedExpense: Expense?,
+    @Assisted editedExpense: Expense?,
     @Assisted date: LocalDate,
 ) : ViewModel() {
 
-    private val expenseDateMutableStateFlow = MutableStateFlow(date)
-    val expenseDateFlow: Flow<LocalDate> = expenseDateMutableStateFlow
+    private val expenseMutableStateFlow = MutableStateFlow(
+        editedExpense?.copy(date = date) ?: Expense("", 0.0, date, false)
+    )
+    val expenseStateFlow: StateFlow<Expense> = expenseMutableStateFlow
 
-    private val editTypeMutableStateFlow = MutableStateFlow(ExpenseEditType(
-        editedExpense?.isRevenue() ?: false,
-        editedExpense != null
-    ))
-    val editTypeFlow: Flow<ExpenseEditType> = editTypeMutableStateFlow
+    private val isEditingMutableStateFlow = MutableStateFlow(editedExpense != null)
+    val isEditingStateFlow: StateFlow<Boolean> = isEditingMutableStateFlow
 
-    val existingExpenseData = editedExpense?.let { expense ->
-        ExistingExpenseData(
-            expense.title,
-            expense.amount,
-        )
-    }
-
-    private val expenseAddBeforeInitDateErrorMutableFlow = MutableLiveFlow<Unit>()
-    val expenseAddBeforeInitDateEventFlow: Flow<Unit> = expenseAddBeforeInitDateErrorMutableFlow
-
-    private val unableToLoadDBEventMutableFlow = MutableLiveFlow<Unit>()
-    val unableToLoadDBEventFlow: Flow<Unit> = unableToLoadDBEventMutableFlow
-
-    private val finishMutableFlow = MutableLiveFlow<Unit>()
-    val finishFlow: Flow<Unit> = finishMutableFlow
+    private val eventMutableFlow = MutableLiveFlow<Event>()
+    val eventFlow: Flow<Event> = eventMutableFlow
 
     private lateinit var db: DB
 
@@ -74,7 +62,7 @@ class ExpenseEditViewModel @AssistedInject constructor(
         val currentDb = currentDBProvider.activeDB
         if (currentDb == null) {
             viewModelScope.launch {
-                unableToLoadDBEventMutableFlow.emit(Unit)
+                eventMutableFlow.emit(Event.UnableToLoadDB)
             }
         } else {
             db = currentDb
@@ -82,57 +70,59 @@ class ExpenseEditViewModel @AssistedInject constructor(
     }
 
     fun onExpenseRevenueValueChanged(isRevenue: Boolean) {
-        editTypeMutableStateFlow.value = ExpenseEditType(isRevenue, editedExpense != null)
+        expenseMutableStateFlow.value = expenseMutableStateFlow.value.copy(
+            amount = if (isRevenue) -abs(expenseMutableStateFlow.value.amount) else abs(expenseMutableStateFlow.value.amount)
+        )
     }
 
-    fun onSave(value: Double, description: String) {
-        val isRevenue = editTypeMutableStateFlow.value.isRevenue
-        val date = expenseDateMutableStateFlow.value
+    fun onDateChanged(date: LocalDate) {
+        expenseMutableStateFlow.value = expenseMutableStateFlow.value.copy(date = date)
+    }
 
+    fun onAmountChanged(amount: Double) {
+        expenseMutableStateFlow.value = expenseMutableStateFlow.value.copy(
+            amount = if (expenseMutableStateFlow.value.amount < 0) -abs(amount) else abs(amount)
+        )
+    }
+
+    fun onSave() {
+        val date = expenseMutableStateFlow.value.date
         val dateOfInstallation = parameters.getInitDate() ?: LocalDate.now()
-
         if( date.isBefore(dateOfInstallation) ) {
             viewModelScope.launch {
-                expenseAddBeforeInitDateErrorMutableFlow.emit(Unit)
+                eventMutableFlow.emit(Event.ExpenseAddBeforeInitDateError)
             }
 
             return
         }
 
-        doSaveExpense(value, description, isRevenue, date)
+        doSaveExpense(expenseMutableStateFlow.value)
     }
 
-    fun onAddExpenseBeforeInitDateConfirmed(value: Double, description: String) {
-        val isRevenue = editTypeMutableStateFlow.value.isRevenue
-        val date = expenseDateMutableStateFlow.value
-
-        doSaveExpense(value, description, isRevenue, date)
+    fun onAddExpenseBeforeInitDateConfirmed() {
+        doSaveExpense(expenseMutableStateFlow.value)
     }
 
     fun onAddExpenseBeforeInitDateCancelled() {
         // No-op
     }
 
-    private fun doSaveExpense(value: Double, description: String, isRevenue: Boolean, date: LocalDate) {
+    private fun doSaveExpense(expense: Expense) {
         viewModelScope.launch {
             withContext(Dispatchers.Default) {
-                val expense = editedExpense?.copy(
-                    title = description,
-                    amount = if (isRevenue) -value else value,
-                    date = date,
-                ) ?: Expense(description, if (isRevenue) -value else value, date, false)
-
                 db.persistExpense(expense)
 
                 withContext(Dispatchers.Main) {
-                    finishMutableFlow.emit(Unit)
+                    eventMutableFlow.emit(Event.Finish)
                 }
             }
         }
     }
 
-    fun onDateChanged(date: LocalDate) {
-        expenseDateMutableStateFlow.value = date
+    sealed class Event {
+        data object Finish : Event()
+        data object UnableToLoadDB : Event()
+        data object ExpenseAddBeforeInitDateError : Event()
     }
 }
 
