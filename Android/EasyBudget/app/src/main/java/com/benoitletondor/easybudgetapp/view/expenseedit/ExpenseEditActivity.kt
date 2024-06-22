@@ -52,7 +52,7 @@ class ExpenseEditActivity : BaseActivity<ActivityExpenseEditBinding>() {
 
     override fun createBinding(): ActivityExpenseEditBinding = ActivityExpenseEditBinding.inflate(layoutInflater)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    /*override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setSupportActionBar(binding.toolbar)
@@ -236,7 +236,7 @@ class ExpenseEditActivity : BaseActivity<ActivityExpenseEditBinding>() {
 
     private fun getCurrentAmount(): Double {
         return java.lang.Double.parseDouble(binding.amountEdittext.text.toString())
-    }
+    }*/
 
     companion object {
         const val ARG_EDITED_EXPENSE = "expense"

@@ -24,6 +24,7 @@ import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
 import com.benoitletondor.easybudgetapp.helper.combine
+import com.benoitletondor.easybudgetapp.helper.watchUserCurrency
 import com.benoitletondor.easybudgetapp.injection.CurrentDBProvider
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.getInitDate
@@ -57,6 +58,8 @@ class ExpenseEditViewModel @AssistedInject constructor(
     private val titleMutableStateFlow = MutableStateFlow(editedExpense?.title ?: "")
     private val isSavingMutableStateFlow = MutableStateFlow(false)
 
+    val userCurrencyFlow = parameters.watchUserCurrency()
+
     val stateFlow: StateFlow<State> = combine(
         editedExpenseMutableStateFlow,
         dateMutableStateFlow,
@@ -65,23 +68,31 @@ class ExpenseEditViewModel @AssistedInject constructor(
         titleMutableStateFlow,
         isSavingMutableStateFlow,
     ) { maybeEditedExpense, date, amount, isRevenue, title, isSaving ->
+        val expense = Expense(
+            id = maybeEditedExpense?.id,
+            title = title,
+            amount = if (isRevenue) -abs(amount) else abs(amount),
+            date = date,
+            checked = maybeEditedExpense?.checked ?: false,
+            associatedRecurringExpense = maybeEditedExpense?.associatedRecurringExpense,
+        )
+
         if (isSaving) {
-            return@combine State.Saving
+            return@combine State.Saving(
+                isEditing = maybeEditedExpense != null,
+                isRevenue = isRevenue,
+                expense = expense,
+            )
         }
 
         return@combine State.Ready(
             isEditing = maybeEditedExpense != null,
-            expense = Expense(
-                id = maybeEditedExpense?.id,
-                title = title,
-                amount = if (isRevenue) -abs(amount) else abs(amount),
-                date = date,
-                checked = maybeEditedExpense?.checked ?: false,
-                associatedRecurringExpense = maybeEditedExpense?.associatedRecurringExpense,
-            )
+            isRevenue = isRevenue,
+            expense = expense,
         )
     }.stateIn(viewModelScope, SharingStarted.Eagerly, State.Ready(
         isEditing = editedExpense != null,
+        isRevenue = editedExpense?.isRevenue() ?: false,
         expense = Expense(
             id = editedExpense?.id,
             title = titleMutableStateFlow.value,
@@ -116,8 +127,8 @@ class ExpenseEditViewModel @AssistedInject constructor(
         dateMutableStateFlow.value = date
     }
 
-    fun onAmountChanged(amount: Double) {
-        amountMutableStateFlow.value = amount
+    fun onAmountChanged(amount: String) {
+        amountMutableStateFlow.value = amount.toDoubleOrNull() ?: 0.0 // FIXME
     }
 
     fun onTitleChanged(title: String) {
@@ -130,6 +141,14 @@ class ExpenseEditViewModel @AssistedInject constructor(
         if( date.isBefore(dateOfInstallation) ) {
             viewModelScope.launch {
                 eventMutableFlow.emit(Event.ExpenseAddBeforeInitDateError)
+            }
+
+            return
+        }
+
+        if (titleMutableStateFlow.value.isEmpty()) {
+            viewModelScope.launch {
+                eventMutableFlow.emit(Event.EmptyTitleError)
             }
 
             return
@@ -170,14 +189,20 @@ class ExpenseEditViewModel @AssistedInject constructor(
     sealed class Event {
         data object Finish : Event()
         data object UnableToLoadDB : Event()
+        data object EmptyTitleError : Event()
         data object ExpenseAddBeforeInitDateError : Event()
         data class ErrorPersistingExpense(val error: Throwable) : Event()
     }
 
-    sealed class State {
+    sealed interface State {
+        val isEditing: Boolean
+        val expense: Expense
+        val isRevenue: Boolean
+
         @Immutable
-        data class Ready(val isEditing: Boolean, val expense: Expense) : State()
-        data object Saving : State()
+        data class Ready(override val isEditing: Boolean, override val isRevenue: Boolean, override val expense: Expense) : State
+        @Immutable
+        data class Saving(override val isEditing: Boolean, override val isRevenue: Boolean, override val expense: Expense) : State
     }
 }
 

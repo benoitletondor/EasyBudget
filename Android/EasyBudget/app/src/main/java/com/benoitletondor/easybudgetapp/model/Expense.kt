@@ -55,12 +55,6 @@ data class Expense(val id: Long?,
         parcel.readParcelable(AssociatedRecurringExpense::class.java.classLoader)
     )
 
-    init {
-        if( title.isEmpty() ) {
-            throw IllegalArgumentException("title is empty")
-        }
-    }
-
     fun isRevenue() = amount < 0
 
     fun isRecurring() = associatedRecurringExpense != null
