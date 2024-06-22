@@ -16,11 +16,14 @@
 
 package com.benoitletondor.easybudgetapp.view.expenseedit
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.db.DB
+import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
+import com.benoitletondor.easybudgetapp.helper.combine
 import com.benoitletondor.easybudgetapp.injection.CurrentDBProvider
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.getInitDate
@@ -28,10 +31,13 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
@@ -44,14 +50,47 @@ class ExpenseEditViewModel @AssistedInject constructor(
     @Assisted editedExpense: Expense?,
     @Assisted date: LocalDate,
 ) : ViewModel() {
+    private val editedExpenseMutableStateFlow = MutableStateFlow(editedExpense)
+    private val dateMutableStateFlow = MutableStateFlow(date)
+    private val amountMutableStateFlow = MutableStateFlow(editedExpense?.amount ?: 0.0)
+    private val isRevenueMutableStateFlow = MutableStateFlow(editedExpense?.isRevenue() ?: false)
+    private val titleMutableStateFlow = MutableStateFlow(editedExpense?.title ?: "")
+    private val isSavingMutableStateFlow = MutableStateFlow(false)
 
-    private val expenseMutableStateFlow = MutableStateFlow(
-        editedExpense?.copy(date = date) ?: Expense("", 0.0, date, false)
-    )
-    val expenseStateFlow: StateFlow<Expense> = expenseMutableStateFlow
+    val stateFlow: StateFlow<State> = combine(
+        editedExpenseMutableStateFlow,
+        dateMutableStateFlow,
+        amountMutableStateFlow,
+        isRevenueMutableStateFlow,
+        titleMutableStateFlow,
+        isSavingMutableStateFlow,
+    ) { maybeEditedExpense, date, amount, isRevenue, title, isSaving ->
+        if (isSaving) {
+            return@combine State.Saving
+        }
 
-    private val isEditingMutableStateFlow = MutableStateFlow(editedExpense != null)
-    val isEditingStateFlow: StateFlow<Boolean> = isEditingMutableStateFlow
+        return@combine State.Ready(
+            isEditing = maybeEditedExpense != null,
+            expense = Expense(
+                id = maybeEditedExpense?.id,
+                title = title,
+                amount = if (isRevenue) -abs(amount) else abs(amount),
+                date = date,
+                checked = maybeEditedExpense?.checked ?: false,
+                associatedRecurringExpense = maybeEditedExpense?.associatedRecurringExpense,
+            )
+        )
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, State.Ready(
+        isEditing = editedExpense != null,
+        expense = Expense(
+            id = editedExpense?.id,
+            title = titleMutableStateFlow.value,
+            amount = if (isRevenueMutableStateFlow.value) -abs(amountMutableStateFlow.value) else abs(amountMutableStateFlow.value),
+            date = dateMutableStateFlow.value,
+            checked = editedExpense?.checked ?: false,
+            associatedRecurringExpense = editedExpense?.associatedRecurringExpense,
+        )
+    ))
 
     private val eventMutableFlow = MutableLiveFlow<Event>()
     val eventFlow: Flow<Event> = eventMutableFlow
@@ -70,23 +109,23 @@ class ExpenseEditViewModel @AssistedInject constructor(
     }
 
     fun onExpenseRevenueValueChanged(isRevenue: Boolean) {
-        expenseMutableStateFlow.value = expenseMutableStateFlow.value.copy(
-            amount = if (isRevenue) -abs(expenseMutableStateFlow.value.amount) else abs(expenseMutableStateFlow.value.amount)
-        )
+        isRevenueMutableStateFlow.value = isRevenue
     }
 
     fun onDateChanged(date: LocalDate) {
-        expenseMutableStateFlow.value = expenseMutableStateFlow.value.copy(date = date)
+        dateMutableStateFlow.value = date
     }
 
     fun onAmountChanged(amount: Double) {
-        expenseMutableStateFlow.value = expenseMutableStateFlow.value.copy(
-            amount = if (expenseMutableStateFlow.value.amount < 0) -abs(amount) else abs(amount)
-        )
+        amountMutableStateFlow.value = amount
+    }
+
+    fun onTitleChanged(title: String) {
+        titleMutableStateFlow.value = title
     }
 
     fun onSave() {
-        val date = expenseMutableStateFlow.value.date
+        val date = dateMutableStateFlow.value
         val dateOfInstallation = parameters.getInitDate() ?: LocalDate.now()
         if( date.isBefore(dateOfInstallation) ) {
             viewModelScope.launch {
@@ -96,11 +135,11 @@ class ExpenseEditViewModel @AssistedInject constructor(
             return
         }
 
-        doSaveExpense(expenseMutableStateFlow.value)
+        doSaveExpense((stateFlow.value as State.Ready).expense)
     }
 
     fun onAddExpenseBeforeInitDateConfirmed() {
-        doSaveExpense(expenseMutableStateFlow.value)
+        doSaveExpense((stateFlow.value as State.Ready).expense)
     }
 
     fun onAddExpenseBeforeInitDateCancelled() {
@@ -109,12 +148,21 @@ class ExpenseEditViewModel @AssistedInject constructor(
 
     private fun doSaveExpense(expense: Expense) {
         viewModelScope.launch {
-            withContext(Dispatchers.Default) {
-                db.persistExpense(expense)
+            isSavingMutableStateFlow.value = true
 
-                withContext(Dispatchers.Main) {
-                    eventMutableFlow.emit(Event.Finish)
+            try {
+                withContext(Dispatchers.IO) {
+                    db.persistExpense(expense)
                 }
+
+                eventMutableFlow.emit(Event.Finish)
+            } catch (e: Throwable) {
+                if (e is CancellationException) throw e
+
+                Logger.error("Error while persisting expense", e)
+                eventMutableFlow.emit(Event.ErrorPersistingExpense(e))
+            } finally {
+                isSavingMutableStateFlow.value = false
             }
         }
     }
@@ -123,12 +171,15 @@ class ExpenseEditViewModel @AssistedInject constructor(
         data object Finish : Event()
         data object UnableToLoadDB : Event()
         data object ExpenseAddBeforeInitDateError : Event()
+        data class ErrorPersistingExpense(val error: Throwable) : Event()
+    }
+
+    sealed class State {
+        @Immutable
+        data class Ready(val isEditing: Boolean, val expense: Expense) : State()
+        data object Saving : State()
     }
 }
-
-data class ExpenseEditType(val isRevenue: Boolean, val editing: Boolean)
-
-data class ExistingExpenseData(val title: String, val amount: Double)
 
 @AssistedFactory
 interface ExpenseEditViewModelFactory {
