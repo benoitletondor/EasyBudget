@@ -1,6 +1,7 @@
 package com.benoitletondor.easybudgetapp.view.expenseedit
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,14 +22,19 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
+import androidx.compose.material3.Button
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -45,18 +51,24 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.compose.AppWithTopAppBarScaffold
 import com.benoitletondor.easybudgetapp.compose.BackButtonBehavior
+import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
 import com.benoitletondor.easybudgetapp.helper.SerializedExpense
 import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.helper.sanitizeFromUnsupportedInputForDecimals
@@ -65,7 +77,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
 import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.Currency
+import java.util.Date
+import java.util.Locale
+import kotlin.math.abs
 
 @Serializable
 data class ExpenseAddDestination(val dateEpochDay: Long) {
@@ -98,9 +115,12 @@ fun ExpenseEditView(
         onAmountUpdate = viewModel::onAmountChanged,
         onSaveButtonClicked = viewModel::onSave,
         onIsRevenueChanged = viewModel::onExpenseRevenueValueChanged,
+        onDateClicked = viewModel::onDateClicked,
+        onDateSelected = viewModel::onDateSelected,
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ExpenseEditView(
     stateFlow: StateFlow<ExpenseEditViewModel.State>,
@@ -112,7 +132,11 @@ private fun ExpenseEditView(
     onAmountUpdate: (String) -> Unit,
     onSaveButtonClicked: () -> Unit,
     onIsRevenueChanged: (Boolean) -> Unit,
+    onDateClicked: () -> Unit,
+    onDateSelected: (Long?) -> Unit,
 ) {
+    var showDatePickerWithDate by remember { mutableStateOf<LocalDate?>(null) }
+
     LaunchedEffect(key1 = "eventsListener") {
         launchCollect(eventFlow) { event ->
             when (event) {
@@ -121,13 +145,15 @@ private fun ExpenseEditView(
                 ExpenseEditViewModel.Event.UnableToLoadDB -> TODO()
                 is ExpenseEditViewModel.Event.ErrorPersistingExpense -> TODO()
                 ExpenseEditViewModel.Event.EmptyTitleError -> TODO()
+                is ExpenseEditViewModel.Event.ShowDatePicker -> showDatePickerWithDate = event.date
             }
         }
     }
 
-    val focusRequester = remember { FocusRequester() }
+    val titleFocusRequester = remember { FocusRequester() }
+    val amountFocusRequester = remember { FocusRequester() }
     LaunchedEffect(key1 = "focusRequester") {
-        focusRequester.requestFocus()
+        titleFocusRequester.requestFocus()
     }
 
     val state by stateFlow.collectAsState()
@@ -142,138 +168,214 @@ private fun ExpenseEditView(
             onBackButtonPressed = navigateUp,
         ),
         content = { contentPadding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(contentPadding),
-            ) {
+            Box(modifier = Modifier.fillMaxSize()) {
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .background(color = colorResource(R.color.action_bar_background))
-                        .padding(horizontal = 26.dp, vertical = 10.dp)
+                        .fillMaxSize()
+                        .padding(contentPadding),
                 ) {
-                    var descriptionTextFieldValue by remember { mutableStateOf(
-                        TextFieldValue(
-                            text = state.expense.title,
-                            selection = TextRange(index = state.expense.title.length),
-                        )
-                    ) }
-
-                    InputTextField(
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .focusRequester(focusRequester),
-                        value = descriptionTextFieldValue,
-                        onValueChange = {
-                            descriptionTextFieldValue = it
-                            onTitleUpdate(it.text)
-                        },
-                        label = stringResource(R.string.description),
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    val currency by userCurrencyFlow.collectAsState()
-
-                    var currentAmountTextFieldValue by remember { mutableStateOf(
-                        TextFieldValue(
-                            text = if (state.expense.amount == 0.0) "" else state.expense.amount.toString(),
-                            selection = TextRange(index = if (state.expense.amount == 0.0) 0 else state.expense.amount.toString().length),
-                        )
-                    ) }
-
-                    InputTextField(
-                        modifier = Modifier.fillMaxWidth(0.5f),
-                        value = currentAmountTextFieldValue,
-                        onValueChange = { newValue ->
-                            val newText = newValue.text.sanitizeFromUnsupportedInputForDecimals()
-
-                            currentAmountTextFieldValue = TextFieldValue(
-                                text = newText,
-                                selection = newValue.selection,
-                            )
-
-                            onAmountUpdate(newText)
-                        },
-                        label = stringResource(R.string.amount, currency.symbol),
-                    )
-
-                    Spacer(modifier = Modifier.height(20.dp))
-                }
-
-                FloatingActionButton(
-                    modifier = Modifier
-                        .align(Alignment.End)
-                        .offset(y = (-30).dp, x = (-26).dp),
-                    onClick = onSaveButtonClicked,
-                    containerColor = colorResource(R.color.secondary),
-                    contentColor = colorResource(R.color.white),
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_save_white_24dp),
-                        contentDescription = stringResource(R.string.fab_add_expense),
-                    )
-                }
-
-                Row(
-                    modifier = Modifier
-                        .offset(y = (-20).dp)
-                        .fillMaxWidth()
-                        .padding(horizontal = 26.dp),
-                ) {
-                    Column(
-                        modifier = Modifier.weight(1f),
+                            .background(color = colorResource(R.color.action_bar_background))
+                            .padding(horizontal = 26.dp, vertical = 10.dp)
                     ) {
-                        Text(
-                            text = stringResource(R.string.type),
-                            color = colorResource(R.color.expense_edit_title_text_color),
-                            fontSize = 14.sp,
+                        var descriptionTextFieldValue by remember { mutableStateOf(
+                            TextFieldValue(
+                                text = state.expense.title,
+                                selection = TextRange(index = state.expense.title.length),
+                            )
+                        ) }
+
+                        InputTextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .focusRequester(titleFocusRequester),
+                            value = descriptionTextFieldValue,
+                            onValueChange = {
+                                descriptionTextFieldValue = it
+                                onTitleUpdate(it.text)
+                            },
+                            label = stringResource(R.string.description),
+                            keyboardActions = KeyboardActions(
+                                onNext = {
+                                    titleFocusRequester.freeFocus()
+                                    amountFocusRequester.requestFocus()
+                                },
+                            ),
+                            keyboardOptions = KeyboardOptions(
+                                imeAction = ImeAction.Next,
+                                keyboardType = KeyboardType.Text,
+                            )
                         )
 
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Switch(
-                                checked = state.isRevenue,
-                                onCheckedChange = onIsRevenueChanged,
-                                colors = SwitchDefaults.colors(
-                                    checkedTrackColor = Color(0xFFDDDDDD),
-                                    checkedThumbColor = colorResource(R.color.budget_green),
-                                    uncheckedThumbColor = colorResource(R.color.budget_red),
-                                    uncheckedTrackColor = Color(0xFFDDDDDD),
-                                    uncheckedBorderColor = Color.Transparent,
-                                    checkedBorderColor = Color.Transparent,
-                                ),
-                                thumbContent = {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(10.dp)
-                                            .clip(CircleShape)
-                                    )
-                                }
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        val currency by userCurrencyFlow.collectAsState()
+
+                        var currentAmountTextFieldValue by remember { mutableStateOf(
+                            TextFieldValue(
+                                text = if (state.expense.amount == 0.0) "" else CurrencyHelper.getFormattedAmountValue(abs(state.expense.amount)),
+                                selection = TextRange(index = if (state.expense.amount == 0.0) 0 else CurrencyHelper.getFormattedAmountValue(abs(state.expense.amount)).length),
                             )
+                        ) }
 
-                            Spacer(modifier = Modifier.width(5.dp))
+                        InputTextField(
+                            modifier = Modifier
+                                .fillMaxWidth(0.5f)
+                                .focusRequester(amountFocusRequester),
+                            value = currentAmountTextFieldValue,
+                            onValueChange = { newValue ->
+                                val newText = newValue.text.sanitizeFromUnsupportedInputForDecimals()
 
+                                currentAmountTextFieldValue = TextFieldValue(
+                                    text = newText,
+                                    selection = newValue.selection,
+                                )
+
+                                onAmountUpdate(newText)
+                            },
+                            label = stringResource(R.string.amount, currency.symbol),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                            )
+                        )
+
+                        Spacer(modifier = Modifier.height(20.dp))
+                    }
+
+                    FloatingActionButton(
+                        modifier = Modifier
+                            .align(Alignment.End)
+                            .offset(y = (-30).dp, x = (-26).dp),
+                        onClick = onSaveButtonClicked,
+                        containerColor = colorResource(R.color.secondary),
+                        contentColor = colorResource(R.color.white),
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_save_white_24dp),
+                            contentDescription = stringResource(R.string.fab_add_expense),
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .offset(y = (-20).dp)
+                            .fillMaxWidth()
+                            .padding(horizontal = 26.dp),
+                    ) {
+                        Column(
+                            modifier = Modifier.weight(1f),
+                        ) {
                             Text(
-                                text = stringResource(if(state.isRevenue) R.string.income else R.string.payment),
-                                color = colorResource(if(state.isRevenue) R.color.budget_green else R.color.budget_red),
+                                text = stringResource(R.string.type),
+                                color = colorResource(R.color.expense_edit_title_text_color),
                                 fontSize = 14.sp,
                             )
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Switch(
+                                    checked = state.isRevenue,
+                                    onCheckedChange = onIsRevenueChanged,
+                                    colors = SwitchDefaults.colors(
+                                        checkedTrackColor = Color(0xFFDDDDDD),
+                                        checkedThumbColor = colorResource(R.color.budget_green),
+                                        uncheckedThumbColor = colorResource(R.color.budget_red),
+                                        uncheckedTrackColor = Color(0xFFDDDDDD),
+                                        uncheckedBorderColor = Color.Transparent,
+                                        checkedBorderColor = Color.Transparent,
+                                    ),
+                                    thumbContent = {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(10.dp)
+                                                .clip(CircleShape)
+                                        )
+                                    }
+                                )
+
+                                Spacer(modifier = Modifier.width(5.dp))
+
+                                Text(
+                                    text = stringResource(if(state.isRevenue) R.string.income else R.string.payment),
+                                    color = colorResource(if(state.isRevenue) R.color.budget_green else R.color.budget_red),
+                                    fontSize = 14.sp,
+                                )
+                            }
+
+
                         }
 
+                        Column(
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            Text(
+                                text = stringResource(R.string.date),
+                                color = colorResource(R.color.expense_edit_title_text_color),
+                                fontSize = 14.sp,
+                            )
 
-                    }
+                            Spacer(modifier = Modifier.height(8.dp))
 
-                    Spacer(modifier = Modifier.width(20.dp))
+                            val context = LocalContext.current
+                            val dateFormatter = remember {
+                                DateTimeFormatter.ofPattern(context.getString(R.string.add_expense_date_format), Locale.getDefault())
+                            }
+                            val dateString = remember(state.expense.date) {
+                                dateFormatter.format(state.expense.date)
+                            }
 
-                    Column(
-                        modifier = Modifier.weight(1f),
-                    ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable(onClick = onDateClicked),
+                            ) {
+                                Text(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    text = dateString,
+                                    textAlign = TextAlign.Center,
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                )
 
+                                Spacer(modifier = Modifier.height(2.dp))
+
+                                HorizontalDivider(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    color = colorResource(R.color.expense_edit_field_accent_color),
+                                    thickness = 1.dp,
+                                )
+                            }
+
+                        }
                     }
                 }
+            }
+
+            val datePickerDate = showDatePickerWithDate
+            if (datePickerDate != null) {
+                val datePickerState = rememberDatePickerState(
+                    initialSelectedDateMillis = Date.from(datePickerDate.atStartOfDay().atZone(ZoneId.of("UTC")).toInstant()).time)
+
+                DatePickerDialog(
+                    onDismissRequest = { showDatePickerWithDate = null },
+                    confirmButton = {
+                        Button(
+                            modifier = Modifier.padding(end = 16.dp, bottom = 10.dp),
+                            onClick = {
+                                onDateSelected(datePickerState.selectedDateMillis)
+                                showDatePickerWithDate = null
+                            }
+                        ) {
+                            Text(text = stringResource(R.string.ok))
+                        }
+                    },
+                    content = {
+                        DatePicker(state = datePickerState)
+                    },
+                )
             }
         },
     )

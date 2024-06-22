@@ -500,14 +500,7 @@ private fun MainView(
                     navigateToAddExpense(event.expense.date, event.expense)
                 }
                 is MainViewModel.Event.OpenEditRecurringExpenseOccurrence -> {
-                    // FIXME replace this
-                    val startIntent = ExpenseEditActivity.newIntent(
-                        context = context,
-                        editedExpense = event.expense,
-                        date = event.expense.date,
-                    )
-
-                    context.startActivity(startIntent)
+                    navigateToAddExpense(event.expense.date, event.expense)
                 }
                 is MainViewModel.Event.OpenEditRecurringExpenseOccurrenceAndFollowingOnes -> {
                     // FIXME replace this

@@ -24,6 +24,7 @@ import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
 import com.benoitletondor.easybudgetapp.helper.combine
+import com.benoitletondor.easybudgetapp.helper.localDateFromTimestamp
 import com.benoitletondor.easybudgetapp.helper.watchUserCurrency
 import com.benoitletondor.easybudgetapp.injection.CurrentDBProvider
 import com.benoitletondor.easybudgetapp.parameters.Parameters
@@ -41,7 +42,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import kotlin.math.abs
 
 @HiltViewModel(assistedFactory = ExpenseEditViewModelFactory::class)
@@ -123,8 +126,18 @@ class ExpenseEditViewModel @AssistedInject constructor(
         isRevenueMutableStateFlow.value = isRevenue
     }
 
-    fun onDateChanged(date: LocalDate) {
-        dateMutableStateFlow.value = date
+    fun onDateSelected(utcTimestamp: Long?) {
+        if (utcTimestamp != null) {
+            dateMutableStateFlow.value = Instant.ofEpochMilli(utcTimestamp)
+                .atZone(ZoneId.of("UTC"))
+                .toLocalDate()
+        }
+    }
+
+    fun onDateClicked() {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.ShowDatePicker(dateMutableStateFlow.value))
+        }
     }
 
     fun onAmountChanged(amount: String) {
@@ -192,6 +205,7 @@ class ExpenseEditViewModel @AssistedInject constructor(
         data object EmptyTitleError : Event()
         data object ExpenseAddBeforeInitDateError : Event()
         data class ErrorPersistingExpense(val error: Throwable) : Event()
+        data class ShowDatePicker(val date: LocalDate) : Event()
     }
 
     sealed interface State {
