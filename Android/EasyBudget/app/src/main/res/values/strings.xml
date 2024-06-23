@@ -510,31 +510,6 @@
     <string name="update_three_dot_two_notification_message">As a Pro user, you can now export your monthly reports as CSV!</string>
     <string name="update_three_dot_two_notification_cta">Discover</string>
 
-    <!-- Keys, not for translations. -->
-    <string name="setting_category_bug_report_send_button_key" translatable="false">send_bug_report</string>
-    <string name="setting_category_show_welcome_screen_button_key" translatable="false">show_welcome_screen</string>
-    <string name="setting_category_limit_set_button_key" translatable="false">limit_set</string>
-    <string name="setting_category_currency_change_button_key" translatable="false">change_currency</string>
-    <string name="setting_category_dev_key" translatable="false">dev_category</string>
-    <string name="setting_category_rate_button_key" translatable="false">rate</string>
-    <string name="setting_category_app_version_key" translatable="false">app_version</string>
-    <string name="setting_category_share_app_key" translatable="false">share_app</string>
-    <string name="setting_category_premium_key" translatable="false">category_premium</string>
-    <string name="setting_category_not_premium_key" translatable="false">category_not_premium</string>
-    <string name="setting_category_premium_status_key" translatable="false">premium</string>
-    <string name="setting_category_premium_redeem_key" translatable="false">redeem</string>
-    <string name="setting_category_notifications_update_key" translatable="false">update_notifs</string>
-    <string name="setting_category_show_checked_balance_key" translatable="false">show_checked_balance</string>
-    <string name="setting_category_notifications_daily_key" translatable="false">daily_notifs</string>
-    <string name="setting_category_notifications_monthly_key" translatable="false">monthly_notifs</string>
-    <string name="setting_category_app_theme_key" translatable="false">app_theme</string>
-    <string name="setting_category_not_premium_status_key" translatable="false">not_premium</string>
-    <string name="setting_category_dev_show_premium_key" translatable="false">show_premium</string>
-    <string name="setting_category_dev_show_login" translatable="false">show_login</string>
-    <string name="setting_category_dev_show_create_account" translatable="false">show_create_account</string>
-    <string name="setting_category_start_day_of_week_key" translatable="false">start_day_of_week</string>
-    <string name="setting_category_backup" translatable="false">backup</string>
-
     <string-array name="themes">
         <item>@string/setting_theme_light</item>
         <item>@string/setting_theme_dark</item>

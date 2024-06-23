@@ -1,11 +1,13 @@
 package com.benoitletondor.easybudgetapp.view.recurringexpenseadd
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,10 +17,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -187,6 +192,10 @@ private fun RecurringExpenseEditView(
     }
 
     val state by stateFlow.collectAsState()
+
+    BackHandler(enabled = state.isSaving) {
+        /* No-op to disable back press while saving */
+    }
 
     AppWithTopAppBarScaffold(
         title = stringResource(if (state.isEditing) {
@@ -474,22 +483,29 @@ private fun RecurringExpenseEditView(
 
             if (state.isSaving) {
                 Dialog(onDismissRequest = { /* No-op */ }) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(color = colorResource(R.color.window_background))
-                            .padding(horizontal = 20.dp, vertical = 20.dp),
-                        verticalAlignment = Alignment.CenterVertically,
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(10.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = colorResource(R.color.window_background),
+                        ),
                     ) {
-                        CircularProgressIndicator()
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 20.dp, vertical = 20.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            CircularProgressIndicator()
 
-                        Spacer(modifier = Modifier.width(10.dp))
+                            Spacer(modifier = Modifier.width(10.dp))
 
-                        Text(
-                            modifier = Modifier.weight(1f),
-                            text = stringResource(if (state.isRevenue) R.string.recurring_income_add_loading_message else R.string.recurring_expense_add_loading_message),
-                            fontSize = 18.sp,
-                        )
+                            Text(
+                                modifier = Modifier.weight(1f),
+                                text = stringResource(if (state.isRevenue) R.string.recurring_income_add_loading_message else R.string.recurring_expense_add_loading_message),
+                                fontSize = 18.sp,
+                            )
+                        }
                     }
                 }
             }
@@ -505,31 +521,39 @@ private fun RecurringIntervalPickerDialog(
     Dialog(
         onDismissRequest = onDismissRequest,
     ) {
-        Column(
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .background(color = colorResource(R.color.window_background))
-                .verticalScroll(rememberScrollState())
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(10.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = colorResource(R.color.window_background),
+            ),
         ) {
-            Text(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 10.dp),
-                text = stringResource(R.string.recurring_expense_interval),
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp,
-                textAlign = TextAlign.Center,
-            )
-
-            RecurringExpenseType.entries.forEach { recurringExpenseType ->
+                    .padding(bottom = 10.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
                 Text(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(color = colorResource(R.color.window_background))
-                        .clickable { onIntervalSelected(recurringExpenseType) }
-                        .padding(horizontal = 26.dp, vertical = 16.dp),
-                    text = recurringExpenseType.stringRepresentation(LocalContext.current),
+                        .padding(horizontal = 16.dp)
+                        .padding(top = 20.dp, bottom = 10.dp),
+                    text = stringResource(R.string.recurring_expense_interval),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    textAlign = TextAlign.Center,
                 )
+
+                RecurringExpenseType.entries.forEach { recurringExpenseType ->
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(color = colorResource(R.color.window_background))
+                            .clickable { onIntervalSelected(recurringExpenseType) }
+                            .padding(horizontal = 26.dp, vertical = 16.dp),
+                        text = recurringExpenseType.stringRepresentation(LocalContext.current),
+                    )
+                }
             }
         }
     }
