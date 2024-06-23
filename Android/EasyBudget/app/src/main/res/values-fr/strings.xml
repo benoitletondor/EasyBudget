@@ -358,6 +358,8 @@
     <string name="expense_edit_unable_to_load_db_error_title">Impossible d\'accéder à la base de données</string>
     <string name="expense_edit_unable_to_load_db_error_message">Impossible d\'accéder à la base de données pour conserver vos dépenses. Veuillez vérifier votre réseau et relancer l\'application.</string>
     <string name="expense_edit_unable_to_load_db_error_cta">Annuler</string>
+    <string name="expense_edit_error_saving_title">Oups</string>
+    <string name="expense_edit_error_saving_message">Une erreur s\'est produite lors de la sauvegarde. Veuillez réessayer et redémarrer l\'application si le problème persiste.</string>
     <string name="account_management_account_left_confirmation">Compte quitté avec succès</string>
     <string name="account_management_account_name_updated_confirmation">Nom du compte mis à jour avec succès</string>
     <string name="account_management_error_title">Oups</string>

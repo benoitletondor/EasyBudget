@@ -358,6 +358,8 @@
     <string name="expense_edit_unable_to_load_db_error_title">Não é possível acessar o banco de dados</string>
     <string name="expense_edit_unable_to_load_db_error_message">Não é possível acessar o banco de dados para manter sua despesa. Verifique sua rede e reinicie o aplicativo.</string>
     <string name="expense_edit_unable_to_load_db_error_cta">Cancelar</string>
+    <string name="expense_edit_error_saving_title">Ops</string>
+    <string name="expense_edit_error_saving_message">Ocorreu um erro ao persistir a entrada. Tente novamente e reinicie o aplicativo se persistir.</string>
     <string name="account_management_account_left_confirmation">Conta encerrada com sucesso</string>
     <string name="account_management_account_name_updated_confirmation">Nome da conta atualizado com sucesso</string>
     <string name="account_management_error_title">Ops</string>

@@ -358,6 +358,8 @@
     <string name="expense_edit_unable_to_load_db_error_title">Auf die Datenbank kann nicht zugegriffen werden</string>
     <string name="expense_edit_unable_to_load_db_error_message">Sie können nicht auf die Datenbank zugreifen, um Ihre Ausgaben beizubehalten. Bitte überprüfen Sie Ihr Netzwerk und starten Sie die App neu.</string>
     <string name="expense_edit_unable_to_load_db_error_cta">Stornieren</string>
+    <string name="expense_edit_error_saving_title">Oops</string>
+    <string name="expense_edit_error_saving_message">Beim Speichern des Eintrags ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut und starten Sie die App neu, wenn das Problem weiterhin besteht.</string>
     <string name="account_management_account_left_confirmation">Das Konto wurde erfolgreich verlassen</string>
     <string name="account_management_account_name_updated_confirmation">Der Kontoname wurde erfolgreich aktualisiert</string>
     <string name="account_management_error_title">Oops</string>
