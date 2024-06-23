@@ -41,7 +41,6 @@ import com.benoitletondor.easybudgetapp.parameters.setPremiumPopupLastAutoShowTi
 import com.benoitletondor.easybudgetapp.parameters.setPremiumPopupShown
 import com.benoitletondor.easybudgetapp.parameters.setRatingPopupLastAutoShowTimestamp
 import com.benoitletondor.easybudgetapp.view.RatingPopup
-import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.getRatingPopupUserStep
 import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -313,13 +312,13 @@ class MainActivity : AppCompatActivity() {
      */
     private fun openAddExpenseIfNeeded(intent: Intent) {
         if (intent.getBooleanExtra(INTENT_SHOW_ADD_EXPENSE, false)) {
-            val startIntent = ExpenseEditActivity.newIntent(
+            /*val startIntent = ExpenseEditActivity.newIntent(
                 context = this,
                 date = LocalDate.now(),
                 editedExpense = null,
             )
 
-            startActivity(startIntent)
+            startActivity(startIntent)*/
         }
     }
 
@@ -342,11 +341,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        const val INTENT_SHOW_WELCOME_SCREEN = "intent.welcomscreen.show"
         const val INTENT_SHOW_ADD_EXPENSE = "intent.addexpense.show"
         const val INTENT_SHOW_ADD_RECURRING_EXPENSE = "intent.addrecurringexpense.show"
-        const val INTENT_SHOW_CHECKED_BALANCE_CHANGED = "intent.showcheckedbalance.changed"
-        const val INTENT_LOW_MONEY_WARNING_THRESHOLD_CHANGED = "intent.lowmoneywarningthreshold.changed"
 
         const val INTENT_REDIRECT_TO_PREMIUM_EXTRA = "intent.extra.premiumshow"
         const val INTENT_REDIRECT_TO_SETTINGS_EXTRA = "intent.extra.redirecttosettings"

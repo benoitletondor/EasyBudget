@@ -60,8 +60,8 @@ class RecurringExpenseEditActivity : BaseActivity<ActivityRecurringExpenseAddBin
 
         setUpButtons()
 
-        binding.descriptionEdittext.setFocus()
-        binding.saveExpenseFab.animateFABAppearance()
+        /*binding.descriptionEdittext.setFocus()
+        binding.saveExpenseFab.animateFABAppearance()*/
 
         lifecycleScope.launchCollect(viewModel.editTypeFlow) { (isRevenue, isEditing) ->
             setExpenseTypeTextViewLayout(isRevenue, isEditing)

@@ -141,7 +141,7 @@ class ExpenseEditViewModel @AssistedInject constructor(
     }
 
     fun onAmountChanged(amount: String) {
-        amountMutableStateFlow.value = amount.toDoubleOrNull() ?: 0.0 // FIXME
+        amountMutableStateFlow.value = amount.toDoubleOrNull() ?: 0.0
     }
 
     fun onTitleChanged(title: String) {
@@ -149,19 +149,30 @@ class ExpenseEditViewModel @AssistedInject constructor(
     }
 
     fun onSave() {
+        var isInError = false
+        if (titleMutableStateFlow.value.isEmpty()) {
+            isInError = true
+            viewModelScope.launch {
+                eventMutableFlow.emit(Event.EmptyTitleError)
+            }
+        }
+
+        if (amountMutableStateFlow.value == 0.0) {
+            isInError = true
+            viewModelScope.launch {
+                eventMutableFlow.emit(Event.EmptyAmountError)
+            }
+        }
+
+        if (isInError) {
+            return
+        }
+
         val date = dateMutableStateFlow.value
         val dateOfInstallation = parameters.getInitDate() ?: LocalDate.now()
         if( date.isBefore(dateOfInstallation) ) {
             viewModelScope.launch {
                 eventMutableFlow.emit(Event.ExpenseAddBeforeInitDateError)
-            }
-
-            return
-        }
-
-        if (titleMutableStateFlow.value.isEmpty()) {
-            viewModelScope.launch {
-                eventMutableFlow.emit(Event.EmptyTitleError)
             }
 
             return
@@ -203,6 +214,7 @@ class ExpenseEditViewModel @AssistedInject constructor(
         data object Finish : Event()
         data object UnableToLoadDB : Event()
         data object EmptyTitleError : Event()
+        data object EmptyAmountError : Event()
         data object ExpenseAddBeforeInitDateError : Event()
         data class ErrorPersistingExpense(val error: Throwable) : Event()
         data class ShowDatePicker(val date: LocalDate) : Event()

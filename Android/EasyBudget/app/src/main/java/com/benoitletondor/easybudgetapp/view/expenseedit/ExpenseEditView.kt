@@ -73,6 +73,7 @@ import com.benoitletondor.easybudgetapp.helper.SerializedExpense
 import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.helper.sanitizeFromUnsupportedInputForDecimals
 import com.benoitletondor.easybudgetapp.model.Expense
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
@@ -117,6 +118,8 @@ fun ExpenseEditView(
         onIsRevenueChanged = viewModel::onExpenseRevenueValueChanged,
         onDateClicked = viewModel::onDateClicked,
         onDateSelected = viewModel::onDateSelected,
+        onAddExpenseBeforeInitDateConfirmed = viewModel::onAddExpenseBeforeInitDateConfirmed,
+        onAddExpenseBeforeInitDateCancelled = viewModel::onAddExpenseBeforeInitDateCancelled,
     )
 }
 
@@ -134,18 +137,44 @@ private fun ExpenseEditView(
     onIsRevenueChanged: (Boolean) -> Unit,
     onDateClicked: () -> Unit,
     onDateSelected: (Long?) -> Unit,
+    onAddExpenseBeforeInitDateConfirmed: () -> Unit,
+    onAddExpenseBeforeInitDateCancelled: () -> Unit,
 ) {
+    val context = LocalContext.current
     var showDatePickerWithDate by remember { mutableStateOf<LocalDate?>(null) }
+    var amountValueError: String? by remember { mutableStateOf(null) }
+    var titleValueError: String? by remember { mutableStateOf(null) }
 
     LaunchedEffect(key1 = "eventsListener") {
         launchCollect(eventFlow) { event ->
             when (event) {
-                ExpenseEditViewModel.Event.ExpenseAddBeforeInitDateError -> TODO()
+                ExpenseEditViewModel.Event.ExpenseAddBeforeInitDateError -> MaterialAlertDialogBuilder(context)
+                    .setTitle(R.string.expense_add_before_init_date_dialog_title)
+                    .setMessage(R.string.expense_add_before_init_date_dialog_description)
+                    .setPositiveButton(R.string.expense_add_before_init_date_dialog_positive_cta) { _, _ ->
+                        onAddExpenseBeforeInitDateConfirmed()
+                    }
+                    .setNegativeButton(R.string.expense_add_before_init_date_dialog_negative_cta) { _, _ ->
+                        onAddExpenseBeforeInitDateCancelled()
+                    }
+                    .show()
                 ExpenseEditViewModel.Event.Finish -> finish()
-                ExpenseEditViewModel.Event.UnableToLoadDB -> TODO()
-                is ExpenseEditViewModel.Event.ErrorPersistingExpense -> TODO()
-                ExpenseEditViewModel.Event.EmptyTitleError -> TODO()
+                ExpenseEditViewModel.Event.UnableToLoadDB -> MaterialAlertDialogBuilder(context)
+                    .setTitle(R.string.expense_edit_unable_to_load_db_error_title)
+                    .setMessage(R.string.expense_edit_unable_to_load_db_error_message)
+                    .setPositiveButton(R.string.expense_edit_unable_to_load_db_error_cta) { _, _ ->
+                        finish()
+                    }
+                    .setCancelable(false)
+                    .show()
+                is ExpenseEditViewModel.Event.ErrorPersistingExpense -> MaterialAlertDialogBuilder(context)
+                    .setTitle(R.string.expense_edit_error_saving_title)
+                    .setMessage(R.string.expense_edit_error_saving_message)
+                    .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
+                    .show()
+                ExpenseEditViewModel.Event.EmptyTitleError -> titleValueError = context.getString(R.string.no_description_error)
                 is ExpenseEditViewModel.Event.ShowDatePicker -> showDatePickerWithDate = event.date
+                ExpenseEditViewModel.Event.EmptyAmountError -> amountValueError = context.getString(R.string.no_amount_error)
             }
         }
     }
@@ -194,9 +223,11 @@ private fun ExpenseEditView(
                             value = descriptionTextFieldValue,
                             onValueChange = {
                                 descriptionTextFieldValue = it
+                                titleValueError = null
                                 onTitleUpdate(it.text)
                             },
-                            label = stringResource(R.string.description),
+                            isError = titleValueError != null,
+                            label = if (titleValueError != null ) "${stringResource(R.string.description)}: $titleValueError" else stringResource(R.string.description),
                             keyboardActions = KeyboardActions(
                                 onNext = {
                                     titleFocusRequester.freeFocus()
@@ -226,16 +257,18 @@ private fun ExpenseEditView(
                                 .focusRequester(amountFocusRequester),
                             value = currentAmountTextFieldValue,
                             onValueChange = { newValue ->
-                                val newText = newValue.text.sanitizeFromUnsupportedInputForDecimals()
+                                val newText = newValue.text.sanitizeFromUnsupportedInputForDecimals(supportsNegativeValue = false)
 
                                 currentAmountTextFieldValue = TextFieldValue(
                                     text = newText,
                                     selection = newValue.selection,
                                 )
 
+                                amountValueError = null
                                 onAmountUpdate(newText)
                             },
-                            label = stringResource(R.string.amount, currency.symbol),
+                            isError = amountValueError != null,
+                            label = if (amountValueError != null) "${stringResource(R.string.amount, currency.symbol)}: $amountValueError" else stringResource(R.string.amount, currency.symbol),
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Number,
                             )
@@ -317,7 +350,7 @@ private fun ExpenseEditView(
                                 fontSize = 14.sp,
                             )
 
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(5.dp))
 
                             val context = LocalContext.current
                             val dateFormatter = remember {
@@ -330,7 +363,8 @@ private fun ExpenseEditView(
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .clickable(onClick = onDateClicked),
+                                    .clickable(onClick = onDateClicked)
+                                    .padding(top = 3.dp),
                             ) {
                                 Text(
                                     modifier = Modifier.fillMaxWidth(),
@@ -348,7 +382,6 @@ private fun ExpenseEditView(
                                     thickness = 1.dp,
                                 )
                             }
-
                         }
                     }
                 }
@@ -357,7 +390,8 @@ private fun ExpenseEditView(
             val datePickerDate = showDatePickerWithDate
             if (datePickerDate != null) {
                 val datePickerState = rememberDatePickerState(
-                    initialSelectedDateMillis = Date.from(datePickerDate.atStartOfDay().atZone(ZoneId.of("UTC")).toInstant()).time)
+                    initialSelectedDateMillis = Date.from(datePickerDate.atStartOfDay().atZone(ZoneId.of("UTC")).toInstant()).time
+                )
 
                 DatePickerDialog(
                     onDismissRequest = { showDatePickerWithDate = null },
@@ -412,17 +446,17 @@ private fun InputTextField(
     colors: TextFieldColors = TextFieldDefaults.colors(
         focusedContainerColor = colorResource(R.color.action_bar_background),
         unfocusedContainerColor = colorResource(R.color.action_bar_background),
+        errorContainerColor = colorResource(R.color.action_bar_background),
         cursorColor = Color.White,
         focusedLabelColor = Color.White,
         unfocusedLabelColor = Color.White,
+        errorLabelColor = colorResource(R.color.budget_red),
         focusedTextColor = Color.White,
         unfocusedTextColor = Color.White,
+        errorTextColor = Color.White,
         focusedIndicatorColor = Color.White,
         unfocusedIndicatorColor = Color.White,
-        selectionColors = TextSelectionColors(
-            handleColor = Color.White,
-            backgroundColor = Color.White.copy(alpha = 0.3f),
-        )
+        errorIndicatorColor = Color.White,
     ),
 ) {
     val textColor = textStyle.color
@@ -439,7 +473,7 @@ private fun InputTextField(
             modifier = modifier
                 .defaultMinSize(
                     minWidth = TextFieldDefaults.MinWidth,
-                    minHeight = TextFieldDefaults.MinHeight
+                    minHeight = TextFieldDefaults.MinHeight + 4.dp,
                 ),
             onValueChange = onValueChange,
             enabled = enabled,
@@ -462,7 +496,7 @@ private fun InputTextField(
                     placeholder = placeholder,
                     label = {
                         Text(
-                            modifier = Modifier.padding(bottom = 2.dp),
+                            modifier = Modifier.padding(bottom = 4.dp),
                             text = label,
                             fontSize = 15.sp,
                         )
@@ -478,7 +512,7 @@ private fun InputTextField(
                     isError = isError,
                     interactionSource = interactionSource,
                     colors = colors,
-                    contentPadding = PaddingValues(top = 5.dp),
+                    contentPadding = PaddingValues(top = 7.dp),
                 )
             }
         )

@@ -382,6 +382,9 @@
     <string name="expense_edit_unable_to_load_db_error_message">Cannot access the database to persist your expense. Please check your network and relaunch the app.</string>
     <string name="expense_edit_unable_to_load_db_error_cta">Cancel</string>
 
+    <string name="expense_edit_error_saving_title">Oops</string>
+    <string name="expense_edit_error_saving_message">An error occurred while persisting the entry. Please try again and restart the app if it persists.</string>
+
     <string name="account_management_account_left_confirmation">Account left successfully</string>
     <string name="account_management_account_name_updated_confirmation">Account name updated successfully</string>
     <string name="account_management_error_title">Oops</string>

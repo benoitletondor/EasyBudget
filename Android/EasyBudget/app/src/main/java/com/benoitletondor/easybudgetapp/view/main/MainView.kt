@@ -53,7 +53,6 @@ import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
-import com.benoitletondor.easybudgetapp.view.expenseedit.ExpenseEditActivity
 import com.benoitletondor.easybudgetapp.view.main.subviews.accountselector.AccountSelectorView
 import com.benoitletondor.easybudgetapp.view.main.subviews.FABMenuOverlay
 import com.benoitletondor.easybudgetapp.view.main.subviews.MainViewContent

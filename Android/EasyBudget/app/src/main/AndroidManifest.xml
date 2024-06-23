@@ -93,13 +93,6 @@
                 android:resource="@xml/shortcuts" />
         </activity>
         <activity
-            android:name=".view.expenseedit.ExpenseEditActivity"
-            android:configChanges="locale|keyboardHidden|orientation|screenSize"
-            android:label="@string/title_activity_add_expense"
-            android:screenOrientation="portrait"
-            tools:ignore="DiscouragedApi,LockedOrientationActivity"
-            android:exported="false"/>
-        <activity
             android:name=".view.recurringexpenseadd.RecurringExpenseEditActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_recurring_expense_add"

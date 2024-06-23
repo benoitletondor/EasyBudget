@@ -16,81 +16,28 @@
 
 package com.benoitletondor.easybudgetapp.helper
 
-import android.app.Activity
 import android.content.Context
-import android.os.Build
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.Gravity
-import android.view.View
-import android.view.WindowManager
-import android.view.animation.AccelerateInterpolator
-import android.view.inputmethod.InputMethodManager
-import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
-import androidx.annotation.ColorRes
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
 import androidx.core.view.updateLayoutParams
 import com.benoitletondor.easybudgetapp.R
-import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 /**
- * This helper prevents the user to add unsupported values into an EditText for decimal numbers
+ * This helper prevents the user to add unsupported values into an TextField for decimal numbers
  */
-
-fun String.sanitizeFromUnsupportedInputForDecimals(): String {
+fun String.sanitizeFromUnsupportedInputForDecimals(supportsNegativeValue: Boolean = true): String {
     val s = Editable.Factory.getInstance().newEditable(
-        filter { "-0123456789.,".contains(it) }
+        filter { (if (supportsNegativeValue) "-0123456789.," else "0123456789.,").contains(it) }
     )
 
-    try {
-        // Remove - that is not at first char
-        val minusIndex = lastIndexOf("-")
-        if (minusIndex > 0) {
-            s.delete(minusIndex, minusIndex + 1)
-
-            if (startsWith("-")) {
-                s.delete(0, 1)
-            } else {
-                s.insert(0, "-")
-            }
-
-            return s.toString()
-        }
-
-        val comaIndex = indexOf(",")
-        val dotIndex = indexOf(".")
-        val lastDotIndex = lastIndexOf(".")
-
-        // Remove ,
-        if (comaIndex >= 0) {
-            if (dotIndex >= 0) {
-                s.delete(comaIndex, comaIndex + 1)
-            } else {
-                s.replace(comaIndex, comaIndex + 1, ".")
-            }
-
-            return s.toString()
-        }
-
-        // Disallow double .
-        if (dotIndex >= 0 && dotIndex != lastDotIndex) {
-            s.delete(lastDotIndex, lastDotIndex + 1)
-        } else if (dotIndex > 0) {
-            val decimals = substring(dotIndex + 1)
-            if (decimals.length > 2) {
-                s.delete(dotIndex + 3, length)
-            }
-        }// No more than 2 decimals
-    } catch (e: Exception) {
-        Logger.error("An error occurred during text changing watcher. Value: $this", e)
-    }
+    s.sanitizeFromUnsupportedInputForDecimals()
 
     return s.toString()
 }
@@ -102,106 +49,55 @@ fun EditText.preventUnsupportedInputForDecimals() {
         override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
 
         override fun afterTextChanged(s: Editable) {
-            val value = text.toString()
-
-            try {
-                // Remove - that is not at first char
-                val minusIndex = value.lastIndexOf("-")
-                if (minusIndex > 0) {
-                    s.delete(minusIndex, minusIndex + 1)
-
-                    if (value.startsWith("-")) {
-                        s.delete(0, 1)
-                    } else {
-                        s.insert(0, "-")
-                    }
-
-                    return
-                }
-
-                val comaIndex = value.indexOf(",")
-                val dotIndex = value.indexOf(".")
-                val lastDotIndex = value.lastIndexOf(".")
-
-                // Remove ,
-                if (comaIndex >= 0) {
-                    if (dotIndex >= 0) {
-                        s.delete(comaIndex, comaIndex + 1)
-                    } else {
-                        s.replace(comaIndex, comaIndex + 1, ".")
-                    }
-
-                    return
-                }
-
-                // Disallow double .
-                if (dotIndex >= 0 && dotIndex != lastDotIndex) {
-                    s.delete(lastDotIndex, lastDotIndex + 1)
-                } else if (dotIndex > 0) {
-                    val decimals = value.substring(dotIndex + 1)
-                    if (decimals.length > 2) {
-                        s.delete(dotIndex + 3, value.length)
-                    }
-                }// No more than 2 decimals
-            } catch (e: Exception) {
-                Logger.error("An error occurred during text changing watcher. Value: $value", e)
-            }
+            s.sanitizeFromUnsupportedInputForDecimals()
         }
     })
 }
 
-/**
- * Show the FAB, animating the appearance if activated (the FAB should be configured with scale & alpha to 0)
- */
-fun View.animateFABAppearance() {
-    ViewCompat.animate(this)
-        .scaleX(1.0f)
-        .scaleY(1.0f)
-        .alpha(1.0f)
-        .setInterpolator(AccelerateInterpolator())
-        .withLayer()
-        .start()
-}
+private fun Editable.sanitizeFromUnsupportedInputForDecimals() {
+    try {
+        // Remove - that is not at first char
+        val minusIndex = lastIndexOf("-")
+        if (minusIndex > 0) {
+            delete(minusIndex, minusIndex + 1)
 
-/**
- * Set the focus on the given text view
- */
-fun EditText.setFocus() {
-    requestFocus()
+            if (startsWith("-")) {
+                delete(0, 1)
+            } else {
+                insert(0, "-")
+            }
 
-    val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-    imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
-}
+            return
+        }
 
-/**
- * Set the status bar color
- */
-fun Activity.setStatusBarColor(@ColorRes colorRes: Int) {
-    val window = window
+        val comaIndex = indexOf(",")
+        val dotIndex = indexOf(".")
+        val lastDotIndex = lastIndexOf(".")
 
-    if (window.attributes.flags and WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS == 0) {
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        // Remove ,
+        if (comaIndex >= 0) {
+            if (dotIndex >= 0) {
+                delete(comaIndex, comaIndex + 1)
+            } else {
+                replace(comaIndex, comaIndex + 1, ".")
+            }
+
+            return
+        }
+
+        // Disallow double .
+        if (dotIndex >= 0 && dotIndex != lastDotIndex) {
+            delete(lastDotIndex, lastDotIndex + 1)
+        } else if (dotIndex >= 0) {
+            // No more than 2 decimals
+            val decimals = substring(dotIndex + 1)
+            if (decimals.length > 2) {
+                delete(dotIndex + 3, length)
+            }
+        }
+    } catch (e: Exception) {
+        Logger.error("An error occurred during text changing watcher. Value: $this", e)
     }
-
-    window.statusBarColor = ContextCompat.getColor(this, colorRes)
-
-    if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ) {
-        window.navigationBarColor = ContextCompat.getColor(this, colorRes)
-    }
-}
-
-fun Activity.setNavigationBarColored() {
-    var flags = window.decorView.systemUiVisibility
-    flags = flags and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
-
-    window.decorView.systemUiVisibility = flags
-}
-
-/**
- * Remove border of the button
- */
-fun Button.removeButtonBorder() {
-    outlineProvider = null
 }
 
 /**
