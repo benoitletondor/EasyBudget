@@ -19,6 +19,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -469,6 +470,28 @@ private fun RecurringExpenseEditView(
                         shouldShowRecurringIntervalPicker = false
                     },
                 )
+            }
+
+            if (state.isSaving) {
+                Dialog(onDismissRequest = { /* No-op */ }) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(color = colorResource(R.color.window_background))
+                            .padding(horizontal = 20.dp, vertical = 20.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        CircularProgressIndicator()
+
+                        Spacer(modifier = Modifier.width(10.dp))
+
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = stringResource(if (state.isRevenue) R.string.recurring_income_add_loading_message else R.string.recurring_expense_add_loading_message),
+                            fontSize = 18.sp,
+                        )
+                    }
+                }
             }
         },
     )
