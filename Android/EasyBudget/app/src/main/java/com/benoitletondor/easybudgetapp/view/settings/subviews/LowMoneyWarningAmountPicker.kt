@@ -16,7 +16,6 @@
 package com.benoitletondor.easybudgetapp.view.settings.subviews
 
 import android.content.Context
-import android.content.res.Configuration
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager

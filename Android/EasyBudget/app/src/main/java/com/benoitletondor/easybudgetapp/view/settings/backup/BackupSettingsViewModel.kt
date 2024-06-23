@@ -166,7 +166,7 @@ class BackupSettingsViewModel @Inject constructor(
                 val lastBackupDate = maybeBackupActivatedState?.lastBackupDate
                 if (lastBackupDate != null) {
                     viewModelScope.launch {
-                        eventMutableFlow.emit(Event.PromptUserToRestoreBackup(lastBackupDate))
+                        eventMutableFlow.emit(Event.PromptUserToRestorePreviousBackup(lastBackupDate))
                     }
                 }
             }
@@ -312,7 +312,7 @@ class BackupSettingsViewModel @Inject constructor(
         data class ShowRestoreConfirmation(val lastBackupDate: Date) : Event()
         data object ShowDeleteConfirmation : Event()
         data class ShowBackupDeletionError(val error: Throwable) : Event()
-        data class PromptUserToRestoreBackup(val lastBackupDate: Date) : Event()
+        data class PromptUserToRestorePreviousBackup(val lastBackupDate: Date) : Event()
     }
 
     sealed class State {

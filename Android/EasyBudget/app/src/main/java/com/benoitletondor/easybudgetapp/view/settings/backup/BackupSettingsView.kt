@@ -89,6 +89,8 @@ fun BackupSettingsView(
         onBackupNowClicked = viewModel::onBackupNowButtonPressed,
         onRestoreNowClicked = viewModel::onRestoreButtonPressed,
         onDeleteBackupClicked = viewModel::onDeleteBackupButtonPressed,
+        onRestorePreviousBackupButtonPressed = viewModel::onRestorePreviousBackupButtonPressed,
+        onIgnorePreviousBackupButtonPressed = viewModel::onIgnorePreviousBackupButtonPressed,
     )
 }
 
@@ -110,6 +112,8 @@ private fun BackupSettingsView(
     onBackupNowClicked: () -> Unit,
     onRestoreNowClicked: () -> Unit,
     onDeleteBackupClicked: () -> Unit,
+    onRestorePreviousBackupButtonPressed: () -> Unit,
+    onIgnorePreviousBackupButtonPressed: () -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -120,20 +124,20 @@ private fun BackupSettingsView(
     LaunchedEffect(key1 = "eventsListener") {
         launchCollect(eventFlow) { event ->
             when (event) {
-                is BackupSettingsViewModel.Event.PromptUserToRestoreBackup -> {
+                is BackupSettingsViewModel.Event.PromptUserToRestorePreviousBackup -> {
                     MaterialAlertDialogBuilder(context)
-                        .setTitle(R.string.backup_restore_confirmation_title)
+                        .setTitle(R.string.backup_already_exist_title)
                         .setMessage(
                             context.getString(
-                                R.string.backup_restore_confirmation_message,
+                                R.string.backup_already_exist_message,
                                 event.lastBackupDate.formatLastBackupDate(context),
                             )
                         )
                         .setPositiveButton(R.string.backup_restore_confirmation_positive_cta) { _, _ ->
-                            onRestoreBackupConfirmationConfirmed()
+                            onRestorePreviousBackupButtonPressed()
                         }
                         .setNegativeButton(R.string.backup_restore_confirmation_negative_cta) { _, _ ->
-                            onRestoreBackupConfirmationCancelled()
+                            onIgnorePreviousBackupButtonPressed()
                         }
                         .show()
                 }

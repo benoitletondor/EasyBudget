@@ -179,11 +179,6 @@
     <string name="setting_category_app_version_message">Made by @BenoitLetondor</string>
     <string name="setting_category_share_app_title">Tell your friends</string>
     <string name="setting_category_share_app_message">EasyBudget is free, so why not share it with your friends!</string>
-    <string name="setting_category_dev_title" translatable="false">Dev</string>
-    <string name="setting_category_show_welcome_screen_button_title" translatable="false">Show welcome screen</string>
-    <string name="setting_category_show_premium" translatable="false">Show premium screen</string>
-    <string name="setting_category_show_login" translatable="false">Show login</string>
-    <string name="setting_category_show_create_account" translatable="false">Show create account</string>
     <string name="setting_category_premium_title">Subscription</string>
     <string name="setting_category_not_premium_title" translatable="false">Premium / Pro</string>
     <string name="setting_category_premium_status_title">You are premium!</string>
@@ -509,18 +504,6 @@
     <string name="update_three_dot_two_notification_title">New in EasyBudget</string>
     <string name="update_three_dot_two_notification_message">As a Pro user, you can now export your monthly reports as CSV!</string>
     <string name="update_three_dot_two_notification_cta">Discover</string>
-
-    <string-array name="themes">
-        <item>@string/setting_theme_light</item>
-        <item>@string/setting_theme_dark</item>
-        <item>@string/setting_theme_platform</item>
-    </string-array>
-
-    <string-array name="themesData">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-    </string-array>
 
     <string name="setting_notification_permission_rejected_dialog_title">Notifications permission denied</string>
     <string name="setting_notification_permission_rejected_dialog_description">To receive your premium daily and monthly reminders, you need to allow notifications. Do you want to receive notifications?</string>

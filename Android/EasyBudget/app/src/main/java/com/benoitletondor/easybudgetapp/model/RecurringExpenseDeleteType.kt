@@ -41,23 +41,4 @@ enum class RecurringExpenseDeleteType(val value: Int) {
      * Delete this expense occurrence only
      */
     ONE(3);
-
-
-    companion object {
-        /**
-         * Retrieve the enum for the given value
-         *
-         * @param value
-         * @return
-         */
-        fun fromValue(value: Int): RecurringExpenseDeleteType? {
-            for (type in entries) {
-                if (value == type.value) {
-                    return type
-                }
-            }
-
-            return null
-        }
-    }
 }

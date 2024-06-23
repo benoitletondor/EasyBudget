@@ -219,7 +219,15 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onPushPermissionResult() {
-        isNotificationPermissionGrantedMutableFlow.value = isNotificationPermissionGranted()
+        val granted = isNotificationPermissionGranted()
+
+        isNotificationPermissionGrantedMutableFlow.value = granted
+
+        if (!granted) {
+            viewModelScope.launch {
+                eventMutableFlow.emit(Event.ShowNotificationRejectedPrompt)
+            }
+        }
     }
 
     fun onRateAppClicked() {
@@ -282,6 +290,12 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun onNotificationPermissionDeniedPromptAccepted() {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.AskForNotificationPermission)
+        }
+    }
+
     private fun isNotificationPermissionGranted(): Boolean = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
     } else {
@@ -289,7 +303,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     sealed class State {
-        object Loading : State()
+        data object Loading : State()
         data class Error(val error: Throwable) : State()
         data class Loaded(
             val userCurrency: Currency,
@@ -341,5 +355,6 @@ class SettingsViewModel @Inject constructor(
         data class OpenBugReport(val localId: String) : Event()
         data object RedirectToTwitter : Event()
         data object OpenRedeemCode : Event()
+        data object ShowNotificationRejectedPrompt : Event()
     }
 }

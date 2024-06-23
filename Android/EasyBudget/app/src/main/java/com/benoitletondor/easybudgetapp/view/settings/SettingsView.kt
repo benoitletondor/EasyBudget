@@ -49,6 +49,7 @@ import com.benoitletondor.easybudgetapp.view.settings.subviews.openRedeemCodeDia
 import com.benoitletondor.easybudgetapp.view.settings.subviews.showLowMoneyWarningAmountPickerDialog
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
@@ -91,6 +92,7 @@ fun SettingsView(
         onAdjustLowMoneyWarningAmountChanged = viewModel::onAdjustLowMoneyWarningAmountChanged,
         navigateToPremium = navigateToPremium,
         onThemeSelected = viewModel::onThemeSelected,
+        onNotificationPermissionDeniedPromptAccepted = viewModel::onNotificationPermissionDeniedPromptAccepted,
     )
 }
 
@@ -123,6 +125,7 @@ private fun SettingsView(
     onAdjustLowMoneyWarningAmountChanged: (Int) -> Unit,
     navigateToPremium: () -> Unit,
     onThemeSelected: (AppTheme) -> Unit,
+    onNotificationPermissionDeniedPromptAccepted: () -> Unit,
 ) {
     val context = LocalContext.current
     val pushPermissionState = rememberPermissionStateCompat()
@@ -186,6 +189,17 @@ private fun SettingsView(
                     }
                 }
                 is SettingsViewModel.Event.ShowThemePicker -> showThemePickerDialogWithTheme = event.currentTheme
+                SettingsViewModel.Event.ShowNotificationRejectedPrompt -> MaterialAlertDialogBuilder(context)
+                    .setTitle(R.string.setting_notification_permission_rejected_dialog_title)
+                    .setMessage(R.string.setting_notification_permission_rejected_dialog_description)
+                    .setPositiveButton(R.string.setting_notification_permission_rejected_dialog_accept_cta) { dialog, _ ->
+                        dialog.dismiss()
+                        onNotificationPermissionDeniedPromptAccepted()
+                    }
+                    .setNegativeButton(R.string.setting_notification_permission_rejected_dialog_not_now_cta) { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .show()
             }
         }
     }

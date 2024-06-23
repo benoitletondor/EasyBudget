@@ -14,7 +14,7 @@
    limitations under the License.
 -->
 
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <color name="easy_budget_green">#00897B</color>
     <color name="easy_budget_green_night">#4DB6AC</color>
     <color name="easy_budget_green_dark">#00695C</color>

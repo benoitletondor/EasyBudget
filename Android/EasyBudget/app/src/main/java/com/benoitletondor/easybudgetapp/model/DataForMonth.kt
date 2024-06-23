@@ -26,7 +26,7 @@ data class DataForMonth(
     val daysData: Map<LocalDate, DataForDay>,
 ) {
     companion object {
-        const val numberOfLeewayDays: Long = 6
+        const val NUMBER_OF_LEEWAY_DAYS: Long = 6
     }
 }
 

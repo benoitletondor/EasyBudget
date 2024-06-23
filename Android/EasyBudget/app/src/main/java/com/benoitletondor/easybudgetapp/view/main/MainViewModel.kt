@@ -523,12 +523,6 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun onIabStatusChanged() {
-        viewModelScope.launch {
-            forceRefreshMutableFlow.emit(Unit)
-        }
-    }
-
     fun onAdjustCurrentBalanceClicked() {
         viewModelScope.launch {
             val balance = withContext(Dispatchers.Default) {
