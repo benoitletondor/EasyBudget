@@ -1,3 +1,18 @@
+/*
+ *   Copyright 2024 Benoit LETONDOR
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
 package com.benoitletondor.easybudgetapp.view.main
 
 import android.app.ProgressDialog
@@ -65,6 +80,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -79,11 +96,14 @@ object MainDestination
 @Composable
 fun MainView(
     viewModel: MainViewModel = hiltViewModel(),
+    openAddExpenseScreenLiveFlow: Flow<Unit>,
+    openAddRecurringExpenseScreenLiveFlow: Flow<Unit>,
+    openMonthlyReportScreenFromNotificationFlow: Flow<Unit>,
     navigateToOnboarding: () -> Unit,
     onboardingResultFlow: Flow<OnboardingResult>,
     closeApp: () -> Unit,
     navigateToPremium: (startOnPro: Boolean) -> Unit,
-    navigateToMonthlyReport: () -> Unit,
+    navigateToMonthlyReport: (fromNotification: Boolean) -> Unit,
     navigateToManageAccount: (account: MainViewModel.SelectedAccount.Selected.Online) -> Unit,
     navigateToSettings: () -> Unit,
     navigateToLogin: (shouldDismissAfterAuth: Boolean) -> Unit,
@@ -95,6 +115,9 @@ fun MainView(
         selectedAccountFlow = viewModel.accountSelectionFlow,
         dbStateFlow = viewModel.dbAvailableFlow,
         eventFlow = viewModel.eventFlow,
+        openAddExpenseScreenLiveFlow = openAddExpenseScreenLiveFlow,
+        openAddRecurringExpenseScreenLiveFlow = openAddRecurringExpenseScreenLiveFlow,
+        openMonthlyReportScreenFromNotificationFlow = openMonthlyReportScreenFromNotificationFlow,
         forceRefreshDataFlow = viewModel.forceRefreshFlow,
         firstDayOfWeekFlow = viewModel.firstDayOfWeekFlow,
         includeCheckedBalanceFlow = viewModel.includeCheckedBalanceFlow,
@@ -165,6 +188,9 @@ private fun MainView(
     selectedAccountFlow: StateFlow<MainViewModel.SelectedAccount>,
     dbStateFlow: StateFlow<MainViewModel.DBState>,
     eventFlow: Flow<MainViewModel.Event>,
+    openAddExpenseScreenLiveFlow: Flow<Unit>,
+    openAddRecurringExpenseScreenLiveFlow: Flow<Unit>,
+    openMonthlyReportScreenFromNotificationFlow: Flow<Unit>,
     forceRefreshDataFlow: Flow<Unit>,
     firstDayOfWeekFlow: StateFlow<DayOfWeek>,
     includeCheckedBalanceFlow: StateFlow<Boolean>,
@@ -217,7 +243,7 @@ private fun MainView(
     onOnboardingResult: (OnboardingResult) -> Unit,
     closeApp: () -> Unit,
     navigateToPremium: (startOnPro: Boolean) -> Unit,
-    navigateToMonthlyReport: () -> Unit,
+    navigateToMonthlyReport: (fromNotification: Boolean) -> Unit,
     navigateToManageAccount: (MainViewModel.SelectedAccount.Selected.Online) -> Unit,
     navigateToSettings: () -> Unit,
     navigateToLogin: (shouldDismissAfterAuth: Boolean) -> Unit,
@@ -236,6 +262,54 @@ private fun MainView(
     LaunchedEffect(key1 = "startOnboarding") {
         if (shouldNavigateToOnboarding) {
             navigateToOnboarding()
+        }
+    }
+
+    LaunchedEffect(key1 = "openAddExpenseScreen") {
+        launch {
+            dbStateFlow
+                .flatMapLatest { state ->
+                    if (state is MainViewModel.DBState.Loaded) {
+                        return@flatMapLatest openAddExpenseScreenLiveFlow
+                    } else {
+                        return@flatMapLatest flow {  }
+                    }
+                }
+                .collect {
+                    navigateToAddExpense(LocalDate.now(), null)
+                }
+        }
+    }
+
+    LaunchedEffect(key1 = "openAddRecurringExpenseScreen") {
+        launch {
+            dbStateFlow
+                .flatMapLatest { state ->
+                    if (state is MainViewModel.DBState.Loaded) {
+                        return@flatMapLatest openAddRecurringExpenseScreenLiveFlow
+                    } else {
+                        return@flatMapLatest flow {  }
+                    }
+                }
+                .collect {
+                    navigateToAddRecurringExpense(LocalDate.now(), null)
+                }
+        }
+    }
+
+    LaunchedEffect(key1 = "openMonthlyReportScreen") {
+        launch {
+            dbStateFlow
+                .flatMapLatest { state ->
+                    if (state is MainViewModel.DBState.Loaded) {
+                        return@flatMapLatest openMonthlyReportScreenFromNotificationFlow
+                    } else {
+                        return@flatMapLatest flow {  }
+                    }
+                }
+                .collect {
+                    navigateToMonthlyReport(true)
+                }
         }
     }
 
@@ -331,7 +405,7 @@ private fun MainView(
                     navigateToAddRecurringExpense(event.date, null)
                 }
                 is MainViewModel.Event.OpenManageAccount -> navigateToManageAccount(event.account)
-                MainViewModel.Event.OpenMonthlyReport -> navigateToMonthlyReport()
+                MainViewModel.Event.OpenMonthlyReport -> navigateToMonthlyReport(false)
                 MainViewModel.Event.OpenPremium -> navigateToPremium(false)
                 is MainViewModel.Event.RecurringExpenseDeletionResult -> {
                     when(event.data) {
@@ -723,6 +797,9 @@ private fun Preview(
             )),
             dbStateFlow = MutableStateFlow(dbState),
             eventFlow = MutableSharedFlow(),
+            openAddExpenseScreenLiveFlow = MutableSharedFlow(),
+            openAddRecurringExpenseScreenLiveFlow = MutableSharedFlow(),
+            openMonthlyReportScreenFromNotificationFlow = MutableSharedFlow(),
             forceRefreshDataFlow = MutableSharedFlow(),
             firstDayOfWeekFlow = MutableStateFlow(DayOfWeek.MONDAY),
             includeCheckedBalanceFlow = MutableStateFlow(true),

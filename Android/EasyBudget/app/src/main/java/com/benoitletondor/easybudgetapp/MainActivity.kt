@@ -64,6 +64,9 @@ class MainActivity : AppCompatActivity() {
     @Inject lateinit var iab: Iab
 
     private val openSubscriptionScreenLiveFlow = MutableLiveFlow<Unit>()
+    private val openAddExpenseScreenLiveFlow = MutableLiveFlow<Unit>()
+    private val openAddRecurringExpenseScreenLiveFlow = MutableLiveFlow<Unit>()
+    private val openMonthlyReportScreenLiveFlow = MutableLiveFlow<Unit>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
@@ -88,6 +91,9 @@ class MainActivity : AppCompatActivity() {
                         finish()
                     },
                     openSubscriptionScreenFlow = openSubscriptionScreenLiveFlow,
+                    openAddExpenseScreenLiveFlow = openAddExpenseScreenLiveFlow,
+                    openAddRecurringExpenseScreenLiveFlow = openAddRecurringExpenseScreenLiveFlow,
+                    openMonthlyReportScreenFlow = openMonthlyReportScreenLiveFlow,
                 )
             }
         }
@@ -98,6 +104,8 @@ class MainActivity : AppCompatActivity() {
 
         showPremiumPopupIfNeeded()
         showRatingPopupIfNeeded()
+
+        performIntentActionIfAny()
     }
 
     private fun showPremiumPopupIfNeeded() {
@@ -213,95 +221,49 @@ class MainActivity : AppCompatActivity() {
         return Date().after(cal.time)
     }
 
-    private fun performIntentActionIfAny() {
+    private fun performIntentActionIfAny(): Boolean {
         if (intent != null) {
-            openSettingsIfNeeded(intent)
-            openMonthlyReportIfNeeded(intent)
-            openPremiumIfNeeded(intent)
-            openAddExpenseIfNeeded(intent)
-            openAddRecurringExpenseIfNeeded(intent)
-            openSettingsForBackupIfNeeded(intent)
-            openAccountsTrayIfNeeded(intent)
-            intent = null
+            return try {
+                openMonthlyReportIfNeeded(intent) || openAddExpenseIfNeeded(intent) || openAddRecurringExpenseIfNeeded(intent)
+            } finally {
+                intent = null
+            }
         }
+
+        return false
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
 
         this.intent = intent
-
-        /*(viewModel.accountSelectionFlow.value as? MainViewModel.SelectedAccount.Selected)?.let {
-            performIntentActionIfAny()
-        }*/
+        performIntentActionIfAny()
     }
 
 // ------------------------------------------>
-
-    /**
-     * Open the settings activity if the given intent contains the [.INTENT_REDIRECT_TO_SETTINGS_EXTRA]
-     * extra.
-     */
-    private fun openSettingsIfNeeded(intent: Intent) {
-        if (intent.getBooleanExtra(INTENT_REDIRECT_TO_SETTINGS_EXTRA, false)) {
-            //val startIntent = Intent(this, SettingsActivity::class.java)
-            //this@MainActivity.startActivity(startIntent)
-        }
-    }
-
-    /**
-     * Open the settings activity to display backup options if the given intent contains the
-     * [.INTENT_REDIRECT_TO_SETTINGS_FOR_BACKUP_EXTRA] extra.
-     */
-    private fun openSettingsForBackupIfNeeded(intent: Intent) {
-        if( intent.getBooleanExtra(INTENT_REDIRECT_TO_SETTINGS_FOR_BACKUP_EXTRA, false) ) {
-            /*val startIntent = Intent(this, SettingsActivity::class.java).apply {
-                putExtra(SHOW_BACKUP_INTENT_KEY, true)
-            }
-            this@MainActivity.startActivity(startIntent)*/
-        }
-    }
-
-    private fun openAccountsTrayIfNeeded(intent: Intent) {
-        if( intent.getBooleanExtra(INTENT_OPEN_ACCOUNTS_TRAY_EXTRA, false) ) {
-            //AccountSelectorFragment().show(supportFragmentManager, "accountSelector")
-            TODO()
-        }
-    }
 
     /**
      * Open the monthly report activity if the given intent contains the monthly uri part.
      *
      * @param intent
      */
-    private fun openMonthlyReportIfNeeded(intent: Intent) {
+    private fun openMonthlyReportIfNeeded(intent: Intent): Boolean {
         try {
             val data = intent.data
             if (data != null && "true" == data.getQueryParameter("monthly")) {
-                /*val startIntent = Intent(this, MonthlyReportBaseActivity::class.java)
-                startIntent.putExtra(MonthlyReportBaseActivity.FROM_NOTIFICATION_EXTRA, true)
-                ActivityCompat.startActivity(this@MainActivity, startIntent, null)*/
-                // FIXME
+                lifecycleScope.launch {
+                    openMonthlyReportScreenLiveFlow.emit(Unit)
+                }
+
+                return true
             }
         } catch (e: Exception) {
             Logger.error("Error while opening report activity", e)
         }
+
+        return false
     }
 
-    /**
-     * Open the premium screen if the given intent contains the [.INTENT_REDIRECT_TO_PREMIUM_EXTRA]
-     * extra.
-     *
-     * @param intent
-     */
-    private fun openPremiumIfNeeded(intent: Intent) {
-        if (intent.getBooleanExtra(INTENT_REDIRECT_TO_PREMIUM_EXTRA, false)) {
-            /*val startIntent = Intent(this, SettingsActivity::class.java)
-            startIntent.putExtra(SettingsActivity.SHOW_PREMIUM_INTENT_KEY, true)
-
-            this.startActivity(startIntent)*/
-        }
-    }
 
     /**
      * Open the add expense screen if the given intent contains the [.INTENT_SHOW_ADD_EXPENSE]
@@ -309,16 +271,16 @@ class MainActivity : AppCompatActivity() {
      *
      * @param intent
      */
-    private fun openAddExpenseIfNeeded(intent: Intent) {
+    private fun openAddExpenseIfNeeded(intent: Intent): Boolean {
         if (intent.getBooleanExtra(INTENT_SHOW_ADD_EXPENSE, false)) {
-            /*val startIntent = ExpenseEditActivity.newIntent(
-                context = this,
-                date = LocalDate.now(),
-                editedExpense = null,
-            )
+            lifecycleScope.launch {
+                openAddExpenseScreenLiveFlow.emit(Unit)
+            }
 
-            startActivity(startIntent)*/
+            return true
         }
+
+        return false
     }
 
     /**
@@ -327,25 +289,21 @@ class MainActivity : AppCompatActivity() {
      *
      * @param intent
      */
-    private fun openAddRecurringExpenseIfNeeded(intent: Intent) {
+    private fun openAddRecurringExpenseIfNeeded(intent: Intent): Boolean {
         if (intent.getBooleanExtra(INTENT_SHOW_ADD_RECURRING_EXPENSE, false)) {
-            /*val startIntent = RecurringExpenseEditActivity.newIntent(
-                context = this,
-                startDate = LocalDate.now(),
-                editedExpense = null,
-            )
+            lifecycleScope.launch {
+                openAddRecurringExpenseScreenLiveFlow.emit(Unit)
+            }
 
-            startActivity(startIntent)*/
+            return true
         }
+
+        return false
     }
 
     companion object {
-        const val INTENT_SHOW_ADD_EXPENSE = "intent.addexpense.show"
-        const val INTENT_SHOW_ADD_RECURRING_EXPENSE = "intent.addrecurringexpense.show"
-
-        const val INTENT_REDIRECT_TO_PREMIUM_EXTRA = "intent.extra.premiumshow"
-        const val INTENT_REDIRECT_TO_SETTINGS_EXTRA = "intent.extra.redirecttosettings"
-        const val INTENT_REDIRECT_TO_SETTINGS_FOR_BACKUP_EXTRA = "intent.extra.redirecttosettingsforbackup"
-        const val INTENT_OPEN_ACCOUNTS_TRAY_EXTRA = "intent.extra.openaccountstray"
+        // Those 2 are used by the shortcuts
+        private const val INTENT_SHOW_ADD_EXPENSE = "intent.addexpense.show"
+        private const val INTENT_SHOW_ADD_RECURRING_EXPENSE = "intent.addrecurringexpense.show"
     }
 }
