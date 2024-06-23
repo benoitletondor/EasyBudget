@@ -90,6 +90,7 @@ fun MainView(
     navigateToLogin: (shouldDismissAfterAuth: Boolean) -> Unit,
     navigateToCreateAccount: () -> Unit,
     navigateToAddExpense: (LocalDate, Expense?) -> Unit,
+    navigateToAddRecurringExpense: (LocalDate, Expense?) -> Unit,
 ) {
     MainView(
         selectedAccountFlow = viewModel.accountSelectionFlow,
@@ -155,6 +156,7 @@ fun MainView(
         navigateToLogin = navigateToLogin,
         navigateToCreateAccount = navigateToCreateAccount,
         navigateToAddExpense = navigateToAddExpense,
+        navigateToAddRecurringExpense = navigateToAddRecurringExpense,
     )
 }
 
@@ -222,6 +224,7 @@ private fun MainView(
     navigateToLogin: (shouldDismissAfterAuth: Boolean) -> Unit,
     navigateToCreateAccount: () -> Unit,
     navigateToAddExpense: (LocalDate, Expense?) -> Unit,
+    navigateToAddRecurringExpense: (LocalDate, Expense?) -> Unit,
 ) {
     var showAccountSelectorModal by rememberSaveable { mutableStateOf(false) }
     val accountSelectorModalSheetState = rememberModalBottomSheetState()
@@ -326,14 +329,7 @@ private fun MainView(
                     navigateToAddExpense(event.date, null)
                 }
                 is MainViewModel.Event.OpenAddRecurringExpense -> {
-                    // FIXME replace this
-                    val startIntent = RecurringExpenseEditActivity.newIntent(
-                        context = context,
-                        editedExpense = null,
-                        startDate = event.date,
-                    )
-
-                    context.startActivity(startIntent)
+                    navigateToAddRecurringExpense(event.date, null)
                 }
                 is MainViewModel.Event.OpenManageAccount -> navigateToManageAccount(event.account)
                 MainViewModel.Event.OpenMonthlyReport -> navigateToMonthlyReport()
@@ -502,14 +498,7 @@ private fun MainView(
                     navigateToAddExpense(event.expense.date, event.expense)
                 }
                 is MainViewModel.Event.OpenEditRecurringExpenseOccurrenceAndFollowingOnes -> {
-                    // FIXME replace this
-                    val startIntent = RecurringExpenseEditActivity.newIntent(
-                        context = context,
-                        editedExpense = event.expense,
-                        startDate = event.expense.date,
-                    )
-
-                    context.startActivity(startIntent)
+                    navigateToAddRecurringExpense(event.expense.date, event.expense)
                 }
                 MainViewModel.Event.StartOnboarding -> navigateToOnboarding()
                 MainViewModel.Event.CloseApp -> closeApp()
@@ -841,6 +830,7 @@ private fun Preview(
             navigateToLogin = {},
             navigateToCreateAccount = {},
             navigateToAddExpense = { _, _ -> },
+            navigateToAddRecurringExpense = { _, _ -> },
         )
     }
 }

@@ -50,7 +50,7 @@ class RecurringExpenseEditActivity : BaseActivity<ActivityRecurringExpenseAddBin
 
     override fun createBinding(): ActivityRecurringExpenseAddBinding = ActivityRecurringExpenseAddBinding.inflate(layoutInflater)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    /*override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setSupportActionBar(binding.toolbar)
@@ -351,7 +351,7 @@ class RecurringExpenseEditActivity : BaseActivity<ActivityRecurringExpenseAddBin
 
     private fun getCurrentAmount(): Double {
         return java.lang.Double.parseDouble(binding.amountEdittext.text.toString())
-    }
+    }*/
 
     companion object {
         const val ARG_EXPENSE = "expense"

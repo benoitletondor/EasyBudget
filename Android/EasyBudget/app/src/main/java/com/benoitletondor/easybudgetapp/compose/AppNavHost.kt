@@ -46,6 +46,10 @@ import com.benoitletondor.easybudgetapp.view.onboarding.OnboardingResult
 import com.benoitletondor.easybudgetapp.view.onboarding.OnboardingView
 import com.benoitletondor.easybudgetapp.view.premium.PremiumDestination
 import com.benoitletondor.easybudgetapp.view.premium.PremiumView
+import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseAddDestination
+import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditDestination
+import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditView
+import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditViewModelFactory
 import com.benoitletondor.easybudgetapp.view.settings.SettingsView
 import com.benoitletondor.easybudgetapp.view.settings.SettingsViewDestination
 import com.benoitletondor.easybudgetapp.view.settings.backup.BackupSettingsDestination
@@ -139,7 +143,14 @@ fun AppNavHost(
                     } else {
                         navController.navigate(ExpenseAddDestination(date = date))
                     }
-                }
+                },
+                navigateToAddRecurringExpense = { date, editedExpense ->
+                    if (editedExpense != null) {
+                        navController.navigate(RecurringExpenseEditDestination(date = date, editedExpense = editedExpense))
+                    } else {
+                        navController.navigate(RecurringExpenseAddDestination(date = date))
+                    }
+                },
             )
         }
         composable<OnboardingDestination>(
@@ -278,7 +289,7 @@ fun AppNavHost(
                     creationCallback = { factory: ExpenseEditViewModelFactory ->
                         factory.create(
                             date = LocalDate.ofEpochDay(destination.dateEpochDay),
-                            editedExpense = destination.editedExpense?.toExpense(),
+                            editedExpense = destination.editedExpense.toExpense(),
                         )
                     }
 
@@ -296,6 +307,48 @@ fun AppNavHost(
             ExpenseEditView(
                 viewModel = hiltViewModel(
                     creationCallback = { factory: ExpenseEditViewModelFactory ->
+                        factory.create(
+                            date = LocalDate.ofEpochDay(destination.dateEpochDay),
+                            editedExpense = null,
+                        )
+                    }
+
+                ),
+                navigateUp = {
+                    navController.navigateUp()
+                },
+                finish = {
+                    navController.popBackStack()
+                },
+            )
+        }
+        composable<RecurringExpenseEditDestination>(
+            typeMap = mapOf(typeOf<SerializedExpense>() to SerializedExpenseNavType),
+        ) { backStackEntry ->
+            val destination: RecurringExpenseEditDestination = backStackEntry.toRoute()
+            RecurringExpenseEditView(
+                viewModel = hiltViewModel(
+                    creationCallback = { factory: RecurringExpenseEditViewModelFactory ->
+                        factory.create(
+                            date = LocalDate.ofEpochDay(destination.dateEpochDay),
+                            editedExpense = destination.editedExpense.toExpense(),
+                        )
+                    }
+
+                ),
+                navigateUp = {
+                    navController.navigateUp()
+                },
+                finish = {
+                    navController.popBackStack()
+                },
+            )
+        }
+        composable<RecurringExpenseAddDestination> { backStackEntry ->
+            val destination: RecurringExpenseAddDestination = backStackEntry.toRoute()
+            RecurringExpenseEditView(
+                viewModel = hiltViewModel(
+                    creationCallback = { factory: RecurringExpenseEditViewModelFactory ->
                         factory.create(
                             date = LocalDate.ofEpochDay(destination.dateEpochDay),
                             editedExpense = null,

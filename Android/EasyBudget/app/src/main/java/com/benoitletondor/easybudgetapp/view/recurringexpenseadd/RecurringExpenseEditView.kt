@@ -1,4 +1,4 @@
-package com.benoitletondor.easybudgetapp.view.expenseedit
+package com.benoitletondor.easybudgetapp.view.recurringexpenseadd
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -74,14 +74,14 @@ import java.util.Locale
 import kotlin.math.abs
 
 @Serializable
-data class ExpenseAddDestination(val dateEpochDay: Long) {
+data class RecurringExpenseAddDestination(val dateEpochDay: Long) {
     constructor(
         date: LocalDate,
     ) : this(date.toEpochDay())
 }
 
 @Serializable
-data class ExpenseEditDestination(val dateEpochDay: Long, val editedExpense: SerializedExpense) {
+data class RecurringExpenseEditDestination(val dateEpochDay: Long, val editedExpense: SerializedExpense) {
     constructor(
         date: LocalDate,
         editedExpense: Expense,
@@ -89,12 +89,12 @@ data class ExpenseEditDestination(val dateEpochDay: Long, val editedExpense: Ser
 }
 
 @Composable
-fun ExpenseEditView(
-    viewModel: ExpenseEditViewModel,
+fun RecurringExpenseEditView(
+    viewModel: RecurringExpenseEditViewModel,
     navigateUp: () -> Unit,
     finish: () -> Unit,
 ) {
-    ExpenseEditView(
+    RecurringExpenseEditView(
         stateFlow = viewModel.stateFlow,
         eventFlow = viewModel.eventFlow,
         userCurrencyFlow = viewModel.userCurrencyFlow,
@@ -113,9 +113,9 @@ fun ExpenseEditView(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ExpenseEditView(
-    stateFlow: StateFlow<ExpenseEditViewModel.State>,
-    eventFlow: Flow<ExpenseEditViewModel.Event>,
+private fun RecurringExpenseEditView(
+    stateFlow: StateFlow<RecurringExpenseEditViewModel.State>,
+    eventFlow: Flow<RecurringExpenseEditViewModel.Event>,
     userCurrencyFlow: StateFlow<Currency>,
     navigateUp: () -> Unit,
     finish: () -> Unit,
@@ -136,7 +136,7 @@ private fun ExpenseEditView(
     LaunchedEffect(key1 = "eventsListener") {
         launchCollect(eventFlow) { event ->
             when (event) {
-                ExpenseEditViewModel.Event.ExpenseAddBeforeInitDateError -> MaterialAlertDialogBuilder(context)
+                RecurringExpenseEditViewModel.Event.ExpenseAddBeforeInitDateError -> MaterialAlertDialogBuilder(context)
                     .setTitle(R.string.expense_add_before_init_date_dialog_title)
                     .setMessage(R.string.expense_add_before_init_date_dialog_description)
                     .setPositiveButton(R.string.expense_add_before_init_date_dialog_positive_cta) { _, _ ->
@@ -146,8 +146,8 @@ private fun ExpenseEditView(
                         onAddExpenseBeforeInitDateCancelled()
                     }
                     .show()
-                ExpenseEditViewModel.Event.Finish -> finish()
-                ExpenseEditViewModel.Event.UnableToLoadDB -> MaterialAlertDialogBuilder(context)
+                RecurringExpenseEditViewModel.Event.Finish -> finish()
+                RecurringExpenseEditViewModel.Event.UnableToLoadDB -> MaterialAlertDialogBuilder(context)
                     .setTitle(R.string.expense_edit_unable_to_load_db_error_title)
                     .setMessage(R.string.expense_edit_unable_to_load_db_error_message)
                     .setPositiveButton(R.string.expense_edit_unable_to_load_db_error_cta) { _, _ ->
@@ -155,14 +155,15 @@ private fun ExpenseEditView(
                     }
                     .setCancelable(false)
                     .show()
-                is ExpenseEditViewModel.Event.ErrorPersistingExpense -> MaterialAlertDialogBuilder(context)
+                is RecurringExpenseEditViewModel.Event.ErrorPersistingExpense -> MaterialAlertDialogBuilder(context)
                     .setTitle(R.string.expense_edit_error_saving_title)
                     .setMessage(R.string.expense_edit_error_saving_message)
                     .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
                     .show()
-                ExpenseEditViewModel.Event.EmptyTitleError -> titleValueError = context.getString(R.string.no_description_error)
-                is ExpenseEditViewModel.Event.ShowDatePicker -> showDatePickerWithDate = event.date
-                ExpenseEditViewModel.Event.EmptyAmountError -> amountValueError = context.getString(R.string.no_amount_error)
+                RecurringExpenseEditViewModel.Event.EmptyTitleError -> titleValueError = context.getString(R.string.no_description_error)
+                is RecurringExpenseEditViewModel.Event.ShowDatePicker -> showDatePickerWithDate = event.date
+                RecurringExpenseEditViewModel.Event.EmptyAmountError -> amountValueError = context.getString(
+                    R.string.no_amount_error)
             }
         }
     }
@@ -177,9 +178,9 @@ private fun ExpenseEditView(
 
     AppWithTopAppBarScaffold(
         title = stringResource(if (state.isEditing) {
-            if (state.isRevenue) { R.string.title_activity_edit_income } else { R.string.title_activity_edit_expense }
+            if (state.isRevenue) { R.string.title_activity_recurring_income_edit } else { R.string.title_activity_recurring_expense_edit }
         } else {
-            if (state.isRevenue) { R.string.title_activity_add_income } else { R.string.title_activity_add_expense }
+            if (state.isRevenue) { R.string.title_activity_recurring_income_add } else { R.string.title_activity_recurring_expense_add }
         }),
         backButtonBehavior = BackButtonBehavior.NavigateBack(
             onBackButtonPressed = navigateUp,
@@ -215,7 +216,8 @@ private fun ExpenseEditView(
                                 onTitleUpdate(it.text)
                             },
                             isError = titleValueError != null,
-                            label = if (titleValueError != null ) "${stringResource(R.string.description)}: $titleValueError" else stringResource(R.string.description),
+                            label = if (titleValueError != null ) "${stringResource(R.string.description)}: $titleValueError" else stringResource(
+                                R.string.description),
                             keyboardActions = KeyboardActions(
                                 onNext = {
                                     titleFocusRequester.freeFocus()
@@ -234,8 +236,12 @@ private fun ExpenseEditView(
 
                         var currentAmountTextFieldValue by remember { mutableStateOf(
                             TextFieldValue(
-                                text = if (state.expense.amount == 0.0) "" else CurrencyHelper.getFormattedAmountValue(abs(state.expense.amount)),
-                                selection = TextRange(index = if (state.expense.amount == 0.0) 0 else CurrencyHelper.getFormattedAmountValue(abs(state.expense.amount)).length),
+                                text = if (state.expense.amount == 0.0) "" else CurrencyHelper.getFormattedAmountValue(
+                                    abs(state.expense.amount)
+                                ),
+                                selection = TextRange(index = if (state.expense.amount == 0.0) 0 else CurrencyHelper.getFormattedAmountValue(
+                                    abs(state.expense.amount)
+                                ).length),
                             )
                         ) }
 
@@ -256,7 +262,8 @@ private fun ExpenseEditView(
                                 onAmountUpdate(newText)
                             },
                             isError = amountValueError != null,
-                            label = if (amountValueError != null) "${stringResource(R.string.amount, currency.symbol)}: $amountValueError" else stringResource(R.string.amount, currency.symbol),
+                            label = if (amountValueError != null) "${stringResource(R.string.amount, currency.symbol)}: $amountValueError" else stringResource(
+                                R.string.amount, currency.symbol),
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Number,
                             )
@@ -377,7 +384,8 @@ private fun ExpenseEditView(
             val datePickerDate = showDatePickerWithDate
             if (datePickerDate != null) {
                 val datePickerState = rememberDatePickerState(
-                    initialSelectedDateMillis = Date.from(datePickerDate.atStartOfDay().atZone(ZoneId.of("UTC")).toInstant()).time
+                    initialSelectedDateMillis = Date.from(datePickerDate.atStartOfDay().atZone(
+                        ZoneId.of("UTC")).toInstant()).time
                 )
 
                 DatePickerDialog(
