@@ -42,7 +42,6 @@ import com.benoitletondor.easybudgetapp.parameters.setPremiumPopupShown
 import com.benoitletondor.easybudgetapp.parameters.setRatingPopupLastAutoShowTimestamp
 import com.benoitletondor.easybudgetapp.view.RatingPopup
 import com.benoitletondor.easybudgetapp.view.getRatingPopupUserStep
-import com.benoitletondor.easybudgetapp.view.recurringexpenseadd.RecurringExpenseEditActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -330,13 +329,13 @@ class MainActivity : AppCompatActivity() {
      */
     private fun openAddRecurringExpenseIfNeeded(intent: Intent) {
         if (intent.getBooleanExtra(INTENT_SHOW_ADD_RECURRING_EXPENSE, false)) {
-            val startIntent = RecurringExpenseEditActivity.newIntent(
+            /*val startIntent = RecurringExpenseEditActivity.newIntent(
                 context = this,
                 startDate = LocalDate.now(),
                 editedExpense = null,
             )
 
-            startActivity(startIntent)
+            startActivity(startIntent)*/
         }
     }
 

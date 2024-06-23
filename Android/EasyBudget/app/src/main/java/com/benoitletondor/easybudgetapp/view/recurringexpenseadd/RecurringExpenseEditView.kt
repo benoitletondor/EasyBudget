@@ -13,9 +13,11 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -52,6 +54,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.compose.AppWithTopAppBarScaffold
 import com.benoitletondor.easybudgetapp.compose.BackButtonBehavior
@@ -60,7 +63,9 @@ import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
 import com.benoitletondor.easybudgetapp.helper.SerializedExpense
 import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.helper.sanitizeFromUnsupportedInputForDecimals
+import com.benoitletondor.easybudgetapp.helper.stringRepresentation
 import com.benoitletondor.easybudgetapp.model.Expense
+import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -108,6 +113,8 @@ fun RecurringExpenseEditView(
         onDateSelected = viewModel::onDateSelected,
         onAddExpenseBeforeInitDateConfirmed = viewModel::onAddExpenseBeforeInitDateConfirmed,
         onAddExpenseBeforeInitDateCancelled = viewModel::onAddExpenseBeforeInitDateCancelled,
+        onEditRecurringIntervalClicked = viewModel::onEditRecurringIntervalClicked,
+        onRecurringIntervalSelected = viewModel::onRecurringExpenseTypeChanged,
     )
 }
 
@@ -127,11 +134,14 @@ private fun RecurringExpenseEditView(
     onDateSelected: (Long?) -> Unit,
     onAddExpenseBeforeInitDateConfirmed: () -> Unit,
     onAddExpenseBeforeInitDateCancelled: () -> Unit,
+    onEditRecurringIntervalClicked: () -> Unit,
+    onRecurringIntervalSelected: (RecurringExpenseType) -> Unit,
 ) {
     val context = LocalContext.current
     var showDatePickerWithDate by remember { mutableStateOf<LocalDate?>(null) }
     var amountValueError: String? by remember { mutableStateOf(null) }
     var titleValueError: String? by remember { mutableStateOf(null) }
+    var shouldShowRecurringIntervalPicker by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = "eventsListener") {
         launchCollect(eventFlow) { event ->
@@ -164,6 +174,7 @@ private fun RecurringExpenseEditView(
                 is RecurringExpenseEditViewModel.Event.ShowDatePicker -> showDatePickerWithDate = event.date
                 RecurringExpenseEditViewModel.Event.EmptyAmountError -> amountValueError = context.getString(
                     R.string.no_amount_error)
+                RecurringExpenseEditViewModel.Event.ShowRecurringIntervalPicker -> shouldShowRecurringIntervalPicker = true
             }
         }
     }
@@ -196,7 +207,8 @@ private fun RecurringExpenseEditView(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(color = colorResource(R.color.action_bar_background))
-                            .padding(horizontal = 26.dp, vertical = 10.dp)
+                            .padding(horizontal = 26.dp)
+                            .padding(top = 10.dp, bottom = 30.dp),
                     ) {
                         var descriptionTextFieldValue by remember { mutableStateOf(
                             TextFieldValue(
@@ -232,42 +244,84 @@ private fun RecurringExpenseEditView(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        val currency by userCurrencyFlow.collectAsState()
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            val currency by userCurrencyFlow.collectAsState()
 
-                        var currentAmountTextFieldValue by remember { mutableStateOf(
-                            TextFieldValue(
-                                text = if (state.expense.amount == 0.0) "" else CurrencyHelper.getFormattedAmountValue(
-                                    abs(state.expense.amount)
-                                ),
-                                selection = TextRange(index = if (state.expense.amount == 0.0) 0 else CurrencyHelper.getFormattedAmountValue(
-                                    abs(state.expense.amount)
-                                ).length),
+                            var currentAmountTextFieldValue by remember { mutableStateOf(
+                                TextFieldValue(
+                                    text = if (state.expense.amount == 0.0) "" else CurrencyHelper.getFormattedAmountValue(
+                                        abs(state.expense.amount)
+                                    ),
+                                    selection = TextRange(index = if (state.expense.amount == 0.0) 0 else CurrencyHelper.getFormattedAmountValue(
+                                        abs(state.expense.amount)
+                                    ).length),
+                                )
+                            ) }
+
+                            ExpenseEditTextField(
+                                modifier = Modifier
+                                    .weight(0.5f)
+                                    .focusRequester(amountFocusRequester),
+                                value = currentAmountTextFieldValue,
+                                onValueChange = { newValue ->
+                                    val newText = newValue.text.sanitizeFromUnsupportedInputForDecimals(supportsNegativeValue = false)
+
+                                    currentAmountTextFieldValue = TextFieldValue(
+                                        text = newText,
+                                        selection = newValue.selection,
+                                    )
+
+                                    amountValueError = null
+                                    onAmountUpdate(newText)
+                                },
+                                isError = amountValueError != null,
+                                label = if (amountValueError != null) "${stringResource(R.string.amount, currency.symbol)}: $amountValueError" else stringResource(
+                                    R.string.amount, currency.symbol),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                )
                             )
-                        ) }
 
-                        ExpenseEditTextField(
-                            modifier = Modifier
-                                .fillMaxWidth(0.5f)
-                                .focusRequester(amountFocusRequester),
-                            value = currentAmountTextFieldValue,
-                            onValueChange = { newValue ->
-                                val newText = newValue.text.sanitizeFromUnsupportedInputForDecimals(supportsNegativeValue = false)
+                            Spacer(modifier = Modifier.width(20.dp))
 
-                                currentAmountTextFieldValue = TextFieldValue(
-                                    text = newText,
-                                    selection = newValue.selection,
+                            Column(
+                                modifier = Modifier
+                                    .weight(0.5f)
+                                    .padding(top = 5.dp),
+                            ) {
+                                Text(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    text = stringResource(R.string.recurring_expense_interval),
+                                    color = colorResource(R.color.expense_edit_title_text_color_dark),
+                                    fontSize = 15.sp,
                                 )
 
-                                amountValueError = null
-                                onAmountUpdate(newText)
-                            },
-                            isError = amountValueError != null,
-                            label = if (amountValueError != null) "${stringResource(R.string.amount, currency.symbol)}: $amountValueError" else stringResource(
-                                R.string.amount, currency.symbol),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number,
-                            )
-                        )
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable(onClick = onEditRecurringIntervalClicked)
+                                        .padding(top = 2.dp),
+                                ) {
+                                    Text(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        text = state.recurringExpenseType.stringRepresentation(context),
+                                        color = colorResource(R.color.expense_edit_field_accent_color_dark),
+                                        fontSize = 17.sp,
+                                    )
+
+                                    Spacer(modifier = Modifier.height(5.dp))
+
+                                    HorizontalDivider(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        color = colorResource(R.color.expense_edit_field_accent_color_dark),
+                                        thickness = 1.dp,
+                                    )
+                                }
+                            }
+                        }
 
                         Spacer(modifier = Modifier.height(20.dp))
                     }
@@ -340,7 +394,7 @@ private fun RecurringExpenseEditView(
                             modifier = Modifier.weight(1f),
                         ) {
                             Text(
-                                text = stringResource(R.string.date),
+                                text = stringResource(R.string.first_occurence),
                                 color = colorResource(R.color.expense_edit_title_text_color),
                                 fontSize = 14.sp,
                             )
@@ -406,6 +460,54 @@ private fun RecurringExpenseEditView(
                     },
                 )
             }
+
+            if (shouldShowRecurringIntervalPicker) {
+                RecurringIntervalPickerDialog(
+                    onDismissRequest = { shouldShowRecurringIntervalPicker = false },
+                    onIntervalSelected = { interval ->
+                        onRecurringIntervalSelected(interval)
+                        shouldShowRecurringIntervalPicker = false
+                    },
+                )
+            }
         },
     )
+}
+
+@Composable
+private fun RecurringIntervalPickerDialog(
+    onDismissRequest: () -> Unit,
+    onIntervalSelected: (RecurringExpenseType) -> Unit,
+) {
+    Dialog(
+        onDismissRequest = onDismissRequest,
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .background(color = colorResource(R.color.window_background))
+                .verticalScroll(rememberScrollState())
+        ) {
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                text = stringResource(R.string.recurring_expense_interval),
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                textAlign = TextAlign.Center,
+            )
+
+            RecurringExpenseType.entries.forEach { recurringExpenseType ->
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(color = colorResource(R.color.window_background))
+                        .clickable { onIntervalSelected(recurringExpenseType) }
+                        .padding(horizontal = 26.dp, vertical = 16.dp),
+                    text = recurringExpenseType.stringRepresentation(LocalContext.current),
+                )
+            }
+        }
+    }
 }

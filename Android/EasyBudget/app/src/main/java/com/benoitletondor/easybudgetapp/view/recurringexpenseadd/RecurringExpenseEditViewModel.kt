@@ -152,6 +152,12 @@ class RecurringExpenseEditViewModel @AssistedInject constructor(
         titleMutableStateFlow.value = title
     }
 
+    fun onEditRecurringIntervalClicked() {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.ShowRecurringIntervalPicker)
+        }
+    }
+
     fun onSave() {
         var isInError = false
         if (titleMutableStateFlow.value.isEmpty()) {
@@ -248,6 +254,7 @@ class RecurringExpenseEditViewModel @AssistedInject constructor(
         data object ExpenseAddBeforeInitDateError : Event()
         data class ErrorPersistingExpense(val error: Throwable) : Event()
         data class ShowDatePicker(val date: LocalDate) : Event()
+        data object ShowRecurringIntervalPicker : Event()
     }
 
     @Immutable

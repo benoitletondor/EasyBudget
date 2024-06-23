@@ -195,7 +195,8 @@ private fun ExpenseEditView(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(color = colorResource(R.color.action_bar_background))
-                            .padding(horizontal = 26.dp, vertical = 10.dp)
+                            .padding(horizontal = 26.dp)
+                            .padding(top = 10.dp, bottom = 20.dp),
                     ) {
                         var descriptionTextFieldValue by remember { mutableStateOf(
                             TextFieldValue(
