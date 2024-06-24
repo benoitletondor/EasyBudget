@@ -47,9 +47,11 @@ import com.benoitletondor.easybudgetapp.parameters.getLatestSelectedOnlineAccoun
 import com.benoitletondor.easybudgetapp.parameters.getOnboardingStep
 import com.benoitletondor.easybudgetapp.parameters.setLatestSelectedOnlineAccountId
 import com.benoitletondor.easybudgetapp.parameters.setOnboardingStep
+import com.benoitletondor.easybudgetapp.parameters.setUserSawMonthlyReportHint
 import com.benoitletondor.easybudgetapp.parameters.watchFirstDayOfWeek
 import com.benoitletondor.easybudgetapp.parameters.watchLowMoneyWarningAmount
 import com.benoitletondor.easybudgetapp.parameters.watchShouldShowCheckedBalance
+import com.benoitletondor.easybudgetapp.parameters.watchUserSawMonthlyReportHint
 import com.benoitletondor.easybudgetapp.view.onboarding.OnboardingResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -77,6 +79,19 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
     private val selectedOnlineAccountIdMutableStateFlow: MutableStateFlow<String?>
         = MutableStateFlow(parameters.getLatestSelectedOnlineAccountId())
+
+    val showMonthlyReportHintFlow: StateFlow<Boolean> = iab.iabStatusFlow
+        .flatMapLatest {
+            iabStatus -> when(iabStatus) {
+                PremiumCheckStatus.PRO_SUBSCRIBED,
+                PremiumCheckStatus.PREMIUM_SUBSCRIBED,
+                PremiumCheckStatus.LEGACY_PREMIUM -> parameters.watchUserSawMonthlyReportHint()
+                    .map { !it }
+                else -> flowOf(false)
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
 
     private val selectedDateMutableStateFlow = MutableStateFlow(LocalDate.now())
     val selectedDateFlow: StateFlow<LocalDate> = selectedDateMutableStateFlow
@@ -392,6 +407,10 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             eventMutableFlow.emit(Event.OpenEditRecurringExpenseOccurrence(expense))
         }
+    }
+
+    fun onMonthlyReportHintDismissed() {
+        parameters.setUserSawMonthlyReportHint()
     }
 
     fun onDeleteExpenseClicked(expense: Expense) {

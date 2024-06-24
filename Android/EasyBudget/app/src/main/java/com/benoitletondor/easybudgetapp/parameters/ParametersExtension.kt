@@ -383,6 +383,16 @@ fun Parameters.setUserHasCompleteRating() {
     putBoolean(RATING_COMPLETED_PARAMETERS_KEY, true)
 }
 
+private lateinit var userSawMonthlyReportHintFlow: MutableStateFlow<Boolean>
+
+fun Parameters.watchUserSawMonthlyReportHint(): StateFlow<Boolean> {
+    if (!::userSawMonthlyReportHintFlow.isInitialized) {
+        userSawMonthlyReportHintFlow = MutableStateFlow(hasUserSawMonthlyReportHint())
+    }
+
+    return userSawMonthlyReportHintFlow
+}
+
 /**
  * Has the user saw the monthly report hint so far
  *
@@ -396,6 +406,11 @@ fun Parameters.hasUserSawMonthlyReportHint(): Boolean {
  * Set that the user saw the monthly report hint
  */
 fun Parameters.setUserSawMonthlyReportHint() {
+    if (!::userSawMonthlyReportHintFlow.isInitialized) {
+        userSawMonthlyReportHintFlow = MutableStateFlow(true)
+    }
+
+    userSawMonthlyReportHintFlow.value = true
     putBoolean(USER_SAW_MONTHLY_REPORT_HINT_PARAMETERS_KEY, true)
 }
 

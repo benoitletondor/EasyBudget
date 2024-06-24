@@ -26,6 +26,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -40,18 +41,22 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.compose.AppTheme
@@ -72,6 +77,7 @@ import com.benoitletondor.easybudgetapp.view.main.subviews.accountselector.Accou
 import com.benoitletondor.easybudgetapp.view.main.subviews.FABMenuOverlay
 import com.benoitletondor.easybudgetapp.view.main.subviews.MainViewContent
 import com.benoitletondor.easybudgetapp.view.main.subviews.MainViewTopBar
+import com.benoitletondor.easybudgetapp.view.main.subviews.MonthlyReportHint
 import com.benoitletondor.easybudgetapp.view.onboarding.OnboardingResult
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.kizitonwose.calendar.core.atStartOfMonth
@@ -115,6 +121,7 @@ fun MainView(
         selectedAccountFlow = viewModel.accountSelectionFlow,
         dbStateFlow = viewModel.dbAvailableFlow,
         eventFlow = viewModel.eventFlow,
+        showMonthlyReportHintFlow = viewModel.showMonthlyReportHintFlow,
         openAddExpenseScreenLiveFlow = openAddExpenseScreenLiveFlow,
         openAddRecurringExpenseScreenLiveFlow = openAddRecurringExpenseScreenLiveFlow,
         openMonthlyReportScreenFromNotificationFlow = openMonthlyReportScreenFromNotificationFlow,
@@ -179,6 +186,7 @@ fun MainView(
         navigateToCreateAccount = navigateToCreateAccount,
         navigateToAddExpense = navigateToAddExpense,
         navigateToAddRecurringExpense = navigateToAddRecurringExpense,
+        onMonthlyReportHintDismissed = viewModel::onMonthlyReportHintDismissed,
     )
 }
 
@@ -188,6 +196,7 @@ private fun MainView(
     selectedAccountFlow: StateFlow<MainViewModel.SelectedAccount>,
     dbStateFlow: StateFlow<MainViewModel.DBState>,
     eventFlow: Flow<MainViewModel.Event>,
+    showMonthlyReportHintFlow: StateFlow<Boolean>,
     openAddExpenseScreenLiveFlow: Flow<Unit>,
     openAddRecurringExpenseScreenLiveFlow: Flow<Unit>,
     openMonthlyReportScreenFromNotificationFlow: Flow<Unit>,
@@ -250,6 +259,7 @@ private fun MainView(
     navigateToCreateAccount: () -> Unit,
     navigateToAddExpense: (LocalDate, Expense?) -> Unit,
     navigateToAddRecurringExpense: (LocalDate, Expense?) -> Unit,
+    onMonthlyReportHintDismissed: () -> Unit,
 ) {
     var showAccountSelectorModal by rememberSaveable { mutableStateOf(false) }
     val accountSelectorModalSheetState = rememberModalBottomSheetState()
@@ -697,6 +707,17 @@ private fun MainView(
                     onExpenseLongPressed = onExpenseLongPressed,
                 )
 
+                val showMonthlyReportHint by showMonthlyReportHintFlow.collectAsState()
+                if (showMonthlyReportHint) {
+                    MonthlyReportHint(
+                        modifier = Modifier
+                            .padding(contentPadding)
+                            .align(Alignment.TopEnd)
+                            .offset(x = (-37).dp, y = (-6).dp),
+                        onDismiss = onMonthlyReportHintDismissed,
+                    )
+                }
+
                 if (showAccountSelectorModal) {
                     ModalBottomSheet(
                         onDismissRequest = {
@@ -797,6 +818,7 @@ private fun Preview(
             )),
             dbStateFlow = MutableStateFlow(dbState),
             eventFlow = MutableSharedFlow(),
+            showMonthlyReportHintFlow = MutableStateFlow(false),
             openAddExpenseScreenLiveFlow = MutableSharedFlow(),
             openAddRecurringExpenseScreenLiveFlow = MutableSharedFlow(),
             openMonthlyReportScreenFromNotificationFlow = MutableSharedFlow(),
@@ -907,6 +929,7 @@ private fun Preview(
             navigateToCreateAccount = {},
             navigateToAddExpense = { _, _ -> },
             navigateToAddRecurringExpense = { _, _ -> },
+            onMonthlyReportHintDismissed = {},
         )
     }
 }
