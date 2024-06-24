@@ -98,6 +98,12 @@ android {
         buildConfig = true
         compose = true
     }
+
+    kotlinOptions {
+        freeCompilerArgs += arrayOf(
+            "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+        )
+    }
 }
 
 composeCompiler {
