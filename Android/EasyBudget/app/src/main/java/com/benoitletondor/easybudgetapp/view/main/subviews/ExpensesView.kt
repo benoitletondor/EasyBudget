@@ -223,7 +223,7 @@ private fun ExpensesList(
                                 onClick = { onExpensePressed(expense) },
                                 onLongClick = { onExpenseLongPressed(expense) },
                             )
-                            .padding(horizontal = 20.dp, vertical = 8.dp),
+                            .padding(horizontal = 20.dp, vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         val context = LocalContext.current
