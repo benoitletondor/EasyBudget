@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -36,7 +35,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,7 +44,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
@@ -59,15 +56,13 @@ import androidx.compose.ui.unit.sp
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
 import com.benoitletondor.easybudgetapp.helper.sanitizeFromUnsupportedInputForDecimals
-import com.benoitletondor.easybudgetapp.view.onboarding.OnboardingViewModel
-import com.benoitletondor.easybudgetapp.view.onboarding.pageIndexToOnboardingPage
 import kotlinx.coroutines.flow.StateFlow
 import java.util.Currency
 
 @Composable
 fun OnboardingPageAccountAmount(
     contentPadding: PaddingValues,
-    pagerState: PagerState,
+    shouldFocusOnAccountAmountField: Boolean,
     userCurrencyFlow: StateFlow<Currency>,
     userMoneyAmountFlow: StateFlow<Double>,
     onNextPressed: () -> Unit,
@@ -95,21 +90,11 @@ fun OnboardingPageAccountAmount(
     }
 
     val focusRequester = remember { FocusRequester() }
-    val keyboardController = LocalSoftwareKeyboardController.current
-
-    val shouldRequestFocus by remember {
-        derivedStateOf {
-            pagerState.currentPageOffsetFraction == 0f && pageIndexToOnboardingPage(pagerState.currentPage) == OnboardingViewModel.OnboardingPage.INITIAL_AMOUNT
-        }
-    }
-
-    LaunchedEffect(shouldRequestFocus) {
-        if (shouldRequestFocus) {
+    LaunchedEffect(shouldFocusOnAccountAmountField) {
+        if (shouldFocusOnAccountAmountField) {
             focusRequester.requestFocus()
-            keyboardController?.show()
         } else {
             focusRequester.freeFocus()
-            keyboardController?.hide()
         }
     }
 

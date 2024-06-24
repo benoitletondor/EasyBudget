@@ -128,9 +128,7 @@ private fun SettingsView(
     onNotificationPermissionDeniedPromptAccepted: () -> Unit,
 ) {
     val context = LocalContext.current
-    val pushPermissionState = rememberPermissionStateCompat()
-
-    LaunchedEffect(pushPermissionState) {
+    val pushPermissionState = rememberPermissionStateCompat {
         onPushPermissionResult()
     }
 

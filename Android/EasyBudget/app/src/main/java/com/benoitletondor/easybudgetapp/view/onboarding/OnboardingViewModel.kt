@@ -24,7 +24,9 @@ import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
 import com.benoitletondor.easybudgetapp.helper.watchUserCurrency
 import com.benoitletondor.easybudgetapp.model.Expense
+import com.benoitletondor.easybudgetapp.parameters.ONBOARDING_STEP_COMPLETED
 import com.benoitletondor.easybudgetapp.parameters.Parameters
+import com.benoitletondor.easybudgetapp.parameters.setOnboardingStep
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -91,7 +93,10 @@ class OnboardingViewModel @Inject constructor(
                         }
                     }
                 }
-                OnboardingPage.END -> mutableEventFlow.emit(Event.FinishWithResult(OnboardingResult(onboardingCompleted = true)))
+                OnboardingPage.END -> {
+                    parameters.setOnboardingStep(ONBOARDING_STEP_COMPLETED)
+                    mutableEventFlow.emit(Event.FinishWithResult(OnboardingResult(onboardingCompleted = true)))
+                }
             }
         }
     }

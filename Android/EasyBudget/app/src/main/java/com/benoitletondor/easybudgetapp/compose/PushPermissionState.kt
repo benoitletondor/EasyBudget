@@ -28,16 +28,21 @@ private val isAndroid33OrMore = Build.VERSION.SDK_INT >= 33
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun rememberPermissionStateCompat() : PermissionState {
+fun rememberPermissionStateCompat(
+    onPermissionResult: (Boolean) -> Unit,
+) : PermissionState {
     return if (isAndroid33OrMore) {
-        rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS)
+        rememberPermissionState(
+            Manifest.permission.POST_NOTIFICATIONS,
+            onPermissionResult = onPermissionResult,
+        )
     } else {
         remember {
             object : PermissionState {
                 override val permission: String = "android.permission.POST_NOTIFICATIONS"
                 override val status: PermissionStatus = PermissionStatus.Granted
                 override fun launchPermissionRequest() {
-                    /* No-op */
+                    onPermissionResult(true)
                 }
             }
         }

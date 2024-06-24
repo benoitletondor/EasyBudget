@@ -46,7 +46,6 @@ import com.benoitletondor.easybudgetapp.parameters.getInitDate
 import com.benoitletondor.easybudgetapp.parameters.getLatestSelectedOnlineAccountId
 import com.benoitletondor.easybudgetapp.parameters.getOnboardingStep
 import com.benoitletondor.easybudgetapp.parameters.setLatestSelectedOnlineAccountId
-import com.benoitletondor.easybudgetapp.parameters.setOnboardingStep
 import com.benoitletondor.easybudgetapp.parameters.setUserSawMonthlyReportHint
 import com.benoitletondor.easybudgetapp.parameters.watchFirstDayOfWeek
 import com.benoitletondor.easybudgetapp.parameters.watchLowMoneyWarningAmount
@@ -91,7 +90,6 @@ class MainViewModel @Inject constructor(
             }
         }
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
-
 
     private val selectedDateMutableStateFlow = MutableStateFlow(LocalDate.now())
     val selectedDateFlow: StateFlow<LocalDate> = selectedDateMutableStateFlow
@@ -368,9 +366,7 @@ class MainViewModel @Inject constructor(
     val shouldNavigateToOnboarding get() = parameters.getOnboardingStep() != ONBOARDING_STEP_COMPLETED
 
     fun onOnboardingResult(onboardingResult: OnboardingResult) {
-        if (onboardingResult.onboardingCompleted) {
-            parameters.setOnboardingStep(ONBOARDING_STEP_COMPLETED)
-        } else {
+        if (!onboardingResult.onboardingCompleted) {
             viewModelScope.launch {
                 eventMutableFlow.emit(Event.CloseApp)
             }

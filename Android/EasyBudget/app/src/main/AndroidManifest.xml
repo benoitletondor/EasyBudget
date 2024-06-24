@@ -40,7 +40,8 @@
         android:supportsRtl="false"
         android:theme="@style/LoadingTheme"
         tools:ignore="DataExtractionRules,UnusedAttribute"
-        android:dataExtractionRules="@xml/data_extraction_rules">
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:enableOnBackInvokedCallback="true">
 
         <!-- Disable advertising ID and SSAID for GA & FCM -->
         <meta-data

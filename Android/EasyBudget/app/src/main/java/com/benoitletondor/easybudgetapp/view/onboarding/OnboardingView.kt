@@ -37,12 +37,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.benoitletondor.easybudgetapp.compose.rememberPermissionStateCompat
@@ -117,7 +120,25 @@ private fun OnboardingView(
         pageCount = { if (isAndroid33OrMore) 5 else 4 },
     )
 
-    val pushPermissionState = rememberPermissionStateCompat()
+    val shouldFocusOnAccountAmountField by remember {
+        derivedStateOf {
+            pagerState.currentPageOffsetFraction == 0f && pageIndexToOnboardingPage(pagerState.currentPage) == OnboardingViewModel.OnboardingPage.INITIAL_AMOUNT
+        }
+    }
+
+    // This is because of a weird bug that shows the keyboard after notification permission
+    val keyboardController = LocalSoftwareKeyboardController.current
+    LaunchedEffect(pagerState.currentPage, pagerState.currentPageOffsetFraction) {
+        if (shouldFocusOnAccountAmountField) {
+            keyboardController?.show()
+        } else {
+            keyboardController?.hide()
+        }
+    }
+
+    val pushPermissionState = rememberPermissionStateCompat {
+        onPushNotificationsResponse(pageIndexToOnboardingPage(pagerState.currentPage))
+    }
 
     LaunchedEffect(key1 = "eventsListener") {
         launchCollect(eventFlow) { event ->
@@ -138,10 +159,6 @@ private fun OnboardingView(
                 }
             }
         }
-    }
-
-    LaunchedEffect(pushPermissionState) {
-        onPushNotificationsResponse(pageIndexToOnboardingPage(pagerState.currentPage))
     }
 
     BackHandler {
@@ -181,7 +198,7 @@ private fun OnboardingView(
                         )
                         OnboardingViewModel.OnboardingPage.INITIAL_AMOUNT -> OnboardingPageAccountAmount(
                             contentPadding = pageContentPadding,
-                            pagerState = pagerState,
+                            shouldFocusOnAccountAmountField = shouldFocusOnAccountAmountField,
                             userCurrencyFlow = userCurrencyFlow,
                             userMoneyAmountFlow = userMoneyAmountFlow,
                             onNextPressed = { onNextButtonPressed(page) },

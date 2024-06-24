@@ -92,9 +92,7 @@ private fun PremiumView(
 ) {
     val context = LocalContext.current
 
-    val pushPermissionState = rememberPermissionStateCompat()
-
-    LaunchedEffect(pushPermissionState) {
+    val pushPermissionState = rememberPermissionStateCompat {
         onPushPermissionResult()
     }
 
