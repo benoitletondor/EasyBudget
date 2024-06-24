@@ -16,12 +16,13 @@
 
 package com.benoitletondor.easybudgetapp.model
 
-import android.os.Parcel
 import android.os.Parcelable
 import androidx.compose.runtime.Immutable
+import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
 
 @Immutable
+@Parcelize
 data class Expense(val id: Long?,
                    val title: String,
                    val amount: Double,
@@ -46,38 +47,7 @@ data class Expense(val id: Long?,
                 checked: Boolean,
                 associatedRecurringExpense: AssociatedRecurringExpense) : this(null, title, amount, date, checked, associatedRecurringExpense)
 
-    private constructor(parcel: Parcel) : this(
-        parcel.readValue(Long::class.java.classLoader) as? Long,
-        parcel.readString()!!,
-        parcel.readDouble(),
-        LocalDate.ofEpochDay(parcel.readLong()),
-        parcel.readInt() == 1,
-        parcel.readParcelable(AssociatedRecurringExpense::class.java.classLoader)
-    )
-
     fun isRevenue() = amount < 0
 
     fun isRecurring() = associatedRecurringExpense != null
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeValue(id)
-        parcel.writeString(title)
-        parcel.writeDouble(amount)
-        parcel.writeLong(date.toEpochDay())
-        parcel.writeInt(if( checked ) { 1 } else { 0 })
-        parcel.writeParcelable(associatedRecurringExpense, flags)
-    }
-
-    override fun describeContents(): Int = 0
-
-    companion object CREATOR : Parcelable.Creator<Expense> {
-        override fun createFromParcel(parcel: Parcel): Expense {
-            return Expense(parcel)
-        }
-
-        override fun newArray(size: Int): Array<Expense?> {
-            return arrayOfNulls(size)
-        }
-    }
-
 }
