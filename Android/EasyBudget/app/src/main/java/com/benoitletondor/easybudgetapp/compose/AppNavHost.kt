@@ -18,8 +18,6 @@ package com.benoitletondor.easybudgetapp.compose
 import android.os.Build
 import android.os.Bundle
 import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -105,20 +103,16 @@ fun AppNavHost(
         startDestination = MainDestination,
         enterTransition = { slideIntoContainer(
             AnimatedContentTransitionScope.SlideDirection.Left,
-            initialOffset = { it / 2 },
-        ) + fadeIn() },
+        )},
         exitTransition = { slideOutOfContainer(
             AnimatedContentTransitionScope.SlideDirection.Left,
-            targetOffset = { it / 2 },
-        ) + fadeOut() },
+        )},
         popEnterTransition = { slideIntoContainer(
             AnimatedContentTransitionScope.SlideDirection.Right,
-            initialOffset = { it / 2 },
-        ) + fadeIn() },
+        )},
         popExitTransition = { slideOutOfContainer(
             AnimatedContentTransitionScope.SlideDirection.Right,
-            targetOffset = { it / 2 },
-        ) + fadeOut() },
+        )},
     ) {
         composable<MainDestination>(
             enterTransition = null,

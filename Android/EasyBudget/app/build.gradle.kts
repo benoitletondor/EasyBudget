@@ -39,7 +39,7 @@ android {
         applicationId = "com.benoitletondor.easybudgetapp"
         compileSdk = 34
         minSdk = 23
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 140
         versionName = "3.3.0"
         vectorDrawables.useSupportLibrary = true
