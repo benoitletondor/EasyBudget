@@ -69,6 +69,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -199,12 +200,6 @@ private fun RecurringExpenseEditView(
         }
     }
 
-    val titleFocusRequester = remember { FocusRequester() }
-    val amountFocusRequester = remember { FocusRequester() }
-    LaunchedEffect(key1 = "focusRequester") {
-        titleFocusRequester.requestFocus()
-    }
-
     val state by stateFlow.collectAsState()
 
     BackHandler(enabled = state.isSaving) {
@@ -221,6 +216,12 @@ private fun RecurringExpenseEditView(
             onBackButtonPressed = navigateUp,
         ),
         content = { contentPadding ->
+            val titleFocusRequester = remember { FocusRequester() }
+            val amountFocusRequester = remember { FocusRequester() }
+            LaunchedEffect(key1 = "focusRequester") {
+                titleFocusRequester.requestFocus()
+            }
+
             Box(modifier = Modifier.fillMaxSize()) {
                 Column(
                     modifier = Modifier
@@ -263,6 +264,7 @@ private fun RecurringExpenseEditView(
                             keyboardOptions = KeyboardOptions(
                                 imeAction = ImeAction.Next,
                                 keyboardType = KeyboardType.Text,
+                                capitalization = KeyboardCapitalization.Sentences,
                             )
                         )
 

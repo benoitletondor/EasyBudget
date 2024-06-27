@@ -15,6 +15,7 @@
  */
 package com.benoitletondor.easybudgetapp.view.expenseedit
 
+import android.inputmethodservice.Keyboard
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -62,6 +63,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -182,12 +184,6 @@ private fun ExpenseEditView(
         }
     }
 
-    val titleFocusRequester = remember { FocusRequester() }
-    val amountFocusRequester = remember { FocusRequester() }
-    LaunchedEffect(key1 = "focusRequester") {
-        titleFocusRequester.requestFocus()
-    }
-
     val state by stateFlow.collectAsState()
 
     AppWithTopAppBarScaffold(
@@ -200,6 +196,12 @@ private fun ExpenseEditView(
             onBackButtonPressed = navigateUp,
         ),
         content = { contentPadding ->
+            val titleFocusRequester = remember { FocusRequester() }
+            val amountFocusRequester = remember { FocusRequester() }
+            LaunchedEffect(key1 = "focusRequester") {
+                titleFocusRequester.requestFocus()
+            }
+
             Box(modifier = Modifier.fillMaxSize()) {
                 Column(
                     modifier = Modifier
@@ -241,6 +243,7 @@ private fun ExpenseEditView(
                             keyboardOptions = KeyboardOptions(
                                 imeAction = ImeAction.Next,
                                 keyboardType = KeyboardType.Text,
+                                capitalization = KeyboardCapitalization.Sentences,
                             )
                         )
 

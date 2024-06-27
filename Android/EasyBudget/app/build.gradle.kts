@@ -116,20 +116,15 @@ dependencies {
     val realmVersion: String by rootProject.extra
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1")
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.core:core-ktx:1.13.1")
-    implementation("com.google.android.material:material:1.12.0")
-    implementation("androidx.recyclerview:recyclerview:1.3.2")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("androidx.activity:activity-ktx:1.9.0")
-    implementation("androidx.fragment:fragment-ktx:1.8.0")
+    implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.2")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.2")
     implementation("androidx.work:work-runtime-ktx:2.9.0")
     implementation("androidx.work:work-gcm:2.9.0")
@@ -155,14 +150,13 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.activity:activity-compose:1.9.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
-    implementation("androidx.navigation:navigation-compose:2.8.0-beta03")
+    implementation("androidx.navigation:navigation-compose:2.8.0-beta04")
     implementation("com.google.accompanist:accompanist-themeadapter-material3:0.34.0")
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
     implementation("com.android.billingclient:billing-ktx:7.0.0")
 
-    implementation("me.relex:circleindicator:2.1.6@aar")
     implementation("com.batch.android:batch-sdk:2.0.3")
 
     implementation("com.google.dagger:hilt-android:$hiltVersion")
