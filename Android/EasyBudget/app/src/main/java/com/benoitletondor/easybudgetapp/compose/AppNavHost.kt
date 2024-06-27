@@ -30,6 +30,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.benoitletondor.easybudgetapp.helper.SerializedExpense
+import com.benoitletondor.easybudgetapp.helper.SerializedSelectedOnlineAccount
 import com.benoitletondor.easybudgetapp.helper.SerializedYearMonth
 import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.helper.toSerializedYearMonth
@@ -44,7 +45,6 @@ import com.benoitletondor.easybudgetapp.view.login.LoginView
 import com.benoitletondor.easybudgetapp.view.login.LoginViewModelFactory
 import com.benoitletondor.easybudgetapp.view.main.MainDestination
 import com.benoitletondor.easybudgetapp.view.main.MainView
-import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import com.benoitletondor.easybudgetapp.view.manageaccount.ManageAccountDestination
 import com.benoitletondor.easybudgetapp.view.manageaccount.ManageAccountView
 import com.benoitletondor.easybudgetapp.view.manageaccount.ManageAccountViewModelFactory
@@ -141,7 +141,7 @@ fun AppNavHost(
                     navController.navigate(MonthlyReportDestination(fromNotification = fromNotification))
                 },
                 navigateToManageAccount = { account ->
-                    navController.navigate(ManageAccountDestination(selectedAccount = account))
+                    navController.navigate(ManageAccountDestination(selectedAccount = SerializedSelectedOnlineAccount(account)))
                 },
                 navigateToSettings = {
                     navController.navigate(SettingsViewDestination)
@@ -208,14 +208,14 @@ fun AppNavHost(
             )
         }
         composable<ManageAccountDestination>(
-            typeMap = mapOf(typeOf<MainViewModel.SelectedAccount.Selected.Online>() to OnlineAccountNavType),
+            typeMap = mapOf(typeOf<SerializedSelectedOnlineAccount>() to OnlineAccountNavType),
         ) { backStackEntry ->
             val destination: ManageAccountDestination = backStackEntry.toRoute()
             ManageAccountView(
                 viewModel = hiltViewModel(
                     creationCallback = { factory: ManageAccountViewModelFactory ->
                         factory.create(
-                            selectedAccount = destination.selectedAccount,
+                            selectedAccount = destination.selectedAccount.toSelectedAccount(),
                         )
                     }
                 ),
@@ -382,27 +382,27 @@ fun AppNavHost(
     }
 }
 
-private val OnlineAccountNavType = object : NavType<MainViewModel.SelectedAccount.Selected.Online>(
+private val OnlineAccountNavType = object : NavType<SerializedSelectedOnlineAccount>(
     isNullableAllowed = false
 ) {
-    override fun get(bundle: Bundle, key: String): MainViewModel.SelectedAccount.Selected.Online? {
+    override fun get(bundle: Bundle, key: String): SerializedSelectedOnlineAccount? {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            bundle.getParcelable(key, MainViewModel.SelectedAccount.Selected.Online::class.java)
+            bundle.getParcelable(key, SerializedSelectedOnlineAccount::class.java)
         } else {
             @Suppress("DEPRECATION")
             bundle.getParcelable(key)
         }
     }
 
-    override fun parseValue(value: String): MainViewModel.SelectedAccount.Selected.Online {
-        return Json.decodeFromString<MainViewModel.SelectedAccount.Selected.Online>(value)
+    override fun parseValue(value: String): SerializedSelectedOnlineAccount {
+        return Json.decodeFromString<SerializedSelectedOnlineAccount>(value)
     }
 
-    override fun serializeAsValue(value: MainViewModel.SelectedAccount.Selected.Online): String {
+    override fun serializeAsValue(value: SerializedSelectedOnlineAccount): String {
         return Json.encodeToString(value)
     }
 
-    override fun put(bundle: Bundle, key: String, value: MainViewModel.SelectedAccount.Selected.Online) {
+    override fun put(bundle: Bundle, key: String, value: SerializedSelectedOnlineAccount) {
         bundle.putParcelable(key, value)
     }
 }

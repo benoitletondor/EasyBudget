@@ -17,7 +17,6 @@
 package com.benoitletondor.easybudgetapp.view.main
 
 import android.content.Context
-import android.os.Parcelable
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -61,8 +60,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.parcelize.Parcelize
-import kotlinx.serialization.Serializable
 import java.time.LocalDate
 import java.time.YearMonth
 import javax.inject.Inject
@@ -743,11 +740,8 @@ class MainViewModel @Inject constructor(
 
     sealed class SelectedAccount {
         data object Loading : SelectedAccount()
-        sealed class Selected : SelectedAccount(), Parcelable {
-            @Parcelize
-            object Offline : Selected()
-            @Parcelize
-            @Serializable
+        sealed class Selected : SelectedAccount() {
+            data object Offline : Selected()
             @Immutable
             data class Online(
                 val name: String,

@@ -22,6 +22,8 @@ import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
+import java.net.URLDecoder
+import java.net.URLEncoder
 import java.time.LocalDate
 
 @Serializable
@@ -36,7 +38,7 @@ data class SerializedExpense(
 ) : Parcelable {
     constructor(expense: Expense) : this(
         expense.id,
-        expense.title,
+        URLEncoder.encode(expense.title, "UTF-8"),
         expense.amount,
         expense.date.toEpochDay(),
         expense.checked,
@@ -45,7 +47,7 @@ data class SerializedExpense(
 
     fun toExpense(): Expense = Expense(
         id,
-        title,
+        URLDecoder.decode(title, "UTF-8"),
         amount,
         LocalDate.ofEpochDay(date),
         checked,
@@ -82,7 +84,7 @@ data class SerializedRecurringExpense(
 ) : Parcelable {
     constructor(recurringExpense: RecurringExpense) : this(
         recurringExpense.id,
-        recurringExpense.title,
+        URLEncoder.encode(recurringExpense.title, "UTF-8"),
         recurringExpense.amount,
         recurringExpense.recurringDate.toEpochDay(),
         recurringExpense.modified,
@@ -91,7 +93,7 @@ data class SerializedRecurringExpense(
 
     fun toRecurringExpense() = RecurringExpense(
         id,
-        title,
+        URLDecoder.decode(title, "UTF-8"),
         amount,
         LocalDate.ofEpochDay(recurringDate),
         modified,

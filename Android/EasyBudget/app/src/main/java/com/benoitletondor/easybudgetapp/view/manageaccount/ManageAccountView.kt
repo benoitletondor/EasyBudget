@@ -28,8 +28,8 @@ import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.accounts.model.Invitation
 import com.benoitletondor.easybudgetapp.compose.AppWithTopAppBarScaffold
 import com.benoitletondor.easybudgetapp.compose.BackButtonBehavior
+import com.benoitletondor.easybudgetapp.helper.SerializedSelectedOnlineAccount
 import com.benoitletondor.easybudgetapp.helper.launchCollect
-import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import com.benoitletondor.easybudgetapp.view.manageaccount.subviews.ContentView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.Flow
@@ -37,7 +37,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ManageAccountDestination(val selectedAccount: MainViewModel.SelectedAccount.Selected.Online)
+data class ManageAccountDestination(val selectedAccount: SerializedSelectedOnlineAccount)
 
 @Composable
 fun ManageAccountView(
