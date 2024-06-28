@@ -16,7 +16,6 @@
 
 package com.benoitletondor.easybudgetapp.db.onlineimpl
 
-import com.benoitletondor.easybudgetapp.BuildConfig
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.benoitletondor.easybudgetapp.db.RestoreAction
 import com.benoitletondor.easybudgetapp.db.onlineimpl.entity.ExpenseEntity
@@ -31,13 +30,10 @@ import com.kizitonwose.calendar.core.atStartOfMonth
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
-import io.realm.kotlin.internal.RealmImpl
 import io.realm.kotlin.mongodb.App
-import io.realm.kotlin.mongodb.AppConfiguration
 import io.realm.kotlin.mongodb.Credentials
 import io.realm.kotlin.mongodb.subscriptions
 import io.realm.kotlin.mongodb.sync.SyncConfiguration
-import io.realm.kotlin.mongodb.syncSession
 import io.realm.kotlin.notifications.UpdatedRealm
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -190,8 +186,8 @@ class OnlineDBImpl(
     }
 
     override suspend fun getDataForMonth(yearMonth: YearMonth): DataForMonth {
-        val startDate = yearMonth.atStartOfMonth().minusDays(DataForMonth.numberOfLeewayDays)
-        val endDate = yearMonth.atEndOfMonth().plusDays(DataForMonth.numberOfLeewayDays)
+        val startDate = yearMonth.atStartOfMonth().minusDays(DataForMonth.NUMBER_OF_LEEWAY_DAYS)
+        val endDate = yearMonth.atEndOfMonth().plusDays(DataForMonth.NUMBER_OF_LEEWAY_DAYS)
 
         var balance = getBalanceForDay(startDate.minusDays(1))
         var checkedBalance = getCheckedBalanceForDay(startDate.minusDays(1))

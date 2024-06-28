@@ -17,6 +17,8 @@
 package com.benoitletondor.easybudgetapp.helper
 
 import com.benoitletondor.easybudgetapp.parameters.Parameters
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.text.NumberFormat
 import java.util.*
 
@@ -73,19 +75,23 @@ object CurrencyHelper {
     fun getCurrencyDisplayName(currency: Currency): String
         = currency.symbol + " - " + currency.displayName
 
-    /**
-     * Helper to display an amount using the user currency
-     */
-    fun getFormattedCurrencyString(parameters: Parameters, amount: Double): String {
+    fun getFormattedCurrencyString(currency: Currency, amount: Double): String {
         val currencyFormat = NumberFormat.getCurrencyInstance()
 
         // No fraction digits
         currencyFormat.maximumFractionDigits = 2
         currencyFormat.minimumFractionDigits = 2
 
-        currencyFormat.currency = parameters.getUserCurrency()
+        currencyFormat.currency = currency
 
         return currencyFormat.format(amount)
+    }
+
+    /**
+     * Helper to display an amount using the user currency
+     */
+    fun getFormattedCurrencyString(parameters: Parameters, amount: Double): String {
+        return getFormattedCurrencyString(parameters.getUserCurrency(), amount)
     }
 
     /**
@@ -107,9 +113,24 @@ object CurrencyHelper {
  */
 private const val CURRENCY_ISO_PARAMETERS_KEY = "currency_iso"
 
+private lateinit var userCurrencyFlow: MutableStateFlow<Currency>
+
+fun Parameters.watchUserCurrency(): StateFlow<Currency> {
+    if (!::userCurrencyFlow.isInitialized) {
+        userCurrencyFlow = MutableStateFlow(getUserCurrency())
+    }
+
+    return userCurrencyFlow
+}
+
 fun Parameters.getUserCurrency(): Currency
     = Currency.getInstance(getString(CURRENCY_ISO_PARAMETERS_KEY))
 
 fun Parameters.setUserCurrency(currency: Currency) {
+    if (!::userCurrencyFlow.isInitialized) {
+        userCurrencyFlow = MutableStateFlow(currency)
+    }
+
+    userCurrencyFlow.value = currency
     putString(CURRENCY_ISO_PARAMETERS_KEY, currency.currencyCode)
 }

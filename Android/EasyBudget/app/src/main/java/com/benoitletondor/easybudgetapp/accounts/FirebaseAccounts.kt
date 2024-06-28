@@ -217,7 +217,7 @@ class FirebaseAccounts(
         val accountRef = db.collection(ACCOUNTS_COLLECTION).document(accountCredentials.id)
         val invitationRef = db.collection(INVITATIONS_COLLECTION).document()
 
-        val account = accountRef.get().await().toAccountOrThrow(currentUser);
+        val account = accountRef.get().await().toAccountOrThrow(currentUser)
         if (account.ownerEmail == email) {
             throw IllegalStateException("Cannot invite the account owner")
         }

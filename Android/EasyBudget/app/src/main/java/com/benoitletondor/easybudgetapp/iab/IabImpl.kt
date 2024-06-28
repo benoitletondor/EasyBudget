@@ -28,7 +28,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.first
 
 private const val SKU_PREMIUM_LEGACY = "premium"
@@ -46,7 +45,11 @@ class IabImpl(
     private val appContext = context.applicationContext
     private val billingClient = BillingClient.newBuilder(appContext)
         .setListener(this)
-        .enablePendingPurchases()
+        .enablePendingPurchases(
+            PendingPurchasesParams.newBuilder()
+                .enableOneTimeProducts()
+                .build()
+        )
         .build()
 
     /**
@@ -545,6 +548,10 @@ class IabImpl(
                     purchase.products.contains(SKU_PREMIUM_SUBSCRIPTION) ||
                     purchase.products.contains(SKU_PRO_SUBSCRIPTION))
                 {
+                    if (purchase.purchaseState != Purchase.PurchaseState.PURCHASED) {
+                        continue
+                    }
+
                     val ackResult = billingClient.acknowledgePurchase(AcknowledgePurchaseParams.newBuilder().setPurchaseToken(purchase.purchaseToken).build())
 
                     if( ackResult.responseCode != BillingClient.BillingResponseCode.OK ) {

@@ -16,15 +16,16 @@
 
 package com.benoitletondor.easybudgetapp.auth
 
-import android.app.Activity
 import android.content.Intent
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.result.ActivityResult
 import kotlinx.coroutines.flow.StateFlow
 
 interface Auth {
     val state: StateFlow<AuthState>
 
-    fun startAuthentication(activity: Activity)
-    fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
+    fun startAuthentication(launcher: ManagedActivityResultLauncher<Intent, ActivityResult>)
+    fun handleActivityResult(resultCode: Int, data: Intent?)
     fun logout()
     suspend fun refreshUserTokens()
 }
