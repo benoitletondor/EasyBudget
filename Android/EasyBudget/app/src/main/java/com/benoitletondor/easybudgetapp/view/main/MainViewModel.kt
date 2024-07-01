@@ -679,13 +679,13 @@ class MainViewModel @Inject constructor(
 
     fun onAddRecurringEntryPressed() {
         viewModelScope.launch {
-            eventMutableFlow.emit(Event.OpenAddRecurringExpense(LocalDate.now()))
+            eventMutableFlow.emit(Event.OpenAddRecurringExpense(selectedDateFlow.value))
         }
     }
 
     fun onAddEntryPressed() {
         viewModelScope.launch {
-            eventMutableFlow.emit(Event.OpenAddExpense(LocalDate.now()))
+            eventMutableFlow.emit(Event.OpenAddExpense(selectedDateFlow.value))
         }
     }
 
