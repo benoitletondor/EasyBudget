@@ -208,17 +208,17 @@ private fun SettingsView(
             onBackButtonPressed = navigateUp,
         ),
         content = { contentPadding ->
-            Box(
-                modifier = Modifier.padding(contentPadding),
-            ) {
+            Box {
                 val state by stateFlow.collectAsState()
 
                 when(val currentState = state) {
                     is SettingsViewModel.State.Error -> ErrorView(
+                        contentPadding = contentPadding,
                         error = currentState.error,
                         onRetryButtonClicked = onRetryButtonClicked,
                     )
                     is SettingsViewModel.State.Loaded -> Settings(
+                        contentPadding = contentPadding,
                         state = currentState,
                         onCurrencyChangeClicked = onCurrencyChangeClicked,
                         onAdjustLowMoneyWarningAmountClicked = onAdjustLowMoneyWarningAmountClicked,
@@ -238,11 +238,14 @@ private fun SettingsView(
                         onSubscribeButtonClicked = onSubscribeButtonClicked,
                         onRedeemCodeButtonClicked = onRedeemCodeButtonClicked,
                     )
-                    SettingsViewModel.State.Loading -> LoadingView()
+                    SettingsViewModel.State.Loading -> LoadingView(
+                        modifier = Modifier.padding(contentPadding),
+                    )
                 }
 
                 if (showCurrencyPickerDialog) {
                     SelectCurrencyDialog(
+                        contentPadding = contentPadding,
                         onDismissRequest = { showCurrencyPickerDialog = false },
                     )
                 }
@@ -250,6 +253,7 @@ private fun SettingsView(
                 val currentThemeForThemePicker = showThemePickerDialogWithTheme
                 if (currentThemeForThemePicker != null) {
                     ThemePickerDialog(
+                        contentPadding = contentPadding,
                         currentTheme = currentThemeForThemePicker,
                         onThemeSelected = {
                             showThemePickerDialogWithTheme = null

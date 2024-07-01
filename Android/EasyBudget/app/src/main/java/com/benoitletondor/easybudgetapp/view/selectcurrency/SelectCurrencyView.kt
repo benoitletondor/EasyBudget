@@ -19,6 +19,7 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -51,11 +52,13 @@ import java.util.Currency
 
 @Composable
 fun SelectCurrencyDialog(
+    contentPadding: PaddingValues,
     onDismissRequest: () -> Unit,
 ) {
     Dialog(onDismissRequest = onDismissRequest) {
         Card(
             modifier = Modifier
+                .padding(contentPadding)
                 .fillMaxWidth()
                 .fillMaxHeight(0.7f),
             shape = RoundedCornerShape(10.dp),

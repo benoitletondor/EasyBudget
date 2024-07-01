@@ -16,6 +16,8 @@
 package com.benoitletondor.easybudgetapp.view.settings.subviews
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -37,6 +39,7 @@ import java.time.DayOfWeek
 
 @Composable
 fun Settings(
+    contentPadding: PaddingValues,
     state: SettingsViewModel.State.Loaded,
     onCurrencyChangeClicked: () -> Unit,
     onAdjustLowMoneyWarningAmountClicked: () -> Unit,
@@ -57,7 +60,10 @@ fun Settings(
     onRedeemCodeButtonClicked: () -> Unit,
 ) {
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .consumeWindowInsets(contentPadding)
+            .fillMaxSize(),
+        contentPadding = contentPadding,
     ) {
         item(key = "generalCategory") {
             SettingsCategoryTitle(title = stringResource(R.string.setting_category_general_title))
@@ -186,7 +192,7 @@ fun Settings(
                 }
 
                 item(key = "checkedBalance") {
-                    SettingsSwitch(
+                    SettingsCheckbox(
                         title = stringResource(R.string.setting_category_show_checked_balance_title),
                         subtitle = stringResource(R.string.setting_category_show_checked_balance_message),
                         checked = subscriptionStatus.showCheckedBalance,

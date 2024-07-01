@@ -319,10 +319,10 @@ private fun ExpenseEditView(
                                     checked = state.isRevenue,
                                     onCheckedChange = onIsRevenueChanged,
                                     colors = SwitchDefaults.colors(
-                                        checkedTrackColor = Color(0xFFDDDDDD),
+                                        checkedTrackColor = colorResource(R.color.add_expense_expense_thumb_background_color),
                                         checkedThumbColor = colorResource(R.color.budget_green),
                                         uncheckedThumbColor = colorResource(R.color.budget_red),
-                                        uncheckedTrackColor = Color(0xFFDDDDDD),
+                                        uncheckedTrackColor = colorResource(R.color.add_expense_expense_thumb_background_color),
                                         uncheckedBorderColor = Color.Transparent,
                                         checkedBorderColor = Color.Transparent,
                                     ),

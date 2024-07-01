@@ -154,7 +154,7 @@ private fun AccountsView(
             .padding(
                 start = 16.dp,
                 end = 16.dp,
-                bottom = 40.dp,
+                bottom = 46.dp,
             )
             .verticalScroll(rememberScrollState()),
     ) {

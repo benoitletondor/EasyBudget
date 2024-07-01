@@ -82,9 +82,9 @@ fun ExpenseEditTextField(
         focusedTextColor = Color.White,
         unfocusedTextColor = Color.White,
         errorTextColor = Color.White,
-        focusedIndicatorColor = Color.White,
-        unfocusedIndicatorColor = Color.White,
-        errorIndicatorColor = Color.White,
+        focusedIndicatorColor = colorResource(R.color.expense_edit_field_accent_color_dark),
+        unfocusedIndicatorColor = colorResource(R.color.expense_edit_field_accent_color_dark),
+        errorIndicatorColor = colorResource(R.color.expense_edit_field_accent_color_dark),
     ),
 ) {
     val textColor = textStyle.color

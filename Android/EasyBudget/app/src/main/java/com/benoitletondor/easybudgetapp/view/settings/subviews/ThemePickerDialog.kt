@@ -17,6 +17,7 @@ package com.benoitletondor.easybudgetapp.view.settings.subviews
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -41,6 +42,7 @@ import com.benoitletondor.easybudgetapp.helper.AppTheme
 
 @Composable
 fun ThemePickerDialog(
+    contentPadding: PaddingValues,
     currentTheme: AppTheme,
     onThemeSelected: (AppTheme) -> Unit,
     onDismissRequest: () -> Unit,
@@ -48,6 +50,7 @@ fun ThemePickerDialog(
     Dialog(onDismissRequest = onDismissRequest) {
         Card(
             modifier = Modifier
+                .padding(contentPadding)
                 .fillMaxWidth(),
             shape = RoundedCornerShape(10.dp),
             colors = CardDefaults.cardColors(

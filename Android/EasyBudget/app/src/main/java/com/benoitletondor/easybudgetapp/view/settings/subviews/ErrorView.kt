@@ -17,6 +17,7 @@ package com.benoitletondor.easybudgetapp.view.settings.subviews
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -36,11 +37,13 @@ import com.benoitletondor.easybudgetapp.R
 
 @Composable
 fun ErrorView(
+    contentPadding: PaddingValues,
     error: Throwable,
     onRetryButtonClicked: () -> Unit,
 ) {
     Column(
         modifier = Modifier
+            .padding(contentPadding)
             .fillMaxSize()
             .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.Center,

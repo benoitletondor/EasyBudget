@@ -76,4 +76,5 @@
     <color name="monthly_report_categories_title">@color/primary_text</color>
     <color name="monthly_report_categories_value">@color/accent</color>
     <color name="monthly_report_date_color">@color/primary</color>
+    <color name="add_expense_expense_thumb_background_color">#DDDDDD</color>
 </resources>

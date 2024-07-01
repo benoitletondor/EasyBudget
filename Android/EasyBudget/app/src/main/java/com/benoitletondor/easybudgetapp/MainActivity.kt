@@ -17,7 +17,6 @@
 package com.benoitletondor.easybudgetapp
 
 import android.content.Intent
-import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.SystemBarStyle
@@ -27,7 +26,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.benoitletondor.easybudgetapp.compose.AppNavHost
 import com.benoitletondor.easybudgetapp.compose.AppTheme
-import com.benoitletondor.easybudgetapp.helper.AppTheme
 import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
 import com.benoitletondor.easybudgetapp.helper.centerButtons
@@ -37,7 +35,6 @@ import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.getNumberOfDailyOpen
 import com.benoitletondor.easybudgetapp.parameters.getPremiumPopupLastAutoShowTimestamp
 import com.benoitletondor.easybudgetapp.parameters.getRatingPopupLastAutoShowTimestamp
-import com.benoitletondor.easybudgetapp.parameters.getTheme
 import com.benoitletondor.easybudgetapp.parameters.hasPremiumPopupBeenShow
 import com.benoitletondor.easybudgetapp.parameters.hasUserCompleteRating
 import com.benoitletondor.easybudgetapp.parameters.setPremiumPopupLastAutoShowTimestamp
@@ -75,14 +72,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.auto(
-                lightScrim = Color.TRANSPARENT,
-                darkScrim = Color.TRANSPARENT,
-                detectDarkMode = { resources ->
-                    // This is reversed to have the right bars colors
-                    parameters.getTheme() == AppTheme.LIGHT ||
-                            (parameters.getTheme() == AppTheme.PLATFORM_DEFAULT && (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_NO)
-                }),
+            statusBarStyle = SystemBarStyle.dark(
+                scrim = Color.TRANSPARENT,
+            )
         )
 
         setContent {
