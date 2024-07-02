@@ -19,11 +19,10 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.R
+import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
 import com.benoitletondor.easybudgetapp.helper.watchUserCurrency
-import com.benoitletondor.easybudgetapp.injection.CurrentDBProvider
-import com.benoitletondor.easybudgetapp.injection.requireDB
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.parameters.ONBOARDING_STEP_COMPLETED
 import com.benoitletondor.easybudgetapp.parameters.Parameters
@@ -42,7 +41,7 @@ import javax.inject.Inject
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
     private val parameters: Parameters,
-    private val dbProvider: CurrentDBProvider,
+    private val db: DB,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
     private val mutableEventFlow: MutableLiveFlow<Event> = MutableLiveFlow()
@@ -53,7 +52,7 @@ class OnboardingViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            userMoneyAmountMutableFlow.value = -dbProvider.requireDB.getBalanceForDay(LocalDate.now())
+            userMoneyAmountMutableFlow.value = -db.getBalanceForDay(LocalDate.now())
         }
     }
 
@@ -77,16 +76,16 @@ class OnboardingViewModel @Inject constructor(
                 OnboardingPage.PUSH_NOTIFICATIONS -> mutableEventFlow.emit(Event.GoToNextPage)
                 OnboardingPage.INITIAL_AMOUNT -> {
                     viewModelScope.launch(Dispatchers.IO) {
-                        val currentBalance = -dbProvider.requireDB.getBalanceForDay(LocalDate.now())
+                        val currentBalance = -db.getBalanceForDay(LocalDate.now())
                         val amountParsed = userMoneyAmountMutableFlow.value
                         if (amountParsed != currentBalance) {
                             val diff = amountParsed - currentBalance
 
-                            val existingBalanceExpense = dbProvider.requireDB.getExpensesForDay(LocalDate.now()).firstOrNull { it.title == context.getString(R.string.adjust_balance_expense_title) }
+                            val existingBalanceExpense = db.getExpensesForDay(LocalDate.now()).firstOrNull { it.title == context.getString(R.string.adjust_balance_expense_title) }
                             val expense = existingBalanceExpense?.copy(amount = -diff)
                                 ?: Expense(context.getString(R.string.adjust_balance_expense_title), -diff, LocalDate.now(), true)
 
-                            dbProvider.requireDB.persistExpense(expense)
+                            db.persistExpense(expense)
                         }
 
                         withContext(Dispatchers.Main) {

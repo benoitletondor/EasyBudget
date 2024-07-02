@@ -49,6 +49,10 @@ class OfflineDBImpl(private val roomDB: RoomDB) : DB {
         roomDB.expenseDao().checkpoint(SimpleSQLiteQuery("pragma wal_checkpoint(full)"))
     }
 
+    override suspend fun forceCacheWipe() {
+        /* No-op as this is a non-cached implementation */
+    }
+
     override suspend fun persistExpense(expense: Expense): Expense {
         val newId = roomDB.expenseDao().persistExpense(expense.toExpenseEntity())
 

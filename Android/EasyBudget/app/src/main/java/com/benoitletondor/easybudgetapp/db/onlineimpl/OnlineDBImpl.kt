@@ -83,6 +83,10 @@ class OnlineDBImpl(
 
     override suspend fun triggerForceWriteToDisk() { /* No-op */ }
 
+    override suspend fun forceCacheWipe() {
+        /* No-op as this is a non-cached implementation */
+    }
+
     suspend fun awaitSyncDone(): SyncSessionState {
         if (syncSessionState.value is SyncSessionState.Done) {
             return SyncSessionState.Done

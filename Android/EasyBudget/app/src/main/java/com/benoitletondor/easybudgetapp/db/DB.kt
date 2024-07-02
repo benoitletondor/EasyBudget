@@ -30,6 +30,8 @@ interface DB {
 
     suspend fun triggerForceWriteToDisk()
 
+    suspend fun forceCacheWipe()
+
     suspend fun persistExpense(expense: Expense): Expense
 
     suspend fun getDataForMonth(yearMonth: YearMonth): DataForMonth

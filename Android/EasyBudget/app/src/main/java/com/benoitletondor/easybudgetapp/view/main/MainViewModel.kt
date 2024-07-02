@@ -363,11 +363,17 @@ class MainViewModel @Inject constructor(
     val shouldNavigateToOnboarding get() = parameters.getOnboardingStep() != ONBOARDING_STEP_COMPLETED
 
     fun onOnboardingResult(onboardingResult: OnboardingResult) {
-        if (!onboardingResult.onboardingCompleted) {
-            viewModelScope.launch {
+        viewModelScope.launch {
+            if (onboardingResult.onboardingCompleted) {
+                // We do this because the onboarding is using an injected DB directly that isn't the one
+                // we currently use so we're not getting update events
+                (dbAvailableFlow.value as? DBState.Loaded)?.db?.forceCacheWipe()
+                forceRefreshMutableFlow.emit(Unit)
+            } else {
                 eventMutableFlow.emit(Event.CloseApp)
             }
         }
+
     }
 
     suspend fun getDataForMonth(month: YearMonth): DataForMonth = awaitDB().getDataForMonth(month)

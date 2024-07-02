@@ -68,7 +68,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge(
