@@ -40,7 +40,7 @@ android {
         compileSdk = 34
         minSdk = 23
         targetSdk = 35
-        versionCode = 145
+        versionCode = 146
         versionName = "3.3.0"
         vectorDrawables.useSupportLibrary = true
     }
@@ -125,7 +125,7 @@ dependencies {
     implementation("androidx.activity:activity-ktx:1.9.0")
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.2")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.3")
     implementation("androidx.work:work-runtime-ktx:2.9.0")
     implementation("androidx.work:work-gcm:2.9.0")
     implementation("com.google.android.play:review-ktx:2.0.1")
@@ -149,7 +149,7 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.ui:ui")
     implementation("androidx.activity:activity-compose:1.9.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3")
     implementation("androidx.navigation:navigation-compose:2.8.0-beta04")
     implementation("com.google.accompanist:accompanist-themeadapter-material3:0.34.0")
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
