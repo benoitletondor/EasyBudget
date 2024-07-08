@@ -358,6 +358,8 @@
     <string name="expense_edit_unable_to_load_db_error_title">Impossibile accedere al database</string>
     <string name="expense_edit_unable_to_load_db_error_message">Impossibile accedere al database per mantenere la tua spesa. Controlla la tua rete e riavvia l\'app.</string>
     <string name="expense_edit_unable_to_load_db_error_cta">Annulla</string>
+    <string name="expense_edit_error_saving_title">OPS!</string>
+    <string name="expense_edit_error_saving_message">Si è verificato un errore durante la persistenza della voce. Riprova e riavvia l\'app se il problema persiste.</string>
     <string name="account_management_account_left_confirmation">Account lasciato con successo</string>
     <string name="account_management_account_name_updated_confirmation">Nome account aggiornato correttamente</string>
     <string name="account_management_error_title">OPS!</string>
@@ -478,4 +480,6 @@
     <string name="update_three_dot_two_notification_title">Novità in EasyBudget</string>
     <string name="update_three_dot_two_notification_message">Come utente Pro, ora puoi esportare i tuoi rapporti mensili come CSV!</string>
     <string name="update_three_dot_two_notification_cta">Scopri</string>
+    <string name="settings_error_loading_title">Impossibile caricare le impostazioni</string>
+    <string name="settings_error_loading_description">Si è verificato un errore durante il caricamento delle impostazioni. Per favore riprova.\n(%s)</string>
 </resources>

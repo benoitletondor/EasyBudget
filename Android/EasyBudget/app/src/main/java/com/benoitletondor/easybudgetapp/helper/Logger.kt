@@ -20,14 +20,14 @@ import com.benoitletondor.easybudgetapp.BuildConfig
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 object Logger {
-    private const val defaultTag = "EasyBudget"
+    private const val DEFAULT_TAG = "EasyBudget"
 
     fun debug(message: String) {
         debug(message, error = null)
     }
 
     fun debug(message: String, error: Throwable?) {
-        debug(defaultTag, message, error)
+        debug(DEFAULT_TAG, message, error)
     }
 
     fun debug(tag: String, message: String) {
@@ -53,7 +53,7 @@ object Logger {
     }
 
     fun warning(message: String, error: Throwable?) {
-        warning(defaultTag, message, error)
+        warning(DEFAULT_TAG, message, error)
     }
 
     fun warning(tag: String, message: String) {
@@ -77,7 +77,7 @@ object Logger {
     }
 
     fun error(message: String, error: Throwable?) {
-        error(defaultTag, message, error)
+        error(DEFAULT_TAG, message, error)
     }
 
     fun error(tag: String, message: String) {

@@ -16,7 +16,7 @@
 
 package com.benoitletondor.easybudgetapp.view.recurringexpenseadd
 
-import androidx.lifecycle.SavedStateHandle
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.helper.Logger
@@ -24,66 +24,98 @@ import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
+import com.benoitletondor.easybudgetapp.helper.combine
+import com.benoitletondor.easybudgetapp.helper.watchUserCurrency
+import com.benoitletondor.easybudgetapp.injection.CurrentDBProvider
 import kotlinx.coroutines.launch
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.getInitDate
-import com.benoitletondor.easybudgetapp.view.main.account.AccountViewModel
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.withContext
+import java.time.Instant
 import java.time.LocalDate
-import javax.inject.Inject
+import java.time.ZoneId
+import kotlin.math.abs
 
-@HiltViewModel
-class RecurringExpenseEditViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = RecurringExpenseEditViewModelFactory::class)
+class RecurringExpenseEditViewModel @AssistedInject constructor(
     private val parameters: Parameters,
-    savedStateHandle: SavedStateHandle,
+    currentDBProvider: CurrentDBProvider,
+    @Assisted private val editedExpense: Expense?,
+    @Assisted date: LocalDate,
 ) : ViewModel() {
-    /**
-     * Expense that is being edited (will be null if it's a new one)
-     */
-    private val editedExpense: Expense? = savedStateHandle[RecurringExpenseEditActivity.ARG_EXPENSE]
+    private val dateMutableStateFlow = MutableStateFlow(date)
+    private val amountMutableStateFlow = MutableStateFlow(editedExpense?.amount ?: 0.0)
+    private val isRevenueMutableStateFlow = MutableStateFlow(editedExpense?.isRevenue() ?: false)
+    private val titleMutableStateFlow = MutableStateFlow(editedExpense?.title ?: "")
+    private val recurringExpenseTypeMutableStateFlow = MutableStateFlow(editedExpense?.associatedRecurringExpense?.recurringExpense?.type ?: RecurringExpenseType.MONTHLY)
+    private val isSavingMutableStateFlow = MutableStateFlow(false)
 
-    private val expenseDateMutableStateFlow = MutableStateFlow(LocalDate.ofEpochDay(
-        savedStateHandle[RecurringExpenseEditActivity.ARG_START_DATE] ?: throw IllegalStateException("No ARG_START_DATE arg")))
-    val expenseDateFlow: Flow<LocalDate> = expenseDateMutableStateFlow
+    val stateFlow: StateFlow<State> = combine(
+        dateMutableStateFlow,
+        amountMutableStateFlow,
+        isRevenueMutableStateFlow,
+        titleMutableStateFlow,
+        recurringExpenseTypeMutableStateFlow,
+        isSavingMutableStateFlow,
+    ) { date, amount, isRevenue, title, recurringExpenseType, isSaving ->
+        val expense = Expense(
+            id = editedExpense?.id,
+            title = title,
+            amount = if (isRevenue) -abs(amount) else abs(amount),
+            date = date,
+            checked = editedExpense?.checked ?: false,
+            associatedRecurringExpense = editedExpense?.associatedRecurringExpense,
+        )
 
-    private val editTypeMutableStateFlow = MutableStateFlow(ExpenseEditType(
-        editedExpense?.isRevenue() ?: false,
-        editedExpense != null
-    ))
-    val editTypeFlow: Flow<ExpenseEditType> = editTypeMutableStateFlow
+        return@combine State(
+            isEditing = editedExpense != null,
+            isSaving = isSaving,
+            recurringExpenseType = recurringExpenseType,
+            isRevenue = isRevenue,
+            expense = expense,
+        )
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, State(
+            isEditing = editedExpense != null,
+            isRevenue = editedExpense?.isRevenue() ?: false,
+            isSaving = false,
+            recurringExpenseType = recurringExpenseTypeMutableStateFlow.value,
+            expense = Expense(
+                id = editedExpense?.id,
+                title = titleMutableStateFlow.value,
+                amount = if (isRevenueMutableStateFlow.value) -abs(amountMutableStateFlow.value) else abs(
+                    amountMutableStateFlow.value
+                ),
+                date = dateMutableStateFlow.value,
+                checked = editedExpense?.checked ?: false,
+                associatedRecurringExpense = editedExpense?.associatedRecurringExpense,
+            )
+        )
+    )
 
-    val existingExpenseData = editedExpense?.let { expense ->
-        ExistingExpenseData(expense.title, expense.amount, expense.associatedRecurringExpense!!.recurringExpense.type)
-    }
+    val userCurrencyFlow = parameters.watchUserCurrency()
 
-    private val savingStateMutableStateFlow: MutableStateFlow<SavingState> = MutableStateFlow(SavingState.Idle)
-    val savingStateFlow: Flow<SavingState> = savingStateMutableStateFlow
-
-    private val expenseAddBeforeInitDateErrorMutableFlow = MutableLiveFlow<Unit>()
-    val expenseAddBeforeInitDateEventFlow: Flow<Unit> = expenseAddBeforeInitDateErrorMutableFlow
-
-    private val unableToLoadDBEventMutableFlow = MutableLiveFlow<Unit>()
-    val unableToLoadDBEventFlow: Flow<Unit> = unableToLoadDBEventMutableFlow
-
-    private val finishMutableFlow = MutableLiveFlow<Unit>()
-    val finishFlow: Flow<Unit> = finishMutableFlow
-
-    private val errorMutableFlow = MutableLiveFlow<Unit>()
-    val errorFlow: Flow<Unit> = errorMutableFlow
+    private val eventMutableFlow = MutableLiveFlow<Event>()
+    val eventFlow: Flow<Event> = eventMutableFlow
 
     private lateinit var db: DB
 
     init {
-        val currentDb = AccountViewModel.getCurrentDB()
+        val currentDb = currentDBProvider.activeDB
         if (currentDb == null) {
             viewModelScope.launch {
-                unableToLoadDBEventMutableFlow.emit(Unit)
+                eventMutableFlow.emit(Event.UnableToLoadDB)
             }
         } else {
             db = currentDb
@@ -91,31 +123,76 @@ class RecurringExpenseEditViewModel @Inject constructor(
     }
 
     fun onExpenseRevenueValueChanged(isRevenue: Boolean) {
-        editTypeMutableStateFlow.value = ExpenseEditType(isRevenue, editedExpense != null)
+        isRevenueMutableStateFlow.value = isRevenue
     }
 
-    fun onSave(value: Double, description: String, recurringExpenseType: RecurringExpenseType) {
-        val isRevenue = editTypeMutableStateFlow.value.isRevenue
-        val date = expenseDateMutableStateFlow.value
+    fun onDateSelected(utcTimestamp: Long?) {
+        if (utcTimestamp != null) {
+            dateMutableStateFlow.value = Instant.ofEpochMilli(utcTimestamp)
+                .atZone(ZoneId.of("UTC"))
+                .toLocalDate()
+        }
+    }
 
+    fun onDateClicked() {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.ShowDatePicker(dateMutableStateFlow.value))
+        }
+    }
+
+    fun onRecurringExpenseTypeChanged(recurringExpenseType: RecurringExpenseType) {
+        recurringExpenseTypeMutableStateFlow.value = recurringExpenseType
+    }
+
+    fun onAmountChanged(amount: String) {
+        amountMutableStateFlow.value = amount.toDoubleOrNull() ?: 0.0
+    }
+
+    fun onTitleChanged(title: String) {
+        titleMutableStateFlow.value = title
+    }
+
+    fun onEditRecurringIntervalClicked() {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.ShowRecurringIntervalPicker)
+        }
+    }
+
+    fun onSave() {
+        var isInError = false
+        if (titleMutableStateFlow.value.isEmpty()) {
+            isInError = true
+            viewModelScope.launch {
+                eventMutableFlow.emit(Event.EmptyTitleError)
+            }
+        }
+
+        if (amountMutableStateFlow.value == 0.0) {
+            isInError = true
+            viewModelScope.launch {
+                eventMutableFlow.emit(Event.EmptyAmountError)
+            }
+        }
+
+        if (isInError) {
+            return
+        }
+
+        val date = dateMutableStateFlow.value
         val dateOfInstallation = parameters.getInitDate() ?: LocalDate.now()
-
         if( date.isBefore(dateOfInstallation) ) {
             viewModelScope.launch {
-                expenseAddBeforeInitDateErrorMutableFlow.emit(Unit)
+                eventMutableFlow.emit(Event.ExpenseAddBeforeInitDateError)
             }
 
             return
         }
 
-        doSaveExpense(value, description, recurringExpenseType, editedExpense, isRevenue, date)
+        doSaveExpense(stateFlow.value.expense, stateFlow.value.recurringExpenseType)
     }
 
-    fun onAddExpenseBeforeInitDateConfirmed(value: Double, description: String, recurringExpenseType: RecurringExpenseType) {
-        val isRevenue = editTypeMutableStateFlow.value.isRevenue
-        val date = expenseDateMutableStateFlow.value
-
-        doSaveExpense(value, description, recurringExpenseType, editedExpense, isRevenue, date)
+    fun onAddExpenseBeforeInitDateConfirmed() {
+        doSaveExpense(stateFlow.value.expense, stateFlow.value.recurringExpenseType)
     }
 
     fun onAddExpenseBeforeInitDateCancelled() {
@@ -123,74 +200,77 @@ class RecurringExpenseEditViewModel @Inject constructor(
     }
 
     private fun doSaveExpense(
-        value: Double,
-        description: String,
+        expense: Expense,
         recurringExpenseType: RecurringExpenseType,
-        editedExpense: Expense?,
-        isRevenue: Boolean,
-        date: LocalDate,
     ) {
-        savingStateMutableStateFlow.value = SavingState.Saving(isRevenue)
+        isSavingMutableStateFlow.value = true
 
         viewModelScope.launch {
             try {
-                val inserted = withContext(Dispatchers.Default) {
-                    if( editedExpense == null ) {
-                        try {
-                            db.persistRecurringExpense(RecurringExpense(description, if (isRevenue) -value else value, date, recurringExpenseType))
-                            return@withContext true
-                        } catch (e: Exception) {
-                            if (e is CancellationException) throw e
-
-                            Logger.error("Error while inserting recurring expense into DB", e)
-                            return@withContext false
-                        }
-
-                    } else {
-                        try {
-                            val recurringExpense = editedExpense.associatedRecurringExpense!!.recurringExpense
-                            db.updateRecurringExpenseAfterDate(
-                                recurringExpense.copy(
-                                    modified = true,
-                                    type = recurringExpenseType,
-                                    recurringDate = date,
-                                    title = description,
-                                    amount = if (isRevenue) -value else value
-                                ),
-                                editedExpense.date,
+                withContext(Dispatchers.IO) {
+                    if (editedExpense == null) {
+                        db.persistRecurringExpense(
+                            RecurringExpense(
+                                expense.title,
+                                expense.amount,
+                                expense.date,
+                                recurringExpenseType
                             )
-
-                            return@withContext true
-                        } catch (e: Exception) {
-                            if (e is CancellationException) throw e
-
-                            Logger.error("Error while editing recurring expense into DB", e)
-                            return@withContext false
-                        }
+                        )
+                        return@withContext true
+                    } else {
+                        val recurringExpense =
+                            editedExpense.associatedRecurringExpense!!.recurringExpense
+                        db.updateRecurringExpenseAfterDate(
+                            recurringExpense.copy(
+                                modified = true,
+                                type = recurringExpenseType,
+                                recurringDate = expense.date,
+                                title = expense.title,
+                                amount = expense.amount,
+                            ),
+                            editedExpense.date,
+                        )
                     }
                 }
 
-                if( inserted ) {
-                    finishMutableFlow.emit(Unit)
-                } else {
-                    errorMutableFlow.emit(Unit)
-                }
+                eventMutableFlow.emit(Event.Finish)
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+
+                Logger.error("Error persisting recurring expense", e)
+                eventMutableFlow.emit(Event.ErrorPersistingExpense(e))
             } finally {
-                savingStateMutableStateFlow.value = SavingState.Idle
+                isSavingMutableStateFlow.value = false
             }
         }
     }
 
-    fun onDateChanged(date: LocalDate) {
-        expenseDateMutableStateFlow.value = date
+    sealed class Event {
+        data object Finish : Event()
+        data object UnableToLoadDB : Event()
+        data object EmptyTitleError : Event()
+        data object EmptyAmountError : Event()
+        data object ExpenseAddBeforeInitDateError : Event()
+        data class ErrorPersistingExpense(val error: Throwable) : Event()
+        data class ShowDatePicker(val date: LocalDate) : Event()
+        data object ShowRecurringIntervalPicker : Event()
     }
 
-    sealed class SavingState {
-        data object Idle : SavingState()
-        data class Saving(val isRevenue: Boolean): SavingState()
-    }
+    @Immutable
+    data class State(
+        val isEditing: Boolean,
+        val isSaving: Boolean,
+        val recurringExpenseType: RecurringExpenseType,
+        val expense: Expense,
+        val isRevenue: Boolean,
+    )
 }
 
-data class ExpenseEditType(val isRevenue: Boolean, val editing: Boolean)
-
-data class ExistingExpenseData(val title: String, val amount: Double, val type: RecurringExpenseType)
+@AssistedFactory
+interface RecurringExpenseEditViewModelFactory {
+    fun create(
+        editedExpense: Expense?,
+        date: LocalDate,
+    ): RecurringExpenseEditViewModel
+}

@@ -36,4 +36,5 @@
     <color name="secondary_text">#BBB</color>
     <color name="divider">#555</color>
     <color name="budget_line_background_color">#303030</color>
+    <color name="add_expense_expense_thumb_background_color">#AAAAAA</color>
 </resources>

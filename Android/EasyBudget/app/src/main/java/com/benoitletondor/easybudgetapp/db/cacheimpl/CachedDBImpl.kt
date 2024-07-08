@@ -62,6 +62,10 @@ open class CachedDBImpl(
         wrappedDB.triggerForceWriteToDisk()
     }
 
+    override suspend fun forceCacheWipe() {
+        wipeCache()
+    }
+
     override suspend fun persistExpense(expense: Expense): Expense
         = wrappedDB.persistExpense(expense)
 

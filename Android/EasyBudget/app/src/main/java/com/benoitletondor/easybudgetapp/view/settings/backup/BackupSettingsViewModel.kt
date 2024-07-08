@@ -16,9 +16,10 @@
 
 package com.benoitletondor.easybudgetapp.view.settings.backup
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.result.ActivityResult
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.ListenableWorker
@@ -35,11 +36,20 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import java.util.*
 import java.lang.RuntimeException
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
 class BackupSettingsViewModel @Inject constructor(
@@ -50,86 +60,90 @@ class BackupSettingsViewModel @Inject constructor(
     @ApplicationContext private val appContext: Context,
 ) : ViewModel() {
 
-    private val cloudBackupStateMutableFlow = MutableStateFlow<BackupCloudStorageState>(BackupCloudStorageState.NotAuthenticated)
-    val cloudBackupStateFlow: Flow<BackupCloudStorageState> = cloudBackupStateMutableFlow
+    private val eventMutableFlow = MutableLiveFlow<Event>()
+    val eventFlow: Flow<Event> = eventMutableFlow
 
-    private val authenticationConfirmationDisplayEventMutableFlow = MutableLiveFlow<Unit>()
-    val authenticationConfirmationDisplayEventFlow : Flow<Unit> = authenticationConfirmationDisplayEventMutableFlow
+    private val backupInProgressFlow = MutableStateFlow(false)
+    private val restorationInProgressFlow = MutableStateFlow(false)
+    private val deletionInProgressFlow = MutableStateFlow(false)
 
-    private val backupNowErrorEventMutableFlow = MutableLiveFlow<Throwable>()
-    val backupNowErrorEventFlow: Flow<Throwable> = backupNowErrorEventMutableFlow
-
-    private val restorationErrorEventMutableFlow = MutableLiveFlow<Throwable>()
-    val restorationErrorEventFlow: Flow<Throwable> = restorationErrorEventMutableFlow
-
-    private val previousBackupAvailableEventMutableFlow = MutableLiveFlow<Date>()
-    val previousBackupAvailableEventFlow: Flow<Date> = previousBackupAvailableEventMutableFlow
-
-    private val appRestartEventMutableFlow = MutableLiveFlow<Unit>()
-    val appRestartEventFlow: Flow<Unit> = appRestartEventMutableFlow
-
-    private val restoreConfirmationDisplayEventMutableFlow = MutableLiveFlow<Date>()
-    val restoreConfirmationDisplayEventFlow: Flow<Date> = restoreConfirmationDisplayEventMutableFlow
-
-    private val deleteConfirmationDisplayEventMutableFlow = MutableLiveFlow<Unit>()
-    val deleteConfirmationDisplayEventFlow: Flow<Unit> = deleteConfirmationDisplayEventMutableFlow
-
-    private val backupDeletionErrorEventMutableFlow = MutableLiveFlow<Throwable>()
-    val backupDeletionErrorEventFlow: Flow<Throwable> = backupDeletionErrorEventMutableFlow
-
-    private var backupInProgress = false
-    private var restorationInProgress = false
-    private var deletionInProgress = false
-
-    init {
-        viewModelScope.launchCollect(auth.state) { authState ->
-            if( authState is AuthState.Authenticated ) {
-                viewModelScope.launch {
-                    withContext(Dispatchers.IO) {
+    val stateFlow: StateFlow<State> = combine(
+        auth.state
+            .onEach { authState ->
+                if (authState is AuthState.Authenticated) {
+                    viewModelScope.launch(Dispatchers.IO) {
                         try {
-                            if( parameters.getLastBackupDate() == null ) {
+                            if (parameters.getLastBackupDate() == null) {
                                 getBackupDBMetaData(cloudStorage, auth)?.let {
                                     parameters.saveLastBackupDate(it.lastUpdateDate)
                                 }
                             }
                         } catch (e: Throwable) {
-                            Logger.error(
-                                "Error getting last backup date",
-                                e
-                            )
+                            if (e is CancellationException) throw e
+
+                            Logger.error("Error getting last backup date", e)
                         }
-
-                        null // ?! not sure why it's needed
                     }
-
-                    cloudBackupStateMutableFlow.value = computeBackupCloudStorageState(authState)
                 }
-            } else {
-                cloudBackupStateMutableFlow.value = computeBackupCloudStorageState(authState)
+            },
+        parameters.watchIsBackupEnabled(),
+        parameters.watchLastBackupDate(),
+        getBackupJobInfosFlow(appContext)
+            .onStart {
+                emit(emptyList())
+            },
+        backupInProgressFlow,
+        restorationInProgressFlow,
+        deletionInProgressFlow,
+    ) { authState, backupEnabled, lastBackupDate, _, backupInProgress, restorationInProgress, deletionInProgress ->
+        return@combine when (authState) {
+            AuthState.NotAuthenticated -> State.NotAuthenticated
+            AuthState.Authenticating -> State.Authenticating
+            is AuthState.Authenticated -> {
+                if (backupInProgress) {
+                    State.BackupInProgress(authState.currentUser)
+                } else if (restorationInProgress) {
+                    State.RestorationInProgress(authState.currentUser)
+                } else if (deletionInProgress) {
+                    State.DeletionInProgress(authState.currentUser)
+                } else {
+                    if (backupEnabled) {
+                        val backupNowAvailable =
+                            lastBackupDate == null || lastBackupDate.isOlderThanADay()
+                        val restoreAvailable = lastBackupDate != null
+
+                        State.Activated(
+                            authState.currentUser,
+                            lastBackupDate,
+                            backupNowAvailable,
+                            restoreAvailable
+                        )
+                    } else {
+                        State.NotActivated(authState.currentUser)
+                    }
+                }
+
             }
         }
-
-        viewModelScope.launchCollect(getBackupJobInfosFlow(appContext)) {
-            cloudBackupStateMutableFlow.value = computeBackupCloudStorageState(auth.state.value)
-        }
     }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, State.NotAuthenticated)
 
     fun onAuthenticateButtonPressed() {
         viewModelScope.launch {
-            authenticationConfirmationDisplayEventMutableFlow.emit(Unit)
+            eventMutableFlow.emit(Event.ShowAuthenticationConfirmation)
         }
     }
 
-    fun onAuthenticationConfirmationConfirmed(activity: Activity) {
-        auth.startAuthentication(activity)
+    fun onAuthenticationConfirmationConfirmed(launcher: ManagedActivityResultLauncher<Intent, ActivityResult>) {
+        auth.startAuthentication(launcher)
     }
 
     fun onAuthenticationConfirmationCancelled() {
         // No-op
     }
 
-    fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        auth.handleActivityResult(requestCode, resultCode, data)
+    fun handleAuthActivityResult(activityResult: ActivityResult) {
+        auth.handleActivityResult(activityResult.resultCode, activityResult.data)
     }
 
     fun onLogoutButtonPressed() {
@@ -140,45 +154,19 @@ class BackupSettingsViewModel @Inject constructor(
         auth.logout()
     }
 
-    private fun computeBackupCloudStorageState(authState: AuthState?): BackupCloudStorageState {
-        return when(authState) {
-            AuthState.NotAuthenticated -> BackupCloudStorageState.NotAuthenticated
-            AuthState.Authenticating -> BackupCloudStorageState.Authenticating
-            is AuthState.Authenticated -> {
-                if( backupInProgress ) {
-                    BackupCloudStorageState.BackupInProgress(authState.currentUser)
-                } else if ( restorationInProgress ) {
-                    BackupCloudStorageState.RestorationInProgress(authState.currentUser)
-                } else if ( deletionInProgress ) {
-                    BackupCloudStorageState.DeletionInProgress(authState.currentUser)
-                } else {
-                    if( parameters.isBackupEnabled() ) {
-                        val lastBackupDate = parameters.getLastBackupDate()
-                        val backupNowAvailable = lastBackupDate == null || lastBackupDate.isOlderThanADay()
-                        val restoreAvailable = lastBackupDate != null
+    fun onBackupActivated() {
+        if (!parameters.isBackupEnabled()) {
+            parameters.setBackupEnabled(true)
 
-                        BackupCloudStorageState.Activated(authState.currentUser, lastBackupDate, backupNowAvailable, restoreAvailable)
-                    } else {
-                        BackupCloudStorageState.NotActivated(authState.currentUser)
-                    }
+            viewModelScope.launch {
+                val maybeBackupActivatedState = withTimeoutOrNull(5.seconds) {
+                    stateFlow.filterIsInstance<State.Activated>().first()
                 }
 
-            }
-            null -> BackupCloudStorageState.NotAuthenticated
-        }
-    }
-
-    fun onBackupActivated() {
-        if( !parameters.isBackupEnabled() ) {
-            parameters.setBackupEnabled(true)
-            val newBackupState = computeBackupCloudStorageState(auth.state.value)
-            cloudBackupStateMutableFlow.value = newBackupState
-
-            if( newBackupState is BackupCloudStorageState.Activated ) {
-                val lastBackupDate = newBackupState.lastBackupDate
-                if( lastBackupDate != null ) {
+                val lastBackupDate = maybeBackupActivatedState?.lastBackupDate
+                if (lastBackupDate != null) {
                     viewModelScope.launch {
-                        previousBackupAvailableEventMutableFlow.emit(lastBackupDate)
+                        eventMutableFlow.emit(Event.PromptUserToRestorePreviousBackup(lastBackupDate))
                     }
                 }
             }
@@ -188,18 +176,15 @@ class BackupSettingsViewModel @Inject constructor(
     }
 
     fun onBackupDeactivated() {
-        if( parameters.isBackupEnabled() ) {
+        if (parameters.isBackupEnabled()) {
             parameters.setBackupEnabled(false)
-            cloudBackupStateMutableFlow.value = computeBackupCloudStorageState(auth.state.value)
-
             unscheduleBackup(appContext)
         }
     }
 
     fun onBackupNowButtonPressed() {
         viewModelScope.launch {
-            backupInProgress = true
-            cloudBackupStateMutableFlow.value = computeBackupCloudStorageState(auth.state.value)
+            backupInProgressFlow.value = true
 
             try {
                 withContext(Dispatchers.IO) {
@@ -211,7 +196,7 @@ class BackupSettingsViewModel @Inject constructor(
                         iab,
                     )
 
-                    if( result !is ListenableWorker.Result.Success ) {
+                    if (result !is ListenableWorker.Result.Success) {
                         throw RuntimeException(result.toString())
                     }
                 }
@@ -219,10 +204,9 @@ class BackupSettingsViewModel @Inject constructor(
                 if (error is CancellationException) throw error
 
                 Logger.error("Error while backup now", error)
-                backupNowErrorEventMutableFlow.emit(error)
+                eventMutableFlow.emit(Event.ShowBackupNowError(error))
             } finally {
-                backupInProgress = false
-                cloudBackupStateMutableFlow.value = computeBackupCloudStorageState(auth.state.value)
+                backupInProgressFlow.value = false
             }
         }
     }
@@ -249,14 +233,13 @@ class BackupSettingsViewModel @Inject constructor(
 
     fun onDeleteBackupButtonPressed() {
         viewModelScope.launch {
-            deleteConfirmationDisplayEventMutableFlow.emit(Unit)
+            eventMutableFlow.emit(Event.ShowDeleteConfirmation)
         }
     }
 
     fun onDeleteBackupConfirmationConfirmed() {
         viewModelScope.launch {
-            deletionInProgress = true
-            cloudBackupStateMutableFlow.value = computeBackupCloudStorageState(auth.state.value)
+            deletionInProgressFlow.value = true
 
             try {
                 withContext(Dispatchers.IO) {
@@ -264,11 +247,12 @@ class BackupSettingsViewModel @Inject constructor(
                     parameters.saveLastBackupDate(null)
                 }
             } catch (error: Throwable) {
+                if (error is CancellationException) throw error
+
                 Logger.error("Error while deleting backup", error)
-                backupDeletionErrorEventMutableFlow.emit(error)
+                eventMutableFlow.emit(Event.ShowBackupDeletionError(error))
             } finally {
-                deletionInProgress = false
-                cloudBackupStateMutableFlow.value = computeBackupCloudStorageState(auth.state.value)
+                deletionInProgressFlow.value = false
             }
         }
     }
@@ -278,34 +262,37 @@ class BackupSettingsViewModel @Inject constructor(
     }
 
     private fun startRestoreFlow() {
-        val lastBackupDate = (cloudBackupStateMutableFlow.value as? BackupCloudStorageState.Activated)?.lastBackupDate
-        if( lastBackupDate == null ) {
-            Logger.error("Starting restore with no last backup date")
+        val lastBackupDate = (stateFlow.value as? State.Activated)?.lastBackupDate
+        if (lastBackupDate == null) {
+            Logger.error(
+                "Starting restore with no last backup date",
+                NullPointerException("No last backup date")
+            )
             return
         }
 
         viewModelScope.launch {
-            restoreConfirmationDisplayEventMutableFlow.emit(lastBackupDate)
+            eventMutableFlow.emit(Event.ShowRestoreConfirmation(lastBackupDate))
         }
     }
 
     private fun restoreData() {
         viewModelScope.launch {
-            restorationInProgress = true
-            cloudBackupStateMutableFlow.value = computeBackupCloudStorageState(auth.state.value)
+            restorationInProgressFlow.value = true
 
             try {
                 withContext(Dispatchers.IO) {
                     restoreLatestDBBackup(appContext, auth, cloudStorage, iab, parameters)
                 }
 
-                appRestartEventMutableFlow.emit(Unit)
+                eventMutableFlow.emit(Event.RestartApp)
             } catch (error: Throwable) {
+                if (error is CancellationException) throw error
+
                 Logger.error("Error while restoring", error)
-                restorationErrorEventMutableFlow.emit(error)
+                eventMutableFlow.emit(Event.ShowRestoreError(error))
             } finally {
-                restorationInProgress = false
-                cloudBackupStateMutableFlow.value = computeBackupCloudStorageState(auth.state.value)
+                restorationInProgressFlow.value = false
             }
         }
     }
@@ -316,17 +303,36 @@ class BackupSettingsViewModel @Inject constructor(
 
         return calendar.time.after(this)
     }
-}
 
-sealed class BackupCloudStorageState {
-    data object NotAuthenticated : BackupCloudStorageState()
-    data object Authenticating : BackupCloudStorageState()
-    data class NotActivated(val currentUser: CurrentUser) : BackupCloudStorageState()
-    data class Activated(val currentUser: CurrentUser,
-                         val lastBackupDate: Date?,
-                         val backupNowAvailable: Boolean,
-                         val restoreAvailable: Boolean): BackupCloudStorageState()
-    data class BackupInProgress(val currentUser: CurrentUser): BackupCloudStorageState()
-    data class RestorationInProgress(val currentUser: CurrentUser): BackupCloudStorageState()
-    data class DeletionInProgress(val currentUser: CurrentUser): BackupCloudStorageState()
+    sealed class Event {
+        data object ShowAuthenticationConfirmation : Event()
+        data class ShowBackupNowError(val error: Throwable) : Event()
+        data class ShowRestoreError(val error: Throwable) : Event()
+        data object RestartApp : Event()
+        data class ShowRestoreConfirmation(val lastBackupDate: Date) : Event()
+        data object ShowDeleteConfirmation : Event()
+        data class ShowBackupDeletionError(val error: Throwable) : Event()
+        data class PromptUserToRestorePreviousBackup(val lastBackupDate: Date) : Event()
+    }
+
+    sealed class State {
+        data object NotAuthenticated : State()
+        data object Authenticating : State()
+        sealed interface Authenticated {
+            val currentUser: CurrentUser
+        }
+
+        data class NotActivated(override val currentUser: CurrentUser) : State(), Authenticated
+        data class Activated(
+            override val currentUser: CurrentUser,
+            val lastBackupDate: Date?,
+            val backupNowAvailable: Boolean,
+            val restoreAvailable: Boolean
+        ) : State(), Authenticated
+
+        data class BackupInProgress(override val currentUser: CurrentUser) : State(), Authenticated
+        data class RestorationInProgress(override val currentUser: CurrentUser) : State(), Authenticated
+        data class DeletionInProgress(override val currentUser: CurrentUser) : State(), Authenticated
+    }
+
 }
