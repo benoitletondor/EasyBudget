@@ -28,7 +28,7 @@ import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.accounts.model.Invitation
 import com.benoitletondor.easybudgetapp.compose.AppWithTopAppBarScaffold
 import com.benoitletondor.easybudgetapp.compose.BackButtonBehavior
-import com.benoitletondor.easybudgetapp.helper.SerializedSelectedOnlineAccount
+import com.benoitletondor.easybudgetapp.helper.serialization.SerializedSelectedOnlineAccount
 import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.view.manageaccount.subviews.ContentView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder

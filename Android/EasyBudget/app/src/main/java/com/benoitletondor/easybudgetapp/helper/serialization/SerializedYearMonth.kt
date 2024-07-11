@@ -13,7 +13,7 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package com.benoitletondor.easybudgetapp.helper
+package com.benoitletondor.easybudgetapp.helper.serialization
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

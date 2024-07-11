@@ -143,10 +143,20 @@ class OnboardingViewModel @Inject constructor(
 }
 
 private fun parseAmountValue(valueString: String): Double {
-    return try {
-        if ( "" == valueString || "-" == valueString) 0.0 else java.lang.Double.valueOf(valueString.replace(",", "."))
-    } catch (e: Exception) {
-        Logger.warning("An error occurred during initial amount parsing: $valueString", e)
+    if ( "" == valueString || "-" == valueString) {
         return 0.0
+    }
+
+    return try {
+        java.lang.Double.valueOf(valueString.replace(",", "."))
+    } catch (e: Exception) {
+        Logger.debug("An error occurred during initial amount parsing first pass: $valueString", e)
+
+        try {
+            return valueString.toDouble()
+        } catch (subException: Exception) {
+            Logger.warning("An error occurred during initial amount parsing second pass: $valueString", e)
+            return 0.0
+        }
     }
 }

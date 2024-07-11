@@ -73,7 +73,7 @@ import com.benoitletondor.easybudgetapp.compose.AppWithTopAppBarScaffold
 import com.benoitletondor.easybudgetapp.compose.BackButtonBehavior
 import com.benoitletondor.easybudgetapp.compose.components.ExpenseEditTextField
 import com.benoitletondor.easybudgetapp.helper.CurrencyHelper
-import com.benoitletondor.easybudgetapp.helper.SerializedExpense
+import com.benoitletondor.easybudgetapp.helper.serialization.SerializedExpense
 import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.helper.sanitizeFromUnsupportedInputForDecimals
 import com.benoitletondor.easybudgetapp.model.Expense
