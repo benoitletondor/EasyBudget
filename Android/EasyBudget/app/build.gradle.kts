@@ -150,7 +150,7 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.activity:activity-compose:1.9.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3")
-    implementation("androidx.navigation:navigation-compose:2.8.0-beta04")
+    implementation("androidx.navigation:navigation-compose:2.8.0-beta05")
     implementation("com.google.accompanist:accompanist-themeadapter-material3:0.34.0")
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
