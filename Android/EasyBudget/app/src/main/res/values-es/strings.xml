@@ -358,6 +358,8 @@
     <string name="expense_edit_unable_to_load_db_error_title">No se puede acceder a la base de datos</string>
     <string name="expense_edit_unable_to_load_db_error_message">No se puede acceder a la base de datos para continuar con su gasto. Verifique su red y reinicie la aplicación.</string>
     <string name="expense_edit_unable_to_load_db_error_cta">Cancelar</string>
+    <string name="expense_edit_error_saving_title">¡Ups</string>
+    <string name="expense_edit_error_saving_message">Se produjo un error al persistir la entrada. Inténtalo de nuevo y reinicia la aplicación si persiste.</string>
     <string name="account_management_account_left_confirmation">Cuenta abandonada con éxito</string>
     <string name="account_management_account_name_updated_confirmation">Nombre de cuenta actualizado con éxito</string>
     <string name="account_management_error_title">¡Ups</string>
@@ -478,4 +480,6 @@
     <string name="update_three_dot_two_notification_title">Nuevo en EasyBudget</string>
     <string name="update_three_dot_two_notification_message">¡Como usuario Pro, ahora puedes exportar tus informes mensuales como CSV!</string>
     <string name="update_three_dot_two_notification_cta">Descubrir</string>
+    <string name="settings_error_loading_title">No se pueden cargar las configuraciones</string>
+    <string name="settings_error_loading_description">Se produjo un error al cargar la configuración. Por favor, inténtalo de nuevo.\n(%s)</string>
 </resources>

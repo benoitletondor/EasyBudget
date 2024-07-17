@@ -268,6 +268,16 @@ private fun Int.toDayOfWeek(): DayOfWeek {
     }
 }
 
+private lateinit var userAllowingUpdatePushesFlow: MutableStateFlow<Boolean>
+
+fun Parameters.watchUserAllowingUpdatePushes(): StateFlow<Boolean> {
+    if (!::userAllowingUpdatePushesFlow.isInitialized) {
+        userAllowingUpdatePushesFlow = MutableStateFlow(isUserAllowingUpdatePushes())
+    }
+
+    return userAllowingUpdatePushesFlow
+}
+
 /**
  * The user wants or not to receive notification about updates
  *
@@ -283,7 +293,22 @@ fun Parameters.isUserAllowingUpdatePushes(): Boolean {
  * @param value if the user wants or not to receive notifications about updates
  */
 fun Parameters.setUserAllowUpdatePushes(value: Boolean) {
+    if (!::userAllowingUpdatePushesFlow.isInitialized) {
+        userAllowingUpdatePushesFlow = MutableStateFlow(value)
+    }
+
+    userAllowingUpdatePushesFlow.value = value
     putBoolean(USER_ALLOW_UPDATE_PUSH_PARAMETERS_KEY, value)
+}
+
+private lateinit var userAllowingDailyReminderPushesFlow: MutableStateFlow<Boolean>
+
+fun Parameters.watchUserAllowingDailyReminderPushes(): StateFlow<Boolean> {
+    if (!::userAllowingDailyReminderPushesFlow.isInitialized) {
+        userAllowingDailyReminderPushesFlow = MutableStateFlow(isUserAllowingDailyReminderPushes())
+    }
+
+    return userAllowingDailyReminderPushesFlow
 }
 
 /**
@@ -301,7 +326,22 @@ fun Parameters.isUserAllowingDailyReminderPushes(): Boolean {
  * @param value if the user wants or not to receive daily notifications
  */
 fun Parameters.setUserAllowDailyReminderPushes(value: Boolean) {
+    if (!::userAllowingDailyReminderPushesFlow.isInitialized) {
+        userAllowingDailyReminderPushesFlow = MutableStateFlow(value)
+    }
+
+    userAllowingDailyReminderPushesFlow.value = value
     putBoolean(USER_ALLOW_DAILY_PUSH_PARAMETERS_KEY, value)
+}
+
+private lateinit var userAllowingMonthlyReminderPushesFlow: MutableStateFlow<Boolean>
+
+fun Parameters.watchUserAllowingMonthlyReminderPushes(): StateFlow<Boolean> {
+    if (!::userAllowingMonthlyReminderPushesFlow.isInitialized) {
+        userAllowingMonthlyReminderPushesFlow = MutableStateFlow(isUserAllowingMonthlyReminderPushes())
+    }
+
+    return userAllowingMonthlyReminderPushesFlow
 }
 
 /**
@@ -319,6 +359,11 @@ fun Parameters.isUserAllowingMonthlyReminderPushes(): Boolean {
  * @param value if the user wants or not to receive monthly notifications
  */
 fun Parameters.setUserAllowMonthlyReminderPushes(value: Boolean) {
+    if (!::userAllowingMonthlyReminderPushesFlow.isInitialized) {
+        userAllowingMonthlyReminderPushesFlow = MutableStateFlow(value)
+    }
+
+    userAllowingMonthlyReminderPushesFlow.value = value
     putBoolean(USER_ALLOW_MONTHLY_PUSH_PARAMETERS_KEY, value)
 }
 
@@ -338,6 +383,16 @@ fun Parameters.setUserHasCompleteRating() {
     putBoolean(RATING_COMPLETED_PARAMETERS_KEY, true)
 }
 
+private lateinit var userSawMonthlyReportHintFlow: MutableStateFlow<Boolean>
+
+fun Parameters.watchUserSawMonthlyReportHint(): StateFlow<Boolean> {
+    if (!::userSawMonthlyReportHintFlow.isInitialized) {
+        userSawMonthlyReportHintFlow = MutableStateFlow(hasUserSawMonthlyReportHint())
+    }
+
+    return userSawMonthlyReportHintFlow
+}
+
 /**
  * Has the user saw the monthly report hint so far
  *
@@ -351,7 +406,22 @@ fun Parameters.hasUserSawMonthlyReportHint(): Boolean {
  * Set that the user saw the monthly report hint
  */
 fun Parameters.setUserSawMonthlyReportHint() {
+    if (!::userSawMonthlyReportHintFlow.isInitialized) {
+        userSawMonthlyReportHintFlow = MutableStateFlow(true)
+    }
+
+    userSawMonthlyReportHintFlow.value = true
     putBoolean(USER_SAW_MONTHLY_REPORT_HINT_PARAMETERS_KEY, true)
+}
+
+private lateinit var themeFlow: MutableStateFlow<AppTheme>
+
+fun Parameters.watchTheme(): StateFlow<AppTheme> {
+    if (!::themeFlow.isInitialized) {
+        themeFlow = MutableStateFlow(getTheme())
+    }
+
+    return themeFlow
 }
 
 fun Parameters.getTheme(): AppTheme {
@@ -360,7 +430,22 @@ fun Parameters.getTheme(): AppTheme {
 }
 
 fun Parameters.setTheme(theme: AppTheme) {
+    if (!::themeFlow.isInitialized) {
+        themeFlow = MutableStateFlow(theme)
+    }
+
+    themeFlow.value = theme
     putInt(APP_THEME_PARAMETERS_KEY, theme.value)
+}
+
+private lateinit var isBackupEnabledFlow: MutableStateFlow<Boolean>
+
+fun Parameters.watchIsBackupEnabled(): StateFlow<Boolean> {
+    if (!::isBackupEnabledFlow.isInitialized) {
+        isBackupEnabledFlow = MutableStateFlow(isBackupEnabled())
+    }
+
+    return isBackupEnabledFlow
 }
 
 fun Parameters.isBackupEnabled(): Boolean {
@@ -368,7 +453,22 @@ fun Parameters.isBackupEnabled(): Boolean {
 }
 
 fun Parameters.setBackupEnabled(enabled: Boolean) {
+    if (!::isBackupEnabledFlow.isInitialized) {
+        isBackupEnabledFlow = MutableStateFlow(enabled)
+    }
+
+    isBackupEnabledFlow.value = enabled
     putBoolean(BACKUP_ENABLED_PARAMETERS_KEY, enabled)
+}
+
+private lateinit var lastBackupDateFlow: MutableStateFlow<Date?>
+
+fun Parameters.watchLastBackupDate(): StateFlow<Date?> {
+    if (!::lastBackupDateFlow.isInitialized) {
+        lastBackupDateFlow = MutableStateFlow(getLastBackupDate())
+    }
+
+    return lastBackupDateFlow
 }
 
 fun Parameters.getLastBackupDate(): Date? {
@@ -381,6 +481,11 @@ fun Parameters.getLastBackupDate(): Date? {
 }
 
 fun Parameters.saveLastBackupDate(date: Date?) {
+    if (!::lastBackupDateFlow.isInitialized) {
+        lastBackupDateFlow = MutableStateFlow(date)
+    }
+
+    lastBackupDateFlow.value = date
     if( date != null ) {
         putLong(LAST_BACKUP_TIMESTAMP, date.time)
     } else {
@@ -419,14 +524,44 @@ fun Parameters.setShouldShowCheckedBalance(shouldShow: Boolean) {
     putBoolean(SHOULD_SHOW_CHECKED_BALANCE, shouldShow)
 }
 
+private lateinit var latestSelectedOnlineAccountIdFlow: MutableStateFlow<String?>
+
+fun Parameters.watchLatestSelectedOnlineAccountId(): StateFlow<String?> {
+    if (!::latestSelectedOnlineAccountIdFlow.isInitialized) {
+        latestSelectedOnlineAccountIdFlow = MutableStateFlow(getLatestSelectedOnlineAccountId())
+    }
+
+    return latestSelectedOnlineAccountIdFlow
+}
+
 fun Parameters.getLatestSelectedOnlineAccountId(): String? {
     return getString(SELECTED_ACCOUNT_ID_KEY)
 }
 
 fun Parameters.setLatestSelectedOnlineAccountId(accountId: String?) {
+    if (!::latestSelectedOnlineAccountIdFlow.isInitialized) {
+        latestSelectedOnlineAccountIdFlow = MutableStateFlow(accountId)
+    }
+
+    latestSelectedOnlineAccountIdFlow.value = accountId
+
     if (accountId != null) {
         putString(SELECTED_ACCOUNT_ID_KEY, accountId)
     } else {
         remove(SELECTED_ACCOUNT_ID_KEY)
     }
+}
+
+/**
+ * The current onboarding step (int)
+ */
+private const val ONBOARDING_STEP_PARAMETERS_KEY = "onboarding_step"
+const val ONBOARDING_STEP_COMPLETED = Integer.MAX_VALUE
+
+fun Parameters.getOnboardingStep(): Int {
+    return getInt(ONBOARDING_STEP_PARAMETERS_KEY, 0)
+}
+
+fun Parameters.setOnboardingStep(step: Int) {
+    putInt(ONBOARDING_STEP_PARAMETERS_KEY, step)
 }

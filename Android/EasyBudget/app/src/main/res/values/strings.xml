@@ -179,11 +179,6 @@
     <string name="setting_category_app_version_message">Made by @BenoitLetondor</string>
     <string name="setting_category_share_app_title">Tell your friends</string>
     <string name="setting_category_share_app_message">EasyBudget is free, so why not share it with your friends!</string>
-    <string name="setting_category_dev_title" translatable="false">Dev</string>
-    <string name="setting_category_show_welcome_screen_button_title" translatable="false">Show welcome screen</string>
-    <string name="setting_category_show_premium" translatable="false">Show premium screen</string>
-    <string name="setting_category_show_login" translatable="false">Show login</string>
-    <string name="setting_category_show_create_account" translatable="false">Show create account</string>
     <string name="setting_category_premium_title">Subscription</string>
     <string name="setting_category_not_premium_title" translatable="false">Premium / Pro</string>
     <string name="setting_category_premium_status_title">You are premium!</string>
@@ -382,6 +377,9 @@
     <string name="expense_edit_unable_to_load_db_error_message">Cannot access the database to persist your expense. Please check your network and relaunch the app.</string>
     <string name="expense_edit_unable_to_load_db_error_cta">Cancel</string>
 
+    <string name="expense_edit_error_saving_title">Oops</string>
+    <string name="expense_edit_error_saving_message">An error occurred while persisting the entry. Please try again and restart the app if it persists.</string>
+
     <string name="account_management_account_left_confirmation">Account left successfully</string>
     <string name="account_management_account_name_updated_confirmation">Account name updated successfully</string>
     <string name="account_management_error_title">Oops</string>
@@ -507,46 +505,11 @@
     <string name="update_three_dot_two_notification_message">As a Pro user, you can now export your monthly reports as CSV!</string>
     <string name="update_three_dot_two_notification_cta">Discover</string>
 
-    <!-- Keys, not for translations. -->
-    <string name="setting_category_bug_report_send_button_key" translatable="false">send_bug_report</string>
-    <string name="setting_category_show_welcome_screen_button_key" translatable="false">show_welcome_screen</string>
-    <string name="setting_category_limit_set_button_key" translatable="false">limit_set</string>
-    <string name="setting_category_currency_change_button_key" translatable="false">change_currency</string>
-    <string name="setting_category_dev_key" translatable="false">dev_category</string>
-    <string name="setting_category_rate_button_key" translatable="false">rate</string>
-    <string name="setting_category_app_version_key" translatable="false">app_version</string>
-    <string name="setting_category_share_app_key" translatable="false">share_app</string>
-    <string name="setting_category_premium_key" translatable="false">category_premium</string>
-    <string name="setting_category_not_premium_key" translatable="false">category_not_premium</string>
-    <string name="setting_category_premium_status_key" translatable="false">premium</string>
-    <string name="setting_category_premium_redeem_key" translatable="false">redeem</string>
-    <string name="setting_category_notifications_update_key" translatable="false">update_notifs</string>
-    <string name="setting_category_show_checked_balance_key" translatable="false">show_checked_balance</string>
-    <string name="setting_category_notifications_daily_key" translatable="false">daily_notifs</string>
-    <string name="setting_category_notifications_monthly_key" translatable="false">monthly_notifs</string>
-    <string name="setting_category_app_theme_key" translatable="false">app_theme</string>
-    <string name="setting_category_not_premium_status_key" translatable="false">not_premium</string>
-    <string name="setting_category_dev_show_premium_key" translatable="false">show_premium</string>
-    <string name="setting_category_dev_show_login" translatable="false">show_login</string>
-    <string name="setting_category_dev_show_create_account" translatable="false">show_create_account</string>
-    <string name="setting_category_start_day_of_week_key" translatable="false">start_day_of_week</string>
-    <string name="setting_category_backup" translatable="false">backup</string>
-
-    <string-array name="themes">
-        <item>@string/setting_theme_light</item>
-        <item>@string/setting_theme_dark</item>
-        <item>@string/setting_theme_platform</item>
-    </string-array>
-
-    <string-array name="themesData">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-    </string-array>
-
     <string name="setting_notification_permission_rejected_dialog_title">Notifications permission denied</string>
     <string name="setting_notification_permission_rejected_dialog_description">To receive your premium daily and monthly reminders, you need to allow notifications. Do you want to receive notifications?</string>
     <string name="setting_notification_permission_rejected_dialog_accept_cta">Allow</string>
     <string name="setting_notification_permission_rejected_dialog_not_now_cta">Not now</string>
+    <string name="settings_error_loading_title">Unable to load settings</string>
+    <string name="settings_error_loading_description">An error occurred while loading settings. Please try again.\n(%s)</string>
 </resources>
 

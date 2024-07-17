@@ -49,8 +49,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-    private var usedOnlineDB: CachedOnlineDBImpl? = null
-
     @Provides
     @Singleton
     fun provideIab(
@@ -64,6 +62,10 @@ object AppModule {
     @Provides
     @Singleton
     fun provideAccounts(): Accounts = FirebaseAccounts(Firebase.firestore)
+
+    @Provides
+    @Singleton
+    fun provideCurrentDBProvider(): CurrentDBProvider = CurrentDBProvider(activeDB = null)
 
     @Provides
     @Singleton
@@ -81,7 +83,8 @@ object AppModule {
         OfflineDBImpl(RoomDB.create(context)),
     )
 
-    private var app: App? = null;
+    private var app: App? = null
+    private var usedOnlineDB: CachedOnlineDBImpl? = null
 
     suspend fun provideSyncedOnlineDBOrThrow(
         currentUser: CurrentUser,

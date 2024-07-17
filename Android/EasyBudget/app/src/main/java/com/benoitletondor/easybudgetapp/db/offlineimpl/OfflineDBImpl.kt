@@ -49,6 +49,10 @@ class OfflineDBImpl(private val roomDB: RoomDB) : DB {
         roomDB.expenseDao().checkpoint(SimpleSQLiteQuery("pragma wal_checkpoint(full)"))
     }
 
+    override suspend fun forceCacheWipe() {
+        /* No-op as this is a non-cached implementation */
+    }
+
     override suspend fun persistExpense(expense: Expense): Expense {
         val newId = roomDB.expenseDao().persistExpense(expense.toExpenseEntity())
 
@@ -58,8 +62,8 @@ class OfflineDBImpl(private val roomDB: RoomDB) : DB {
     }
 
     override suspend fun getDataForMonth(yearMonth: YearMonth): DataForMonth {
-        val startDate = yearMonth.atStartOfMonth().minusDays(DataForMonth.numberOfLeewayDays)
-        val endDate = yearMonth.atEndOfMonth().plusDays(DataForMonth.numberOfLeewayDays)
+        val startDate = yearMonth.atStartOfMonth().minusDays(DataForMonth.NUMBER_OF_LEEWAY_DAYS)
+        val endDate = yearMonth.atEndOfMonth().plusDays(DataForMonth.NUMBER_OF_LEEWAY_DAYS)
 
         var balance = roomDB.expenseDao().getBalanceForDay(startDate.minusDays(1)).getRealValueFromDB()
         var checkedBalance = roomDB.expenseDao().getCheckedBalanceForDay(startDate.minusDays(1)).getRealValueFromDB()

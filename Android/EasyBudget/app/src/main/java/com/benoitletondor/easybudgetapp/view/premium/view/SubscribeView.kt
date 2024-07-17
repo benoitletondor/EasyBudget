@@ -56,7 +56,6 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -64,10 +63,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.benoitletondor.easybudgetapp.R
 import com.benoitletondor.easybudgetapp.iab.Pricing
-import com.benoitletondor.easybudgetapp.theme.AppTheme
-import com.benoitletondor.easybudgetapp.theme.easyBudgetGreenColor
-import com.benoitletondor.easybudgetapp.theme.easyBudgetGreenDarkColor
-import com.benoitletondor.easybudgetapp.view.premium.PremiumViewModel
+import com.benoitletondor.easybudgetapp.compose.AppTheme
+import com.benoitletondor.easybudgetapp.compose.easyBudgetGreenColor
+import com.benoitletondor.easybudgetapp.compose.easyBudgetGreenDarkColor
 
 private val starsYellowColor = Color(0xFFFEE101)
 private val starsGreyColor = Color(0xFFD7D7D7)

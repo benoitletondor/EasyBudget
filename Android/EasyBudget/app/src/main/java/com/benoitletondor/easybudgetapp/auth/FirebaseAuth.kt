@@ -18,6 +18,8 @@ package com.benoitletondor.easybudgetapp.auth
 
 import android.app.Activity
 import android.content.Intent
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.result.ActivityResult
 import com.benoitletondor.easybudgetapp.helper.Logger
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
@@ -29,8 +31,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-
-private const val SIGN_IN_REQUEST_CODE = 10524
 
 class FirebaseAuth(
     private val auth: com.google.firebase.auth.FirebaseAuth,
@@ -45,16 +45,15 @@ class FirebaseAuth(
         }
     }
 
-    override fun startAuthentication(activity: Activity) {
+    override fun startAuthentication(launcher: ManagedActivityResultLauncher<Intent, ActivityResult>) {
         currentState.value = AuthState.Authenticating
 
         try {
-            activity.startActivityForResult(
+            launcher.launch(
                 AuthUI.getInstance()
                     .createSignInIntentBuilder()
                     .setAvailableProviders(listOf(AuthUI.IdpConfig.GoogleBuilder().build()))
-                    .build(),
-                SIGN_IN_REQUEST_CODE
+                    .build()
             )
         } catch (error: Throwable) {
             Logger.error("FirebaseAuth", "Error launching auth activity", error)
@@ -63,22 +62,19 @@ class FirebaseAuth(
 
     }
 
-    override fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == SIGN_IN_REQUEST_CODE) {
-
-            if (resultCode != Activity.RESULT_OK) {
-                val response = IdpResponse.fromResultIntent(data)
-                if( response != null ) {
-                    Logger.error(
-                        "FirebaseAuth",
-                        "Error while authenticating: ${response.error?.errorCode}: ${response.error?.localizedMessage}",
-                        response.error
-                    )
-                }
+    override fun handleActivityResult(resultCode: Int, data: Intent?) {
+        if (resultCode != Activity.RESULT_OK) {
+            val response = IdpResponse.fromResultIntent(data)
+            if( response != null ) {
+                Logger.error(
+                    "FirebaseAuth",
+                    "Error while authenticating: ${response.error?.errorCode}: ${response.error?.localizedMessage}",
+                    response.error
+                )
             }
-
-            updateAuthState()
         }
+
+        updateAuthState()
     }
 
     override fun logout() {
