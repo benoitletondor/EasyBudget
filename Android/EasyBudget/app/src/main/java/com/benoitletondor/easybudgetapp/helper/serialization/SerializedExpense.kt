@@ -13,7 +13,7 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package com.benoitletondor.easybudgetapp.helper
+package com.benoitletondor.easybudgetapp.helper.serialization
 
 import android.os.Parcelable
 import com.benoitletondor.easybudgetapp.model.AssociatedRecurringExpense
@@ -22,8 +22,6 @@ import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
-import java.net.URLDecoder
-import java.net.URLEncoder
 import java.time.LocalDate
 
 @Serializable
@@ -38,7 +36,7 @@ data class SerializedExpense(
 ) : Parcelable {
     constructor(expense: Expense) : this(
         expense.id,
-        URLEncoder.encode(expense.title, "UTF-8"),
+        expense.title.serializeForNavigation(),
         expense.amount,
         expense.date.toEpochDay(),
         expense.checked,
@@ -47,7 +45,7 @@ data class SerializedExpense(
 
     fun toExpense(): Expense = Expense(
         id,
-        URLDecoder.decode(title, "UTF-8"),
+        title.deserializeForNavigation(),
         amount,
         LocalDate.ofEpochDay(date),
         checked,
@@ -84,7 +82,7 @@ data class SerializedRecurringExpense(
 ) : Parcelable {
     constructor(recurringExpense: RecurringExpense) : this(
         recurringExpense.id,
-        URLEncoder.encode(recurringExpense.title, "UTF-8"),
+        recurringExpense.title.serializeForNavigation(),
         recurringExpense.amount,
         recurringExpense.recurringDate.toEpochDay(),
         recurringExpense.modified,
@@ -93,7 +91,7 @@ data class SerializedRecurringExpense(
 
     fun toRecurringExpense() = RecurringExpense(
         id,
-        URLDecoder.decode(title, "UTF-8"),
+        title.deserializeForNavigation(),
         amount,
         LocalDate.ofEpochDay(recurringDate),
         modified,

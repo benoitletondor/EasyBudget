@@ -1,4 +1,4 @@
-package com.benoitletondor.easybudgetapp.helper
+package com.benoitletondor.easybudgetapp.helper.serialization
 
 import android.os.Parcelable
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
