@@ -158,7 +158,7 @@ fun OnboardingPageAccountAmount(
                     ),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number,
+                        keyboardType = KeyboardType.Decimal,
                         autoCorrectEnabled = false,
                     ),
                 )

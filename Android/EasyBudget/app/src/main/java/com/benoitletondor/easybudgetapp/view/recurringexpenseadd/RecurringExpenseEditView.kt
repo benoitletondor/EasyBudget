@@ -307,7 +307,7 @@ private fun RecurringExpenseEditView(
                                 label = if (amountValueError != null) "${stringResource(R.string.amount, currency.symbol)}: $amountValueError" else stringResource(
                                     R.string.amount, currency.symbol),
                                 keyboardOptions = KeyboardOptions(
-                                    keyboardType = KeyboardType.Number,
+                                    keyboardType = KeyboardType.Decimal,
                                 )
                             )
 
