@@ -360,7 +360,7 @@ private fun MainView(
                                 )
                             ),
                             actionLabel = context.getString(R.string.undo),
-                            duration = SnackbarDuration.Long,
+                            duration = SnackbarDuration.Short,
                         )
 
                         if (result === SnackbarResult.ActionPerformed) {
@@ -401,7 +401,7 @@ private fun MainView(
                         val result = snackbarHostState.showSnackbar(
                             message = context.getString(if (deletedExpense.isRevenue()) R.string.income_delete_snackbar_text else R.string.expense_delete_snackbar_text),
                             actionLabel = context.getString(R.string.undo),
-                            duration = SnackbarDuration.Long,
+                            duration = SnackbarDuration.Short,
                         )
 
                         if (result === SnackbarResult.ActionPerformed) {
@@ -447,7 +447,7 @@ private fun MainView(
                                 val result = snackbarHostState.showSnackbar(
                                     message = context.getString(R.string.recurring_expense_delete_success_message),
                                     actionLabel = context.getString(R.string.undo),
-                                    duration = SnackbarDuration.Long,
+                                    duration = SnackbarDuration.Short,
                                 )
 
                                 if (result === SnackbarResult.ActionPerformed) {
@@ -474,7 +474,7 @@ private fun MainView(
                                 snackbarHostState.showSnackbar(
                                     message = context.getString(R.string.recurring_expense_restored_success_message),
                                     actionLabel = context.getString(R.string.undo),
-                                    duration = SnackbarDuration.Long,
+                                    duration = SnackbarDuration.Short,
                                 )
                             }
                         }
