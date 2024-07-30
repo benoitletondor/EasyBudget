@@ -32,8 +32,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.delete
+import androidx.compose.foundation.text.input.insert
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -56,6 +58,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -71,7 +74,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -90,6 +92,7 @@ import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.serialization.Serializable
 import java.time.LocalDate
 import java.time.ZoneId
@@ -235,32 +238,28 @@ private fun RecurringExpenseEditView(
                             .padding(horizontal = 26.dp)
                             .padding(top = 10.dp, bottom = 30.dp),
                     ) {
-                        var descriptionTextFieldValue by remember { mutableStateOf(
-                            TextFieldValue(
-                                text = state.expense.title,
-                                selection = TextRange(index = state.expense.title.length),
-                            )
-                        ) }
+                        val descriptionTextFieldState = rememberTextFieldState(initialText = state.expense.title)
+
+                        LaunchedEffect(key1 = "descriptionTextFieldStateWatcher") {
+                            snapshotFlow { descriptionTextFieldState.text }
+                                .collectLatest { text ->
+                                    titleValueError = null
+                                    onTitleUpdate(text.toString())
+                                }
+                        }
 
                         ExpenseEditTextField(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .focusRequester(titleFocusRequester),
-                            value = descriptionTextFieldValue,
-                            onValueChange = {
-                                descriptionTextFieldValue = it
-                                titleValueError = null
-                                onTitleUpdate(it.text)
-                            },
+                            state = descriptionTextFieldState,
                             isError = titleValueError != null,
                             label = if (titleValueError != null ) "${stringResource(R.string.description)}: $titleValueError" else stringResource(
                                 R.string.description),
-                            keyboardActions = KeyboardActions(
-                                onNext = {
-                                    titleFocusRequester.freeFocus()
-                                    amountFocusRequester.requestFocus()
-                                },
-                            ),
+                            onKeyboardAction = {
+                                titleFocusRequester.freeFocus()
+                                amountFocusRequester.requestFocus()
+                            },
                             keyboardOptions = KeyboardOptions(
                                 imeAction = ImeAction.Next,
                                 keyboardType = KeyboardType.Text,
@@ -276,33 +275,33 @@ private fun RecurringExpenseEditView(
                         ) {
                             val currency by userCurrencyFlow.collectAsState()
 
-                            var currentAmountTextFieldValue by remember { mutableStateOf(
-                                TextFieldValue(
-                                    text = if (state.expense.amount == 0.0) "" else CurrencyHelper.getFormattedAmountValue(
-                                        abs(state.expense.amount)
-                                    ),
-                                    selection = TextRange(index = if (state.expense.amount == 0.0) 0 else CurrencyHelper.getFormattedAmountValue(
-                                        abs(state.expense.amount)
-                                    ).length),
-                                )
-                            ) }
+                            val currentAmountTextFieldState = rememberTextFieldState(
+                                initialText = if (state.expense.amount == 0.0) "" else CurrencyHelper.getFormattedAmountValue(abs(state.expense.amount)),
+                                initialSelection = TextRange(index = if (state.expense.amount == 0.0) 0 else CurrencyHelper.getFormattedAmountValue(abs(state.expense.amount)).length),
+                            )
+
+                            LaunchedEffect(key1 = "currentAmountTextFieldStateWatcher") {
+                                snapshotFlow { currentAmountTextFieldState.text }
+                                    .collectLatest { text ->
+                                        val newText = text.toString().sanitizeFromUnsupportedInputForDecimals(supportsNegativeValue = false)
+
+                                        if (newText !== text) {
+                                            currentAmountTextFieldState.edit {
+                                                delete(0, text.length)
+                                                insert(0, newText)
+                                            }
+                                        }
+
+                                        amountValueError = null
+                                        onAmountUpdate(newText)
+                                    }
+                            }
 
                             ExpenseEditTextField(
                                 modifier = Modifier
                                     .weight(0.5f)
                                     .focusRequester(amountFocusRequester),
-                                value = currentAmountTextFieldValue,
-                                onValueChange = { newValue ->
-                                    val newText = newValue.text.sanitizeFromUnsupportedInputForDecimals(supportsNegativeValue = false)
-
-                                    currentAmountTextFieldValue = TextFieldValue(
-                                        text = newText,
-                                        selection = newValue.selection,
-                                    )
-
-                                    amountValueError = null
-                                    onAmountUpdate(newText)
-                                },
+                                state = currentAmountTextFieldState,
                                 isError = amountValueError != null,
                                 label = if (amountValueError != null) "${stringResource(R.string.amount, currency.symbol)}: $amountValueError" else stringResource(
                                     R.string.amount, currency.symbol),
