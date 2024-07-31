@@ -40,8 +40,8 @@ android {
         compileSdk = 34
         minSdk = 23
         targetSdk = 35
-        versionCode = 148
-        versionName = "3.3.1"
+        versionCode = 149
+        versionName = "3.3.2"
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -122,10 +122,10 @@ dependencies {
 
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.activity:activity-ktx:1.9.0")
+    implementation("androidx.activity:activity-ktx:1.9.1")
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.3")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.4")
     implementation("androidx.work:work-runtime-ktx:2.9.0")
     implementation("androidx.work:work-gcm:2.9.0")
     implementation("com.google.android.play:review-ktx:2.0.1")
@@ -148,9 +148,13 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.ui:ui")
-    implementation("androidx.activity:activity-compose:1.9.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3")
-    implementation("androidx.navigation:navigation-compose:2.8.0-beta05")
+    implementation("androidx.activity:activity-compose:1.9.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.4")
+
+    // TODO migrate to bom when 1.7.0 is stable
+    implementation("androidx.compose.foundation:foundation:1.7.0-beta06")
+    implementation("androidx.navigation:navigation-compose:2.8.0-beta06")
+
     implementation("com.google.accompanist:accompanist-themeadapter-material3:0.34.0")
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
@@ -170,7 +174,7 @@ dependencies {
 
     implementation("io.realm.kotlin:library-sync:$realmVersion")
 
-    implementation("com.kizitonwose.calendar:compose:2.6.0-beta02")
+    implementation("com.kizitonwose.calendar:compose:2.6.0-beta03")
     implementation("net.sf.biweekly:biweekly:0.6.8")
 
     implementation("net.lingala.zip4j:zip4j:2.11.5")
