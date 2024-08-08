@@ -17,6 +17,7 @@ package com.benoitletondor.easybudgetapp.view.main
 
 import android.app.ProgressDialog
 import android.content.res.Configuration
+import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
@@ -500,6 +501,7 @@ private fun MainView(
                 is MainViewModel.Event.StartCurrentBalanceEditor -> {
                     val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_adjust_balance, null)
                     val amountEditText = dialogView.findViewById<EditText>(R.id.balance_amount)
+                    amountEditText.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL or InputType.TYPE_NUMBER_FLAG_SIGNED
                     amountEditText.setText(
                         if (event.currentBalance == 0.0) "0" else CurrencyHelper.getFormattedAmountValue(
                             event.currentBalance
