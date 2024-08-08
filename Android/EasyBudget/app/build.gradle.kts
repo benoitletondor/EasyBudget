@@ -37,7 +37,7 @@ android {
 
     defaultConfig {
         applicationId = "com.benoitletondor.easybudgetapp"
-        compileSdk = 34
+        compileSdk = 35
         minSdk = 23
         targetSdk = 35
         versionCode = 149
@@ -126,8 +126,8 @@ dependencies {
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.4")
-    implementation("androidx.work:work-runtime-ktx:2.9.0")
-    implementation("androidx.work:work-gcm:2.9.0")
+    implementation("androidx.work:work-runtime-ktx:2.9.1")
+    implementation("androidx.work:work-gcm:2.9.1")
     implementation("com.google.android.play:review-ktx:2.0.1")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
@@ -152,8 +152,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.4")
 
     // TODO migrate to bom when 1.7.0 is stable
-    implementation("androidx.compose.foundation:foundation:1.7.0-beta06")
-    implementation("androidx.navigation:navigation-compose:2.8.0-beta06")
+    implementation("androidx.compose.foundation:foundation:1.7.0-beta07")
+    implementation("androidx.navigation:navigation-compose:2.8.0-beta07")
 
     implementation("com.google.accompanist:accompanist-themeadapter-material3:0.34.0")
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
@@ -174,7 +174,7 @@ dependencies {
 
     implementation("io.realm.kotlin:library-sync:$realmVersion")
 
-    implementation("com.kizitonwose.calendar:compose:2.6.0-beta03")
+    implementation("com.kizitonwose.calendar:compose:2.6.0-beta04")
     implementation("net.sf.biweekly:biweekly:0.6.8")
 
     implementation("net.lingala.zip4j:zip4j:2.11.5")
