@@ -285,7 +285,7 @@ private fun RecurringExpenseEditView(
                                     .collectLatest { text ->
                                         val newText = text.toString().sanitizeFromUnsupportedInputForDecimals(supportsNegativeValue = false)
 
-                                        if (newText !== text) {
+                                        if (newText != text) {
                                             currentAmountTextFieldState.edit {
                                                 delete(0, text.length)
                                                 insert(0, newText)
