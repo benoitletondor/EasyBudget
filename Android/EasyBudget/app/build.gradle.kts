@@ -40,8 +40,8 @@ android {
         compileSdk = 35
         minSdk = 23
         targetSdk = 35
-        versionCode = 149
-        versionName = "3.3.2"
+        versionCode = 150
+        versionName = "3.3.3"
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -76,7 +76,7 @@ android {
 
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
     signingConfigs {
