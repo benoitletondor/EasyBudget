@@ -290,7 +290,6 @@ class OnlineDBImpl(
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
 
         val sumOfRecurringCheckedExpenseUpToTheDay = recurringExpenses
-            .asSequence()
             .map { it.generateExpenses(from = null, to = dayDate) }
             .flatten()
             .filter { it.checked }
