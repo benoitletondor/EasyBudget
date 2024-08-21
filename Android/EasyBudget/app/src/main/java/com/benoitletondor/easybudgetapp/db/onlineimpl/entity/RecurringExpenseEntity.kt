@@ -39,6 +39,8 @@ import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.Index
 import io.realm.kotlin.types.annotations.PrimaryKey
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.security.SecureRandom
 import java.time.LocalDate
 import java.util.Date
@@ -67,8 +69,12 @@ class RecurringExpenseEntity() : RealmObject {
         this.accountSecret = account.secret
     }
 
-    fun toRecurringExpense(): RecurringExpense {
-        val event = getCal().events
+    suspend fun toRecurringExpense(): RecurringExpense = withContext(Dispatchers.Default) {
+        toRecurringExpenseBlocking()
+    }
+
+    private fun toRecurringExpenseBlocking(): RecurringExpense {
+        val event = getCalBlocking().events
             .filterExceptions()
             .last()
 
@@ -87,12 +93,12 @@ class RecurringExpenseEntity() : RealmObject {
         )
     }
 
-    fun generateExpenses(from: LocalDate?, to: LocalDate): List<Expense> {
+    suspend fun generateExpenses(from: LocalDate?, to: LocalDate): List<Expense> {
         return getCal().getExpenses(from, to, toRecurringExpense())
     }
 
     fun addExceptionFromExpense(expense: Expense, originalOccurrenceDate: LocalDate) {
-        val cal = getCal()
+        val cal = getCalBlocking()
         cal.addExceptionFromExpense(expense, originalOccurrenceDate)
         iCalRepresentation = cal.write()
     }
@@ -127,7 +133,7 @@ class RecurringExpenseEntity() : RealmObject {
     }
 
     fun deleteOccurrence(occurrenceDate: LocalDate, originalOccurrenceDate: LocalDate) {
-        val cal = getCal()
+        val cal = getCalBlocking()
 
         val exceptionEvent = VEvent()
         exceptionEvent.dateStart = DateStart(occurrenceDate.toStartOfDayDate(), false)
@@ -153,7 +159,7 @@ class RecurringExpenseEntity() : RealmObject {
     }
 
     fun deleteOccurrencesAfterDate(date: LocalDate) {
-        val cal = getCal()
+        val cal = getCalBlocking()
 
         cal.events
             .filterExceptions()
@@ -175,7 +181,7 @@ class RecurringExpenseEntity() : RealmObject {
     }
 
     fun deleteOccurrencesBeforeDate(date: LocalDate) {
-        val cal = getCal()
+        val cal = getCalBlocking()
 
         cal.events
             .filterExceptions()
@@ -202,7 +208,7 @@ class RecurringExpenseEntity() : RealmObject {
         afterDate: LocalDate,
         newRecurringExpense: RecurringExpense,
     ) {
-        val cal = getCal()
+        val cal = getCalBlocking()
 
         // Put an end date to all existing events (and memoize the biggest existing end date to re-apply it to the new event later)
         var newEventEndDate: Date? = null
@@ -241,7 +247,7 @@ class RecurringExpenseEntity() : RealmObject {
     }
 
     fun getFirstOccurrenceDate(): LocalDate {
-        val cal = getCal()
+        val cal = getCalBlocking()
 
         val firstEventTimestamp = cal.events
             .filter { !it.status.isCancelled }
@@ -251,8 +257,8 @@ class RecurringExpenseEntity() : RealmObject {
         return localDateFromTimestamp(firstEventTimestamp)
     }
 
-    fun getFirstOccurrence(): Expense {
-        val cal = getCal()
+    suspend fun getFirstOccurrence(): Expense {
+        val cal = getCalBlocking()
         val event = cal.events.first()
 
         val firstOccurrenceDate = localDateFromTimestamp(event.dateStart.value.time)
@@ -264,8 +270,8 @@ class RecurringExpenseEntity() : RealmObject {
     }
 
     fun markAllOccurrencesAsChecked(beforeDate: LocalDate) {
-        val cal = getCal()
-        val expenses = cal.getExpenses(from = null, beforeDate, toRecurringExpense())
+        val cal = getCalBlocking()
+        val expenses = cal.getExpenses(from = null, beforeDate, toRecurringExpenseBlocking())
         for (expense in expenses) {
             if (expense.date == beforeDate) {
                 continue
@@ -280,11 +286,15 @@ class RecurringExpenseEntity() : RealmObject {
         iCalRepresentation = cal.write()
     }
 
-    private fun getCal(): ICalendar = Biweekly.parse(iCalRepresentation)
+    private fun getCalBlocking(): ICalendar = Biweekly.parse(iCalRepresentation)
         .first()
         .apply {
             setProductId(null as String?)
         }
+
+    private suspend fun getCal(): ICalendar = withContext(Dispatchers.Default) {
+        getCalBlocking()
+    }
 
     private data class EventInRange(
         val event: VEvent,
