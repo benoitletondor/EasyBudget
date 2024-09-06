@@ -213,7 +213,7 @@
     <string name="premium_popup_not_premium_feature2_title">1. Monthly report</string>
     <string name="premium_popup_not_premium_feature2_message">Get a sum-up of your expenses and incomes of the month and see how much you saved.</string>
     <string name="premium_popup_not_premium_feature_more_expense_check">4. Tick entries</string>
-    <string name="premium_popup_not_premium_feature_more_expense_check_desc">Ability to tick an entry when it has reached your bank account to keep tracks of what\'s going on</string>
+    <string name="premium_popup_not_premium_feature_more_expense_check_desc">Ability to tick an entry when it has reached your bank account to keep track of what\'s going on</string>
     <string name="premium_popup_not_premium_feature_more_dark_theme">5. Dark theme support!</string>
     <string name="premium_popup_not_premium_feature_more_dark_theme_desc">Unlock dark theme for the app and activate it automatically or when you want it.</string>
     <string name="premium_popup_not_premium_feature_more_backup_title">2. Backup</string>
