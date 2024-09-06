@@ -733,7 +733,7 @@ private fun MainView(
                             showAccountSelectorModal = false
                         },
                         sheetState = accountSelectorModalSheetState,
-                        windowInsets = WindowInsets(0, 0, 0, 0),
+                        contentWindowInsets = { WindowInsets(0, 0, 0, 0) },
                     ) {
                         AccountSelectorView(
                             onAccountSelected = { account ->
