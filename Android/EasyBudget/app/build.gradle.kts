@@ -40,8 +40,8 @@ android {
         compileSdk = 35
         minSdk = 23
         targetSdk = 35
-        versionCode = 152
-        versionName = "3.3.4"
+        versionCode = 153
+        versionName = "3.3.5"
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -116,16 +116,16 @@ dependencies {
     val realmVersion: String by rootProject.extra
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.2")
 
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.2")
 
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.activity:activity-ktx:1.9.1")
+    implementation("androidx.activity:activity-ktx:1.9.2")
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.4")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.5")
     implementation("androidx.work:work-runtime-ktx:2.9.1")
     implementation("androidx.work:work-gcm:2.9.1")
     implementation("com.google.android.play:review-ktx:2.0.1")
@@ -133,7 +133,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 
-    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
+    implementation(platform("com.google.firebase:firebase-bom:33.2.0"))
     implementation("com.google.firebase:firebase-messaging-ktx")
     implementation("com.google.firebase:firebase-storage")
     implementation("com.google.firebase:firebase-crashlytics")
@@ -141,22 +141,19 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.firebaseui:firebase-ui-auth:8.0.2")
 
-    val composeBom = platform("androidx.compose:compose-bom:2024.06.00")
+    val composeBom = platform("androidx.compose:compose-bom:2024.09.00")
     implementation(composeBom)
     androidTestImplementation(composeBom)
     debugImplementation("androidx.compose.ui:ui-tooling")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.ui:ui")
-    implementation("androidx.activity:activity-compose:1.9.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.4")
+    implementation("androidx.activity:activity-compose:1.9.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.5")
+    implementation("androidx.navigation:navigation-compose:2.8.0")
 
-    // TODO migrate to bom when 1.7.0 is stable
-    implementation("androidx.compose.foundation:foundation:1.7.0-beta07")
-    implementation("androidx.navigation:navigation-compose:2.8.0-beta07")
-
-    implementation("com.google.accompanist:accompanist-themeadapter-material3:0.34.0")
-    implementation("com.google.accompanist:accompanist-permissions:0.34.0")
+    implementation("com.google.accompanist:accompanist-themeadapter-material3:0.36.0")
+    implementation("com.google.accompanist:accompanist-permissions:0.36.0")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
     implementation("com.android.billingclient:billing-ktx:7.0.0")
