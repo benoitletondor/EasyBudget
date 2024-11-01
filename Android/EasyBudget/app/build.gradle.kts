@@ -40,8 +40,8 @@ android {
         compileSdk = 35
         minSdk = 23
         targetSdk = 35
-        versionCode = 153
-        versionName = "3.3.5"
+        versionCode = 154
+        versionName = "3.3.6"
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -106,59 +106,56 @@ android {
     }
 }
 
-composeCompiler {
-    enableStrongSkippingMode = true
-}
-
 dependencies {
     val kotlinVersion: String by rootProject.extra
     val hiltVersion: String by rootProject.extra
     val realmVersion: String by rootProject.extra
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.2")
 
     implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.activity:activity-ktx:1.9.2")
+    implementation("androidx.core:core-ktx:1.15.0")
+    implementation("androidx.activity:activity-ktx:1.9.3")
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.5")
-    implementation("androidx.work:work-runtime-ktx:2.9.1")
-    implementation("androidx.work:work-gcm:2.9.1")
-    implementation("com.google.android.play:review-ktx:2.0.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
+    implementation("androidx.work:work-runtime-ktx:2.10.0")
+    implementation("androidx.work:work-gcm:2.10.0")
+    implementation("com.google.android.play:review-ktx:2.0.2")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
 
-    implementation(platform("com.google.firebase:firebase-bom:33.2.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
     implementation("com.google.firebase:firebase-messaging-ktx")
     implementation("com.google.firebase:firebase-storage")
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.google.firebase:firebase-config")
     implementation("com.firebaseui:firebase-ui-auth:8.0.2")
 
-    val composeBom = platform("androidx.compose:compose-bom:2024.09.00")
+    val composeBom = platform("androidx.compose:compose-bom:2024.10.01")
     implementation(composeBom)
     androidTestImplementation(composeBom)
     debugImplementation("androidx.compose.ui:ui-tooling")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.ui:ui")
-    implementation("androidx.activity:activity-compose:1.9.2")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.5")
-    implementation("androidx.navigation:navigation-compose:2.8.0")
+    implementation("androidx.activity:activity-compose:1.9.3")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+    implementation("androidx.navigation:navigation-compose:2.8.3")
 
     implementation("com.google.accompanist:accompanist-themeadapter-material3:0.36.0")
     implementation("com.google.accompanist:accompanist-permissions:0.36.0")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
-    implementation("com.android.billingclient:billing-ktx:7.0.0")
+    implementation("com.android.billingclient:billing-ktx:7.1.1")
 
-    implementation("com.batch.android:batch-sdk:2.0.3")
+    implementation("com.batch.android:batch-sdk:2.1.0")
 
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     implementation("androidx.hilt:hilt-work:1.2.0")
@@ -171,7 +168,7 @@ dependencies {
 
     implementation("io.realm.kotlin:library-sync:$realmVersion")
 
-    implementation("com.kizitonwose.calendar:compose:2.6.0-beta04")
+    implementation("com.kizitonwose.calendar:compose:2.6.0")
     implementation("net.sf.biweekly:biweekly:0.6.8")
 
     implementation("net.lingala.zip4j:zip4j:2.11.5")

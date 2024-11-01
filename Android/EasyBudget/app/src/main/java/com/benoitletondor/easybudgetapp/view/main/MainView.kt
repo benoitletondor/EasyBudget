@@ -124,6 +124,7 @@ fun MainView(
         selectedAccountFlow = viewModel.accountSelectionFlow,
         dbStateFlow = viewModel.dbAvailableFlow,
         eventFlow = viewModel.eventFlow,
+        alertMessageFlow = viewModel.alertMessageFlow,
         showMonthlyReportHintFlow = viewModel.showMonthlyReportHintFlow,
         openAddExpenseScreenLiveFlow = openAddExpenseScreenLiveFlow,
         openAddRecurringExpenseScreenLiveFlow = openAddRecurringExpenseScreenLiveFlow,
@@ -199,6 +200,7 @@ private fun MainView(
     selectedAccountFlow: StateFlow<MainViewModel.SelectedAccount>,
     dbStateFlow: StateFlow<MainViewModel.DBState>,
     eventFlow: Flow<MainViewModel.Event>,
+    alertMessageFlow: StateFlow<String?>,
     showMonthlyReportHintFlow: StateFlow<Boolean>,
     openAddExpenseScreenLiveFlow: Flow<Unit>,
     openAddRecurringExpenseScreenLiveFlow: Flow<Unit>,
@@ -694,6 +696,7 @@ private fun MainView(
                     ),
                     selectedAccountFlow = selectedAccountFlow,
                     dbStateFlow = dbStateFlow,
+                    alertMessageFlow = alertMessageFlow,
                     hasPendingInvitationsFlow = hasPendingInvitationsFlow,
                     forceRefreshDataFlow = forceRefreshDataFlow,
                     firstDayOfWeekFlow = firstDayOfWeekFlow,
@@ -797,6 +800,16 @@ private fun ProAccountSelectedPreview() {
 @Composable
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
+private fun AlertMessageDisplayed() {
+    Preview(
+        dbState = MainViewModel.DBState.Loaded(AppModule.provideDB(LocalContext.current)),
+        alertMessage = "Test alert message",
+    )
+}
+
+@Composable
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 private fun DBLoadingPreview() {
     Preview(
         dbState = MainViewModel.DBState.Loading,
@@ -815,6 +828,7 @@ private fun DBErrorLoadingPreview() {
 @Composable
 private fun Preview(
     dbState: MainViewModel.DBState,
+    alertMessage: String? = null,
 ) {
     AppTheme {
         MainView(
@@ -827,6 +841,7 @@ private fun Preview(
             )),
             dbStateFlow = MutableStateFlow(dbState),
             eventFlow = MutableSharedFlow(),
+            alertMessageFlow = MutableStateFlow(alertMessage),
             showMonthlyReportHintFlow = MutableStateFlow(false),
             openAddExpenseScreenLiveFlow = MutableSharedFlow(),
             openAddRecurringExpenseScreenLiveFlow = MutableSharedFlow(),

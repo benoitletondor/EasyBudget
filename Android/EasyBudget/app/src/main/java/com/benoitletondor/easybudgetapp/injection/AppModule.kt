@@ -25,6 +25,8 @@ import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.benoitletondor.easybudgetapp.auth.FirebaseAuth
 import com.benoitletondor.easybudgetapp.cloudstorage.CloudStorage
 import com.benoitletondor.easybudgetapp.cloudstorage.FirebaseStorage
+import com.benoitletondor.easybudgetapp.config.Config
+import com.benoitletondor.easybudgetapp.config.FirebaseRemoteConfig
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.iab.IabImpl
 import com.benoitletondor.easybudgetapp.db.DB
@@ -82,6 +84,10 @@ object AppModule {
     ): DB = CachedDBImpl(
         OfflineDBImpl(RoomDB.create(context)),
     )
+
+    @Provides
+    @Singleton
+    fun provideConfig(): Config = FirebaseRemoteConfig()
 
     private var app: App? = null
     private var usedOnlineDB: CachedOnlineDBImpl? = null
