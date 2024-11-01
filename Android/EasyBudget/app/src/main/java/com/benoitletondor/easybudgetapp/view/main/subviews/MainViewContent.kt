@@ -41,6 +41,7 @@ fun MainViewContent(
     modifier: Modifier = Modifier,
     selectedAccountFlow: StateFlow<MainViewModel.SelectedAccount>,
     dbStateFlow: StateFlow<MainViewModel.DBState>,
+    alertMessageFlow: StateFlow<String?>,
     hasPendingInvitationsFlow: StateFlow<Boolean>,
     forceRefreshDataFlow: Flow<Unit>,
     firstDayOfWeekFlow: StateFlow<DayOfWeek>,
@@ -63,10 +64,18 @@ fun MainViewContent(
     onExpenseLongPressed: (Expense) -> Unit,
 ) {
     val account by selectedAccountFlow.collectAsState()
+    val maybeAlertMessage by alertMessageFlow.collectAsState()
 
     Column(
         modifier = modifier.fillMaxSize(),
     ) {
+        val alertMessage = maybeAlertMessage
+        if (alertMessage != null) {
+            AlertMessageView(
+                message = alertMessage,
+            )
+        }
+
         when(val selectedAccount = account) {
             MainViewModel.SelectedAccount.Loading -> LoadingView()
             is MainViewModel.SelectedAccount.Selected -> {

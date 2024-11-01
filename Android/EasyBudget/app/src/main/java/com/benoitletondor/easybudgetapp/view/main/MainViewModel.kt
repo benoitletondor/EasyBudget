@@ -25,6 +25,7 @@ import com.benoitletondor.easybudgetapp.accounts.model.Account
 import com.benoitletondor.easybudgetapp.accounts.model.AccountCredentials
 import com.benoitletondor.easybudgetapp.auth.Auth
 import com.benoitletondor.easybudgetapp.auth.AuthState
+import com.benoitletondor.easybudgetapp.config.Config
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.db.RestoreAction
 import com.benoitletondor.easybudgetapp.db.onlineimpl.OnlineDB
@@ -71,10 +72,30 @@ class MainViewModel @Inject constructor(
     private val accounts: Accounts,
     private val auth: Auth,
     private val dbProvider: CurrentDBProvider,
+    config: Config,
     @ApplicationContext appContext: Context,
 ) : ViewModel() {
     private val selectedOnlineAccountIdMutableStateFlow: MutableStateFlow<String?>
         = MutableStateFlow(parameters.getLatestSelectedOnlineAccountId())
+
+    val alertMessageFlow = iab.iabStatusFlow.flatMapLatest { iabStatus ->
+        when(iabStatus) {
+            PremiumCheckStatus.PRO_SUBSCRIBED -> config.watchProAlertMessage()
+                .flatMapLatest { maybeProAlertMessage ->
+                    if (maybeProAlertMessage != null) {
+                        flowOf(maybeProAlertMessage)
+                    } else {
+                        config.watchGlobalAlertMessage()
+                    }
+                }
+            PremiumCheckStatus.LEGACY_PREMIUM,
+            PremiumCheckStatus.PREMIUM_SUBSCRIBED,
+            PremiumCheckStatus.NOT_PREMIUM,
+            PremiumCheckStatus.INITIALIZING,
+            PremiumCheckStatus.CHECKING,
+            PremiumCheckStatus.ERROR -> config.watchGlobalAlertMessage()
+        }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     val showMonthlyReportHintFlow: StateFlow<Boolean> = iab.iabStatusFlow
         .flatMapLatest {
