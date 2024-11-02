@@ -17,6 +17,7 @@
 package com.benoitletondor.easybudgetapp.injection
 
 import android.content.Context
+import com.benoitletondor.easybudgetapp.AppUpdateManager
 import com.benoitletondor.easybudgetapp.BuildConfig
 import com.benoitletondor.easybudgetapp.accounts.Accounts
 import com.benoitletondor.easybudgetapp.accounts.FirebaseAccounts
@@ -88,6 +89,12 @@ object AppModule {
     @Provides
     @Singleton
     fun provideConfig(): Config = FirebaseRemoteConfig()
+
+    @Provides
+    @Singleton
+    fun provideAppUpdateManager(
+        @ApplicationContext context: Context,
+    ) = AppUpdateManager(context)
 
     private var app: App? = null
     private var usedOnlineDB: CachedOnlineDBImpl? = null
