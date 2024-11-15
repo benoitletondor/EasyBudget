@@ -50,11 +50,13 @@ private const val BACKUP_DB_FILENAME = "db_backup"
 
 class BackupException(message: String) : Exception("Backup: $message")
 
-suspend fun backupDB(context: Context,
-                     cloudStorage: CloudStorage,
-                     auth: Auth,
-                     parameters: Parameters,
-                     iab: Iab): ListenableWorker.Result {
+suspend fun backupDB(
+    context: Context,
+    cloudStorage: CloudStorage,
+    auth: Auth,
+    parameters: Parameters,
+    iab: Iab,
+): ListenableWorker.Result {
     Logger.debug("BackupJob", "Starting backup")
 
     val currentUser = (auth.state.value as? AuthState.Authenticated)?.currentUser

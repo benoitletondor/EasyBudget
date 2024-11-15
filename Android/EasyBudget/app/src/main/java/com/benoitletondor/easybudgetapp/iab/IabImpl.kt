@@ -18,8 +18,6 @@ package com.benoitletondor.easybudgetapp.iab
 
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.android.billingclient.api.*
 import com.android.billingclient.api.BillingFlowParams.SubscriptionUpdateParams
 import com.benoitletondor.easybudgetapp.R
@@ -74,16 +72,12 @@ class IabImpl(
     }
 
     /**
-     * Set the new iab status and notify the app by sending an [.INTENT_IAB_STATUS_CHANGED] intent
+     * Set the new iab status and notify the app via the [iabStatusFlow]
      *
      * @param status the new status
      */
     private fun setIabStatusAndNotify(status: PremiumCheckStatus) {
         iabStatusMutableFlow.value = status
-
-        val intent = Intent(INTENT_IAB_STATUS_CHANGED)
-
-        LocalBroadcastManager.getInstance(appContext).sendBroadcast(intent)
     }
 
     override fun isIabReady(): Boolean {
