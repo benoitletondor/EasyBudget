@@ -44,8 +44,3 @@ enum class PurchaseType {
     PREMIUM_SUBSCRIPTION,
     PRO_SUBSCRIPTION,
 }
-
-/**
- * Intent action broadcast when the status of iab changed
- */
-const val INTENT_IAB_STATUS_CHANGED = "iabStatusChanged"

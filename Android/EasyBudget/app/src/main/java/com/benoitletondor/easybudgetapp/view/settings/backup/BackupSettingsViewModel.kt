@@ -157,6 +157,7 @@ class BackupSettingsViewModel @Inject constructor(
     fun onBackupActivated() {
         if (!parameters.isBackupEnabled()) {
             parameters.setBackupEnabled(true)
+            Logger.debug("Backup activated")
 
             viewModelScope.launch {
                 val maybeBackupActivatedState = withTimeoutOrNull(5.seconds) {
@@ -178,6 +179,7 @@ class BackupSettingsViewModel @Inject constructor(
     fun onBackupDeactivated() {
         if (parameters.isBackupEnabled()) {
             parameters.setBackupEnabled(false)
+            Logger.debug("Backup deactivated")
             unscheduleBackup(appContext)
         }
     }
