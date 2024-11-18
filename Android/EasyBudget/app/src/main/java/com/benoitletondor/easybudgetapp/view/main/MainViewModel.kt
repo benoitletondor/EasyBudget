@@ -29,6 +29,7 @@ import com.benoitletondor.easybudgetapp.config.Config
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.db.RestoreAction
 import com.benoitletondor.easybudgetapp.db.onlineimpl.OnlineDB
+import com.benoitletondor.easybudgetapp.helper.BackupException
 import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
@@ -419,8 +420,8 @@ class MainViewModel @Inject constructor(
 
                                 val lastBackupDate = parameters.getLastBackupDate()
                                 val backupDiffDaysValue = backupDiffDays(lastBackupDate)
-                                if (backupDiffDaysValue != null) {
-                                    Logger.warning("Backup is late, last backup was $backupDiffDaysValue days ago", Exception("Late backup exception"))
+                                if (backupDiffDaysValue != null && backupDiffDaysValue >= 14) {
+                                    Logger.warning("Backup is very late, last backup was $backupDiffDaysValue days ago", BackupException("Very late backup exception"))
                                 } else {
                                     Logger.warning("Backup is active but never happened")
                                 }
