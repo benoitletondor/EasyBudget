@@ -419,8 +419,8 @@ class MainViewModel @Inject constructor(
 
                                 val lastBackupDate = parameters.getLastBackupDate()
                                 val backupDiffDaysValue = backupDiffDays(lastBackupDate)
-                                if (backupDiffDaysValue != null) {
-                                    Logger.warning("Backup is late, last backup was $backupDiffDaysValue days ago", Exception("Late backup exception"))
+                                if (backupDiffDaysValue != null && backupDiffDaysValue >= 14) {
+                                    Logger.warning("Backup is very late, last backup was $backupDiffDaysValue days ago", Exception("Very late backup exception"))
                                 } else {
                                     Logger.warning("Backup is active but never happened")
                                 }
