@@ -565,3 +565,18 @@ fun Parameters.getOnboardingStep(): Int {
 fun Parameters.setOnboardingStep(step: Int) {
     putInt(ONBOARDING_STEP_PARAMETERS_KEY, step)
 }
+
+private const val BACKUP_MANUALLY_RESCHEDULED_AT_PARAMETERS_KEY = "backup_manually_rescheduled_at"
+
+fun Parameters.getBackupManuallyRescheduledAt(): Date? {
+    val timestamp = getLong(BACKUP_MANUALLY_RESCHEDULED_AT_PARAMETERS_KEY, -1)
+    if (timestamp < 0) {
+        return null
+    }
+
+    return Date(timestamp)
+}
+
+fun Parameters.setBackupManuallyRescheduledAt(date: Date) {
+    putLong(BACKUP_MANUALLY_RESCHEDULED_AT_PARAMETERS_KEY, date.time)
+}

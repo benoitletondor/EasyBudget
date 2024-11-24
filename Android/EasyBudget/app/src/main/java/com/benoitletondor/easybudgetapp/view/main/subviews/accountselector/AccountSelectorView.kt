@@ -114,11 +114,7 @@ private fun AccountsView(
         is AccountSelectorViewModel.State.NotPro,
         is AccountSelectorViewModel.State.Error -> true
     }
-
-    val offlineBackupState = if (state is AccountSelectorViewModel.OfflineBackupStateAvailable) { state.backupState } else { null }
-    val shouldDisplayOfflineBackupEnabled = offlineBackupState != null && offlineBackupState is AccountSelectorViewModel.OfflineBackupState.Enabled
-    val shouldDisplayOfflineBackupIsLate = offlineBackupState != null && offlineBackupState is AccountSelectorViewModel.OfflineBackupState.Enabled && offlineBackupState.showLateBackupAlert
-    // TODO: implement this warning
+    val shouldDisplayOfflineBackupEnabled = state is AccountSelectorViewModel.OfflineBackStateAvailable && state.isOfflineBackupEnabled
 
     val context = LocalContext.current
 
@@ -643,7 +639,7 @@ fun AccountsNotProViewPreview() {
     AppTheme {
         AccountsView(
             state = AccountSelectorViewModel.State.NotPro(
-                backupState = AccountSelectorViewModel.OfflineBackupState.Disabled,
+                isOfflineBackupEnabled = false,
             ),
             eventFlow = MutableSharedFlow(),
             onIabErrorRetryButtonClicked = {},
@@ -665,7 +661,7 @@ fun AccountsNotAuthenticatedViewPreview() {
     AppTheme {
         AccountsView(
             state = AccountSelectorViewModel.State.NotAuthenticated(
-                backupState = AccountSelectorViewModel.OfflineBackupState.Disabled,
+                isOfflineBackupEnabled = false,
             ),
             eventFlow = MutableSharedFlow(),
             onIabErrorRetryButtonClicked = {},
@@ -723,7 +719,7 @@ fun AccountsAvailableViewPreview() {
                     )
                 ),
                 pendingInvitations = listOf(),
-                backupState = AccountSelectorViewModel.OfflineBackupState.Enabled(showLateBackupAlert = false),
+                isOfflineBackupEnabled = true,
             ),
             eventFlow = MutableSharedFlow(),
             onIabErrorRetryButtonClicked = {},
@@ -801,7 +797,7 @@ fun AccountsAvailableFullViewPreview() {
                         user = CurrentUser("", "", ""),
                     )
                 ),
-                backupState = AccountSelectorViewModel.OfflineBackupState.Enabled(showLateBackupAlert = true),
+                isOfflineBackupEnabled = false,
             ),
             eventFlow = MutableSharedFlow(),
             onIabErrorRetryButtonClicked = {},

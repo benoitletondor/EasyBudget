@@ -240,7 +240,6 @@ fun scheduleBackup(context: Context) {
     unscheduleBackup(context)
 
     val constraints = Constraints.Builder()
-        .setRequiresCharging(true)
         .setRequiredNetworkType(NetworkType.CONNECTED)
         .build()
 
