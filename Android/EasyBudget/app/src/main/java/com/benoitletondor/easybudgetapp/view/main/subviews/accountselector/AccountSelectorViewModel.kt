@@ -29,9 +29,7 @@ import com.benoitletondor.easybudgetapp.helper.combine
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.iab.PremiumCheckStatus
 import com.benoitletondor.easybudgetapp.parameters.Parameters
-import com.benoitletondor.easybudgetapp.parameters.getLastBackupDate
 import com.benoitletondor.easybudgetapp.parameters.watchIsBackupEnabled
-import com.benoitletondor.easybudgetapp.parameters.watchLastBackupDate
 import com.benoitletondor.easybudgetapp.parameters.watchLatestSelectedOnlineAccountId
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
@@ -46,8 +44,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.util.Date
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -98,21 +94,14 @@ class AccountSelectorViewModel @Inject constructor(
         loadingInvitationMutableFlow,
         parameters.watchLatestSelectedOnlineAccountId(),
         parameters.watchIsBackupEnabled(),
-        parameters.watchLastBackupDate(),
-    ) { iabStatus, authStatus, onlineAccounts, pendingAccountsInvitation, maybeLoadingInvitation, maybeSelectedOnlineAccountId, isBackupEnabled, lastBackupDate ->
+    ) { iabStatus, authStatus, onlineAccounts, pendingAccountsInvitation, maybeLoadingInvitation, maybeSelectedOnlineAccountId, isBackupEnabled ->
         return@combine when(iabStatus) {
             PremiumCheckStatus.INITIALIZING,
             PremiumCheckStatus.CHECKING -> State.Loading
             PremiumCheckStatus.ERROR -> State.IabError
-            PremiumCheckStatus.NOT_PREMIUM -> State.NotPro(backupState = OfflineBackupState.Disabled)
+            PremiumCheckStatus.NOT_PREMIUM -> State.NotPro(isOfflineBackupEnabled = false)
             PremiumCheckStatus.LEGACY_PREMIUM,
-            PremiumCheckStatus.PREMIUM_SUBSCRIBED -> State.NotPro(
-                backupState = if (isBackupEnabled) {
-                    OfflineBackupState.Enabled(showLateBackupAlert = isBackupLate(lastBackupDate))
-                } else {
-                    OfflineBackupState.Disabled
-                }
-            )
+            PremiumCheckStatus.PREMIUM_SUBSCRIBED -> State.NotPro(isOfflineBackupEnabled = isBackupEnabled)
             PremiumCheckStatus.PRO_SUBSCRIBED -> when(authStatus) {
                 is AuthState.Authenticated -> {
                     val ownAccounts = onlineAccounts
@@ -137,20 +126,12 @@ class AccountSelectorViewModel @Inject constructor(
                                 isLoading = maybeLoadingInvitation?.account?.id == account.id,
                             )
                         },
-                        backupState = if (isBackupEnabled) {
-                            OfflineBackupState.Enabled(showLateBackupAlert = isBackupLate(lastBackupDate))
-                        } else {
-                            OfflineBackupState.Disabled
-                        }
+                        isOfflineBackupEnabled = isBackupEnabled,
                     )
                 }
                 AuthState.Authenticating -> State.Loading
                 AuthState.NotAuthenticated -> State.NotAuthenticated(
-                    backupState = if (isBackupEnabled) {
-                        OfflineBackupState.Enabled(showLateBackupAlert = isBackupLate(lastBackupDate))
-                    } else {
-                        OfflineBackupState.Disabled
-                    }
+                    isOfflineBackupEnabled = isBackupEnabled,
                 )
             }
         }
@@ -250,39 +231,22 @@ class AccountSelectorViewModel @Inject constructor(
         selected = maybeSelectedOnlineAccountId == id,
     )
 
-    private fun isBackupLate(lastBackupDate: Date?): Boolean {
-        if (lastBackupDate == null) {
-            return false
-        }
-
-        val now = Date()
-        val diff = now.time - lastBackupDate.time
-        val diffInDays = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS)
-
-        return diffInDays >= 14
-    }
-
     data class Invitation(
         val account: Account,
         val user: CurrentUser,
         val isLoading: Boolean,
     )
 
-    sealed interface OfflineBackupStateAvailable {
-        val backupState: OfflineBackupState
-    }
-
-    sealed class OfflineBackupState {
-        data object Disabled: OfflineBackupState()
-        data class Enabled(val showLateBackupAlert: Boolean): OfflineBackupState()
+    sealed interface OfflineBackStateAvailable {
+        val isOfflineBackupEnabled: Boolean
     }
 
     sealed class State {
         data object Loading : State()
         data object IabError : State()
         data class Error(val cause: Throwable) : State()
-        data class NotPro(override val backupState: OfflineBackupState) : State(), OfflineBackupStateAvailable
-        data class NotAuthenticated(override val backupState: OfflineBackupState) : State(), OfflineBackupStateAvailable
+        data class NotPro(override val isOfflineBackupEnabled: Boolean) : State(), OfflineBackStateAvailable
+        data class NotAuthenticated(override val isOfflineBackupEnabled: Boolean) : State(), OfflineBackStateAvailable
         data class AccountsAvailable(
             val userEmail: String,
             val isOfflineSelected: Boolean,
@@ -290,8 +254,8 @@ class AccountSelectorViewModel @Inject constructor(
             val showCreateOnlineAccountButton: Boolean,
             val invitedAccounts: List<Account>,
             val pendingInvitations: List<Invitation>,
-            override val backupState: OfflineBackupState,
-        ) : State(), OfflineBackupStateAvailable
+            override val isOfflineBackupEnabled: Boolean,
+        ) : State(), OfflineBackStateAvailable
     }
 
     sealed class Event {

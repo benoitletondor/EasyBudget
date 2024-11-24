@@ -29,7 +29,6 @@ import com.benoitletondor.easybudgetapp.config.Config
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.db.RestoreAction
 import com.benoitletondor.easybudgetapp.db.onlineimpl.OnlineDB
-import com.benoitletondor.easybudgetapp.helper.BackupException
 import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
@@ -44,10 +43,8 @@ import com.benoitletondor.easybudgetapp.model.RecurringExpenseDeleteType
 import com.benoitletondor.easybudgetapp.parameters.ONBOARDING_STEP_COMPLETED
 import com.benoitletondor.easybudgetapp.parameters.Parameters
 import com.benoitletondor.easybudgetapp.parameters.getInitDate
-import com.benoitletondor.easybudgetapp.parameters.getLastBackupDate
 import com.benoitletondor.easybudgetapp.parameters.getLatestSelectedOnlineAccountId
 import com.benoitletondor.easybudgetapp.parameters.getOnboardingStep
-import com.benoitletondor.easybudgetapp.parameters.isBackupEnabled
 import com.benoitletondor.easybudgetapp.parameters.setLatestSelectedOnlineAccountId
 import com.benoitletondor.easybudgetapp.parameters.setUserSawMonthlyReportHint
 import com.benoitletondor.easybudgetapp.parameters.watchFirstDayOfWeek
@@ -66,8 +63,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.YearMonth
-import java.util.Date
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -387,57 +382,6 @@ class MainViewModel @Inject constructor(
     val appInitDate: LocalDate get() = parameters.getInitDate() ?: LocalDate.now()
 
     val shouldNavigateToOnboarding get() = parameters.getOnboardingStep() != ONBOARDING_STEP_COMPLETED
-
-    init {
-        monitorLastBackupState()
-    }
-
-    // TODO remove this whole block once we have enough data
-    private fun monitorLastBackupState() {
-        viewModelScope.launch {
-            try {
-                iab.iabStatusFlow.collectLatest { iabStatusFlow ->
-                    when(iabStatusFlow) {
-                        PremiumCheckStatus.INITIALIZING,
-                        PremiumCheckStatus.CHECKING,
-                        PremiumCheckStatus.ERROR,
-                        PremiumCheckStatus.NOT_PREMIUM -> Unit
-                        PremiumCheckStatus.LEGACY_PREMIUM,
-                        PremiumCheckStatus.PREMIUM_SUBSCRIBED,
-                        PremiumCheckStatus.PRO_SUBSCRIBED -> {
-                            if (parameters.isBackupEnabled()) {
-                                fun backupDiffDays(lastBackupDate: Date?): Long? {
-                                    if (lastBackupDate == null) {
-                                        return null
-                                    }
-
-                                    val now = Date()
-                                    val diff = now.time - lastBackupDate.time
-                                    val diffInDays = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS)
-
-                                    return diffInDays
-                                }
-
-                                val lastBackupDate = parameters.getLastBackupDate()
-                                val backupDiffDaysValue = backupDiffDays(lastBackupDate)
-                                if (backupDiffDaysValue != null && backupDiffDaysValue >= 14) {
-                                    Logger.warning("Backup is very late, last backup was $backupDiffDaysValue days ago", BackupException("Very late backup exception"))
-                                } else {
-                                    Logger.warning("Backup is active but never happened")
-                                }
-                            } else {
-                                Logger.debug("Backup is inactive")
-                            }
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                if (e is CancellationException) throw e
-
-                Logger.warning("Error while monitoring late offline account backup", e)
-            }
-        }
-    }
 
     fun onOnboardingResult(onboardingResult: OnboardingResult) {
         viewModelScope.launch {
