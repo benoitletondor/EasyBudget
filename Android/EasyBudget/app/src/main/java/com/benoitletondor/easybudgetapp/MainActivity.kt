@@ -60,7 +60,6 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity() {
     @Inject lateinit var parameters: Parameters
     @Inject lateinit var iab: Iab
-    @Inject lateinit var appUpdateManager: AppUpdateManager
 
     private val openSubscriptionScreenLiveFlow = MutableLiveFlow<Unit>()
     private val openAddExpenseScreenLiveFlow = MutableLiveFlow<Unit>()
@@ -70,8 +69,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
-
-        appUpdateManager.plugToActivityLifecycle(this)
 
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(
@@ -101,12 +98,6 @@ class MainActivity : AppCompatActivity() {
         showRatingPopupIfNeeded()
 
         performIntentActionIfAny()
-    }
-
-    override fun onDestroy() {
-        appUpdateManager.unplugFromActivityLifecycle(this)
-
-        super.onDestroy()
     }
 
     private fun showPremiumPopupIfNeeded() {
