@@ -149,7 +149,16 @@ class BackupSettingsViewModel @Inject constructor(
     fun onLogoutButtonPressed() {
         parameters.saveLastBackupDate(null)
         parameters.setBackupEnabled(false)
-        unscheduleBackup(appContext)
+
+        viewModelScope.launch {
+            try {
+                unscheduleBackup(appContext)
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+
+                Logger.error("Error while unscheduling backup", e)
+            }
+        }
 
         auth.logout()
     }
@@ -170,17 +179,33 @@ class BackupSettingsViewModel @Inject constructor(
                         eventMutableFlow.emit(Event.PromptUserToRestorePreviousBackup(lastBackupDate))
                     }
                 }
-            }
 
-            scheduleBackup(appContext)
+                try {
+                    scheduleBackup(appContext)
+                } catch (e: Exception) {
+                    if (e is CancellationException) throw e
+
+                    Logger.error("Error while scheduling backup", e)
+                }
+            }
         }
     }
 
     fun onBackupDeactivated() {
         if (parameters.isBackupEnabled()) {
             parameters.setBackupEnabled(false)
+
+            viewModelScope.launch {
+                try {
+                    unscheduleBackup(appContext)
+                } catch (e: Exception) {
+                    if (e is CancellationException) throw e
+
+                    Logger.error("Error while unscheduling backup", e)
+                }
+            }
+
             Logger.debug("Backup deactivated")
-            unscheduleBackup(appContext)
         }
     }
 
