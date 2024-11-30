@@ -465,7 +465,10 @@ class EasyBudget : Application(), Configuration.Provider {
             if (diffInDays < 5) {
                 Logger.warning("Backup is $noBackupSinceDays days late but was manually retriggered $diffInDays days ago, ignoring")
             } else {
-                Logger.warning("Backup is $noBackupSinceDays days late but was manually retriggered $diffInDays days ago, doing it manually and recheduling", Exception("Backup is $noBackupSinceDays days late and has been recheduled $diffInDays days ago, rescheduled it"))
+                Logger.warning(
+                    "Backup is $noBackupSinceDays days late but was manually retriggered $diffInDays days ago, doing it manually and recheduling",
+                    LateBackupWithManualRescheduleException("Backup is $noBackupSinceDays days late and has been recheduled $diffInDays days ago, rescheduled it"),
+                )
 
                 unscheduleBackup(this)
                 scheduleBackup(this)
@@ -484,9 +487,15 @@ class EasyBudget : Application(), Configuration.Provider {
             unscheduleBackup(this)
             scheduleBackup(this)
 
-            Logger.warning("Rescheduled backup", Exception("Backup is $noBackupSinceDays days late, rescheduled it"))
+            Logger.warning(
+                "Rescheduled backup",
+                LateBackupException("Backup is $noBackupSinceDays days late, rescheduled it"),
+            )
             parameters.setBackupManuallyRescheduledAt(Date())
         }
     }
 
 }
+
+private class LateBackupException(message: String) : Exception(message)
+private class LateBackupWithManualRescheduleException(message: String) : Exception(message)
