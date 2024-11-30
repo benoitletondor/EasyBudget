@@ -35,6 +35,8 @@ import com.batch.android.Batch
 import com.batch.android.BatchActivityLifecycleHelper
 import com.batch.android.BatchNotificationChannelsManager.DEFAULT_CHANNEL_ID
 import com.batch.android.PushNotificationType
+import com.benoitletondor.easybudgetapp.auth.Auth
+import com.benoitletondor.easybudgetapp.cloudstorage.CloudStorage
 import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.*
 import com.benoitletondor.easybudgetapp.iab.Iab
@@ -69,6 +71,8 @@ class EasyBudget : Application(), Configuration.Provider {
     @Inject lateinit var iab: Iab
     @Inject lateinit var parameters: Parameters
     @Inject lateinit var db: DB
+    @Inject lateinit var cloudStorage: CloudStorage
+    @Inject lateinit var auth: Auth
 
     @Inject lateinit var workerFactory: HiltWorkerFactory
 
@@ -450,7 +454,7 @@ class EasyBudget : Application(), Configuration.Provider {
         }
     }
 
-    private fun onBackupIsLate(noBackupSinceDays: Long) {
+    private suspend fun onBackupIsLate(noBackupSinceDays: Long) {
         Logger.warning("Backup is $noBackupSinceDays days late")
 
         val maybeLastManualRetriggerDate = parameters.getBackupManuallyRescheduledAt()
@@ -460,15 +464,29 @@ class EasyBudget : Application(), Configuration.Provider {
 
             if (diffInDays < 5) {
                 Logger.warning("Backup is $noBackupSinceDays days late but was manually retriggered $diffInDays days ago, ignoring")
-                return
+            } else {
+                Logger.warning("Backup is $noBackupSinceDays days late but was manually retriggered $diffInDays days ago, doing it manually and recheduling", Exception("Backup is $noBackupSinceDays days late and has been recheduled $diffInDays days ago, rescheduled it"))
+
+                unscheduleBackup(this)
+                scheduleBackup(this)
+
+                parameters.setBackupManuallyRescheduledAt(Date())
+
+                try {
+                    backupDB(this, cloudStorage, auth, parameters, iab)
+                } catch (e: Exception) {
+                    if (e is CancellationException) throw e
+
+                    Logger.error("Error while manually triggering backup", e)
+                }
             }
+        } else {
+            unscheduleBackup(this)
+            scheduleBackup(this)
+
+            Logger.warning("Rescheduled backup", Exception("Backup is $noBackupSinceDays days late, rescheduled it"))
+            parameters.setBackupManuallyRescheduledAt(Date())
         }
-
-        unscheduleBackup(this)
-        scheduleBackup(this)
-
-        Logger.warning("Rescheduled backup", Exception("Backup is $noBackupSinceDays days late, rescheduled it"))
-        parameters.setBackupManuallyRescheduledAt(Date())
     }
 
 }
