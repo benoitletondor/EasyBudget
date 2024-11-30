@@ -31,6 +31,7 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.lifecycle.lifecycleScope
 import androidx.work.Configuration
+import androidx.work.await
 import com.batch.android.Batch
 import com.batch.android.BatchActivityLifecycleHelper
 import com.batch.android.BatchNotificationChannelsManager.DEFAULT_CHANNEL_ID
@@ -436,7 +437,13 @@ class EasyBudget : Application(), Configuration.Provider {
                                 val lastBackupDate = parameters.getLastBackupDate()
                                 val backupDiffDaysValue = backupDiffDays(lastBackupDate)
                                 if (backupDiffDaysValue != null && backupDiffDaysValue >= 14) {
-                                    onBackupIsLate(backupDiffDaysValue)
+                                    try {
+                                        onBackupIsLate(backupDiffDaysValue)
+                                    } catch (e: Exception) {
+                                        if (e is CancellationException) throw e
+
+                                        Logger.error("Error while calling onBackupIsLate", e)
+                                    }
                                 } else {
                                     Logger.warning("Backup is active but never happened")
                                 }
@@ -480,7 +487,7 @@ class EasyBudget : Application(), Configuration.Provider {
                 } catch (e: Exception) {
                     if (e is CancellationException) throw e
 
-                    Logger.error("Error while manually triggering backup", e)
+                    Logger.error("Error while manually doing backup", e)
                 }
             }
         } else {
