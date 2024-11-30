@@ -31,6 +31,7 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.lifecycle.lifecycleScope
 import androidx.work.Configuration
+import androidx.work.await
 import com.batch.android.Batch
 import com.batch.android.BatchActivityLifecycleHelper
 import com.batch.android.BatchNotificationChannelsManager.DEFAULT_CHANNEL_ID
@@ -436,7 +437,13 @@ class EasyBudget : Application(), Configuration.Provider {
                                 val lastBackupDate = parameters.getLastBackupDate()
                                 val backupDiffDaysValue = backupDiffDays(lastBackupDate)
                                 if (backupDiffDaysValue != null && backupDiffDaysValue >= 14) {
-                                    onBackupIsLate(backupDiffDaysValue)
+                                    try {
+                                        onBackupIsLate(backupDiffDaysValue)
+                                    } catch (e: Exception) {
+                                        if (e is CancellationException) throw e
+
+                                        Logger.error("Error while calling onBackupIsLate", e)
+                                    }
                                 } else {
                                     Logger.warning("Backup is active but never happened")
                                 }
@@ -465,7 +472,10 @@ class EasyBudget : Application(), Configuration.Provider {
             if (diffInDays < 5) {
                 Logger.warning("Backup is $noBackupSinceDays days late but was manually retriggered $diffInDays days ago, ignoring")
             } else {
-                Logger.warning("Backup is $noBackupSinceDays days late but was manually retriggered $diffInDays days ago, doing it manually and recheduling", Exception("Backup is $noBackupSinceDays days late and has been recheduled $diffInDays days ago, rescheduled it"))
+                Logger.warning(
+                    "Backup is $noBackupSinceDays days late but was manually retriggered $diffInDays days ago, doing it manually and recheduling",
+                    LateBackupWithManualRescheduleException("Backup is $noBackupSinceDays days late and has been recheduled $diffInDays days ago, rescheduled it"),
+                )
 
                 unscheduleBackup(this)
                 scheduleBackup(this)
@@ -477,16 +487,22 @@ class EasyBudget : Application(), Configuration.Provider {
                 } catch (e: Exception) {
                     if (e is CancellationException) throw e
 
-                    Logger.error("Error while manually triggering backup", e)
+                    Logger.error("Error while manually doing backup", e)
                 }
             }
         } else {
             unscheduleBackup(this)
             scheduleBackup(this)
 
-            Logger.warning("Rescheduled backup", Exception("Backup is $noBackupSinceDays days late, rescheduled it"))
+            Logger.warning(
+                "Rescheduled backup",
+                LateBackupException("Backup is $noBackupSinceDays days late, rescheduled it"),
+            )
             parameters.setBackupManuallyRescheduledAt(Date())
         }
     }
 
 }
+
+private class LateBackupException(message: String) : Exception(message)
+private class LateBackupWithManualRescheduleException(message: String) : Exception(message)

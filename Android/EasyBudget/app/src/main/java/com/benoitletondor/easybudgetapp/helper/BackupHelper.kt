@@ -236,7 +236,7 @@ private fun getRemoteBackupPath(userId: String): String {
     return "user/$userId/backup.zip"
 }
 
-fun scheduleBackup(context: Context) {
+suspend fun scheduleBackup(context: Context) {
     unscheduleBackup(context)
 
     val constraints = Constraints.Builder()
@@ -250,11 +250,11 @@ fun scheduleBackup(context: Context) {
         .addTag(BACKUP_JOB_REQUEST_TAG)
         .build()
 
-    WorkManager.getInstance(context).enqueue(backupRequest)
+    WorkManager.getInstance(context).enqueue(backupRequest).await()
 }
 
-fun unscheduleBackup(context: Context) {
-    WorkManager.getInstance(context).cancelAllWorkByTag(BACKUP_JOB_REQUEST_TAG)
+suspend fun unscheduleBackup(context: Context) {
+    WorkManager.getInstance(context).cancelAllWorkByTag(BACKUP_JOB_REQUEST_TAG).await()
 }
 
 fun getBackupJobInfosFlow(context: Context): Flow<List<WorkInfo>> = callbackFlow {
