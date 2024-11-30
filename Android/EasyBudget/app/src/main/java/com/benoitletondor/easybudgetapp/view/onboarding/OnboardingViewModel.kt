@@ -143,7 +143,7 @@ class OnboardingViewModel @Inject constructor(
 }
 
 private fun parseAmountValue(valueString: String): Double {
-    if ( "" == valueString || "-" == valueString) {
+    if ( "" == valueString || "-" == valueString || "." == valueString || "," == valueString ) {
         return 0.0
     }
 
