@@ -237,10 +237,6 @@ class AccountSelectorViewModel @Inject constructor(
         val isLoading: Boolean,
     )
 
-    sealed interface OfflineBackStateAvailable {
-        val isOfflineBackupEnabled: Boolean
-    }
-
     sealed class State {
         data object Loading : State()
         data object IabError : State()
