@@ -381,6 +381,7 @@
     <string name="accounts_screen_title">Contas</string>
     <string name="accounts_offline_account_title">Padrão (off-line)</string>
     <string name="accounts_offline_backup_activated">Backup automático na nuvem ativado.</string>
+    <string name="accounts_offline_backup_activated_no_auth">Efetue login para habilitar o backup</string>
     <string name="accounts_online_section_title">On-line</string>
     <string name="accounts_online_login_title">Entre com sua conta do Google</string>
     <string name="accounts_online_login_desc">Para criar ou recuperar suas contas online, faça login com sua conta do Google.</string>

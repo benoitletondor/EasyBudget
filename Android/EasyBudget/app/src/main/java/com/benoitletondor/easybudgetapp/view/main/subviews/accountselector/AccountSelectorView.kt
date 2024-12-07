@@ -17,6 +17,7 @@
 package com.benoitletondor.easybudgetapp.view.main.subviews.accountselector
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -44,6 +45,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -54,8 +56,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.benoitletondor.easybudgetapp.R
+import com.benoitletondor.easybudgetapp.auth.AuthState
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.benoitletondor.easybudgetapp.compose.AppTheme
+import com.benoitletondor.easybudgetapp.helper.OfflineAccountBackupStatus
 import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -114,7 +118,12 @@ private fun AccountsView(
         is AccountSelectorViewModel.State.NotPro,
         is AccountSelectorViewModel.State.Error -> true
     }
-    val shouldDisplayOfflineBackupEnabled = state is AccountSelectorViewModel.OfflineBackStateAvailable && state.isOfflineBackupEnabled
+    val shouldDisplayOfflineBackupEnabled = state is AccountSelectorViewModel.OfflineAccountBackupStateAvailable &&
+            state.offlineAccountBackupStatus is OfflineAccountBackupStatus.Enabled
+
+    val shouldDisplayBackupEnabledWithoutAuthWarning = state is AccountSelectorViewModel.OfflineAccountBackupStateAvailable &&
+            state.offlineAccountBackupStatus is OfflineAccountBackupStatus.Enabled &&
+            (state.offlineAccountBackupStatus as OfflineAccountBackupStatus.Enabled).authState is AuthState.NotAuthenticated
 
     val context = LocalContext.current
 
@@ -183,6 +192,26 @@ private fun AccountsView(
                 modifier = Modifier.padding(horizontal = 4.dp),
                 color = colorResource(R.color.secondary_text),
             )
+
+            if (shouldDisplayBackupEnabledWithoutAuthWarning) {
+                Spacer(modifier = Modifier.height(6.dp))
+
+                Button(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    onClick = onLoginButtonPressed,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = colorResource(R.color.budget_orange),
+                        contentColor = colorResource(R.color.white),
+                    ),
+                ) {
+                    Text(
+                        text = stringResource(R.string.accounts_offline_backup_activated_no_auth),
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            }
         }
 
         Spacer(modifier = Modifier.height(30.dp))
@@ -639,7 +668,7 @@ fun AccountsNotProViewPreview() {
     AppTheme {
         AccountsView(
             state = AccountSelectorViewModel.State.NotPro(
-                isOfflineBackupEnabled = false,
+                offlineAccountBackupStatus = OfflineAccountBackupStatus.Disabled,
             ),
             eventFlow = MutableSharedFlow(),
             onIabErrorRetryButtonClicked = {},
@@ -661,7 +690,7 @@ fun AccountsNotAuthenticatedViewPreview() {
     AppTheme {
         AccountsView(
             state = AccountSelectorViewModel.State.NotAuthenticated(
-                isOfflineBackupEnabled = false,
+                offlineAccountBackupStatus = OfflineAccountBackupStatus.Disabled,
             ),
             eventFlow = MutableSharedFlow(),
             onIabErrorRetryButtonClicked = {},
@@ -719,7 +748,29 @@ fun AccountsAvailableViewPreview() {
                     )
                 ),
                 pendingInvitations = listOf(),
-                isOfflineBackupEnabled = true,
+                offlineAccountBackupStatus = OfflineAccountBackupStatus.Enabled(lastBackupDaysAgo = 3, authState = AuthState.Authenticated(CurrentUser("", "", ""))),
+            ),
+            eventFlow = MutableSharedFlow(),
+            onIabErrorRetryButtonClicked = {},
+            onErrorRetryButtonClicked = {},
+            onAccountSelected = {},
+            onBecomeProButtonClicked = {},
+            onLoginButtonPressed = {},
+            onEmailTapped = {},
+            onCreateAccountClicked = {},
+            onRejectInvitationConfirmed = {},
+            onAcceptInvitationConfirmed = {},
+        )
+    }
+}
+
+@Composable
+@Preview(name = "Backup enabled without auth preview")
+fun BackupWithoutAuthViewPreview() {
+    AppTheme {
+        AccountsView(
+            state = AccountSelectorViewModel.State.NotPro(
+                offlineAccountBackupStatus = OfflineAccountBackupStatus.Enabled(lastBackupDaysAgo = 3, authState = AuthState.NotAuthenticated),
             ),
             eventFlow = MutableSharedFlow(),
             onIabErrorRetryButtonClicked = {},
@@ -797,7 +848,7 @@ fun AccountsAvailableFullViewPreview() {
                         user = CurrentUser("", "", ""),
                     )
                 ),
-                isOfflineBackupEnabled = false,
+                offlineAccountBackupStatus = OfflineAccountBackupStatus.Disabled,
             ),
             eventFlow = MutableSharedFlow(),
             onIabErrorRetryButtonClicked = {},

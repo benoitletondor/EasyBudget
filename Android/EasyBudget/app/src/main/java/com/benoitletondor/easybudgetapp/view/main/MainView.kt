@@ -150,6 +150,7 @@ fun MainView(
         dayDataFlow = viewModel.selectedDateDataFlow,
         showExpensesCheckBoxFlow = viewModel.showExpensesCheckBoxFlow,
         onboardingResultFlow = onboardingResultFlow,
+        shouldDisplayAccountsWarningFlow = viewModel.shouldDisplayAccountsWarningFlow,
         shouldNavigateToOnboarding = viewModel.shouldNavigateToOnboarding,
         onSettingsButtonPressed = viewModel::onSettingsButtonPressed,
         onAdjustCurrentBalanceButtonPressed = viewModel::onAdjustCurrentBalanceClicked,
@@ -224,6 +225,7 @@ private fun MainView(
     dayDataFlow: StateFlow<MainViewModel.SelectedDateExpensesData>,
     showExpensesCheckBoxFlow: StateFlow<Boolean>,
     onboardingResultFlow: Flow<OnboardingResult>,
+    shouldDisplayAccountsWarningFlow: StateFlow<Boolean>,
     shouldNavigateToOnboarding: Boolean,
     onSettingsButtonPressed: () -> Unit,
     onAdjustCurrentBalanceButtonPressed: () -> Unit,
@@ -708,6 +710,7 @@ private fun MainView(
                     dayDataFlow = dayDataFlow,
                     userCurrencyFlow = userCurrencyFlow,
                     showExpensesCheckBoxFlow = showExpensesCheckBoxFlow,
+                    shouldDisplayAccountsWarningFlow = shouldDisplayAccountsWarningFlow,
                     appInitDate = appInitDate,
                     onCurrentAccountTapped = onCurrentAccountTapped,
                     onMonthChanged = onMonthChanged,
@@ -810,6 +813,16 @@ private fun AlertMessageDisplayed() {
 @Composable
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
+private fun AccountsWarningDisplayed() {
+    Preview(
+        dbState = MainViewModel.DBState.Loaded(AppModule.provideDB(LocalContext.current)),
+        shouldDisplayAccountsWarning = true,
+    )
+}
+
+@Composable
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 private fun DBLoadingPreview() {
     Preview(
         dbState = MainViewModel.DBState.Loading,
@@ -829,6 +842,7 @@ private fun DBErrorLoadingPreview() {
 private fun Preview(
     dbState: MainViewModel.DBState,
     alertMessage: String? = null,
+    shouldDisplayAccountsWarning: Boolean = false,
 ) {
     AppTheme {
         MainView(
@@ -913,6 +927,7 @@ private fun Preview(
             )),
             showExpensesCheckBoxFlow = MutableStateFlow(true),
             onboardingResultFlow = MutableSharedFlow(),
+            shouldDisplayAccountsWarningFlow = MutableStateFlow(shouldDisplayAccountsWarning),
             shouldNavigateToOnboarding = false,
             onSettingsButtonPressed = {},
             onAdjustCurrentBalanceButtonPressed = {},

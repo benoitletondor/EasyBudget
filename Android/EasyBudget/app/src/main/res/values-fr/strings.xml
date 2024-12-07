@@ -381,6 +381,7 @@
     <string name="accounts_screen_title">Comptes</string>
     <string name="accounts_offline_account_title">Par défaut (hors ligne)</string>
     <string name="accounts_offline_backup_activated">Sauvegarde cloud automatique activée.</string>
+    <string name="accounts_offline_backup_activated_no_auth">Connectez-vous pour activer la sauvegarde cloud</string>
     <string name="accounts_online_section_title">En ligne</string>
     <string name="accounts_online_login_title">Connectez-vous avec votre compte Google</string>
     <string name="accounts_online_login_desc">Pour créer ou récupérer vos comptes en ligne, connectez-vous avec votre compte Google.</string>

@@ -53,6 +53,7 @@ fun MainViewContent(
     dayDataFlow: StateFlow<MainViewModel.SelectedDateExpensesData>,
     userCurrencyFlow: StateFlow<Currency>,
     showExpensesCheckBoxFlow: StateFlow<Boolean>,
+    shouldDisplayAccountsWarningFlow: StateFlow<Boolean>,
     appInitDate: LocalDate,
     onCurrentAccountTapped: () -> Unit,
     onMonthChanged: (YearMonth) -> Unit,
@@ -82,6 +83,7 @@ fun MainViewContent(
                 SelectedAccountHeader(
                     selectedAccount = selectedAccount,
                     hasPendingInvitationsFlow = hasPendingInvitationsFlow,
+                    shouldDisplayAccountsWarningFlow = shouldDisplayAccountsWarningFlow,
                     onCurrentAccountTapped = onCurrentAccountTapped,
                 )
 
