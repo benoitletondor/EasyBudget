@@ -381,6 +381,7 @@
     <string name="accounts_screen_title">Cuentas</string>
     <string name="accounts_offline_account_title">Predeterminado (fuera de línea)</string>
     <string name="accounts_offline_backup_activated">Copia de seguridad automática en la nube habilitada.</string>
+    <string name="accounts_offline_backup_activated_no_auth">Inicie sesión para habilitar la copia de seguridad</string>
     <string name="accounts_online_section_title">En línea</string>
     <string name="accounts_online_login_title">Inicia sesión con tu cuenta de Google</string>
     <string name="accounts_online_login_desc">Para crear o recuperar sus cuentas en línea, inicie sesión con su cuenta de Google.</string>

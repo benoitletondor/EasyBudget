@@ -381,6 +381,7 @@
     <string name="accounts_screen_title">Conti</string>
     <string name="accounts_offline_account_title">Predefinito (non in linea)</string>
     <string name="accounts_offline_backup_activated">Backup automatico su cloud abilitato.</string>
+    <string name="accounts_offline_backup_activated_no_auth">Accedi per abilitare il backup su cloud</string>
     <string name="accounts_online_section_title">In linea</string>
     <string name="accounts_online_login_title">Accedi con il tuo account Google</string>
     <string name="accounts_online_login_desc">Per creare o recuperare i tuoi account online, accedi con il tuo account Google.</string>
