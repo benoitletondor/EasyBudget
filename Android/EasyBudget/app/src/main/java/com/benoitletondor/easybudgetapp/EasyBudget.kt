@@ -17,6 +17,7 @@
 package com.benoitletondor.easybudgetapp
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.*
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -29,6 +30,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import androidx.work.ListenableWorker
 import com.batch.android.Batch
 import com.batch.android.BatchActivityLifecycleHelper
 import com.batch.android.BatchNotificationChannelsManager.DEFAULT_CHANNEL_ID
@@ -455,6 +457,7 @@ class EasyBudget : Application(), Configuration.Provider {
         }
     }
 
+    @SuppressLint("RestrictedApi")
     private suspend fun onBackupIsLate(noBackupSinceDays: Long) {
         Logger.warning("Backup is $noBackupSinceDays days late")
 
@@ -476,7 +479,10 @@ class EasyBudget : Application(), Configuration.Provider {
 
                 parameters.setBackupManuallyRescheduledAt(Date())
 
-                backupDB(this, cloudStorage, auth, parameters, iab)
+                val result = backupDB(this, cloudStorage, auth, parameters, iab)
+                if (result !is ListenableWorker.Result.Success) {
+                    Logger.error("Error while performing manual backup: ${result.outputData}", LateBackupErrorWhileDoingManualBackup("Error while performing manual backup"))
+                }
             }
         } else {
             unscheduleBackup(this)
@@ -495,3 +501,4 @@ class EasyBudget : Application(), Configuration.Provider {
 private class LateBackupException(message: String) : Exception(message)
 private class LateBackupWithManualRescheduleException(message: String) : Exception(message)
 private class LateBackupWithUnauthUserException(message: String) : Exception(message)
+private class LateBackupErrorWhileDoingManualBackup(message: String) : Exception(message)
