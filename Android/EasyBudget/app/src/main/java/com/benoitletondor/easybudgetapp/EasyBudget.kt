@@ -55,6 +55,7 @@ import io.realm.kotlin.log.RealmLogger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -416,60 +417,64 @@ class EasyBudget : Application(), Configuration.Provider {
             val componentActivity = activity as? ComponentActivity ?: throw IllegalStateException("Activity is not a ComponentActivity")
 
             componentActivity.lifecycleScope.launch(Dispatchers.IO) {
-                iab.iabStatusFlow.flatMapLatest { iabStatusFlow ->
-                    when(iabStatusFlow) {
-                        PremiumCheckStatus.INITIALIZING,
-                        PremiumCheckStatus.CHECKING,
-                        PremiumCheckStatus.ERROR,
-                        PremiumCheckStatus.NOT_PREMIUM -> emptyFlow()
-                        PremiumCheckStatus.LEGACY_PREMIUM,
-                        PremiumCheckStatus.PREMIUM_SUBSCRIBED,
-                        PremiumCheckStatus.PRO_SUBSCRIBED -> {
-                            if (parameters.isBackupEnabled()) {
-                                auth.state
-                                    .mapLatest { authState ->
-                                        when(authState) {
-                                            is AuthState.Authenticated -> {
-                                                fun backupDiffDays(lastBackupDate: Date?): Long? {
-                                                    if (lastBackupDate == null) {
-                                                        return null
+                iab.iabStatusFlow
+                    .flatMapLatest { iabStatusFlow ->
+                        when(iabStatusFlow) {
+                            PremiumCheckStatus.INITIALIZING,
+                            PremiumCheckStatus.CHECKING,
+                            PremiumCheckStatus.ERROR,
+                            PremiumCheckStatus.NOT_PREMIUM -> emptyFlow()
+                            PremiumCheckStatus.LEGACY_PREMIUM,
+                            PremiumCheckStatus.PREMIUM_SUBSCRIBED,
+                            PremiumCheckStatus.PRO_SUBSCRIBED -> {
+                                if (parameters.isBackupEnabled()) {
+                                    auth.state
+                                        .mapLatest { authState ->
+                                            when(authState) {
+                                                is AuthState.Authenticated -> {
+                                                    fun backupDiffDays(lastBackupDate: Date?): Long? {
+                                                        if (lastBackupDate == null) {
+                                                            return null
+                                                        }
+
+                                                        val now = Date()
+                                                        val diff = now.time - lastBackupDate.time
+                                                        val diffInDays = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS)
+
+                                                        return diffInDays
                                                     }
 
-                                                    val now = Date()
-                                                    val diff = now.time - lastBackupDate.time
-                                                    val diffInDays = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS)
+                                                    val lastBackupDate = parameters.getLastBackupDate()
+                                                    val backupDiffDaysValue = backupDiffDays(lastBackupDate)
+                                                    if (backupDiffDaysValue != null && backupDiffDaysValue >= 14) {
+                                                        try {
+                                                            onBackupIsLate(backupDiffDaysValue)
+                                                        } catch (e: Exception) {
+                                                            if (e is CancellationException) throw e
 
-                                                    return diffInDays
-                                                }
-
-                                                val lastBackupDate = parameters.getLastBackupDate()
-                                                val backupDiffDaysValue = backupDiffDays(lastBackupDate)
-                                                if (backupDiffDaysValue != null && backupDiffDaysValue >= 14) {
-                                                    try {
-                                                        onBackupIsLate(backupDiffDaysValue)
-                                                    } catch (e: Exception) {
-                                                        if (e is CancellationException) throw e
-
-                                                        Logger.error("Error while calling onBackupIsLate", e)
+                                                            Logger.error("Error while calling onBackupIsLate", e)
+                                                        }
+                                                    } else {
+                                                        Logger.warning("Backup is active but never happened")
                                                     }
-                                                } else {
-                                                    Logger.warning("Backup is active but never happened")
+                                                }
+                                                is AuthState.NotAuthenticated -> {
+                                                    Logger.warning("Backup is active but user is not authenticated", LateBackupWithUnauthUserException("Backup is active but user is not authenticated"))
+                                                }
+                                                is AuthState.Authenticating -> {
+                                                    // No-op
                                                 }
                                             }
-                                            is AuthState.NotAuthenticated -> {
-                                                Logger.warning("Backup is active but user is not authenticated", LateBackupWithUnauthUserException("Backup is active but user is not authenticated"))
-                                            }
-                                            is AuthState.Authenticating -> {
-                                                // No-op
-                                            }
-                                        }
+                                    }
+                                } else {
+                                    Logger.debug("Backup is inactive")
+                                    emptyFlow()
                                 }
-                            } else {
-                                Logger.debug("Backup is inactive")
-                                emptyFlow()
                             }
                         }
-                    }
+                }
+                .collectLatest {
+                    // No-op
                 }
             }
         } catch (e: Exception) {
