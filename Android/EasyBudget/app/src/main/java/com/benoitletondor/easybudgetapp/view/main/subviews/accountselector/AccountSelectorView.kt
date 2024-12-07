@@ -208,6 +208,7 @@ private fun AccountsView(
                         text = stringResource(R.string.accounts_offline_backup_activated_no_auth),
                         fontSize = 15.sp,
                         fontWeight = FontWeight.SemiBold,
+                        textAlign = TextAlign.Center,
                     )
                 }
             }

@@ -381,6 +381,7 @@
     <string name="accounts_screen_title">Konten</string>
     <string name="accounts_offline_account_title">Standard (Offline)</string>
     <string name="accounts_offline_backup_activated">Automatisches Cloud-Backup aktiviert.</string>
+    <string name="accounts_offline_backup_activated_no_auth">Melden Sie sich an, um die Cloud-Backup zu aktivieren</string>
     <string name="accounts_online_section_title">Online</string>
     <string name="accounts_online_login_title">Melden Sie sich mit Ihrem Google-Konto an</string>
     <string name="accounts_online_login_desc">Um Ihre Online-Konten zu erstellen oder abzurufen, melden Sie sich mit Ihrem Google-Konto an.</string>

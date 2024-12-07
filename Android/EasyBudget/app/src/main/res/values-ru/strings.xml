@@ -383,6 +383,7 @@
     <string name="accounts_screen_title">Счета</string>
     <string name="accounts_offline_account_title">По умолчанию (офлайн)</string>
     <string name="accounts_offline_backup_activated">Включено автоматическое резервное копирование в облако.</string>
+    <string name="accounts_offline_backup_activated_no_auth">Войдите, чтобы включить резервное копирование в облаке</string>
     <string name="accounts_online_section_title">В сети</string>
     <string name="accounts_online_login_title">Войдите в свою учетную запись Google</string>
     <string name="accounts_online_login_desc">Чтобы создать или восстановить учетные записи в Интернете, войдите в свою учетную запись Google.</string>
