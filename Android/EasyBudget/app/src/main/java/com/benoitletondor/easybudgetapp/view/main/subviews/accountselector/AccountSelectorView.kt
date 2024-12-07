@@ -17,6 +17,7 @@
 package com.benoitletondor.easybudgetapp.view.main.subviews.accountselector
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -44,6 +45,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -116,7 +118,12 @@ private fun AccountsView(
         is AccountSelectorViewModel.State.NotPro,
         is AccountSelectorViewModel.State.Error -> true
     }
-    val shouldDisplayOfflineBackupEnabled = state is AccountSelectorViewModel.OfflineAccountBackupStateAvailable && state.offlineAccountBackupStatus is OfflineAccountBackupStatus.Enabled
+    val shouldDisplayOfflineBackupEnabled = state is AccountSelectorViewModel.OfflineAccountBackupStateAvailable &&
+            state.offlineAccountBackupStatus is OfflineAccountBackupStatus.Enabled
+
+    val shouldDisplayBackupEnabledWithoutAuthWarning = state is AccountSelectorViewModel.OfflineAccountBackupStateAvailable &&
+            state.offlineAccountBackupStatus is OfflineAccountBackupStatus.Enabled &&
+            (state.offlineAccountBackupStatus as OfflineAccountBackupStatus.Enabled).authState is AuthState.NotAuthenticated
 
     val context = LocalContext.current
 
@@ -185,6 +192,25 @@ private fun AccountsView(
                 modifier = Modifier.padding(horizontal = 4.dp),
                 color = colorResource(R.color.secondary_text),
             )
+
+            if (shouldDisplayBackupEnabledWithoutAuthWarning) {
+                Spacer(modifier = Modifier.height(6.dp))
+
+                Button(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    onClick = onLoginButtonPressed,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = colorResource(R.color.budget_orange),
+                        contentColor = colorResource(R.color.white),
+                    ),
+                ) {
+                    Text(
+                        text = stringResource(R.string.accounts_offline_backup_activated_no_auth),
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
+            }
         }
 
         Spacer(modifier = Modifier.height(30.dp))
@@ -722,6 +748,28 @@ fun AccountsAvailableViewPreview() {
                 ),
                 pendingInvitations = listOf(),
                 offlineAccountBackupStatus = OfflineAccountBackupStatus.Enabled(lastBackupDaysAgo = 3, authState = AuthState.Authenticated(CurrentUser("", "", ""))),
+            ),
+            eventFlow = MutableSharedFlow(),
+            onIabErrorRetryButtonClicked = {},
+            onErrorRetryButtonClicked = {},
+            onAccountSelected = {},
+            onBecomeProButtonClicked = {},
+            onLoginButtonPressed = {},
+            onEmailTapped = {},
+            onCreateAccountClicked = {},
+            onRejectInvitationConfirmed = {},
+            onAcceptInvitationConfirmed = {},
+        )
+    }
+}
+
+@Composable
+@Preview(name = "Backup enabled without auth preview")
+fun BackupWithoutAuthViewPreview() {
+    AppTheme {
+        AccountsView(
+            state = AccountSelectorViewModel.State.NotPro(
+                offlineAccountBackupStatus = OfflineAccountBackupStatus.Enabled(lastBackupDaysAgo = 3, authState = AuthState.NotAuthenticated),
             ),
             eventFlow = MutableSharedFlow(),
             onIabErrorRetryButtonClicked = {},

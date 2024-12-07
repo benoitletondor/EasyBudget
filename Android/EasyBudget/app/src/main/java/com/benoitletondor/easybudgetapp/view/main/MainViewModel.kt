@@ -32,6 +32,8 @@ import com.benoitletondor.easybudgetapp.db.onlineimpl.OnlineDB
 import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
+import com.benoitletondor.easybudgetapp.helper.OfflineAccountBackupStatus
+import com.benoitletondor.easybudgetapp.helper.getOfflineAccountBackupStatusFlow
 import com.benoitletondor.easybudgetapp.helper.watchUserCurrency
 import com.benoitletondor.easybudgetapp.iab.PremiumCheckStatus
 import com.benoitletondor.easybudgetapp.injection.AppModule
@@ -160,6 +162,16 @@ class MainViewModel @Inject constructor(
                         }
                     }
                 else -> flowOf(false)
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+    val shouldDisplayAccountsWarningFlow: StateFlow<Boolean> = getOfflineAccountBackupStatusFlow(iab, parameters, auth)
+        .map { status ->
+            when(status) {
+                is OfflineAccountBackupStatus.Enabled -> status.authState is AuthState.NotAuthenticated
+                is OfflineAccountBackupStatus.Disabled,
+                OfflineAccountBackupStatus.Unavailable -> false
             }
         }
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)

@@ -399,6 +399,7 @@
     <string name="accounts_screen_title">Accounts</string>
     <string name="accounts_offline_account_title">Default (Offline)</string>
     <string name="accounts_offline_backup_activated">Automatic cloud backup enabled.</string>
+    <string name="accounts_offline_backup_activated_no_auth">Login to enable cloud backup</string>
     <string name="accounts_online_section_title">Online</string>
     <string name="accounts_online_login_title">Login with your Google account</string>
     <string name="accounts_online_login_desc">To create or retrieve your online accounts, login with your Google account.</string>

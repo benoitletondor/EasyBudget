@@ -46,9 +46,11 @@ import kotlinx.coroutines.flow.StateFlow
 fun SelectedAccountHeader(
     selectedAccount: MainViewModel.SelectedAccount.Selected,
     hasPendingInvitationsFlow: StateFlow<Boolean>,
+    shouldDisplayAccountsWarningFlow: StateFlow<Boolean>,
     onCurrentAccountTapped: () -> Unit,
 ) {
     val hasPendingInvitations by hasPendingInvitationsFlow.collectAsState()
+    val shouldDisplayAccountsWarning by shouldDisplayAccountsWarningFlow.collectAsState()
 
     Box(
         modifier = Modifier
@@ -85,6 +87,15 @@ fun SelectedAccountHeader(
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
+            }
+
+            if (shouldDisplayAccountsWarning) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_baseline_warning_24),
+                    colorFilter = ColorFilter.tint(colorResource(R.color.budget_orange)),
+                    contentDescription = null,
+                    modifier = Modifier.padding(start = 10.dp),
+                )
             }
 
             if (hasPendingInvitations) {
