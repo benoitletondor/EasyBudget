@@ -25,7 +25,9 @@ import com.benoitletondor.easybudgetapp.auth.AuthState
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
+import com.benoitletondor.easybudgetapp.helper.OfflineAccountBackupStatus
 import com.benoitletondor.easybudgetapp.helper.combine
+import com.benoitletondor.easybudgetapp.helper.getOfflineAccountBackupStatusFlow
 import com.benoitletondor.easybudgetapp.iab.Iab
 import com.benoitletondor.easybudgetapp.iab.PremiumCheckStatus
 import com.benoitletondor.easybudgetapp.parameters.Parameters
@@ -93,15 +95,15 @@ class AccountSelectorViewModel @Inject constructor(
             },
         loadingInvitationMutableFlow,
         parameters.watchLatestSelectedOnlineAccountId(),
-        parameters.watchIsBackupEnabled(),
-    ) { iabStatus, authStatus, onlineAccounts, pendingAccountsInvitation, maybeLoadingInvitation, maybeSelectedOnlineAccountId, isBackupEnabled ->
+        getOfflineAccountBackupStatusFlow(iab, parameters, auth),
+    ) { iabStatus, authStatus, onlineAccounts, pendingAccountsInvitation, maybeLoadingInvitation, maybeSelectedOnlineAccountId, offlineAccountBackupStatus ->
         return@combine when(iabStatus) {
             PremiumCheckStatus.INITIALIZING,
             PremiumCheckStatus.CHECKING -> State.Loading
             PremiumCheckStatus.ERROR -> State.IabError
-            PremiumCheckStatus.NOT_PREMIUM -> State.NotPro(isOfflineBackupEnabled = false)
+            PremiumCheckStatus.NOT_PREMIUM -> State.NotPro(offlineAccountBackupStatus = offlineAccountBackupStatus)
             PremiumCheckStatus.LEGACY_PREMIUM,
-            PremiumCheckStatus.PREMIUM_SUBSCRIBED -> State.NotPro(isOfflineBackupEnabled = isBackupEnabled)
+            PremiumCheckStatus.PREMIUM_SUBSCRIBED -> State.NotPro(offlineAccountBackupStatus = offlineAccountBackupStatus)
             PremiumCheckStatus.PRO_SUBSCRIBED -> when(authStatus) {
                 is AuthState.Authenticated -> {
                     val ownAccounts = onlineAccounts
@@ -126,12 +128,12 @@ class AccountSelectorViewModel @Inject constructor(
                                 isLoading = maybeLoadingInvitation?.account?.id == account.id,
                             )
                         },
-                        isOfflineBackupEnabled = isBackupEnabled,
+                        offlineAccountBackupStatus = offlineAccountBackupStatus,
                     )
                 }
                 AuthState.Authenticating -> State.Loading
                 AuthState.NotAuthenticated -> State.NotAuthenticated(
-                    isOfflineBackupEnabled = isBackupEnabled,
+                    offlineAccountBackupStatus = offlineAccountBackupStatus,
                 )
             }
         }
@@ -237,12 +239,16 @@ class AccountSelectorViewModel @Inject constructor(
         val isLoading: Boolean,
     )
 
+    sealed interface OfflineAccountBackupStateAvailable {
+        val offlineAccountBackupStatus: OfflineAccountBackupStatus
+    }
+
     sealed class State {
         data object Loading : State()
         data object IabError : State()
         data class Error(val cause: Throwable) : State()
-        data class NotPro(override val isOfflineBackupEnabled: Boolean) : State(), OfflineBackStateAvailable
-        data class NotAuthenticated(override val isOfflineBackupEnabled: Boolean) : State(), OfflineBackStateAvailable
+        data class NotPro(override val offlineAccountBackupStatus: OfflineAccountBackupStatus) : State(), OfflineAccountBackupStateAvailable
+        data class NotAuthenticated(override val offlineAccountBackupStatus: OfflineAccountBackupStatus) : State(), OfflineAccountBackupStateAvailable
         data class AccountsAvailable(
             val userEmail: String,
             val isOfflineSelected: Boolean,
@@ -250,8 +256,8 @@ class AccountSelectorViewModel @Inject constructor(
             val showCreateOnlineAccountButton: Boolean,
             val invitedAccounts: List<Account>,
             val pendingInvitations: List<Invitation>,
-            override val isOfflineBackupEnabled: Boolean,
-        ) : State(), OfflineBackStateAvailable
+            override val offlineAccountBackupStatus: OfflineAccountBackupStatus,
+        ) : State(), OfflineAccountBackupStateAvailable
     }
 
     sealed class Event {

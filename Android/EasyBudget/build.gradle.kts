@@ -18,8 +18,8 @@ val hiltVersion by extra("2.52") // Change in the plugins below too
 val realmVersion by extra("2.3.0") // Change in the plugins below too
 
 plugins {
-    id("com.android.application") version "8.7.2" apply false
-    id("com.android.library") version "8.7.2" apply false
+    id("com.android.application") version "8.7.3" apply false
+    id("com.android.library") version "8.7.3" apply false
     id("com.google.firebase.crashlytics") version "3.0.2" apply false
     id("com.google.gms.google-services") version "4.4.2" apply false
     id("com.google.dagger.hilt.android") version "2.52" apply false

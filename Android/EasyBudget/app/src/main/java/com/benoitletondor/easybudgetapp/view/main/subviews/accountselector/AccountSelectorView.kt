@@ -54,8 +54,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.benoitletondor.easybudgetapp.R
+import com.benoitletondor.easybudgetapp.auth.AuthState
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.benoitletondor.easybudgetapp.compose.AppTheme
+import com.benoitletondor.easybudgetapp.helper.OfflineAccountBackupStatus
 import com.benoitletondor.easybudgetapp.helper.launchCollect
 import com.benoitletondor.easybudgetapp.view.main.MainViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -114,7 +116,7 @@ private fun AccountsView(
         is AccountSelectorViewModel.State.NotPro,
         is AccountSelectorViewModel.State.Error -> true
     }
-    val shouldDisplayOfflineBackupEnabled = state is AccountSelectorViewModel.OfflineBackStateAvailable && state.isOfflineBackupEnabled
+    val shouldDisplayOfflineBackupEnabled = state is AccountSelectorViewModel.OfflineAccountBackupStateAvailable && state.offlineAccountBackupStatus is OfflineAccountBackupStatus.Enabled
 
     val context = LocalContext.current
 
@@ -639,7 +641,7 @@ fun AccountsNotProViewPreview() {
     AppTheme {
         AccountsView(
             state = AccountSelectorViewModel.State.NotPro(
-                isOfflineBackupEnabled = false,
+                offlineAccountBackupStatus = OfflineAccountBackupStatus.Disabled,
             ),
             eventFlow = MutableSharedFlow(),
             onIabErrorRetryButtonClicked = {},
@@ -661,7 +663,7 @@ fun AccountsNotAuthenticatedViewPreview() {
     AppTheme {
         AccountsView(
             state = AccountSelectorViewModel.State.NotAuthenticated(
-                isOfflineBackupEnabled = false,
+                offlineAccountBackupStatus = OfflineAccountBackupStatus.Disabled,
             ),
             eventFlow = MutableSharedFlow(),
             onIabErrorRetryButtonClicked = {},
@@ -719,7 +721,7 @@ fun AccountsAvailableViewPreview() {
                     )
                 ),
                 pendingInvitations = listOf(),
-                isOfflineBackupEnabled = true,
+                offlineAccountBackupStatus = OfflineAccountBackupStatus.Enabled(lastBackupDaysAgo = 3, authState = AuthState.Authenticated(CurrentUser("", "", ""))),
             ),
             eventFlow = MutableSharedFlow(),
             onIabErrorRetryButtonClicked = {},
@@ -797,7 +799,7 @@ fun AccountsAvailableFullViewPreview() {
                         user = CurrentUser("", "", ""),
                     )
                 ),
-                isOfflineBackupEnabled = false,
+                offlineAccountBackupStatus = OfflineAccountBackupStatus.Disabled,
             ),
             eventFlow = MutableSharedFlow(),
             onIabErrorRetryButtonClicked = {},
