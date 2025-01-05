@@ -98,7 +98,7 @@ fun Entry(
                 )
 
                 Text(
-                    text = CurrencyHelper.getFormattedCurrencyString(currency, expense.amount),
+                    text = CurrencyHelper.getFormattedCurrencyString(currency, -expense.amount),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = colorResource(if (expense.isRevenue()) R.color.budget_green else R.color.budget_red),
