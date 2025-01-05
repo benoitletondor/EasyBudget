@@ -170,8 +170,13 @@ class IabImpl(
 
     override suspend fun fetchPricingOrDefault(): Pricing {
         try {
-            if(iabStatusMutableFlow.value == PremiumCheckStatus.INITIALIZING || iabStatusMutableFlow.value == PremiumCheckStatus.ERROR) {
+            if (iabStatusMutableFlow.value == PremiumCheckStatus.INITIALIZING) {
                 throw IllegalStateException("IAB is not setup")
+            }
+
+            if (iabStatusMutableFlow.value == PremiumCheckStatus.ERROR) {
+                updateIAPStatusIfNeeded()
+                throw IllegalStateException("IAB is in error state")
             }
 
             val skuList = listOf(
