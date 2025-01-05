@@ -1,5 +1,5 @@
 /*
- *   Copyright 2024 Benoit LETONDOR
+ *   Copyright 2025 Benoit Letondor
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 val kotlinVersion by extra("2.0.21") // Change in the plugins below too & for compose & serialization plugin
-val hiltVersion by extra("2.52") // Change in the plugins below too
+val hiltVersion by extra("2.54") // Change in the plugins below too
 val realmVersion by extra("2.3.0") // Change in the plugins below too
 
 plugins {
@@ -22,9 +22,9 @@ plugins {
     id("com.android.library") version "8.7.3" apply false
     id("com.google.firebase.crashlytics") version "3.0.2" apply false
     id("com.google.gms.google-services") version "4.4.2" apply false
-    id("com.google.dagger.hilt.android") version "2.52" apply false
+    id("com.google.dagger.hilt.android") version "2.54" apply false
     id("io.realm.kotlin") version "2.3.0" apply false
-    id("com.google.devtools.ksp") version "2.0.21-1.0.27" apply false
+    id("com.google.devtools.ksp") version "2.0.21-1.0.28" apply false
     id("org.jetbrains.kotlin.android") version "2.0.21" apply false
     id("org.jetbrains.kotlin.plugin.compose") version "2.0.21" apply false
     id("org.jetbrains.kotlin.plugin.serialization") version "2.0.21" apply false

@@ -1,5 +1,5 @@
 /*
- *   Copyright 2024 Benoit LETONDOR
+ *   Copyright 2025 Benoit Letondor
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -27,10 +27,13 @@ import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+
+private val AUTH_STATE_SETUP_TIMEOUT_MS = 5000L
 
 class FirebaseAuth(
     private val auth: com.google.firebase.auth.FirebaseAuth,
@@ -42,6 +45,14 @@ class FirebaseAuth(
     init {
         auth.addAuthStateListener {
             updateAuthState()
+        }
+
+        launch {
+            delay(AUTH_STATE_SETUP_TIMEOUT_MS)
+            if (state.value === AuthState.Authenticating) {
+                Logger.error("FirebaseAuth", "Auth state setup timeout, forcing state update", Exception("Auth state setup timeout"))
+                updateAuthState()
+            }
         }
     }
 

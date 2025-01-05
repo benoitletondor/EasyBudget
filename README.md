@@ -38,6 +38,6 @@ You can contact me regarding EasyBudget using this email: [easybudget@benoitleto
 
 ### Copyright
 
-    Copyright (C) 2023 Benoit LETONDOR. The name "EasyBudget", the app idea and assets (images, names, wordings etc...) are all under copyright.
+    Copyright (C) 2025 Benoit LETONDOR. The name "EasyBudget", the app idea and assets (images, names, wordings etc...) are all under copyright.
 
     Sources are availables under the Apache 2 licence (See LICENSE for details) and contributions will be warmely welcomed! Feel free to contribute :)

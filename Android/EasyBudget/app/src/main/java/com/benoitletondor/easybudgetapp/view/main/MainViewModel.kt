@@ -1,5 +1,5 @@
 /*
- *   Copyright 2024 Benoit LETONDOR
+ *   Copyright 2025 Benoit Letondor
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -187,11 +187,16 @@ class MainViewModel @Inject constructor(
                             when(authState) {
                                 is AuthState.Authenticated -> accounts.watchAccounts(authState.currentUser)
                                     .map { OnlineAccountResponse.Available(it) }
-                                AuthState.Authenticating,
-                                AuthState.NotAuthenticated -> flowOf(OnlineAccountResponse.Loading)
+                                AuthState.Authenticating -> flowOf(OnlineAccountResponse.Loading)
+                                AuthState.NotAuthenticated -> flowOf(OnlineAccountResponse.Error("Not authenticated"))
                             }
                         }
-                    else -> flowOf(OnlineAccountResponse.Loading)
+                    PremiumCheckStatus.INITIALIZING,
+                    PremiumCheckStatus.CHECKING -> flowOf(OnlineAccountResponse.Loading)
+                    PremiumCheckStatus.ERROR -> flowOf(OnlineAccountResponse.Error("Error checking Pro status"))
+                    PremiumCheckStatus.NOT_PREMIUM,
+                    PremiumCheckStatus.LEGACY_PREMIUM,
+                    PremiumCheckStatus.PREMIUM_SUBSCRIBED -> flowOf(OnlineAccountResponse.Error("Not a Pro user"))
                 }
             }
     ) { selectedOnlineAccountId, iabStatus, onlineAccountsResponse ->
@@ -219,6 +224,10 @@ class MainViewModel @Inject constructor(
                         )
                     } ?: SelectedAccount.Selected.Offline
                 OnlineAccountResponse.Loading -> SelectedAccount.Loading
+                is OnlineAccountResponse.Error -> {
+                    Logger.error("Error while loading online accounts", Exception(onlineAccountsResponse.message))
+                    SelectedAccount.Selected.Offline
+                }
             }
         }
     }.retryWhen { cause, _ ->
@@ -774,6 +783,7 @@ class MainViewModel @Inject constructor(
 
     private sealed class OnlineAccountResponse {
         data object Loading : OnlineAccountResponse()
+        data class Error(val message: String) : OnlineAccountResponse()
         data class Available(val accounts: List<Account>) : OnlineAccountResponse()
     }
 

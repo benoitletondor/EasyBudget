@@ -1,5 +1,5 @@
 /*
- *   Copyright 2024 Benoit LETONDOR
+ *   Copyright 2025 Benoit Letondor
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -31,6 +31,9 @@ import kotlinx.coroutines.flow.first
 private const val SKU_PREMIUM_LEGACY = "premium"
 private const val SKU_PREMIUM_SUBSCRIPTION = "premium_subscription"
 private const val SKU_PRO_SUBSCRIPTION = "pro_subscription"
+
+private const val INITIALIZATION_TIMEOUT_MS = 5000L
+private const val PURCHASE_CHECK_TIMEOUT_MS = 5000L
 
 class IabImpl(
     context: Context,
@@ -65,6 +68,15 @@ class IabImpl(
             setIabStatusAndNotify(PremiumCheckStatus.INITIALIZING)
 
             billingClient.startConnection(this)
+
+            scope.launch {
+                delay(INITIALIZATION_TIMEOUT_MS)
+                if (iabStatusFlow.value === PremiumCheckStatus.INITIALIZING) {
+                    Logger.error("IAB initialization timeout", Exception("IAB initialization timeout"))
+
+                    setIabStatusAndNotify(PremiumCheckStatus.ERROR)
+                }
+            }
         } catch (e: Exception) {
             Logger.error("Error while checking iab status", e)
             setIabStatusAndNotify(PremiumCheckStatus.ERROR)
@@ -152,10 +164,7 @@ class IabImpl(
             PremiumCheckStatus.NOT_PREMIUM,
             PremiumCheckStatus.LEGACY_PREMIUM,
             PremiumCheckStatus.PREMIUM_SUBSCRIBED,
-            PremiumCheckStatus.PRO_SUBSCRIBED -> {
-                setIabStatusAndNotify(PremiumCheckStatus.CHECKING)
-                queryPurchases()
-            }
+            PremiumCheckStatus.PRO_SUBSCRIBED -> checkPurchases()
         }
     }
 
@@ -493,8 +502,20 @@ class IabImpl(
             return
         }
 
+        checkPurchases()
+    }
+
+    private fun checkPurchases() {
         setIabStatusAndNotify(PremiumCheckStatus.CHECKING)
         queryPurchases()
+
+        scope.launch {
+            delay(PURCHASE_CHECK_TIMEOUT_MS)
+            if (iabStatusFlow.value === PremiumCheckStatus.CHECKING) {
+                Logger.error("IAB checking timeout", Exception("IAB checking timeout"))
+                setIabStatusAndNotify(PremiumCheckStatus.ERROR)
+            }
+        }
     }
 
     override fun onBillingServiceDisconnected() {
