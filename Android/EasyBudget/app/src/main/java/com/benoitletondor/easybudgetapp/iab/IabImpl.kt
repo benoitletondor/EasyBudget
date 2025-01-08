@@ -32,8 +32,8 @@ private const val SKU_PREMIUM_LEGACY = "premium"
 private const val SKU_PREMIUM_SUBSCRIPTION = "premium_subscription"
 private const val SKU_PRO_SUBSCRIPTION = "pro_subscription"
 
-private const val INITIALIZATION_TIMEOUT_MS = 5000L
-private const val PURCHASE_CHECK_TIMEOUT_MS = 5000L
+private const val INITIALIZATION_TIMEOUT_MS = 10000L
+private const val PURCHASE_CHECK_TIMEOUT_MS = 10000L
 
 class IabImpl(
     context: Context,
