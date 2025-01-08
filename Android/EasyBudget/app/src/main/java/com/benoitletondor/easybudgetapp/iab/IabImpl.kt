@@ -32,8 +32,8 @@ private const val SKU_PREMIUM_LEGACY = "premium"
 private const val SKU_PREMIUM_SUBSCRIPTION = "premium_subscription"
 private const val SKU_PRO_SUBSCRIPTION = "pro_subscription"
 
-private const val INITIALIZATION_TIMEOUT_MS = 5000L
-private const val PURCHASE_CHECK_TIMEOUT_MS = 5000L
+private const val INITIALIZATION_TIMEOUT_MS = 10000L
+private const val PURCHASE_CHECK_TIMEOUT_MS = 10000L
 
 class IabImpl(
     context: Context,
@@ -170,8 +170,13 @@ class IabImpl(
 
     override suspend fun fetchPricingOrDefault(): Pricing {
         try {
-            if(iabStatusMutableFlow.value == PremiumCheckStatus.INITIALIZING || iabStatusMutableFlow.value == PremiumCheckStatus.ERROR) {
+            if (iabStatusMutableFlow.value == PremiumCheckStatus.INITIALIZING) {
                 throw IllegalStateException("IAB is not setup")
+            }
+
+            if (iabStatusMutableFlow.value == PremiumCheckStatus.ERROR) {
+                updateIAPStatusIfNeeded()
+                throw IllegalStateException("IAB is in error state")
             }
 
             val skuList = listOf(

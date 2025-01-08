@@ -33,7 +33,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-private val AUTH_STATE_SETUP_TIMEOUT_MS = 5000L
+private const val AUTH_STATE_SETUP_TIMEOUT_MS = 10000L
 
 class FirebaseAuth(
     private val auth: com.google.firebase.auth.FirebaseAuth,
