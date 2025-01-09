@@ -376,14 +376,11 @@ class RecurringExpenseEntity(
     }
 
     companion object {
-        fun fromCursorOrThrow(cursor: SqlCursor): RecurringExpenseEntity {
-            cursor.next()
-            return RecurringExpenseEntity(
-                id = cursor.getLong(RECURRING_EXPENSE_ID_COLUMN_INDEX)!!,
-                accountId = cursor.getString(RECURRING_EXPENSE_ACCOUNT_ID_COLUMN_INDEX)!!,
-                iCalRepresentation = cursor.getString(RECURRING_EXPENSE_I_CAL_REPRESENTATION_COLUMN_INDEX)!!,
-            )
-        }
+        fun fromCursorOrThrow(cursor: SqlCursor) = RecurringExpenseEntity(
+            id = cursor.getLong(RECURRING_EXPENSE_ID_COLUMN_INDEX)!!,
+            accountId = cursor.getString(RECURRING_EXPENSE_ACCOUNT_ID_COLUMN_INDEX)!!,
+            iCalRepresentation = cursor.getString(RECURRING_EXPENSE_I_CAL_REPRESENTATION_COLUMN_INDEX)!!,
+        )
 
         suspend fun createFromRecurringExpenseOrThrow(
             recurringExpenseId: Long,

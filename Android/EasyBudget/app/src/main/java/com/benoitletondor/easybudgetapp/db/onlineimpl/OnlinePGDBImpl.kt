@@ -94,6 +94,8 @@ class OnlinePGDBImpl(
                 throw e
             }
 
+            onChangeMutableFlow.emit(Unit)
+
             return expense
         } else {
             if (expense.id != null) {
@@ -103,11 +105,15 @@ class OnlinePGDBImpl(
                     expenseEntity.persistOrThrow(transaction)
                 }
 
+                onChangeMutableFlow.emit(Unit)
+
                 return expense
             } else {
                 val expenseEntity = db.writeTransaction { transaction ->
                     ExpenseEntity.createFromExpenseOrThrow(SecureRandom().nextLong(), expense, account, transaction)
                 }
+
+                onChangeMutableFlow.emit(Unit)
 
                 return expenseEntity.toExpense(associatedRecurringExpense = null)
             }
@@ -205,10 +211,14 @@ class OnlinePGDBImpl(
     override suspend fun persistRecurringExpense(recurringExpense: RecurringExpense): RecurringExpense {
         awaitRecurringExpensesLoadOrThrow()
 
-        return db.writeTransaction { transaction ->
+        val entity = db.writeTransaction { transaction ->
             val recurringExpenseEntity = RecurringExpenseEntity.createFromRecurringExpenseOrThrow(SecureRandom().nextLong(), recurringExpense, account, transaction)
             return@writeTransaction recurringExpenseEntity.toRecurringExpense()
         }
+
+        onChangeMutableFlow.emit(Unit)
+
+        return entity
     }
 
     override suspend fun updateRecurringExpenseAfterDate(
@@ -234,6 +244,8 @@ class OnlinePGDBImpl(
             entity.iCalRepresentation = calRepresentationBeforeUpdate
             throw e
         }
+
+        onChangeMutableFlow.emit(Unit)
     }
 
     override suspend fun deleteRecurringExpense(recurringExpense: RecurringExpense): RestoreAction {
@@ -246,10 +258,14 @@ class OnlinePGDBImpl(
             transaction.execute("DELETE FROM recurring_expense WHERE id = ?", listOf(entity.id))
         }
 
+        onChangeMutableFlow.emit(Unit)
+
         return {
             db.writeTransaction { transaction ->
                 RecurringExpenseEntity.createFromRecurringExpenseOrThrow(entity.id, recurringExpense, account, transaction)
             }
+
+            onChangeMutableFlow.emit(Unit)
         }
     }
 
@@ -273,22 +289,30 @@ class OnlinePGDBImpl(
                 throw e
             }
 
+            onChangeMutableFlow.emit(Unit)
+
             return {
                 entity.iCalRepresentation = icalBeforeDeletion
 
                 db.writeTransaction { transaction ->
                     entity.persistOrThrow(transaction)
                 }
+
+                onChangeMutableFlow.emit(Unit)
             }
         } else {
             db.writeTransaction {
                 db.execute("DELETE FROM expense WHERE id = ?", listOf(expenseId))
             }
 
+            onChangeMutableFlow.emit(Unit)
+
             return {
                 db.writeTransaction { transaction ->
                     ExpenseEntity.createFromExpenseOrThrow(expense.id, expense, account, transaction)
                 }
+
+                onChangeMutableFlow.emit(Unit)
             }
         }
     }
@@ -314,11 +338,15 @@ class OnlinePGDBImpl(
             throw e
         }
 
+        onChangeMutableFlow.emit(Unit)
+
         return {
             db.writeTransaction { transaction ->
                 entity.iCalRepresentation = icalBeforeEdit
                 entity.persistOrThrow(transaction)
             }
+
+            onChangeMutableFlow.emit(Unit)
         }
     }
 
@@ -343,11 +371,15 @@ class OnlinePGDBImpl(
             throw e
         }
 
+        onChangeMutableFlow.emit(Unit)
+
         return {
             db.writeTransaction { transaction ->
                 entity.iCalRepresentation = icalBeforeEdit
                 entity.persistOrThrow(transaction)
             }
+
+            onChangeMutableFlow.emit(Unit)
         }
     }
 
@@ -374,17 +406,11 @@ class OnlinePGDBImpl(
         val oldestRecurringExpenseOccurrence = recurringExpenses
             .map { it.getFirstOccurrence() }.minByOrNull { it.date }
 
-        val oldestExpense = try {
-            db.get(
-                "SELECT * FROM expense WHERE account_id = ? ORDER BY date ASC LIMIT 1",
-                listOf(account.id),
-                ExpenseEntity::fromCursorOrThrow,
-            ).toExpense(associatedRecurringExpense = null)
-        } catch (e: Exception) {
-            if (e is CancellationException) throw e
-
-            null
-        }
+        val oldestExpense = db.getOptional(
+            "SELECT * FROM expense WHERE account_id = ? ORDER BY date ASC LIMIT 1",
+            listOf(account.id),
+            ExpenseEntity::fromCursorOrThrow,
+        )?.toExpense(associatedRecurringExpense = null)
 
         return if (oldestExpense != null && oldestRecurringExpenseOccurrence != null) {
             if (oldestExpense.date.isBefore(oldestRecurringExpenseOccurrence.date)) {
@@ -408,6 +434,8 @@ class OnlinePGDBImpl(
                 recurringExpense.persistOrThrow(transaction)
             }
         }
+
+        onChangeMutableFlow.emit(Unit)
     }
 
     override fun close() {

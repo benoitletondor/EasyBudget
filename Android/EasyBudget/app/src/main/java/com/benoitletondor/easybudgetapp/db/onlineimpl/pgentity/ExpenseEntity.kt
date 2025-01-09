@@ -81,18 +81,14 @@ class ExpenseEntity(
     }
 
     companion object {
-        fun fromCursorOrThrow(cursor: SqlCursor): ExpenseEntity {
-            cursor.next()
-
-            return ExpenseEntity(
-                id = cursor.getLong(EXPENSE_ID_COLUMN_INDEX)!!,
-                accountId = cursor.getString(EXPENSE_ACCOUNT_ID_COLUMN_INDEX)!!,
-                title = cursor.getString(EXPENSE_TITLE_COLUMN_INDEX)!!,
-                amount = cursor.getLong(EXPENSE_AMOUNT_COLUMN_INDEX)!!,
-                date = cursor.getLong(EXPENSE_DATE_COLUMN_INDEX)!!,
-                checked = cursor.getBoolean(EXPENSE_CHECKED_COLUMN_INDEX)!!,
-            )
-        }
+        fun fromCursorOrThrow(cursor: SqlCursor) = ExpenseEntity(
+            id = cursor.getLong(EXPENSE_ID_COLUMN_INDEX)!!,
+            accountId = cursor.getString(EXPENSE_ACCOUNT_ID_COLUMN_INDEX)!!,
+            title = cursor.getString(EXPENSE_TITLE_COLUMN_INDEX)!!,
+            amount = cursor.getLong(EXPENSE_AMOUNT_COLUMN_INDEX)!!,
+            date = cursor.getLong(EXPENSE_DATE_COLUMN_INDEX)!!,
+            checked = cursor.getBoolean(EXPENSE_CHECKED_COLUMN_INDEX)!!,
+        )
 
         suspend fun createFromExpenseOrThrow(expenseId: Long, expense: Expense, account: Account, transaction: PowerSyncTransaction): ExpenseEntity {
             transaction.execute(
