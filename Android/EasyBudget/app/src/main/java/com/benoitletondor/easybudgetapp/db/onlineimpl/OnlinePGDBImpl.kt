@@ -94,8 +94,6 @@ class OnlinePGDBImpl(
                 throw e
             }
 
-            onChangeMutableFlow.emit(Unit)
-
             return expense
         } else {
             if (expense.id != null) {
@@ -216,8 +214,6 @@ class OnlinePGDBImpl(
             return@writeTransaction recurringExpenseEntity.toRecurringExpense()
         }
 
-        onChangeMutableFlow.emit(Unit)
-
         return entity
     }
 
@@ -244,8 +240,6 @@ class OnlinePGDBImpl(
             entity.iCalRepresentation = calRepresentationBeforeUpdate
             throw e
         }
-
-        onChangeMutableFlow.emit(Unit)
     }
 
     override suspend fun deleteRecurringExpense(recurringExpense: RecurringExpense): RestoreAction {
@@ -258,14 +252,10 @@ class OnlinePGDBImpl(
             transaction.execute("DELETE FROM recurring_expense WHERE id = ?", listOf(entity.id))
         }
 
-        onChangeMutableFlow.emit(Unit)
-
         return {
             db.writeTransaction { transaction ->
                 RecurringExpenseEntity.createFromRecurringExpenseOrThrow(entity.id, recurringExpense, account, transaction)
             }
-
-            onChangeMutableFlow.emit(Unit)
         }
     }
 
@@ -289,16 +279,12 @@ class OnlinePGDBImpl(
                 throw e
             }
 
-            onChangeMutableFlow.emit(Unit)
-
             return {
                 entity.iCalRepresentation = icalBeforeDeletion
 
                 db.writeTransaction { transaction ->
                     entity.persistOrThrow(transaction)
                 }
-
-                onChangeMutableFlow.emit(Unit)
             }
         } else {
             db.writeTransaction {
@@ -338,15 +324,11 @@ class OnlinePGDBImpl(
             throw e
         }
 
-        onChangeMutableFlow.emit(Unit)
-
         return {
             db.writeTransaction { transaction ->
                 entity.iCalRepresentation = icalBeforeEdit
                 entity.persistOrThrow(transaction)
             }
-
-            onChangeMutableFlow.emit(Unit)
         }
     }
 
@@ -371,15 +353,11 @@ class OnlinePGDBImpl(
             throw e
         }
 
-        onChangeMutableFlow.emit(Unit)
-
         return {
             db.writeTransaction { transaction ->
                 entity.iCalRepresentation = icalBeforeEdit
                 entity.persistOrThrow(transaction)
             }
-
-            onChangeMutableFlow.emit(Unit)
         }
     }
 
