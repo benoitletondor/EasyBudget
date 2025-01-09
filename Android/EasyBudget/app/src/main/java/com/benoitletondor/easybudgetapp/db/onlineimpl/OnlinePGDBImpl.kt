@@ -411,6 +411,12 @@ class OnlinePGDBImpl(
     }
 
     override fun close() {
+        if (!db.currentStatus.connected && !db.currentStatus.connecting) {
+            Logger.debug("Ignoring call to close for Online DB: ${account.id}, already closed")
+            return
+        }
+
+        Logger.debug("Closing Online DB: ${account.id}")
         runBlocking { db.disconnect() }
 
         cancel()
