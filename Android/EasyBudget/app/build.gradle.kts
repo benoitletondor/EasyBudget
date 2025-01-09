@@ -168,6 +168,9 @@ dependencies {
 
     implementation("io.realm.kotlin:library-sync:$realmVersion")
 
+    implementation("com.powersync:core-android:1.0.0-BETA14")
+    implementation("com.powersync:connector-supabase:1.0.0-BETA14")
+
     implementation("com.kizitonwose.calendar:compose:2.6.1")
     implementation("net.sf.biweekly:biweekly:0.6.8")
 
