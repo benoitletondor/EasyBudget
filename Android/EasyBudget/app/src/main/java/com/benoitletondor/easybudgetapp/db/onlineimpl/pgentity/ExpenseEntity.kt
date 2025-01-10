@@ -12,7 +12,6 @@ import com.powersync.db.schema.Column
 import com.powersync.db.schema.Index
 import com.powersync.db.schema.IndexedColumn
 import com.powersync.db.schema.Table
-import java.security.SecureRandom
 import java.time.LocalDate
 
 private const val EXPENSE_TABLE_NAME = "expense"

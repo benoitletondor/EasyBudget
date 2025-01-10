@@ -38,7 +38,7 @@ android {
     defaultConfig {
         applicationId = "com.benoitletondor.easybudgetapp"
         compileSdk = 35
-        minSdk = 23
+        minSdk = 24
         targetSdk = 35
         versionCode = 165
         versionName = "3.4.2"
@@ -168,8 +168,16 @@ dependencies {
 
     implementation("io.realm.kotlin:library-sync:$realmVersion")
 
-    implementation("com.powersync:core-android:1.0.0-BETA14")
-    implementation("com.powersync:connector-supabase:1.0.0-BETA14")
+    implementation("com.powersync:core-android:1.0.0-BETA15") {
+        exclude("com.powersync", "core-android-debug")
+        // FIXME realm uses ktor 2.0 and powersync uses 3.0, this makes sure realm works correctly but will likely break powersync's runtime
+        exclude("io.ktor")
+    }
+    implementation("com.powersync:connector-supabase:1.0.0-BETA15")  {
+        exclude("com.powersync", "core-android-debug")
+        // FIXME realm uses ktor 2.0 and powersync uses 3.0, this makes sure realm works correctly but will likely break powersync's runtime
+        exclude("io.ktor")
+    }
 
     implementation("com.kizitonwose.calendar:compose:2.6.1")
     implementation("net.sf.biweekly:biweekly:0.6.8")
