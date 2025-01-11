@@ -54,8 +54,8 @@ class OnlinePGDBImpl(
 
     override suspend fun deleteAllEntries() {
         db.writeTransaction { transaction ->
-            transaction.execute("DELETE FROM expense WHERE account_id = ?", listOf(account.id))
-            transaction.execute("DELETE FROM recurring_expense WHERE account_id = ?", listOf(account.id))
+            transaction.execute("DELETE FROM expense", emptyList())
+            transaction.execute("DELETE FROM recurring_expense", emptyList())
         }
     }
 
@@ -152,8 +152,8 @@ class OnlinePGDBImpl(
             .flatten()
 
         val expenses = db.getAll(
-            "SELECT * FROM expense WHERE account_id = ? AND date = ?",
-            listOf(account.id, dayDate.toEpochDay()),
+            "SELECT * FROM expense WHERE date = ?",
+            listOf(dayDate.toEpochDay()),
             ExpenseEntity::fromCursorOrThrow,
         ).map {
             it.toExpense(associatedRecurringExpense = null)
@@ -176,8 +176,8 @@ class OnlinePGDBImpl(
             .fold(0.0) { acc, expenseAmount -> acc + expenseAmount }
 
         val expensesSumUpToTheDay = db.get(
-            "SELECT SUM(amount) FROM expense WHERE account_id = ? AND date <= ?",
-            listOf(account.id, dayDate.toEpochDay()),
+            "SELECT SUM(amount) FROM expense WHERE date <= ?",
+            listOf(dayDate.toEpochDay()),
         ) { cursor ->
             cursor.getLong(0)!!
         }.getRealValueFromDB()
@@ -196,8 +196,8 @@ class OnlinePGDBImpl(
             .fold(0.0) { acc, expenseAmount -> acc + expenseAmount }
 
         val checkedExpensesSumUpToTheDay = db.get(
-            "SELECT SUM(amount) FROM expense WHERE account_id = ? AND date <= ? AND checked == 1",
-            listOf(account.id, dayDate.toEpochDay()),
+            "SELECT SUM(amount) FROM expense WHERE date <= ? AND checked == 1",
+            listOf(dayDate.toEpochDay()),
         ) { cursor ->
             cursor.getLong(0)!!
         }.getRealValueFromDB()
@@ -384,8 +384,8 @@ class OnlinePGDBImpl(
             .map { it.getFirstOccurrence() }.minByOrNull { it.date }
 
         val oldestExpense = db.getOptional(
-            "SELECT * FROM expense WHERE account_id = ? ORDER BY date ASC LIMIT 1",
-            listOf(account.id),
+            "SELECT * FROM expense ORDER BY date ASC LIMIT 1",
+            emptyList(),
             ExpenseEntity::fromCursorOrThrow,
         )?.toExpense(associatedRecurringExpense = null)
 
@@ -404,7 +404,7 @@ class OnlinePGDBImpl(
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
 
         db.writeTransaction { transaction ->
-            transaction.execute("UPDATE expense SET checked = 1 WHERE account_id = ? AND date < ?", listOf(account.id, beforeDate.toEpochDay()))
+            transaction.execute("UPDATE expense SET checked = 1 WHERE date < ?", listOf(beforeDate.toEpochDay()))
 
             for (recurringExpense in recurringExpenses) {
                 recurringExpense.markAllOccurrencesAsChecked(beforeDate)
@@ -436,8 +436,8 @@ class OnlinePGDBImpl(
             .flatten()
 
         val expenses = db.getAll(
-            "SELECT * FROM expense WHERE account_id = ? AND date >= ? AND date <= ?",
-            listOf(account.id, start.toEpochDay(), end.toEpochDay()),
+            "SELECT * FROM expense WHERE date >= ? AND date <= ?",
+            listOf(start.toEpochDay(), end.toEpochDay()),
             ExpenseEntity::fromCursorOrThrow,
         ).map {
             it.toExpense(associatedRecurringExpense = null)
@@ -476,8 +476,8 @@ class OnlinePGDBImpl(
             awaitSyncDone()
 
             db.watch(
-                "SELECT * FROM recurring_expense WHERE account_id = ?",
-                listOf(account.id),
+                "SELECT * FROM recurring_expense",
+                emptyList(),
                 RecurringExpenseEntity::fromCursorOrThrow,
             )
                 .catch { e ->

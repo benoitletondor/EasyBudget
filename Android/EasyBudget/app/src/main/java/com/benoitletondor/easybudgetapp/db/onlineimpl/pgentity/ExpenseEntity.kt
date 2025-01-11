@@ -34,20 +34,16 @@ val expenseEntityTable = Table(
     ),
     indexes = listOf(
         Index(
-            name = "account_id_index",
-            columns = listOf(IndexedColumn("account_id"))
-        ),
-        Index(
-            name = "amount_index",
-            columns = listOf(IndexedColumn("amount"))
+            name = "id_index",
+            columns = listOf(IndexedColumn("id"))
         ),
         Index(
             name = "date_index",
-            columns = listOf(IndexedColumn("date"))
+            columns = listOf(IndexedColumn.ascending("date"))
         ),
         Index(
-            name = "checked_index",
-            columns = listOf(IndexedColumn("checked"))
+            name = "date_checked_index",
+            columns = listOf(IndexedColumn.ascending("date"), IndexedColumn("checked"))
         ),
     )
 )

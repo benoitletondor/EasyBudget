@@ -53,10 +53,6 @@ val recurringExpenseEntityTable = Table(
             name = "recurring_id_index",
             columns = listOf(IndexedColumn("id"))
         ),
-        Index(
-            name = "recurring_account_id_index",
-            columns = listOf(IndexedColumn("account_id"))
-        )
     )
 )
 
@@ -92,7 +88,9 @@ class RecurringExpenseEntity(
     suspend fun addExceptionFromExpense(expense: Expense, originalOccurrenceDate: LocalDate) {
         val cal = getCal()
         cal.addExceptionFromExpense(expense, originalOccurrenceDate)
-        iCalRepresentation = cal.write()
+        iCalRepresentation = withContext(Dispatchers.Default) {
+            cal.write()
+        }
     }
 
     private fun ICalendar.findNonExceptionEventForOriginalOccurrenceDate(originalOccurrenceDate: LocalDate): VEvent
@@ -155,7 +153,9 @@ class RecurringExpenseEntity(
 
         cal.addEvent(exceptionEvent)
 
-        iCalRepresentation = cal.write()
+        iCalRepresentation = withContext(Dispatchers.Default) {
+            cal.write()
+        }
     }
 
     suspend fun deleteOccurrencesAfterDate(date: LocalDate) {
@@ -177,7 +177,9 @@ class RecurringExpenseEntity(
                 }
             }
 
-        iCalRepresentation = cal.write()
+        iCalRepresentation = withContext(Dispatchers.Default) {
+            cal.write()
+        }
     }
 
     suspend fun deleteOccurrencesBeforeDate(date: LocalDate) {
@@ -201,7 +203,9 @@ class RecurringExpenseEntity(
                 }
             }
 
-        iCalRepresentation = cal.write()
+        iCalRepresentation = withContext(Dispatchers.Default) {
+            cal.write()
+        }
     }
 
     suspend fun updateAllOccurrencesAfterDate(
@@ -243,7 +247,9 @@ class RecurringExpenseEntity(
 
         cal.addEvent(newEvent)
 
-        iCalRepresentation = cal.write()
+        iCalRepresentation = withContext(Dispatchers.Default) {
+            cal.write()
+        }
     }
 
     suspend fun getFirstOccurrenceDate(): LocalDate {
@@ -283,7 +289,9 @@ class RecurringExpenseEntity(
             )
         }
 
-        iCalRepresentation = cal.write()
+        iCalRepresentation = withContext(Dispatchers.Default) {
+            cal.write()
+        }
     }
 
     private suspend fun getCal(): ICalendar = withContext(Dispatchers.Default) {
@@ -300,7 +308,7 @@ class RecurringExpenseEntity(
         val originalDate: Date,
     )
 
-    private fun ICalendar.getExpenses(from: LocalDate?, to: LocalDate, recurringExpense: RecurringExpense): List<Expense> {
+    private suspend fun ICalendar.getExpenses(from: LocalDate?, to: LocalDate, recurringExpense: RecurringExpense): List<Expense> = withContext(Dispatchers.Default) {
         val startDate = from?.toStartOfDayDate()
         val endDate = to.toStartOfDayDate()
 
@@ -346,7 +354,7 @@ class RecurringExpenseEntity(
                 }
             }
 
-        return eventsInRange
+        return@withContext eventsInRange
             .map { (event, date, originalDate) ->
                 Expense(
                     id = event.uid.value.hashCode() + date.time,
