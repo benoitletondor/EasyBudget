@@ -17,8 +17,6 @@
 package com.benoitletondor.easybudgetapp.db.onlineimpl
 
 import android.content.Context
-import co.touchlab.kermit.LogWriter
-import co.touchlab.kermit.Severity
 import com.benoitletondor.easybudgetapp.BuildConfig
 import com.benoitletondor.easybudgetapp.auth.Auth
 import com.benoitletondor.easybudgetapp.auth.AuthState
@@ -29,7 +27,6 @@ import com.benoitletondor.easybudgetapp.db.onlineimpl.pgentity.RecurringExpenseE
 import com.benoitletondor.easybudgetapp.db.onlineimpl.pgentity.expenseEntityTable
 import com.benoitletondor.easybudgetapp.db.onlineimpl.pgentity.recurringExpenseEntityTable
 import com.benoitletondor.easybudgetapp.helper.Logger
-import com.benoitletondor.easybudgetapp.helper.SupabaseConnector
 import com.benoitletondor.easybudgetapp.helper.getRealValueFromDB
 import com.benoitletondor.easybudgetapp.model.DataForDay
 import com.benoitletondor.easybudgetapp.model.DataForMonth
@@ -68,6 +65,7 @@ private val readWriteTimeout = 5.toDuration(DurationUnit.SECONDS)
 
 class OnlinePGDBImpl(
     private val db: PowerSyncDatabase,
+    private val supabaseConnector: SupabaseConnector,
     override val account: Account,
 ) : OnlineDB, CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.IO) {
     private var recurringExpenseWatchingJob: Job? = null
@@ -454,6 +452,7 @@ class OnlinePGDBImpl(
 
         Logger.debug("Closing PG Online DB: ${account.id}")
         runBlocking { db.disconnect() }
+        supabaseConnector.close()
 
         cancel()
         recurringExpensesLoadingStateMutableFlow.value = RecurringExpenseLoadingState.NotLoaded
@@ -585,26 +584,7 @@ class OnlinePGDBImpl(
                     )
                 ),
                 dbFilename = "${accountId}_v1.db",
-                logger = co.touchlab.kermit.Logger.let {
-                    it.addLogWriter(object : LogWriter() {
-                        override fun log(
-                            severity: Severity,
-                            message: String,
-                            tag: String,
-                            throwable: Throwable?
-                        ) {
-                            if (severity === Severity.Error || severity === Severity.Assert) {
-                                Logger.error("PowerSync","$tag: $message", throwable ?: Exception("PowerSync error: $message"))
-                            } else if (severity === Severity.Warn) {
-                                Logger.warning("PowerSync","$tag: $message", throwable ?: Exception("PowerSync warning: $message"))
-                            } else if (severity === Severity.Info) {
-                                Logger.debug("PowerSync","$tag: $message")
-                            }
-                        }
-                    })
-                    it.setMinSeverity(if (BuildConfig.DEBUG) Severity.Debug else Severity.Info)
-                    it
-                }
+                logger = co.touchlab.kermit.Logger,
             )
 
             db.connect(
@@ -616,6 +596,7 @@ class OnlinePGDBImpl(
 
             return OnlinePGDBImpl(
                 db = db,
+                supabaseConnector = supabaseConnector,
                 account = Account(
                     id = accountId,
                     secret = accountSecret,

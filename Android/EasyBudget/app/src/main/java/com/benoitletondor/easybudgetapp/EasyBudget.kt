@@ -31,6 +31,8 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import androidx.work.ListenableWorker
+import co.touchlab.kermit.LogWriter
+import co.touchlab.kermit.Severity
 import com.batch.android.Batch
 import com.batch.android.BatchActivityLifecycleHelper
 import com.batch.android.BatchNotificationChannelsManager.DEFAULT_CHANNEL_ID
@@ -117,6 +119,9 @@ class EasyBudget : Application(), Configuration.Provider {
 
         // Realm
         setupRealm()
+
+        // Setup PowerSync
+        setupPowerSync()
 
         // Setup theme
         AppCompatDelegate.setDefaultNightMode(parameters.getTheme().toPlatformValue())
@@ -283,6 +288,26 @@ class EasyBudget : Application(), Configuration.Provider {
                     }
 
                     else -> Unit // No-op
+                }
+            }
+        })
+    }
+
+    private fun setupPowerSync() {
+        co.touchlab.kermit.Logger.setMinSeverity(if (BuildConfig.DEBUG) Severity.Debug else Severity.Info)
+        co.touchlab.kermit.Logger.addLogWriter(object : LogWriter() {
+            override fun log(
+                severity: Severity,
+                message: String,
+                tag: String,
+                throwable: Throwable?
+            ) {
+                if (severity === Severity.Error || severity === Severity.Assert) {
+                    Logger.error("PowerSync","$tag: $message", throwable ?: Exception("PowerSync error: $message"))
+                } else if (severity === Severity.Warn) {
+                    Logger.warning("PowerSync","$tag: $message", throwable ?: Exception("PowerSync warning: $message"))
+                } else if (severity === Severity.Info) {
+                    Logger.debug("PowerSync","$tag: $message")
                 }
             }
         })

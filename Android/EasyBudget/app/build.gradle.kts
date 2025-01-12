@@ -181,6 +181,7 @@ dependencies {
 
     implementation("io.realm.kotlin:library-sync:$realmVersion")
 
+    // Be careful to check the code of SupabaseConnector when upgrading, especially around the ignoreNextInvalidate part
     implementation("com.powersync:core-android:1.0.0-BETA15") {
         // FIXME realm uses ktor 2.0 and powersync uses 3.0, this makes sure realm works correctly but will likely break powersync's runtime
         // exclude("io.ktor")

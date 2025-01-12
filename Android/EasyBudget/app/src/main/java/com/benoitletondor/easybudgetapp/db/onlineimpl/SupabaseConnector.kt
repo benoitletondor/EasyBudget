@@ -14,9 +14,11 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp.helper
+package com.benoitletondor.easybudgetapp.db.onlineimpl
 
+import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Logger
+import co.touchlab.kermit.Severity
 import com.benoitletondor.easybudgetapp.auth.Auth
 import com.benoitletondor.easybudgetapp.auth.AuthState
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
@@ -35,9 +37,6 @@ import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.Job
 import kotlinx.serialization.json.Json
 
-/**
- * Get a Supabase token to authenticate against the PowerSync instance.
- */
 @OptIn(SupabaseInternal::class)
 class SupabaseConnector(
     private val supabaseClient: SupabaseClient,
@@ -45,8 +44,6 @@ class SupabaseConnector(
     currentUser: CurrentUser,
     private val auth: Auth,
 ) : PowerSyncBackendConnector() {
-    private var currentUser: CurrentUser? = currentUser
-
     private var errorCode: String? = null
 
     private object PostgresFatalCodes {
@@ -92,16 +89,55 @@ class SupabaseConnector(
         }
     }
 
+    private val logWriter = object : LogWriter() {
+        override fun log(
+            severity: Severity,
+            message: String,
+            tag: String,
+            throwable: Throwable?
+        ) {
+            // Faulty code is in SyncStream.kt, see https://github.com/powersync-ja/powersync-kotlin/issues/102
+            if (message == "Error in streamingSync" && severity == Severity.Error) {
+                com.benoitletondor.easybudgetapp.helper.Logger.debug("SupabaseConnector", "Detected error in streamingSync, ignoring next invalidate")
+                ignoreNextInvalidate = true
+            }
+        }
+
+    }
+
+    init {
+        Logger.addLogWriter(logWriter)
+    }
+
+    fun close() {
+        Logger.mutableConfig.logWriterList -= logWriter
+    }
+
+    private var ignoreNextInvalidate = false
+    private var currentUser: CurrentUser? = currentUser
 
     override fun invalidateCredentials() {
-        com.benoitletondor.easybudgetapp.helper.Logger.debug("SupabaseConnector", "Invalidating token")
+        com.benoitletondor.easybudgetapp.helper.Logger.debug(
+            "SupabaseConnector",
+            "Invalidating token"
+        )
+
+        if (ignoreNextInvalidate) {
+            com.benoitletondor.easybudgetapp.helper.Logger.debug("SupabaseConnector", "Ignoring invalidate")
+            ignoreNextInvalidate = false
+            return
+        }
+
         currentUser = null
     }
 
     override suspend fun fetchCredentials(): PowerSyncCredentials {
         val currentUser = currentUser
         val token = if (currentUser == null) {
-            com.benoitletondor.easybudgetapp.helper.Logger.debug("SupabaseConnector", "Regenerating token")
+            com.benoitletondor.easybudgetapp.helper.Logger.debug(
+                "SupabaseConnector",
+                "Regenerating token"
+            )
             auth.refreshUserTokens()
             val newUser = (auth.state.value as? AuthState.Authenticated)?.currentUser ?: throw IllegalStateException("User not authenticated")
             this.currentUser = newUser
