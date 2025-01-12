@@ -388,7 +388,7 @@ class RecurringExpenseEntity(
     suspend fun persistOrThrow(transaction: PowerSyncTransaction) {
         transaction.execute(
             "UPDATE $RECURRING_EXPENSE_TABLE_NAME SET i_cal_representation = ? WHERE id = ?",
-            listOf(id, iCalRepresentation)
+            listOf(iCalRepresentation, id)
         )
     }
 
