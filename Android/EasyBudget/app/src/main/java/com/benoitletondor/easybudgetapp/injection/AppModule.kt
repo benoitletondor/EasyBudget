@@ -36,6 +36,7 @@ import com.benoitletondor.easybudgetapp.db.offlineimpl.OfflineDBImpl
 import com.benoitletondor.easybudgetapp.db.offlineimpl.RoomDB
 import com.benoitletondor.easybudgetapp.db.onlineimpl.OnlineDB
 import com.benoitletondor.easybudgetapp.db.onlineimpl.OnlineDBImpl
+import com.benoitletondor.easybudgetapp.db.onlineimpl.OnlinePGDBImpl
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import dagger.Module
@@ -89,37 +90,60 @@ object AppModule {
     @Singleton
     fun provideConfig(): Config = FirebaseRemoteConfig()
 
+    private const val SHOULD_USE_MONGO = false
+
     private var app: App? = null
     private var usedOnlineDB: CachedOnlineDBImpl? = null
 
     suspend fun provideSyncedOnlineDBOrThrow(
+        appContext: Context,
         currentUser: CurrentUser,
+        auth: Auth,
         accountId: String,
         accountSecret: String,
     ): OnlineDB {
         usedOnlineDB?.close()
 
-        val app = this.app ?: run {
-            val createdApp = App.create(
-                AppConfiguration.Builder(BuildConfig.ATLAS_APP_ID)
-                    .enableSessionMultiplexing(true)
-                    .build()
+        if (SHOULD_USE_MONGO) {
+            val app = this.app ?: run {
+                val createdApp = App.create(
+                    AppConfiguration.Builder(BuildConfig.ATLAS_APP_ID)
+                        .enableSessionMultiplexing(true)
+                        .build()
+                )
+
+                this.app = createdApp
+                createdApp
+            }
+
+            val db = CachedOnlineDBImpl(
+                OnlineDBImpl.provideFor(
+                    currentUser = currentUser,
+                    accountId = accountId,
+                    accountSecret = accountSecret,
+                    app = app,
+                ),
             )
 
-            this.app = createdApp
-            createdApp
+            usedOnlineDB = db
+            return db
+        } else {
+            val db = CachedOnlineDBImpl(
+                OnlinePGDBImpl.provideFor(
+                    currentUser = currentUser,
+                    auth = auth,
+                    accountId = accountId,
+                    accountSecret = accountSecret,
+                    appContext = appContext,
+                )
+            )
+
+            usedOnlineDB = db
+            return db
         }
 
-        val db = CachedOnlineDBImpl(
-            OnlineDBImpl.provideFor(
-                currentUser = currentUser,
-                accountId = accountId,
-                accountSecret = accountSecret,
-                app = app,
-            ),
-        )
 
-        usedOnlineDB = db
-        return db
+
+
     }
 }

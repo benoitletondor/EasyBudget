@@ -1,16 +1,47 @@
+/*
+ *   Copyright 2025 Benoit Letondor
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
 package com.benoitletondor.easybudgetapp.db.onlineimpl
 
+import android.content.Context
+import co.touchlab.kermit.LogWriter
+import co.touchlab.kermit.Severity
+import com.benoitletondor.easybudgetapp.BuildConfig
+import com.benoitletondor.easybudgetapp.auth.Auth
+import com.benoitletondor.easybudgetapp.auth.AuthState
+import com.benoitletondor.easybudgetapp.auth.CurrentUser
 import com.benoitletondor.easybudgetapp.db.RestoreAction
 import com.benoitletondor.easybudgetapp.db.onlineimpl.pgentity.ExpenseEntity
 import com.benoitletondor.easybudgetapp.db.onlineimpl.pgentity.RecurringExpenseEntity
+import com.benoitletondor.easybudgetapp.db.onlineimpl.pgentity.expenseEntityTable
+import com.benoitletondor.easybudgetapp.db.onlineimpl.pgentity.recurringExpenseEntityTable
 import com.benoitletondor.easybudgetapp.helper.Logger
+import com.benoitletondor.easybudgetapp.helper.SupabaseConnector
 import com.benoitletondor.easybudgetapp.helper.getRealValueFromDB
 import com.benoitletondor.easybudgetapp.model.DataForDay
 import com.benoitletondor.easybudgetapp.model.DataForMonth
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
 import com.kizitonwose.calendar.core.atStartOfMonth
+import com.powersync.DatabaseDriverFactory
 import com.powersync.PowerSyncDatabase
+import com.powersync.db.schema.Schema
+import com.powersync.utils.JsonParam
+import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.createSupabaseClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -175,11 +206,11 @@ class OnlinePGDBImpl(
             .map { it.amount }
             .fold(0.0) { acc, expenseAmount -> acc + expenseAmount }
 
-        val expensesSumUpToTheDay = db.get(
+        val expensesSumUpToTheDay = db.getOptional(
             "SELECT SUM(amount) FROM expense WHERE date <= ?",
             listOf(dayDate.toEpochDay()),
         ) { cursor ->
-            cursor.getLong(0)!!
+            cursor.getLong(0) ?: 0
         }.getRealValueFromDB()
 
         return sumOfRecurringExpenseUpToTheDay + expensesSumUpToTheDay
@@ -199,7 +230,7 @@ class OnlinePGDBImpl(
             "SELECT SUM(amount) FROM expense WHERE date <= ? AND checked == 1",
             listOf(dayDate.toEpochDay()),
         ) { cursor ->
-            cursor.getLong(0)!!
+            cursor.getLong(0) ?: 0
         }.getRealValueFromDB()
 
         return sumOfRecurringCheckedExpenseUpToTheDay + checkedExpensesSumUpToTheDay
@@ -518,5 +549,78 @@ class OnlinePGDBImpl(
         data object Loading : RecurringExpenseLoadingState()
         data class Loaded(val expenses: List<RecurringExpenseEntity>) : RecurringExpenseLoadingState()
         class Error(val exception: Throwable) : RecurringExpenseLoadingState()
+    }
+
+    companion object {
+        suspend fun provideFor(
+            appContext: Context,
+            currentUser: CurrentUser,
+            auth: Auth,
+            accountId: String,
+            accountSecret: String,
+        ): OnlinePGDBImpl {
+            val supabaseConnector = SupabaseConnector(
+                supabaseClient = createSupabaseClient(
+                    supabaseUrl = BuildConfig.SUPABASE_URL,
+                    supabaseKey = BuildConfig.SUPABASE_ANON_KEY,
+                    builder = {
+                        this.accessToken = {
+                            (auth.state.value as? AuthState.Authenticated)?.currentUser?.token
+                        }
+
+                        install(Postgrest)
+                    },
+                ),
+                powerSyncEndpoint = BuildConfig.POWER_SYNC_ENDPOINT,
+                currentUser = currentUser,
+                auth = auth,
+            )
+
+            val db = PowerSyncDatabase(
+                factory = DatabaseDriverFactory(context = appContext),
+                schema = Schema(
+                    listOf(
+                        expenseEntityTable,
+                        recurringExpenseEntityTable,
+                    )
+                ),
+                dbFilename = "${accountId}_v1.db",
+                logger = co.touchlab.kermit.Logger.let {
+                    it.addLogWriter(object : LogWriter() {
+                        override fun log(
+                            severity: Severity,
+                            message: String,
+                            tag: String,
+                            throwable: Throwable?
+                        ) {
+                            if (severity === Severity.Error || severity === Severity.Assert) {
+                                Logger.error("PowerSync","$tag: $message", throwable ?: Exception("PowerSync error: $message"))
+                            } else if (severity === Severity.Warn) {
+                                Logger.warning("PowerSync","$tag: $message", throwable ?: Exception("PowerSync warning: $message"))
+                            } else if (severity === Severity.Info) {
+                                Logger.debug("PowerSync","$tag: $message")
+                            }
+                        }
+                    })
+                    it.setMinSeverity(if (BuildConfig.DEBUG) Severity.Debug else Severity.Info)
+                    it
+                }
+            )
+
+            db.connect(
+                supabaseConnector,
+                params = mapOf(
+                    "account_id" to JsonParam.String(accountId),
+                ),
+            )
+
+            return OnlinePGDBImpl(
+                db = db,
+                account = Account(
+                    id = accountId,
+                    secret = accountSecret,
+                ),
+            )
+        }
     }
 }

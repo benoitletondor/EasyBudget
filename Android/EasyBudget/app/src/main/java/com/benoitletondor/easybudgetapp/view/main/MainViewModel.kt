@@ -255,7 +255,9 @@ class MainViewModel @Inject constructor(
                                 val currentUser = (auth.state.value as? AuthState.Authenticated)?.currentUser ?: throw IllegalStateException("User is not authenticated")
 
                                 AppModule.provideSyncedOnlineDBOrThrow(
+                                    appContext = appContext,
                                     currentUser = currentUser,
+                                    auth = auth,
                                     accountId = selectedAccount.accountId,
                                     accountSecret = selectedAccount.accountSecret,
                                 )

@@ -1,3 +1,19 @@
+/*
+ *   Copyright 2025 Benoit Letondor
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
 package com.benoitletondor.easybudgetapp.db.onlineimpl.pgentity
 
 import app.cash.sqldelight.db.SqlCursor
@@ -44,16 +60,9 @@ private const val RECURRING_EXPENSE_I_CAL_REPRESENTATION_COLUMN_INDEX = 2
 val recurringExpenseEntityTable = Table(
     RECURRING_EXPENSE_TABLE_NAME,
     listOf(
-        Column.text("id"),
         Column.text("account_id"),
         Column.text("i_cal_representation"),
     ),
-    indexes = listOf(
-        Index(
-            name = "recurring_id_index",
-            columns = listOf(IndexedColumn("id"))
-        ),
-    )
 )
 
 class RecurringExpenseEntity(

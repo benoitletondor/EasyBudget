@@ -30,6 +30,7 @@ apply {
     from("batch.gradle.kts")
     from("iap.gradle.kts")
     from("atlas.gradle.kts")
+    from("pg.gradle.kts")
 }
 
 android {
@@ -50,6 +51,9 @@ android {
             val batchDevKey = rootProject.extra["batchDevKey"] as String
             val licenceKey = rootProject.extra["licenceKey"] as String
             val atlasAppId = rootProject.extra["devAtlasAppId"] as String
+            val powerSyncEndpoint = rootProject.extra["powerSyncEndpointDev"] as String
+            val supabaseUrl = rootProject.extra["supabaseUrlDev"] as String
+            val supabaseAnonKey = rootProject.extra["supabaseAnonKeyDev"] as String
 
             buildConfigField("boolean", "DEBUG_LOG", "true")
             buildConfigField("boolean", "CRASHLYTICS_ACTIVATED", "false")
@@ -58,6 +62,9 @@ android {
             buildConfigField("boolean", "DEV_PREFERENCES", "true")
             buildConfigField("String", "LICENCE_KEY", "\"$licenceKey\"")
             buildConfigField("String", "ATLAS_APP_ID", "\"$atlasAppId\"")
+            buildConfigField("String", "POWER_SYNC_ENDPOINT", "\"$powerSyncEndpoint\"")
+            buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
+            buildConfigField("String", "SUPABASE_ANON_KEY", "\"$supabaseAnonKey\"")
 
             signingConfig = signingConfigs.getByName("debug")
         }
@@ -65,6 +72,9 @@ android {
             val batchLiveKey = rootProject.extra["batchLiveKey"] as String
             val licenceKey = rootProject.extra["licenceKey"] as String
             val atlasAppId = rootProject.extra["atlasAppId"] as String
+            val powerSyncEndpoint = rootProject.extra["powerSyncEndpoint"] as String
+            val supabaseUrl = rootProject.extra["supabaseUrl"] as String
+            val supabaseAnonKey = rootProject.extra["supabaseAnonKey"] as String
 
             buildConfigField("boolean", "DEBUG_LOG", "false")
             buildConfigField("boolean", "CRASHLYTICS_ACTIVATED", "true")
@@ -73,6 +83,9 @@ android {
             buildConfigField("boolean", "DEV_PREFERENCES", "false")
             buildConfigField("String", "LICENCE_KEY", "\"$licenceKey\"")
             buildConfigField("String", "ATLAS_APP_ID", "\"$atlasAppId\"")
+            buildConfigField("String", "POWER_SYNC_ENDPOINT", "\"$powerSyncEndpoint\"")
+            buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
+            buildConfigField("String", "SUPABASE_ANON_KEY", "\"$supabaseAnonKey\"")
 
             isMinifyEnabled = true
             isShrinkResources = true
@@ -169,15 +182,10 @@ dependencies {
     implementation("io.realm.kotlin:library-sync:$realmVersion")
 
     implementation("com.powersync:core-android:1.0.0-BETA15") {
-        exclude("com.powersync", "core-android-debug")
         // FIXME realm uses ktor 2.0 and powersync uses 3.0, this makes sure realm works correctly but will likely break powersync's runtime
-        exclude("io.ktor")
+        // exclude("io.ktor")
     }
-    implementation("com.powersync:connector-supabase:1.0.0-BETA15")  {
-        exclude("com.powersync", "core-android-debug")
-        // FIXME realm uses ktor 2.0 and powersync uses 3.0, this makes sure realm works correctly but will likely break powersync's runtime
-        exclude("io.ktor")
-    }
+    implementation("io.github.jan-tennert.supabase:postgrest-kt:3.0.1") // Make sure to update this when updating powersync
 
     implementation("com.kizitonwose.calendar:compose:2.6.1")
     implementation("net.sf.biweekly:biweekly:0.6.8")
