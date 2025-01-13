@@ -15,8 +15,12 @@
  */
 package com.benoitletondor.easybudgetapp.view.main
 
+import android.app.Activity
 import android.app.ProgressDialog
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
@@ -192,6 +196,7 @@ fun MainView(
         navigateToAddExpense = navigateToAddExpense,
         navigateToAddRecurringExpense = navigateToAddRecurringExpense,
         onMonthlyReportHintDismissed = viewModel::onMonthlyReportHintDismissed,
+        onUpdateAppClicked = viewModel::onUpdateAppClicked,
     )
 }
 
@@ -267,6 +272,7 @@ private fun MainView(
     navigateToAddExpense: (LocalDate, Expense?) -> Unit,
     navigateToAddRecurringExpense: (LocalDate, Expense?) -> Unit,
     onMonthlyReportHintDismissed: () -> Unit,
+    onUpdateAppClicked: () -> Unit,
 ) {
     var showAccountSelectorModal by rememberSaveable { mutableStateOf(false) }
     val accountSelectorModalSheetState = rememberModalBottomSheetState()
@@ -594,6 +600,34 @@ private fun MainView(
                 }
                 MainViewModel.Event.StartOnboarding -> navigateToOnboarding()
                 MainViewModel.Event.CloseApp -> closeApp()
+                MainViewModel.Event.ShowUpdateAfterPgMigration -> {
+                    MaterialAlertDialogBuilder(context)
+                        .setTitle(R.string.account_migrated_to_pg_error_title)
+                        .setMessage(R.string.account_migrated_to_pg_error_message)
+                        .setPositiveButton(R.string.account_migrated_to_pg_error_update_cta) { dialog, _ ->
+                            dialog.dismiss()
+                            onUpdateAppClicked()
+                        }
+                        .setNegativeButton(R.string.cancel) { dialog1, _ ->
+                            dialog1.dismiss()
+                        }
+                        .show()
+                }
+
+                MainViewModel.Event.OpenPlayStore -> {
+                    val activity = context as Activity
+                    val appPackageName = activity.packageName
+
+                    try {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$appPackageName"))
+
+                        activity.startActivity(intent)
+                    } catch (e: ActivityNotFoundException) {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName"))
+
+                        activity.startActivity(intent)
+                    }
+                }
             }
         }
     }
@@ -852,6 +886,7 @@ private fun Preview(
                 ownerEmail = "test@test.com",
                 accountId = "accountId",
                 accountSecret = "accountSecret",
+                hasBeenMigratedToPg = false,
             )),
             dbStateFlow = MutableStateFlow(dbState),
             eventFlow = MutableSharedFlow(),
@@ -969,6 +1004,7 @@ private fun Preview(
             navigateToAddExpense = { _, _ -> },
             navigateToAddRecurringExpense = { _, _ -> },
             onMonthlyReportHintDismissed = {},
+            onUpdateAppClicked = {},
         )
     }
 }

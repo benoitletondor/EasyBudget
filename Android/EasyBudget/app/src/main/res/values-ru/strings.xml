@@ -485,4 +485,8 @@
     <string name="update_three_dot_two_notification_cta">Обнаружить</string>
     <string name="settings_error_loading_title">Не удалось загрузить настройки</string>
     <string name="settings_error_loading_description">Произошла ошибка при загрузке настроек. Пожалуйста, попробуйте еще раз.\n(%s)</string>
+
+    <string name="account_migrated_to_pg_error_title">Требуется обновление приложения</string>
+    <string name="account_migrated_to_pg_error_message">Эта учетная запись использовалась в более поздней версии приложения, и вам необходимо обновить EasyBudget, чтобы получить к ней доступ.\n\nВы хотите открыть PlayStore, чтобы обновить приложение?\n\n(Если обновление недоступно, подождите несколько часов и повторите попытку)</string>
+    <string name="account_migrated_to_pg_error_update_cta">Обновить приложение</string>
 </resources>

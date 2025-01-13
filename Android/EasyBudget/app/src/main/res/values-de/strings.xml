@@ -483,4 +483,8 @@
     <string name="update_three_dot_two_notification_cta">Entdecken</string>
     <string name="settings_error_loading_title">Einstellungen konnten nicht geladen werden</string>
     <string name="settings_error_loading_description">Beim Laden der Einstellungen ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.\n(%s)</string>
+
+    <string name="account_migrated_to_pg_error_title">App-Update erforderlich</string>
+    <string name="account_migrated_to_pg_error_message">Dieses Konto wurde in einer neueren Version der App verwendet und Sie müssen EasyBudget aktualisieren, um darauf zugreifen zu können.\n\nMöchten Sie den PlayStore öffnen, um die App zu aktualisieren?\n\n(Wenn kein Update verfügbar ist, warten Sie bitte einige Stunden und versuchen Sie es erneut.)</string>
+    <string name="account_migrated_to_pg_error_update_cta">App aktualisieren</string>
 </resources>
