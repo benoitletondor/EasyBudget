@@ -60,6 +60,7 @@ import io.realm.kotlin.mongodb.exceptions.AuthException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -233,12 +234,16 @@ class MainViewModel @Inject constructor(
         }
     }
         .onEach { account ->
-            if (account is SelectedAccount.Selected.Online && account.hasBeenMigratedToPg) {
-                parameters.setLatestSelectedOnlineAccountId(null)
-                selectedOnlineAccountIdMutableStateFlow.value = null
+            viewModelScope.async {
+                if (account is SelectedAccount.Selected.Online && !account.hasBeenMigratedToPg) {
+                    Logger.debug("Marking account ${account.accountId} as migrated to PG")
 
-                eventMutableFlow.emit(Event.ShowUpdateAfterPgMigration)
-            }
+                    accounts.markAccountAsMigratedToPg(
+                        currentUser = (auth.state.value as? AuthState.Authenticated)?.currentUser ?: return@async,
+                        accountCredentials = AccountCredentials(id = account.accountId, secret = account.accountSecret),
+                    )
+                }
+            }.start()
         }
         .retryWhen { cause, _ ->
             Logger.error("Error while building accountSelectionFlow", cause)
@@ -358,14 +363,6 @@ class MainViewModel @Inject constructor(
             retryLoadingAccountsEventMutableFlow.emit(Unit)
         }
 
-        if (account is SelectedAccount.Selected.Online && account.hasBeenMigratedToPg) {
-            viewModelScope.launch {
-                eventMutableFlow.emit(Event.ShowUpdateAfterPgMigration)
-            }
-
-            return
-        }
-
         val onlineAccountId = when(account) {
             SelectedAccount.Selected.Offline -> null
             is SelectedAccount.Selected.Online -> account.accountId
@@ -373,12 +370,6 @@ class MainViewModel @Inject constructor(
 
         parameters.setLatestSelectedOnlineAccountId(onlineAccountId)
         selectedOnlineAccountIdMutableStateFlow.value = onlineAccountId
-    }
-
-    fun onUpdateAppClicked() {
-        viewModelScope.launch {
-            eventMutableFlow.emit(Event.OpenPlayStore)
-        }
     }
 
     val showMenuActionButtonsFlow: StateFlow<Boolean> = iab.iabStatusFlow
@@ -883,8 +874,6 @@ class MainViewModel @Inject constructor(
         data class OpenEditRecurringExpenseOccurrence(val expense: Expense) : Event()
         data object StartOnboarding : Event()
         data object CloseApp : Event()
-        data object ShowUpdateAfterPgMigration : Event()
-        data object OpenPlayStore : Event()
     }
 
 
