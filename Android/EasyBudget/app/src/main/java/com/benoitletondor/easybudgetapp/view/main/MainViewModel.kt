@@ -37,6 +37,7 @@ import com.benoitletondor.easybudgetapp.helper.getOfflineAccountBackupStatusFlow
 import com.benoitletondor.easybudgetapp.helper.watchUserCurrency
 import com.benoitletondor.easybudgetapp.iab.PremiumCheckStatus
 import com.benoitletondor.easybudgetapp.injection.AppModule
+import com.benoitletondor.easybudgetapp.injection.AppModule.SHOULD_USE_MONGO
 import com.benoitletondor.easybudgetapp.injection.CurrentDBProvider
 import com.benoitletondor.easybudgetapp.model.DataForMonth
 import com.benoitletondor.easybudgetapp.model.Expense
@@ -235,7 +236,7 @@ class MainViewModel @Inject constructor(
     }
         .onEach { account ->
             viewModelScope.async {
-                if (account is SelectedAccount.Selected.Online && !account.hasBeenMigratedToPg) {
+                if (!SHOULD_USE_MONGO && account is SelectedAccount.Selected.Online && !account.hasBeenMigratedToPg) {
                     Logger.debug("Marking account ${account.accountId} as migrated to PG")
 
                     accounts.markAccountAsMigratedToPg(

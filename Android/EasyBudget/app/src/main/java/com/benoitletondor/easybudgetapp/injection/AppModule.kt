@@ -90,7 +90,7 @@ object AppModule {
     @Singleton
     fun provideConfig(): Config = FirebaseRemoteConfig()
 
-    private const val SHOULD_USE_MONGO = false // Make sure to add the exclude("io.ktor") in gradle when changing this
+    const val SHOULD_USE_MONGO = false // Make sure to add the exclude("io.ktor") in gradle when changing this
 
     private var app: App? = null
     private var usedOnlineDB: CachedOnlineDBImpl? = null
