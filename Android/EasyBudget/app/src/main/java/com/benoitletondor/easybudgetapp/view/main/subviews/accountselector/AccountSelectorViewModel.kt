@@ -218,6 +218,7 @@ class AccountSelectorViewModel @Inject constructor(
         val name: String,
         val selected: Boolean,
         val ownerEmail: String,
+        val hasBeenMigratedToPg: Boolean,
     ) {
         fun toAccountCredentials() = AccountCredentials(
             id = id,
@@ -231,6 +232,7 @@ class AccountSelectorViewModel @Inject constructor(
         name = name,
         ownerEmail = ownerEmail,
         selected = maybeSelectedOnlineAccountId == id,
+        hasBeenMigratedToPg = hasBeenMigratedToPg,
     )
 
     data class Invitation(

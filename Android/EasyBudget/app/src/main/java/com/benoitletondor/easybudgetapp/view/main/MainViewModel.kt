@@ -221,6 +221,7 @@ class MainViewModel @Inject constructor(
                             ownerEmail = account.ownerEmail,
                             accountId = account.id,
                             accountSecret = account.secret,
+                            hasBeenMigratedToPg = account.hasBeenMigratedToPg,
                         )
                     } ?: SelectedAccount.Selected.Offline
                 OnlineAccountResponse.Loading -> SelectedAccount.Loading
@@ -230,14 +231,24 @@ class MainViewModel @Inject constructor(
                 }
             }
         }
-    }.retryWhen { cause, _ ->
-        Logger.error("Error while building accountSelectionFlow", cause)
-        emit(SelectedAccount.Selected.Offline)
+    }
+        .onEach { account ->
+            if (account is SelectedAccount.Selected.Online && account.hasBeenMigratedToPg) {
+                parameters.setLatestSelectedOnlineAccountId(null)
+                selectedOnlineAccountIdMutableStateFlow.value = null
 
-        retryLoadingAccountsEventMutableFlow.first()
+                eventMutableFlow.emit(Event.ShowUpdateAfterPgMigration)
+            }
+        }
+        .retryWhen { cause, _ ->
+            Logger.error("Error while building accountSelectionFlow", cause)
+            emit(SelectedAccount.Selected.Offline)
 
-        true
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, SelectedAccount.Loading)
+            retryLoadingAccountsEventMutableFlow.first()
+
+            true
+        }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, SelectedAccount.Loading)
 
     private var changesWatchingJob: Job? = null
     val dbAvailableFlow: StateFlow<DBState> = accountSelectionFlow
@@ -347,6 +358,14 @@ class MainViewModel @Inject constructor(
             retryLoadingAccountsEventMutableFlow.emit(Unit)
         }
 
+        if (account is SelectedAccount.Selected.Online && account.hasBeenMigratedToPg) {
+            viewModelScope.launch {
+                eventMutableFlow.emit(Event.ShowUpdateAfterPgMigration)
+            }
+
+            return
+        }
+
         val onlineAccountId = when(account) {
             SelectedAccount.Selected.Offline -> null
             is SelectedAccount.Selected.Online -> account.accountId
@@ -354,6 +373,12 @@ class MainViewModel @Inject constructor(
 
         parameters.setLatestSelectedOnlineAccountId(onlineAccountId)
         selectedOnlineAccountIdMutableStateFlow.value = onlineAccountId
+    }
+
+    fun onUpdateAppClicked() {
+        viewModelScope.launch {
+            eventMutableFlow.emit(Event.OpenPlayStore)
+        }
     }
 
     val showMenuActionButtonsFlow: StateFlow<Boolean> = iab.iabStatusFlow
@@ -800,6 +825,7 @@ class MainViewModel @Inject constructor(
                 val ownerEmail: String,
                 val accountId: String,
                 val accountSecret: String,
+                val hasBeenMigratedToPg: Boolean,
             ) : Selected() {
                 fun toAccountCredentials() = AccountCredentials(
                     id = accountId,
@@ -857,6 +883,8 @@ class MainViewModel @Inject constructor(
         data class OpenEditRecurringExpenseOccurrence(val expense: Expense) : Event()
         data object StartOnboarding : Event()
         data object CloseApp : Event()
+        data object ShowUpdateAfterPgMigration : Event()
+        data object OpenPlayStore : Event()
     }
 
 

@@ -22,4 +22,5 @@ data class Account(
     val name: String,
     val ownerEmail: String,
     val isUserOwner: Boolean,
+    val hasBeenMigratedToPg: Boolean,
 )

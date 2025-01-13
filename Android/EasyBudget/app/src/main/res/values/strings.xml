@@ -512,5 +512,9 @@
     <string name="setting_notification_permission_rejected_dialog_not_now_cta">Not now</string>
     <string name="settings_error_loading_title">Unable to load settings</string>
     <string name="settings_error_loading_description">An error occurred while loading settings. Please try again.\n(%s)</string>
+
+    <string name="account_migrated_to_pg_error_title">App update required</string>
+    <string name="account_migrated_to_pg_error_message">This account has been used in a more recent version of the app and you need to update EasyBudget to access it.\n\nDo you want to open the PlayStore to update the app?\n\n(If no update is available, please wait a few hours and try again)</string>
+    <string name="account_migrated_to_pg_error_update_cta">Update app</string>
 </resources>
 
