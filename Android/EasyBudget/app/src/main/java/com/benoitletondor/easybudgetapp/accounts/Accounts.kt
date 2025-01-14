@@ -36,5 +36,5 @@ interface Accounts {
     suspend fun updateAccountName(currentUser: CurrentUser, accountCredentials: AccountCredentials, newName: String)
     suspend fun leaveAccount(currentUser: CurrentUser, accountCredentials: AccountCredentials)
     suspend fun deleteAccount(currentUser: CurrentUser, accountCredentials: AccountCredentials)
-    suspend fun markAccountAsMigratedToPg(currentUser: CurrentUser, accountCredentials: AccountCredentials)
+    suspend fun markAccountAsMigratedToPg(accountCredentials: AccountCredentials)
 }

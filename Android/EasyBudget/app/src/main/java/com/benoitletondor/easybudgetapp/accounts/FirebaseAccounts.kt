@@ -201,7 +201,6 @@ class FirebaseAccounts(
     }
 
     override suspend fun markAccountAsMigratedToPg(
-        currentUser: CurrentUser,
         accountCredentials: AccountCredentials
     ) {
         db.collection(ACCOUNTS_COLLECTION)

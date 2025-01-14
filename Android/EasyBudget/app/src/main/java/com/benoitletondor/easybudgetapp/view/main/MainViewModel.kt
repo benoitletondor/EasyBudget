@@ -37,7 +37,6 @@ import com.benoitletondor.easybudgetapp.helper.getOfflineAccountBackupStatusFlow
 import com.benoitletondor.easybudgetapp.helper.watchUserCurrency
 import com.benoitletondor.easybudgetapp.iab.PremiumCheckStatus
 import com.benoitletondor.easybudgetapp.injection.AppModule
-import com.benoitletondor.easybudgetapp.injection.AppModule.SHOULD_USE_MONGO
 import com.benoitletondor.easybudgetapp.injection.CurrentDBProvider
 import com.benoitletondor.easybudgetapp.model.DataForMonth
 import com.benoitletondor.easybudgetapp.model.Expense
@@ -61,7 +60,6 @@ import io.realm.kotlin.mongodb.exceptions.AuthException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -234,17 +232,16 @@ class MainViewModel @Inject constructor(
             }
         }
     }
-        .onEach { account ->
-            viewModelScope.async {
-                if (!SHOULD_USE_MONGO && account is SelectedAccount.Selected.Online && !account.hasBeenMigratedToPg) {
-                    Logger.debug("Marking account ${account.accountId} as migrated to PG")
-
-                    accounts.markAccountAsMigratedToPg(
-                        currentUser = (auth.state.value as? AuthState.Authenticated)?.currentUser ?: return@async,
-                        accountCredentials = AccountCredentials(id = account.accountId, secret = account.accountSecret),
-                    )
+        // This ensures we don't emit a new account and reload everything if only the hasBeenMigratedToPg flag changes
+        // Make sure to remove this when migration has been done
+        .runningFold(SelectedAccount.Loading as SelectedAccount) { previous, next ->
+            if (previous is SelectedAccount.Selected.Online && next is SelectedAccount.Selected.Online) {
+                if (previous == next.copy(hasBeenMigratedToPg = false)) {
+                    return@runningFold previous
                 }
-            }.start()
+            }
+
+            return@runningFold next
         }
         .retryWhen { cause, _ ->
             Logger.error("Error while building accountSelectionFlow", cause)
@@ -277,6 +274,8 @@ class MainViewModel @Inject constructor(
                                     auth = auth,
                                     accountId = selectedAccount.accountId,
                                     accountSecret = selectedAccount.accountSecret,
+                                    accountHasBeenMigratedToPg = selectedAccount.hasBeenMigratedToPg,
+                                    accounts = accounts,
                                 )
                             }
                         }

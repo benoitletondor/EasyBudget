@@ -90,7 +90,7 @@ object AppModule {
     @Singleton
     fun provideConfig(): Config = FirebaseRemoteConfig()
 
-    const val SHOULD_USE_MONGO = false // Make sure to add the exclude("io.ktor") in gradle when changing this
+    private const val SHOULD_USE_MONGO = false // Make sure to add the exclude("io.ktor") in gradle when changing this
 
     private var app: App? = null
     private var usedOnlineDB: CachedOnlineDBImpl? = null
@@ -101,6 +101,8 @@ object AppModule {
         auth: Auth,
         accountId: String,
         accountSecret: String,
+        accountHasBeenMigratedToPg: Boolean,
+        accounts: Accounts,
     ): OnlineDB {
         usedOnlineDB?.close()
 
@@ -135,15 +137,13 @@ object AppModule {
                     accountId = accountId,
                     accountSecret = accountSecret,
                     appContext = appContext,
+                    accounts = accounts,
+                    accountHasBeenMigratedToPg = accountHasBeenMigratedToPg,
                 )
             )
 
             usedOnlineDB = db
             return db
         }
-
-
-
-
     }
 }

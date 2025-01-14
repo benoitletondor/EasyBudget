@@ -18,6 +18,8 @@ package com.benoitletondor.easybudgetapp.db.onlineimpl
 
 import android.content.Context
 import com.benoitletondor.easybudgetapp.BuildConfig
+import com.benoitletondor.easybudgetapp.accounts.Accounts
+import com.benoitletondor.easybudgetapp.accounts.model.AccountCredentials
 import com.benoitletondor.easybudgetapp.auth.Auth
 import com.benoitletondor.easybudgetapp.auth.AuthState
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
@@ -67,6 +69,8 @@ class OnlinePGDBImpl(
     private val db: PowerSyncDatabase,
     private val supabaseConnector: SupabaseConnector,
     override val account: Account,
+    private val accounts: Accounts,
+    private var accountHasBeenMigratedToPg: Boolean,
 ) : OnlineDB, CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.IO) {
     private var recurringExpenseWatchingJob: Job? = null
 
@@ -102,6 +106,8 @@ class OnlinePGDBImpl(
 
     override suspend fun persistExpense(expense: Expense): Expense {
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
+
+        markAccountAsMigratedIfNeeded()
 
         if (expense.associatedRecurringExpense != null) {
             val recurringExpenseEntity = recurringExpenses.firstOrNull { it.id == expense.associatedRecurringExpense.recurringExpense.id }
@@ -237,6 +243,8 @@ class OnlinePGDBImpl(
     override suspend fun persistRecurringExpense(recurringExpense: RecurringExpense): RecurringExpense {
         awaitRecurringExpensesLoadOrThrow()
 
+        markAccountAsMigratedIfNeeded()
+
         val entity = db.writeTransaction { transaction ->
             val recurringExpenseEntity = RecurringExpenseEntity.createFromRecurringExpenseOrThrow(SecureRandom().nextLong(), recurringExpense, account, transaction)
             return@writeTransaction recurringExpenseEntity.toRecurringExpense()
@@ -250,6 +258,8 @@ class OnlinePGDBImpl(
         oldOccurrenceDate: LocalDate
     ) {
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
+
+        markAccountAsMigratedIfNeeded()
 
         val recurringExpenseId = newRecurringExpense.id ?: throw IllegalStateException("Editing recurring expense occurrence without id")
         val entity = recurringExpenses.firstOrNull { it.id == recurringExpenseId } ?: throw IllegalStateException("Editing recurring expense occurrence but can't find it for id: $recurringExpenseId")
@@ -273,6 +283,8 @@ class OnlinePGDBImpl(
     override suspend fun deleteRecurringExpense(recurringExpense: RecurringExpense): RestoreAction {
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
 
+        markAccountAsMigratedIfNeeded()
+
         val id = recurringExpense.id ?: throw IllegalStateException("Deleting recurring expense without id")
         val entity = recurringExpenses.firstOrNull { it.id == id } ?: throw IllegalStateException("Deleting recurring expense but can't find it for id: $id")
 
@@ -290,6 +302,8 @@ class OnlinePGDBImpl(
     override suspend fun deleteExpense(expense: Expense): RestoreAction {
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
         val expenseId = expense.id ?: throw IllegalStateException("Try to delete an expense without id")
+
+        markAccountAsMigratedIfNeeded()
 
         if (expense.associatedRecurringExpense != null) {
             val recurringExpenseId = expense.associatedRecurringExpense.recurringExpense.id ?: throw IllegalStateException("Deleting recurring expense occurrence without id")
@@ -337,6 +351,8 @@ class OnlinePGDBImpl(
     ): RestoreAction {
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
 
+        markAccountAsMigratedIfNeeded()
+
         val recurringExpenseId = recurringExpense.id ?: throw IllegalStateException("Editing recurring expense occurrence without id")
         val entity = recurringExpenses.firstOrNull { it.id == recurringExpenseId } ?: throw IllegalStateException("Editing recurring expense occurrence but can't find it for id: $recurringExpenseId")
         val icalBeforeEdit = entity.iCalRepresentation
@@ -365,6 +381,8 @@ class OnlinePGDBImpl(
         beforeDate: LocalDate
     ): RestoreAction {
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
+
+        markAccountAsMigratedIfNeeded()
 
         val recurringExpenseId = recurringExpense.id ?: throw IllegalStateException("Editing recurring expense occurrence without id")
         val entity = recurringExpenses.firstOrNull { it.id == recurringExpenseId } ?: throw IllegalStateException("Editing recurring expense occurrence but can't find it for id: $recurringExpenseId")
@@ -431,6 +449,8 @@ class OnlinePGDBImpl(
 
     override suspend fun markAllEntriesAsChecked(beforeDate: LocalDate) {
         val recurringExpenses = awaitRecurringExpensesLoadOrThrow().expenses
+
+        markAccountAsMigratedIfNeeded()
 
         db.writeTransaction { transaction ->
             transaction.execute("UPDATE expense SET checked = 1 WHERE date < ?", listOf(beforeDate.toEpochDay()))
@@ -543,6 +563,19 @@ class OnlinePGDBImpl(
         }
     }
 
+    // Make sure to delete the runningFold of the MainViewModel when deleting this
+    private suspend fun markAccountAsMigratedIfNeeded() {
+        if (!accountHasBeenMigratedToPg) {
+            Logger.debug("Marking account ${account.id} as migrated to PG")
+
+            accounts.markAccountAsMigratedToPg(
+                accountCredentials = AccountCredentials(id = account.id, secret = account.secret),
+            )
+
+            accountHasBeenMigratedToPg = true
+        }
+    }
+
     private sealed class RecurringExpenseLoadingState {
         data object NotLoaded : RecurringExpenseLoadingState()
         data object Loading : RecurringExpenseLoadingState()
@@ -557,6 +590,8 @@ class OnlinePGDBImpl(
             auth: Auth,
             accountId: String,
             accountSecret: String,
+            accounts: Accounts,
+            accountHasBeenMigratedToPg: Boolean,
         ): OnlinePGDBImpl {
             val supabaseConnector = SupabaseConnector(
                 supabaseClient = createSupabaseClient(
@@ -601,6 +636,8 @@ class OnlinePGDBImpl(
                     id = accountId,
                     secret = accountSecret,
                 ),
+                accounts = accounts,
+                accountHasBeenMigratedToPg = accountHasBeenMigratedToPg,
             )
         }
     }
