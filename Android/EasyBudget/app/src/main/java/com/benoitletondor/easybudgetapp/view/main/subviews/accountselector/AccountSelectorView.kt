@@ -251,6 +251,7 @@ private fun AccountsView(
                         ownerEmail = it.ownerEmail,
                         accountId = it.id,
                         accountSecret = it.secret,
+                        hasBeenMigratedToPg = it.hasBeenMigratedToPg,
                     ))
                 },
                 onCreateAccountClicked = onCreateAccountClicked,
@@ -721,6 +722,7 @@ fun AccountsAvailableViewPreview() {
                         selected = true,
                         name = "Own account 1",
                         ownerEmail = "",
+                        hasBeenMigratedToPg = false,
                     ),
                     AccountSelectorViewModel.Account(
                         id = "",
@@ -728,6 +730,7 @@ fun AccountsAvailableViewPreview() {
                         selected = false,
                         name = "Own account 2 with a super long name to test how it looks and see how the cell behaves",
                         ownerEmail = "",
+                        hasBeenMigratedToPg = false,
                     )
                 ),
                 showCreateOnlineAccountButton = true,
@@ -738,6 +741,7 @@ fun AccountsAvailableViewPreview() {
                         selected = false,
                         name = "Other person account",
                         ownerEmail = "other.person@gmail.com",
+                        hasBeenMigratedToPg = false,
                     ),
                     AccountSelectorViewModel.Account(
                         id = "",
@@ -745,6 +749,7 @@ fun AccountsAvailableViewPreview() {
                         selected = false,
                         name = "Other account 2 with a super long name to test how it looks and see how the cell behaves",
                         ownerEmail = "other.person.withasuperlongemailoiqoisqdohqsolihqsdoiqshdoqisdhqsdoihsdqoihqsdiouhhqohidqsh@gmail.com",
+                        hasBeenMigratedToPg = false,
                     )
                 ),
                 pendingInvitations = listOf(),
@@ -801,6 +806,7 @@ fun AccountsAvailableFullViewPreview() {
                         selected = true,
                         name = "Own account 1",
                         ownerEmail = "",
+                        hasBeenMigratedToPg = false,
                     ),
                 ),
                 showCreateOnlineAccountButton = false,
@@ -811,6 +817,7 @@ fun AccountsAvailableFullViewPreview() {
                         selected = false,
                         name = "Other person account",
                         ownerEmail = "other.person@gmail.com",
+                        hasBeenMigratedToPg = false,
                     ),
                 ),
                 pendingInvitations = listOf(
@@ -821,6 +828,7 @@ fun AccountsAvailableFullViewPreview() {
                             selected = false,
                             name = "Other person account",
                             ownerEmail = "other.person@gmail.com",
+                            hasBeenMigratedToPg = false,
                         ),
                         isLoading = true,
                         user = CurrentUser("", "", ""),
@@ -832,6 +840,7 @@ fun AccountsAvailableFullViewPreview() {
                             selected = false,
                             name = "Other person account 2",
                             ownerEmail = "other.person@gmail.com",
+                            hasBeenMigratedToPg = false,
                         ),
                         isLoading = false,
                         user = CurrentUser("", "", ""),
@@ -843,6 +852,7 @@ fun AccountsAvailableFullViewPreview() {
                             selected = false,
                             name = "Other person account with a super long name to test how it looks on multiple lines to make sure it's ok",
                             ownerEmail = "other.person.with.a.super.long.email.that.nobody.can.type@gmail.com",
+                            hasBeenMigratedToPg = false,
                         ),
                         isLoading = false,
                         user = CurrentUser("", "", ""),

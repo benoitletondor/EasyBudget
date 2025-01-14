@@ -483,4 +483,8 @@
     <string name="update_three_dot_two_notification_cta">Descubra</string>
     <string name="settings_error_loading_title">Não foi possível carregar as configurações</string>
     <string name="settings_error_loading_description">Ocorreu um erro ao carregar as configurações. Por favor, tente novamente.\n(%s)</string>
+
+    <string name="account_migrated_to_pg_error_title">Atualização do aplicativo necessária</string>
+    <string name="account_migrated_to_pg_error_message">Esta conta foi usada em uma versão mais recente do aplicativo e você precisa atualizar o EasyBudget para acessá-la.\n\nDeseja abrir a PlayStore para atualizar o aplicativo?\n\n(Se nenhuma atualização estiver disponível, aguarde algumas horas e tente novamente)</string>
+    <string name="account_migrated_to_pg_error_update_cta">Atualizar aplicativo</string>
 </resources>

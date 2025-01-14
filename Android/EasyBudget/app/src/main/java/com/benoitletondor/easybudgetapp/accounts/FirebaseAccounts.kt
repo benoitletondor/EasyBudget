@@ -101,6 +101,8 @@ class FirebaseAccounts(
     override suspend fun createAccount(currentUser: CurrentUser, name: String): Account {
         val (id, secret) = generateSecureAccountIdAndSecret()
 
+        val migratedToPg = false
+
         db.collection(ACCOUNTS_COLLECTION)
             .document(id)
             .set(mapOf(
@@ -109,6 +111,7 @@ class FirebaseAccounts(
                 ACCOUNT_DOCUMENT_OWNER_ID to currentUser.id,
                 ACCOUNT_DOCUMENT_OWNER_EMAIL to currentUser.email,
                 ACCOUNT_DOCUMENT_MEMBERS to listOf(currentUser.email),
+                ACCOUNT_DOCUMENT_HAS_BEEN_MIGRATED_TO_PG to migratedToPg,
             ))
             .await()
 
@@ -118,6 +121,7 @@ class FirebaseAccounts(
             name = name,
             ownerEmail = currentUser.email,
             isUserOwner = true,
+            hasBeenMigratedToPg = migratedToPg,
         )
     }
 
@@ -347,6 +351,7 @@ class FirebaseAccounts(
             name = getString(ACCOUNT_DOCUMENT_NAME) ?: throw IllegalStateException("Missing $ACCOUNT_DOCUMENT_NAME to create account"),
             ownerEmail = ownerEmail,
             isUserOwner = ownerEmail == currentUser.email,
+            hasBeenMigratedToPg = getBoolean(ACCOUNT_DOCUMENT_HAS_BEEN_MIGRATED_TO_PG) ?: false,
         )
     }
 
@@ -394,6 +399,7 @@ class FirebaseAccounts(
         private const val ACCOUNT_DOCUMENT_OWNER_EMAIL = "ownerEmail"
         private const val ACCOUNT_DOCUMENT_NAME = "name"
         private const val ACCOUNT_DOCUMENT_MEMBERS = "members"
+        private const val ACCOUNT_DOCUMENT_HAS_BEEN_MIGRATED_TO_PG = "migratedToPg"
 
         private const val SECURE_STRING_ALLOWED_CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
     }

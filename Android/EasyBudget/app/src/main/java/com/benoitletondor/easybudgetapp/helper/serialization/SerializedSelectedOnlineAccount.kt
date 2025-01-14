@@ -15,6 +15,7 @@ data class SerializedSelectedOnlineAccount(
     val ownerEmail: String,
     val accountId: String,
     val accountSecret: String,
+    val hasBeenMigratedToPg: Boolean,
 ) : Parcelable {
     constructor(selectedAccount: MainViewModel.SelectedAccount.Selected.Online) : this(
         URLEncoder.encode(selectedAccount.name, "UTF-8"),
@@ -22,6 +23,7 @@ data class SerializedSelectedOnlineAccount(
         selectedAccount.ownerEmail,
         selectedAccount.accountId,
         selectedAccount.accountSecret,
+        selectedAccount.hasBeenMigratedToPg,
     )
 
     fun toSelectedAccount() = MainViewModel.SelectedAccount.Selected.Online(
@@ -30,5 +32,6 @@ data class SerializedSelectedOnlineAccount(
         ownerEmail,
         accountId,
         accountSecret,
+        hasBeenMigratedToPg,
     )
 }
