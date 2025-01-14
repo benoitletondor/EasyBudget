@@ -22,12 +22,14 @@ private const val REMOTE_CONFIG_FETCH_THROTTLE_DEFAULT_VALUE_HOURS = 1L
 
 private const val GLOBAL_ALERT_MESSAGE_KEY = "global_alert_message"
 private const val PRO_ALERT_MESSAGE_KEY = "pro_alert_message"
+private const val PRO_MIGRATED_TO_PG_ALERT_MESSAGE_KEY = "pro_migrated_to_pg_alert_message"
 
 class FirebaseRemoteConfig : Config, ConfigUpdateListener, CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.IO) {
     private val remoteConfig = Firebase.remoteConfig
 
     private val globalAlertMessageMutableStateFlow = MutableStateFlow<String?>(null)
     private val proAlertMessageMutableStateFlow = MutableStateFlow<String?>(null)
+    private val proMigratedToPgAlertMessageMutableStateFlow = MutableStateFlow<String?>(null)
 
     init {
         remoteConfig.setConfigSettingsAsync(remoteConfigSettings {
@@ -51,6 +53,7 @@ class FirebaseRemoteConfig : Config, ConfigUpdateListener, CoroutineScope by Cor
 
             globalAlertMessageMutableStateFlow.value = remoteConfig.getStringOrNull(GLOBAL_ALERT_MESSAGE_KEY)
             proAlertMessageMutableStateFlow.value = remoteConfig.getStringOrNull(PRO_ALERT_MESSAGE_KEY)
+            proMigratedToPgAlertMessageMutableStateFlow.value = remoteConfig.getStringOrNull(PRO_MIGRATED_TO_PG_ALERT_MESSAGE_KEY)
         }
     }
 
@@ -73,6 +76,8 @@ class FirebaseRemoteConfig : Config, ConfigUpdateListener, CoroutineScope by Cor
     override fun watchGlobalAlertMessage(): StateFlow<String?> = globalAlertMessageMutableStateFlow
 
     override fun watchProAlertMessage(): StateFlow<String?> = proAlertMessageMutableStateFlow
+
+    override fun watchProMigratedToPgAlertMessage(): StateFlow<String?> = proMigratedToPgAlertMessageMutableStateFlow
 }
 
 private fun com.google.firebase.remoteconfig.FirebaseRemoteConfig.getStringOrNull(key: String): String? {

@@ -91,6 +91,8 @@ object AppModule {
     fun provideConfig(): Config = FirebaseRemoteConfig()
 
     private const val SHOULD_USE_MONGO = false // Make sure to add the exclude("io.ktor") in gradle when changing this
+    // Make sure to also remove runningFold in MainViewModel
+    // Make sure to also delete config.watchProMigratedToPgAlertMessage()
 
     private var app: App? = null
     private var usedOnlineDB: CachedOnlineDBImpl? = null

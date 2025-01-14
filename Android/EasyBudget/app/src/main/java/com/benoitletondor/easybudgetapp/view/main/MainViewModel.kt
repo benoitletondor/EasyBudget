@@ -82,7 +82,7 @@ class MainViewModel @Inject constructor(
 
     val alertMessageFlow = iab.iabStatusFlow.flatMapLatest { iabStatus ->
         when(iabStatus) {
-            PremiumCheckStatus.PRO_SUBSCRIBED -> config.watchProAlertMessage()
+            PremiumCheckStatus.PRO_SUBSCRIBED -> config.watchProMigratedToPgAlertMessage()
                 .flatMapLatest { maybeProAlertMessage ->
                     if (maybeProAlertMessage != null) {
                         flowOf(maybeProAlertMessage)
