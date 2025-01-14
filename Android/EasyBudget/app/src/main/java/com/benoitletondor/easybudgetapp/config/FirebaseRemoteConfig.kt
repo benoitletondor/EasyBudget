@@ -64,6 +64,7 @@ class FirebaseRemoteConfig : Config, ConfigUpdateListener, CoroutineScope by Cor
                 when(key) {
                     GLOBAL_ALERT_MESSAGE_KEY -> globalAlertMessageMutableStateFlow.value = remoteConfig.getStringOrNull(GLOBAL_ALERT_MESSAGE_KEY)
                     PRO_ALERT_MESSAGE_KEY -> proAlertMessageMutableStateFlow.value = remoteConfig.getStringOrNull(PRO_ALERT_MESSAGE_KEY)
+                    PRO_MIGRATED_TO_PG_ALERT_MESSAGE_KEY -> proMigratedToPgAlertMessageMutableStateFlow.value = remoteConfig.getStringOrNull(PRO_MIGRATED_TO_PG_ALERT_MESSAGE_KEY)
                 }
             }
         }
