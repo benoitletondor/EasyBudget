@@ -62,7 +62,14 @@ val recurringExpenseEntityTable = Table(
     listOf(
         Column.text("account_id"),
         Column.text("i_cal_representation"),
+        Column.text("created_at"),
     ),
+    indexes = listOf(
+        Index(
+            name = "created_at_index",
+            columns = listOf(IndexedColumn.ascending("created_at")),
+        ),
+    )
 )
 
 class RecurringExpenseEntity(

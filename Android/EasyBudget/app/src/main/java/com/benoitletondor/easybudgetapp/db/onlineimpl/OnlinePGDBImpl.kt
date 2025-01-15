@@ -73,6 +73,7 @@ class OnlinePGDBImpl(
     private var accountHasBeenMigratedToPg: Boolean,
 ) : OnlineDB, CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.IO) {
     private var recurringExpenseWatchingJob: Job? = null
+    private var expenseWatchingJob: Job? = null
 
     private val recurringExpensesLoadingStateMutableFlow = MutableStateFlow<RecurringExpenseLoadingState>(RecurringExpenseLoadingState.NotLoaded)
 
@@ -83,6 +84,7 @@ class OnlinePGDBImpl(
         Logger.debug("Opening PG Online DB: ${account.id}")
 
         watchAllRecurringExpenses()
+        watchAllExpenses()
     }
 
     override suspend fun deleteAllEntries() {
@@ -137,15 +139,11 @@ class OnlinePGDBImpl(
                     expenseEntity.persistOrThrow(transaction)
                 }
 
-                onChangeMutableFlow.emit(Unit)
-
                 return expense
             } else {
                 val expenseEntity = db.writeTransaction { transaction ->
                     ExpenseEntity.createFromExpenseOrThrow(SecureRandom().nextLong(), expense, account, transaction)
                 }
-
-                onChangeMutableFlow.emit(Unit)
 
                 return expenseEntity.toExpense(associatedRecurringExpense = null)
             }
@@ -187,7 +185,7 @@ class OnlinePGDBImpl(
             .flatten()
 
         val expenses = db.getAll(
-            "SELECT * FROM expense WHERE date = ?",
+            "SELECT * FROM expense WHERE date = ? ORDER by CASE WHEN created_at IS NULL THEN 'Z' ELSE created_at END ASC",
             listOf(dayDate.toEpochDay()),
             ExpenseEntity::fromCursorOrThrow,
         ).map {
@@ -333,14 +331,10 @@ class OnlinePGDBImpl(
                 db.execute("DELETE FROM expense WHERE id = ?", listOf(expenseId))
             }
 
-            onChangeMutableFlow.emit(Unit)
-
             return {
                 db.writeTransaction { transaction ->
                     ExpenseEntity.createFromExpenseOrThrow(expense.id, expense, account, transaction)
                 }
-
-                onChangeMutableFlow.emit(Unit)
             }
         }
     }
@@ -460,8 +454,6 @@ class OnlinePGDBImpl(
                 recurringExpense.persistOrThrow(transaction)
             }
         }
-
-        onChangeMutableFlow.emit(Unit)
     }
 
     override fun close() {
@@ -486,7 +478,7 @@ class OnlinePGDBImpl(
             .flatten()
 
         val expenses = db.getAll(
-            "SELECT * FROM expense WHERE date >= ? AND date <= ?",
+            "SELECT * FROM expense WHERE date >= ? AND date <= ? ORDER by CASE WHEN created_at IS NULL THEN 'Z' ELSE created_at END ASC",
             listOf(start.toEpochDay(), end.toEpochDay()),
             ExpenseEntity::fromCursorOrThrow,
         ).map {
@@ -526,7 +518,7 @@ class OnlinePGDBImpl(
             awaitSyncDone()
 
             db.watch(
-                "SELECT * FROM recurring_expense",
+                "SELECT * FROM recurring_expense ORDER by CASE WHEN created_at IS NULL THEN 'Z' ELSE created_at END ASC",
                 emptyList(),
                 RecurringExpenseEntity::fromCursorOrThrow,
             )
@@ -536,6 +528,23 @@ class OnlinePGDBImpl(
                 }
                 .collect { recurringExpenses ->
                     recurringExpensesLoadingStateMutableFlow.value = RecurringExpenseLoadingState.Loaded(recurringExpenses)
+                    onChangeMutableFlow.emit(Unit)
+                }
+        }
+    }
+
+    private fun watchAllExpenses() {
+        expenseWatchingJob?.cancel()
+        expenseWatchingJob = launch {
+            awaitSyncDone()
+
+            // This dummy request just adds a watcher on the expense table to trigger a refresh
+            // when an expense is edited, both remotely or locally
+            db.watch(
+                "SELECT null FROM expense LIMIT 1",
+                emptyList(),
+            ) { _ -> }
+                .collect {
                     onChangeMutableFlow.emit(Unit)
                 }
         }
