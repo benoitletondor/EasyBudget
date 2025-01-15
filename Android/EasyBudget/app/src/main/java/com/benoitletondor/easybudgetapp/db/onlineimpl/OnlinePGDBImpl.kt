@@ -544,6 +544,9 @@ class OnlinePGDBImpl(
                 "SELECT null FROM expense LIMIT 1",
                 emptyList(),
             ) { _ -> }
+                .catch { e ->
+                    Logger.error("Fatal error watching expenses!!", e)
+                }
                 .collect {
                     onChangeMutableFlow.emit(Unit)
                 }
