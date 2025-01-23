@@ -67,7 +67,6 @@ private val readWriteTimeout = 5.toDuration(DurationUnit.SECONDS)
 
 class OnlinePGDBImpl(
     private val db: PowerSyncDatabase,
-    private val supabaseConnector: SupabaseConnector,
     override val account: Account,
     private val accounts: Accounts,
     private var accountHasBeenMigratedToPg: Boolean,
@@ -463,8 +462,7 @@ class OnlinePGDBImpl(
         }
 
         Logger.debug("Closing PG Online DB: ${account.id}")
-        runBlocking { db.disconnect() }
-        supabaseConnector.close()
+        runBlocking { db.close() }
 
         cancel()
         recurringExpensesLoadingStateMutableFlow.value = RecurringExpenseLoadingState.NotLoaded
@@ -643,7 +641,6 @@ class OnlinePGDBImpl(
 
             return OnlinePGDBImpl(
                 db = db,
-                supabaseConnector = supabaseConnector,
                 account = Account(
                     id = accountId,
                     secret = accountSecret,

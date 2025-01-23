@@ -16,9 +16,7 @@
 
 package com.benoitletondor.easybudgetapp.db.onlineimpl
 
-import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Logger
-import co.touchlab.kermit.Severity
 import com.benoitletondor.easybudgetapp.auth.Auth
 import com.benoitletondor.easybudgetapp.auth.AuthState
 import com.benoitletondor.easybudgetapp.auth.CurrentUser
@@ -89,31 +87,7 @@ class SupabaseConnector(
         }
     }
 
-    private val logWriter = object : LogWriter() {
-        override fun log(
-            severity: Severity,
-            message: String,
-            tag: String,
-            throwable: Throwable?
-        ) {
-            // Faulty code is in SyncStream.kt, see https://github.com/powersync-ja/powersync-kotlin/issues/102
-            if (message == "Error in streamingSync" && severity == Severity.Error) {
-                com.benoitletondor.easybudgetapp.helper.Logger.debug("SupabaseConnector", "Detected error in streamingSync, ignoring next invalidate")
-                ignoreNextInvalidate = true
-            }
-        }
 
-    }
-
-    init {
-        Logger.addLogWriter(logWriter)
-    }
-
-    fun close() {
-        Logger.mutableConfig.logWriterList -= logWriter
-    }
-
-    private var ignoreNextInvalidate = false
     private var currentUser: CurrentUser? = currentUser
 
     override fun invalidateCredentials() {
@@ -121,12 +95,6 @@ class SupabaseConnector(
             "SupabaseConnector",
             "Invalidating token"
         )
-
-        if (ignoreNextInvalidate) {
-            com.benoitletondor.easybudgetapp.helper.Logger.debug("SupabaseConnector", "Ignoring invalidate")
-            ignoreNextInvalidate = false
-            return
-        }
 
         currentUser = null
     }
@@ -149,7 +117,7 @@ class SupabaseConnector(
         return PowerSyncCredentials(
             endpoint = powerSyncEndpoint,
             token = token,
-            userId = currentUser?.id,
+            userId = this.currentUser?.id,
         )
     }
 
