@@ -20,7 +20,6 @@ plugins {
     id("dagger.hilt.android.plugin")
     id("com.google.devtools.ksp")
     id("com.google.gms.google-services")
-    id("io.realm.kotlin")
     id("kotlin-parcelize")
     id("org.jetbrains.kotlin.plugin.compose")
     id("org.jetbrains.kotlin.plugin.serialization")
@@ -179,13 +178,8 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
 
-    implementation("io.realm.kotlin:library-sync:$realmVersion")
-
     // Be careful to check the code of SupabaseConnector when upgrading, especially around the ignoreNextInvalidate part
-    implementation("com.powersync:core-android:1.0.0-BETA16") {
-        // FIXME realm uses ktor 2.0 and powersync uses 3.0, this makes sure realm works correctly but will likely break powersync's runtime
-        // exclude("io.ktor")
-    }
+    implementation("com.powersync:core-android:1.0.0-BETA16")
     implementation("io.github.jan-tennert.supabase:postgrest-kt:3.0.1") // Make sure to update this when updating powersync
 
     implementation("com.kizitonwose.calendar:compose:2.6.1")

@@ -49,10 +49,6 @@ import com.benoitletondor.easybudgetapp.push.PushService.Companion.DAILY_REMINDE
 import com.benoitletondor.easybudgetapp.push.PushService.Companion.MONTHLY_REMINDER_KEY
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.HiltAndroidApp
-import io.realm.kotlin.log.LogCategory
-import io.realm.kotlin.log.LogLevel
-import io.realm.kotlin.log.RealmLog
-import io.realm.kotlin.log.RealmLogger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -116,9 +112,6 @@ class EasyBudget : Application(), Configuration.Provider {
 
         // Batch
         setUpBatchSDK()
-
-        // Realm
-        setupRealm()
 
         // Setup PowerSync
         setupPowerSync()
@@ -261,36 +254,6 @@ class EasyBudget : Application(), Configuration.Provider {
         Batch.Push.setNotificationsType(notificationTypes)
 
         registerActivityLifecycleCallbacks(BatchActivityLifecycleHelper())
-    }
-
-    private fun setupRealm() {
-        RealmLog.setLevel(level = if (BuildConfig.DEBUG_LOG) LogLevel.INFO else LogLevel.WARN)
-        RealmLog.add(object : RealmLogger {
-            override fun log(
-                category: LogCategory,
-                level: LogLevel,
-                throwable: Throwable?,
-                message: String?,
-                vararg args: Any?
-            ) {
-                val argsString = args
-                    .mapNotNull {
-                        it?.toString()
-                    }
-                    .joinToString { ", " }
-
-                when (level) {
-                    LogLevel.WARN -> {
-                        Logger.warning((message ?: "Realm warning") + " $argsString", throwable)
-                    }
-                    LogLevel.ERROR -> {
-                        Logger.error((message ?: "Realm error") + " $argsString", throwable)
-                    }
-
-                    else -> Unit // No-op
-                }
-            }
-        })
     }
 
     private fun setupPowerSync() {

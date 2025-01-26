@@ -56,7 +56,6 @@ import com.benoitletondor.easybudgetapp.parameters.watchUserSawMonthlyReportHint
 import com.benoitletondor.easybudgetapp.view.onboarding.OnboardingResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.realm.kotlin.mongodb.exceptions.AuthException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -300,17 +299,6 @@ class MainViewModel @Inject constructor(
 
             retryLoadingDBEventMutableFlow.first()
             emit(DBState.Loading)
-
-            if (cause is AuthException) {
-                try {
-                    Logger.debug("Refreshing user tokens")
-                    auth.refreshUserTokens()
-                } catch (e: Exception) {
-                    if (e is CancellationException) throw e
-
-                    Logger.error("Error while force refreshing user token", e)
-                }
-            }
 
             true
         }
