@@ -31,6 +31,8 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import androidx.work.ListenableWorker
+import co.touchlab.kermit.LogWriter
+import co.touchlab.kermit.Severity
 import com.batch.android.Batch
 import com.batch.android.BatchActivityLifecycleHelper
 import com.batch.android.BatchNotificationChannelsManager.DEFAULT_CHANNEL_ID
@@ -47,10 +49,6 @@ import com.benoitletondor.easybudgetapp.push.PushService.Companion.DAILY_REMINDE
 import com.benoitletondor.easybudgetapp.push.PushService.Companion.MONTHLY_REMINDER_KEY
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.HiltAndroidApp
-import io.realm.kotlin.log.LogCategory
-import io.realm.kotlin.log.LogLevel
-import io.realm.kotlin.log.RealmLog
-import io.realm.kotlin.log.RealmLogger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -115,8 +113,8 @@ class EasyBudget : Application(), Configuration.Provider {
         // Batch
         setUpBatchSDK()
 
-        // Realm
-        setupRealm()
+        // Setup PowerSync
+        setupPowerSync()
 
         // Setup theme
         AppCompatDelegate.setDefaultNightMode(parameters.getTheme().toPlatformValue())
@@ -258,31 +256,21 @@ class EasyBudget : Application(), Configuration.Provider {
         registerActivityLifecycleCallbacks(BatchActivityLifecycleHelper())
     }
 
-    private fun setupRealm() {
-        RealmLog.setLevel(level = if (BuildConfig.DEBUG_LOG) LogLevel.INFO else LogLevel.WARN)
-        RealmLog.add(object : RealmLogger {
+    private fun setupPowerSync() {
+        co.touchlab.kermit.Logger.setMinSeverity(if (BuildConfig.DEBUG) Severity.Debug else Severity.Info)
+        co.touchlab.kermit.Logger.addLogWriter(object : LogWriter() {
             override fun log(
-                category: LogCategory,
-                level: LogLevel,
-                throwable: Throwable?,
-                message: String?,
-                vararg args: Any?
+                severity: Severity,
+                message: String,
+                tag: String,
+                throwable: Throwable?
             ) {
-                val argsString = args
-                    .mapNotNull {
-                        it?.toString()
-                    }
-                    .joinToString { ", " }
-
-                when (level) {
-                    LogLevel.WARN -> {
-                        Logger.warning((message ?: "Realm warning") + " $argsString", throwable)
-                    }
-                    LogLevel.ERROR -> {
-                        Logger.error((message ?: "Realm error") + " $argsString", throwable)
-                    }
-
-                    else -> Unit // No-op
+                if (severity === Severity.Error || severity === Severity.Assert) {
+                    Logger.error("PowerSync","$tag: $message", throwable ?: Exception("PowerSync error: $message"))
+                } else if (severity === Severity.Warn) {
+                    Logger.warning("PowerSync","$tag: $message", throwable ?: Exception("PowerSync warning: $message"))
+                } else if (severity === Severity.Info) {
+                    Logger.debug("PowerSync","$tag: $message")
                 }
             }
         })

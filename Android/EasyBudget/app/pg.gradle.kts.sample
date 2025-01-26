@@ -1,0 +1,6 @@
+val powerSyncEndpointDev by rootProject.extra("")
+val supabaseUrlDev by rootProject.extra("")
+val supabaseAnonKeyDev by rootProject.extra("")
+val powerSyncEndpoint by rootProject.extra("")
+val supabaseUrl by rootProject.extra("")
+val supabaseAnonKey by rootProject.extra("")

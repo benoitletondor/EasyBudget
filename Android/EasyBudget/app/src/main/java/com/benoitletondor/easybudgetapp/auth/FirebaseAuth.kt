@@ -18,6 +18,7 @@ package com.benoitletondor.easybudgetapp.auth
 
 import android.app.Activity
 import android.content.Intent
+import android.util.Base64
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.result.ActivityResult
 import com.benoitletondor.easybudgetapp.helper.Logger

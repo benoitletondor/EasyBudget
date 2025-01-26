@@ -101,7 +101,7 @@ class FirebaseAccounts(
     override suspend fun createAccount(currentUser: CurrentUser, name: String): Account {
         val (id, secret) = generateSecureAccountIdAndSecret()
 
-        val migratedToPg = false
+        val migratedToPg = true
 
         db.collection(ACCOUNTS_COLLECTION)
             .document(id)
@@ -198,6 +198,17 @@ class FirebaseAccounts(
                 }
             }
         }
+    }
+
+    override suspend fun markAccountAsMigratedToPg(
+        accountCredentials: AccountCredentials
+    ) {
+        db.collection(ACCOUNTS_COLLECTION)
+            .document(accountCredentials.id)
+            .update(mapOf(
+                ACCOUNT_DOCUMENT_HAS_BEEN_MIGRATED_TO_PG to true,
+            ))
+            .await()
     }
 
     private fun watchOwnAccounts(currentUser: CurrentUser): Flow<List<Account>> = db.collection(ACCOUNTS_COLLECTION)
