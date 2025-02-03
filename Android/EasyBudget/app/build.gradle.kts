@@ -124,7 +124,7 @@ dependencies {
     val realmVersion: String by rootProject.extra
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 
@@ -150,7 +150,7 @@ dependencies {
     implementation("com.google.firebase:firebase-config")
     implementation("com.firebaseui:firebase-ui-auth:8.0.2")
 
-    val composeBom = platform("androidx.compose:compose-bom:2024.12.01")
+    val composeBom = platform("androidx.compose:compose-bom:2025.01.01")
     implementation(composeBom)
     androidTestImplementation(composeBom)
     debugImplementation("androidx.compose.ui:ui-tooling")
@@ -159,7 +159,7 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.activity:activity-compose:1.10.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
-    implementation("androidx.navigation:navigation-compose:2.8.5")
+    implementation("androidx.navigation:navigation-compose:2.8.6")
 
     implementation("com.google.accompanist:accompanist-themeadapter-material3:0.36.0")
     implementation("com.google.accompanist:accompanist-permissions:0.37.0")
@@ -179,7 +179,7 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
 
     // Be careful to check the code of SupabaseConnector when upgrading, especially around the ignoreNextInvalidate part
-    implementation("com.powersync:core-android:1.0.0-BETA16")
+    implementation("com.powersync:core-android:1.0.0-BETA18")
     implementation("io.github.jan-tennert.supabase:postgrest-kt:3.0.1") // Make sure to update this when updating powersync
 
     implementation("com.kizitonwose.calendar:compose:2.6.1")

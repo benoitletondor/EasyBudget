@@ -84,7 +84,7 @@ class ExpenseEntity(
         ) },
     )
 
-    suspend fun persistOrThrow(transaction: PowerSyncTransaction) {
+    fun persistOrThrow(transaction: PowerSyncTransaction) {
         transaction.execute(
             "UPDATE $EXPENSE_TABLE_NAME SET title = ?, amount = ?, date = ?, checked = ? WHERE id = ?",
             listOf(title, amount, date, checked, id)
@@ -101,7 +101,7 @@ class ExpenseEntity(
             checked = cursor.getBoolean(EXPENSE_CHECKED_COLUMN_INDEX)!!,
         )
 
-        suspend fun createFromExpenseOrThrow(expenseId: Long, expense: Expense, account: Account, transaction: PowerSyncTransaction): ExpenseEntity {
+        fun createFromExpenseOrThrow(expenseId: Long, expense: Expense, account: Account, transaction: PowerSyncTransaction): ExpenseEntity {
             transaction.execute(
                 "INSERT INTO $EXPENSE_TABLE_NAME (id, account_id, title, amount, date, checked) VALUES (?, ?, ?, ?, ?, ?)",
                 listOf(expenseId, account.id, expense.title, expense.amount.getDBValue(), expense.date.toEpochDay(), expense.checked)

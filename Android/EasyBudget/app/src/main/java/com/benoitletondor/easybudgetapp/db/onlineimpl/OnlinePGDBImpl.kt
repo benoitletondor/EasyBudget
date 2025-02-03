@@ -243,11 +243,10 @@ class OnlinePGDBImpl(
         markAccountAsMigratedIfNeeded()
 
         val entity = db.writeTransaction { transaction ->
-            val recurringExpenseEntity = RecurringExpenseEntity.createFromRecurringExpenseOrThrow(SecureRandom().nextLong(), recurringExpense, account, transaction)
-            return@writeTransaction recurringExpenseEntity.toRecurringExpense()
+             RecurringExpenseEntity.createFromRecurringExpenseOrThrow(SecureRandom().nextLong(), recurringExpense, account, transaction)
         }
 
-        return entity
+        return entity.toRecurringExpense()
     }
 
     override suspend fun updateRecurringExpenseAfterDate(
@@ -326,8 +325,8 @@ class OnlinePGDBImpl(
                 }
             }
         } else {
-            db.writeTransaction {
-                db.execute("DELETE FROM expense WHERE id = ?", listOf(expenseId))
+            db.writeTransaction { transaction ->
+                transaction.execute("DELETE FROM expense WHERE id = ?", listOf(expenseId))
             }
 
             return {
@@ -449,7 +448,7 @@ class OnlinePGDBImpl(
             transaction.execute("UPDATE expense SET checked = 1 WHERE date < ?", listOf(beforeDate.toEpochDay()))
 
             for (recurringExpense in recurringExpenses) {
-                recurringExpense.markAllOccurrencesAsChecked(beforeDate)
+                runBlocking { recurringExpense.markAllOccurrencesAsChecked(beforeDate) }
                 recurringExpense.persistOrThrow(transaction)
             }
         }

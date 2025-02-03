@@ -392,7 +392,7 @@ class RecurringExpenseEntity(
 
     private val VEvent.isException get() = recurrenceId != null
 
-    suspend fun persistOrThrow(transaction: PowerSyncTransaction) {
+    fun persistOrThrow(transaction: PowerSyncTransaction) {
         transaction.execute(
             "UPDATE $RECURRING_EXPENSE_TABLE_NAME SET i_cal_representation = ? WHERE id = ?",
             listOf(iCalRepresentation, id)
@@ -406,7 +406,7 @@ class RecurringExpenseEntity(
             iCalRepresentation = cursor.getString(RECURRING_EXPENSE_I_CAL_REPRESENTATION_COLUMN_INDEX)!!,
         )
 
-        suspend fun createFromRecurringExpenseOrThrow(
+        fun createFromRecurringExpenseOrThrow(
             recurringExpenseId: Long,
             recurringExpense: RecurringExpense,
             account: Account,
