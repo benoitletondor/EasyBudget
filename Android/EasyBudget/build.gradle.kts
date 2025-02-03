@@ -17,8 +17,8 @@ val kotlinVersion by extra("2.1.10") // Change in the plugins below too & for co
 val hiltVersion by extra("2.55") // Change in the plugins below too
 
 plugins {
-    id("com.android.application") version "8.8.0" apply false
-    id("com.android.library") version "8.8.0" apply false
+    id("com.android.application") version "8.7.3" apply false
+    id("com.android.library") version "8.7.3" apply false
     id("com.google.firebase.crashlytics") version "3.0.2" apply false
     id("com.google.gms.google-services") version "4.4.2" apply false
     id("com.google.dagger.hilt.android") version "2.55" apply false
