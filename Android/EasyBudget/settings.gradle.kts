@@ -11,6 +11,7 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven { setUrl("https://maven.batch.com/release") }
+        maven { setUrl("https://jitpack.io") }
     }
 }
 rootProject.name = "EasyBudget"

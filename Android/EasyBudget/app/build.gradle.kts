@@ -20,7 +20,6 @@ plugins {
     id("dagger.hilt.android.plugin")
     id("com.google.devtools.ksp")
     id("com.google.gms.google-services")
-    id("io.realm.kotlin")
     id("kotlin-parcelize")
     id("org.jetbrains.kotlin.plugin.compose")
     id("org.jetbrains.kotlin.plugin.serialization")
@@ -30,6 +29,7 @@ apply {
     from("batch.gradle.kts")
     from("iap.gradle.kts")
     from("atlas.gradle.kts")
+    from("pg.gradle.kts")
 }
 
 android {
@@ -38,7 +38,7 @@ android {
     defaultConfig {
         applicationId = "com.benoitletondor.easybudgetapp"
         compileSdk = 35
-        minSdk = 23
+        minSdk = 24
         targetSdk = 35
         versionCode = 166
         versionName = "3.4.3"
@@ -50,6 +50,9 @@ android {
             val batchDevKey = rootProject.extra["batchDevKey"] as String
             val licenceKey = rootProject.extra["licenceKey"] as String
             val atlasAppId = rootProject.extra["devAtlasAppId"] as String
+            val powerSyncEndpoint = rootProject.extra["powerSyncEndpointDev"] as String
+            val supabaseUrl = rootProject.extra["supabaseUrlDev"] as String
+            val supabaseAnonKey = rootProject.extra["supabaseAnonKeyDev"] as String
 
             buildConfigField("boolean", "DEBUG_LOG", "true")
             buildConfigField("boolean", "CRASHLYTICS_ACTIVATED", "false")
@@ -58,6 +61,9 @@ android {
             buildConfigField("boolean", "DEV_PREFERENCES", "true")
             buildConfigField("String", "LICENCE_KEY", "\"$licenceKey\"")
             buildConfigField("String", "ATLAS_APP_ID", "\"$atlasAppId\"")
+            buildConfigField("String", "POWER_SYNC_ENDPOINT", "\"$powerSyncEndpoint\"")
+            buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
+            buildConfigField("String", "SUPABASE_ANON_KEY", "\"$supabaseAnonKey\"")
 
             signingConfig = signingConfigs.getByName("debug")
         }
@@ -65,6 +71,9 @@ android {
             val batchLiveKey = rootProject.extra["batchLiveKey"] as String
             val licenceKey = rootProject.extra["licenceKey"] as String
             val atlasAppId = rootProject.extra["atlasAppId"] as String
+            val powerSyncEndpoint = rootProject.extra["powerSyncEndpoint"] as String
+            val supabaseUrl = rootProject.extra["supabaseUrl"] as String
+            val supabaseAnonKey = rootProject.extra["supabaseAnonKey"] as String
 
             buildConfigField("boolean", "DEBUG_LOG", "false")
             buildConfigField("boolean", "CRASHLYTICS_ACTIVATED", "true")
@@ -73,6 +82,9 @@ android {
             buildConfigField("boolean", "DEV_PREFERENCES", "false")
             buildConfigField("String", "LICENCE_KEY", "\"$licenceKey\"")
             buildConfigField("String", "ATLAS_APP_ID", "\"$atlasAppId\"")
+            buildConfigField("String", "POWER_SYNC_ENDPOINT", "\"$powerSyncEndpoint\"")
+            buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
+            buildConfigField("String", "SUPABASE_ANON_KEY", "\"$supabaseAnonKey\"")
 
             isMinifyEnabled = true
             isShrinkResources = true
@@ -166,7 +178,9 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
 
-    implementation("io.realm.kotlin:library-sync:$realmVersion")
+    // Be careful to check the code of SupabaseConnector when upgrading, especially around the ignoreNextInvalidate part
+    implementation("com.powersync:core-android:1.0.0-BETA16")
+    implementation("io.github.jan-tennert.supabase:postgrest-kt:3.0.1") // Make sure to update this when updating powersync
 
     implementation("com.kizitonwose.calendar:compose:2.6.1")
     implementation("net.sf.biweekly:biweekly:0.6.8")

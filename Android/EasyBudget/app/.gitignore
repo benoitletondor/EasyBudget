@@ -3,3 +3,4 @@ batch.gradle.kts
 iap.gradle.kts
 atlas.gradle.kts
 fabric.properties
+pg.gradle.kts
