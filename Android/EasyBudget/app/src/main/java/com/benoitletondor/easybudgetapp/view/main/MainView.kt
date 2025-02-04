@@ -482,7 +482,6 @@ private fun MainView(
                             coroutineScope.launch {
                                 snackbarHostState.showSnackbar(
                                     message = context.getString(R.string.recurring_expense_restored_success_message),
-                                    actionLabel = context.getString(R.string.undo),
                                     duration = SnackbarDuration.Short,
                                 )
                             }
