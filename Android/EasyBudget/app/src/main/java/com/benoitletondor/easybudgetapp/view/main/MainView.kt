@@ -196,6 +196,7 @@ fun MainView(
         navigateToAddExpense = navigateToAddExpense,
         navigateToAddRecurringExpense = navigateToAddRecurringExpense,
         onMonthlyReportHintDismissed = viewModel::onMonthlyReportHintDismissed,
+        onRetrySelectedDateDataLoadingButtonPressed = viewModel::onRetrySelectedDateDataLoadingButtonPressed,
     )
 }
 
@@ -271,6 +272,7 @@ private fun MainView(
     navigateToAddExpense: (LocalDate, Expense?) -> Unit,
     navigateToAddRecurringExpense: (LocalDate, Expense?) -> Unit,
     onMonthlyReportHintDismissed: () -> Unit,
+    onRetrySelectedDateDataLoadingButtonPressed: () -> Unit,
 ) {
     var showAccountSelectorModal by rememberSaveable { mutableStateOf(false) }
     val accountSelectorModalSheetState = rememberModalBottomSheetState()
@@ -723,6 +725,7 @@ private fun MainView(
                     onExpenseCheckedChange = onExpenseCheckedChange,
                     onExpensePressed = onExpensePressed,
                     onExpenseLongPressed = onExpenseLongPressed,
+                    onRetrySelectedDateDataLoadingButtonPressed = onRetrySelectedDateDataLoadingButtonPressed,
                 )
 
                 val showMonthlyReportHint by showMonthlyReportHintFlow.collectAsState()
@@ -837,15 +840,56 @@ private fun DBLoadingPreview() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 private fun DBErrorLoadingPreview() {
     Preview(
+        dbState = MainViewModel.DBState.Loaded(AppModule.provideDB(LocalContext.current)),
+        dayData = MainViewModel.SelectedDateExpensesData.ErrorLoadingData(RuntimeException("Error")),
+    )
+}
+
+@Composable
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
+private fun DayDataErrorLoadingPreview() {
+    Preview(
         dbState = MainViewModel.DBState.Error(RuntimeException("Error")),
     )
 }
+
 
 @Composable
 private fun Preview(
     dbState: MainViewModel.DBState,
     alertMessage: String? = null,
     shouldDisplayAccountsWarning: Boolean = false,
+    dayData: MainViewModel.SelectedDateExpensesData = MainViewModel.SelectedDateExpensesData.DataAvailable(
+        date = LocalDate.now(),
+        balance = 100.0,
+        checkedBalance = 20.0,
+        expenses = listOf(
+            Expense(
+                id = 1L,
+                date = LocalDate.now(),
+                title = "Test",
+                amount = 10.0,
+                checked = false,
+            ),
+            Expense(
+                id = 2L,
+                date = LocalDate.now(),
+                title = "Test 2",
+                amount = -10.0,
+                checked = true,
+                associatedRecurringExpense = AssociatedRecurringExpense(
+                    recurringExpense = RecurringExpense(
+                        title = "Test",
+                        originalAmount = -10.0,
+                        recurringDate = LocalDate.now(),
+                        type = RecurringExpenseType.WEEKLY,
+                    ),
+                    originalDate = LocalDate.now(),
+                )
+            )
+        ),
+    ),
 ) {
     AppTheme {
         MainView(
@@ -899,36 +943,7 @@ private fun Preview(
             userCurrencyFlow = MutableStateFlow(Currency.getInstance("USD")),
             recurringExpenseDeletionProgressFlow = MutableStateFlow(MainViewModel.RecurringExpenseDeleteProgressState.Idle),
             recurringExpenseRestoreProgressFlow = MutableStateFlow(MainViewModel.RecurringExpenseRestoreProgressState.Idle),
-            dayDataFlow = MutableStateFlow(MainViewModel.SelectedDateExpensesData.DataAvailable(
-                date = LocalDate.now(),
-                balance = 100.0,
-                checkedBalance = 20.0,
-                expenses = listOf(
-                    Expense(
-                        id = 1L,
-                        date = LocalDate.now(),
-                        title = "Test",
-                        amount = 10.0,
-                        checked = false,
-                    ),
-                    Expense(
-                        id = 2L,
-                        date = LocalDate.now(),
-                        title = "Test 2",
-                        amount = -10.0,
-                        checked = true,
-                        associatedRecurringExpense = AssociatedRecurringExpense(
-                            recurringExpense = RecurringExpense(
-                                title = "Test",
-                                originalAmount = -10.0,
-                                recurringDate = LocalDate.now(),
-                                type = RecurringExpenseType.WEEKLY,
-                            ),
-                            originalDate = LocalDate.now(),
-                        )
-                    )
-                ),
-            )),
+            dayDataFlow = MutableStateFlow(dayData),
             showExpensesCheckBoxFlow = MutableStateFlow(true),
             onboardingResultFlow = MutableSharedFlow(),
             shouldDisplayAccountsWarningFlow = MutableStateFlow(shouldDisplayAccountsWarning),
@@ -973,6 +988,7 @@ private fun Preview(
             navigateToAddExpense = { _, _ -> },
             navigateToAddRecurringExpense = { _, _ -> },
             onMonthlyReportHintDismissed = {},
+            onRetrySelectedDateDataLoadingButtonPressed = {},
         )
     }
 }

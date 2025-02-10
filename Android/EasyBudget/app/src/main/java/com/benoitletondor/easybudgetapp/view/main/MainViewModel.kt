@@ -131,6 +131,7 @@ class MainViewModel @Inject constructor(
     val showGoToCurrentMonthButtonStateFlow: StateFlow<Boolean> = showGoToCurrentMonthButtonStateMutableFlow
 
     private val retryLoadingAccountsEventMutableFlow = MutableSharedFlow<Unit>()
+    private val retryLoadingSelectedDateDataEventMutableFlow = MutableSharedFlow<Unit>()
     private val retryLoadingDBEventMutableFlow = MutableSharedFlow<Unit>()
 
     val includeCheckedBalanceFlow = iab.iabStatusFlow
@@ -327,11 +328,21 @@ class MainViewModel @Inject constructor(
 
         SelectedDateExpensesData.DataAvailable(date, balance, checkedBalance, expenses) as SelectedDateExpensesData
     }
-        .catch { e ->
+        .retryWhen { e, _ ->
             Logger.error("Error while getting selected date data", e)
-            emit(SelectedDateExpensesData.NoDataAvailable)
+            emit(SelectedDateExpensesData.ErrorLoadingData(e))
+
+            retryLoadingSelectedDateDataEventMutableFlow.first()
+
+            true
         }
         .stateIn(viewModelScope, SharingStarted.Eagerly, SelectedDateExpensesData.NoDataAvailable)
+
+    fun onRetrySelectedDateDataLoadingButtonPressed() {
+        viewModelScope.launch {
+            retryLoadingSelectedDateDataEventMutableFlow.emit(Unit)
+        }
+    }
 
     fun onDiscoverPremiumButtonPressed() {
         viewModelScope.launch {
@@ -867,6 +878,7 @@ class MainViewModel @Inject constructor(
 
     sealed class SelectedDateExpensesData {
         data object NoDataAvailable : SelectedDateExpensesData()
+        data class ErrorLoadingData(val error: Throwable) : SelectedDateExpensesData()
         @Immutable
         data class DataAvailable(val date: LocalDate, val balance: Double, val checkedBalance: Double?, val expenses: List<Expense>) : SelectedDateExpensesData()
     }

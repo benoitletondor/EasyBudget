@@ -63,6 +63,7 @@ fun MainViewContent(
     onExpenseCheckedChange: (Expense, Boolean) -> Unit,
     onExpensePressed: (Expense) -> Unit,
     onExpenseLongPressed: (Expense) -> Unit,
+    onRetrySelectedDateDataLoadingButtonPressed: () -> Unit,
 ) {
     val account by selectedAccountFlow.collectAsState()
     val maybeAlertMessage by alertMessageFlow.collectAsState()
@@ -120,6 +121,7 @@ fun MainViewContent(
                             onExpenseCheckedChange = onExpenseCheckedChange,
                             onExpensePressed = onExpensePressed,
                             onExpenseLongPressed = onExpenseLongPressed,
+                            onRetryButtonClicked = onRetrySelectedDateDataLoadingButtonPressed,
                         )
                     }
                     MainViewModel.DBState.Loading,
