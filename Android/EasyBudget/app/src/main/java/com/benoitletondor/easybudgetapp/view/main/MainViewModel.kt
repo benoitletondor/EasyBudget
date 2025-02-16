@@ -333,6 +333,7 @@ class MainViewModel @Inject constructor(
             emit(SelectedDateExpensesData.ErrorLoadingData(e))
 
             retryLoadingSelectedDateDataEventMutableFlow.first()
+            emit(SelectedDateExpensesData.NoDataAvailable)
 
             true
         }
