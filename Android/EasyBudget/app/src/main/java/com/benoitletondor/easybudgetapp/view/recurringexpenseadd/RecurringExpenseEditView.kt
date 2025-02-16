@@ -333,7 +333,7 @@ private fun RecurringExpenseEditView(
                                     Text(
                                         modifier = Modifier.fillMaxWidth(),
                                         text = state.recurringExpenseType.stringRepresentation(context),
-                                        color = colorResource(R.color.expense_edit_field_accent_color_dark),
+                                        color = colorResource(R.color.expense_edit_title_text_color_dark),
                                         fontSize = 17.sp,
                                     )
 
