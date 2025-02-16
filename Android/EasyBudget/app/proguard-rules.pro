@@ -31,3 +31,6 @@
 
 # https://github.com/mangstadt/biweekly/issues/98
 -keep class biweekly.** { *; }
+
+# Powersync
+-keep class com.powersync.** { *; }

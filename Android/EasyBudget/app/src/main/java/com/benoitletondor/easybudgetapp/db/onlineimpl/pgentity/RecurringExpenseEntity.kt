@@ -14,8 +14,9 @@
  *   limitations under the License.
  */
 
-package com.benoitletondor.easybudgetapp.db.onlineimpl.entity
+package com.benoitletondor.easybudgetapp.db.onlineimpl.pgentity
 
+import app.cash.sqldelight.db.SqlCursor
 import biweekly.Biweekly
 import biweekly.ICalendar
 import biweekly.component.VEvent
@@ -37,12 +38,13 @@ import com.benoitletondor.easybudgetapp.helper.toStartOfDayDate
 import com.benoitletondor.easybudgetapp.model.AssociatedRecurringExpense
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
-import io.realm.kotlin.types.RealmObject
-import io.realm.kotlin.types.annotations.Index
-import io.realm.kotlin.types.annotations.PrimaryKey
+import com.powersync.db.internal.PowerSyncTransaction
+import com.powersync.db.schema.Column
+import com.powersync.db.schema.Index
+import com.powersync.db.schema.IndexedColumn
+import com.powersync.db.schema.Table
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.security.SecureRandom
 import java.time.LocalDate
 import java.util.Date
 import java.util.TimeZone
@@ -50,32 +52,33 @@ import java.util.TimeZone
 private const val AMOUNT_KEY = "amount"
 private const val CHECKED_KEY = "checked"
 
-class RecurringExpenseEntity() : RealmObject {
-    @PrimaryKey
-    var _id: Long = SecureRandom().nextLong()
-    var iCalRepresentation: String = ""
-    @Index
-    var accountId: String = ""
-    @Index
-    var accountSecret: String = ""
+const val RECURRING_EXPENSE_TABLE_NAME = "recurring_expense"
+private const val RECURRING_EXPENSE_ID_COLUMN_INDEX = 0
+private const val RECURRING_EXPENSE_ACCOUNT_ID_COLUMN_INDEX = 1
+private const val RECURRING_EXPENSE_I_CAL_REPRESENTATION_COLUMN_INDEX = 2
 
-    constructor(
-        id: Long?,
-        representation: String,
-        account: Account,
-    ) : this() {
-        this._id = id ?: SecureRandom().nextLong()
-        this.iCalRepresentation = representation
-        this.accountId = account.id
-        this.accountSecret = account.secret
-    }
+val recurringExpenseEntityTable = Table(
+    RECURRING_EXPENSE_TABLE_NAME,
+    listOf(
+        Column.text("account_id"),
+        Column.text("i_cal_representation"),
+        Column.text("created_at"),
+    ),
+    indexes = listOf(
+        Index(
+            name = "created_at_index",
+            columns = listOf(IndexedColumn.ascending("created_at")),
+        ),
+    )
+)
 
-    suspend fun toRecurringExpense(): RecurringExpense = withContext(Dispatchers.Default) {
-        toRecurringExpenseBlocking()
-    }
-
-    private fun toRecurringExpenseBlocking(): RecurringExpense {
-        val event = getCalBlocking().events
+class RecurringExpenseEntity(
+    val id: Long,
+    val accountId: String,
+    var iCalRepresentation: String,
+) {
+    suspend fun toRecurringExpense(): RecurringExpense {
+        val event = getCal().events
             .filterExceptions()
             .last()
 
@@ -85,7 +88,7 @@ class RecurringExpenseEntity() : RealmObject {
         val recurrenceExpenseType = event.recurrenceRule.value.toRecurringExpenseType()
 
         return RecurringExpense(
-            _id,
+            id,
             title,
             originalAmount.getRealValueFromDB(),
             startDate,
@@ -98,27 +101,29 @@ class RecurringExpenseEntity() : RealmObject {
         return getCal().getExpenses(from, to, toRecurringExpense())
     }
 
-    fun addExceptionFromExpense(expense: Expense, originalOccurrenceDate: LocalDate) {
-        val cal = getCalBlocking()
+    suspend fun addExceptionFromExpense(expense: Expense, originalOccurrenceDate: LocalDate) {
+        val cal = getCal()
         cal.addExceptionFromExpense(expense, originalOccurrenceDate)
-        iCalRepresentation = cal.write()
+        iCalRepresentation = withContext(Dispatchers.Default) {
+            cal.write()
+        }
     }
 
     private fun ICalendar.findNonExceptionEventForOriginalOccurrenceDate(originalOccurrenceDate: LocalDate): VEvent
-        = events
-            .filterExceptions()
-            .let { nonExceptionEvents ->
-                val firstNonExceptionEvent = nonExceptionEvents.firstOrNull {
-                    it.dateEnd == null || !it.dateEnd.value.before(originalOccurrenceDate.toStartOfDayDate())
-                }
-
-                if (firstNonExceptionEvent != null) {
-                    return@let firstNonExceptionEvent
-                }
-
-                Logger.warning("No non exception event found for original occurrence date $originalOccurrenceDate, using first event")
-                return@let nonExceptionEvents.first { it.dateEnd !== null && !it.dateStart.value.after(originalOccurrenceDate.toStartOfDayDate()) }
+            = events
+        .filterExceptions()
+        .let { nonExceptionEvents ->
+            val firstNonExceptionEvent = nonExceptionEvents.firstOrNull {
+                it.dateEnd == null || !it.dateEnd.value.before(originalOccurrenceDate.toStartOfDayDate())
             }
+
+            if (firstNonExceptionEvent != null) {
+                return@let firstNonExceptionEvent
+            }
+
+            Logger.warning("No non exception event found for original occurrence date $originalOccurrenceDate, using first event")
+            return@let nonExceptionEvents.first { it.dateEnd !== null && !it.dateStart.value.after(originalOccurrenceDate.toStartOfDayDate()) }
+        }
 
     private fun ICalendar.addExceptionFromExpense(expense: Expense, originalOccurrenceDate: LocalDate) {
         val exceptionEvent = VEvent()
@@ -144,8 +149,8 @@ class RecurringExpenseEntity() : RealmObject {
         addEvent(exceptionEvent)
     }
 
-    fun deleteOccurrence(occurrenceDate: LocalDate, originalOccurrenceDate: LocalDate) {
-        val cal = getCalBlocking()
+    suspend fun deleteOccurrence(occurrenceDate: LocalDate, originalOccurrenceDate: LocalDate) {
+        val cal = getCal()
 
         val exceptionEvent = VEvent()
         exceptionEvent.dateStart = DateStart(occurrenceDate.toStartOfDayDate(), false)
@@ -164,11 +169,13 @@ class RecurringExpenseEntity() : RealmObject {
 
         cal.addEvent(exceptionEvent)
 
-        iCalRepresentation = cal.write()
+        iCalRepresentation = withContext(Dispatchers.Default) {
+            cal.write()
+        }
     }
 
-    fun deleteOccurrencesAfterDate(date: LocalDate) {
-        val cal = getCalBlocking()
+    suspend fun deleteOccurrencesAfterDate(date: LocalDate) {
+        val cal = getCal()
 
         cal.events
             .filterExceptions()
@@ -186,11 +193,13 @@ class RecurringExpenseEntity() : RealmObject {
                 }
             }
 
-        iCalRepresentation = cal.write()
+        iCalRepresentation = withContext(Dispatchers.Default) {
+            cal.write()
+        }
     }
 
-    fun deleteOccurrencesBeforeDate(date: LocalDate) {
-        val cal = getCalBlocking()
+    suspend fun deleteOccurrencesBeforeDate(date: LocalDate) {
+        val cal = getCal()
 
         cal.events
             .filterExceptions()
@@ -210,14 +219,16 @@ class RecurringExpenseEntity() : RealmObject {
                 }
             }
 
-        iCalRepresentation = cal.write()
+        iCalRepresentation = withContext(Dispatchers.Default) {
+            cal.write()
+        }
     }
 
-    fun updateAllOccurrencesAfterDate(
+    suspend fun updateAllOccurrencesAfterDate(
         afterDate: LocalDate,
         newRecurringExpense: RecurringExpense,
     ) {
-        val cal = getCalBlocking()
+        val cal = getCal()
 
         // Put an end date to all existing events (and memoize the biggest existing end date to re-apply it to the new event later)
         var newEventEndDate: Date? = null
@@ -252,11 +263,13 @@ class RecurringExpenseEntity() : RealmObject {
 
         cal.addEvent(newEvent)
 
-        iCalRepresentation = cal.write()
+        iCalRepresentation = withContext(Dispatchers.Default) {
+            cal.write()
+        }
     }
 
-    fun getFirstOccurrenceDate(): LocalDate {
-        val cal = getCalBlocking()
+    suspend fun getFirstOccurrenceDate(): LocalDate {
+        val cal = getCal()
 
         val firstEventTimestamp = cal.events
             .filter { !it.status.isCancelled }
@@ -267,7 +280,7 @@ class RecurringExpenseEntity() : RealmObject {
     }
 
     suspend fun getFirstOccurrence(): Expense {
-        val cal = getCalBlocking()
+        val cal = getCal()
         val event = cal.events.first()
 
         val firstOccurrenceDate = localDateFromTimestamp(event.dateStart.value.time)
@@ -278,9 +291,9 @@ class RecurringExpenseEntity() : RealmObject {
         ).first()
     }
 
-    fun markAllOccurrencesAsChecked(beforeDate: LocalDate) {
-        val cal = getCalBlocking()
-        val expenses = cal.getExpenses(from = null, beforeDate, toRecurringExpenseBlocking())
+    suspend fun markAllOccurrencesAsChecked(beforeDate: LocalDate) {
+        val cal = getCal()
+        val expenses = cal.getExpenses(from = null, beforeDate, toRecurringExpense())
         for (expense in expenses) {
             if (expense.date == beforeDate) {
                 continue
@@ -292,17 +305,17 @@ class RecurringExpenseEntity() : RealmObject {
             )
         }
 
-        iCalRepresentation = cal.write()
+        iCalRepresentation = withContext(Dispatchers.Default) {
+            cal.write()
+        }
     }
 
-    private fun getCalBlocking(): ICalendar = Biweekly.parse(iCalRepresentation)
-        .first()
-        .apply {
-            setProductId(null as String?)
-        }
-
     private suspend fun getCal(): ICalendar = withContext(Dispatchers.Default) {
-        getCalBlocking()
+        Biweekly.parse(iCalRepresentation)
+            .first()
+            .apply {
+                setProductId(null as String?)
+            }
     }
 
     private data class EventInRange(
@@ -311,7 +324,7 @@ class RecurringExpenseEntity() : RealmObject {
         val originalDate: Date,
     )
 
-    private fun ICalendar.getExpenses(from: LocalDate?, to: LocalDate, recurringExpense: RecurringExpense): List<Expense> {
+    private suspend fun ICalendar.getExpenses(from: LocalDate?, to: LocalDate, recurringExpense: RecurringExpense): List<Expense> = withContext(Dispatchers.Default) {
         val startDate = from?.toStartOfDayDate()
         val endDate = to.toStartOfDayDate()
 
@@ -357,7 +370,7 @@ class RecurringExpenseEntity() : RealmObject {
                 }
             }
 
-        return eventsInRange
+        return@withContext eventsInRange
             .map { (event, date, originalDate) ->
                 Expense(
                     id = event.uid.value.hashCode() + date.time,
@@ -379,8 +392,26 @@ class RecurringExpenseEntity() : RealmObject {
 
     private val VEvent.isException get() = recurrenceId != null
 
+    fun persistOrThrow(transaction: PowerSyncTransaction) {
+        transaction.execute(
+            "UPDATE $RECURRING_EXPENSE_TABLE_NAME SET i_cal_representation = ? WHERE id = ?",
+            listOf(iCalRepresentation, id)
+        )
+    }
+
     companion object {
-        fun newFromRecurringExpense(recurringExpense: RecurringExpense, account: Account): RecurringExpenseEntity {
+        fun fromCursorOrThrow(cursor: SqlCursor) = RecurringExpenseEntity(
+            id = cursor.getLong(RECURRING_EXPENSE_ID_COLUMN_INDEX)!!,
+            accountId = cursor.getString(RECURRING_EXPENSE_ACCOUNT_ID_COLUMN_INDEX)!!,
+            iCalRepresentation = cursor.getString(RECURRING_EXPENSE_I_CAL_REPRESENTATION_COLUMN_INDEX)!!,
+        )
+
+        fun createFromRecurringExpenseOrThrow(
+            recurringExpenseId: Long,
+            recurringExpense: RecurringExpense,
+            account: Account,
+            transaction: PowerSyncTransaction
+        ): RecurringExpenseEntity {
             val cal = ICalendar().apply { setProductId(null as String?) }
             val event = VEvent()
 
@@ -392,10 +423,14 @@ class RecurringExpenseEntity() : RealmObject {
             event.recurrenceRule = RecurrenceRule(recurringExpense.type.toRecurrence())
             cal.addEvent(event)
 
+            transaction.execute("INSERT INTO $RECURRING_EXPENSE_TABLE_NAME (id, account_id, i_cal_representation) VALUES (?, ?, ?)",
+                listOf(recurringExpenseId, account.id, cal.write())
+            )
+
             return RecurringExpenseEntity(
-                id = recurringExpense.id,
-                representation = cal.write(),
-                account = account,
+                id = recurringExpenseId,
+                accountId = account.id,
+                iCalRepresentation = cal.write(),
             )
         }
     }

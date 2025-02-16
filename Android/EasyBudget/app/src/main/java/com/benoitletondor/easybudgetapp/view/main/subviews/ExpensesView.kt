@@ -79,6 +79,7 @@ fun ColumnScope.ExpensesView(
     onExpenseCheckedChange: (Expense, Boolean) -> Unit,
     onExpensePressed: (Expense) -> Unit,
     onExpenseLongPressed: (Expense) -> Unit,
+    onRetryButtonClicked: () -> Unit,
 ) {
     val dataForDay by dayDataFlow.collectAsState()
     val userCurrency by userCurrencyFlow.collectAsState()
@@ -104,6 +105,12 @@ fun ColumnScope.ExpensesView(
         }
         MainViewModel.SelectedDateExpensesData.NoDataAvailable -> {
             LoadingView()
+        }
+        is MainViewModel.SelectedDateExpensesData.ErrorLoadingData -> {
+            DBLoadingErrorView(
+                error = dayData.error,
+                onRetryButtonClicked = onRetryButtonClicked,
+            )
         }
     }
 }

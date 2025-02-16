@@ -196,7 +196,7 @@ fun MainView(
         navigateToAddExpense = navigateToAddExpense,
         navigateToAddRecurringExpense = navigateToAddRecurringExpense,
         onMonthlyReportHintDismissed = viewModel::onMonthlyReportHintDismissed,
-        onUpdateAppClicked = viewModel::onUpdateAppClicked,
+        onRetrySelectedDateDataLoadingButtonPressed = viewModel::onRetrySelectedDateDataLoadingButtonPressed,
     )
 }
 
@@ -272,7 +272,7 @@ private fun MainView(
     navigateToAddExpense: (LocalDate, Expense?) -> Unit,
     navigateToAddRecurringExpense: (LocalDate, Expense?) -> Unit,
     onMonthlyReportHintDismissed: () -> Unit,
-    onUpdateAppClicked: () -> Unit,
+    onRetrySelectedDateDataLoadingButtonPressed: () -> Unit,
 ) {
     var showAccountSelectorModal by rememberSaveable { mutableStateOf(false) }
     val accountSelectorModalSheetState = rememberModalBottomSheetState()
@@ -484,7 +484,6 @@ private fun MainView(
                             coroutineScope.launch {
                                 snackbarHostState.showSnackbar(
                                     message = context.getString(R.string.recurring_expense_restored_success_message),
-                                    actionLabel = context.getString(R.string.undo),
                                     duration = SnackbarDuration.Short,
                                 )
                             }
@@ -600,34 +599,6 @@ private fun MainView(
                 }
                 MainViewModel.Event.StartOnboarding -> navigateToOnboarding()
                 MainViewModel.Event.CloseApp -> closeApp()
-                MainViewModel.Event.ShowUpdateAfterPgMigration -> {
-                    MaterialAlertDialogBuilder(context)
-                        .setTitle(R.string.account_migrated_to_pg_error_title)
-                        .setMessage(R.string.account_migrated_to_pg_error_message)
-                        .setPositiveButton(R.string.account_migrated_to_pg_error_update_cta) { dialog, _ ->
-                            dialog.dismiss()
-                            onUpdateAppClicked()
-                        }
-                        .setNegativeButton(R.string.cancel) { dialog1, _ ->
-                            dialog1.dismiss()
-                        }
-                        .show()
-                }
-
-                MainViewModel.Event.OpenPlayStore -> {
-                    val activity = context as Activity
-                    val appPackageName = activity.packageName
-
-                    try {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$appPackageName"))
-
-                        activity.startActivity(intent)
-                    } catch (e: ActivityNotFoundException) {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName"))
-
-                        activity.startActivity(intent)
-                    }
-                }
             }
         }
     }
@@ -754,6 +725,7 @@ private fun MainView(
                     onExpenseCheckedChange = onExpenseCheckedChange,
                     onExpensePressed = onExpensePressed,
                     onExpenseLongPressed = onExpenseLongPressed,
+                    onRetrySelectedDateDataLoadingButtonPressed = onRetrySelectedDateDataLoadingButtonPressed,
                 )
 
                 val showMonthlyReportHint by showMonthlyReportHintFlow.collectAsState()
@@ -868,15 +840,56 @@ private fun DBLoadingPreview() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 private fun DBErrorLoadingPreview() {
     Preview(
+        dbState = MainViewModel.DBState.Loaded(AppModule.provideDB(LocalContext.current)),
+        dayData = MainViewModel.SelectedDateExpensesData.ErrorLoadingData(RuntimeException("Error")),
+    )
+}
+
+@Composable
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
+private fun DayDataErrorLoadingPreview() {
+    Preview(
         dbState = MainViewModel.DBState.Error(RuntimeException("Error")),
     )
 }
+
 
 @Composable
 private fun Preview(
     dbState: MainViewModel.DBState,
     alertMessage: String? = null,
     shouldDisplayAccountsWarning: Boolean = false,
+    dayData: MainViewModel.SelectedDateExpensesData = MainViewModel.SelectedDateExpensesData.DataAvailable(
+        date = LocalDate.now(),
+        balance = 100.0,
+        checkedBalance = 20.0,
+        expenses = listOf(
+            Expense(
+                id = 1L,
+                date = LocalDate.now(),
+                title = "Test",
+                amount = 10.0,
+                checked = false,
+            ),
+            Expense(
+                id = 2L,
+                date = LocalDate.now(),
+                title = "Test 2",
+                amount = -10.0,
+                checked = true,
+                associatedRecurringExpense = AssociatedRecurringExpense(
+                    recurringExpense = RecurringExpense(
+                        title = "Test",
+                        originalAmount = -10.0,
+                        recurringDate = LocalDate.now(),
+                        type = RecurringExpenseType.WEEKLY,
+                    ),
+                    originalDate = LocalDate.now(),
+                )
+            )
+        ),
+    ),
 ) {
     AppTheme {
         MainView(
@@ -930,36 +943,7 @@ private fun Preview(
             userCurrencyFlow = MutableStateFlow(Currency.getInstance("USD")),
             recurringExpenseDeletionProgressFlow = MutableStateFlow(MainViewModel.RecurringExpenseDeleteProgressState.Idle),
             recurringExpenseRestoreProgressFlow = MutableStateFlow(MainViewModel.RecurringExpenseRestoreProgressState.Idle),
-            dayDataFlow = MutableStateFlow(MainViewModel.SelectedDateExpensesData.DataAvailable(
-                date = LocalDate.now(),
-                balance = 100.0,
-                checkedBalance = 20.0,
-                expenses = listOf(
-                    Expense(
-                        id = 1L,
-                        date = LocalDate.now(),
-                        title = "Test",
-                        amount = 10.0,
-                        checked = false,
-                    ),
-                    Expense(
-                        id = 2L,
-                        date = LocalDate.now(),
-                        title = "Test 2",
-                        amount = -10.0,
-                        checked = true,
-                        associatedRecurringExpense = AssociatedRecurringExpense(
-                            recurringExpense = RecurringExpense(
-                                title = "Test",
-                                originalAmount = -10.0,
-                                recurringDate = LocalDate.now(),
-                                type = RecurringExpenseType.WEEKLY,
-                            ),
-                            originalDate = LocalDate.now(),
-                        )
-                    )
-                ),
-            )),
+            dayDataFlow = MutableStateFlow(dayData),
             showExpensesCheckBoxFlow = MutableStateFlow(true),
             onboardingResultFlow = MutableSharedFlow(),
             shouldDisplayAccountsWarningFlow = MutableStateFlow(shouldDisplayAccountsWarning),
@@ -1004,7 +988,7 @@ private fun Preview(
             navigateToAddExpense = { _, _ -> },
             navigateToAddRecurringExpense = { _, _ -> },
             onMonthlyReportHintDismissed = {},
-            onUpdateAppClicked = {},
+            onRetrySelectedDateDataLoadingButtonPressed = {},
         )
     }
 }

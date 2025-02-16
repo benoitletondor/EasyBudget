@@ -20,7 +20,6 @@ plugins {
     id("dagger.hilt.android.plugin")
     id("com.google.devtools.ksp")
     id("com.google.gms.google-services")
-    id("io.realm.kotlin")
     id("kotlin-parcelize")
     id("org.jetbrains.kotlin.plugin.compose")
     id("org.jetbrains.kotlin.plugin.serialization")
@@ -30,6 +29,7 @@ apply {
     from("batch.gradle.kts")
     from("iap.gradle.kts")
     from("atlas.gradle.kts")
+    from("pg.gradle.kts")
 }
 
 android {
@@ -38,10 +38,10 @@ android {
     defaultConfig {
         applicationId = "com.benoitletondor.easybudgetapp"
         compileSdk = 35
-        minSdk = 23
+        minSdk = 24
         targetSdk = 35
-        versionCode = 166
-        versionName = "3.4.3"
+        versionCode = 170
+        versionName = "3.5.0"
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -50,6 +50,9 @@ android {
             val batchDevKey = rootProject.extra["batchDevKey"] as String
             val licenceKey = rootProject.extra["licenceKey"] as String
             val atlasAppId = rootProject.extra["devAtlasAppId"] as String
+            val powerSyncEndpoint = rootProject.extra["powerSyncEndpointDev"] as String
+            val supabaseUrl = rootProject.extra["supabaseUrlDev"] as String
+            val supabaseAnonKey = rootProject.extra["supabaseAnonKeyDev"] as String
 
             buildConfigField("boolean", "DEBUG_LOG", "true")
             buildConfigField("boolean", "CRASHLYTICS_ACTIVATED", "false")
@@ -58,6 +61,9 @@ android {
             buildConfigField("boolean", "DEV_PREFERENCES", "true")
             buildConfigField("String", "LICENCE_KEY", "\"$licenceKey\"")
             buildConfigField("String", "ATLAS_APP_ID", "\"$atlasAppId\"")
+            buildConfigField("String", "POWER_SYNC_ENDPOINT", "\"$powerSyncEndpoint\"")
+            buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
+            buildConfigField("String", "SUPABASE_ANON_KEY", "\"$supabaseAnonKey\"")
 
             signingConfig = signingConfigs.getByName("debug")
         }
@@ -65,6 +71,9 @@ android {
             val batchLiveKey = rootProject.extra["batchLiveKey"] as String
             val licenceKey = rootProject.extra["licenceKey"] as String
             val atlasAppId = rootProject.extra["atlasAppId"] as String
+            val powerSyncEndpoint = rootProject.extra["powerSyncEndpoint"] as String
+            val supabaseUrl = rootProject.extra["supabaseUrl"] as String
+            val supabaseAnonKey = rootProject.extra["supabaseAnonKey"] as String
 
             buildConfigField("boolean", "DEBUG_LOG", "false")
             buildConfigField("boolean", "CRASHLYTICS_ACTIVATED", "true")
@@ -73,6 +82,9 @@ android {
             buildConfigField("boolean", "DEV_PREFERENCES", "false")
             buildConfigField("String", "LICENCE_KEY", "\"$licenceKey\"")
             buildConfigField("String", "ATLAS_APP_ID", "\"$atlasAppId\"")
+            buildConfigField("String", "POWER_SYNC_ENDPOINT", "\"$powerSyncEndpoint\"")
+            buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
+            buildConfigField("String", "SUPABASE_ANON_KEY", "\"$supabaseAnonKey\"")
 
             isMinifyEnabled = true
             isShrinkResources = true
@@ -112,13 +124,13 @@ dependencies {
     val realmVersion: String by rootProject.extra
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.core:core-ktx:1.15.0")
-    implementation("androidx.activity:activity-ktx:1.9.3")
+    implementation("androidx.activity:activity-ktx:1.10.0")
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
@@ -129,25 +141,25 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1")
 
-    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
-    implementation("com.google.firebase:firebase-messaging-ktx")
+    implementation(platform("com.google.firebase:firebase-bom:33.8.0"))
+    implementation("com.google.firebase:firebase-messaging")
     implementation("com.google.firebase:firebase-storage")
     implementation("com.google.firebase:firebase-crashlytics")
-    implementation("com.google.firebase:firebase-analytics-ktx")
-    implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-config")
     implementation("com.firebaseui:firebase-ui-auth:8.0.2")
 
-    val composeBom = platform("androidx.compose:compose-bom:2024.12.01")
+    val composeBom = platform("androidx.compose:compose-bom:2025.01.01")
     implementation(composeBom)
     androidTestImplementation(composeBom)
     debugImplementation("androidx.compose.ui:ui-tooling")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.ui:ui")
-    implementation("androidx.activity:activity-compose:1.9.3")
+    implementation("androidx.activity:activity-compose:1.10.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
-    implementation("androidx.navigation:navigation-compose:2.8.5")
+    implementation("androidx.navigation:navigation-compose:2.8.6")
 
     implementation("com.google.accompanist:accompanist-themeadapter-material3:0.36.0")
     implementation("com.google.accompanist:accompanist-permissions:0.37.0")
@@ -166,7 +178,9 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
 
-    implementation("io.realm.kotlin:library-sync:$realmVersion")
+    // Be careful to check the code of SupabaseConnector when upgrading, especially around the ignoreNextInvalidate part
+    implementation("com.powersync:core-android:1.0.0-BETA18")
+    implementation("io.github.jan-tennert.supabase:postgrest-kt:3.0.1") // Make sure to update this when updating powersync
 
     implementation("com.kizitonwose.calendar:compose:2.6.1")
     implementation("net.sf.biweekly:biweekly:0.6.8")

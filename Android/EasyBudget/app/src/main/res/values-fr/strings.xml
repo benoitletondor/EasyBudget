@@ -483,8 +483,4 @@
     <string name="update_three_dot_two_notification_cta">Découvrir</string>
     <string name="settings_error_loading_title">Impossible de charger les paramètres</string>
     <string name="settings_error_loading_description">Une erreur est survenue lors du chargement des paramètres. Veuillez réessayer.\n(%s)</string>
-
-    <string name="account_migrated_to_pg_error_title">Mise à jour requise</string>
-    <string name="account_migrated_to_pg_error_message">Ce compte a été utilisé par une version plus récente de l\'app et vous devez mettre à jour EasyBudget pour y accéder.\n\nVoulez-vous ouvrir le PlayStore pour mettre à jour l\'app ?\n\n(Si aucune mise à jour n\'est proposée, réessayez dans quelques heures)</string>
-    <string name="account_migrated_to_pg_error_update_cta">Mettre à jour l\'app</string>
 </resources>
