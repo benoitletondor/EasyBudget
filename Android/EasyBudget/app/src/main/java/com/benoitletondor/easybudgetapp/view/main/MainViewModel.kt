@@ -306,37 +306,45 @@ class MainViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.Eagerly, DBState.NotLoaded)
 
     val selectedDateDataFlow = combine(
-        dbAvailableFlow.filterIsInstance<DBState.Loaded>(),
+        dbAvailableFlow,
         selectedDateMutableStateFlow,
         includeCheckedBalanceFlow,
         forceRefreshMutableFlow
             .onStart {
                 emit(Unit)
             },
-    ) { _, date, includeCheckedBalance, _ ->
-        val (balance, expenses, checkedBalance) = withContext(Dispatchers.Default) {
-            Triple(
-                getBalanceForDay(date),
-                awaitDB().getExpensesForDay(date),
-                if (includeCheckedBalance) {
-                    getCheckedBalanceForDay(date)
-                } else {
-                    null
-                },
-            )
-        }
+    ) { dbState, date, includeCheckedBalance, _ ->
+        when(dbState) {
+            is DBState.Loaded -> {
+                val (balance, expenses, checkedBalance) = withContext(Dispatchers.Default) {
+                    Triple(
+                        dbState.db.computeBalanceForDay(date),
+                        dbState.db.getExpensesForDay(date),
+                        if (includeCheckedBalance) {
+                            dbState.db.computeCheckedBalanceForDay(date)
+                        } else {
+                            null
+                        },
+                    )
+                }
 
-        SelectedDateExpensesData.DataAvailable(date, balance, checkedBalance, expenses) as SelectedDateExpensesData
+                SelectedDateExpensesData.DataAvailable(date, balance, checkedBalance, expenses)
+            }
+            DBState.Loading,
+            DBState.NotLoaded -> SelectedDateExpensesData.LoadingData
+            is DBState.Error -> SelectedDateExpensesData.ErrorLoadingData(dbState.error)
+        }
     }
         .retryWhen { e, _ ->
             Logger.error("Error while getting selected date data", e)
             emit(SelectedDateExpensesData.ErrorLoadingData(e))
 
             retryLoadingSelectedDateDataEventMutableFlow.first()
+            emit(SelectedDateExpensesData.LoadingData)
 
             true
         }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, SelectedDateExpensesData.NoDataAvailable)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, SelectedDateExpensesData.LoadingData)
 
     fun onRetrySelectedDateDataLoadingButtonPressed() {
         viewModelScope.launch {
@@ -770,6 +778,7 @@ class MainViewModel @Inject constructor(
         val currentDB = dbProvider.activeDB
         val dbState = dbAvailableFlow.value as? DBState.Loaded
         if (currentDB != null && dbState != null && dbState.db == currentDB) {
+            Logger.debug("Clearing active DB in MainViewModel onCleared")
             dbProvider.activeDB = null
         }
 
@@ -784,16 +793,16 @@ class MainViewModel @Inject constructor(
         super.onCleared()
     }
 
-    private suspend fun getBalanceForDay(date: LocalDate): Double {
+    private suspend fun DB.computeBalanceForDay(date: LocalDate): Double {
         var balance = 0.0 // Just to keep a positive number if balance == 0
-        balance -= awaitDB().getBalanceForDay(date)
+        balance -= getBalanceForDay(date)
 
         return balance
     }
 
-    private suspend fun getCheckedBalanceForDay(date: LocalDate): Double {
+    private suspend fun DB.computeCheckedBalanceForDay(date: LocalDate): Double {
         var balance = 0.0 // Just to keep a positive number if balance == 0
-        balance -= awaitDB().getCheckedBalanceForDay(date)
+        balance -= getCheckedBalanceForDay(date)
 
         return balance
     }
@@ -877,7 +886,7 @@ class MainViewModel @Inject constructor(
 
 
     sealed class SelectedDateExpensesData {
-        data object NoDataAvailable : SelectedDateExpensesData()
+        data object LoadingData : SelectedDateExpensesData()
         data class ErrorLoadingData(val error: Throwable) : SelectedDateExpensesData()
         @Immutable
         data class DataAvailable(val date: LocalDate, val balance: Double, val checkedBalance: Double?, val expenses: List<Expense>) : SelectedDateExpensesData()

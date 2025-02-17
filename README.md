@@ -28,6 +28,7 @@ You can contact me regarding EasyBudget using this email: [easybudget@benoitleto
 
 ### Contributors
 
+- [Jeremy Noble](https://www.linkedin.com/in/j%C3%A9r%C3%A9my-noble-9b86494a/): PlayStore assets
 - [Christine Hauser](https://fr.linkedin.com/in/christine-hauser-23627578): wording & german translations
 - [Eleonora Acerra](https://fr.linkedin.com/in/eleonora-acerra-7aa14a77/fr): italian translations
 - [Baptiste Guerre](https://fr.linkedin.com/in/baptiste-guerre-65547484): spanish translations
