@@ -103,7 +103,7 @@ fun ColumnScope.ExpensesView(
                 onExpenseLongPressed = onExpenseLongPressed,
             )
         }
-        MainViewModel.SelectedDateExpensesData.NoDataAvailable -> {
+        MainViewModel.SelectedDateExpensesData.LoadingData -> {
             LoadingView()
         }
         is MainViewModel.SelectedDateExpensesData.ErrorLoadingData -> {

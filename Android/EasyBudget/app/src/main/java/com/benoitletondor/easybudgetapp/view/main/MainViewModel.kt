@@ -306,7 +306,7 @@ class MainViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.Eagerly, DBState.NotLoaded)
 
     val selectedDateDataFlow = combine(
-        dbAvailableFlow.filterIsInstance<DBState.Loaded>(),
+        dbAvailableFlow,
         selectedDateMutableStateFlow,
         includeCheckedBalanceFlow,
         forceRefreshMutableFlow
@@ -314,30 +314,37 @@ class MainViewModel @Inject constructor(
                 emit(Unit)
             },
     ) { dbState, date, includeCheckedBalance, _ ->
-        val (balance, expenses, checkedBalance) = withContext(Dispatchers.Default) {
-            Triple(
-                dbState.db.computeBalanceForDay(date),
-                dbState.db.getExpensesForDay(date),
-                if (includeCheckedBalance) {
-                    dbState.db.computeCheckedBalanceForDay(date)
-                } else {
-                    null
-                },
-            )
-        }
+        when(dbState) {
+            is DBState.Loaded -> {
+                val (balance, expenses, checkedBalance) = withContext(Dispatchers.Default) {
+                    Triple(
+                        dbState.db.computeBalanceForDay(date),
+                        dbState.db.getExpensesForDay(date),
+                        if (includeCheckedBalance) {
+                            dbState.db.computeCheckedBalanceForDay(date)
+                        } else {
+                            null
+                        },
+                    )
+                }
 
-        SelectedDateExpensesData.DataAvailable(date, balance, checkedBalance, expenses) as SelectedDateExpensesData
+                SelectedDateExpensesData.DataAvailable(date, balance, checkedBalance, expenses)
+            }
+            DBState.Loading,
+            DBState.NotLoaded -> SelectedDateExpensesData.LoadingData
+            is DBState.Error -> SelectedDateExpensesData.ErrorLoadingData(dbState.error)
+        }
     }
         .retryWhen { e, _ ->
             Logger.error("Error while getting selected date data", e)
             emit(SelectedDateExpensesData.ErrorLoadingData(e))
 
             retryLoadingSelectedDateDataEventMutableFlow.first()
-            emit(SelectedDateExpensesData.NoDataAvailable)
+            emit(SelectedDateExpensesData.LoadingData)
 
             true
         }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, SelectedDateExpensesData.NoDataAvailable)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, SelectedDateExpensesData.LoadingData)
 
     fun onRetrySelectedDateDataLoadingButtonPressed() {
         viewModelScope.launch {
@@ -879,7 +886,7 @@ class MainViewModel @Inject constructor(
 
 
     sealed class SelectedDateExpensesData {
-        data object NoDataAvailable : SelectedDateExpensesData()
+        data object LoadingData : SelectedDateExpensesData()
         data class ErrorLoadingData(val error: Throwable) : SelectedDateExpensesData()
         @Immutable
         data class DataAvailable(val date: LocalDate, val balance: Double, val checkedBalance: Double?, val expenses: List<Expense>) : SelectedDateExpensesData()
