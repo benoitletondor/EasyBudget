@@ -313,13 +313,13 @@ class MainViewModel @Inject constructor(
             .onStart {
                 emit(Unit)
             },
-    ) { _, date, includeCheckedBalance, _ ->
+    ) { dbState, date, includeCheckedBalance, _ ->
         val (balance, expenses, checkedBalance) = withContext(Dispatchers.Default) {
             Triple(
-                getBalanceForDay(date),
-                awaitDB().getExpensesForDay(date),
+                dbState.db.computeBalanceForDay(date),
+                dbState.db.getExpensesForDay(date),
                 if (includeCheckedBalance) {
-                    getCheckedBalanceForDay(date)
+                    dbState.db.computeCheckedBalanceForDay(date)
                 } else {
                     null
                 },
@@ -771,6 +771,7 @@ class MainViewModel @Inject constructor(
         val currentDB = dbProvider.activeDB
         val dbState = dbAvailableFlow.value as? DBState.Loaded
         if (currentDB != null && dbState != null && dbState.db == currentDB) {
+            Logger.debug("Clearing active DB in MainViewModel onCleared")
             dbProvider.activeDB = null
         }
 
@@ -785,16 +786,16 @@ class MainViewModel @Inject constructor(
         super.onCleared()
     }
 
-    private suspend fun getBalanceForDay(date: LocalDate): Double {
+    private suspend fun DB.computeBalanceForDay(date: LocalDate): Double {
         var balance = 0.0 // Just to keep a positive number if balance == 0
-        balance -= awaitDB().getBalanceForDay(date)
+        balance -= getBalanceForDay(date)
 
         return balance
     }
 
-    private suspend fun getCheckedBalanceForDay(date: LocalDate): Double {
+    private suspend fun DB.computeCheckedBalanceForDay(date: LocalDate): Double {
         var balance = 0.0 // Just to keep a positive number if balance == 0
-        balance -= awaitDB().getCheckedBalanceForDay(date)
+        balance -= getCheckedBalanceForDay(date)
 
         return balance
     }
