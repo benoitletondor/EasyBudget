@@ -19,7 +19,6 @@ package com.benoitletondor.easybudgetapp.view.expenseedit
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
@@ -49,7 +48,7 @@ import kotlin.math.abs
 @HiltViewModel(assistedFactory = ExpenseEditViewModelFactory::class)
 class ExpenseEditViewModel @AssistedInject constructor(
     private val parameters: Parameters,
-    currentDBProvider: CurrentDBProvider,
+    private val currentDBProvider: CurrentDBProvider,
     @Assisted private val editedExpense: Expense?,
     @Assisted date: LocalDate,
 ) : ViewModel() {
@@ -99,19 +98,6 @@ class ExpenseEditViewModel @AssistedInject constructor(
 
     private val eventMutableFlow = MutableLiveFlow<Event>()
     val eventFlow: Flow<Event> = eventMutableFlow
-
-    private lateinit var db: DB
-
-    init {
-        val currentDb = currentDBProvider.activeDB
-        if (currentDb == null) {
-            viewModelScope.launch {
-                eventMutableFlow.emit(Event.UnableToLoadDB)
-            }
-        } else {
-            db = currentDb
-        }
-    }
 
     fun onExpenseRevenueValueChanged(isRevenue: Boolean) {
         isRevenueMutableStateFlow.value = isRevenue
@@ -182,6 +168,11 @@ class ExpenseEditViewModel @AssistedInject constructor(
 
     private fun doSaveExpense(expense: Expense) {
         viewModelScope.launch {
+            val db = currentDBProvider.activeDB ?: run {
+                eventMutableFlow.emit(Event.UnableToLoadDB)
+                return@launch
+            }
+
             isSavingMutableStateFlow.value = true
 
             try {

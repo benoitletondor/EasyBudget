@@ -88,6 +88,7 @@ import com.benoitletondor.easybudgetapp.view.main.subviews.MonthlyReportHint
 import com.benoitletondor.easybudgetapp.view.onboarding.OnboardingResult
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.kizitonwose.calendar.core.atStartOfMonth
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -802,7 +803,7 @@ private fun MainView(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 private fun ProAccountSelectedPreview() {
     Preview(
-        dbState = MainViewModel.DBState.Loaded(AppModule.provideDB(LocalContext.current)),
+        dbState = MainViewModel.DBState.Loaded(AppModule.provideDB(LocalContext.current), Job()),
     )
 }
 
@@ -811,7 +812,7 @@ private fun ProAccountSelectedPreview() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 private fun AlertMessageDisplayed() {
     Preview(
-        dbState = MainViewModel.DBState.Loaded(AppModule.provideDB(LocalContext.current)),
+        dbState = MainViewModel.DBState.Loaded(AppModule.provideDB(LocalContext.current), Job()),
         alertMessage = "Test alert message",
     )
 }
@@ -821,7 +822,7 @@ private fun AlertMessageDisplayed() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 private fun AccountsWarningDisplayed() {
     Preview(
-        dbState = MainViewModel.DBState.Loaded(AppModule.provideDB(LocalContext.current)),
+        dbState = MainViewModel.DBState.Loaded(AppModule.provideDB(LocalContext.current), Job()),
         shouldDisplayAccountsWarning = true,
     )
 }
@@ -840,7 +841,7 @@ private fun DBLoadingPreview() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 private fun DBErrorLoadingPreview() {
     Preview(
-        dbState = MainViewModel.DBState.Loaded(AppModule.provideDB(LocalContext.current)),
+        dbState = MainViewModel.DBState.Loaded(AppModule.provideDB(LocalContext.current), Job()),
         dayData = MainViewModel.SelectedDateExpensesData.ErrorLoadingData(RuntimeException("Error")),
     )
 }

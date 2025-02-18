@@ -53,6 +53,8 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.*
@@ -385,6 +387,11 @@ class EasyBudget : Application(), Configuration.Provider {
          * Check if backup is late and trigger it if needed
          */
         checkBackupState()
+
+        /*
+         * Update isAppForegroundMutableStateFlow
+         */
+        isAppForegroundMutableStateFlow.value = true
     }
 
     /**
@@ -394,6 +401,8 @@ class EasyBudget : Application(), Configuration.Provider {
         Logger.debug("onAppBackground")
 
         offlineAccountBackupStatusWatchJob?.cancel()
+
+        isAppForegroundMutableStateFlow.value = false
     }
 
     private var offlineAccountBackupStatusWatchJob: Job? = null
@@ -482,6 +491,11 @@ class EasyBudget : Application(), Configuration.Provider {
             )
             parameters.setBackupManuallyRescheduledAt(Date())
         }
+    }
+
+    companion object {
+        private val isAppForegroundMutableStateFlow = MutableStateFlow(false)
+        val isAppForegroundStateFlow: StateFlow<Boolean> = isAppForegroundMutableStateFlow
     }
 
 }

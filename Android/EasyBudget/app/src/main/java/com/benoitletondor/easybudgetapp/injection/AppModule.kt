@@ -91,8 +91,6 @@ object AppModule {
     // - Make sure to also remove runningFold in MainViewModel
     // - Make sure to also delete config.watchProMigratedToPgAlertMessage()
 
-    private var usedOnlineDB: CachedOnlineDBImpl? = null
-
     suspend fun provideSyncedOnlineDBOrThrow(
         appContext: Context,
         currentUser: CurrentUser,
@@ -102,9 +100,7 @@ object AppModule {
         accountHasBeenMigratedToPg: Boolean,
         accounts: Accounts,
     ): OnlineDB {
-        usedOnlineDB?.close()
-
-        val db = CachedOnlineDBImpl(
+        return CachedOnlineDBImpl(
             OnlinePGDBImpl.provideFor(
                 currentUser = currentUser,
                 auth = auth,
@@ -115,8 +111,5 @@ object AppModule {
                 accountHasBeenMigratedToPg = accountHasBeenMigratedToPg,
             )
         )
-
-        usedOnlineDB = db
-        return db
     }
 }

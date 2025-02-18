@@ -22,7 +22,6 @@ import androidx.lifecycle.viewModelScope
 import com.benoitletondor.easybudgetapp.helper.Logger
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpenseType
-import com.benoitletondor.easybudgetapp.db.DB
 import com.benoitletondor.easybudgetapp.helper.MutableLiveFlow
 import com.benoitletondor.easybudgetapp.helper.combine
 import com.benoitletondor.easybudgetapp.helper.watchUserCurrency
@@ -51,7 +50,7 @@ import kotlin.math.abs
 @HiltViewModel(assistedFactory = RecurringExpenseEditViewModelFactory::class)
 class RecurringExpenseEditViewModel @AssistedInject constructor(
     private val parameters: Parameters,
-    currentDBProvider: CurrentDBProvider,
+    private val currentDBProvider: CurrentDBProvider,
     @Assisted private val editedExpense: Expense?,
     @Assisted date: LocalDate,
 ) : ViewModel() {
@@ -108,19 +107,6 @@ class RecurringExpenseEditViewModel @AssistedInject constructor(
 
     private val eventMutableFlow = MutableLiveFlow<Event>()
     val eventFlow: Flow<Event> = eventMutableFlow
-
-    private lateinit var db: DB
-
-    init {
-        val currentDb = currentDBProvider.activeDB
-        if (currentDb == null) {
-            viewModelScope.launch {
-                eventMutableFlow.emit(Event.UnableToLoadDB)
-            }
-        } else {
-            db = currentDb
-        }
-    }
 
     fun onExpenseRevenueValueChanged(isRevenue: Boolean) {
         isRevenueMutableStateFlow.value = isRevenue
@@ -203,9 +189,14 @@ class RecurringExpenseEditViewModel @AssistedInject constructor(
         expense: Expense,
         recurringExpenseType: RecurringExpenseType,
     ) {
-        isSavingMutableStateFlow.value = true
-
         viewModelScope.launch {
+            val db = currentDBProvider.activeDB ?: run {
+                eventMutableFlow.emit(Event.UnableToLoadDB)
+                return@launch
+            }
+
+            isSavingMutableStateFlow.value = true
+
             try {
                 withContext(Dispatchers.IO) {
                     if (editedExpense == null) {

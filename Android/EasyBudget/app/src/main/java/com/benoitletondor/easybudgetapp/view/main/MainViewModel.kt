@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.benoitletondor.easybudgetapp.EasyBudget
 import com.benoitletondor.easybudgetapp.accounts.Accounts
 import com.benoitletondor.easybudgetapp.accounts.model.Account
 import com.benoitletondor.easybudgetapp.accounts.model.AccountCredentials
@@ -73,6 +74,7 @@ class MainViewModel @Inject constructor(
     private val accounts: Accounts,
     private val auth: Auth,
     private val dbProvider: CurrentDBProvider,
+    private val offlineDB: DB,
     config: Config,
     @ApplicationContext appContext: Context,
 ) : ViewModel() {
@@ -253,46 +255,70 @@ class MainViewModel @Inject constructor(
         }
         .stateIn(viewModelScope, SharingStarted.Eagerly, SelectedAccount.Loading)
 
-    private var changesWatchingJob: Job? = null
-    val dbAvailableFlow: StateFlow<DBState> = accountSelectionFlow
-        .flatMapLatest { selectedAccount ->
-            changesWatchingJob?.cancel()
+    val dbAvailableFlow: StateFlow<DBState> = EasyBudget.isAppForegroundStateFlow
+        .flatMapLatest { isAppForeground ->
+            if (!isAppForeground) {
+                return@flatMapLatest flowOf(DBState.NotLoaded)
+            }
 
-            when(selectedAccount) {
-                SelectedAccount.Loading -> flowOf(DBState.NotLoaded)
-                is SelectedAccount.Selected -> flow<DBState> {
-                    emit(DBState.Loading)
-                    val db = withContext(Dispatchers.IO) {
-                        when(selectedAccount) {
-                            SelectedAccount.Selected.Offline -> AppModule.provideDB(appContext)
-                            is SelectedAccount.Selected.Online -> {
-                                val currentUser = (auth.state.value as? AuthState.Authenticated)?.currentUser ?: throw IllegalStateException("User is not authenticated")
+            return@flatMapLatest accountSelectionFlow.flatMapLatest { selectedAccount ->
+                when(selectedAccount) {
+                    SelectedAccount.Loading -> flowOf(DBState.NotLoaded)
+                    is SelectedAccount.Selected -> flow<DBState> {
+                        emit(DBState.Loading)
+                        val db = withContext(Dispatchers.IO) {
+                            when(selectedAccount) {
+                                SelectedAccount.Selected.Offline -> offlineDB
+                                is SelectedAccount.Selected.Online -> {
+                                    val currentUser = (auth.state.value as? AuthState.Authenticated)?.currentUser ?: throw IllegalStateException("User is not authenticated")
 
-                                AppModule.provideSyncedOnlineDBOrThrow(
-                                    appContext = appContext,
-                                    currentUser = currentUser,
-                                    auth = auth,
-                                    accountId = selectedAccount.accountId,
-                                    accountSecret = selectedAccount.accountSecret,
-                                    accountHasBeenMigratedToPg = selectedAccount.hasBeenMigratedToPg,
-                                    accounts = accounts,
-                                )
+                                    AppModule.provideSyncedOnlineDBOrThrow(
+                                        appContext = appContext,
+                                        currentUser = currentUser,
+                                        auth = auth,
+                                        accountId = selectedAccount.accountId,
+                                        accountSecret = selectedAccount.accountSecret,
+                                        accountHasBeenMigratedToPg = selectedAccount.hasBeenMigratedToPg,
+                                        accounts = accounts,
+                                    )
+                                }
                             }
                         }
+
+                        val watchingJob = viewModelScope.launch {
+                            db.onChangeFlow
+                                .collect {
+                                    forceRefreshMutableFlow.emit(Unit)
+                                }
+                        }
+
+                        emit(DBState.Loaded(db, watchingJob))
                     }
-
-                    changesWatchingJob = viewModelScope.launch {
-                        db.onChangeFlow
-                            .collect {
-                                forceRefreshMutableFlow.emit(Unit)
-                            }
-                    }
-
-                    dbProvider.activeDB = db
-
-                    emit(DBState.Loaded(db))
                 }
             }
+        }
+        .runningFold(DBState.NotLoaded as DBState) { previous, next ->
+            Logger.debug("Going from DBState.${previous.logName()} to DBState.${next.logName()}")
+
+            // Clean up old state
+            (previous as? DBState.Loaded)?.let { loadedState ->
+                Logger.debug("Closing old DB & watcher")
+
+                try {
+                    loadedState.close()
+                } catch (e: Exception) {
+                    Logger.warning("Error while trying to close online DB when changing DB state, continuing", e)
+                }
+            }
+
+            dbProvider.activeDB = when(next) {
+                is DBState.Loaded -> next.db
+                DBState.Loading,
+                DBState.NotLoaded,
+                is DBState.Error -> null
+            }
+
+            return@runningFold next
         }
         .retryWhen { cause, _ ->
             Logger.error("Error while loading DB", cause)
@@ -304,6 +330,13 @@ class MainViewModel @Inject constructor(
             true
         }
         .stateIn(viewModelScope, SharingStarted.Eagerly, DBState.NotLoaded)
+
+    private fun DBState.logName() = when(this) {
+        is DBState.Error -> "Error"
+        is DBState.Loaded -> "Loaded (${if (this.db is OnlineDB) { "Online" } else { "Offline" }})"
+        DBState.Loading -> "Loading"
+        DBState.NotLoaded -> "NotLoaded"
+    }
 
     val selectedDateDataFlow = combine(
         dbAvailableFlow,
@@ -776,19 +809,19 @@ class MainViewModel @Inject constructor(
 
     override fun onCleared() {
         val currentDB = dbProvider.activeDB
-        val dbState = dbAvailableFlow.value as? DBState.Loaded
-        if (currentDB != null && dbState != null && dbState.db == currentDB) {
-            Logger.debug("Clearing active DB in MainViewModel onCleared")
-            dbProvider.activeDB = null
-        }
+        val loadedDBState = dbAvailableFlow.value as? DBState.Loaded
+        if (loadedDBState != null) {
+            if (currentDB != null && loadedDBState.db == currentDB) {
+                Logger.debug("Clearing active DB in MainViewModel onCleared")
+                dbProvider.activeDB = null
+            }
 
-        try {
-            (dbState?.db as? OnlineDB)?.close()
-        } catch (e: Exception) {
-            Logger.warning("Error while trying to close online DB when clearing, continuing")
+            try {
+                loadedDBState.close()
+            } catch (e: Exception) {
+                Logger.warning("Error while trying to close online DB when clearing, continuing", e)
+            }
         }
-
-        changesWatchingJob?.cancel()
 
         super.onCleared()
     }
@@ -901,7 +934,12 @@ class MainViewModel @Inject constructor(
         data object NotLoaded : DBState()
         data object Loading : DBState()
         @Immutable
-        class Loaded(val db: DB) : DBState()
+        class Loaded(val db: DB, private val watchingJob: Job) : DBState() {
+            fun close() {
+                watchingJob.cancel()
+                (db as? OnlineDB)?.close()
+            }
+        }
         class Error(val error: Throwable) : DBState()
     }
 }
