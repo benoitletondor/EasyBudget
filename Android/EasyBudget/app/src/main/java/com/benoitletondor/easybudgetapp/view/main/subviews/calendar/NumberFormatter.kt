@@ -50,3 +50,7 @@ private class API24NumberFormatter : NumberFormatter {
 
     override fun format(amount: Double): String = formatter.format(amount)
 }
+
+class RoundedToIntNumberFormatter : NumberFormatter {
+    override fun format(amount: Double): String = amount.toInt().toString()
+}
