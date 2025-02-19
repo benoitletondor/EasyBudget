@@ -32,5 +32,5 @@
 # https://github.com/mangstadt/biweekly/issues/98
 -keep class biweekly.** { *; }
 
-# Powersync
+# https://github.com/powersync-ja/powersync-kotlin/issues/112
 -keep class com.powersync.** { *; }
