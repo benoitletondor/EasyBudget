@@ -16,7 +16,6 @@
 
 package com.benoitletondor.easybudgetapp.db.onlineimpl.pgentity
 
-import app.cash.sqldelight.db.SqlCursor
 import biweekly.Biweekly
 import biweekly.ICalendar
 import biweekly.component.VEvent
@@ -38,6 +37,7 @@ import com.benoitletondor.easybudgetapp.helper.toStartOfDayDate
 import com.benoitletondor.easybudgetapp.model.AssociatedRecurringExpense
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
+import com.powersync.db.SqlCursor
 import com.powersync.db.internal.PowerSyncTransaction
 import com.powersync.db.schema.Column
 import com.powersync.db.schema.Index

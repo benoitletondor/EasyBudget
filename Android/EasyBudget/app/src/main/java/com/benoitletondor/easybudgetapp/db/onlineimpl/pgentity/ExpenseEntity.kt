@@ -16,13 +16,13 @@
 
 package com.benoitletondor.easybudgetapp.db.onlineimpl.pgentity
 
-import app.cash.sqldelight.db.SqlCursor
 import com.benoitletondor.easybudgetapp.db.onlineimpl.Account
 import com.benoitletondor.easybudgetapp.helper.getDBValue
 import com.benoitletondor.easybudgetapp.helper.getRealValueFromDB
 import com.benoitletondor.easybudgetapp.model.AssociatedRecurringExpense
 import com.benoitletondor.easybudgetapp.model.Expense
 import com.benoitletondor.easybudgetapp.model.RecurringExpense
+import com.powersync.db.SqlCursor
 import com.powersync.db.internal.PowerSyncTransaction
 import com.powersync.db.schema.Column
 import com.powersync.db.schema.Index

@@ -179,7 +179,7 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
 
     // Be careful to check the code of SupabaseConnector when upgrading, especially around the ignoreNextInvalidate part
-    implementation("com.powersync:core-android:1.0.0-BETA18")
+    implementation("com.powersync:core-android:1.0.0-BETA24")
     implementation("io.github.jan-tennert.supabase:postgrest-kt:3.0.1") // Make sure to update this when updating powersync
 
     implementation("com.kizitonwose.calendar:compose:2.6.1")
