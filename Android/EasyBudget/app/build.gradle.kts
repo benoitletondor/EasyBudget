@@ -28,7 +28,6 @@ plugins {
 apply {
     from("batch.gradle.kts")
     from("iap.gradle.kts")
-    from("atlas.gradle.kts")
     from("pg.gradle.kts")
 }
 
@@ -49,7 +48,6 @@ android {
         debug {
             val batchDevKey = rootProject.extra["batchDevKey"] as String
             val licenceKey = rootProject.extra["licenceKey"] as String
-            val atlasAppId = rootProject.extra["devAtlasAppId"] as String
             val powerSyncEndpoint = rootProject.extra["powerSyncEndpointDev"] as String
             val supabaseUrl = rootProject.extra["supabaseUrlDev"] as String
             val supabaseAnonKey = rootProject.extra["supabaseAnonKeyDev"] as String
@@ -60,7 +58,6 @@ android {
             buildConfigField("boolean", "ANALYTICS_ACTIVATED", "false")
             buildConfigField("boolean", "DEV_PREFERENCES", "true")
             buildConfigField("String", "LICENCE_KEY", "\"$licenceKey\"")
-            buildConfigField("String", "ATLAS_APP_ID", "\"$atlasAppId\"")
             buildConfigField("String", "POWER_SYNC_ENDPOINT", "\"$powerSyncEndpoint\"")
             buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
             buildConfigField("String", "SUPABASE_ANON_KEY", "\"$supabaseAnonKey\"")
@@ -70,7 +67,6 @@ android {
         release {
             val batchLiveKey = rootProject.extra["batchLiveKey"] as String
             val licenceKey = rootProject.extra["licenceKey"] as String
-            val atlasAppId = rootProject.extra["atlasAppId"] as String
             val powerSyncEndpoint = rootProject.extra["powerSyncEndpoint"] as String
             val supabaseUrl = rootProject.extra["supabaseUrl"] as String
             val supabaseAnonKey = rootProject.extra["supabaseAnonKey"] as String
@@ -81,7 +77,6 @@ android {
             buildConfigField("boolean", "ANALYTICS_ACTIVATED", "true")
             buildConfigField("boolean", "DEV_PREFERENCES", "false")
             buildConfigField("String", "LICENCE_KEY", "\"$licenceKey\"")
-            buildConfigField("String", "ATLAS_APP_ID", "\"$atlasAppId\"")
             buildConfigField("String", "POWER_SYNC_ENDPOINT", "\"$powerSyncEndpoint\"")
             buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
             buildConfigField("String", "SUPABASE_ANON_KEY", "\"$supabaseAnonKey\"")
@@ -141,7 +136,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1")
 
-    implementation(platform("com.google.firebase:firebase-bom:33.8.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
     implementation("com.google.firebase:firebase-messaging")
     implementation("com.google.firebase:firebase-storage")
     implementation("com.google.firebase:firebase-crashlytics")
@@ -150,7 +145,7 @@ dependencies {
     implementation("com.google.firebase:firebase-config")
     implementation("com.firebaseui:firebase-ui-auth:8.0.2")
 
-    val composeBom = platform("androidx.compose:compose-bom:2025.01.01")
+    val composeBom = platform("androidx.compose:compose-bom:2025.02.00")
     implementation(composeBom)
     androidTestImplementation(composeBom)
     debugImplementation("androidx.compose.ui:ui-tooling")
@@ -159,7 +154,7 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.activity:activity-compose:1.10.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
-    implementation("androidx.navigation:navigation-compose:2.8.6")
+    implementation("androidx.navigation:navigation-compose:2.8.7")
 
     implementation("com.google.accompanist:accompanist-themeadapter-material3:0.36.0")
     implementation("com.google.accompanist:accompanist-permissions:0.37.0")
@@ -182,7 +177,7 @@ dependencies {
     implementation("com.powersync:core-android:1.0.0-BETA24")
     implementation("io.github.jan-tennert.supabase:postgrest-kt:3.0.1") // Make sure to update this when updating powersync
 
-    implementation("com.kizitonwose.calendar:compose:2.6.1")
+    implementation("com.kizitonwose.calendar:compose:2.6.2")
     implementation("net.sf.biweekly:biweekly:0.6.8")
 
     implementation("net.lingala.zip4j:zip4j:2.11.5")
